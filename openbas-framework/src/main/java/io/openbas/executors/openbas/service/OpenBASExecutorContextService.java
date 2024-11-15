@@ -21,7 +21,7 @@ public class OpenBASExecutorContextService {
   }
 
   private String computeCommand(
-      @NotNull final Inject inject, Endpoint.PLATFORM_TYPE platform, Endpoint.PLATFORM_ARCH arch) {
+      @NotNull final Inject inject, Endpoint.PLATFORM_TYPE platform, PlatformArchitecture arch) {
     Injector injector =
         inject
             .getInjectorContract()
@@ -57,7 +57,7 @@ public class OpenBASExecutorContextService {
         Objects.equals(asset.getType(), "Endpoint")
             ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
             : null;
-    Endpoint.PLATFORM_ARCH arch =
+    PlatformArchitecture arch =
         Objects.equals(asset.getType(), "Endpoint")
             ? ((Endpoint) Hibernate.unproxy(asset)).getArch()
             : null;

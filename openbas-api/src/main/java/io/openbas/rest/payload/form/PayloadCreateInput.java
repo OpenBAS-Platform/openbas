@@ -3,12 +3,12 @@ package io.openbas.rest.payload.form;
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.database.model.Payload.PAYLOAD_SOURCE;
 import io.openbas.database.model.Payload.PAYLOAD_STATUS;
 import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
+import io.openbas.database.model.PlatformArchitecture;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -54,7 +54,7 @@ public class PayloadCreateInput {
   private String content;
 
   @JsonProperty("executable_arch")
-  private Endpoint.PLATFORM_ARCH executableArch;
+  private PlatformArchitecture executableArch;
 
   @JsonProperty("executable_file")
   private String executableFile;

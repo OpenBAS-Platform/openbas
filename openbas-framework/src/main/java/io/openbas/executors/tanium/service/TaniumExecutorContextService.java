@@ -1,10 +1,6 @@
 package io.openbas.executors.tanium.service;
 
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.Injector;
-import io.openbas.database.model.InjectorContract;
+import io.openbas.database.model.*;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import jakarta.validation.constraints.NotNull;
@@ -44,7 +40,7 @@ public class TaniumExecutorContextService {
         Objects.equals(asset.getType(), "Endpoint")
             ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
             : null;
-    Endpoint.PLATFORM_ARCH arch =
+    PlatformArchitecture arch =
         Objects.equals(asset.getType(), "Endpoint")
             ? ((Endpoint) Hibernate.unproxy(asset)).getArch()
             : null;

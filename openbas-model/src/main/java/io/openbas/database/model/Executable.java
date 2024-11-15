@@ -33,7 +33,7 @@ public class Executable extends Payload {
   @JsonProperty("executable_arch")
   @Enumerated(EnumType.STRING)
   @NotNull
-  private Endpoint.PLATFORM_ARCH executableArch;
+  private PlatformArchitecture executableArch;
 
   public Executable() {}
 

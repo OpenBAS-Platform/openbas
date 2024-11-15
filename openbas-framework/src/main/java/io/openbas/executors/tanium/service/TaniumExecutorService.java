@@ -4,10 +4,7 @@ import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 
 import io.openbas.asset.EndpointService;
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Executor;
-import io.openbas.database.model.Injector;
+import io.openbas.database.model.*;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.model.NodeEndpoint;
@@ -55,11 +52,11 @@ public class TaniumExecutorService implements Runnable {
     };
   }
 
-  public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
+  public static PlatformArchitecture toArch(@NotBlank final String arch) {
     return switch (arch) {
-      case "x64-based PC", "x86_64" -> Endpoint.PLATFORM_ARCH.x86_64;
-      case "arm64-based PC", "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
-      default -> Endpoint.PLATFORM_ARCH.Unknown;
+      case "x64-based PC", "x86_64" -> PlatformArchitecture.x86_64;
+      case "arm64-based PC", "arm64" -> PlatformArchitecture.arm64;
+      default -> PlatformArchitecture.Unknown;
     };
   }
 

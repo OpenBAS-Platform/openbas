@@ -152,7 +152,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   private static PayloadCreateInput validateExecutableCreateInput(PayloadCreateInput input) {
-    Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
+    Optional<PlatformArchitecture> maybeArch = Optional.ofNullable(input.getExecutableArch());
     if (maybeArch.isPresent()) {
       return input;
     } else {
@@ -161,7 +161,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   private static PayloadUpdateInput validateExecutableUpdateInput(PayloadUpdateInput input) {
-    Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
+    Optional<PlatformArchitecture> maybeArch = Optional.ofNullable(input.getExecutableArch());
     if (maybeArch.isPresent()) {
       return input;
     } else {

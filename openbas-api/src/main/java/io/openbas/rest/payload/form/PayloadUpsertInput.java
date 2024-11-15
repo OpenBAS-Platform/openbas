@@ -3,10 +3,7 @@ package io.openbas.rest.payload.form;
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
-import io.openbas.database.model.PayloadArgument;
-import io.openbas.database.model.PayloadPrerequisite;
+import io.openbas.database.model.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +40,9 @@ public class PayloadUpsertInput {
 
   @JsonProperty("payload_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms;
+
+  @JsonProperty("executable_arch")
+  private PlatformArchitecture executableArch;
 
   @JsonProperty("payload_description")
   private String description;

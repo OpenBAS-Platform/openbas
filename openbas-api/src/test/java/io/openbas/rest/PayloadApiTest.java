@@ -12,6 +12,8 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Payload;
+import io.openbas.database.model.PlatformArchitecture;
+import io.openbas.database.model.Payload;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
@@ -109,7 +111,7 @@ public class PayloadApiTest extends IntegrationTest {
     PayloadUpdateInput updateInput = new PayloadUpdateInput();
     updateInput.setName("My Updated Executable Payload");
     updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    updateInput.setExecutableArch(Endpoint.PLATFORM_ARCH.arm64);
+    updateInput.setExecutableArch(PlatformArchitecture.arm64);
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
@@ -270,7 +272,7 @@ public class PayloadApiTest extends IntegrationTest {
     updateInput.setName("updated command line payload");
     updateInput.setContent("echo world again");
     updateInput.setExecutor("sh");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.Linux});
 
     updateInput.setCleanupCommand("cleanup this mess");
 

@@ -1,9 +1,9 @@
 package io.openbas.rest;
 
-import static io.openbas.database.model.Endpoint.PLATFORM_ARCH.arm64;
 import static io.openbas.database.model.Endpoint.PLATFORM_TYPE.Linux;
 import static io.openbas.database.model.Filters.FilterOperator.contains;
 import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.MANUAL;
+import static io.openbas.database.model.PlatformArchitecture.arm64;
 import static io.openbas.rest.payload.PayloadApi.PAYLOAD_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.PayloadFixture.*;

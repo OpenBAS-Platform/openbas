@@ -187,7 +187,7 @@ const PayloadForm: FunctionComponent<Props> = ({
         )}
       />
 
-      {type === 'Executable' && (
+
         <Controller
           control={control}
           name="executable_arch"
@@ -209,7 +209,6 @@ const PayloadForm: FunctionComponent<Props> = ({
             </TextField>
           )}
         />
-      )}
 
       <TextField
         name="payload_description"

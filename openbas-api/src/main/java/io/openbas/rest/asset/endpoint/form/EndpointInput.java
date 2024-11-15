@@ -4,6 +4,7 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.rest.asset.form.AssetInput;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -32,7 +33,7 @@ public class EndpointInput extends AssetInput {
 
   @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("endpoint_arch")
-  private Endpoint.PLATFORM_ARCH arch;
+  private PlatformArchitecture arch;
 
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;

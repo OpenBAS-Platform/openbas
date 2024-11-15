@@ -2,6 +2,7 @@ package io.openbas.injectors.openbas;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.integrations.InjectorService;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class OpenBASInjector {
     String withProxyVar = "with_proxy=\"" + openBASConfig.isWithProxy() + "\"";
     Map<String, String> executorCommands = new HashMap<>();
     executorCommands.put(
-        Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
+        Endpoint.PLATFORM_TYPE.Windows.name() + "." + PlatformArchitecture.x86_64,
         "$x=\"#{location}\";$location=$x.Replace(\"\\obas-agent-caldera.exe\", \"\");[Environment]::CurrentDirectory = $location;$filename=\"obas-implant-#{inject}.exe\";$"
             + tokenVar
             + ";$"
@@ -58,7 +59,7 @@ public class OpenBASInjector {
             + dlVar(openBASConfig, "windows", "x86_64")
             + ";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);[io.file]::WriteAllBytes($filename,$data) | Out-Null;Remove-NetFirewallRule -DisplayName \"Allow OpenBAS Inbound\";New-NetFirewallRule -DisplayName \"Allow OpenBAS Inbound\" -Direction Inbound -Program \"$location\\$filename\" -Action Allow | Out-Null;Remove-NetFirewallRule -DisplayName \"Allow OpenBAS Outbound\";New-NetFirewallRule -DisplayName \"Allow OpenBAS Outbound\" -Direction Outbound -Program \"$location\\$filename\" -Action Allow | Out-Null;Start-Process -FilePath \"$location\\$filename\" -ArgumentList \"--uri $server --token $token --unsecured-certificate $unsecured_certificate --with-proxy $with_proxy --inject-id #{inject}\" -WindowStyle hidden;");
     executorCommands.put(
-        Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
+        Endpoint.PLATFORM_TYPE.Linux.name() + "." + PlatformArchitecture.x86_64,
         "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-#{inject};"
             + serverVar
             + ";"
@@ -71,7 +72,7 @@ public class OpenBASInjector {
             + dlUri(openBASConfig, "linux", "x86_64")
             + " > $location/$filename;chmod +x $location/$filename;$location/$filename --uri $server --token $token --unsecured-certificate $unsecured_certificate --with-proxy $with_proxy --inject-id #{inject} &");
     executorCommands.put(
-        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
+        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + PlatformArchitecture.x86_64,
         "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-#{inject};"
             + serverVar
             + ";"
@@ -84,7 +85,7 @@ public class OpenBASInjector {
             + dlUri(openBASConfig, "macos", "x86_64")
             + " > $location/$filename;chmod +x $location/$filename;$location/$filename --uri $server --token $token --unsecured-certificate $unsecured_certificate --with-proxy $with_proxy --inject-id #{inject} &");
     executorCommands.put(
-        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64,
+        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + PlatformArchitecture.arm64,
         "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-#{inject};"
             + serverVar
             + ";"
@@ -98,16 +99,16 @@ public class OpenBASInjector {
             + " > $location/$filename;chmod +x $location/$filename;$location/$filename --uri $server --token $token --unsecured-certificate $unsecured_certificate --with-proxy $with_proxy --inject-id #{inject} &");
     Map<String, String> executorClearCommands = new HashMap<>();
     executorClearCommands.put(
-        Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
+        Endpoint.PLATFORM_TYPE.Windows.name() + "." + PlatformArchitecture.x86_64,
         "$x=\"#{location}\";$location=$x.Replace(\"\\obas-agent-caldera.exe\", \"\");[Environment]::CurrentDirectory = $location;cd \"$location\";Get-ChildItem -Recurse -Filter *implant* | Remove-Item");
     executorClearCommands.put(
-        Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
+        Endpoint.PLATFORM_TYPE.Linux.name() + "." + PlatformArchitecture.x86_64,
         "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");cd \"$location\"; rm *implant*");
     executorClearCommands.put(
-        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
+        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + PlatformArchitecture.x86_64,
         "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");cd \"$location\"; rm *implant*");
     executorClearCommands.put(
-        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64,
+        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + PlatformArchitecture.arm64,
         "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");cd \"$location\"; rm *implant*");
     try {
       injectorService.register(

@@ -21,15 +21,6 @@ public class Endpoint extends Asset {
 
   public static final String ENDPOINT_TYPE = "Endpoint";
 
-  public enum PLATFORM_ARCH {
-    @JsonProperty("x86_64")
-    x86_64,
-    @JsonProperty("arm64")
-    arm64,
-    @JsonProperty("Unknown")
-    Unknown,
-  }
-
   public enum PLATFORM_TYPE {
     @JsonProperty("Linux")
     Linux,
@@ -79,7 +70,7 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_arch")
   @Enumerated(EnumType.STRING)
   @NotNull
-  private PLATFORM_ARCH arch;
+  private PlatformArchitecture arch;
 
   @Type(StringArrayType.class)
   @Column(name = "endpoint_mac_addresses")

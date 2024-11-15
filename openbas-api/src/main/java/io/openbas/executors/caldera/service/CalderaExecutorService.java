@@ -36,11 +36,8 @@ public class CalderaExecutorService implements Runnable {
   private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
   private final CalderaExecutorClient client;
-
   private final EndpointService endpointService;
-
   private final CalderaExecutorContextService calderaExecutorContextService;
-
   private final InjectorService injectorService;
   private final PlatformSettingsService platformSettingsService;
 
@@ -55,10 +52,10 @@ public class CalderaExecutorService implements Runnable {
     };
   }
 
-  public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
+  public static PlatformArchitecture toArch(@NotBlank final String arch) {
     return switch (arch) {
-      case "amd64" -> Endpoint.PLATFORM_ARCH.x86_64;
-      case "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
+      case "amd64" -> PlatformArchitecture.x86_64;
+      case "arm64" -> PlatformArchitecture.arm64;
       default -> throw new IllegalArgumentException("This arch is not supported : " + arch);
     };
   }
