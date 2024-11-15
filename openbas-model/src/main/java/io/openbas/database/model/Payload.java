@@ -16,6 +16,7 @@ import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +34,22 @@ import org.hibernate.annotations.UuidGenerator;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "payload_type", discriminatorType = STRING)
 @EntityListeners(ModelBaseListener.class)
+@Schema(
+    discriminatorProperty = "payload_type",
+    oneOf = {
+      Command.class,
+      Executable.class,
+      FileDrop.class,
+      DnsResolution.class,
+      NetworkTraffic.class
+    },
+    discriminatorMapping = {
+      @DiscriminatorMapping(value = "Command", schema = Command.class),
+      @DiscriminatorMapping(value = "Executable", schema = Executable.class),
+      @DiscriminatorMapping(value = "File", schema = FileDrop.class),
+      @DiscriminatorMapping(value = "Dns", schema = DnsResolution.class),
+      @DiscriminatorMapping(value = "Network", schema = NetworkTraffic.class)
+    })
 public class Payload implements Base {
 
   private static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_PAYLOAD = 1;
