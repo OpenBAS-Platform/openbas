@@ -20,7 +20,7 @@ RUN mvn install -DskipTests -Pdev
 
 FROM eclipse-temurin:21.0.5_11-jre AS app
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini;
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini && rm -rf /var/lib/apt/lists/*
 COPY --from=api-builder /opt/openbas-build/openbas/openbas-api/target/openbas-api.jar ./
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
