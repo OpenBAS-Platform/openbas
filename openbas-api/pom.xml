@@ -320,6 +320,7 @@
                     <apiDocsUrl>http://localhost:8080/api-docs</apiDocsUrl>
                     <outputFileName>swagger.json</outputFileName>
                     <outputDir>.</outputDir>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>
