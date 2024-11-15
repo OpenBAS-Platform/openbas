@@ -110,12 +110,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                 >
                   {t('External ID')}
                 </Typography>
-                {injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_external_id
-                && injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_external_id.length > 0 ? (
-                      <pre>
-                        <ItemCopy content={injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_external_id} />
-                      </pre>
-                    ) : '-'}
+                {emptyFilled(injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_external_id)}
               </Grid>
             </Grid>
 
@@ -144,7 +139,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                   gutterBottom
                   style={{ marginTop: 20 }}
                 >
-                  {t('Attack commands')}
+                  {t('Attack command')}
                 </Typography>
                 <pre>
                   <ItemCopy content={
@@ -291,7 +286,9 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                                     {argument.key}
                                   </TableCell>
                                   <TableCell>
-                                    {argument.default_value}
+                                    <pre>
+                                      <ItemCopy content={argument.default_value} />
+                                    </pre>
                                   </TableCell>
                                 </TableRow>
                               </>
@@ -336,7 +333,12 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                                     {prerequisite.get_command}
                                   </TableCell>
                                   <TableCell>
-                                    {prerequisite.check_command}
+                                    {prerequisite.check_command !== undefined
+                                      ? (
+                                          <pre>
+                                            <ItemCopy content={prerequisite.check_command} />
+                                          </pre>
+                                        ) : '-'}
                                   </TableCell>
                                 </TableRow>
                               </>
@@ -360,7 +362,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
               gutterBottom
               style={{ marginTop: 20 }}
             >
-              {t('Cleanup commands')}
+              {t('Cleanup command')}
             </Typography>
             {injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_cleanup_command
             && injectResultDto.inject_injector_contract?.injector_contract_payload?.payload_cleanup_command.length > 0
