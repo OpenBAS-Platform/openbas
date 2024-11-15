@@ -181,7 +181,7 @@ public class InjectsExecutionJob implements Job {
     Inject inject = executableInject.getInjection().getInject();
 
     // We are now checking if we depend on another inject and if it did not failed
-    Optional<List<String>> errorMessages = null;
+    Optional<List<String>> errorMessages = Optional.empty();
     if (executableInject.getExercise() != null) {
       errorMessages = getErrorMessagesPreExecution(executableInject.getExercise().getId(), inject);
     }
@@ -231,24 +231,19 @@ public class InjectsExecutionJob implements Job {
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
                 // Status
-                InjectStatus statusSaved =
-                    initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
+                initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
+
                 } catch (Exception e) {
-                  ExecutionTraceStatus traceStatus =
-                      e.getMessage().startsWith("Asset error")
-                          ? ExecutionTraceStatus.ASSET_INACTIVE
-                          : ExecutionTraceStatus.ERROR;
-
-                  statusSaved
-                      .getTraces()
-                      .add(InjectStatusExecution.traceError(traceStatus, e.getMessage()));
-
-                  statusSaved.setName(ExecutionStatus.ERROR);
-                  injectStatusRepository.save(statusSaved);
-                  throw new RuntimeException(e);
+                  InjectStatus injectStatus =
+                      inject
+                          .getStatus()
+                          .orElseThrow(() -> new IllegalArgumentException("Status should exists"));
+                  injectStatus.setName(ExecutionStatus.ERROR);
+                  injectStatusRepository.save(injectStatus);
+                  return;
                 }
               }
               if (externalInjector.isExternal()) {
@@ -264,7 +259,7 @@ public class InjectsExecutionJob implements Job {
                     InjectStatusExecution.traceError("Inject does not have a contract")));
   }
 
-  private InjectStatus initializeInjectStatus(
+  private void initializeInjectStatus(
       Inject inject, ExecutionStatus status, @Nullable InjectStatusExecution trace) {
     InjectStatus injectStatus =
         inject
@@ -282,7 +277,8 @@ public class InjectsExecutionJob implements Job {
     injectStatus.setName(status);
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setCommandsLines(injectUtils.getCommandsLinesFromInject(inject));
-    return injectStatusRepository.save(injectStatus);
+    injectStatusRepository.save(injectStatus);
+    inject.setStatus(injectStatus);
   }
 
   /**
@@ -353,7 +349,9 @@ public class InjectsExecutionJob implements Job {
 
     injectDependencies.forEach(
         injectDependency -> {
-          injectDependency.getInjectDependencyCondition().getConditions().stream()
+          injectDependency
+              .getInjectDependencyCondition()
+              .getConditions()
               .forEach(
                   condition -> {
                     mapCondition.put(condition.getKey(), false);
