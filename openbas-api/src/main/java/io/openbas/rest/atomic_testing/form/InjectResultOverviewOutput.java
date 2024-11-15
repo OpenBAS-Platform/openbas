@@ -3,13 +3,16 @@ package io.openbas.rest.atomic_testing.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.InjectStatusCommandLine;
+import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -57,7 +60,7 @@ public class InjectResultOverviewOutput {
   @Schema(description = "Full contract")
   @JsonProperty("inject_injector_contract")
   @NotNull
-  private InjectorContractSimple injectorContract;
+  private InjectorContractOutput injectorContract;
 
   @Schema(description = "status")
   @JsonProperty("inject_status")
