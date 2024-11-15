@@ -1,19 +1,13 @@
 package io.openbas.rest.challenge;
 
-import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-
 import io.openbas.database.model.Challenge;
 import io.openbas.database.model.ChallengeFlag;
 import io.openbas.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
-import io.openbas.rest.challenge.form.ChallengeCreateInput;
+import io.openbas.rest.challenge.form.ChallengeInput;
 import io.openbas.rest.challenge.form.ChallengeTryInput;
-import io.openbas.rest.challenge.form.ChallengeUpdateInput;
 import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
@@ -22,13 +16,19 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
+import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,7 +53,7 @@ public class ChallengeApi extends RestBehavior {
   @PutMapping("/api/challenges/{challengeId}")
   @Transactional(rollbackOn = Exception.class)
   public Challenge updateChallenge(
-      @PathVariable String challengeId, @Valid @RequestBody ChallengeUpdateInput input) {
+      @PathVariable String challengeId, @Valid @RequestBody ChallengeInput input) {
     Challenge challenge =
         challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
     challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -82,7 +82,7 @@ public class ChallengeApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @PostMapping("/api/challenges")
   @Transactional(rollbackOn = Exception.class)
-  public Challenge createChallenge(@Valid @RequestBody ChallengeCreateInput input) {
+  public Challenge createChallenge(@Valid @RequestBody ChallengeInput input) {
     Challenge challenge = new Challenge();
     challenge.setUpdateAttributes(input);
     challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
