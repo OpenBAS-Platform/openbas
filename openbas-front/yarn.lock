@@ -8923,7 +8923,7 @@ __metadata:
     react-syntax-highlighter: "npm:15.5.0"
     redux: "npm:4.2.1"
     redux-first-history: "npm:5.2.0"
-    redux-thunk: "npm:2.4.2"
+    redux-thunk: "npm:3.1.0"
     remark-flexible-markers: "npm:1.2.1"
     remark-gfm: "npm:4.0.0"
     remark-parse: "npm:11.0.0"
@@ -9799,12 +9799,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux-thunk@npm:2.4.2":
-  version: 2.4.2
-  resolution: "redux-thunk@npm:2.4.2"
+"redux-thunk@npm:3.1.0":
+  version: 3.1.0
+  resolution: "redux-thunk@npm:3.1.0"
   peerDependencies:
-    redux: ^4
-  checksum: 10c0/e202d6ef7dfa7df08ed24cb221aa89d6c84dbaa7d65fe90dbd8e826d0c10d801f48388f9a7598a4fd970ecbc93d335014570a61ca7bc8bf569eab5de77b31a3c
+    redux: ^5.0.0
+  checksum: 10c0/21557f6a30e1b2e3e470933247e51749be7f1d5a9620069a3125778675ce4d178d84bdee3e2a0903427a5c429e3aeec6d4df57897faf93eb83455bc1ef7b66fd
   languageName: node
   linkType: hard
 
