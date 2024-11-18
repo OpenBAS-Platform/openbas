@@ -267,7 +267,7 @@ const PayloadForm: FunctionComponent<Props> = ({
           />
         </>
       )}
-      {type === 'Executable' &&  (
+      {type === 'Executable' && (
         <Controller
           control={control}
           name="executable_file"

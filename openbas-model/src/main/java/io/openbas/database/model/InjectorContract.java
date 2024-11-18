@@ -75,7 +75,7 @@ public class InjectorContract implements Base {
   public PlatformArchitecture getArch() {
     return Optional.ofNullable(getPayload())
         .filter(payload -> payload instanceof Executable || payload instanceof Command)
-        .map(payload -> ((Executable) payload).getExecutableArch())
+        .map(payload -> payload instanceof Executable ? ((Executable) payload).getExecutableArch() : ((Command) payload).getExecutableArch())
         .orElse(null);
   }
 
