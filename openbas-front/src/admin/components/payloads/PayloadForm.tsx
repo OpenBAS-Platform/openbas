@@ -53,6 +53,7 @@ const PayloadForm: FunctionComponent<Props> = ({
     payload_attack_patterns: [],
     payload_cleanup_command: '',
     payload_cleanup_executor: '',
+    executable_file: undefined,
     file_drop_file: '',
     dns_resolution_hostname: '',
     payload_tags: [],
