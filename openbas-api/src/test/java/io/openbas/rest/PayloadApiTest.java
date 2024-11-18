@@ -58,6 +58,7 @@ public class PayloadApiTest extends IntegrationTest {
   @DisplayName("Create Payloads with architecture")
   @WithMockAdminUser
   void createExecutablePayload() throws Exception {
+    // -- Test for Payload type Executable
     PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
     input.setExecutableFile(EXECUTABLE_FILE.getId());
 
@@ -71,6 +72,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
         .andExpect(jsonPath("$.executable_arch").value("x86_64"));
 
+    // -- Test for Paylaod type Command
     input = PayloadFixture.getCommandPayloadCreateInput();
 
     mvc.perform(
@@ -129,10 +131,7 @@ public class PayloadApiTest extends IntegrationTest {
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
-    PayloadUpdateInput updateInput = new PayloadUpdateInput();
-    updateInput.setName("My Updated Executable Payload");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    updateInput.setExecutableArch(PlatformArchitecture.arm64);
+    PayloadUpdateInput updateInput = PayloadFixture.getExecutablePayloadUpdateInput();
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
@@ -165,9 +164,8 @@ public class PayloadApiTest extends IntegrationTest {
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
-    PayloadUpdateInput updateInput = new PayloadUpdateInput();
-    updateInput.setName("My Updated Executable Payload");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
+    PayloadUpdateInput updateInput = PayloadFixture.getExecutablePayloadUpdateInput();
+    updateInput.setExecutableArch(null);
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(

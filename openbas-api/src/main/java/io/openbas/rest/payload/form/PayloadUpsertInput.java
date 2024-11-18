@@ -41,6 +41,7 @@ public class PayloadUpsertInput {
   @JsonProperty("payload_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms;
 
+  @RequiredArchIfType(validTypes = {"Command", "Executable"})
   @JsonProperty("executable_arch")
   private PlatformArchitecture executableArch;
 

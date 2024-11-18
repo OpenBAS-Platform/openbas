@@ -9,6 +9,7 @@ import static io.openbas.database.model.Payload.PAYLOAD_STATUS.VERIFIED;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.payload.form.PayloadCreateInput;
+import io.openbas.rest.payload.form.PayloadUpdateInput;
 import java.util.Collections;
 
 public class PayloadFixture {
@@ -74,5 +75,13 @@ public class PayloadFixture {
     input.setExecutableArch(PlatformArchitecture.arm64);
     input.setAttackPatternsIds(Collections.emptyList());
     return input;
+  }
+
+  public static PayloadUpdateInput getExecutablePayloadUpdateInput() {
+    PayloadUpdateInput updateInput = new PayloadUpdateInput();
+    updateInput.setName("My Updated Executable Payload");
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
+    updateInput.setExecutableArch(PlatformArchitecture.arm64);
+    return updateInput;
   }
 }
