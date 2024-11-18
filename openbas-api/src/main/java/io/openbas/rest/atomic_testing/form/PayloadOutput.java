@@ -3,6 +3,10 @@ package io.openbas.rest.atomic_testing.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.model.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,5 +59,43 @@ public class PayloadOutput {
   @JsonProperty("payload_tags")
   private Set<String> tags;
 
+  @JsonProperty("command_executor")
+  private String executor;
+
+  @JsonProperty("command_content")
+  private String content;
+
+  @JsonProperty("executable_file")
+  private Document executableFile;
+
+  @JsonProperty("executable_arch")
+  @Enumerated(EnumType.STRING)
+  private Endpoint.PLATFORM_ARCH executableArch;
+
+  @JsonProperty("file_drop_file")
+  private Document fileDropFile;
+
+  @JsonProperty("dns_resolution_hostname")
+  private String hostname;
+
+  @JsonProperty("network_traffic_ip_src")
+  @NotNull
+  private String ipSrc;
+
+  @JsonProperty("network_traffic_ip_dst")
+  @NotNull
+  private String ipDst;
+
+  @JsonProperty("network_traffic_port_src")
+  @NotNull
+  private Integer portSrc;
+
+  @JsonProperty("network_traffic_port_dst")
+  @NotNull
+  private Integer portDst;
+
+  @JsonProperty("network_traffic_protocol")
+  @NotNull
+  private String protocol;
 
 }
