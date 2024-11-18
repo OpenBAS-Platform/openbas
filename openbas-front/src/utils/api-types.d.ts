@@ -2509,6 +2509,7 @@ export interface PayloadUpsertInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
+  executable_arch?: "x86_64" | "arm64" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];

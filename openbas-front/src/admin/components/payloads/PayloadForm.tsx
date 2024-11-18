@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-type PayloadCreateInputForm = Omit<PayloadCreateInput, 'payload_type' | 'payload_source' | 'payload_status' | 'payload_platforms'> & {
+type PayloadCreateInputForm = Omit<PayloadCreateInput, 'payload_type' | 'payload_source' | 'payload_status' | 'payload_platforms' | 'executable_file'> & {
   payload_platforms: Option[];
   executable_file: Option | undefined;
 };
@@ -53,7 +53,6 @@ const PayloadForm: FunctionComponent<Props> = ({
     payload_attack_patterns: [],
     payload_cleanup_command: '',
     payload_cleanup_executor: '',
-    executable_file: '',
     file_drop_file: '',
     dns_resolution_hostname: '',
     payload_tags: [],
@@ -100,7 +99,7 @@ const PayloadForm: FunctionComponent<Props> = ({
       extendedSchema = baseSchema.extend({
         command_executor: z.string().min(1, { message: t('Should not be empty') }),
         command_content: z.string().min(1, { message: t('Should not be empty') }),
-        executable_arch: z.enum(['x86_64', 'arm64'], { message: t('Should not be empty') })
+        executable_arch: z.enum(['x86_64', 'arm64'], { message: t('Should not be empty') }),
       });
       break;
     case 'Executable':
@@ -278,7 +277,7 @@ const PayloadForm: FunctionComponent<Props> = ({
               setFieldValue={(_name, document) => {
                 onChange(document);
               }}
-              initialValue={{ id: initialValues.executable_file }}
+              initialValue={{ id: initialValues.executable_file?.id }}
               InputLabelProps={{ required: true }}
               error={!!errors.executable_file}
             />
