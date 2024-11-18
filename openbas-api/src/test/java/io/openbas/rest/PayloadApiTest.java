@@ -11,7 +11,6 @@ import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
 import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.database.model.Payload;
 import io.openbas.database.repository.DocumentRepository;
@@ -21,6 +20,7 @@ import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import io.openbas.rest.payload.form.PayloadsDeprecateInput;
+import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
@@ -55,7 +55,7 @@ public class PayloadApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Create Executable Payload")
+  @DisplayName("Create Payloads with architecture")
   @WithMockAdminUser
   void createExecutablePayload() throws Exception {
     PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
@@ -70,14 +70,35 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
         .andExpect(jsonPath("$.executable_arch").value("x86_64"));
+
+    input = PayloadFixture.getCommandPayloadCreateInput();
+
+    mvc.perform(
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("My Command Payload"))
+        .andExpect(jsonPath("$.payload_description").value("Command description"))
+        .andExpect(jsonPath("$.payload_source").value("COMMUNITY"))
+        .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"))
+        .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
+        .andExpect(jsonPath("$.executable_arch").value("arm64"));
   }
 
   @Test
-  @DisplayName("Creating an Executable Payload without Arch should fail")
+  @DisplayName("Creating a Payload type command and Executable without Arch should fail")
   @WithMockAdminUser
   void createExecutablePayloadWithoutArch() throws Exception {
+    // -- Test for Payload type Executable
     PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
     input.setExecutableFile(EXECUTABLE_FILE.getId());
+    input.setExecutableArch(null);
+
+    mvc.perform(
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().isBadRequest());
+
+    // -- Test for Paylaod type Command
+    input = PayloadFixture.getCommandPayloadCreateInput();
     input.setExecutableArch(null);
 
     mvc.perform(
