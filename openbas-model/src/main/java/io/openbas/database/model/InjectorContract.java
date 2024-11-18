@@ -74,11 +74,10 @@ public class InjectorContract implements Base {
   @Enumerated(EnumType.STRING)
   public PlatformArchitecture getArch() {
     return Optional.ofNullable(getPayload())
-        .filter(payload -> payload instanceof Executable)
+        .filter(payload -> payload instanceof Executable || payload instanceof Command)
         .map(payload -> ((Executable) payload).getExecutableArch())
         .orElse(null);
   }
-  ;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "injector_contract_payload")
