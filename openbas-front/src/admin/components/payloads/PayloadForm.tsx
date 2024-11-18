@@ -278,7 +278,7 @@ const PayloadForm: FunctionComponent<Props> = ({
               setFieldValue={(_name, document) => {
                 onChange(document);
               }}
-              initialValue={{ id: initialValues.executable_file?.id }}
+              initialValue={{ id: initialValues.executable_file }}
               InputLabelProps={{ required: true }}
               error={!!errors.executable_file}
             />
