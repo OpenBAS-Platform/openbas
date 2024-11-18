@@ -3,10 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,6 +31,13 @@ public class Command extends Payload {
   @JsonProperty("command_content")
   @NotNull
   private String content;
+
+  @Queryable(filterable = true, searchable = true)
+  @Column(name = "executable_arch")
+  @JsonProperty("executable_arch")
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private PlatformArchitecture executableArch;
 
   public Command() {}
 
