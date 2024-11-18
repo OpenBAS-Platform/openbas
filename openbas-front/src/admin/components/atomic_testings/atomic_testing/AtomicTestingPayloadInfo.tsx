@@ -7,7 +7,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemCopy from '../../../../components/ItemCopy';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { AttackPattern, PayloadArgument, PayloadPrerequisite } from '../../../../utils/api-types';
+import { AttackPattern, AttackPatternSimple, PayloadArgument, PayloadPrerequisite } from '../../../../utils/api-types';
 import { emptyFilled } from '../../../../utils/String';
 import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
@@ -78,7 +78,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                 >
                   {t('Attack patterns')}
                 </Typography>
-                {injectResultOverviewOutput.inject_attack_patterns && injectResultOverviewOutput.inject_attack_patterns.length === 0 ? '-' : injectResultOverviewOutput.inject_attack_patterns?.map((attackPattern: AttackPattern) => (
+                {injectResultOverviewOutput.inject_attack_patterns && injectResultOverviewOutput.inject_attack_patterns.length === 0 ? '-' : injectResultOverviewOutput.inject_attack_patterns?.map((attackPattern: AttackPatternSimple) => (
                   <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
                     <Chip
                       variant="outlined"
