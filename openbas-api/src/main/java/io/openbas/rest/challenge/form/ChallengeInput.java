@@ -1,15 +1,14 @@
 package io.openbas.rest.challenge.form;
 
+import static io.openbas.config.AppConfig.EMPTY_MESSAGE;
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static io.openbas.config.AppConfig.EMPTY_MESSAGE;
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import lombok.Data;
 
 @Data
 public class ChallengeInput {
@@ -39,5 +38,4 @@ public class ChallengeInput {
   @NotEmpty(message = EMPTY_MESSAGE)
   @JsonProperty("challenge_flags")
   private List<FlagInput> flags = new ArrayList<>();
-
 }
