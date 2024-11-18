@@ -68,37 +68,43 @@ public class PlayerService {
       Specification<User> specification,
       Specification<User> specificationCount,
       Pageable pageable) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<User> userRoot = cq.from(User.class);
-    select(cb, cq, userRoot);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<User> userRoot = cq.from(User.class);
+      select(cb, cq, userRoot);
 
-    // -- Specification --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(userRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      // -- Specification --
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(userRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      // -- Sorting --
+      List<Order> orders = toSortCriteriaBuilder(cb, userRoot, pageable.getSort());
+      cq.orderBy(orders);
+
+      // Type Query
+      TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+      // -- Pagination --
+      query.setFirstResult((int) pageable.getOffset());
+      query.setMaxResults(pageable.getPageSize());
+
+      // -- EXECUTION --
+      List<PlayerOutput> players = execution(query);
+
+      // -- Count Query --
+      Long total = countQuery(cb, this.entityManager, User.class, specificationCount);
+
+      return new PageImpl<>(players, pageable, total);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, userRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<PlayerOutput> players = execution(query);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, User.class, specificationCount);
-
-    return new PageImpl<>(players, pageable, total);
   }
 }

@@ -67,38 +67,44 @@ public class InjectorContractService {
       @Nullable final Specification<InjectorContract> specification,
       @Nullable final Specification<InjectorContract> specificationCount,
       @NotNull final Pageable pageable) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<InjectorContract> injectorContractRoot = cq.from(InjectorContract.class);
-    selectForInjectorContract(cb, cq, injectorContractRoot);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<InjectorContract> injectorContractRoot = cq.from(InjectorContract.class);
+      selectForInjectorContract(cb, cq, injectorContractRoot);
 
-    // -- Text Search and Filters --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(injectorContractRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      // -- Text Search and Filters --
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(injectorContractRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      // -- Sorting --
+      List<Order> orders = toSortCriteriaBuilder(cb, injectorContractRoot, pageable.getSort());
+      cq.orderBy(orders);
+
+      // Type Query
+      TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
+
+      // -- Pagination --
+      query.setFirstResult((int) pageable.getOffset());
+      query.setMaxResults(pageable.getPageSize());
+
+      // -- EXECUTION --
+      List<InjectorContractOutput> injectorContractOutputs = execInjectorContract(query);
+
+      // -- Count Query --
+      Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
+
+      return new PageImpl<>(injectorContractOutputs, pageable, total);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, injectorContractRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<InjectorContractOutput> injectorContractOutputs = execInjectorContract(query);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
-
-    return new PageImpl<>(injectorContractOutputs, pageable, total);
   }
 
   // -- CRITERIA BUILDER --

@@ -55,28 +55,34 @@ public class InjectSearchService {
 
   @Tracing(name = "Fetch injects with criteria builder", layer = "service", operation = "GET")
   public List<InjectOutput> injects(Specification<Inject> specification) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForInject(cb, cq, injectRoot, new HashMap<>());
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<Inject> injectRoot = cq.from(Inject.class);
+      selectForInject(cb, cq, injectRoot, new HashMap<>());
 
-    // -- Text Search and Filters --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      // -- Text Search and Filters --
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      // -- Sorting --
+      cq.orderBy(cb.asc(injectRoot.get("dependsDuration")));
+
+      // Type Query
+      TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
+
+      // -- EXECUTION --
+      return execInject(query);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    // -- Sorting --
-    cq.orderBy(cb.asc(injectRoot.get("dependsDuration")));
-
-    // Type Query
-    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
-
-    // -- EXECUTION --
-    return execInject(query);
   }
 
   // -- PAGE INJECT OUTPUT --
@@ -85,38 +91,44 @@ public class InjectSearchService {
       Specification<Inject> specificationCount,
       Pageable pageable,
       Map<String, Join<Base, Base>> joinMap) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Inject> injectRoot = cq.from(Inject.class);
-    selectForInject(cb, cq, injectRoot, joinMap);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<Inject> injectRoot = cq.from(Inject.class);
+      selectForInject(cb, cq, injectRoot, joinMap);
 
-    // -- Text Search and Filters --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      // -- Text Search and Filters --
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(injectRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      // -- Sorting --
+      List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
+      cq.orderBy(orders);
+
+      // Type Query
+      TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
+
+      // -- Pagination --
+      query.setFirstResult((int) pageable.getOffset());
+      query.setMaxResults(pageable.getPageSize());
+
+      // -- EXECUTION --
+      List<InjectOutput> injects = execInject(query);
+
+      // -- Count Query --
+      Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
+
+      return new PageImpl<>(injects, pageable, total);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, injectRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = this.entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<InjectOutput> injects = execInject(query);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Inject.class, specificationCount);
-
-    return new PageImpl<>(injects, pageable, total);
   }
 
   private void selectForInject(

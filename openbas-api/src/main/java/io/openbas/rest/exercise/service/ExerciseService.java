@@ -338,40 +338,46 @@ public class ExerciseService {
       Specification<Exercise> specificationCount,
       Pageable pageable,
       Map<String, Join<Base, Base>> joinMap) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Exercise> exerciseRoot = cq.from(Exercise.class);
-    select(cb, cq, exerciseRoot, joinMap);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<Exercise> exerciseRoot = cq.from(Exercise.class);
+      select(cb, cq, exerciseRoot, joinMap);
 
-    // -- Text Search and Filters --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(exerciseRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      // -- Text Search and Filters --
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(exerciseRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      // -- Sorting --
+      List<Order> orders = toSortCriteriaBuilder(cb, exerciseRoot, pageable.getSort());
+      cq.orderBy(orders);
+
+      // Type Query
+      TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+      // -- Pagination --
+      query.setFirstResult((int) pageable.getOffset());
+      query.setMaxResults(pageable.getPageSize());
+
+      // -- EXECUTION --
+      List<ExerciseSimple> exercises = execution(query);
+
+      setComputedAttribute(exercises);
+
+      // -- Count Query --
+      Long total = countQuery(cb, this.entityManager, Exercise.class, specificationCount);
+
+      return new PageImpl<>(exercises, pageable, total);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, exerciseRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<ExerciseSimple> exercises = execution(query);
-
-    setComputedAttribute(exercises);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Exercise.class, specificationCount);
-
-    return new PageImpl<>(exercises, pageable, total);
   }
 
   // -- SELECT --

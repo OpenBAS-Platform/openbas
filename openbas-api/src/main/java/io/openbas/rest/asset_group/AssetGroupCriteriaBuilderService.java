@@ -39,21 +39,27 @@ public class AssetGroupCriteriaBuilderService {
   }
 
   public List<AssetGroupOutput> find(Specification<AssetGroup> specification) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<AssetGroup> root = cq.from(AssetGroup.class);
-    select(cb, cq, root);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<AssetGroup> root = cq.from(AssetGroup.class);
+      select(cb, cq, root);
 
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(root, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(root, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      TypedQuery<Tuple> query = entityManager.createQuery(cq);
+      return execution(query, this.mapper);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-    return execution(query, this.mapper);
   }
 
   // -- PRIVATE --
@@ -62,37 +68,43 @@ public class AssetGroupCriteriaBuilderService {
       Specification<AssetGroup> specification,
       Specification<AssetGroup> specificationCount,
       Pageable pageable) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<AssetGroup> assetGroupRoot = cq.from(AssetGroup.class);
-    select(cb, cq, assetGroupRoot);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<AssetGroup> assetGroupRoot = cq.from(AssetGroup.class);
+      select(cb, cq, assetGroupRoot);
 
-    // -- Specification --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(assetGroupRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      // -- Specification --
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(assetGroupRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      // -- Sorting --
+      List<Order> orders = toSortCriteriaBuilder(cb, assetGroupRoot, pageable.getSort());
+      cq.orderBy(orders);
+
+      // Type Query
+      TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+      // -- Pagination --
+      query.setFirstResult((int) pageable.getOffset());
+      query.setMaxResults(pageable.getPageSize());
+
+      // -- EXECUTION --
+      List<AssetGroupOutput> assetGroups = execution(query, this.mapper);
+
+      // -- Count Query --
+      Long total = countQuery(cb, this.entityManager, AssetGroup.class, specificationCount);
+
+      return new PageImpl<>(assetGroups, pageable, total);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, assetGroupRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<AssetGroupOutput> assetGroups = execution(query, this.mapper);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, AssetGroup.class, specificationCount);
-
-    return new PageImpl<>(assetGroups, pageable, total);
   }
 }

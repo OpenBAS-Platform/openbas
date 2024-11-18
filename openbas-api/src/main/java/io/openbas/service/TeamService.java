@@ -98,55 +98,68 @@ public class TeamService {
       Specification<Team> specification,
       Specification<Team> specificationCount,
       Pageable pageable) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Team> teamRoot = cq.from(Team.class);
-    select(cb, cq, teamRoot);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<Team> teamRoot = cq.from(Team.class);
+      select(cb, cq, teamRoot);
 
-    // -- Specification --
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(teamRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      // -- Specification --
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(teamRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      // -- Sorting --
+      List<Order> orders = toSortCriteriaBuilder(cb, teamRoot, pageable.getSort());
+      cq.orderBy(orders);
+
+      // Type Query
+      TypedQuery<Tuple> query = entityManager.createQuery(cq);
+
+      // -- Pagination --
+      query.setFirstResult((int) pageable.getOffset());
+      query.setMaxResults(pageable.getPageSize());
+
+      // -- EXECUTION --
+      List<TeamOutput> teams = execution(query);
+
+      // -- Count Query --
+      Long total = countQuery(cb, this.entityManager, Team.class, specificationCount);
+
+      return new PageImpl<>(teams, pageable, total);
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    // -- Sorting --
-    List<Order> orders = toSortCriteriaBuilder(cb, teamRoot, pageable.getSort());
-    cq.orderBy(orders);
-
-    // Type Query
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-
-    // -- Pagination --
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-
-    // -- EXECUTION --
-    List<TeamOutput> teams = execution(query);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Team.class, specificationCount);
-
-    return new PageImpl<>(teams, pageable, total);
   }
 
   public List<TeamOutput> find(Specification<Team> specification) {
-    CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+    try {
+      CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Team> teamRoot = cq.from(Team.class);
-    select(cb, cq, teamRoot);
+      CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+      Root<Team> teamRoot = cq.from(Team.class);
+      select(cb, cq, teamRoot);
 
-    if (specification != null) {
-      Predicate predicate = specification.toPredicate(teamRoot, cq, cb);
-      if (predicate != null) {
-        cq.where(predicate);
+      if (specification != null) {
+        Predicate predicate = specification.toPredicate(teamRoot, cq, cb);
+        if (predicate != null) {
+          cq.where(predicate);
+        }
+      }
+
+      TypedQuery<Tuple> query = entityManager.createQuery(cq);
+      return execution(query);
+
+    } finally {
+      if (entityManager != null && entityManager.isOpen()) {
+        entityManager.close();
       }
     }
-
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-    return execution(query);
   }
 }
