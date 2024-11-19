@@ -11,6 +11,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.database.model.Payload;
 import io.openbas.database.repository.DocumentRepository;
@@ -293,7 +294,7 @@ public class PayloadApiTest extends IntegrationTest {
     updateInput.setName("updated command line payload");
     updateInput.setContent("echo world again");
     updateInput.setExecutor("sh");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.Linux});
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
 
     updateInput.setCleanupCommand("cleanup this mess");
 
