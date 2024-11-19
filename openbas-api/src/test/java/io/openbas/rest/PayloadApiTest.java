@@ -19,6 +19,7 @@ import io.openbas.rest.collector.form.CollectorCreateInput;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.rest.payload.form.PayloadUpsertInput;
 import io.openbas.rest.payload.form.PayloadsDeprecateInput;
 import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.PayloadInputFixture;
@@ -412,5 +413,19 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_name").value("Command Payload 2"))
         .andExpect(jsonPath("$.payload_collector").value(collectorId))
         .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"));
+  }
+
+  @Test
+  @DisplayName("Upsert a command Payload without arch should fail")
+  @WithMockAdminUser
+  void upsertCommandPayloadWithoutArch() throws Exception {
+    PayloadUpsertInput upsertInput = PayloadFixture.getCommandPayloadUpsertInput();
+    upsertInput.setExecutableArch(null);
+
+    mvc.perform(
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isBadRequest());
   }
 }
