@@ -22,8 +22,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,45 +33,17 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Secured(ROLE_USER)
+@RequiredArgsConstructor
 public class PayloadApi extends RestBehavior {
 
   public static final String PAYLOAD_URI = "/api/payloads";
 
-  private PayloadRepository payloadRepository;
-  private TagRepository tagRepository;
-  private PayloadService payloadService;
-  private AttackPatternRepository attackPatternRepository;
-  private DocumentRepository documentRepository;
+  private final PayloadRepository payloadRepository;
+  private final TagRepository tagRepository;
+  private final PayloadService payloadService;
+  private final AttackPatternRepository attackPatternRepository;
+  private final DocumentRepository documentRepository;
   private final CollectorRepository collectorRepository;
-
-  public PayloadApi(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
-  }
-
-  @Autowired
-  public void setPayloadRepository(PayloadRepository payloadRepository) {
-    this.payloadRepository = payloadRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setPayloadService(PayloadService payloadService) {
-    this.payloadService = payloadService;
-  }
-
-  @Autowired
-  public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
-    this.attackPatternRepository = attackPatternRepository;
-  }
-
-  @Autowired
-  public void setDocumentRepository(DocumentRepository documentRepository) {
-    this.documentRepository = documentRepository;
-  }
 
   @PostMapping("/api/payloads/search")
   public Page<Payload> payloads(
@@ -212,7 +184,7 @@ public class PayloadApi extends RestBehavior {
     return this.payloadService.duplicate(payloadId);
   }
 
-  @PostMapping("/api/payloads/upsert")
+  @PostMapping(PAYLOAD_URI + "/upsert")
   @PreAuthorize("isPlanner()")
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public Payload upsertPayload(@Valid @RequestBody PayloadUpsertInput input) {
@@ -361,7 +333,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @DeleteMapping("/api/payloads/{payloadId}")
+  @DeleteMapping(PAYLOAD_URI + "/{payloadId}")
   public void deletePayload(@PathVariable String payloadId) {
     payloadRepository.deleteById(payloadId);
   }

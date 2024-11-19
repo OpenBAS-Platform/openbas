@@ -24,6 +24,7 @@ import io.openbas.rest.payload.form.PayloadsDeprecateInput;
 import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.junit.jupiter.api.*;
@@ -417,15 +418,29 @@ public class PayloadApiTest extends IntegrationTest {
 
   @Test
   @DisplayName("Upsert a command Payload without arch should fail")
-  @WithMockAdminUser
+  @WithMockPlannerUser
   void upsertCommandPayloadWithoutArch() throws Exception {
     PayloadUpsertInput upsertInput = PayloadFixture.getCommandPayloadUpsertInput();
     upsertInput.setExecutableArch(null);
 
     mvc.perform(
-            post(PAYLOAD_URI)
+            post(PAYLOAD_URI + "/upsert")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(upsertInput)))
         .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Upsert a command Payload with arch should success")
+  @WithMockPlannerUser
+  void upsertCommandPayloadWithArch() throws Exception {
+    PayloadUpsertInput upsertInput = PayloadFixture.getCommandPayloadUpsertInput();
+    // upsertInput.setExternalId();
+
+    mvc.perform(
+            post(PAYLOAD_URI + "/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isOk());
   }
 }
