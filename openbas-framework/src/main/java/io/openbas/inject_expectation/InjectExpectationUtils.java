@@ -2,7 +2,6 @@ package io.openbas.inject_expectation;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -42,7 +41,8 @@ public class InjectExpectationUtils {
     }
   }
 
-  public static void extractedExpectations(ExecutableInject executableInject, List<Expectation> expectations) {
+  public static void extractedExpectations(
+      ExecutableInject executableInject, List<Expectation> expectations) {
     boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
     boolean isScheduledInject = !executableInject.isDirect();
     // Create the expectations
@@ -77,10 +77,7 @@ public class InjectExpectationUtils {
                                           .map(
                                               expectation ->
                                                   expectationConverter(
-                                                      team,
-                                                      user,
-                                                      executableInject,
-                                                      expectation))))
+                                                      team, user, executableInject, expectation))))
                   .toList();
         } else {
           // Create expectations for every enabled player in every team
