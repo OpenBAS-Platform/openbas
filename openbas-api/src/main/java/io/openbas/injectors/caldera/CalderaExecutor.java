@@ -264,9 +264,10 @@ public class CalderaExecutor extends Injector {
         (assetGroup ->
             computeExpectationsForAssetGroup(
                 expectations, content, assetGroup, new ArrayList<>())));
+
     String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
     execution.addTrace(traceInfo(message, asyncIds));
-    return new ExecutionProcess(true, expectations);
+    return new ExecutionProcess(true);
   }
 
   @Override

@@ -95,8 +95,8 @@ public class OvhSmsExecutor extends Injector {
                         default -> Stream.of();
                       })
               .toList();
-      return new ExecutionProcess(false, expectations);
+      return new ExecutionProcess(false);
     }
-    return new ExecutionProcess(false, Collections.emptyList());
+    return new ExecutionProcess(false);
   }
 }

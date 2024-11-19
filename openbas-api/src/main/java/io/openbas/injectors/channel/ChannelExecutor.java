@@ -153,13 +153,13 @@ public class ChannelExecutor extends Injector {
                           })
                   .toList());
         }
-        return new ExecutionProcess(false, expectations);
+        return new ExecutionProcess(false);
       } else {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
       execution.addTrace(traceError(e.getMessage()));
     }
-    return new ExecutionProcess(false, List.of());
+    return new ExecutionProcess(false);
   }
 }

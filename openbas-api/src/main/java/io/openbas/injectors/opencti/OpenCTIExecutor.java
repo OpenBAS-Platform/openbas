@@ -79,6 +79,6 @@ public class OpenCTIExecutor extends Injector {
                       default -> Stream.of();
                     })
             .toList();
-    return new ExecutionProcess(false, expectations);
+    return new ExecutionProcess(false);
   }
 }
