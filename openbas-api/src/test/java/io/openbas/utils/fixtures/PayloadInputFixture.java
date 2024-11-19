@@ -1,9 +1,15 @@
 package io.openbas.utils.fixtures;
 
+import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.COMMUNITY;
+import static io.openbas.database.model.Payload.PAYLOAD_STATUS.UNVERIFIED;
+
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Payload;
+import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.rest.payload.form.PayloadCreateInput;
+import io.openbas.rest.payload.form.PayloadUpdateInput;
+import io.openbas.rest.payload.form.PayloadUpsertInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import java.util.Collections;
 
@@ -19,7 +25,7 @@ public class PayloadInputFixture {
     input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
     input.setAttackPatternsIds(Collections.emptyList());
     input.setTagIds(Collections.emptyList());
-
+    input.setExecutableArch(PlatformArchitecture.x86_64);
     input.setExecutor("bash");
     input.setContent("echo hello");
     return input;
@@ -35,7 +41,29 @@ public class PayloadInputFixture {
     input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
     input.setAttackPatternsIds(Collections.emptyList());
     input.setTagIds(Collections.emptyList());
-    input.setExecutableArch(Endpoint.PLATFORM_ARCH.x86_64);
+    input.setExecutableArch(PlatformArchitecture.x86_64);
+    return input;
+  }
+
+  public static PayloadUpdateInput getDefaultExecutablePayloadUpdateInput() {
+    PayloadUpdateInput updateInput = new PayloadUpdateInput();
+    updateInput.setName("My Updated Executable Payload");
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
+    updateInput.setExecutableArch(PlatformArchitecture.arm64);
+    return updateInput;
+  }
+
+  public static PayloadUpsertInput getDefaultCommandPayloadUpsertInput() {
+    PayloadUpsertInput input = new PayloadUpsertInput();
+    input.setType("Command");
+    input.setName("My Command Payload");
+    input.setDescription("Command description");
+    input.setContent("cd ..");
+    input.setExecutor("PowerShell");
+    input.setSource(COMMUNITY);
+    input.setStatus(UNVERIFIED);
+    input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
+    input.setExecutableArch(PlatformArchitecture.arm64);
     return input;
   }
 

@@ -11,6 +11,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.database.model.Payload;
@@ -76,17 +77,17 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.executable_arch").value("x86_64"));
 
     // -- Test for Paylaod type Command
-    input = PayloadFixture.getCommandPayloadCreateInput();
+    input = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     mvc.perform(
             post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
         .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.payload_name").value("My Command Payload"))
-        .andExpect(jsonPath("$.payload_description").value("Command description"))
-        .andExpect(jsonPath("$.payload_source").value("COMMUNITY"))
-        .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"))
-        .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
-        .andExpect(jsonPath("$.executable_arch").value("arm64"));
+        .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+        .andExpect(jsonPath("$.payload_description").value("This does something, maybe"))
+        .andExpect(jsonPath("$.payload_source").value("MANUAL"))
+        .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
+        .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
+        .andExpect(jsonPath("$.executable_arch").value("x86_64"));
   }
 
   @Test
@@ -103,7 +104,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().isBadRequest());
 
     // -- Test for Paylaod type Command
-    input = PayloadFixture.getCommandPayloadCreateInput();
+    input = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
     input.setExecutableArch(null);
 
     mvc.perform(
@@ -134,7 +135,7 @@ public class PayloadApiTest extends IntegrationTest {
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
-    PayloadUpdateInput updateInput = PayloadFixture.getExecutablePayloadUpdateInput();
+    PayloadUpdateInput updateInput = PayloadInputFixture.getDefaultExecutablePayloadUpdateInput();
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
@@ -167,7 +168,7 @@ public class PayloadApiTest extends IntegrationTest {
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
-    PayloadUpdateInput updateInput = PayloadFixture.getExecutablePayloadUpdateInput();
+    PayloadUpdateInput updateInput = PayloadInputFixture.getDefaultExecutablePayloadUpdateInput();
     updateInput.setExecutableArch(null);
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
@@ -184,7 +185,6 @@ public class PayloadApiTest extends IntegrationTest {
   void createCommandLinePayloadWithBothSetExecutorAndContent() throws Exception {
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
-
     createInput.setExecutor("sh");
     createInput.setExecutor("echo hello world");
 
@@ -202,7 +202,6 @@ public class PayloadApiTest extends IntegrationTest {
   void createCommandLinePayloadWithBothNullCleanupExecutorAndCommand() throws Exception {
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
-
     createInput.setCleanupExecutor(null);
     createInput.setCleanupCommand(null);
 
@@ -220,7 +219,6 @@ public class PayloadApiTest extends IntegrationTest {
   void createCommandLinePayloadWithBothSetCleanupExecutorAndCommand() throws Exception {
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
-
     createInput.setCleanupExecutor("sh");
     createInput.setCleanupCommand("cleanup this mess");
 
@@ -238,7 +236,6 @@ public class PayloadApiTest extends IntegrationTest {
   void createCommandLinePayloadWithOnlySetCleanupExecutorAndNullCommand() throws Exception {
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
-
     createInput.setCleanupExecutor("sh");
     createInput.setCleanupCommand(null);
 
@@ -256,7 +253,6 @@ public class PayloadApiTest extends IntegrationTest {
   void createCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
-
     createInput.setCleanupExecutor(null);
     createInput.setCleanupCommand("cleanup this mess");
 
@@ -274,7 +270,6 @@ public class PayloadApiTest extends IntegrationTest {
   void updateCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
-
     createInput.setCleanupExecutor(null);
     createInput.setCleanupCommand(null);
 
@@ -295,7 +290,7 @@ public class PayloadApiTest extends IntegrationTest {
     updateInput.setContent("echo world again");
     updateInput.setExecutor("sh");
     updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
-
+    updateInput.setExecutableArch(PlatformArchitecture.arm64);
     updateInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
@@ -421,7 +416,7 @@ public class PayloadApiTest extends IntegrationTest {
   @DisplayName("Upsert a command Payload without arch should fail")
   @WithMockPlannerUser
   void upsertCommandPayloadWithoutArch() throws Exception {
-    PayloadUpsertInput upsertInput = PayloadFixture.getCommandPayloadUpsertInput();
+    PayloadUpsertInput upsertInput = PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
     upsertInput.setExecutableArch(null);
 
     mvc.perform(
@@ -435,7 +430,7 @@ public class PayloadApiTest extends IntegrationTest {
   @DisplayName("Upsert a command Payload with arch should success")
   @WithMockPlannerUser
   void upsertCommandPayloadWithArch() throws Exception {
-    PayloadUpsertInput upsertInput = PayloadFixture.getCommandPayloadUpsertInput();
+    PayloadUpsertInput upsertInput = PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
     // upsertInput.setExternalId();
 
     mvc.perform(

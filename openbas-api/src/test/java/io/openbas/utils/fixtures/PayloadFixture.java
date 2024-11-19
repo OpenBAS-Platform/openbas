@@ -2,15 +2,10 @@ package io.openbas.utils.fixtures;
 
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
-import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.COMMUNITY;
 import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.MANUAL;
-import static io.openbas.database.model.Payload.PAYLOAD_STATUS.UNVERIFIED;
 import static io.openbas.database.model.Payload.PAYLOAD_STATUS.VERIFIED;
 
 import io.openbas.database.model.*;
-import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.form.PayloadUpdateInput;
-import io.openbas.rest.payload.form.PayloadUpsertInput;
 import java.util.Collections;
 
 public class PayloadFixture {
@@ -47,56 +42,5 @@ public class PayloadFixture {
     executable.setStatus(VERIFIED);
     executable.setAttackPatterns(Collections.emptyList());
     return executable;
-  }
-
-  public static PayloadCreateInput getExecutablePayloadCreateInput() {
-    PayloadCreateInput input = new PayloadCreateInput();
-    input.setType("Executable");
-    input.setName("My Executable Payload");
-    input.setDescription("Executable description");
-    input.setSource(MANUAL);
-    input.setStatus(VERIFIED);
-    input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
-    input.setAttackPatternsIds(Collections.emptyList());
-    input.setTagIds(Collections.emptyList());
-    input.setExecutableArch(PlatformArchitecture.x86_64);
-    return input;
-  }
-
-  public static PayloadCreateInput getCommandPayloadCreateInput() {
-    PayloadCreateInput input = new PayloadCreateInput();
-    input.setType("Command");
-    input.setName("My Command Payload");
-    input.setDescription("Command description");
-    input.setContent("cd ..");
-    input.setExecutor("PowerShell");
-    input.setSource(COMMUNITY);
-    input.setStatus(UNVERIFIED);
-    input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    input.setExecutableArch(PlatformArchitecture.arm64);
-    input.setAttackPatternsIds(Collections.emptyList());
-    return input;
-  }
-
-  public static PayloadUpdateInput getExecutablePayloadUpdateInput() {
-    PayloadUpdateInput updateInput = new PayloadUpdateInput();
-    updateInput.setName("My Updated Executable Payload");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    updateInput.setExecutableArch(PlatformArchitecture.arm64);
-    return updateInput;
-  }
-
-  public static PayloadUpsertInput getCommandPayloadUpsertInput() {
-    PayloadUpsertInput input = new PayloadUpsertInput();
-    input.setType("Command");
-    input.setName("My Command Payload");
-    input.setDescription("Command description");
-    input.setContent("cd ..");
-    input.setExecutor("PowerShell");
-    input.setSource(COMMUNITY);
-    input.setStatus(UNVERIFIED);
-    input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    input.setExecutableArch(PlatformArchitecture.arm64);
-    return input;
   }
 }
