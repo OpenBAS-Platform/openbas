@@ -27,7 +27,7 @@ export const fetchChallenge = challengeId => (dispatch) => {
 
 export const updateChallenge = (challengeId, data) => (dispatch) => {
   const uri = `/api/challenges/${challengeId}`;
-  return putReferential(challengeId, uri, data)(dispatch);
+  return putReferential(challenge, uri, data)(dispatch);
 };
 
 export const addChallenge = data => dispatch => postReferential(challenge, '/api/challenges', data)(dispatch);

@@ -18,7 +18,7 @@ const ChallengeExpectation: FunctionComponent<Props> = ({
     <ExpectationLine
       expectation={expectation}
       info={challenge.challenge_category}
-      title={challenge.challenge_name ?? ''}
+      title={challenge.challenge_name}
       icon={<EmojiEventsOutlined fontSize="small" />}
     />
   );

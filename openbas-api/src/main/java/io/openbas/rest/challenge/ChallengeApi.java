@@ -11,9 +11,8 @@ import io.openbas.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
-import io.openbas.rest.challenge.form.ChallengeCreateInput;
+import io.openbas.rest.challenge.form.ChallengeInput;
 import io.openbas.rest.challenge.form.ChallengeTryInput;
-import io.openbas.rest.challenge.form.ChallengeUpdateInput;
 import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
@@ -53,11 +52,11 @@ public class ChallengeApi extends RestBehavior {
   @PutMapping("/api/challenges/{challengeId}")
   @Transactional(rollbackOn = Exception.class)
   public Challenge updateChallenge(
-      @PathVariable String challengeId, @Valid @RequestBody ChallengeUpdateInput input) {
+      @PathVariable String challengeId, @Valid @RequestBody ChallengeInput input) {
     Challenge challenge =
         challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
-    challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
+    challenge.setTags(iterableToSet(tagRepository.findAllById(input.tagIds())));
+    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.documentIds())));
     challenge.setUpdateAttributes(input);
     challenge.setUpdatedAt(Instant.now());
     // Clear all flags
@@ -66,7 +65,7 @@ public class ChallengeApi extends RestBehavior {
     challengeFlags.clear();
     // Add new ones
     input
-        .getFlags()
+        .flags()
         .forEach(
             flagInput -> {
               ChallengeFlag challengeFlag = new ChallengeFlag();
@@ -82,13 +81,13 @@ public class ChallengeApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @PostMapping("/api/challenges")
   @Transactional(rollbackOn = Exception.class)
-  public Challenge createChallenge(@Valid @RequestBody ChallengeCreateInput input) {
+  public Challenge createChallenge(@Valid @RequestBody ChallengeInput input) {
     Challenge challenge = new Challenge();
     challenge.setUpdateAttributes(input);
-    challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
+    challenge.setTags(iterableToSet(tagRepository.findAllById(input.tagIds())));
+    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.documentIds())));
     List<ChallengeFlag> challengeFlags =
-        input.getFlags().stream()
+        input.flags().stream()
             .map(
                 flagInput -> {
                   ChallengeFlag challengeFlag = new ChallengeFlag();

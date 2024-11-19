@@ -199,17 +199,19 @@ const ChallengeForm = (props) => {
             <Grid item={true} xs={6}>
               <OldTextField
                 name="challenge_score"
-                fullWidth={true}
+                fullWidth
                 type="number"
                 label={t('Score')}
+                inputProps={{ min: 0 }}
               />
             </Grid>
             <Grid item={true} xs={6}>
               <OldTextField
                 name="challenge_max_attempts"
-                fullWidth={true}
+                fullWidth
                 type="number"
                 label={t('Max number of attempts')}
+                inputProps={{ min: 0 }}
               />
             </Grid>
           </Grid>
@@ -375,6 +377,7 @@ const ChallengeForm = (props) => {
           )}
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
+              variant="contained"
               onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
@@ -382,6 +385,7 @@ const ChallengeForm = (props) => {
               {t('Cancel')}
             </Button>
             <Button
+              variant="contained"
               color="secondary"
               type="submit"
               disabled={submitting || Object.keys(errors).length > 0}

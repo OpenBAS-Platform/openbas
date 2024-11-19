@@ -10,11 +10,14 @@ import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 @Getter
@@ -32,11 +35,13 @@ public class Challenge implements Base {
   @NotBlank
   private String id;
 
+  @CreationTimestamp
   @Column(name = "challenge_created_at")
   @JsonProperty("challenge_created_at")
   @NotNull
   private Instant createdAt = now();
 
+  @UpdateTimestamp
   @Column(name = "challenge_updated_at")
   @JsonProperty("challenge_updated_at")
   @NotNull
@@ -44,6 +49,7 @@ public class Challenge implements Base {
 
   @Column(name = "challenge_name")
   @JsonProperty("challenge_name")
+  @NotBlank
   private String name;
 
   @Column(name = "challenge_category")
@@ -66,6 +72,7 @@ public class Challenge implements Base {
   @OneToMany(mappedBy = "challenge", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonProperty("challenge_flags")
   @JsonSerialize(using = MultiModelDeserializer.class)
+  @NotEmpty
   private List<ChallengeFlag> flags = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.LAZY)

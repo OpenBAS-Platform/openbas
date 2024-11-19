@@ -208,6 +208,7 @@ export interface AttackPatternCreateInput {
   attack_pattern_stix_id?: string;
 }
 
+/** Attack pattern */
 export interface AttackPatternSimple {
   attack_pattern_external_id: string;
   attack_pattern_id: string;
@@ -232,11 +233,11 @@ export interface Challenge {
   challenge_created_at: string;
   challenge_documents?: Document[];
   challenge_exercises?: string[];
-  challenge_flags?: ChallengeFlag[];
+  challenge_flags: ChallengeFlag[];
   challenge_id: string;
   /** @format int32 */
   challenge_max_attempts?: number;
-  challenge_name?: string;
+  challenge_name: string;
   challenge_scenarios?: string[];
   /** @format double */
   challenge_score?: number;
@@ -247,19 +248,6 @@ export interface Challenge {
   /** @format date-time */
   challenge_virtual_publication?: string;
   listened?: boolean;
-}
-
-export interface ChallengeCreateInput {
-  challenge_category?: string;
-  challenge_content?: string;
-  challenge_documents?: string[];
-  challenge_flags: FlagInput[];
-  /** @format int32 */
-  challenge_max_attempts?: number;
-  challenge_name: string;
-  /** @format int32 */
-  challenge_score?: number;
-  challenge_tags?: string[];
 }
 
 export interface ChallengeFlag {
@@ -279,15 +267,7 @@ export interface ChallengeInformation {
   challenge_expectation?: InjectExpectation;
 }
 
-export interface ChallengeResult {
-  result?: boolean;
-}
-
-export interface ChallengeTryInput {
-  challenge_value?: string;
-}
-
-export interface ChallengeUpdateInput {
+export interface ChallengeInput {
   challenge_category?: string;
   challenge_content?: string;
   challenge_documents?: string[];
@@ -295,9 +275,17 @@ export interface ChallengeUpdateInput {
   /** @format int32 */
   challenge_max_attempts?: number;
   challenge_name: string;
-  /** @format int32 */
+  /** @format double */
   challenge_score?: number;
   challenge_tags?: string[];
+}
+
+export interface ChallengeResult {
+  result?: boolean;
+}
+
+export interface ChallengeTryInput {
+  challenge_value?: string;
 }
 
 export interface ChallengesReader {
@@ -526,19 +514,15 @@ export interface DryInjectStatus {
   listened?: boolean;
   status_id?: string;
   status_name?:
+    | "SUCCESS"
+    | "ERROR"
+    | "MAYBE_PREVENTED"
     | "DRAFT"
-    | "INFO"
     | "QUEUING"
     | "EXECUTING"
     | "PENDING"
     | "PARTIAL"
-    | "ERROR"
-    | "WARNING"
-    | "COMMAND_NOT_FOUND"
-    | "COMMAND_CANNOT_BE_EXECUTED"
-    | "MAYBE_PARTIAL_PREVENTED"
-    | "MAYBE_PREVENTED"
-    | "SUCCESS";
+    | "MAYBE_PARTIAL_PREVENTED";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1208,6 +1192,7 @@ export interface InjectExpectationSignature {
   value?: string;
 }
 
+/** Expectations */
 export interface InjectExpectationSimple {
   inject_expectation_id: string;
   inject_expectation_name?: string;
@@ -1295,38 +1280,59 @@ export interface InjectReceptionInput {
 export interface InjectResultOutput {
   /** Result of expectations */
   inject_expectation_results: ExpectationResultsByType[];
+  /** Id of inject */
   inject_id: string;
   /** Full contract */
   inject_injector_contract?: InjectorContractSimple;
+  /** Status */
   inject_status?: InjectStatusSimple;
   inject_targets?: TargetSimple[];
+  /** Title of inject */
   inject_title: string;
+  /** Type of inject */
   inject_type?: string;
-  /** @format date-time */
+  /**
+   * Timestamp when the inject was last updated
+   * @format date-time
+   */
   inject_updated_at: string;
 }
 
 export interface InjectResultOverviewOutput {
+  /** Attack pattern */
   inject_attack_patterns?: AttackPatternSimple[];
   inject_commands_lines?: InjectStatusCommandLine;
   inject_content?: object;
+  /** Description of inject */
   inject_description?: string;
   /** Result of expectations */
   inject_expectation_results: ExpectationResultsByType[];
+  /** Expectations */
   inject_expectations?: InjectExpectationSimple[];
+  /** Id of inject */
   inject_id: string;
   /** Full contract */
   inject_injector_contract: InjectorContractSimple;
+  /** Kill chain phases */
   inject_kill_chain_phases?: KillChainPhaseSimple[];
+  /** Indicates whether the inject is ready for use */
   inject_ready?: boolean;
+  /** status */
   inject_status?: InjectStatusOutput;
   /** Results of expectations for each target */
   inject_targets: InjectTargetWithResult[];
+  /** Title of inject */
   inject_title: string;
+  /** Type of inject */
   inject_type?: string;
-  /** @format date-time */
+  /**
+   * Timestamp when the inject was last updated
+   * @format date-time
+   */
   inject_updated_at?: string;
+  /** Documents */
   injects_documents?: string[];
+  /** Tags */
   injects_tags?: string[];
 }
 
@@ -1335,19 +1341,15 @@ export interface InjectStatus {
   status_commands_lines?: InjectStatusCommandLine;
   status_id?: string;
   status_name:
+    | "SUCCESS"
+    | "ERROR"
+    | "MAYBE_PREVENTED"
     | "DRAFT"
-    | "INFO"
     | "QUEUING"
     | "EXECUTING"
     | "PENDING"
     | "PARTIAL"
-    | "ERROR"
-    | "WARNING"
-    | "COMMAND_NOT_FOUND"
-    | "COMMAND_CANNOT_BE_EXECUTED"
-    | "MAYBE_PARTIAL_PREVENTED"
-    | "MAYBE_PREVENTED"
-    | "SUCCESS";
+    | "MAYBE_PARTIAL_PREVENTED";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1378,23 +1380,19 @@ export interface InjectStatusExecution {
   execution_duration?: number;
   execution_message?: string;
   execution_status?:
-    | "DRAFT"
-    | "INFO"
-    | "QUEUING"
-    | "EXECUTING"
-    | "PENDING"
-    | "PARTIAL"
+    | "SUCCESS"
     | "ERROR"
-    | "WARNING"
+    | "MAYBE_PREVENTED"
+    | "INFO"
     | "COMMAND_NOT_FOUND"
     | "COMMAND_CANNOT_BE_EXECUTED"
-    | "MAYBE_PARTIAL_PREVENTED"
-    | "MAYBE_PREVENTED"
-    | "SUCCESS";
+    | "WARNING"
+    | "ASSET_INACTIVE";
   /** @format date-time */
   execution_time?: string;
 }
 
+/** status */
 export interface InjectStatusOutput {
   status_id: string;
   status_name?: string;
@@ -1415,6 +1413,7 @@ export interface InjectStatusOutput {
   tracking_total_success?: number;
 }
 
+/** Status */
 export interface InjectStatusSimple {
   status_id: string;
   status_name?: string;
@@ -1448,19 +1447,15 @@ export interface InjectTestStatus {
   listened?: boolean;
   status_id?: string;
   status_name:
+    | "SUCCESS"
+    | "ERROR"
+    | "MAYBE_PREVENTED"
     | "DRAFT"
-    | "INFO"
     | "QUEUING"
     | "EXECUTING"
     | "PENDING"
     | "PARTIAL"
-    | "ERROR"
-    | "WARNING"
-    | "COMMAND_NOT_FOUND"
-    | "COMMAND_CANNOT_BE_EXECUTED"
-    | "MAYBE_PARTIAL_PREVENTED"
-    | "MAYBE_PREVENTED"
-    | "SUCCESS";
+    | "MAYBE_PARTIAL_PREVENTED";
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1696,6 +1691,7 @@ export interface KillChainPhaseCreateInput {
   phase_stix_id?: string;
 }
 
+/** Kill chain phases */
 export interface KillChainPhaseSimple {
   phase_id: string;
   phase_name?: string;
