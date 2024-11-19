@@ -11,6 +11,7 @@ import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Payload;
 import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.PlatformArchitecture;
@@ -21,6 +22,7 @@ import io.openbas.rest.collector.form.CollectorCreateInput;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import io.openbas.rest.payload.form.PayloadsDeprecateInput;
 import io.openbas.utils.fixtures.PayloadFixture;
@@ -430,8 +432,11 @@ public class PayloadApiTest extends IntegrationTest {
   @DisplayName("Upsert a command Payload with arch should success")
   @WithMockPlannerUser
   void upsertCommandPayloadWithArch() throws Exception {
+    Payload payload = payloadRepository.save(PayloadFixture.createDefaultCommand());
+    payload.setExternalId("external-id");
+
     PayloadUpsertInput upsertInput = PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
-    // upsertInput.setExternalId();
+    upsertInput.setExternalId(payload.getExternalId());
 
     mvc.perform(
             post(PAYLOAD_URI + "/upsert")
