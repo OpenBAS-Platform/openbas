@@ -58,6 +58,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -183,12 +184,12 @@ public class ScenarioService {
     // Join on TAG
     Join<Base, Base> scenarioTagsJoin = scenarioRoot.join("tags", JoinType.LEFT);
     joinMap.put("tags", scenarioTagsJoin);
+    Expression<String> nullString = cb.nullLiteral(String.class);
+    Expression<String[]> arr =
+        ((HibernateCriteriaBuilder) cb).arrayAgg(null, scenarioTagsJoin.get("id"));
     Expression<String[]> tagIdsExpression =
-        cb.function(
-            "array_remove",
-            String[].class,
-            cb.function("array_agg", String[].class, scenarioTagsJoin.get("id")),
-            cb.nullLiteral(String.class));
+        ((HibernateCriteriaBuilder) cb).arrayRemove(arr, nullString);
+
     // Join on INJECT and INJECTOR CONTRACT
     Join<Base, Base> injectsJoin = scenarioRoot.join("injects", JoinType.LEFT);
     joinMap.put("injects", injectsJoin);
