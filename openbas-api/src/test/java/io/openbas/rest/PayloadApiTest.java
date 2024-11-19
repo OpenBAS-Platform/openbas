@@ -15,13 +15,13 @@ import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
+import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import io.openbas.utils.fixtures.PayloadInputFixture;
 
 @TestInstance(PER_CLASS)
 public class PayloadApiTest extends IntegrationTest {
@@ -29,12 +29,9 @@ public class PayloadApiTest extends IntegrationTest {
   private static final String PAYLOAD_URI = "/api/payloads";
   private static Document EXECUTABLE_FILE;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private DocumentRepository documentRepository;
-  @Autowired
-  private PayloadRepository payloadRepository;
+  @Autowired private MockMvc mvc;
+  @Autowired private DocumentRepository documentRepository;
+  @Autowired private PayloadRepository payloadRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -55,14 +52,14 @@ public class PayloadApiTest extends IntegrationTest {
     input.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
-                    post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-            .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
-            .andExpect(jsonPath("$.payload_description").value("Executable description"))
-            .andExpect(jsonPath("$.payload_source").value("MANUAL"))
-            .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
-            .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.executable_arch").value("x86_64"));
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
+        .andExpect(jsonPath("$.payload_description").value("Executable description"))
+        .andExpect(jsonPath("$.payload_source").value("MANUAL"))
+        .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
+        .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
+        .andExpect(jsonPath("$.executable_arch").value("x86_64"));
   }
 
   @Test
@@ -74,182 +71,190 @@ public class PayloadApiTest extends IntegrationTest {
     input.setExecutableArch(null);
 
     mvc.perform(
-                    post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-            .andExpect(status().isBadRequest());
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   @DisplayName("Update Executable Payload")
   @WithMockAdminUser
   void updateExecutablePayload() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
     createInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     String response =
-            mvc.perform(
-                            post(PAYLOAD_URI)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(asJsonString(createInput)))
-                    .andExpect(status().is2xxSuccessful())
-                    .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
-                    .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-                    .andExpect(jsonPath("$.executable_arch").value("x86_64"))
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
+            .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
+            .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
     PayloadUpdateInput updateInput = new PayloadUpdateInput();
     updateInput.setName("My Updated Executable Payload");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.MacOS});
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
     updateInput.setExecutableArch(Endpoint.PLATFORM_ARCH.arm64);
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
-                    put(PAYLOAD_URI + "/" + payloadId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(updateInput)))
-            .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.payload_name").value("My Updated Executable Payload"))
-            .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
-            .andExpect(jsonPath("$.executable_arch").value("arm64"));
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("My Updated Executable Payload"))
+        .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
+        .andExpect(jsonPath("$.executable_arch").value("arm64"));
   }
 
   @Test
   @DisplayName("Updating an Executable Payload without arch should fail")
   @WithMockAdminUser
   void updateExecutablePayloadWithoutArch() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
     createInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     String response =
-            mvc.perform(
-                            post(PAYLOAD_URI)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(asJsonString(createInput)))
-                    .andExpect(status().is2xxSuccessful())
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
     PayloadUpdateInput updateInput = new PayloadUpdateInput();
     updateInput.setName("My Updated Executable Payload");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.MacOS});
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
-                    put(PAYLOAD_URI + "/" + payloadId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(updateInput)))
-            .andExpect(status().isBadRequest());
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   @DisplayName("Creating Command Line payload with both set executor and content should succeed")
   @WithMockAdminUser
   void createCommandLinePayloadWithBothSetExecutorAndContent() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     createInput.setExecutor("sh");
     createInput.setExecutor("echo hello world");
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isOk());
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isOk());
   }
 
   @Test
   @DisplayName(
-          "Creating Command Line payload with both null cleanup executor and command should succeed")
+      "Creating Command Line payload with both null cleanup executor and command should succeed")
   @WithMockAdminUser
   void createCommandLinePayloadWithBothNullCleanupExecutorAndCommand() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     createInput.setCleanupExecutor(null);
     createInput.setCleanupCommand(null);
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isOk());
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isOk());
   }
 
   @Test
   @DisplayName(
-          "Creating Command Line payload with both set cleanup executor and command should succeed")
+      "Creating Command Line payload with both set cleanup executor and command should succeed")
   @WithMockAdminUser
   void createCommandLinePayloadWithBothSetCleanupExecutorAndCommand() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     createInput.setCleanupExecutor("sh");
     createInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isOk());
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isOk());
   }
 
   @Test
   @DisplayName(
-          "Creating Command Line payload with only set cleanup executor and null command should fail")
+      "Creating Command Line payload with only set cleanup executor and null command should fail")
   @WithMockAdminUser
   void createCommandLinePayloadWithOnlySetCleanupExecutorAndNullCommand() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     createInput.setCleanupExecutor("sh");
     createInput.setCleanupCommand(null);
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isConflict());
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isConflict());
   }
 
   @Test
   @DisplayName(
-          "Creating Command Line payload with only set cleanup command and null executor should fail")
+      "Creating Command Line payload with only set cleanup command and null executor should fail")
   @WithMockAdminUser
   void createCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     createInput.setCleanupExecutor(null);
     createInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
-                    post(PAYLOAD_URI)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(createInput)))
-            .andExpect(status().isConflict());
+            post(PAYLOAD_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(createInput)))
+        .andExpect(status().isConflict());
   }
 
   @Test
   @DisplayName(
-          "Updating Command Line payload with only set cleanup command and null executor should fail")
+      "Updating Command Line payload with only set cleanup command and null executor should fail")
   @WithMockAdminUser
   void updateCommandLinePayloadWithOnlySetCommandAndNullExecutor() throws Exception {
-    PayloadCreateInput createInput = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
     createInput.setCleanupExecutor(null);
     createInput.setCleanupCommand(null);
 
     String response =
-            mvc.perform(
-                            post(PAYLOAD_URI)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(asJsonString(createInput)))
-                    .andExpect(status().isOk())
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
@@ -257,14 +262,14 @@ public class PayloadApiTest extends IntegrationTest {
     updateInput.setName("updated command line payload");
     updateInput.setContent("echo world again");
     updateInput.setExecutor("sh");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[]{Endpoint.PLATFORM_TYPE.Linux});
+    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
 
     updateInput.setCleanupCommand("cleanup this mess");
 
     mvc.perform(
-                    put(PAYLOAD_URI + "/" + payloadId)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(asJsonString(updateInput)))
-            .andExpect(status().isConflict());
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().isConflict());
   }
 }
