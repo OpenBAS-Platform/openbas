@@ -10,6 +10,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
 import io.openbas.execution.ProtectUser;
+import io.openbas.inject_expectation.InjectExpectationUtils;
 import io.openbas.injectors.ovh.model.OvhSmsContent;
 import io.openbas.injectors.ovh.service.OvhSmsService;
 import io.openbas.model.ExecutionProcess;
@@ -95,6 +96,7 @@ public class OvhSmsExecutor extends Injector {
                         default -> Stream.of();
                       })
               .toList();
+      InjectExpectationUtils.extractedExpectations(injection, expectations);
       return new ExecutionProcess(false);
     }
     return new ExecutionProcess(false);

@@ -8,6 +8,7 @@ import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationUtils;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
@@ -135,6 +136,7 @@ public class EmailExecutor extends Injector {
                       default -> Stream.of();
                     })
             .toList();
+    InjectExpectationUtils.extractedExpectations(injection, expectations);
     return new ExecutionProcess(false);
   }
 }
