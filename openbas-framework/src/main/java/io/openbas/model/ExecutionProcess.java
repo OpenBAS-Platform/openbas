@@ -10,10 +10,7 @@ public class ExecutionProcess {
 
   private boolean async;
 
-  private List<Expectation> expectations;
-
-  public ExecutionProcess(boolean async, List<Expectation> expectations) {
+  public ExecutionProcess(boolean async) {
     this.async = async;
-    this.expectations = expectations;
   }
 }

@@ -135,6 +135,6 @@ public class EmailExecutor extends Injector {
                       default -> Stream.of();
                     })
             .toList();
-    return new ExecutionProcess(false, expectations);
+    return new ExecutionProcess(false);
   }
 }

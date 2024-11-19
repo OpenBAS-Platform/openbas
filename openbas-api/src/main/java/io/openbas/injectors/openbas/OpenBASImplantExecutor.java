@@ -266,7 +266,7 @@ public class OpenBASImplantExecutor extends Injector {
         (assetGroup ->
             computeExpectationsForAssetGroup(
                 expectations, content, assetGroup, new ArrayList<>())));
-    return new ExecutionProcess(true, expectations);
+    return new ExecutionProcess(true);
   }
 
   private List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
