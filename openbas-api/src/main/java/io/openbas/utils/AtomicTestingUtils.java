@@ -538,7 +538,10 @@ public class AtomicTestingUtils {
   }
 
   public static OptionalDouble calculateAverageFromExpectations(final List<Double> scores) {
-    return scores.stream().filter(Objects::nonNull).mapToDouble(Double::doubleValue).average(); //Null values are expectations for injects in Pending
+    return scores.stream()
+        .filter(Objects::nonNull)
+        .mapToDouble(Double::doubleValue)
+        .average(); // Null values are expectations for injects in Pending
   }
 
   public static List<ResultDistribution> getResultDetail(
