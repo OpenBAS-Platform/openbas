@@ -429,7 +429,7 @@ public class PayloadApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Upsert a command Payload with arch should success")
+  @DisplayName("Upsert a command Payload with arch should succeed")
   @WithMockPlannerUser
   void upsertCommandPayloadWithArch() throws Exception {
     Payload payload = payloadRepository.save(PayloadFixture.createDefaultCommand());
