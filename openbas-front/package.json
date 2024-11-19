@@ -80,7 +80,7 @@
     "zustand": "4.5.5"
   },
   "devDependencies": {
-    "@eslint/js": "9.13.0",
+    "@eslint/js": "9.15.0",
     "@playwright/test": "1.48.2",
     "@stylistic/eslint-plugin": "2.10.1",
     "@testing-library/dom": "10.4.0",
@@ -101,7 +101,7 @@
     "chokidar": "4.0.1",
     "cross-env": "7.0.3",
     "esbuild": "0.24.0",
-    "eslint": "9.13.0",
+    "eslint": "9.15.0",
     "eslint-import-resolver-oxc": "0.4.0",
     "eslint-plugin-custom-rules": "link:packages/eslint-plugin-custom-rules",
     "eslint-plugin-i18next": "6.1.0",
