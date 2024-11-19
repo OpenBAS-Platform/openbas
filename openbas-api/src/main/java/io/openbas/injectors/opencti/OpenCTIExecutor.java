@@ -6,6 +6,7 @@ import static io.openbas.injectors.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationUtils;
 import io.openbas.injectors.opencti.model.CaseContent;
 import io.openbas.injectors.opencti.service.OpenCTIService;
 import io.openbas.model.ExecutionProcess;
@@ -79,6 +80,7 @@ public class OpenCTIExecutor extends Injector {
                       default -> Stream.of();
                     })
             .toList();
+    InjectExpectationUtils.extractedExpectations(injection, expectations);
     return new ExecutionProcess(false);
   }
 }

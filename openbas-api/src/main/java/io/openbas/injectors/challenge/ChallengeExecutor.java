@@ -11,6 +11,7 @@ import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationUtils;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.challenge.model.ChallengeVariable;
 import io.openbas.injectors.email.service.EmailService;
@@ -147,6 +148,7 @@ public class ChallengeExecutor extends Injector {
                           })
                   .toList());
         }
+        InjectExpectationUtils.extractedExpectations(injection, expectations);
         return new ExecutionProcess(false);
       } else {
         throw new UnsupportedOperationException("Unknown contract " + contract);

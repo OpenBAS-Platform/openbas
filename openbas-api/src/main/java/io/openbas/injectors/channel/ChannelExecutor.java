@@ -11,6 +11,7 @@ import io.openbas.database.repository.ArticleRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationUtils;
 import io.openbas.injectors.channel.model.ArticleVariable;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.injectors.email.service.EmailService;
@@ -153,6 +154,7 @@ public class ChannelExecutor extends Injector {
                           })
                   .toList());
         }
+        InjectExpectationUtils.extractedExpectations(injection, expectations);
         return new ExecutionProcess(false);
       } else {
         throw new UnsupportedOperationException("Unknown contract " + contract);
