@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties;
 import org.springframework.context.ApplicationContext;
@@ -47,6 +48,12 @@ public class PlatformSettingsService {
   private OpenCTIConfig openCTIConfig;
   private AiConfig aiConfig;
   private CalderaExecutorConfig calderaExecutorConfig;
+
+  @Value("${openbas.mail.imap.enabled}")
+  private boolean imapEnabled;
+
+  @Value("${openbas.mail.imap.username}")
+  private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
   @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
@@ -180,8 +187,13 @@ public class PlatformSettingsService {
         ofNullable(dbSettings.get(DEFAULT_LANG.key()))
             .map(Setting::getValue)
             .orElse(DEFAULT_LANG.defaultValue()));
-    platformSettings.setDefaultMailer(openBASConfig.getDefaultMailer());
-    platformSettings.setDefaultReplyTo(openBASConfig.getDefaultReplyTo());
+    if (this.imapEnabled) {
+      platformSettings.setDefaultMailer(this.imapUsername);
+      platformSettings.setDefaultReplyTo(this.imapUsername);
+    } else {
+      platformSettings.setDefaultMailer(openBASConfig.getDefaultMailer());
+      platformSettings.setDefaultReplyTo(openBASConfig.getDefaultReplyTo());
+    }
 
     // Build authenticated user settings
     OpenBASPrincipal user = currentUser();
