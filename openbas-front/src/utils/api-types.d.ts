@@ -2456,16 +2456,16 @@ export interface PayloadArgument {
 }
 
 export interface PayloadCreateInput {
-  command_content?: string;
-  command_executor?: string;
+  command_content?: string | null;
+  command_executor?: string | null;
   dns_resolution_hostname?: string;
   executable_arch?: "x86_64" | "arm64" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
-  payload_cleanup_command?: string;
-  payload_cleanup_executor?: string;
+  payload_cleanup_command?: string | null;
+  payload_cleanup_executor?: string | null;
   payload_description?: string;
   payload_name: string;
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
@@ -2490,16 +2490,16 @@ export interface PayloadSimple {
 }
 
 export interface PayloadUpdateInput {
-  command_content?: string;
-  command_executor?: string;
+  command_content?: string | null;
+  command_executor?: string | null;
   dns_resolution_hostname?: string;
   executable_arch?: "x86_64" | "arm64" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
-  payload_cleanup_command?: string;
-  payload_cleanup_executor?: string;
+  payload_cleanup_command?: string | null;
+  payload_cleanup_executor?: string | null;
   payload_description?: string;
   payload_name: string;
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
@@ -2508,15 +2508,15 @@ export interface PayloadUpdateInput {
 }
 
 export interface PayloadUpsertInput {
-  command_content?: string;
-  command_executor?: string;
+  command_content?: string | null;
+  command_executor?: string | null;
   dns_resolution_hostname?: string;
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
-  payload_cleanup_command?: string;
-  payload_cleanup_executor?: string;
+  payload_cleanup_command?: string | null;
+  payload_cleanup_executor?: string | null;
   payload_collector?: string;
   payload_description?: string;
   payload_elevation_required?: boolean;

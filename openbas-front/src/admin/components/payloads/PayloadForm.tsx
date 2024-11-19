@@ -125,6 +125,16 @@ const PayloadForm: FunctionComponent<Props> = ({
       break;
   }
 
+  extendedSchema = extendedSchema.refine(input =>
+    !(!input.payload_cleanup_command && input.payload_cleanup_executor), {
+    message: t('Cleanup command and executor must be defined together or none at all'),
+    path: ['payload_cleanup_command'],
+  }).refine(input =>
+    !(input.payload_cleanup_command && !input.payload_cleanup_executor), {
+    message: t('Cleanup command and executor must be defined together or none at all'),
+    path: ['payload_cleanup_executor'],
+  });
+
   const {
     register,
     control,
@@ -469,6 +479,8 @@ const PayloadForm: FunctionComponent<Props> = ({
         control={control}
         fullWidth={true}
         style={{ marginTop: 10 }}
+        error={!!errors.payload_cleanup_executor}
+        helperText={errors.payload_cleanup_executor?.message}
       >
         <MenuItem value="psh">
           {t('PowerShell')}
@@ -489,6 +501,8 @@ const PayloadForm: FunctionComponent<Props> = ({
         rows={3}
         label={t('Cleanup command')}
         style={{ marginTop: 20 }}
+        error={!!errors.payload_cleanup_command}
+        helperText={errors.payload_cleanup_command?.message}
         inputProps={register('payload_cleanup_command')}
       />
       <Controller

@@ -47,6 +47,8 @@ class CreatePayload extends Component {
       R.assoc('payload_tags', data.payload_tags),
       R.assoc('payload_attack_patterns', data.payload_attack_patterns),
       R.assoc('executable_file', data.executable_file?.id),
+      R.assoc('payload_cleanup_executor', data.payload_cleanup_executor === '' ? null : data.payload_cleanup_executor),
+      R.assoc('payload_cleanup_command', data.payload_cleanup_command === '' ? null : data.payload_cleanup_command),
     )(data);
     return this.props
       .addPayload(inputValues)
