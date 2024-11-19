@@ -27,7 +27,7 @@ import type { Theme } from '../../../../components/Theme';
 import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
-import type { KillChainPhase } from '../../../../utils/api-types';
+import type { KillChainPhase, SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isEmptyField } from '../../../../utils/utils';
@@ -80,10 +80,17 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
 
   // Exercises
+  const [loadingExercises, setLoadingExercises] = useState(true);
   const [exercises, setExercises] = useState<EndpointStore[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({
     sorts: initSorting('exercise_start_date'),
   }));
+  const search = (scenarioId: ScenarioStore['scenario_id'], input: SearchPaginationInput) => {
+    setLoadingExercises(true);
+    return searchScenarioExercises(scenarioId, input).finally(() => {
+      setLoadingExercises(false);
+    });
+  };
   const secondaryAction = (exercise: ExerciseStore) => (
     <ExercisePopover
       exercise={exercise}
@@ -223,7 +230,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined">
               <PaginationComponentV2
-                fetch={input => searchScenarioExercises(scenarioId, input)}
+                fetch={input => search(scenarioId, input)}
                 searchPaginationInput={searchPaginationInput}
                 setContent={setExercises}
                 entityPrefix="exercise"
@@ -235,7 +242,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 exercises={exercises}
                 queryableHelpers={queryableHelpers}
                 secondaryAction={secondaryAction}
-                loading={loadingScenarioExercises}
+                loading={loadingExercises}
               />
             </Paper>
           </Grid>
