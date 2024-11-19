@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { useSelector } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
 import { createReduxHistoryContext } from 'redux-first-history';
-import thunk from 'redux-thunk';
+import { thunk } from 'redux-thunk';
 import Immutable from 'seamless-immutable';
 
 import { storeHelper } from './actions/Schema';
