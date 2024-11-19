@@ -35,7 +35,6 @@ public class PayloadUpdateInput {
   @Schema(nullable = true)
   private String content;
 
-  @RequiredArchIfType(validTypes = {"Command", "Executable"})
   @JsonProperty("executable_arch")
   private PlatformArchitecture executableArch;
 

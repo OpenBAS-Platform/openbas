@@ -95,24 +95,30 @@ public class PayloadApi extends RestBehavior {
     switch (PayloadType.fromString(input.getType())) {
       case PayloadType.COMMAND:
         Command commandPayload = new Command();
-        commandPayload.setUpdateAttributes(input);
+        PayloadCreateInput validatedCommandInput = validateExecutableCreateInput(input);
+        commandPayload.setUpdateAttributes(validatedCommandInput);
         commandPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+            fromIterable(
+                attackPatternRepository.findAllById(validatedCommandInput.getAttackPatternsIds())));
+        commandPayload.setTags(
+            iterableToSet(tagRepository.findAllById(validatedCommandInput.getTagIds())));
         commandPayload = payloadRepository.save(commandPayload);
         this.payloadService.updateInjectorContractsForPayload(commandPayload);
         return commandPayload;
       case PayloadType.EXECUTABLE:
         Executable executablePayload = new Executable();
-        PayloadCreateInput validatedInput = validateExecutableCreateInput(input);
-        executablePayload.setUpdateAttributes(validatedInput);
+        PayloadCreateInput validatedExecutableInput = validateExecutableCreateInput(input);
+        executablePayload.setUpdateAttributes(validatedExecutableInput);
         executablePayload.setAttackPatterns(
             fromIterable(
-                attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
+                attackPatternRepository.findAllById(
+                    validatedExecutableInput.getAttackPatternsIds())));
         executablePayload.setTags(
-            iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
+            iterableToSet(tagRepository.findAllById(validatedExecutableInput.getTagIds())));
         executablePayload.setExecutableFile(
-            documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
+            documentRepository
+                .findById(validatedExecutableInput.getExecutableFile())
+                .orElseThrow());
         executablePayload = payloadRepository.save(executablePayload);
         this.payloadService.updateInjectorContractsForPayload(executablePayload);
         return executablePayload;
@@ -183,8 +189,9 @@ public class PayloadApi extends RestBehavior {
     payload.setUpdatedAt(Instant.now());
     switch (PayloadType.fromString(payload.getType())) {
       case PayloadType.COMMAND:
+        PayloadUpdateInput validatedCommandInput = validateExecutableUpdateInput(input);
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        payloadCommand.setUpdateAttributes(input);
+        payloadCommand.setUpdateAttributes(validatedCommandInput);
         payloadCommand = payloadRepository.save(payloadCommand);
         this.payloadService.updateInjectorContractsForPayload(payloadCommand);
         return payloadCommand;
