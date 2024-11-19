@@ -55,8 +55,8 @@ public class ChallengeApi extends RestBehavior {
       @PathVariable String challengeId, @Valid @RequestBody ChallengeInput input) {
     Challenge challenge =
         challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
-    challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
+    challenge.setTags(iterableToSet(tagRepository.findAllById(input.tagIds())));
+    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.documentIds())));
     challenge.setUpdateAttributes(input);
     challenge.setUpdatedAt(Instant.now());
     // Clear all flags
@@ -65,7 +65,7 @@ public class ChallengeApi extends RestBehavior {
     challengeFlags.clear();
     // Add new ones
     input
-        .getFlags()
+        .flags()
         .forEach(
             flagInput -> {
               ChallengeFlag challengeFlag = new ChallengeFlag();
@@ -84,10 +84,10 @@ public class ChallengeApi extends RestBehavior {
   public Challenge createChallenge(@Valid @RequestBody ChallengeInput input) {
     Challenge challenge = new Challenge();
     challenge.setUpdateAttributes(input);
-    challenge.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
+    challenge.setTags(iterableToSet(tagRepository.findAllById(input.tagIds())));
+    challenge.setDocuments(fromIterable(documentRepository.findAllById(input.documentIds())));
     List<ChallengeFlag> challengeFlags =
-        input.getFlags().stream()
+        input.flags().stream()
             .map(
                 flagInput -> {
                   ChallengeFlag challengeFlag = new ChallengeFlag();

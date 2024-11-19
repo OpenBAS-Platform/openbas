@@ -6,36 +6,27 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
 
-@Data
-public class ChallengeInput {
+public record ChallengeInput(
+    @NotBlank(message = MANDATORY_MESSAGE) @JsonProperty("challenge_name") String name,
+    @JsonProperty("challenge_category") String category,
+    @JsonProperty("challenge_content") String content,
+    @JsonProperty("challenge_score") Double score,
+    @JsonProperty("challenge_max_attempts") Integer maxAttempts,
+    @JsonProperty("challenge_tags") List<String> tagIds,
+    @JsonProperty("challenge_documents") List<String> documentIds,
+    @NotEmpty(message = EMPTY_MESSAGE) @JsonProperty("challenge_flags") List<FlagInput> flags) {
 
-  @NotBlank(message = MANDATORY_MESSAGE)
-  @JsonProperty("challenge_name")
-  private String name;
-
-  @JsonProperty("challenge_category")
-  private String category;
-
-  @JsonProperty("challenge_content")
-  private String content;
-
-  @JsonProperty("challenge_score")
-  private Double score;
-
-  @JsonProperty("challenge_max_attempts")
-  private Integer maxAttempts;
-
-  @JsonProperty("challenge_tags")
-  private List<String> tagIds = new ArrayList<>();
-
-  @JsonProperty("challenge_documents")
-  private List<String> documentIds = new ArrayList<>();
-
-  @NotEmpty(message = EMPTY_MESSAGE)
-  @JsonProperty("challenge_flags")
-  private List<FlagInput> flags = new ArrayList<>();
+  public ChallengeInput {
+    if (tagIds == null) {
+      tagIds = List.of();
+    }
+    if (documentIds == null) {
+      documentIds = List.of();
+    }
+    if (flags == null) {
+      flags = List.of();
+    }
+  }
 }
