@@ -80,7 +80,7 @@ const Payload: FunctionComponent<Props> = ({
             >
               {t('Architecture')}
             </Typography>
-            {selectedPayload?.executable_arch}
+            {t(selectedPayload?.executable_arch)}
           </>
         )}
         <Typography
