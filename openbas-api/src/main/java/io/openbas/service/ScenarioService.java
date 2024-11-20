@@ -105,12 +105,14 @@ public class ScenarioService {
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
-    if (this.imapEnabled) {
-      scenario.setFrom(this.imapUsername);
-      scenario.setReplyTos(List.of(this.imapUsername));
-    } else {
-      scenario.setFrom(this.openBASConfig.getDefaultMailer());
-      scenario.setReplyTos(List.of(this.openBASConfig.getDefaultReplyTo()));
+    if (!org.springframework.util.StringUtils.hasText(scenario.getFrom())) {
+      if (this.imapEnabled) {
+        scenario.setFrom(this.imapUsername);
+        scenario.setReplyTos(List.of(this.imapUsername));
+      } else {
+        scenario.setFrom(this.openBASConfig.getDefaultMailer());
+        scenario.setReplyTos(List.of(this.openBASConfig.getDefaultReplyTo()));
+      }
     }
     this.grantService.computeGrant(scenario);
     return this.scenarioRepository.save(scenario);

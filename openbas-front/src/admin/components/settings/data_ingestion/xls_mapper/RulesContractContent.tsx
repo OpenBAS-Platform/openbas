@@ -140,7 +140,9 @@ const RulesContractContent: React.FC<Props> = ({
   }, []);
 
   const onChangeInjectorContractId = () => {
-    directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: { data: InjectorContractConverted }) => {
+    directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: {
+      data: InjectorContractConverted;
+    }) => {
       const injectorContract = result.data;
       setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
       const tmp = injectorContract?.convertedContent?.fields
@@ -244,8 +246,7 @@ const RulesContractContent: React.FC<Props> = ({
                 <Badge
                   color="secondary"
                   variant="dot"
-                  invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
+                  invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`) || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
                   && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
                     || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
                 >
@@ -257,8 +258,7 @@ const RulesContractContent: React.FC<Props> = ({
                 <Badge
                   color="secondary"
                   variant="dot"
-                  invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
+                  invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`) || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
                   && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
                     || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
                 >

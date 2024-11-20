@@ -2531,6 +2531,8 @@ export interface PlatformSettings {
   platform_saml2_providers?: OAuthProvider[];
   auth_local_enable?: boolean;
   auth_openid_enable?: boolean;
+  default_mailer?: string;
+  default_reply_to?: string;
   disabled_dev_features?: string[];
   executor_caldera_enable?: boolean;
   executor_caldera_public_url?: string;
@@ -2892,7 +2894,11 @@ export interface ScenarioInput {
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;
+  scenario_mail_from: string;
+  scenario_mails_reply_to?: string[];
   scenario_main_focus?: string;
+  scenario_message_footer?: string;
+  scenario_message_header?: string;
   scenario_name: string;
   scenario_severity?: "low" | "medium" | "high" | "critical";
   scenario_subtitle?: string;

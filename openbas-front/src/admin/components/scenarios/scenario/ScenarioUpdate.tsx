@@ -1,15 +1,12 @@
-import { Box, Tab, Tabs } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
+import { FunctionComponent } from 'react';
 
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import { updateScenario, updateScenarioInformation } from '../../../../actions/scenarios/scenario-actions';
+import { updateScenario } from '../../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { ScenarioInformationInput, ScenarioInput } from '../../../../utils/api-types';
+import type { ScenarioInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useScenarioPermissions from '../../../../utils/Scenario';
-import EmailParametersForm, { SettingUpdateInput } from '../../common/simulate/EmailParametersForm';
 import ScenarioForm from '../ScenarioForm';
 
 interface Props {
@@ -28,10 +25,6 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const permissions = useScenarioPermissions(scenario.scenario_id);
 
-  // Tabs
-  const [currentTab, setCurrentTab] = useState(0);
-  const handleChangeTab = (event: React.SyntheticEvent, value: number) => setCurrentTab(value);
-
   // Scenario form
   const initialValues = (({
     scenario_name,
@@ -43,6 +36,10 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
     scenario_tags,
     scenario_external_reference,
     scenario_external_url,
+    scenario_message_header,
+    scenario_message_footer,
+    scenario_mail_from,
+    scenario_mails_reply_to,
   }) => ({
     scenario_name,
     scenario_subtitle: scenario_subtitle ?? '',
@@ -53,27 +50,14 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
     scenario_tags: scenario_tags ?? [],
     scenario_external_reference: scenario_external_reference ?? '',
     scenario_external_url: scenario_external_url ?? '',
+    scenario_message_header: scenario_message_header ?? '',
+    scenario_message_footer: scenario_message_footer ?? '',
+    scenario_mail_from: scenario_mail_from ?? '',
+    scenario_mails_reply_to: scenario_mails_reply_to ?? [],
   }))(scenario);
   const submitEdit = (data: ScenarioInput) => {
     dispatch(updateScenario(scenario.scenario_id, data));
     handleClose();
-  };
-
-  // Email parameters
-  const initialValuesEmailParameters = {
-    setting_mail_from: scenario.scenario_mail_from,
-    setting_mails_reply_to: scenario.scenario_mails_reply_to,
-    setting_message_header: scenario.scenario_message_header,
-    setting_message_footer: scenario.scenario_message_footer,
-  };
-  const submitUpdateEmailParameters = (data: SettingUpdateInput) => {
-    const scenarioInformationInput: ScenarioInformationInput = {
-      scenario_mail_from: data.setting_mail_from || '',
-      scenario_mails_reply_to: data.setting_mails_reply_to,
-      scenario_message_header: data.setting_message_header,
-      scenario_message_footer: scenario.scenario_message_footer,
-    };
-    dispatch(updateScenarioInformation(scenario.scenario_id, scenarioInformationInput)).then(() => handleClose());
   };
 
   return (
@@ -82,29 +66,13 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
       handleClose={handleClose}
       title={t('Update the scenario')}
     >
-      <>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={currentTab} onChange={handleChangeTab}>
-            <Tab label={t('Overview')} />
-            <Tab label={t('Mail configuration')} />
-          </Tabs>
-        </Box>
-        {currentTab === 0 && (
-          <ScenarioForm
-            initialValues={initialValues}
-            editing
-            onSubmit={submitEdit}
-            handleClose={handleClose}
-          />
-        )}
-        {currentTab === 1 && (
-          <EmailParametersForm
-            initialValues={initialValuesEmailParameters}
-            onSubmit={submitUpdateEmailParameters}
-            disabled={permissions.readOnly}
-          />
-        )}
-      </>
+      <ScenarioForm
+        initialValues={initialValues}
+        editing
+        disabled={permissions.readOnly}
+        onSubmit={submitEdit}
+        handleClose={handleClose}
+      />
     </Drawer>
   );
 };

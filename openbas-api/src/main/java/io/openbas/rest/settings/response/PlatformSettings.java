@@ -158,4 +158,11 @@ public class PlatformSettings {
   @NotNull
   @JsonProperty("expectation_manual_default_score_value")
   private int expectationDefaultScoreValue;
+
+  // EMAIL CONFIG
+  @JsonProperty("default_mailer")
+  private String defaultMailer;
+
+  @JsonProperty("default_reply_to")
+  private String defaultReplyTo;
 }

@@ -59,6 +59,8 @@ public class ScenarioApiTest {
     // -- PREPARE --
     String name = "My scenario";
     scenarioInput.setName(name);
+    String from = "no-reply@openbas.io";
+    scenarioInput.setFrom(from);
 
     // -- EXECUTE --
     String response =
@@ -132,6 +134,7 @@ public class ScenarioApiTest {
     ScenarioInput scenarioInput = new ScenarioInput();
     String subtitle = "A subtitle";
     scenarioInput.setName(JsonPath.read(response, "$.scenario_name"));
+    scenarioInput.setFrom(JsonPath.read(response, "$.scenario_mail_from"));
     scenarioInput.setSubtitle(subtitle);
 
     // -- EXECUTE --
