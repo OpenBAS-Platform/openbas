@@ -2163,7 +2163,6 @@ const i18n = {
       'Percent of reached score': '达到分数百分比',
       'Pause': '暂停',
       'Resume': '恢复',
-      'Emails and SMS': '电子邮件和短信',
       'injects': '注入',
       'Paused': '已暂停',
       'Canceled': '已取消',

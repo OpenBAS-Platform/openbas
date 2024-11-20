@@ -37,12 +37,10 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,8 +57,7 @@ import org.springframework.validation.annotation.Validated;
 @Service
 public class ExerciseService {
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final GrantService grantService;
   private final InjectDuplicateService injectDuplicateService;
@@ -88,8 +85,7 @@ public class ExerciseService {
   @Value("${openbas.mail.imap.username}")
   private String imapUsername;
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
   // endregion
 
