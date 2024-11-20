@@ -1328,6 +1328,7 @@ const i18n = {
         'Souhaitez-vous supprimer cette question de retour d\'expérience ?',
       'x86_64': 'x86_64',
       'arm64': 'arm64',
+      'all_architectures': 'Toutes les architectures',
       'Invalid IP addresses': 'Adresses IP invalides',
       'Invalid MAC addresses': 'Adresses MAC invalides',
       'Create a new security platform': 'Créer une nouvelle plateforme de sécurité',
@@ -2684,6 +2685,7 @@ const i18n = {
         '你想要删除这个经验教训问题么?',
       'x86_64': 'x86_64',
       'arm64': 'arm64',
+      'all_architectures': '所有架构',
       'Invalid IP addresses': '无效IP地址',
       'Invalid MAC addresses': '无效MAC地址',
       'Create a new security platform': '创建一个新的安全平台',
@@ -2824,6 +2826,7 @@ const i18n = {
         + 'It may contain white spaces or hyphens ( – ) or parenthesis.\n',
       'Exercise': 'Simulation',
       'Scheduling_time': 'Time',
+      'all_architectures': 'All architectures',
       // -- FILTERS --
       // Asset
       'asset_tags': 'Tags',

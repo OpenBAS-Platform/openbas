@@ -587,7 +587,7 @@ export interface Endpoint {
   /** @format date-time */
   asset_updated_at: string;
   endpoint_agent_version?: string;
-  endpoint_arch: "x86_64" | "arm64" | "Unknown";
+  endpoint_arch: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   endpoint_hostname?: string;
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
@@ -602,7 +602,7 @@ export interface EndpointInput {
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
-  endpoint_arch: "x86_64" | "arm64" | "Unknown";
+  endpoint_arch: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   endpoint_hostname?: string;
   /**
    * @maxItems 2147483647
@@ -621,7 +621,7 @@ export interface EndpointRegisterInput {
   asset_name: string;
   asset_tags?: string[];
   endpoint_agent_version?: string;
-  endpoint_arch: "x86_64" | "arm64" | "Unknown";
+  endpoint_arch: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   endpoint_hostname?: string;
   /**
    * @maxItems 2147483647
@@ -1511,7 +1511,7 @@ export interface InjectorConnection {
 
 export interface InjectorContract {
   convertedContent?: object;
-  injector_contract_arch?: "x86_64" | "arm64" | "Unknown";
+  injector_contract_arch?: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   injector_contract_atomic_testing?: boolean;
   injector_contract_attack_patterns?: AttackPattern[];
   injector_contract_content: string;
@@ -1566,7 +1566,7 @@ export interface InjectorContractInput {
 }
 
 export interface InjectorContractOutput {
-  injector_contract_arch?: "x86_64" | "arm64" | "Unknown";
+  injector_contract_arch?: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   injector_contract_attack_patterns?: string[];
   injector_contract_content: string;
   injector_contract_id: string;
@@ -2418,8 +2418,6 @@ export interface Pause {
   pause_exercise?: Exercise;
 }
 
-export type PayloadStatus =  "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
-
 export interface Payload {
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
@@ -2438,7 +2436,7 @@ export interface Payload {
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: PayloadStatus;
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;
@@ -2457,7 +2455,7 @@ export interface PayloadCreateInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "Unknown";
+  executable_arch?: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
@@ -2469,7 +2467,7 @@ export interface PayloadCreateInput {
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   payload_tags?: string[];
   payload_type: string;
 }
@@ -2491,7 +2489,7 @@ export interface PayloadUpdateInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "Unknown";
+  executable_arch?: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
@@ -2509,7 +2507,7 @@ export interface PayloadUpsertInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "Unknown";
+  executable_arch?: "x86_64" | "arm64" | "all_architectures" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];
@@ -2524,9 +2522,14 @@ export interface PayloadUpsertInput {
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   payload_tags?: string[];
   payload_type: string;
+}
+
+export interface PayloadsDeprecateInput {
+  collector_id: string;
+  payload_external_ids: string[];
 }
 
 export interface PlatformSettings {
