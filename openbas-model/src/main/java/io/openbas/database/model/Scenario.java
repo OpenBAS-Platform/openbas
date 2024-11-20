@@ -111,7 +111,7 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_message_header")
   @JsonProperty("scenario_message_header")
-  private String header = "EXERCISE HEADER";
+  private String header = "SIMULATION HEADER";
 
   @Column(name = "scenario_message_footer")
   @JsonProperty("scenario_message_footer")
