@@ -59,7 +59,7 @@ public class InjectResultOverviewOutput {
   @Schema(description = "Full contract")
   @JsonProperty("inject_injector_contract")
   @NotNull
-  private InjectorContractOutput injectorContract;
+  private AtomicInjectorContractOutput injectorContract;
 
   @Schema(description = "status")
   @JsonProperty("inject_status")

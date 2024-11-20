@@ -7,7 +7,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemCopy from '../../../../components/ItemCopy';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { AttackPattern, AttackPatternSimple, PayloadArgument, PayloadPrerequisite } from '../../../../utils/api-types';
+import { AttackPatternSimple, PayloadArgument, PayloadPrerequisite } from '../../../../utils/api-types';
 import { emptyFilled } from '../../../../utils/String';
 import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
