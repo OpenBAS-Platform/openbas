@@ -2418,6 +2418,8 @@ export interface Pause {
   pause_exercise?: Exercise;
 }
 
+export type PayloadStatus =  "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+
 export interface Payload {
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
@@ -2436,7 +2438,7 @@ export interface Payload {
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED";
+  payload_status: PayloadStatus;
   /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;

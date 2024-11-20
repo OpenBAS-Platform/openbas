@@ -23,6 +23,7 @@ import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
+import { PayloadStatus } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePayload from './CreatePayload';
@@ -108,6 +109,18 @@ const chipSx = {
   textTransform: 'uppercase',
   borderRadius: 1,
   width: 120,
+};
+
+const fromPayloadStatusToChipColor = (payloadStatus: PayloadStatus) => {
+  switch (payloadStatus) {
+    case 'VERIFIED':
+      return 'success';
+    case 'UNVERIFIED':
+      return 'warning';
+    case 'DEPRECATED':
+    default:
+      return 'default';
+  }
 };
 
 const Payloads = () => {
@@ -197,7 +210,7 @@ const Payloads = () => {
         <Chip
           variant="outlined"
           classes={{ root: classes.chipInList2 }}
-          color={payload.payload_status === 'VERIFIED' ? 'success' : 'warning'}
+          color={fromPayloadStatusToChipColor(payload.payload_status)}
           label={t(payload.payload_status ?? 'UNVERIFIED')}
         />
       ),
@@ -295,7 +308,8 @@ const Payloads = () => {
                     onUpdate={(result: PayloadStore) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
                     onDuplicate={(result: PayloadStore) => setPayloads([result, ...payloads])}
                     onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
-                    disabled={collector !== null}
+                    disableUpdate={collector !== null}
+                    disableDelete={collector !== null && payload.payload_status !== 'DEPRECATED'}
                   />
                 )}
                 disablePadding
