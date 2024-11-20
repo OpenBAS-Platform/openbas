@@ -7,6 +7,9 @@ public enum PlatformArchitecture {
   x86_64,
   @JsonProperty("arm64")
   arm64,
+  @JsonProperty("all_architectures")
+  all_architectures,
   @JsonProperty("Unknown")
   Unknown,
 }
+

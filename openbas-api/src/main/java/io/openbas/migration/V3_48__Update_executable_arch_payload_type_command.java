@@ -14,7 +14,7 @@ public class V3_48__Update_executable_arch_payload_type_command extends BaseJava
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
     statement.execute(
-        "UPDATE payloads SET executable_arch = 'x86_64' WHERE payload_type ='Command';");
+        "UPDATE payloads SET executable_arch = 'all_architectures' WHERE payload_type ='Command';");
 
     statement.execute(
         """
