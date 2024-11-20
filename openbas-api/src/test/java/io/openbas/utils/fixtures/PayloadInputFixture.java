@@ -10,7 +10,6 @@ import io.openbas.database.model.PlatformArchitecture;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
-import io.openbas.rest.payload.form.PayloadUpsertInput;
 import java.util.Collections;
 
 public class PayloadInputFixture {
@@ -86,6 +85,7 @@ public class PayloadInputFixture {
     input.setTagIds(Collections.emptyList());
     input.setExecutor("sh");
     input.setContent("ufw prepend deny from 1.2.3.4\n" + "ufw status numbered\n");
+    input.setExecutableArch(PlatformArchitecture.arm64);
     return input;
   }
 }

@@ -19,6 +19,7 @@ public class PayloadFixture {
     command.setSource(MANUAL);
     command.setStatus(VERIFIED);
     command.setAttackPatterns(Collections.emptyList());
+    command.setExecutableArch(PlatformArchitecture.arm64);
     return command;
   }
 
