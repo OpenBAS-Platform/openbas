@@ -70,12 +70,12 @@ public class InjectMapper {
   }
 
   // -- INJECTORCONTRACT to INJECTORCONTRACT SIMPLE --
-  public InjectorContractOutput toInjectorContractOutput(
+  public AtomicInjectorContractOutput toInjectorContractOutput(
       Optional<InjectorContract> injectorContract) {
     return injectorContract
         .map(
             contract ->
-                InjectorContractOutput.builder()
+                AtomicInjectorContractOutput.builder()
                     .id(contract.getId())
                     .content(contract.getContent())
                     .convertedContent(contract.getConvertedContent())

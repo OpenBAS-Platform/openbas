@@ -16,7 +16,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
-public class InjectorContractOutput {
+public class AtomicInjectorContractOutput {
 
   @JsonProperty("injector_contract_id")
   @NotBlank
