@@ -115,7 +115,7 @@ public class Scenario implements Base {
 
   @Column(name = "scenario_message_footer")
   @JsonProperty("scenario_message_footer")
-  private String footer = "EXERCISE FOOTER";
+  private String footer = "SIMULATION FOOTER";
 
   @Column(name = "scenario_mail_from")
   @JsonProperty("scenario_mail_from")
