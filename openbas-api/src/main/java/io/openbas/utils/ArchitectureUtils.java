@@ -20,17 +20,13 @@ public class ArchitectureUtils {
         ofNullable(searchPaginationInput.getFilterGroup())
             .flatMap(f -> f.findByKey(EXECUTABLE_ARCH));
 
-    if (payloadFilterOpt.isPresent()) {
-      if (payloadFilterOpt.get().getValues().contains("x86_64")
-          || (payloadFilterOpt.get().getValues().contains("arm64"))) {
-        searchPaginationInput
-            .getFilterGroup()
-            .findByKey(EXECUTABLE_ARCH)
-            .get()
-            .getValues()
-            .add(ALL);
-      }
-    }
+    payloadFilterOpt.ifPresent(
+        payloadFilter -> {
+          if (payloadFilter.getValues().contains("x86_64")
+              || payloadFilter.getValues().contains("arm64")) {
+            payloadFilter.getValues().add(ALL);
+          }
+        });
 
     return searchPaginationInput;
   }
@@ -41,16 +37,15 @@ public class ArchitectureUtils {
     Optional<Filters.Filter> endpointFilterOpt =
         ofNullable(searchPaginationInput.getFilterGroup()).flatMap(f -> f.findByKey(ENDPOINT_ARCH));
 
-    if (endpointFilterOpt.isPresent()) {
-      if (endpointFilterOpt.get().getValues().contains(ALL)) {
-        searchPaginationInput
-            .getFilterGroup()
-            .findByKey(ENDPOINT_ARCH)
-            .get()
-            .getValues()
-            .remove(ALL);
-      }
-    }
+    endpointFilterOpt.ifPresent(
+        endpointFilter -> {
+          if (endpointFilter.getValues().contains(ALL)) {
+            endpointFilter.getValues().remove(ALL);
+          }
+          if (endpointFilter.getValues().isEmpty()) {
+            searchPaginationInput.getFilterGroup().removeByKey(ENDPOINT_ARCH);
+          }
+        });
 
     return searchPaginationInput;
   }
