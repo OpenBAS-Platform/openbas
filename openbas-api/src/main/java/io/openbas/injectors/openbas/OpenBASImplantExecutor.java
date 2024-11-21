@@ -15,6 +15,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
+import io.openbas.executors.Injector;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;

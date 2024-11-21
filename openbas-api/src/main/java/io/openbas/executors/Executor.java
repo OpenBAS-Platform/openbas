@@ -1,4 +1,4 @@
-package io.openbas.execution;
+package io.openbas.executors;
 
 import static io.openbas.database.model.InjectStatusExecution.traceInfo;
 
@@ -9,6 +9,8 @@ import io.openbas.database.model.Injector;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorRepository;
+import io.openbas.execution.ExecutableInject;
+import io.openbas.execution.ExecutionExecutorService;
 import jakarta.annotation.Resource;
 import java.time.Duration;
 import java.time.Instant;
@@ -96,9 +98,9 @@ public class Executor {
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
-    io.openbas.execution.Injector executor =
+    io.openbas.executors.Injector executor =
         this.context.getBean(
-            injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
+            injectorContract.getInjector().getType(), io.openbas.executors.Injector.class);
     Execution execution = executor.executeInjection(executableInject);
     Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
     InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);

@@ -9,6 +9,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
+import io.openbas.executors.Injector;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
