@@ -41,7 +41,7 @@ public class ExpectationsExpirationManagerService {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
             this.injectExpectationService.computeExpectation(
-                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false);
+                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
           }
         });
   }
@@ -54,7 +54,7 @@ public class ExpectationsExpirationManagerService {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
             this.injectExpectationService.computeExpectation(
-                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false);
+                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
           }
         });
   }

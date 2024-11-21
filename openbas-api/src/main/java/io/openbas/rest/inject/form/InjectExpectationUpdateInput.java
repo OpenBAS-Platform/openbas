@@ -2,7 +2,10 @@ package io.openbas.rest.inject.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
+import java.util.Map;
+import lombok.Data;
 
+@Data
 public class InjectExpectationUpdateInput {
   @NotNull
   @JsonProperty("collector_id")
@@ -16,27 +19,6 @@ public class InjectExpectationUpdateInput {
   @JsonProperty("is_success")
   private Boolean isSuccess;
 
-  public String getCollectorId() {
-    return collectorId;
-  }
-
-  public void setCollectorId(String collectorId) {
-    this.collectorId = collectorId;
-  }
-
-  public String getResult() {
-    return result;
-  }
-
-  public void setResult(String result) {
-    this.result = result;
-  }
-
-  public Boolean getSuccess() {
-    return isSuccess;
-  }
-
-  public void setSuccess(Boolean success) {
-    isSuccess = success;
-  }
+  @JsonProperty("metadata")
+  private Map<String, String> metadata;
 }
