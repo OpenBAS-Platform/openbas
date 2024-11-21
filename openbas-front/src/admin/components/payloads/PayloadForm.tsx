@@ -210,7 +210,7 @@ const PayloadForm: FunctionComponent<Props> = ({
             >
               <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
               <MenuItem value="arm64">{t('arm64')}</MenuItem>
-              <MenuItem value="All">{t('All')}</MenuItem>
+              {type === 'Command' && (<MenuItem value="All">{t('All')}</MenuItem>)}
             </TextField>
           )}
         />
