@@ -1,6 +1,6 @@
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Button, Grid } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { Box, Button, Grid2 as Grid } from '@mui/material';
+import { useTheme } from '@mui/styles';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';
 import { Link } from 'react-router-dom';
@@ -9,35 +9,6 @@ import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
 import { donutChartOptions } from '../../../../utils/Charts';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  chartContainer: {
-    margin: '0 auto',
-    textAlign: 'center',
-    position: 'relative',
-  },
-  chartTitle: {
-    marginTop: -20,
-    fontWeight: 500,
-    textAlign: 'center',
-  },
-  chartTitleDisabled: {
-    marginTop: -20,
-    fontWeight: 500,
-    textAlign: 'center',
-    color: theme.palette.text?.disabled,
-  },
-  column: {
-    textAlign: 'center',
-  },
-  iconOverlay: {
-    position: 'absolute',
-    top: '37%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    fontSize: 35,
-  },
-}));
 
 interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
@@ -62,6 +33,14 @@ const getColor = (theme: Theme, result: string | undefined): string => {
   return colorMap[result ?? ''] ?? theme.palette.error.main ?? '';
 };
 
+const iconOverlay = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  fontSize: 35,
+};
+
 const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
@@ -69,7 +48,6 @@ const ResponsePie: FunctionComponent<Props> = ({
   disableChartAnimation,
 }) => {
   // Standard hooks
-  const classes = useStyles();
   const { t } = useFormatter();
   const theme = useTheme<Theme>();
 
@@ -81,11 +59,11 @@ const ResponsePie: FunctionComponent<Props> = ({
   const renderIcon = (type: string, hasDistribution: boolean | undefined) => {
     switch (type) {
       case 'prevention':
-        return <ShieldOutlined color={hasDistribution ? 'inherit' : 'disabled'} className={classes.iconOverlay} />;
+        return <ShieldOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
       case 'detection':
-        return <TrackChangesOutlined color={hasDistribution ? 'inherit' : 'disabled'} className={classes.iconOverlay} />;
+        return <TrackChangesOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
       default:
-        return <SensorOccupiedOutlined color={hasDistribution ? 'inherit' : 'disabled'} className={classes.iconOverlay} />;
+        return <SensorOccupiedOutlined color={hasDistribution ? 'inherit' : 'disabled'} sx={iconOverlay} />;
     }
   };
 
@@ -105,30 +83,36 @@ const ResponsePie: FunctionComponent<Props> = ({
     const data = useMemo(() => (hasDistribution ? expectationResultsByType.distribution.map(e => e.value) : [1]), [expectationResultsByType]);
 
     return (
-      <div className={classes.column}>
-        <div className={classes.chartContainer}>
-          {renderIcon(type, hasDistribution)}
-          <Chart
-            options={
-              donutChartOptions({
-                theme,
-                labels,
-                chartColors: colors,
-                displayLegend: false,
-                displayLabels: hasDistribution,
-                displayValue: hasDistribution,
-                displayTooltip: hasDistribution,
-                isFakeData: !hasDistribution,
-                disableAnimation: disableChartAnimation,
-              })
-            }
-            series={data}
-            type="donut"
-            width="100%"
-            height="100%"
-          />
-        </div>
-        <div className={hasDistribution ? classes.chartTitle : classes.chartTitleDisabled}>{title}</div>
+      <Grid size={4}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box sx={{ position: 'relative', height: 120 }}>
+            {renderIcon(type, hasDistribution)}
+            <Chart
+              options={
+                donutChartOptions({
+                  theme,
+                  labels,
+                  chartColors: colors,
+                  displayLegend: false,
+                  displayLabels: hasDistribution,
+                  displayValue: hasDistribution,
+                  displayTooltip: hasDistribution,
+                  isFakeData: !hasDistribution,
+                  disableAnimation: disableChartAnimation,
+                })
+              }
+              series={data}
+              type="donut"
+              height="100%"
+              width="100%"
+            />
+          </Box>
+          <span
+            style={{ ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}), fontWeight: 500, paddingTop: 24 }}
+          >
+            {title}
+          </span>
+        </Box>
         {expectationResultsByType?.type === 'HUMAN_RESPONSE' && displayHumanValidationBtn && (
           <Button
             startIcon={<InfoOutlined />}
@@ -139,22 +123,18 @@ const ResponsePie: FunctionComponent<Props> = ({
             {`${pending.length} ${t('validations needed')}`}
           </Button>
         )}
-      </div>
+      </Grid>
     );
   }, [immutable, theme, classes, displayHumanValidationBtn, humanValidationLink, pending]);
 
   return (
-    <Grid id="score_details" container={true} spacing={3}>
-      <Grid item={true} xs={4}>
+    <Box sx={{ flexGrow: 1 }}>
+      <Grid id="score_details" container spacing={3} direction="row">
         <Pie type="prevention" title={t('TYPE_PREVENTION')} expectationResultsByType={prevention} />
-      </Grid>
-      <Grid item={true} xs={4}>
         <Pie type="detection" title={t('TYPE_DETECTION')} expectationResultsByType={detection} />
-      </Grid>
-      <Grid item={true} xs={4}>
         <Pie type="human_response" title={t('TYPE_HUMAN_RESPONSE')} expectationResultsByType={humanResponse} />
       </Grid>
-    </Grid>
+    </Box>
   );
 };
 
