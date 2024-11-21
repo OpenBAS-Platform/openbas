@@ -29,7 +29,6 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
-import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
@@ -82,7 +81,6 @@ public class InjectApi extends RestBehavior {
   private final ScenarioService scenarioService;
   private final InjectService injectService;
   private final InjectSearchService injectSearchService;
-  private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
 
   // -- INJECTS --
@@ -163,11 +161,6 @@ public class InjectApi extends RestBehavior {
       }
     }
     return injectRepository.save(inject);
-  }
-
-  @GetMapping("/api/injects/try/{injectId}")
-  public Inject tryInject(@PathVariable String injectId) {
-    return atomicTestingService.tryInject(injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -375,8 +368,10 @@ public class InjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject duplicateInjectForExercise(
-      @PathVariable final String exerciseId, @PathVariable final String injectId) {
-    return injectDuplicateService.createInjectForExercise(exerciseId, injectId, true);
+      @PathVariable @NotBlank final String exerciseId,
+      @PathVariable @NotBlank final String injectId) {
+    return injectDuplicateService.duplicateInjectForExerciseWithDuplicateWordInTitle(
+        exerciseId, injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -606,8 +601,10 @@ public class InjectApi extends RestBehavior {
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject duplicateInjectForScenario(
-      @PathVariable final String scenarioId, @PathVariable final String injectId) {
-    return injectDuplicateService.createInjectForScenario(scenarioId, injectId, true);
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId) {
+    return injectDuplicateService.duplicateInjectForScenarioWithDuplicateWordInTitle(
+        scenarioId, injectId);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")

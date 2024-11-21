@@ -1,9 +1,11 @@
 package io.openbas.rest;
 
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
+import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
@@ -12,16 +14,17 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
+import io.openbas.utils.fixtures.AtomicTestingInputFixture;
+import io.openbas.utils.fixtures.InjectFixture;
+import io.openbas.utils.fixtures.InjectStatusFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @TestInstance(PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AtomicTestingApiTest extends IntegrationTest {
 
   public static final String ATOMIC_TESTINGS_URI = "/api/atomic-testings";
@@ -29,7 +32,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   static Inject INJECT_WITH_PAYLOAD;
   static Inject INJECT_WITHOUT_PAYLOAD;
   static InjectStatus INJECT_STATUS;
-  static String NEW_INJECT_ID;
+  static InjectorContract INJECTOR_CONTRACT;
 
   @Autowired private MockMvc mvc;
   @Autowired private InjectRepository injectRepository;
@@ -38,39 +41,21 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
   @BeforeAll
   void beforeAll() {
-    Inject injectToCreate1 = new Inject();
-    injectToCreate1.setTitle("Inject without payload");
-    injectToCreate1.setCreatedAt(Instant.now());
-    injectToCreate1.setUpdatedAt(Instant.now());
-    injectToCreate1.setDependsDuration(0L);
-    injectToCreate1.setEnabled(true);
-    injectToCreate1.setInjectorContract(
-        injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
-    INJECT_WITHOUT_PAYLOAD = injectRepository.save(injectToCreate1);
+    INJECTOR_CONTRACT = injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
+    Inject injectWithoutPayload = InjectFixture.getInjectForEmailContract(INJECTOR_CONTRACT);
+    INJECT_WITHOUT_PAYLOAD = injectRepository.save(injectWithoutPayload);
 
-    Inject injectToCreate2 = new Inject();
-    injectToCreate2.setTitle("Inject with payload");
-    injectToCreate2.setCreatedAt(Instant.now());
-    injectToCreate2.setUpdatedAt(Instant.now());
-    injectToCreate2.setDependsDuration(0L);
-    injectToCreate2.setEnabled(true);
-    injectToCreate2.setInjectorContract(
-        injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
-    INJECT_WITH_PAYLOAD = injectRepository.save(injectToCreate2);
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(injectToCreate2);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(ExecutionStatus.SUCCESS);
-    injectStatus.setCommandsLines(
-        new InjectStatusCommandLine(List.of("cmd"), List.of("clean cmd"), "id1234567"));
+    Inject injectWithPayload = InjectFixture.getInjectForEmailContract(INJECTOR_CONTRACT);
+    INJECT_WITH_PAYLOAD = injectRepository.save(injectWithPayload);
+    InjectStatus injectStatus = InjectStatusFixture.createDefaultInjectStatus();
+    injectStatus.setInject(injectWithPayload);
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
   }
 
-  @DisplayName("Find an atomic testing without payload")
   @Test
+  @DisplayName("Find an atomic testing without payload")
   @WithMockAdminUser
-  @Order(1)
-  void findAnAtomicTestingTestWithoutPayload() throws Exception {
+  void findAnAtomicTestingWithoutPayload() throws Exception {
     String response =
         mvc.perform(
                 get(ATOMIC_TESTINGS_URI + "/" + INJECT_WITHOUT_PAYLOAD.getId())
@@ -85,11 +70,10 @@ public class AtomicTestingApiTest extends IntegrationTest {
     assertNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
-  @DisplayName("Find an atomic testing with payload")
   @Test
+  @DisplayName("Find an atomic testing with payload")
   @WithMockAdminUser
-  @Order(2)
-  void findAnAtomicTestingTestWithPayload() throws Exception {
+  void findAnAtomicTestingWithPayload() throws Exception {
     String response =
         mvc.perform(
                 get(ATOMIC_TESTINGS_URI + "/" + INJECT_WITH_PAYLOAD.getId())
@@ -104,15 +88,14 @@ public class AtomicTestingApiTest extends IntegrationTest {
     assertNotNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
-  @DisplayName("Duplicate and delete an atomic testing")
   @Test
+  @DisplayName("Duplicate and delete an atomic testing")
   @WithMockAdminUser
-  @Order(3)
-  void duplicateAndDeleteAtomicTestingTest() throws Exception {
+  void duplicateAndDeleteAtomicTesting() throws Exception {
     // Duplicate
     String response =
         mvc.perform(
-                post(ATOMIC_TESTINGS_URI + "/" + INJECT_WITHOUT_PAYLOAD.getId())
+                post(ATOMIC_TESTINGS_URI + "/" + INJECT_WITHOUT_PAYLOAD.getId() + "/duplicate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -121,40 +104,92 @@ public class AtomicTestingApiTest extends IntegrationTest {
             .getContentAsString();
     assertNotNull(response);
     // Assert duplicate
-    NEW_INJECT_ID = JsonPath.read(response, "$.inject_id");
+    String newInjectId = JsonPath.read(response, "$.inject_id");
     response =
-        mvc.perform(
-                get(ATOMIC_TESTINGS_URI + "/" + NEW_INJECT_ID).accept(MediaType.APPLICATION_JSON))
+        mvc.perform(get(ATOMIC_TESTINGS_URI + "/" + newInjectId).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertEquals(NEW_INJECT_ID, JsonPath.read(response, "$.inject_id"));
+    assertEquals(newInjectId, JsonPath.read(response, "$.inject_id"));
     // Delete
-    response =
-        mvc.perform(
-                delete(ATOMIC_TESTINGS_URI + "/" + NEW_INJECT_ID)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertNotNull(response);
+    mvc.perform(delete(ATOMIC_TESTINGS_URI + "/" + newInjectId).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful());
     // Assert delete
-    response =
+    mvc.perform(get(ATOMIC_TESTINGS_URI + "/" + newInjectId).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is4xxClientError());
+  }
+
+  @Test
+  @DisplayName("Launch an Atomic Testing")
+  @WithMockAdminUser
+  void launchAtomicTesting() throws Exception {
+    AtomicTestingInput atomicTestingInput =
+        AtomicTestingInputFixture.createDefaultAtomicTestingInput();
+    atomicTestingInput.setInjectorContract(INJECTOR_CONTRACT.getId());
+
+    String createdInject =
         mvc.perform(
-                get(ATOMIC_TESTINGS_URI + "/" + NEW_INJECT_ID).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is4xxClientError())
+                post(ATOMIC_TESTINGS_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(atomicTestingInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.inject_status.status_name").value("DRAFT"))
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertNotNull(response);
+
+    String injectId = JsonPath.read(createdInject, "$.inject_id");
+
+    mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + injectId + "/launch"))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.inject_status.status_name").value("QUEUING"));
+  }
+
+  @Test
+  @DisplayName("Relaunch an Atomic Testing")
+  @WithMockAdminUser
+  void relaunchAtomicTesting() throws Exception {
+    AtomicTestingInput atomicTestingInput =
+        AtomicTestingInputFixture.createDefaultAtomicTestingInput();
+    atomicTestingInput.setInjectorContract(INJECTOR_CONTRACT.getId());
+
+    String createdInject =
+        mvc.perform(
+                post(ATOMIC_TESTINGS_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(atomicTestingInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.inject_status.status_name").value("DRAFT"))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    String injectId = JsonPath.read(createdInject, "$.inject_id");
+
+    mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + injectId + "/launch"))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.inject_status.status_name").value("QUEUING"));
+
+    String relaunchedInject =
+        mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + injectId + "/relaunch"))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.inject_status.status_name").value("QUEUING"))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    String relaunchedInjectId = JsonPath.read(relaunchedInject, "$.inject_id");
+
+    mvc.perform(get(ATOMIC_TESTINGS_URI + "/" + injectId)).andExpect(status().is4xxClientError());
+
+    mvc.perform(get(ATOMIC_TESTINGS_URI + "/" + relaunchedInjectId))
+        .andExpect(status().is2xxSuccessful());
   }
 
   @AfterAll
   void afterAll() {
-    injectStatusRepository.delete(INJECT_STATUS);
-    injectRepository.delete(INJECT_WITH_PAYLOAD);
-    injectRepository.delete(INJECT_WITHOUT_PAYLOAD);
+    injectStatusRepository.deleteAll();
+    injectRepository.deleteAll();
   }
 }

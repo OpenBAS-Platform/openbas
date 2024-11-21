@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.utils.StringUtils.duplicateString;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,11 +10,16 @@ import io.openbas.database.model.InjectDocument;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
+import io.openbas.utils.InjectMapper;
+import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +34,8 @@ public class InjectService {
 
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
+  private final InjectStatusRepository injectStatusRepository;
+  private final InjectMapper injectMapper;
 
   @Resource protected ObjectMapper mapper;
 
@@ -92,5 +100,51 @@ public class InjectService {
                 })
             .toList();
     injectDocumentRepository.deleteAll(updatedInjects);
+  }
+
+  @Transactional
+  public InjectResultOverviewOutput duplicate(String id) {
+    Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+    Inject duplicatedInject = InjectUtils.duplicateInject(injectOrigin);
+    duplicatedInject.setTitle(duplicateString(duplicatedInject.getTitle()));
+    Inject savedInject = injectRepository.save(duplicatedInject);
+    return injectMapper.toInjectResultOverviewOutput(savedInject);
+  }
+
+  @Transactional
+  public InjectResultOverviewOutput launch(String id) {
+    Inject inject = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+    inject.clean();
+    inject.setUpdatedAt(Instant.now());
+
+    InjectStatus injectStatus = setInjectStatusAsQueuing(inject);
+    inject.setStatus(injectStatus);
+
+    return injectMapper.toInjectResultOverviewOutput(injectRepository.save(inject));
+  }
+
+  @Transactional
+  public InjectResultOverviewOutput relaunch(String id) {
+    Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+    Inject duplicatedInject = InjectUtils.duplicateInject(injectOrigin);
+
+    Inject savedInject = injectRepository.save(duplicatedInject);
+
+    InjectStatus injectStatus = setInjectStatusAsQueuing(savedInject);
+    savedInject.setStatus(injectStatus);
+
+    injectDocumentRepository.deleteDocumentsFromInject(id);
+    injectRepository.deleteById(id);
+
+    return injectMapper.toInjectResultOverviewOutput(injectRepository.save(savedInject));
+  }
+
+  private InjectStatus setInjectStatusAsQueuing(Inject inject) {
+    InjectStatus injectStatus = new InjectStatus();
+    injectStatus.setInject(inject);
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setName(ExecutionStatus.QUEUING);
+    this.injectStatusRepository.save(injectStatus);
+    return injectStatus;
   }
 }

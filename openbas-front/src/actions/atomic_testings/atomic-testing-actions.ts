@@ -24,9 +24,19 @@ export const updateAtomicTesting = (injectId: string, data: AtomicTestingInput) 
   return simplePutCall(uri, data);
 };
 
-export const tryAtomicTesting = (injectId: string) => {
-  const uri = `${ATOMIC_TESTING_URI}/try/${injectId}`;
-  return simpleCall(uri);
+export const duplicateAtomicTesting = (injectId: string) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/duplicate`;
+  return simplePostCall(uri, null);
+};
+
+export const launchAtomicTesting = (injectId: string) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/launch`;
+  return simplePostCall(uri);
+};
+
+export const relaunchAtomicTesting = (injectId: string) => {
+  const uri = `${ATOMIC_TESTING_URI}/${injectId}/relaunch`;
+  return simplePostCall(uri);
 };
 
 export const fetchTargetResult = (injectId: string, targetId: string, targetType: string, parentTargetId?: string) => {
@@ -39,11 +49,6 @@ export const fetchTargetResult = (injectId: string, targetId: string, targetType
 
 export const createAtomicTesting = (data: AtomicTestingInput) => {
   return simplePostCall(ATOMIC_TESTING_URI, data);
-};
-
-export const duplicateAtomicTesting = (injectId: string) => {
-  const uri = `${ATOMIC_TESTING_URI}/${injectId}`;
-  return simplePostCall(uri, null);
 };
 
 // -- TEAMS --

@@ -4,7 +4,10 @@ import { makeStyles } from '@mui/styles';
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { fetchInjectResultOverviewOutput, tryAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import {
+  launchAtomicTesting,
+  relaunchAtomicTesting,
+} from '../../../../actions/atomic_testings/atomic-testing-actions';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
@@ -34,19 +37,33 @@ const AtomicTestingHeader = () => {
   const { injectResultOverviewOutput, updateInjectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
 
   // Launch atomic testing
-  const [open, setOpen] = useState(false);
-  const [availableLaunch, setAvailableLaunch] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+  const [canLaunch, setCanLaunch] = useState(true);
+  const handleCanLaunch = () => setCanLaunch(true);
+  const handleCannotLaunch = () => setCanLaunch(false);
 
   const submitLaunch = async () => {
-    setOpen(false);
-    setAvailableLaunch(false);
+    handleCloseDialog();
+    handleCannotLaunch();
     if (injectResultOverviewOutput?.inject_id) {
-      await tryAtomicTesting(injectResultOverviewOutput.inject_id);
-      fetchInjectResultOverviewOutput(injectResultOverviewOutput.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
+      await launchAtomicTesting(injectResultOverviewOutput.inject_id).then((result: { data: InjectResultOverviewOutput }) => {
         updateInjectResultOverviewOutput(result.data);
       });
     }
-    setAvailableLaunch(true);
+    handleCanLaunch();
+  };
+
+  const submitRelaunch = async () => {
+    handleCloseDialog();
+    handleCannotLaunch();
+    if (injectResultOverviewOutput?.inject_id) {
+      await relaunchAtomicTesting(injectResultOverviewOutput.inject_id).then((result) => {
+        navigate(`/admin/atomic_testings/${result.data.inject_id}`);
+      });
+    }
+    handleCanLaunch();
   };
 
   if (!injectResultOverviewOutput) {
@@ -57,6 +74,96 @@ const AtomicTestingHeader = () => {
   const [edition, setEdition] = useState(false);
   const handleOpenEdit = () => setEdition(true);
   const handleCloseEdit = () => setEdition(false);
+
+  function getActionButton(injectResultOverviewOutput: InjectResultOverviewOutput) {
+    if (!injectResultOverviewOutput.inject_injector_contract) {
+      return null;
+    }
+    if (injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id) {
+      return (
+        <Button
+          style={{ marginRight: 10 }}
+          startIcon={<PlayArrowOutlined />}
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={handleOpenDialog}
+          disabled={!canLaunch}
+        >
+          {t('Launch now')}
+        </Button>
+      );
+    } else if (injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.status_id) {
+      return (
+        <Button
+          style={{ marginRight: 10 }}
+          startIcon={<PlayArrowOutlined />}
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={handleOpenDialog}
+          disabled={!canLaunch}
+        >
+          {t('Relaunch now')}
+        </Button>
+      );
+    } else {
+      return (
+        <>
+          <Button
+            style={{ marginRight: 10 }}
+            startIcon={<SettingsOutlined />}
+            variant="contained"
+            color="warning"
+            size="small"
+            onClick={handleOpenEdit}
+          >
+            {t('Configure')}
+          </Button>
+          <AtomicTestingUpdate
+            open={edition}
+            handleClose={handleCloseEdit}
+            atomic={injectResultOverviewOutput}
+          />
+        </>
+      );
+    }
+  }
+
+  function getDialog(injectResultOverviewOutput: InjectResultOverviewOutput) {
+    return (
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        TransitionComponent={Transition}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            { injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
+              ? t('Do you want to launch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })
+              : t('Do you want to relaunch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title }) }
+          </DialogContentText>
+          {(injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.status_id) && (
+            <Alert severity="warning" style={{ marginTop: 20 }}>
+              {t('This atomic testing and its previous results will be deleted')}
+            </Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>
+            {t('Cancel')}
+          </Button>
+          <Button
+            color="secondary"
+            onClick={injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id ? submitLaunch : submitRelaunch}
+          >
+            {t('Confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
 
   return (
     <>
@@ -70,73 +177,14 @@ const AtomicTestingHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        {/* eslint-disable-next-line no-nested-ternary */}
-        {injectResultOverviewOutput.inject_injector_contract ? (
-          !injectResultOverviewOutput.inject_ready
-            ? (
-                <>
-                  <Button
-                    style={{ marginRight: 10 }}
-                    startIcon={<SettingsOutlined />}
-                    variant="contained"
-                    color="warning"
-                    size="small"
-                    onClick={handleOpenEdit}
-                  >
-                    {t('Configure')}
-                  </Button>
-                  <AtomicTestingUpdate
-                    open={edition}
-                    handleClose={handleCloseEdit}
-                    atomic={injectResultOverviewOutput}
-                  />
-                </>
-              )
-            : (
-                <Button
-                  style={{ marginRight: 10 }}
-                  startIcon={<PlayArrowOutlined />}
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => setOpen(true)}
-                  disabled={!availableLaunch}
-                >
-                  {t('Launch')}
-                </Button>
-              )) : null}
+        {getActionButton(injectResultOverviewOutput)}
         <AtomicTestingPopover
           atomic={injectResultOverviewOutput}
           actions={['Update', 'Duplicate', 'Delete']}
           onDelete={() => navigate('/admin/atomic_testings')}
         />
       </div>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        TransitionComponent={Transition}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            {t('Do you want to launch this inject?')}
-          </DialogContentText>
-          <Alert severity="warning" style={{ marginTop: 20 }}>
-            {t('The previous results will be deleted.')}
-          </Alert>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>
-            {t('Cancel')}
-          </Button>
-          <Button
-            color="secondary"
-            onClick={submitLaunch}
-          >
-            {t('Confirm')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {getDialog(injectResultOverviewOutput)}
       <div className="clearfix" />
     </>
   );

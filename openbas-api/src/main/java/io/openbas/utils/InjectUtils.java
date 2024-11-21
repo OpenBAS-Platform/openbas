@@ -2,8 +2,13 @@ package io.openbas.utils;
 
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -105,5 +110,40 @@ public class InjectUtils {
       }
     }
     return true;
+  }
+
+  public static Inject duplicateInject(@NotNull Inject injectOrigin) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    Inject duplicatedInject = new Inject();
+    duplicatedInject.setUser(injectOrigin.getUser());
+    duplicatedInject.setTitle(injectOrigin.getTitle());
+    duplicatedInject.setDescription(injectOrigin.getDescription());
+    try {
+      ObjectNode content =
+          objectMapper.readValue(
+              objectMapper.writeValueAsString(injectOrigin.getContent()), ObjectNode.class);
+      duplicatedInject.setContent(content);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    duplicatedInject.setAllTeams(injectOrigin.isAllTeams());
+    duplicatedInject.setTeams(injectOrigin.getTeams().stream().toList());
+    duplicatedInject.setEnabled(injectOrigin.isEnabled());
+    duplicatedInject.setDependsDuration(injectOrigin.getDependsDuration());
+    if (injectOrigin.getDependsOn() != null) {
+      duplicatedInject.setDependsOn(injectOrigin.getDependsOn().stream().toList());
+    }
+    duplicatedInject.setCountry(injectOrigin.getCountry());
+    duplicatedInject.setCity(injectOrigin.getCity());
+    duplicatedInject.setInjectorContract(injectOrigin.getInjectorContract().orElse(null));
+    duplicatedInject.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
+    duplicatedInject.setAssets(injectOrigin.getAssets().stream().toList());
+    duplicatedInject.setCommunications(injectOrigin.getCommunications().stream().toList());
+    duplicatedInject.setPayloads(injectOrigin.getPayloads().stream().toList());
+    duplicatedInject.setTags(new HashSet<>(injectOrigin.getTags()));
+
+    duplicatedInject.setExercise(injectOrigin.getExercise());
+    duplicatedInject.setScenario(injectOrigin.getScenario());
+    return duplicatedInject;
   }
 }
