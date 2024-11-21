@@ -10,17 +10,26 @@ import org.jetbrains.annotations.NotNull;
 public class ArchitectureUtils {
 
   private static final String EXECUTABLE_ARCH = "executable_arch";
+  private static final String INJECTOR_CONTRACT_ARCH = "injector_contract_arch";
   private static final String ENDPOINT_ARCH = "endpoint_arch";
   public static final String ALL = "All";
 
-  public static SearchPaginationInput handlePayloadFilter(
+  public static SearchPaginationInput handleArchitectureFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
 
-    Optional<Filters.Filter> payloadFilterOpt =
+    Optional<Filters.Filter> filterOpt =
         ofNullable(searchPaginationInput.getFilterGroup())
-            .flatMap(f -> f.findByKey(EXECUTABLE_ARCH));
+            .flatMap(
+                f -> {
+                  Optional<Filters.Filter> filter = f.findByKey(EXECUTABLE_ARCH);
+                  if (filter.isPresent()) {
+                    return filter;
+                  } else {
+                    return f.findByKey(INJECTOR_CONTRACT_ARCH);
+                  }
+                });
 
-    payloadFilterOpt.ifPresent(
+    filterOpt.ifPresent(
         payloadFilter -> {
           if (payloadFilter.getValues().contains("x86_64")
               || payloadFilter.getValues().contains("arm64")) {
