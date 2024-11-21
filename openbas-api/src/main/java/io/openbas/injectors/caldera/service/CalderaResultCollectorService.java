@@ -3,6 +3,7 @@ package io.openbas.injectors.caldera.service;
 import static io.openbas.database.model.InjectStatusExecution.*;
 
 import io.openbas.database.model.ExecutionStatus;
+import io.openbas.database.model.ExecutionTraceStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectRepository;
@@ -161,22 +162,22 @@ public class CalderaResultCollectorService implements Runnable {
     if (injectStatus.getTraces().stream()
             .filter(
                 injectStatusExecution ->
-                    injectStatusExecution.getStatus().equals(ExecutionStatus.ERROR))
+                    ExecutionTraceStatus.ERROR.equals(injectStatusExecution.getStatus()))
             .count()
         >= completedActions) {
       injectStatus.setName(ExecutionStatus.ERROR);
     } else if (injectStatus.getTraces().stream()
-        .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.ERROR))) {
+        .anyMatch(trace -> ExecutionTraceStatus.ERROR.equals(trace.getStatus()))) {
       injectStatus.setName(ExecutionStatus.PARTIAL);
     } else if (injectStatus.getTraces().stream()
             .filter(
                 injectStatusExecution ->
-                    injectStatusExecution.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))
+                    ExecutionTraceStatus.MAYBE_PREVENTED.equals(injectStatusExecution.getStatus()))
             .count()
         >= completedActions) {
       injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
     } else if (injectStatus.getTraces().stream()
-        .anyMatch(trace -> trace.getStatus().equals(ExecutionStatus.MAYBE_PREVENTED))) {
+        .anyMatch(trace -> ExecutionTraceStatus.MAYBE_PREVENTED.equals(trace.getStatus()))) {
       injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
     } else {
       injectStatus.setName(ExecutionStatus.SUCCESS);

@@ -147,7 +147,7 @@ public class ComchecksExecutionJob implements Job {
                     execution.getTraces().stream()
                         .filter(
                             executionTrace ->
-                                executionTrace.getStatus().equals(ExecutionStatus.SUCCESS))
+                                ExecutionTraceStatus.SUCCESS.equals(executionTrace.getStatus()))
                         .flatMap(t -> t.getIdentifiers().stream())
                         .toList();
                 List<ComcheckStatus> statusToUpdate =
