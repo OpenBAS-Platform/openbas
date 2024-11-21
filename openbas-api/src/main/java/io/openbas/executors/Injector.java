@@ -1,4 +1,4 @@
-package io.openbas.execution;
+package io.openbas.executors;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
 
@@ -6,24 +6,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.DocumentRepository;
+import io.openbas.execution.ExecutableInject;
 import io.openbas.model.ExecutionProcess;
-import io.openbas.model.expectation.*;
+import io.openbas.rest.atomic_testing.form.PayloadOutput;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class Injector {
 
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
   private FileService fileService;
   private DocumentRepository documentRepository;
 
@@ -40,7 +44,7 @@ public abstract class Injector {
   public abstract ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception;
 
-  public InjectStatusCommandLine getCommandsLines(String externalId) {
+  public PayloadOutput getPayloadOutput(String externalId) {
     return null;
   }
 
