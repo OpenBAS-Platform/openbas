@@ -12,6 +12,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
+import io.openbas.executors.Injector;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.challenge.model.ChallengeVariable;
 import io.openbas.injectors.email.service.EmailService;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +43,16 @@ public class ChallengeExecutor extends Injector {
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
+
+  @Autowired
+  public void setChallengeRepository(ChallengeRepository challengeRepository) {
+    this.challengeRepository = challengeRepository;
+  }
+
+  @Autowired
+  public void setEmailService(EmailService emailService) {
+    this.emailService = emailService;
+  }
 
   private String buildChallengeUri(
       ExecutionContext context, Exercise exercise, Challenge challenge) {

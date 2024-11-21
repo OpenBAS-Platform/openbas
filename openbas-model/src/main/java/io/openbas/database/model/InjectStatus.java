@@ -3,8 +3,11 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.converter.InjectStatusCommandLineConverter;
 import jakarta.persistence.*;
+
 import java.time.Duration;
 import java.time.Instant;
+
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +21,7 @@ public class InjectStatus extends BaseInjectStatus {
   @Column(name = "status_commands_lines")
   @Convert(converter = InjectStatusCommandLineConverter.class)
   @JsonProperty("status_commands_lines")
-  private InjectStatusCommandLine commandsLines;
+  private PayloadOutput commandsLines;
 
   public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
     InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());
