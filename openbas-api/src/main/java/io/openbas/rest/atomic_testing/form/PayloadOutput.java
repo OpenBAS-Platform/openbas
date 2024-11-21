@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Singular;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,6 @@ import java.util.Set;
 @Getter
 @Builder
 public class PayloadOutput {
-
-  @JsonProperty("payload_id")
-  private String id;
 
   @JsonProperty("payload_type")
   private String type;
@@ -44,8 +42,9 @@ public class PayloadOutput {
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
-  @JsonProperty("payload_cleanup_command")
-  private String cleanupCommand;
+  @JsonProperty("payload_command_blocks")
+  @Singular
+  private List<PayloadCommandBlock> payloadCommandBlocks = new ArrayList<>();
 
   @JsonProperty("payload_arguments")
   private List<PayloadArgument> arguments = new ArrayList<>();
@@ -58,12 +57,6 @@ public class PayloadOutput {
 
   @JsonProperty("payload_tags")
   private Set<String> tags;
-
-  @JsonProperty("command_executor")
-  private String executor;
-
-  @JsonProperty("command_content")
-  private String content;
 
   @JsonProperty("executable_file")
   private Document executableFile;

@@ -17,7 +17,7 @@ import io.openbas.database.specification.InjectTestSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
-import io.openbas.execution.Injector;
+import io.openbas.executors.Injector;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

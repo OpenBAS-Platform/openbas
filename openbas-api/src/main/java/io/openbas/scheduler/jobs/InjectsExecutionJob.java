@@ -148,10 +148,10 @@ public class InjectsExecutionJob implements Job {
         .getInjectorContract()
         .ifPresent(
             injectorContract -> {
-              io.openbas.execution.Injector executor =
+              io.openbas.executors.Injector executor =
                   context.getBean(
                       injectorContract.getInjector().getType(),
-                      io.openbas.execution.Injector.class);
+                      io.openbas.executors.Injector.class);
               Execution execution = executor.executeInjection(executableInject);
               // After execution, expectations are already created
               // Injection status is filled after complete execution

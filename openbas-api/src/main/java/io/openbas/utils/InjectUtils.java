@@ -3,28 +3,28 @@ package io.openbas.utils;
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 
 import io.openbas.database.model.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.openbas.rest.atomic_testing.form.PayloadOutput;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@Log
 public class InjectUtils {
 
   private final ApplicationContext context;
 
-  public InjectStatusCommandLine getCommandsLinesFromInject(final Inject inject) {
+  public PayloadOutput getCommandsLinesFromInject(final Inject inject) {
     if (inject == null) {
       return null;
     }
@@ -39,27 +39,21 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        return new InjectStatusCommandLine(
+        return new PayloadOutput(
             payloadCommand.getContent() != null && !payloadCommand.getContent().isBlank()
                 ? List.of(payloadCommand.getContent())
                 : null,
             payloadCommand.getCleanupCommand() != null
-                    && !payloadCommand.getCleanupCommand().isBlank()
+                && !payloadCommand.getCleanupCommand().isBlank()
                 ? List.of(payload.getCleanupCommand())
                 : null,
             payload.getExternalId());
       } else {
-        try {
-          // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
-          io.openbas.execution.Injector executor =
-              context.getBean(
-                  injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
-          return executor.getCommandsLines(injectorContract.getId());
-        } catch (NoSuchBeanDefinitionException e) {
-          log.info(
-              "No executor found for this injector: " + injectorContract.getInjector().getType());
-          return null;
-        }
+        // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
+        io.openbas.executors.Injector executor =
+            context.getBean(
+                injectorContract.getInjector().getType(), io.openbas.executors.Injector.class);
+        return executor.getPayloadOutput(injectorContract.getId());
       }
     }
     return null;
