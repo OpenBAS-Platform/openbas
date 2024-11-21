@@ -46,16 +46,10 @@ public class InjectExpectationService {
       @NotBlank final String sourceName,
       @NotBlank final String result,
       @NotBlank final Boolean success) {
-    if (success) {
-      computeResult(
-          expectation, sourceId, sourceType, sourceName, result, expectation.getExpectedScore());
-      expectation.setScore(expectation.getExpectedScore());
-    } else if (expectation.getScore() == null) {
-      computeResult(expectation, sourceId, sourceType, sourceName, result, 0.0);
-      expectation.setScore(0.0);
-    } else {
-      computeResult(expectation, sourceId, sourceType, sourceName, result, expectation.getScore());
-    }
+    double actual_score = success ? expectation.getExpectedScore() : expectation.getScore() == null ? 0.0 : expectation.getScore();
+    computeResult(
+        expectation, sourceId, sourceType, sourceName, result, actual_score);
+    expectation.setScore(actual_score);
     return this.update(expectation);
   }
 
