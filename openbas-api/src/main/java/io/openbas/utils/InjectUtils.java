@@ -7,16 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Log
 public class InjectUtils {
 
   private final ApplicationContext context;
@@ -46,11 +49,17 @@ public class InjectUtils {
                 : null,
             payload.getExternalId());
       } else {
-        // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
-        io.openbas.execution.Injector executor =
-            context.getBean(
-                injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
-        return executor.getCommandsLines(injectorContract.getId());
+        try {
+          // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
+          io.openbas.execution.Injector executor =
+              context.getBean(
+                  injectorContract.getInjector().getType(), io.openbas.execution.Injector.class);
+          return executor.getCommandsLines(injectorContract.getId());
+        } catch (NoSuchBeanDefinitionException e) {
+          log.info(
+              "No executor found for this injector: " + injectorContract.getInjector().getType());
+          return null;
+        }
       }
     }
     return null;
