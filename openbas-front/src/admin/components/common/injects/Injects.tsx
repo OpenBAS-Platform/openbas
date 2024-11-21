@@ -1,4 +1,4 @@
-import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
