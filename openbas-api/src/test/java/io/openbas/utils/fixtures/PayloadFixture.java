@@ -18,7 +18,7 @@ public class PayloadFixture {
     command.setSource(MANUAL);
     command.setStatus(VERIFIED);
     command.setAttackPatterns(Collections.emptyList());
-    command.setExecutableArch(PlatformArchitecture.arm64);
+    command.setExecutableArch(PlatformArchitecture.All);
     return command;
   }
 
@@ -37,10 +37,10 @@ public class PayloadFixture {
     Executable executable =
         new Executable("executable-id", Executable.EXECUTABLE_TYPE, "executable payload");
     executable.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    executable.setExecutableArch(PlatformArchitecture.arm64);
     executable.setSource(MANUAL);
     executable.setStatus(VERIFIED);
     executable.setAttackPatterns(Collections.emptyList());
+    executable.setExecutableArch(PlatformArchitecture.arm64);
     return executable;
   }
 }

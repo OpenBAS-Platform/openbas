@@ -204,7 +204,7 @@ public class PayloadApiSearchTest extends IntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(searchPaginationInput)))
             .andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.numberOfElements").value(1));
+            .andExpect(jsonPath("$.numberOfElements").value(2));
       }
     }
   }

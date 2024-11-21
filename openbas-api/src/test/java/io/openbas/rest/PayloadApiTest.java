@@ -55,6 +55,8 @@ public class PayloadApiTest extends IntegrationTest {
     this.payloadRepository.deleteAll();
   }
 
+  // -- ARCHITECTURE --
+
   @Test
   @DisplayName("Create Payloads with architecture")
   @WithMockAdminUser
@@ -175,6 +177,71 @@ public class PayloadApiTest extends IntegrationTest {
                 .content(asJsonString(updateInput)))
         .andExpect(status().isBadRequest());
   }
+
+  @Test
+  @DisplayName("Update architecture on Command Payload")
+  @WithMockAdminUser
+  void updateCommandPayloadToValidateArchitecture() throws Exception {
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+
+    String response =
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+            .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
+            .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var payloadId = JsonPath.read(response, "$.payload_id");
+
+    PayloadUpdateInput updateInput = PayloadInputFixture.getDefaultCommandPayloadUpdateInput();
+    mvc.perform(
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("Updated Command line payload"))
+        .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
+        .andExpect(jsonPath("$.executable_arch").value("arm64"));
+
+    updateInput.setExecutableArch(null);
+    mvc.perform(
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("Upsert architecture of a command Payload")
+  @WithMockPlannerUser
+  void upsertCommandPayloadToValidateArchitecture() throws Exception {
+    Payload payload = payloadRepository.save(PayloadFixture.createDefaultCommand());
+    payload.setExternalId("external-id");
+
+    PayloadUpsertInput upsertInput = PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
+    upsertInput.setExternalId(payload.getExternalId());
+    mvc.perform(
+            post(PAYLOAD_URI + "/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isOk());
+
+    upsertInput.setExecutableArch(null);
+    mvc.perform(
+            post(PAYLOAD_URI + "/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isBadRequest());
+  }
+
+  // -- CHECK CLEANUP AND EXECUTOR --
 
   @Test
   @DisplayName("Creating Command Line payload with both set executor and content should succeed")
@@ -334,6 +401,8 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"));
   }
 
+  // -- DEPRECATED PAYLOADS
+
   @Test
   @DisplayName("Process Deprecated Payloads")
   @WithMockAdminUser
@@ -407,36 +476,5 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_name").value("Command Payload 2"))
         .andExpect(jsonPath("$.payload_collector").value(collectorId))
         .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"));
-  }
-
-  @Test
-  @DisplayName("Upsert a command Payload without arch should fail")
-  @WithMockPlannerUser
-  void upsertCommandPayloadWithoutArch() throws Exception {
-    PayloadUpsertInput upsertInput = PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
-    upsertInput.setExecutableArch(null);
-
-    mvc.perform(
-            post(PAYLOAD_URI + "/upsert")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(upsertInput)))
-        .andExpect(status().isBadRequest());
-  }
-
-  @Test
-  @DisplayName("Upsert a command Payload with arch should succeed")
-  @WithMockPlannerUser
-  void upsertCommandPayloadWithArch() throws Exception {
-    Payload payload = payloadRepository.save(PayloadFixture.createDefaultCommand());
-    payload.setExternalId("external-id");
-
-    PayloadUpsertInput upsertInput = PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
-    upsertInput.setExternalId(payload.getExternalId());
-
-    mvc.perform(
-            post(PAYLOAD_URI + "/upsert")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(upsertInput)))
-        .andExpect(status().isOk());
   }
 }

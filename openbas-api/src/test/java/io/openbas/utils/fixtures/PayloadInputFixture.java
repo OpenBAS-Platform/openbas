@@ -88,4 +88,16 @@ public class PayloadInputFixture {
     input.setExecutableArch(PlatformArchitecture.arm64);
     return input;
   }
+
+  public static PayloadUpdateInput getDefaultCommandPayloadUpdateInput() {
+    PayloadUpdateInput input = new PayloadUpdateInput();
+    input.setName("Updated Command line payload");
+    input.setDescription("Command line description");
+    input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
+    input.setTagIds(Collections.emptyList());
+    input.setExecutor("sh");
+    input.setContent("ufw prepend deny from 1.2.3.4\n" + "ufw status numbered\n");
+    input.setExecutableArch(PlatformArchitecture.arm64);
+    return input;
+  }
 }
