@@ -256,6 +256,7 @@ const Payloads = () => {
       'payload_status',
       'payload_created_at',
       'payload_updated_at',
+      'executable_arch',
     ],
     exportData: payloads,
     exportFileName: `${t('Payloads')}.csv`,
