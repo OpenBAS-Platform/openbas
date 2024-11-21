@@ -66,7 +66,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  showActions?: boolean,
+  showActions?: boolean;
   fetchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectResultOutput> }>;
   goTo: (injectId: string) => string;
   queryableHelpers: QueryableHelpers;
