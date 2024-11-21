@@ -247,6 +247,7 @@ public class PayloadApi extends RestBehavior {
     } else {
       switch (PayloadType.fromString(input.getType())) {
         case PayloadType.COMMAND:
+          validateArchitecture(input.getExecutableArch());
           Command commandPayload = new Command();
           commandPayload.setUpdateAttributes(input);
           if (input.getCollector() != null) {
@@ -262,6 +263,7 @@ public class PayloadApi extends RestBehavior {
           this.payloadService.updateInjectorContractsForPayload(commandPayload);
           return commandPayload;
         case PayloadType.EXECUTABLE:
+          validateArchitecture(input.getExecutableArch());
           Executable executablePayload = new Executable();
           executablePayload.setUpdateAttributes(input);
           if (input.getCollector() != null) {
