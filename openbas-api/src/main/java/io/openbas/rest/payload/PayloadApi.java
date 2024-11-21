@@ -4,7 +4,7 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.utils.PayloadUtils.handleFilter;
+import static io.openbas.utils.ArchitectureUtils.handlePayloadFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
@@ -52,7 +52,7 @@ public class PayloadApi extends RestBehavior {
     return buildPaginationJPA(
         (Specification<Payload> specification, Pageable pageable) ->
             this.payloadRepository.findAll(specification, pageable),
-        handleFilter(searchPaginationInput),
+        handlePayloadFilter(searchPaginationInput),
         Payload.class);
   }
 
