@@ -13,8 +13,7 @@ public class V3_49__Update_executable_arch_payload_type_command extends BaseJava
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
-    statement.execute(
-        "UPDATE payloads SET executable_arch = 'All' WHERE payload_type ='Command';");
+    statement.execute("UPDATE payloads SET executable_arch = 'All' WHERE payload_type ='Command';");
 
     statement.execute(
         """
