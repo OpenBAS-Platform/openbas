@@ -53,8 +53,8 @@ public class PayloadCreateInput {
   @Schema(nullable = true)
   private String content;
 
-  @JsonProperty("executable_arch")
-  private PlatformArchitecture executableArch;
+  @JsonProperty("payload_arch")
+  private PlatformArchitecture architecture = PlatformArchitecture.All;;
 
   @JsonProperty("executable_file")
   private String executableFile;

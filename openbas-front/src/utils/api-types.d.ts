@@ -2420,6 +2420,7 @@ export interface Pause {
 
 export interface Payload {
   listened?: boolean;
+  payload_arch: "x86_64" | "arm64" | "All" | "Unknown";
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPattern[];
   payload_cleanup_command?: string;
@@ -2455,9 +2456,9 @@ export interface PayloadCreateInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "All" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
+  payload_arch?: "x86_64" | "arm64" | "All" | "Unknown";
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string | null;
@@ -2489,9 +2490,9 @@ export interface PayloadUpdateInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "All" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
+  payload_arch?: "x86_64" | "arm64" | "All" | "Unknown";
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string | null;
@@ -2507,9 +2508,9 @@ export interface PayloadUpsertInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "All" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
+  payload_arch?: "x86_64" | "arm64" | "All" | "Unknown";
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string | null;

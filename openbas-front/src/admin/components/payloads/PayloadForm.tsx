@@ -100,7 +100,7 @@ const PayloadForm: FunctionComponent<Props> = ({
       extendedSchema = baseSchema.extend({
         command_executor: z.string().min(1, { message: t('Should not be empty') }),
         command_content: z.string().min(1, { message: t('Should not be empty') }),
-        executable_arch: z.enum(['x86_64', 'arm64', 'All'], { message: t('Should not be empty') }),
+        payload_arch: z.enum(['x86_64', 'arm64', 'All'], { message: t('Should not be empty') }),
       });
       break;
     case 'Executable':
@@ -109,7 +109,7 @@ const PayloadForm: FunctionComponent<Props> = ({
           id: z.string().min(1, { message: t('Should not be empty') }),
           label: z.string().min(1, { message: t('Should not be empty') }),
         }),
-        executable_arch: z.enum(['x86_64', 'arm64', 'All'], { message: t('Should not be empty') }),
+        payload_arch: z.enum(['x86_64', 'arm64', 'All'], { message: t('Should not be empty') }),
       });
       break;
     case 'FileDrop':
@@ -194,7 +194,7 @@ const PayloadForm: FunctionComponent<Props> = ({
       {showArchitecture && (
         <Controller
           control={control}
-          name="executable_arch"
+          name="payload_arch"
           render={({ field }) => (
             <TextField
               select
@@ -203,9 +203,9 @@ const PayloadForm: FunctionComponent<Props> = ({
               value={field.value}
               label={t('Architecture')}
               style={{ marginTop: 20 }}
-              error={!!errors.executable_arch}
-              helperText={errors.executable_arch?.message}
-              inputProps={register('executable_arch')}
+              error={!!errors.payload_arch}
+              helperText={errors.payload_arch?.message}
+              inputProps={register('payload_arch')}
               InputLabelProps={{ required: true }}
             >
               <MenuItem value="x86_64">{t('x86_64')}</MenuItem>

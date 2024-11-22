@@ -13,16 +13,8 @@ public class V3_49__Update_executable_arch_payload_type_command extends BaseJava
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
-    statement.execute("UPDATE payloads SET executable_arch = 'All' WHERE payload_type ='Command';");
-
-    statement.execute(
-        """
-           ALTER TABLE payloads
-           ADD CONSTRAINT chk_arch_payload_cmd_exe_consistency
-           CHECK (
-               (payload_type IN ('Command', 'Executable') AND executable_arch IS NOT NULL)
-               OR (payload_type NOT IN ('Command', 'Executable'))
-           )
-           """);
+    statement.execute("UPDATE payloads SET executable_arch = 'All' WHERE executable_arch IS NULL;");
+    statement.execute("ALTER TABLE payloads RENAME COLUMN executable_arch TO payload_arch");
+    statement.execute("ALTER TABLE payloads ALTER COLUMN payload_arch SET DEFAULT 'All'");
   }
 }

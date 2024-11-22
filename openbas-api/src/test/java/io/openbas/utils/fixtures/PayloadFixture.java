@@ -18,7 +18,7 @@ public class PayloadFixture {
     command.setSource(MANUAL);
     command.setStatus(VERIFIED);
     command.setAttackPatterns(Collections.emptyList());
-    command.setExecutableArch(PlatformArchitecture.All);
+    command.setArchitecture(PlatformArchitecture.All);
     return command;
   }
 
@@ -40,7 +40,7 @@ public class PayloadFixture {
     executable.setSource(MANUAL);
     executable.setStatus(VERIFIED);
     executable.setAttackPatterns(Collections.emptyList());
-    executable.setExecutableArch(PlatformArchitecture.arm64);
+    executable.setArchitecture(PlatformArchitecture.arm64);
     return executable;
   }
 }

@@ -67,7 +67,6 @@ public class PayloadApi extends RestBehavior {
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
     switch (PayloadType.fromString(input.getType())) {
       case PayloadType.COMMAND:
-        validateArchitecture(input.getExecutableArch());
         Command commandPayload = new Command();
         commandPayload.setUpdateAttributes(input);
         commandPayload.setAttackPatterns(
@@ -77,7 +76,6 @@ public class PayloadApi extends RestBehavior {
         this.payloadService.updateInjectorContractsForPayload(commandPayload);
         return commandPayload;
       case PayloadType.EXECUTABLE:
-        validateArchitecture(input.getExecutableArch());
         Executable executablePayload = new Executable();
         executablePayload.setUpdateAttributes(input);
         executablePayload.setAttackPatterns(
@@ -137,14 +135,12 @@ public class PayloadApi extends RestBehavior {
     payload.setUpdatedAt(Instant.now());
     switch (PayloadType.fromString(payload.getType())) {
       case PayloadType.COMMAND:
-        validateArchitecture(input.getExecutableArch());
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
         payloadCommand.setUpdateAttributes(input);
         payloadCommand = payloadRepository.save(payloadCommand);
         this.payloadService.updateInjectorContractsForPayload(payloadCommand);
         return payloadCommand;
       case PayloadType.EXECUTABLE:
-        validateArchitecture(input.getExecutableArch());
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
         payloadExecutable.setUpdateAttributes(input);
         payloadExecutable.setExecutableFile(
@@ -204,14 +200,12 @@ public class PayloadApi extends RestBehavior {
       existingPayload.setUpdatedAt(Instant.now());
       switch (PayloadType.fromString(existingPayload.getType())) {
         case PayloadType.COMMAND:
-          validateArchitecture(input.getExecutableArch());
           Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
           payloadCommand.setUpdateAttributes(input);
           payloadCommand = payloadRepository.save(payloadCommand);
           this.payloadService.updateInjectorContractsForPayload(payloadCommand);
           return payloadCommand;
         case PayloadType.EXECUTABLE:
-          validateArchitecture(input.getExecutableArch());
           Executable payloadExecutable = (Executable) Hibernate.unproxy(existingPayload);
           payloadExecutable.setUpdateAttributes(input);
           payloadExecutable.setExecutableFile(
@@ -247,7 +241,6 @@ public class PayloadApi extends RestBehavior {
     } else {
       switch (PayloadType.fromString(input.getType())) {
         case PayloadType.COMMAND:
-          validateArchitecture(input.getExecutableArch());
           Command commandPayload = new Command();
           commandPayload.setUpdateAttributes(input);
           if (input.getCollector() != null) {
@@ -263,7 +256,6 @@ public class PayloadApi extends RestBehavior {
           this.payloadService.updateInjectorContractsForPayload(commandPayload);
           return commandPayload;
         case PayloadType.EXECUTABLE:
-          validateArchitecture(input.getExecutableArch());
           Executable executablePayload = new Executable();
           executablePayload.setUpdateAttributes(input);
           if (input.getCollector() != null) {
@@ -339,12 +331,6 @@ public class PayloadApi extends RestBehavior {
   @DeleteMapping(PAYLOAD_URI + "/{payloadId}")
   public void deletePayload(@PathVariable String payloadId) {
     payloadRepository.deleteById(payloadId);
-  }
-
-  private void validateArchitecture(PlatformArchitecture executableArch) {
-    if (executableArch == null) {
-      throw new BadRequestException("Executable arch is missing");
-    }
   }
 
   @PostMapping(PAYLOAD_URI + "/deprecate")

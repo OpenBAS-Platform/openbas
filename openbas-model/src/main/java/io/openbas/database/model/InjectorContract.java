@@ -69,18 +69,11 @@ public class InjectorContract implements Base {
   @Queryable(filterable = true)
   private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
 
-  @Queryable(filterable = true, dynamicValues = true, path = "payload.executableArch")
+  @Queryable(filterable = true, dynamicValues = true, path = "payload.architecture")
   @JsonProperty("injector_contract_arch")
   @Enumerated(EnumType.STRING)
   public PlatformArchitecture getArch() {
-    return Optional.ofNullable(getPayload())
-        .filter(payload -> payload instanceof Executable || payload instanceof Command)
-        .map(
-            payload ->
-                payload instanceof Executable
-                    ? ((Executable) payload).getExecutableArch()
-                    : ((Command) payload).getExecutableArch())
-        .orElse(null);
+    return Optional.ofNullable(getPayload()).map(Payload::getArchitecture).orElse(null);
   }
 
   @ManyToOne(fetch = FetchType.EAGER)

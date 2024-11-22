@@ -128,7 +128,7 @@ public class InjectorContractService {
             payloadCollectorJoin.get("type").alias("collector_type"),
             injectorContractInjectorJoin.get("type").alias("injector_contract_injector_type"),
             attackPatternIdsExpression.alias("injector_contract_attack_patterns"),
-            injectorContractPayloadJoin.get("executableArch").alias("payload_executable_arch"))
+            injectorContractPayloadJoin.get("architecture").alias("payload_executable_arch"))
         .distinct(true);
 
     // GROUP BY

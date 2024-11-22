@@ -932,7 +932,7 @@ const i18n = {
       'payload_status': 'Statut',
       'payload_tags': 'Tags',
       'payload_updated_at': 'Mis à jour à',
-      'executable_arch': 'Architecture',
+      'payload_arch': 'Architecture',
       // Team
       'team_tags': 'Tags',
       // User
@@ -2879,7 +2879,7 @@ const i18n = {
       'payload_status': 'Status',
       'payload_tags': 'Tags',
       'payload_updated_at': 'Updated',
-      'executable_arch': 'Architecture',
+      'payload_arch': 'Architecture',
       // Team
       'team_tags': 'Tags',
       // User

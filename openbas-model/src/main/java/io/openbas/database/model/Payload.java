@@ -134,6 +134,13 @@ public class Payload implements Base {
   @NotNull
   private PAYLOAD_STATUS status;
 
+  @Queryable(filterable = true, searchable = true)
+  @Column(name = "payload_arch")
+  @JsonProperty("payload_arch")
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private PlatformArchitecture architecture;
+
   // -- COLLECTOR --
 
   @ManyToOne(fetch = FetchType.LAZY)

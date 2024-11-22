@@ -32,13 +32,6 @@ public class Command extends Payload {
   @NotNull
   private String content;
 
-  @Queryable(filterable = true, searchable = true)
-  @Column(name = "executable_arch")
-  @JsonProperty("executable_arch")
-  @Enumerated(EnumType.STRING)
-  @NotNull
-  private PlatformArchitecture executableArch;
-
   public Command() {}
 
   public Command(String id, String type, String name) {

@@ -73,7 +73,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.executable_arch").value("x86_64"));
+        .andExpect(jsonPath("$.payload_arch").value("x86_64"));
 
     // -- Test for Paylaod type Command
     input = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
@@ -86,7 +86,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.executable_arch").value("x86_64"));
+        .andExpect(jsonPath("$.payload_arch").value("x86_64"));
   }
 
   @Test
@@ -127,7 +127,7 @@ public class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+            .andExpect(jsonPath("$.payload_arch").value("x86_64"))
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -144,7 +144,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("My Updated Executable Payload"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
-        .andExpect(jsonPath("$.executable_arch").value("arm64"));
+        .andExpect(jsonPath("$.payload_arch").value("arm64"));
   }
 
   @Test
@@ -193,7 +193,7 @@ public class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("Command line payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+            .andExpect(jsonPath("$.payload_arch").value("x86_64"))
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -208,7 +208,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("Updated Command line payload"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
-        .andExpect(jsonPath("$.executable_arch").value("arm64"));
+        .andExpect(jsonPath("$.payload_arch").value("arm64"));
 
     updateInput.setExecutableArch(null);
     mvc.perform(
@@ -383,7 +383,7 @@ public class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+            .andExpect(jsonPath("$.payload_arch").value("x86_64"))
             .andExpect(jsonPath("$.payload_source").value("COMMUNITY"))
             .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
             .andReturn()
@@ -396,7 +396,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("My Executable Payload (duplicate)"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+        .andExpect(jsonPath("$.payload_arch").value("x86_64"))
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"));
   }

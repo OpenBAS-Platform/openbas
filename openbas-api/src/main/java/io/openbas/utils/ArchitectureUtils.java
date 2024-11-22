@@ -9,10 +9,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class ArchitectureUtils {
 
-  private static final String EXECUTABLE_ARCH = "executable_arch";
+  private static final String PAYLOAD_ARCH = "payload_arch";
   private static final String INJECTOR_CONTRACT_ARCH = "injector_contract_arch";
   private static final String ENDPOINT_ARCH = "endpoint_arch";
-  public static final String ALL = "All";
+  private static final String ALL = "All";
 
   public static SearchPaginationInput handleArchitectureFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
@@ -21,7 +21,7 @@ public class ArchitectureUtils {
         ofNullable(searchPaginationInput.getFilterGroup())
             .flatMap(
                 f -> {
-                  Optional<Filters.Filter> filter = f.findByKey(EXECUTABLE_ARCH);
+                  Optional<Filters.Filter> filter = f.findByKey(PAYLOAD_ARCH);
                   if (filter.isPresent()) {
                     return filter;
                   } else {
