@@ -36,7 +36,9 @@ public class PayloadUpdateInput {
   private String content;
 
   @JsonProperty("payload_arch")
-  private PlatformArchitecture architecture = PlatformArchitecture.All;;
+  private PlatformArchitecture architecture = PlatformArchitecture.All;
+
+  ;
 
   @JsonProperty("executable_file")
   private String executableFile;

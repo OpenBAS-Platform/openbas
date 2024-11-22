@@ -10,7 +10,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.integrations.PayloadService;
-import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;

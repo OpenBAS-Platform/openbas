@@ -128,7 +128,7 @@ public class InjectorContractService {
             payloadCollectorJoin.get("type").alias("collector_type"),
             injectorContractInjectorJoin.get("type").alias("injector_contract_injector_type"),
             attackPatternIdsExpression.alias("injector_contract_attack_patterns"),
-            injectorContractPayloadJoin.get("architecture").alias("payload_executable_arch"))
+            injectorContractPayloadJoin.get("architecture").alias("payload_arch"))
         .distinct(true);
 
     // GROUP BY
@@ -153,7 +153,7 @@ public class InjectorContractService {
                     tuple.get("collector_type", String.class),
                     tuple.get("injector_contract_injector_type", String.class),
                     tuple.get("injector_contract_attack_patterns", String[].class),
-                    tuple.get("payload_executable_arch", PlatformArchitecture.class)))
+                    tuple.get("payload_arch", PlatformArchitecture.class)))
         .toList();
   }
 }

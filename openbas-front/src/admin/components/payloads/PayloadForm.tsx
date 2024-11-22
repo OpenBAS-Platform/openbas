@@ -163,7 +163,7 @@ const PayloadForm: FunctionComponent<Props> = ({
     handleSubmit(onSubmit)(e);
   };
 
-  const showArchitecture = (type === 'Executable') || (type === 'Command');
+  const updateArchitecture = (type === 'Executable') || (type === 'Command');
 
   return (
     <form id="payloadForm" onSubmit={handleSubmitWithoutDefault}>
@@ -191,30 +191,38 @@ const PayloadForm: FunctionComponent<Props> = ({
         )}
       />
 
-      {showArchitecture && (
-        <Controller
-          control={control}
-          name="payload_arch"
-          render={({ field }) => (
-            <TextField
-              select
-              variant="standard"
-              fullWidth
-              value={field.value}
-              label={t('Architecture')}
-              style={{ marginTop: 20 }}
-              error={!!errors.payload_arch}
-              helperText={errors.payload_arch?.message}
-              inputProps={register('payload_arch')}
-              InputLabelProps={{ required: true }}
-            >
-              <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
-              <MenuItem value="arm64">{t('arm64')}</MenuItem>
-              {type === 'Command' && (<MenuItem value="All">{t('All')}</MenuItem>)}
-            </TextField>
-          )}
-        />
-      )}
+      <Controller
+        control={control}
+        name="payload_arch"
+        render={({ field }) => (
+          <TextField
+            select
+            variant="standard"
+            fullWidth
+            value={field.value}
+            label={t('Architecture')}
+            style={{ marginTop: 20 }}
+            error={!!errors.payload_arch}
+            helperText={errors.payload_arch?.message}
+            inputProps={register('payload_arch')}
+            InputLabelProps={{ required: updateArchitecture }}
+          >
+            {updateArchitecture ? (
+              <>
+                <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+                <MenuItem value="arm64">{t('arm64')}</MenuItem>
+                {type === 'Command' && (
+                  <MenuItem value="All">{t('All')}</MenuItem>
+                )}
+              </>
+            ) : (
+              <MenuItem value={field.value} disabled>
+                {field.value}
+              </MenuItem>
+            )}
+          </TextField>
+        )}
+      />
 
       <TextField
         name="payload_description"
@@ -228,100 +236,108 @@ const PayloadForm: FunctionComponent<Props> = ({
         inputProps={register('payload_description')}
       />
 
-      {type === 'Command' && (
-        <>
-          <SelectField
-            variant="standard"
-            label={t('Command executor')}
-            name="command_executor"
+      {
+        type === 'Command' && (
+          <>
+            <SelectField
+              variant="standard"
+              label={t('Command executor')}
+              name="command_executor"
+              control={control}
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+              error={!!errors.command_executor}
+              helperText={t('Should not be empty')}
+              InputLabelProps={{ required: true }}
+            >
+              <MenuItem value="psh">
+                {t('PowerShell')}
+              </MenuItem>
+              <MenuItem value="cmd">
+                {t('Command Prompt')}
+              </MenuItem>
+              <MenuItem value="bash">
+                {t('Bash')}
+              </MenuItem>
+              <MenuItem value="sh">
+                {t('Sh')}
+              </MenuItem>
+            </SelectField>
+            <TextField
+              name="command_content"
+              multiline
+              fullWidth
+              rows={3}
+              label={t('Command')}
+              style={{ marginTop: 20 }}
+              error={!!errors.command_content}
+              helperText={t('To put arguments in the command line, use #{argument_key}')}
+              InputLabelProps={{ required: true }}
+              inputProps={register('command_content')}
+            />
+          </>
+        )
+      }
+      {
+        type === 'Executable' && (
+          <Controller
             control={control}
-            fullWidth={true}
-            style={{ marginTop: 20 }}
-            error={!!errors.command_executor}
-            helperText={t('Should not be empty')}
-            InputLabelProps={{ required: true }}
-          >
-            <MenuItem value="psh">
-              {t('PowerShell')}
-            </MenuItem>
-            <MenuItem value="cmd">
-              {t('Command Prompt')}
-            </MenuItem>
-            <MenuItem value="bash">
-              {t('Bash')}
-            </MenuItem>
-            <MenuItem value="sh">
-              {t('Sh')}
-            </MenuItem>
-          </SelectField>
-          <TextField
-            name="command_content"
-            multiline
-            fullWidth
-            rows={3}
-            label={t('Command')}
-            style={{ marginTop: 20 }}
-            error={!!errors.command_content}
-            helperText={t('To put arguments in the command line, use #{argument_key}')}
-            InputLabelProps={{ required: true }}
-            inputProps={register('command_content')}
+            name="executable_file"
+            render={({ field: { onChange } }) => (
+              <FileLoader
+                name="executable_file"
+                label={t('Executable file')}
+                setFieldValue={(_name, document) => {
+                  onChange(document);
+                }}
+                initialValue={{ id: initialValues.executable_file?.id }}
+                InputLabelProps={{ required: true }}
+                error={!!errors.executable_file}
+              />
+            )}
           />
-        </>
-      )}
-      {type === 'Executable' && (
-        <Controller
-          control={control}
-          name="executable_file"
-          render={({ field: { onChange } }) => (
-            <FileLoader
-              name="executable_file"
-              label={t('Executable file')}
-              setFieldValue={(_name, document) => {
-                onChange(document);
-              }}
-              initialValue={{ id: initialValues.executable_file?.id }}
-              InputLabelProps={{ required: true }}
-              error={!!errors.executable_file}
-            />
-          )}
-        />
 
-      )}
-      {type === 'FileDrop' && (
-        <Controller
-          control={control}
-          name="file_drop_file"
-          render={({ field: { onChange } }) => (
-            <FileLoader
-              name="file_drop_file"
-              label={t('File to drop')}
-              setFieldValue={(_name, document) => {
-                onChange(document?.id);
-              }}
-              initialValue={{ id: initialValues.file_drop_file }}
-              InputLabelProps={{ required: true }}
-              error={!!errors.file_drop_file}
-            />
+        )
+      }
+      {
+        type === 'FileDrop' && (
+          <Controller
+            control={control}
+            name="file_drop_file"
+            render={({ field: { onChange } }) => (
+              <FileLoader
+                name="file_drop_file"
+                label={t('File to drop')}
+                setFieldValue={(_name, document) => {
+                  onChange(document?.id);
+                }}
+                initialValue={{ id: initialValues.file_drop_file }}
+                InputLabelProps={{ required: true }}
+                error={!!errors.file_drop_file}
+              />
 
-          )}
-        />
-      )}
-      {type === 'DnsResolution' && (
-        <>
-          <TextField
-            name="dns_resolution_hostname"
-            label={t('Hostname')}
-            style={{ marginTop: 20 }}
-            multiline
-            fullWidth
-            rows={3}
-            error={!!errors.dns_resolution_hostname}
-            helperText={t('One hostname by line')}
-            InputLabelProps={{ required: true }}
-            inputProps={register('dns_resolution_hostname')}
+            )}
           />
-        </>
-      )}
+        )
+      }
+      {
+        type === 'DnsResolution' && (
+          <>
+            <TextField
+              name="dns_resolution_hostname"
+              label={t('Hostname')}
+              style={{ marginTop: 20 }}
+              multiline
+              fullWidth
+              rows={3}
+              error={!!errors.dns_resolution_hostname}
+              helperText={t('One hostname by line')}
+              InputLabelProps={{ required: true }}
+              inputProps={register('dns_resolution_hostname')}
+            />
+          </>
+        )
+      }
       <div style={{ marginTop: 20 }}>
         <InputLabel
           variant="standard"
@@ -557,7 +573,8 @@ const PayloadForm: FunctionComponent<Props> = ({
       </div>
 
     </form>
-  );
+  )
+  ;
 };
 
 export default PayloadForm;
