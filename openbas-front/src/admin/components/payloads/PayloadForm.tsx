@@ -100,7 +100,6 @@ const PayloadForm: FunctionComponent<Props> = ({
       extendedSchema = baseSchema.extend({
         command_executor: z.string().min(1, { message: t('Should not be empty') }),
         command_content: z.string().min(1, { message: t('Should not be empty') }),
-        payload_arch: z.enum(['x86_64', 'arm64', 'All'], { message: t('Should not be empty') }),
       });
       break;
     case 'Executable':
