@@ -125,7 +125,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         )}
       </Grid>
     );
-  }, [immutable, theme, classes, displayHumanValidationBtn, humanValidationLink, pending]);
+  }, [immutable, theme, displayHumanValidationBtn, humanValidationLink, pending]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

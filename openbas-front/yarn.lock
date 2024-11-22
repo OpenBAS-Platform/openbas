@@ -8872,7 +8872,7 @@ __metadata:
     qs: "npm:6.13.0"
     ramda: "npm:0.30.1"
     react: "npm:18.3.1"
-    react-apexcharts: "npm:1.5.0"
+    react-apexcharts: "patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch"
     react-color: "npm:2.19.3"
     react-csv: "npm:2.2.2"
     react-dom: "npm:18.3.1"
@@ -9451,6 +9451,18 @@ __metadata:
     apexcharts: ^3.41.0
     react: ">=0.13"
   checksum: 10c0/91aef93cfd999053b0fad03b31b32b18dccfe5f08676b07e251cef214ffcc20e8e9cf92821c5ced090521ec5a02c0ca668f0139bf0f76a338cceeab0345889e9
+  languageName: node
+  linkType: hard
+
+"react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch":
+  version: 1.5.0
+  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch::version=1.5.0&hash=85e843"
+  dependencies:
+    prop-types: "npm:^15.8.1"
+  peerDependencies:
+    apexcharts: ^3.41.0
+    react: ">=0.13"
+  checksum: 10c0/854d440acadd577735cdd11aafbf50eb1d2c77e14eff5157b191d89bdcf022fd041ae32189d43bd345ebb735e21fce81e1a04e6502430449d1b7cc488cc4c631
   languageName: node
   linkType: hard
 
