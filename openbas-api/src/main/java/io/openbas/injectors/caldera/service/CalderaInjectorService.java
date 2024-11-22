@@ -92,7 +92,7 @@ public class CalderaInjectorService {
                   Map<String, Object> executor = new HashMap<>();
                   executor.put(
                       "platform",
-                      platform.equals(PLATFORM_TYPE.MacOS)
+                      PLATFORM_TYPE.MacOS.equals(platform)
                           ? "darwin"
                           : platform.name().toLowerCase());
                   executor.put("name", PLATFORM_TYPE.Windows.equals(platform) ? "psh" : "sh");
