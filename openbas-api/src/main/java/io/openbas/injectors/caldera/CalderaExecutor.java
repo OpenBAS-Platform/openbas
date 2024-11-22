@@ -149,6 +149,11 @@ public class CalderaExecutor extends Injector {
                                 case "Command":
                                   injectExpectationSignatures.add(
                                       InjectExpectationSignature.builder()
+                                          .type(EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME)
+                                          .value(executionEndpoint.getProcessName())
+                                          .build());
+                                  injectExpectationSignatures.add(
+                                      InjectExpectationSignature.builder()
                                           .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
                                           .value(executionEndpoint.getProcessName())
                                           .build());
@@ -197,6 +202,11 @@ public class CalderaExecutor extends Injector {
                                           + " is not supported");
                               }
                             } else {
+                              injectExpectationSignatures.add(
+                                  InjectExpectationSignature.builder()
+                                      .type(EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME)
+                                      .value(executionEndpoint.getProcessName())
+                                      .build());
                               injectExpectationSignatures.add(
                                   InjectExpectationSignature.builder()
                                       .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
