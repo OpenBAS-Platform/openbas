@@ -87,12 +87,12 @@ public class DryInjectStatus implements Base {
     int numberOfError =
         (int)
             execution.getTraces().stream()
-                .filter(ex -> ex.getStatus().equals(ExecutionStatus.ERROR))
+                .filter(ex -> ExecutionTraceStatus.ERROR.equals(ex.getStatus()))
                 .count();
     int numberOfSuccess =
         (int)
             execution.getTraces().stream()
-                .filter(ex -> ex.getStatus().equals(ExecutionStatus.SUCCESS))
+                .filter(ex -> ExecutionTraceStatus.SUCCESS.equals(ex.getStatus()))
                 .count();
     injectStatus.setTrackingTotalError(numberOfError);
     injectStatus.setTrackingTotalSuccess(numberOfSuccess);

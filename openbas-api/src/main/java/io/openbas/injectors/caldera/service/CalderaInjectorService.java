@@ -95,8 +95,7 @@ public class CalderaInjectorService {
                       platform.equals(PLATFORM_TYPE.MacOS)
                           ? "darwin"
                           : platform.name().toLowerCase());
-                  executor.put(
-                      "name", platform.equals(PLATFORM_TYPE.Windows.name()) ? "psh" : "sh");
+                  executor.put("name", PLATFORM_TYPE.Windows.equals(platform) ? "psh" : "sh");
                   String windowsCommand =
                       "Invoke-WebRequest -Method GET -Uri "
                           + openBASConfig.getBaseUrl()
@@ -123,7 +122,7 @@ public class CalderaInjectorService {
                           + ";";
                   executor.put(
                       "command",
-                      platform.equals(PLATFORM_TYPE.Windows.name()) ? windowsCommand : unixCommand);
+                      PLATFORM_TYPE.Windows.equals(platform) ? windowsCommand : unixCommand);
                   executor.put("cleanup", cleanupCommands);
                   executors.add(executor);
                 });
