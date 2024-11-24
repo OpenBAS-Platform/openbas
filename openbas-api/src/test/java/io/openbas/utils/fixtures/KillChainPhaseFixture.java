@@ -10,11 +10,13 @@ public class KillChainPhaseFixture {
 
   private static final Random RANDOM = new Random();
 
-  public static KillChainPhase getKillChainPhase(@NotBlank final String name) {
+  public static KillChainPhase getKillChainPhase(@NotBlank final String name,
+                                                 @NotBlank final Long order) {
     KillChainPhase killChainPhase = new KillChainPhase();
     killChainPhase.setName(name);
     killChainPhase.setShortName(name);
     killChainPhase.setKillChainName("mitre-attack");
+    killChainPhase.setOrder(order);
     killChainPhase.setExternalId(valueOf(RANDOM.nextInt()));
     return killChainPhase;
   }
