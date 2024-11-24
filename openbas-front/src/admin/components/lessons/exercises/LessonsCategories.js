@@ -79,7 +79,7 @@ const LessonsCategories = ({
     R.fromPairs,
   )(lessonsAnswers);
   return (
-    <div id="lessons_categories" style={{ marginTop: '30px', ...style }}>
+    <div id="lessons_categories" style={{ marginTop: '40px', ...style }}>
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
@@ -87,7 +87,7 @@ const LessonsCategories = ({
           ),
         );
         return (
-          <div key={category.lessonscategory_id}>
+          <div key={category.lessonscategory_id}  style={{ marginTop: '50px' }}>
             <Typography variant="h2" style={{ float: 'left' }}>
               {category.lessons_category_name}
             </Typography>
