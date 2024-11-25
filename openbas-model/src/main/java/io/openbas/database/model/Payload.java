@@ -48,6 +48,12 @@ public class Payload implements Base {
     DEPRECATED
   }
 
+  public enum PAYLOAD_EXECUTION_ARCH {
+    X86_64,
+    ARM64,
+    ALL_ARCHITECTURES,
+  }
+
   @Id
   @Column(name = "payload_id")
   @GeneratedValue(generator = "UUID")
@@ -136,6 +142,13 @@ public class Payload implements Base {
   @JsonProperty("payload_status")
   @NotNull
   private PAYLOAD_STATUS status;
+
+  @Queryable(filterable = true, searchable = true)
+  @Column(name = "payload_execution_arch")
+  @JsonProperty("payload_execution_arch")
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private PAYLOAD_EXECUTION_ARCH executionArch;
 
   // -- COLLECTOR --
 

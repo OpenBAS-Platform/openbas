@@ -72,13 +72,11 @@ public class InjectorContract implements Base {
   @Queryable(filterable = true, dynamicValues = true, path = "payload.executableArch")
   @JsonProperty("injector_contract_arch")
   @Enumerated(EnumType.STRING)
-  public Endpoint.PLATFORM_ARCH getArch() {
+  public Payload.PAYLOAD_EXECUTION_ARCH getArch() {
     return Optional.ofNullable(getPayload())
-        .filter(payload -> payload instanceof Executable)
-        .map(payload -> ((Executable) payload).getExecutableArch())
+        .map(payload -> payload.getExecutionArch())
         .orElse(null);
   }
-  ;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "injector_contract_payload")
