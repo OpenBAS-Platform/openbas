@@ -9,7 +9,6 @@ import static io.openbas.model.expectation.ManualExpectation.manualExpectationFo
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
@@ -23,8 +22,6 @@ import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -269,7 +266,8 @@ public class OpenBASImplantExecutor extends Injector {
 
   private List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
-    List<String> knownPayloadTypes = Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
+    List<String> knownPayloadTypes =
+        Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
 
     /*
      * Always add the "Parent process" signature type for the OpenBAS Implant Executor
@@ -279,8 +277,8 @@ public class OpenBASImplantExecutor extends Injector {
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME, "obas-implant-" + inject.getId()));
 
     if (!knownPayloadTypes.contains(payload.getType())) {
-        throw new UnsupportedOperationException(
-            "Payload type " + payload.getType() + " is not supported");
+      throw new UnsupportedOperationException(
+          "Payload type " + payload.getType() + " is not supported");
     }
     return signatures;
   }
