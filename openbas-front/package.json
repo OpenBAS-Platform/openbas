@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.15.0",
-    "@playwright/test": "1.48.2",
+    "@playwright/test": "1.49.0",
     "@stylistic/eslint-plugin": "2.11.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.0.1",
