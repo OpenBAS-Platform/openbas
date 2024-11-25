@@ -12,6 +12,7 @@ import static io.openbas.injector_contract.fields.ContractExpectations.expectati
 import static io.openbas.injector_contract.fields.ContractSelect.selectFieldWithDefault;
 
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.Payload;
 import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.*;
@@ -148,6 +149,7 @@ public class CalderaContract extends Contractor {
                       Map.of(en, ability.getName(), fr, ability.getName()),
                       builder.build(),
                       platforms,
+                      Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
                       true);
               contract.addAttackPattern(ability.getTechnique_id());
               return contract;

@@ -9,6 +9,7 @@ import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.textareaField;
 
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Payload;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.Contractor;
@@ -68,6 +69,7 @@ public class MastodonContract extends Contractor {
             Map.of(en, "Mastodon"),
             instance,
             List.of(Endpoint.PLATFORM_TYPE.Service),
+            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false));
   }
 

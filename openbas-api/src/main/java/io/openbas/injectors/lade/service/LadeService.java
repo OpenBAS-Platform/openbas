@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.InjectStatusExecution;
+import io.openbas.database.model.Payload;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
@@ -264,6 +265,7 @@ public class LadeService {
                     Map.of(en, contractName),
                     builder.build(),
                     List.of(Endpoint.PLATFORM_TYPE.Service),
+                    Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
                     false);
             contractInstance.addContext("lade_type", "action");
             contractInstance.addContext("bundle_identifier", bundleIdentifier);
@@ -292,6 +294,7 @@ public class LadeService {
                   Map.of(en, contractName + qualifier),
                   builder.build(),
                   List.of(Endpoint.PLATFORM_TYPE.Service),
+                  Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
                   false);
           contractInstance.addContext("lade_type", "scenario");
           contractInstance.addContext("bundle_identifier", bundleIdentifier);

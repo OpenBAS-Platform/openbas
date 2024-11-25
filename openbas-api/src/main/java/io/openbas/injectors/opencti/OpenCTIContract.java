@@ -13,6 +13,7 @@ import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
 
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Payload;
 import io.openbas.database.model.Variable.VariableType;
 import io.openbas.injector_contract.*;
 import io.openbas.injector_contract.fields.ContractElement;
@@ -87,6 +88,7 @@ public class OpenCTIContract extends Contractor {
             Map.of(en, "Create a new case", fr, "Créer un nouveau case"),
             createCaseInstance,
             List.of(Endpoint.PLATFORM_TYPE.Service),
+            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false);
     createCase.addVariable(documentUriVariable);
     List<ContractElement> createReportInstance =
@@ -103,6 +105,7 @@ public class OpenCTIContract extends Contractor {
             Map.of(en, "Create a new report", fr, "Créer un nouveau rapport"),
             createReportInstance,
             List.of(Endpoint.PLATFORM_TYPE.Service),
+            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false);
     createReport.addVariable(documentUriVariable);
     return List.of(createCase, createReport);

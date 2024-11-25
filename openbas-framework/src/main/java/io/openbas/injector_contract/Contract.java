@@ -2,6 +2,7 @@ package io.openbas.injector_contract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.Payload;
 import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.fields.ContractElement;
 import io.openbas.injector_contract.variables.VariableHelper;
@@ -52,6 +53,10 @@ public class Contract {
   @JsonProperty("platforms")
   private List<PLATFORM_TYPE> platforms = new ArrayList<>();
 
+  @NotEmpty
+  @JsonProperty("execution_arch")
+  private Payload.PAYLOAD_EXECUTION_ARCH executionArch;
+
   private Contract(
       @NotNull final ContractConfig config,
       @NotBlank final String id,
@@ -59,6 +64,7 @@ public class Contract {
       final boolean manual,
       @NotEmpty final List<ContractElement> fields,
       final List<PLATFORM_TYPE> platforms,
+      @NotEmpty final Payload.PAYLOAD_EXECUTION_ARCH executionArch,
       final boolean needsExecutor) {
     this.config = config;
     this.id = id;
@@ -67,6 +73,7 @@ public class Contract {
     this.fields = fields;
     this.needsExecutor = needsExecutor;
     this.platforms = platforms;
+    this.executionArch = executionArch;
 
     // Default variables linked to ExecutionContext
     // User variables
@@ -94,6 +101,7 @@ public class Contract {
             true,
             fields,
             platforms == null ? List.of(PLATFORM_TYPE.Generic) : platforms,
+            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             needsExecutor);
     contract.setAtomicTesting(false);
     return contract;
@@ -105,6 +113,7 @@ public class Contract {
       @NotEmpty final Map<SupportedLanguage, String> label,
       @NotEmpty final List<ContractElement> fields,
       final List<PLATFORM_TYPE> platforms,
+      @NotEmpty final Payload.PAYLOAD_EXECUTION_ARCH executionArch,
       final boolean needsExecutor) {
     return new Contract(
         config,
@@ -113,6 +122,7 @@ public class Contract {
         false,
         fields,
         platforms == null ? List.of(PLATFORM_TYPE.Generic) : platforms,
+        executionArch,
         needsExecutor);
   }
 

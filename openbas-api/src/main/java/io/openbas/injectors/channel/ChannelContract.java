@@ -18,6 +18,7 @@ import static io.openbas.injectors.channel.ChannelExecutor.VARIABLE_ARTICLE;
 import static io.openbas.injectors.channel.ChannelExecutor.VARIABLE_ARTICLES;
 
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Payload;
 import io.openbas.database.model.Variable.VariableType;
 import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.injector_contract.Contract;
@@ -112,6 +113,7 @@ public class ChannelContract extends Contractor {
             Map.of(en, "Publish a media pressure", fr, "Publier de la pression médiatique"),
             publishInstance,
             List.of(Endpoint.PLATFORM_TYPE.Internal),
+            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false);
     // Adding generated variables
     publishArticle.addVariable(
