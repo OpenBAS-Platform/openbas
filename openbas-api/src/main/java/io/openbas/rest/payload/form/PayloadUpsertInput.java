@@ -44,6 +44,10 @@ public class PayloadUpsertInput {
   @JsonProperty("payload_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms;
 
+  @JsonProperty("payload_arch")
+  private Payload.PAYLOAD_EXECUTION_ARCH executionArch =
+      Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
+
   @JsonProperty("payload_description")
   private String description;
 
