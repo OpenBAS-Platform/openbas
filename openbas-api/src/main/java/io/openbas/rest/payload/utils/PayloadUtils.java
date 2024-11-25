@@ -30,7 +30,7 @@ public class PayloadUtils {
 
     filterOpt.ifPresent(
         payloadFilter -> {
-          if (payloadFilter.getValues().contains("x86_64")
+          if (payloadFilter.getValues().contains("X86_64")
               || payloadFilter.getValues().contains("ARM64")) {
             payloadFilter.getValues().add(ALL);
           }

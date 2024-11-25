@@ -71,7 +71,7 @@ const Payload: FunctionComponent<Props> = ({
         ) : selectedPayload?.payload_platforms?.map(
           platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
         )}
-        {(selectedPayload?.executable_arch) && (
+        {(selectedPayload?.payload_execution_arch) && (
           <>
             <Typography
               variant="h3"
@@ -80,7 +80,7 @@ const Payload: FunctionComponent<Props> = ({
             >
               {t('Architecture')}
             </Typography>
-            {selectedPayload?.executable_arch}
+            {selectedPayload?.payload_execution_arch}
           </>
         )}
         <Typography
