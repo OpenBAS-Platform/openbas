@@ -139,7 +139,6 @@ public class InjectUtils {
     duplicatedInject.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
     duplicatedInject.setAssets(injectOrigin.getAssets().stream().toList());
     duplicatedInject.setCommunications(injectOrigin.getCommunications().stream().toList());
-    duplicatedInject.setPayloads(injectOrigin.getPayloads().stream().toList());
     duplicatedInject.setTags(new HashSet<>(injectOrigin.getTags()));
 
     duplicatedInject.setExercise(injectOrigin.getExercise());
