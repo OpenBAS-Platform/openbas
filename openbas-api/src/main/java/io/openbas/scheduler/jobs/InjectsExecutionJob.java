@@ -15,10 +15,12 @@ import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -64,9 +66,11 @@ public class InjectsExecutionJob implements Job {
   private final List<InjectExpectation.EXPECTATION_STATUS> expectationStatusesSuccess =
       List.of(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
 
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
 
-  @PersistenceContext private EntityManager entityManager;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   public void setEntityManager(EntityManager entityManager) {
@@ -200,7 +204,7 @@ public class InjectsExecutionJob implements Job {
               errorMsg -> finalStatus.getTraces().add(InjectStatusExecution.traceError(errorMsg)));
       finalStatus.setName(ExecutionStatus.ERROR);
       finalStatus.setTrackingSentDate(Instant.now());
-      finalStatus.setCommandsLines(injectUtils.getCommandsLinesFromInject(inject));
+      finalStatus.setPayloadOutput(injectUtils.getCommandsLinesFromInject(inject));
       injectStatusRepository.save(finalStatus);
     } else {
       setInjectStatusAndExecuteInject(executableInject, inject);
@@ -276,7 +280,7 @@ public class InjectsExecutionJob implements Job {
     }
     injectStatus.setName(status);
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setCommandsLines(injectUtils.getCommandsLinesFromInject(inject));
+    injectStatus.setPayloadOutput(injectUtils.getCommandsLinesFromInject(inject));
     injectStatusRepository.save(injectStatus);
     inject.setStatus(injectStatus);
   }
@@ -285,7 +289,7 @@ public class InjectsExecutionJob implements Job {
    * Get error messages if pre execution conditions are not met
    *
    * @param exerciseId the id of the exercise
-   * @param inject the inject to check
+   * @param inject     the inject to check
    * @return an optional of list of error message
    */
   private Optional<List<String>> getErrorMessagesPreExecution(String exerciseId, Inject inject) {
@@ -338,8 +342,8 @@ public class InjectsExecutionJob implements Job {
   /**
    * Get a map containing the expectations and if they are met or not
    *
-   * @param parents the parents injects
-   * @param exerciseId the id of the exercise
+   * @param parents            the parents injects
+   * @param exerciseId         the id of the exercise
    * @param injectDependencies the list of dependencies
    * @return a map of expectations and their value
    */
@@ -377,7 +381,7 @@ public class InjectsExecutionJob implements Job {
                 }
                 if (InjectExpectation.EXPECTATION_TYPE.CHALLENGE.equals(injectExpectation.getType())
                     || InjectExpectation.EXPECTATION_TYPE.ARTICLE.equals(
-                        injectExpectation.getType())) {
+                    injectExpectation.getType())) {
                   if (injectExpectation.getUser() == null && injectExpectation.getScore() != null) {
                     mapCondition.put(
                         name, injectExpectation.getScore() >= injectExpectation.getExpectedScore());

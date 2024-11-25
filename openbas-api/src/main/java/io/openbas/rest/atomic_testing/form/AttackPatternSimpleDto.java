@@ -6,10 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @Builder
-public class AttackPatternSimple {
+public class AttackPatternSimpleDto {
 
   @JsonProperty("attack_pattern_id")
   @NotBlank
