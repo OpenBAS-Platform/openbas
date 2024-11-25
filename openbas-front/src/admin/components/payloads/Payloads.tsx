@@ -110,7 +110,7 @@ const chipSx = {
   width: 120,
 };
 
-const fromPayloadStatusToChipColor = (payloadStatus: String) => {
+const fromPayloadStatusToChipColor = (payloadStatus: string) => {
   switch (payloadStatus) {
     case 'VERIFIED':
       return 'success';
