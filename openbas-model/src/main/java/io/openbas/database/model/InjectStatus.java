@@ -1,7 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.converter.InjectStatusCommandLineConverter;
+import io.openbas.database.converter.PayloadOutputConverter;
 import jakarta.persistence.*;
 
 import java.time.Duration;
@@ -18,10 +18,10 @@ import lombok.Setter;
 public class InjectStatus extends BaseInjectStatus {
 
   // commands lines tracking
-  @Column(name = "status_commands_lines")
-  @Convert(converter = InjectStatusCommandLineConverter.class)
-  @JsonProperty("status_commands_lines")
-  private PayloadOutput commandsLines;
+  @Column(name = "status_payload_output")
+  @Convert(converter = PayloadOutputConverter.class)
+  @JsonProperty("status_payload_output")
+  private PayloadOutput payloadOutput;
 
   public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
     InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());

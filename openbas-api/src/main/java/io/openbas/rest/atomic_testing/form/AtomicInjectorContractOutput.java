@@ -34,7 +34,7 @@ public class AtomicInjectorContractOutput {
   private Endpoint.PLATFORM_TYPE[] platforms;
 
   @JsonProperty("injector_contract_payload")
-  private PayloadOutput payload;
+  private PayloadOutputDto payload;
 
   @Builder.Default
   @JsonProperty("injector_contract_labels")

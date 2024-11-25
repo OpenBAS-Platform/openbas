@@ -31,8 +31,8 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
-import io.openbas.rest.atomic_testing.form.PayloadCommandBlock;
-import io.openbas.rest.atomic_testing.form.PayloadOutput;
+import io.openbas.database.model.PayloadCommandBlock;
+import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
 
@@ -279,8 +279,8 @@ public class CalderaExecutor extends Injector {
   }
 
   @Override
-  public PayloadOutput getPayloadOutput(String externalId) {
-    PayloadOutput.PayloadOutputBuilder payloadOutputBuilder = PayloadOutput.builder();
+  public PayloadOutputDto getPayloadOutput(String externalId) {
+    PayloadOutputDto.PayloadOutputBuilder payloadOutputBuilder = PayloadOutputDto.builder();
     Ability ability = calderaService.findAbilityById(externalId);
     if (ability != null) {
       ability

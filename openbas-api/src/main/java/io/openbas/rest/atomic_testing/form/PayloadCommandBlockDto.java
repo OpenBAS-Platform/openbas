@@ -7,11 +7,10 @@ import lombok.Setter;
 
 import java.util.List;
 
-
-@Setter
 @Getter
+@Setter
 @Builder
-public class PayloadCommandBlock {
+public class PayloadCommandBlockDto {
 
   @JsonProperty("command_executor")
   private String executor;
