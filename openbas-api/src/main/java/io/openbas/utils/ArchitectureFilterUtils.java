@@ -1,4 +1,4 @@
-package io.openbas.rest.payload.utils;
+package io.openbas.utils;
 
 import static java.util.Optional.ofNullable;
 
@@ -7,11 +7,12 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
-public class PayloadUtils {
+public class ArchitectureFilterUtils {
 
   private static final String PAYLOAD_EXECUTION_ARCH = "payload_execution_arch";
   private static final String INJECTOR_CONTRACT_ARCH = "injector_contract_arch";
-  private static final String ALL = "ALL_ARCHITECTURES";
+  private static final String ENDPOINT_ARCH = "endpoint_arch";
+  private static final String ALL_ARCHITECTURES = "ALL_ARCHITECTURES";
 
   public static SearchPaginationInput handleArchitectureFilter(
       @NotNull final SearchPaginationInput searchPaginationInput) {
@@ -32,7 +33,26 @@ public class PayloadUtils {
         payloadFilter -> {
           if (payloadFilter.getValues().contains("X86_64")
               || payloadFilter.getValues().contains("ARM64")) {
-            payloadFilter.getValues().add(ALL);
+            payloadFilter.getValues().add(ALL_ARCHITECTURES);
+          }
+        });
+
+    return searchPaginationInput;
+  }
+
+  public static SearchPaginationInput handleEndpointFilter(
+      @NotNull final SearchPaginationInput searchPaginationInput) {
+
+    Optional<Filters.Filter> endpointFilterOpt =
+        ofNullable(searchPaginationInput.getFilterGroup()).flatMap(f -> f.findByKey(ENDPOINT_ARCH));
+
+    endpointFilterOpt.ifPresent(
+        endpointFilter -> {
+          if (endpointFilter.getValues().contains(ALL_ARCHITECTURES)) {
+            endpointFilter.getValues().remove(ALL_ARCHITECTURES);
+          }
+          if (endpointFilter.getValues().isEmpty()) {
+            searchPaginationInput.getFilterGroup().removeByKey(ENDPOINT_ARCH);
           }
         });
 

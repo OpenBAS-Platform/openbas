@@ -153,7 +153,7 @@ public class InjectorContractService {
                     tuple.get("collector_type", String.class),
                     tuple.get("injector_contract_injector_type", String.class),
                     tuple.get("injector_contract_attack_patterns", String[].class),
-                    tuple.get("payload_executable_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
+                    tuple.get("payload_execution_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
         .toList();
   }
 }

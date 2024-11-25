@@ -4,6 +4,7 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.asset.EndpointService;
@@ -136,7 +137,7 @@ public class EndpointApi {
         (Specification<Endpoint> specification, Pageable pageable) ->
             this.endpointRepository.findAll(
                 EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
-        searchPaginationInput,
+        handleEndpointFilter(searchPaginationInput),
         Endpoint.class);
   }
 
