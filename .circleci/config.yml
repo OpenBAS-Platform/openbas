@@ -7,7 +7,7 @@ jobs:
   build_frontend:
     working_directory: ~/openbas
     docker:
-      - image: nikolaik/python-nodejs:python3.10-nodejs20
+      - image: nikolaik/python-nodejs:python3.10-nodejs22
     resource_class: large
     steps:
       - run:

@@ -124,7 +124,7 @@
     "vitest": "2.1.1"
   },
   "engines": {
-    "node": ">= 20.10.0"
+    "node": ">= 22.11.0"
   },
   "scripts": {
     "start": "vite",
