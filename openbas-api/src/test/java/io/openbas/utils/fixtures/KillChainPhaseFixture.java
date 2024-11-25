@@ -10,8 +10,8 @@ public class KillChainPhaseFixture {
 
   private static final Random RANDOM = new Random();
 
-  public static KillChainPhase getKillChainPhase(@NotBlank final String name,
-                                                 @NotBlank final Long order) {
+  public static KillChainPhase getKillChainPhase(
+      @NotBlank final String name, @NotBlank final Long order) {
     KillChainPhase killChainPhase = new KillChainPhase();
     killChainPhase.setName(name);
     killChainPhase.setShortName(name);

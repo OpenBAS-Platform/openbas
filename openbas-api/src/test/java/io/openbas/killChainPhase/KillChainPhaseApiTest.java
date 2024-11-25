@@ -23,7 +23,6 @@ import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,20 +44,16 @@ public class KillChainPhaseApiTest extends IntegrationTest {
 
   @Autowired private KillChainPhaseRepository killChainPhaseRepository;
 
-  @Mock
-  private KillChainPhaseRepository mockKillChainPhaseRepository;
+  @Mock private KillChainPhaseRepository mockKillChainPhaseRepository;
 
-
-  @InjectMocks
-  private KillChainPhaseApi killChainPhaseApi;
-
+  @InjectMocks private KillChainPhaseApi killChainPhaseApi;
 
   private static final KillChainPhase KILL_CHAIN_PHASE_1 = getKillChainPhase("name1", 1L);
   private static final KillChainPhase KILL_CHAIN_PHASE_2 = getKillChainPhase("name2", 2L);
   private static final KillChainPhase KILL_CHAIN_PHASE_3 = getKillChainPhase("name3", 3L);
 
-  private final static String SEARCH_INPUT = "search input";
-  private final static Specification<KillChainPhase> spec = byName(SEARCH_INPUT);
+  private static final String SEARCH_INPUT = "search input";
+  private static final Specification<KillChainPhase> spec = byName(SEARCH_INPUT);
 
   private static String KILL_CHAIN_PHASE_ID_1;
   private static String KILL_CHAIN_PHASE_ID_2;
@@ -66,10 +61,8 @@ public class KillChainPhaseApiTest extends IntegrationTest {
 
   private static List<KillChainPhase> killChainPhaseList = new ArrayList<>();
 
-
   @BeforeAll
   public void beforeAll() {
-
 
     KILL_CHAIN_PHASE_ID_1 = this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_1).getId();
     KILL_CHAIN_PHASE_ID_2 = this.killChainPhaseRepository.save(KILL_CHAIN_PHASE_2).getId();
@@ -78,7 +71,7 @@ public class KillChainPhaseApiTest extends IntegrationTest {
     killChainPhaseList = Arrays.asList(KILL_CHAIN_PHASE_1, KILL_CHAIN_PHASE_2, KILL_CHAIN_PHASE_3);
 
     when(mockKillChainPhaseRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "order")))
-            .thenReturn(killChainPhaseList);
+        .thenReturn(killChainPhaseList);
   }
 
   @AfterAll
@@ -240,7 +233,6 @@ public class KillChainPhaseApiTest extends IntegrationTest {
               .sorts(List.of(SortField.builder().property("phase_name").direction("desc").build()))
               .build();
 
-
       mvc.perform(
               post("/api/kill_chain_phases/search")
                   .contentType(MediaType.APPLICATION_JSON)
@@ -256,13 +248,17 @@ public class KillChainPhaseApiTest extends IntegrationTest {
   @Test
   void optionsByNameTest() throws Exception {
 
-    try (MockedStatic<KillChainPhaseSpecification> mocked = Mockito.mockStatic(KillChainPhaseSpecification.class)) {
+    try (MockedStatic<KillChainPhaseSpecification> mocked =
+        Mockito.mockStatic(KillChainPhaseSpecification.class)) {
       when(KillChainPhaseSpecification.byName(SEARCH_INPUT)).thenReturn(spec);
       List<FilterUtilsJpa.Option> result = killChainPhaseApi.optionsByName(SEARCH_INPUT);
 
       verify(mockKillChainPhaseRepository).findAll(spec, Sort.by(Sort.Direction.ASC, "order"));
-      assertEquals(killChainPhaseList.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName())).toList(),
-              result);
+      assertEquals(
+          killChainPhaseList.stream()
+              .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+              .toList(),
+          result);
     }
   }
 }
