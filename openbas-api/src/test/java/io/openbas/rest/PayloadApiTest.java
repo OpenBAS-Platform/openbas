@@ -1,6 +1,7 @@
 package io.openbas.rest;
 
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,8 +20,10 @@ import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import io.openbas.rest.payload.form.PayloadsDeprecateInput;
+import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.fixtures.PayloadInputFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.junit.jupiter.api.*;
@@ -53,7 +56,7 @@ public class PayloadApiTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Create Executable Payload")
+  @DisplayName("Create Payload")
   @WithMockAdminUser
   void createExecutablePayload() throws Exception {
     PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
@@ -67,20 +70,37 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.executable_arch").value("x86_64"));
+        .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"));
   }
 
   @Test
-  @DisplayName("Creating an Executable Payload without Arch should fail")
+  @DisplayName("Creating a Payload with a null as arch should fail")
+  @WithMockAdminUser
+  void createPayloadWithNullArch() throws Exception {
+    PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+    input.setExecutionArch(null);
+    mvc.perform(
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName(
+      "Creating an executable Payload with an arch different from x86_64 or arm64 should fail")
   @WithMockAdminUser
   void createExecutablePayloadWithoutArch() throws Exception {
     PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
     input.setExecutableFile(EXECUTABLE_FILE.getId());
-    input.setExecutableArch(null);
+    input.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES);
 
     mvc.perform(
             post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            result -> {
+              String errorMessage = result.getResolvedException().getMessage();
+              assertTrue(errorMessage.contains("Executable architecture must be X86_64 or ARM64"));
+            });
   }
 
   @Test
@@ -99,17 +119,14 @@ public class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+            .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
             .andReturn()
             .getResponse()
             .getContentAsString();
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
-    PayloadUpdateInput updateInput = new PayloadUpdateInput();
-    updateInput.setName("My Updated Executable Payload");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    updateInput.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.ARM64);
+    PayloadUpdateInput updateInput = PayloadInputFixture.getDefaultExecutablePayloadUpdateInput();
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
@@ -119,11 +136,11 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("My Updated Executable Payload"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
-        .andExpect(jsonPath("$.executable_arch").value("arm64"));
+        .andExpect(jsonPath("$.payload_execution_arch").value("ARM64"));
   }
 
   @Test
-  @DisplayName("Updating an Executable Payload without arch should fail")
+  @DisplayName("Updating an Executed Payload with null as arch should fail")
   @WithMockAdminUser
   void updateExecutablePayloadWithoutArch() throws Exception {
     PayloadCreateInput createInput =
@@ -142,17 +159,86 @@ public class PayloadApiTest extends IntegrationTest {
 
     var payloadId = JsonPath.read(response, "$.payload_id");
 
-    PayloadUpdateInput updateInput = new PayloadUpdateInput();
-    updateInput.setName("My Updated Executable Payload");
-    updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
+    PayloadUpdateInput updateInput = PayloadInputFixture.getDefaultExecutablePayloadUpdateInput();
+    updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
+    updateInput.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES);
+
+    mvc.perform(
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            result -> {
+              String errorMessage = result.getResolvedException().getMessage();
+              assertTrue(errorMessage.contains("Executable architecture must be X86_64 or ARM64"));
+            });
+  }
+
+  @Test
+  @DisplayName("Updating a Payload no Executable without arch should set ALL_ARCHITECTURES")
+  @WithMockAdminUser
+  void updatePayloadNoExecutableWithoutArch() throws Exception {
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+
+    String response =
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var payloadId = JsonPath.read(response, "$.payload_id");
+
+    PayloadUpdateInput updateInput = PayloadInputFixture.getDefaultCommandPayloadUpdateInput();
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
             put(PAYLOAD_URI + "/" + payloadId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(updateInput)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("Updated Command line payload"))
+        .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
+        .andExpect(jsonPath("$.payload_execution_arch").value("ALL_ARCHITECTURES"));
   }
+
+  @Test
+  @DisplayName("Upsert architecture of a Payload")
+  @WithMockPlannerUser
+  void upsertCommandPayloadToValidateArchitecture() throws Exception {
+    Payload payload = payloadRepository.save(PayloadFixture.createDefaultCommand());
+    payload.setExternalId("external-id");
+
+    // -- Without property architecture
+    PayloadUpsertInput upsertInput = PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
+    upsertInput.setExternalId(payload.getExternalId());
+    mvc.perform(
+            post(PAYLOAD_URI + "/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.payload_execution_arch").value("ALL_ARCHITECTURES"));
+
+    // -- With property architecture and null value
+    upsertInput.setExecutionArch(null);
+    mvc.perform(
+            post(PAYLOAD_URI + "/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            result -> {
+              String errorMessage = result.getResolvedException().getMessage();
+              assertTrue(errorMessage.contains("Executable architecture cannot be null"));
+            });
+  }
+
+  // -- CHECK CLEANUP AND EXECUTOR --
 
   @Test
   @DisplayName("Creating Command Line payload with both set executor and content should succeed")
@@ -300,7 +386,7 @@ public class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+            .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
             .andExpect(jsonPath("$.payload_source").value("COMMUNITY"))
             .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
             .andReturn()
@@ -313,7 +399,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("My Executable Payload (duplicate)"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.executable_arch").value("x86_64"))
+        .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"));
   }
@@ -339,12 +425,12 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful());
 
     PayloadUpsertInput payloadUpsertInput1 =
-        PayloadInputFixture.createDefaultPayloadUpsertInputForCommandLine();
+        PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
     payloadUpsertInput1.setCollector(collectorId);
     payloadUpsertInput1.setExternalId("54e03fc3-e906-4b8e-865a-972e3e339d60");
 
     PayloadUpsertInput payloadUpsertInput2 =
-        PayloadInputFixture.createDefaultPayloadUpsertInputForCommandLine();
+        PayloadInputFixture.getDefaultCommandPayloadUpsertInput();
     payloadUpsertInput2.setName("Command Payload 2");
     payloadUpsertInput2.setCollector(collectorId);
     payloadUpsertInput2.setExternalId("7a1ecc3c-3201-45cb-9a93-58405c0a680d");
@@ -382,7 +468,7 @@ public class PayloadApiTest extends IntegrationTest {
 
     mvc.perform(get(PAYLOAD_URI + "/" + payloadId1))
         .andExpect(status().is2xxSuccessful())
-        .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+        .andExpect(jsonPath("$.payload_name").value("My Command Payload"))
         .andExpect(jsonPath("$.payload_collector").value(collectorId))
         .andExpect(jsonPath("$.payload_status").value("DEPRECATED"));
 

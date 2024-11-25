@@ -1,5 +1,7 @@
 package io.openbas.rest.payload;
 
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.ARM64;
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.X86_64;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -10,6 +12,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.integrations.PayloadService;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
@@ -64,7 +67,9 @@ public class PayloadApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
-    switch (PayloadType.fromString(input.getType())) {
+    PayloadType payloadType = PayloadType.fromString(input.getType());
+    validateArchitecture(payloadType.key, input.getExecutionArch());
+    switch (payloadType) {
       case PayloadType.COMMAND:
         Command commandPayload = new Command();
         commandPayload.setUpdateAttributes(input);
@@ -132,7 +137,10 @@ public class PayloadApi extends RestBehavior {
         fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     payload.setUpdatedAt(Instant.now());
-    switch (payload.getTypeEnum()) {
+
+    PayloadType payloadType = PayloadType.fromString(payload.getType());
+    validateArchitecture(payloadType.key, input.getExecutionArch());
+    switch (payloadType) {
       case PayloadType.COMMAND:
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
         payloadCommand.setUpdateAttributes(input);
@@ -197,7 +205,10 @@ public class PayloadApi extends RestBehavior {
                   input.getAttackPatternsExternalIds())));
       existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       existingPayload.setUpdatedAt(Instant.now());
-      switch (existingPayload.getTypeEnum()) {
+
+      PayloadType payloadType = PayloadType.fromString(existingPayload.getType());
+      validateArchitecture(payloadType.key, input.getExecutionArch());
+      switch (payloadType) {
         case PayloadType.COMMAND:
           Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
           payloadCommand.setUpdateAttributes(input);
@@ -339,5 +350,17 @@ public class PayloadApi extends RestBehavior {
       @Valid @RequestBody PayloadsDeprecateInput input) {
     this.payloadService.deprecateNonProcessedPayloadsByCollector(
         input.collectorId(), input.processedPayloadExternalIds());
+  }
+
+  private static void validateArchitecture(
+      String payloadType, Payload.PAYLOAD_EXECUTION_ARCH arch) {
+    if (arch == null) {
+      throw new BadRequestException("Executable architecture cannot be null.");
+    }
+    if (Executable.EXECUTABLE_TYPE.equals(payloadType)) {
+      if (arch != X86_64 && arch != ARM64) {
+        throw new BadRequestException("Executable architecture must be X86_64 or ARM64.");
+      }
+    }
   }
 }

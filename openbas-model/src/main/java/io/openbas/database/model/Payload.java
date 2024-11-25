@@ -144,11 +144,11 @@ public class Payload implements Base {
   private PAYLOAD_STATUS status;
 
   @Queryable(filterable = true, searchable = true)
-  @Column(name = "payload_execution_arch")
+  @Column(name = "payload_execution_arch", nullable = false)
   @JsonProperty("payload_execution_arch")
   @Enumerated(EnumType.STRING)
   @NotNull
-  private PAYLOAD_EXECUTION_ARCH executionArch;
+  private PAYLOAD_EXECUTION_ARCH executionArch = Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
 
   // -- COLLECTOR --
 
