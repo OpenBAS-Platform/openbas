@@ -2936,6 +2936,9 @@ const i18n = {
       'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
       'New simulation successfully created and started. Click {here} to view the simulation.': 'New simulation successfully created and started. Click {here} to view the simulation.',
+      'The element already exists': 'The element already exists',
+      'Internal error': 'Internal error',
+      'Something went wrong. Please refresh the page or try again later.': 'Something went wrong. Please refresh the page or try again later.',
     },
   },
 };
