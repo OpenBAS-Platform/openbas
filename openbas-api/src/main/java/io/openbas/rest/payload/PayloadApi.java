@@ -4,12 +4,12 @@ import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.rest.payload.utils.PayloadUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.integrations.PayloadService;
-import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.payload.form.PayloadCreateInput;
@@ -51,7 +51,7 @@ public class PayloadApi extends RestBehavior {
     return buildPaginationJPA(
         (Specification<Payload> specification, Pageable pageable) ->
             this.payloadRepository.findAll(specification, pageable),
-        searchPaginationInput,
+        handleArchitectureFilter(searchPaginationInput),
         Payload.class);
   }
 
@@ -76,15 +76,12 @@ public class PayloadApi extends RestBehavior {
         return commandPayload;
       case PayloadType.EXECUTABLE:
         Executable executablePayload = new Executable();
-        PayloadCreateInput validatedInput = validateExecutableCreateInput(input);
-        executablePayload.setUpdateAttributes(validatedInput);
+        executablePayload.setUpdateAttributes(input);
         executablePayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
-        executablePayload.setTags(
-            iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
+            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+        executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         executablePayload.setExecutableFile(
-            documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
+            documentRepository.findById(input.getExecutableFile()).orElseThrow());
         executablePayload = payloadRepository.save(executablePayload);
         this.payloadService.updateInjectorContractsForPayload(executablePayload);
         return executablePayload;
@@ -143,11 +140,10 @@ public class PayloadApi extends RestBehavior {
         this.payloadService.updateInjectorContractsForPayload(payloadCommand);
         return payloadCommand;
       case PayloadType.EXECUTABLE:
-        PayloadUpdateInput validatedInput = validateExecutableUpdateInput(input);
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-        payloadExecutable.setUpdateAttributes(validatedInput);
+        payloadExecutable.setUpdateAttributes(input);
         payloadExecutable.setExecutableFile(
-            documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
+            documentRepository.findById(input.getExecutableFile()).orElseThrow());
         payloadExecutable = payloadRepository.save(payloadExecutable);
         this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
         return payloadExecutable;

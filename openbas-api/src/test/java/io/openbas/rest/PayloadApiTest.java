@@ -109,7 +109,7 @@ public class PayloadApiTest extends IntegrationTest {
     PayloadUpdateInput updateInput = new PayloadUpdateInput();
     updateInput.setName("My Updated Executable Payload");
     updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    updateInput.setExecutableArch(Endpoint.PLATFORM_ARCH.arm64);
+    updateInput.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.ARM64);
     updateInput.setExecutableFile(EXECUTABLE_FILE.getId());
 
     mvc.perform(
