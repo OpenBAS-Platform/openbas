@@ -87,7 +87,7 @@ const LessonsCategories = ({
           ),
         );
         return (
-          <div key={category.lessonscategory_id}  style={{ marginTop: '50px' }}>
+          <div key={category.lessonscategory_id} style={{ marginTop: '50px' }}>
             <Typography variant="h2" style={{ float: 'left' }}>
               {category.lessons_category_name}
             </Typography>
