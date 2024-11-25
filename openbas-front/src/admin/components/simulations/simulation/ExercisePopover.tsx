@@ -66,10 +66,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_main_focus: data.exercise_main_focus,
       exercise_tags: data.exercise_tags,
       exercise_start_date: data.exercise_start_date,
-      exercise_mails_reply_to: exercise.exercise_mails_reply_to,
-      exercise_mail_from: exercise.exercise_mail_from,
-      exercise_message_header: exercise.exercise_message_header,
-      exercise_message_footer: exercise.exercise_message_footer,
+      exercise_mails_reply_to: data.exercise_mails_reply_to,
+      exercise_mail_from: data.exercise_mail_from,
+      exercise_message_header: data.exercise_message_header,
+      exercise_message_footer: data.exercise_message_footer,
     };
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
   };
