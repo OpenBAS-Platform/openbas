@@ -1189,7 +1189,7 @@ class InjectDefinition extends Component {
                 disabled={fieldAssets.readOnly}
                 platforms={injectorContract.platforms}
                 payloadType={injectorContract.payloadType}
-                payloadArch={injectorContract.payloadArch}
+                payloadArch={injectorContract.execution_arch}
               />
             </>
           )}
