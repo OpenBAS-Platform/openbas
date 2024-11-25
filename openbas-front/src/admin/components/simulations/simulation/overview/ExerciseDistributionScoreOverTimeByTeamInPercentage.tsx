@@ -46,7 +46,7 @@ const ExerciseDistributionScoreOverTimeByTeamInPercentage: FunctionComponent<Pro
   const teamsColors = computeTeamsColors(teams, theme);
   let cumulation = 0;
   const teamsPercentScoresData = R.pipe(
-    R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team),
+    R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team && n?.inject_expectation_user === null),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
     R.map((n: [string, InjectExpectationStore[]]) => {
@@ -94,7 +94,6 @@ const ExerciseDistributionScoreOverTimeByTeamInPercentage: FunctionComponent<Pro
             null,
             undefined,
             false,
-            true,
           )}
           series={teamsPercentScoresData}
           type="line"
