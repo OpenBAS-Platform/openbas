@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { deleteChannel, updateChannel } from '../../../../actions/channels/channel-action';
 import Transition from '../../../../components/common/Transition';

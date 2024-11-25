@@ -4,7 +4,7 @@ import { Button, Dialog, DialogContent, DialogTitle, Grid, SpeedDial, SpeedDialA
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { addComcheck } from '../../../../../actions/Comcheck';
 import { addDryrun } from '../../../../../actions/Dryrun';

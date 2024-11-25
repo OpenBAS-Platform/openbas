@@ -2,7 +2,7 @@ import { DeleteOutlined, MarkEmailReadOutlined } from '@mui/icons-material';
 import { IconButton, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { deleteComcheck, fetchComchecks } from '../../../../../actions/Comcheck';
 import type { ComCheckHelper } from '../../../../../actions/comchecks/comcheck-helper';

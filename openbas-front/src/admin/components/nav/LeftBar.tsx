@@ -29,7 +29,7 @@ import { Collapse, Divider, Drawer, ListItemIcon, ListItemText, MenuItem, MenuLi
 import { createStyles, makeStyles, styled, useTheme } from '@mui/styles';
 import { DramaMasks, NewspaperVariantMultipleOutline, PostOutline, SecurityNetwork, SelectGroup, Target } from 'mdi-material-ui';
 import { LegacyRef, MutableRefObject, ReactNode, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 import type { UserHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';

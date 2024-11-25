@@ -1,7 +1,7 @@
 import { Groups3Outlined, MailOutlined, NotificationsOutlined, PersonOutlined } from '@mui/icons-material';
 import { Alert, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchExercise, updateExercise } from '../../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';

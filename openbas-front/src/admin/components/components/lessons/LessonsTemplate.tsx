@@ -1,7 +1,7 @@
 import { HelpOutlined } from '@mui/icons-material';
 import { Grid, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import type { UserHelper } from '../../../../actions/helper';
 import { fetchLessonsTemplateCategories, fetchLessonsTemplateQuestions } from '../../../../actions/Lessons';

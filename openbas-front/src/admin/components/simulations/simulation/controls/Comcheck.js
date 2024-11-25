@@ -3,7 +3,7 @@ import { Grid, LinearProgress, linearProgressClasses, List, ListItem, ListItemIc
 import { makeStyles, styled } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchComcheck, fetchComcheckStatuses } from '../../../../../actions/Comcheck';
 import { fetchOrganizations } from '../../../../../actions/Organization';

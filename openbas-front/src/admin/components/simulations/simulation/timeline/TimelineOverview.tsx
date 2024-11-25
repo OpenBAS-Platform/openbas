@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';

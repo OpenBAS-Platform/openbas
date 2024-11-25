@@ -3,7 +3,7 @@ import { AppBar, IconButton, Menu, MenuItem, MenuProps, Toolbar } from '@mui/mat
 import { makeStyles, useTheme } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';

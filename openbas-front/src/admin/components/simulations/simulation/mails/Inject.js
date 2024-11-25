@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchInjectCommunications } from '../../../../../actions/Communication';
 import { executeInject, fetchExerciseInjects } from '../../../../../actions/Inject';

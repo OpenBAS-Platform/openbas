@@ -1,6 +1,6 @@
 import { Paper, Typography } from '@mui/material';
 import { useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { addVariableForScenario, deleteVariableForScenario, fetchVariablesForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';

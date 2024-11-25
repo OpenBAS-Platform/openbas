@@ -2,7 +2,7 @@ import { CancelOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } 
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 import { updateExerciseStatus } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';

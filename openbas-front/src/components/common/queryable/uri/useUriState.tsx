@@ -1,7 +1,7 @@
 import * as qs from 'qs';
 import * as R from 'ramda';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 import type { SearchPaginationInput } from '../../../../utils/api-types';
@@ -44,6 +44,8 @@ const useUriState = (localStorageKey: string, initSearchPaginationInput: SearchP
       const encodedParams = btoa(params);
       setSearchParams({
         query: encodedParams,
+      }, {
+        replace: true,
       });
     },
   };

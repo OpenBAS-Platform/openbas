@@ -2,7 +2,7 @@ import { Button, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import Empty from '../../../components/Empty';
 import OldTextField from '../../../components/fields/OldTextField';

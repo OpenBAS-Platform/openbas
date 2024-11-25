@@ -2,7 +2,7 @@ import { DeleteOutlined, VideoSettingsOutlined } from '@mui/icons-material';
 import { IconButton, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { deleteDryrun, fetchDryruns } from '../../../../../actions/Dryrun';
 import type { DryRunHelper } from '../../../../../actions/dryruns/dryrun-helper';

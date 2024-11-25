@@ -4,7 +4,7 @@ import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tab, T
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useEffect, useState } from 'react';
 import * as React from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router';
 
 import { fullTextSearch, fullTextSearchByClass } from '../../../actions/fullTextSearch-action';
 import Breadcrumbs from '../../../components/Breadcrumbs';

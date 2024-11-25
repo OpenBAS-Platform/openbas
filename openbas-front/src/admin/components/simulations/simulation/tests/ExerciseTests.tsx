@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchInjectTestStatus, searchExerciseInjectTests } from '../../../../../actions/inject_test/inject-test-actions';
 import type { Exercise, InjectTestStatus } from '../../../../../utils/api-types';

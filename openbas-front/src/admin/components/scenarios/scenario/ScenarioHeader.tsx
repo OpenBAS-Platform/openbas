@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Toolti
 import { makeStyles, useTheme } from '@mui/styles';
 import { useEffect } from 'react';
 import * as React from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';

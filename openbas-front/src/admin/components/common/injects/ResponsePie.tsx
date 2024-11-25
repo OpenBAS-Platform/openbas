@@ -3,7 +3,7 @@ import { Box, Button, Grid2 as Grid } from '@mui/material';
 import { useTheme } from '@mui/styles';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';

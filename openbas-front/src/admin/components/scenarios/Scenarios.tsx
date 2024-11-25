@@ -2,7 +2,7 @@ import { MovieFilterOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { fetchStatistics } from '../../../actions/Application';
 import type { TagHelper, UserHelper } from '../../../actions/helper';

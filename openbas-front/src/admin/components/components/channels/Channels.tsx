@@ -2,7 +2,7 @@ import { ChevronRightOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';

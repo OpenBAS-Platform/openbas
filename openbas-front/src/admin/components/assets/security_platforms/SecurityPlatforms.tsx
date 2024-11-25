@@ -1,7 +1,7 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
 import type { UserHelper } from '../../../../actions/helper';

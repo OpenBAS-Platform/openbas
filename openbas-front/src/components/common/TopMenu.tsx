@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 
 import { useFormatter } from '../i18n';
 import type { Theme } from '../Theme';
