@@ -10,7 +10,7 @@ import jakarta.persistence.Converter;
 import java.io.IOException;
 
 @Converter(autoApply = true)
-public class InjectStatusCommandLineConverter
+public class PayloadOutputConverter
     implements AttributeConverter<PayloadOutput, String> {
 
   @Resource

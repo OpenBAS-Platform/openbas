@@ -16,7 +16,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.*;
-import io.openbas.rest.atomic_testing.form.PayloadOutput;
+import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -82,16 +82,16 @@ public class AtomicTestingService {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  public PayloadOutput findPayloadOutputByInjectId(String injectId) {
-    PayloadOutput payloadOutput = PayloadOutput.builder().build();
+  public PayloadOutputDto findPayloadOutputByInjectId(String injectId) {
+    PayloadOutputDto payloadOutputDto = PayloadOutputDto.builder().build();
     Optional<Inject> inject = injectRepository.findById(injectId);
     if (inject.isPresent()) {
       Optional<InjectorContract> injectorContract = inject.get().getInjectorContract();
       AtomicInjectorContractOutput atomicInjectorContractOutput = injectMapper.toInjectorContractOutput(
           injectorContract);
-      payloadOutput = atomicInjectorContractOutput.getPayload();
+      payloadOutputDto = atomicInjectorContractOutput.getPayload();
     }
-    return payloadOutput;
+    return payloadOutputDto;
   }
 
   @Transactional

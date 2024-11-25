@@ -6,9 +6,11 @@ import io.openbas.database.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.openbas.rest.atomic_testing.form.PayloadOutput;
+import io.openbas.rest.atomic_testing.form.AttackPatternSimpleDto;
+import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -29,9 +31,9 @@ public class InjectUtils {
       return null;
     }
 
-    if (inject.getStatus().isPresent() && inject.getStatus().get().getCommandsLines() != null) {
+    if (inject.getStatus().isPresent() && inject.getStatus().get().getPayloadOutput() != null) {
       // Commands lines saved because inject has been executed
-      return inject.getStatus().get().getCommandsLines();
+      return inject.getStatus().get().getPayloadOutput();
     } else if (inject.getInjectorContract().isPresent()) {
       InjectorContract injectorContract = inject.getInjectorContract().get();
       if (injectorContract.getPayload() != null
@@ -39,15 +41,19 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        return new PayloadOutput(
-            payloadCommand.getContent() != null && !payloadCommand.getContent().isBlank()
-                ? List.of(payloadCommand.getContent())
-                : null,
+        return new PayloadOutput(COMMAND_TYPE, null, null, null, null, null, null, null, null, null,
+            payloadCommand.getTags(), payloadCommand.getExternalId(), payloadCommand.getPrerequisites(),
+            payloadCommand.getArguments(), payloadCommand.getContent() != null && !payloadCommand.getContent().isBlank()
+            ? List.of(payloadCommand.getContent())
+            : null,
             payloadCommand.getCleanupCommand() != null
                 && !payloadCommand.getCleanupCommand().isBlank()
                 ? List.of(payload.getCleanupCommand())
                 : null,
-            payload.getExternalId());
+            payload.getExternalId(), payloadCommand.getCleanupExecutor(),
+            toAttackPatternSimples(payloadCommand.getAttackPatterns()), payloadCommand.getPlatforms(),
+            payloadCommand.getDescription(), payloadCommand.getName(), payloadCommand.getCollectorType());
+
       } else {
         // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
         io.openbas.executors.Injector executor =
@@ -57,6 +63,18 @@ public class InjectUtils {
       }
     }
     return null;
+  }
+
+  // -- ATTACKPATTERN to ATTACKPATTERNSIMPLE
+  public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
+    return attackPatterns.stream()
+        .filter(Objects::nonNull)
+        .map(this::toAttackPatternSimple)
+        .toList();
+  }
+
+  private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
+    return new AttackPatternSimple(attackPattern.getId(), attackPattern.getName(), attackPattern.getExternalId());
   }
 
   public List<InjectExpectation> getPrimaryExpectations(Inject inject) {

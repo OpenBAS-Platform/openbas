@@ -14,7 +14,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.*;
-import io.openbas.rest.atomic_testing.form.PayloadOutput;
+import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
@@ -59,7 +59,7 @@ public abstract class Injector {
   public abstract ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception;
 
-  public PayloadOutput getPayloadOutput(String externalId) {
+  public PayloadOutputDto getPayloadOutput(String externalId) {
     return null;
   }
 
