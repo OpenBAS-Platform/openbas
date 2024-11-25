@@ -69,7 +69,7 @@ const FilterChipValues: FunctionComponent<Props> = ({
       {idx > 0 && or}
       <span>
         {' '}
-        { propertySchema?.schema_property_type.includes('instant') ? (o.label) : o.label}
+        { propertySchema?.schema_property_type.includes('instant') ? (o.label) : t(o.label)}
       </span>
     </Fragment>
   ));
@@ -102,7 +102,7 @@ const FilterChipValues: FunctionComponent<Props> = ({
       if (propertySchema?.schema_property_type.includes('instant')) {
         str = `${str} ${fldt(o.label)}`;
       } else {
-        str = `${str} ${o.label}`;
+        str = `${str} ${t(o.label)}`;
       }
     });
     return str;
