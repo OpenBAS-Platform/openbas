@@ -253,7 +253,7 @@ public class OpenBASImplantExecutor extends Injector {
             execution.setExpectedCount(
                 payload.getPrerequisites().size()
                     + (payload.getCleanupCommand() != null ? 1 : 0)
-                    + 1);
+                    + payload.getNumberOfActions());
           }
           computeExpectationsForAsset(
               expectations, content, asset, isInGroup, injectExpectationSignatures);
