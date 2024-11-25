@@ -1,13 +1,9 @@
-package io.openbas.rest.atomic_testing.form;
+package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.annotation.Queryable;
-import io.openbas.database.model.*;
-import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
@@ -16,9 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@Setter
 @Getter
-@Builder
+@Setter
 public class PayloadOutput {
 
   @JsonProperty("payload_type")
@@ -90,5 +85,37 @@ public class PayloadOutput {
   @JsonProperty("network_traffic_protocol")
   @NotNull
   private String protocol;
+
+  public PayloadOutput() {
+  }
+
+  public PayloadOutput(String type, String protocol, Integer portDst, Integer portSrc, String ipDst, String ipSrc,
+      String hostname, Document fileDropFile, Endpoint.PLATFORM_ARCH executableArch, Document executableFile,
+      Set<String> tags, String externalId, List<PayloadPrerequisite> prerequisites, List<PayloadArgument> arguments,
+      List<PayloadCommandBlock> payloadCommandBlocks, String cleanupExecutor, List<AttackPatternSimple> attackPatterns,
+      Endpoint.PLATFORM_TYPE[] platforms, String description, String name, String collectorType) {
+    this.type = type;
+    this.protocol = protocol;
+    this.portDst = portDst;
+    this.portSrc = portSrc;
+    this.ipDst = ipDst;
+    this.ipSrc = ipSrc;
+    this.hostname = hostname;
+    this.fileDropFile = fileDropFile;
+    this.executableArch = executableArch;
+    this.executableFile = executableFile;
+    this.tags = tags;
+    this.externalId = externalId;
+    this.prerequisites = prerequisites;
+    this.arguments = arguments;
+    this.payloadCommandBlocks = payloadCommandBlocks;
+    this.cleanupExecutor = cleanupExecutor;
+    this.attackPatterns = attackPatterns;
+    this.platforms = platforms;
+    this.description = description;
+    this.name = name;
+    this.collectorType = collectorType;
+  }
+
 
 }

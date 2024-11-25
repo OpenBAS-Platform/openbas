@@ -49,7 +49,7 @@ public class AtomicTestingApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping("/{injectId}/payload")
   @Tracing(name = "Get the payload of an atomic testing", layer = "api", operation = "GET")
-  public PayloadOutput findAtomicTestingPayload(@PathVariable String injectId) {
+  public PayloadOutputDto findAtomicTestingPayload(@PathVariable String injectId) {
     return atomicTestingService.findPayloadOutputByInjectId(injectId);
   }
 

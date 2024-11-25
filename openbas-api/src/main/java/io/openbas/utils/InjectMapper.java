@@ -38,7 +38,7 @@ public class InjectMapper {
         .title(inject.getTitle())
         .description(inject.getDescription())
         .content(inject.getContent())
-        .payloadOutput(injectUtils.getCommandsLinesFromInject(inject))
+        .payloadOutputDto(injectUtils.getCommandsLinesFromInject(inject))
         .type(injectorContract.map(contract -> contract.getInjector().getType()).orElse(null))
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
@@ -89,13 +89,13 @@ public class InjectMapper {
         .orElse(null);
   }
 
-  private PayloadOutput toPayloadOutput(Optional<Payload> payload, InjectorContract injectorContract) {
+  private PayloadOutputDto toPayloadOutput(Optional<Payload> payload, InjectorContract injectorContract) {
     if (payload.isPresent()) {
       return payload
           .map(
               payloadToOutput -> {
-                PayloadCommandBlock.PayloadCommandBlockBuilder payloadCommandBlockBuilder = PayloadCommandBlock.builder();
-                PayloadOutput.PayloadOutputBuilder payloadOutput = PayloadOutput.builder()
+                PayloadCommandBlockDto.PayloadCommandBlockDtoBuilder payloadCommandBlockBuilder = PayloadCommandBlockDto.builder();
+                PayloadOutputDto.PayloadOutputDtoBuilder payloadOutput = PayloadOutputDto.builder()
                     .type(payloadToOutput.getType())
                     .collectorType(payloadToOutput.getCollectorType())
                     .name(payloadToOutput.getName())
@@ -207,15 +207,15 @@ public class InjectMapper {
   }
 
   // -- ATTACKPATTERN to ATTACKPATTERNSIMPLE
-  public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
+  public List<AttackPatternSimpleDto> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
     return attackPatterns.stream()
         .filter(Objects::nonNull)
         .map(this::toAttackPatternSimple)
         .toList();
   }
 
-  private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
-    return AttackPatternSimple.builder()
+  private AttackPatternSimpleDto toAttackPatternSimple(AttackPattern attackPattern) {
+    return AttackPatternSimpleDto.builder()
         .id(attackPattern.getId())
         .name(attackPattern.getName())
         .externalId(attackPattern.getExternalId())
