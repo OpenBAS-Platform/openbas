@@ -2,7 +2,7 @@ import { Grid, Paper, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 
-import { fetchExercise, fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
+import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
@@ -53,7 +53,6 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
   useDataLoader(() => {
     setLoading(true);
     const fetchPromises = [
-      dispatch(fetchExercise(exerciseId)).finally(() => setLoading(false)),
       dispatch(fetchExerciseInjectExpectations(exerciseId)),
       dispatch(fetchExerciseInjects(exerciseId)),
       dispatch(fetchExerciseTeams(exerciseId)),
@@ -81,7 +80,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
   }
 
   return (
-    <Grid id="exercise_distribution" container spacing={3}>
+    <Grid id="exercise_distribution" container spacing={3} sx={{ marginBottom: 1 }}>
       <Grid item xs={6} style={{ marginTop: 25 }}>
         <Typography variant="h4">
           {t('Distribution of score by team (in % of expectations)')}
@@ -89,7 +88,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
           }
         </Paper>
@@ -101,7 +100,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionScoreOverTimeByTeamInPercentage exerciseId={exerciseId} />
           }
         </Paper>
@@ -123,7 +122,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
           }
         </Paper>
@@ -135,7 +134,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionByInjectorContract exerciseId={exerciseId} />
           }
         </Paper>
@@ -147,7 +146,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
           }
         </Paper>
@@ -159,7 +158,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionScoreByOrganization exerciseId={exerciseId} />
           }
         </Paper>
@@ -171,7 +170,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionScoreByPlayer exerciseId={exerciseId} />
           }
         </Paper>
@@ -183,7 +182,7 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {
             loading
-              ? <Loader variant="inline" />
+              ? <Loader variant="inElement" />
               : <ExerciseDistributionScoreByInject exerciseId={exerciseId} />
           }
         </Paper>

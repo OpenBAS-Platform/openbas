@@ -42,6 +42,7 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
 
   const sortedInjectsByTotalScore = R.pipe(
     R.sortWith([R.descend(R.prop('inject_total_score'))]),
+    R.filter((n: InjectExpectationStore) => n.inject_total_score > 0),
     R.take(10),
   )(injectsTotalScores);
 
@@ -57,7 +58,7 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
 
   return (
     <>
-      {injectsTotalScores.length > 0 ? (
+      {sortedInjectsByTotalScore.length > 0 ? (
         <Chart
           id="exercise_distribution_total_score_by_inject"
           options={horizontalBarsChartOptions(
@@ -70,7 +71,7 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
           series={totalScoreByInjectData}
           type="bar"
           width="100%"
-          height={50 + injectsTotalScores.length * 50}
+          height={50 + sortedInjectsByTotalScore.length * 50}
         />
       ) : (
         <Empty
