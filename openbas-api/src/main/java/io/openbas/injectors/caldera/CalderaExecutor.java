@@ -149,18 +149,8 @@ public class CalderaExecutor extends Injector {
                                 case "Command":
                                   injectExpectationSignatures.add(
                                       InjectExpectationSignature.builder()
-                                          .type(EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME)
-                                          .value(executionEndpoint.getProcessName())
-                                          .build());
-                                  injectExpectationSignatures.add(
-                                      InjectExpectationSignature.builder()
                                           .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
                                           .value(executionEndpoint.getProcessName())
-                                          .build());
-                                  injectExpectationSignatures.add(
-                                      InjectExpectationSignature.builder()
-                                          .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
-                                          .value(exploitResult.getCommand())
                                           .build());
                                   break;
                                 case "Executable":
@@ -204,18 +194,8 @@ public class CalderaExecutor extends Injector {
                             } else {
                               injectExpectationSignatures.add(
                                   InjectExpectationSignature.builder()
-                                      .type(EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME)
-                                      .value(executionEndpoint.getProcessName())
-                                      .build());
-                              injectExpectationSignatures.add(
-                                  InjectExpectationSignature.builder()
                                       .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
                                       .value(executionEndpoint.getProcessName())
-                                      .build());
-                              injectExpectationSignatures.add(
-                                  InjectExpectationSignature.builder()
-                                      .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
-                                      .value(exploitResult.getCommand())
                                       .build());
                             }
                             computeExpectationsForAsset(

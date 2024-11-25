@@ -269,6 +269,7 @@ public class OpenBASImplantExecutor extends Injector {
 
   private List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
+    List<String> knownPayloadTypes = Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
 
     /*
      * Always add the "Parent process" signature type for the OpenBAS Implant Executor
@@ -277,44 +278,7 @@ public class OpenBASImplantExecutor extends Injector {
         createSignature(
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME, "obas-implant-" + inject.getId()));
 
-    switch (payload.getType()) {
-      case "Command":
-        Command commandPayload = (Command) payload;
-        String interpolatedCommand =
-            interpolateCommand(commandPayload.getContent(), inject.getContent());
-        signatures.add(
-            createSignature(
-                EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE_BASE64,
-                Base64.getEncoder().encodeToString(interpolatedCommand.getBytes())));
-        signatures.add(
-            createSignature(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE, interpolatedCommand));
-        break;
-      case "Executable":
-        Executable executablePayload = (Executable) payload;
-        signatures.add(
-            createSignature(
-                EXPECTATION_SIGNATURE_TYPE_FILE_NAME,
-                executablePayload.getExecutableFile().getName()));
-        break;
-      case "FileDrop":
-        FileDrop payloadFileDrop = (FileDrop) payload;
-        signatures.add(
-            createSignature(
-                EXPECTATION_SIGNATURE_TYPE_FILE_NAME, payloadFileDrop.getFileDropFile().getName()));
-        break;
-      case "DnsResolution":
-        DnsResolution payloadDnsResolution = (DnsResolution) payload;
-        // TODO this is only generating the signature for the first hostname
-        // Problem is: we are not supporting multiple signatures of the same type
-        // with "AND" parameters, and this can be in multiple alerts downstream in
-        // security platforms
-        // Tech pain to refine
-        signatures.add(
-            createSignature(
-                EXPECTATION_SIGNATURE_TYPE_HOSTNAME,
-                payloadDnsResolution.getHostname().split("\\r?\\n")[0]));
-        break;
-      default:
+    if (!knownPayloadTypes.contains(payload.getType())) {
         throw new UnsupportedOperationException(
             "Payload type " + payload.getType() + " is not supported");
     }
@@ -324,25 +288,5 @@ public class OpenBASImplantExecutor extends Injector {
   private static InjectExpectationSignature createSignature(
       String signatureType, String signatureValue) {
     return InjectExpectationSignature.builder().type(signatureType).value(signatureValue).build();
-  }
-
-  private static String interpolateCommand(String commandMask, ObjectNode injectContent) {
-    List<String> placeholders = extractPlaceholderNames(commandMask);
-    String interpolatedCommand = commandMask;
-    for (String placeholder : placeholders) {
-      String value = injectContent.get(placeholder).asText();
-      interpolatedCommand = interpolatedCommand.replace("#{" + placeholder + "}", value);
-    }
-    return interpolatedCommand;
-  }
-
-  private static List<String> extractPlaceholderNames(String command) {
-    List<String> placeholders = new ArrayList<>();
-    Pattern pattern = Pattern.compile("#\\{(.*?)\\}");
-    Matcher matcher = pattern.matcher(command);
-    while (matcher.find()) {
-      placeholders.add(matcher.group(1));
-    }
-    return placeholders;
   }
 }
