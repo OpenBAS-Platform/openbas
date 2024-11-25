@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, Suspense, useEffect, useState } from 'react';
-import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router';
 
 import { fetchInjectResultOverviewOutput } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { fetchExercise } from '../../../../../actions/Exercise';

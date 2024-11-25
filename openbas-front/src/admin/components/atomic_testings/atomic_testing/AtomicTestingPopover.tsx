@@ -1,5 +1,5 @@
 import { FunctionComponent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { deleteAtomicTesting, duplicateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';

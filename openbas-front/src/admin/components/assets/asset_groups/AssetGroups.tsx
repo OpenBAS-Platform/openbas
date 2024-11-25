@@ -2,7 +2,7 @@ import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListIte
 import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { CSSProperties, Fragment, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';

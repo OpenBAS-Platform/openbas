@@ -2,7 +2,7 @@ import { CastOutlined, CheckCircleOutlineOutlined, PersonOutlined } from '@mui/i
 import { Chip, Grid, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchDryinjects } from '../../../../../actions/Dryinject';
 import { fetchDryrun } from '../../../../../actions/Dryrun';

@@ -1,5 +1,5 @@
 import { FunctionComponent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';

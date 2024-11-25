@@ -2,7 +2,7 @@ import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/ic
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';

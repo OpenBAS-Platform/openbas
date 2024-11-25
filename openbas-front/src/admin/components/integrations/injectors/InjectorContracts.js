@@ -3,7 +3,7 @@ import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemTe
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';

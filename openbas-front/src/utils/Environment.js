@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { Subject, timer } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 

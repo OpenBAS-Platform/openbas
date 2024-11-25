@@ -1,5 +1,5 @@
 import { FunctionComponent, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import type { ChallengeHelper } from '../../../../../actions/helper';

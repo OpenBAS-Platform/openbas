@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router';
 
 import { errorWrapper } from '../../../components/Error';
 import NotFound from '../../../components/NotFound';

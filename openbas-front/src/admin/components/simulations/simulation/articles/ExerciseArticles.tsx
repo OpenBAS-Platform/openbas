@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';

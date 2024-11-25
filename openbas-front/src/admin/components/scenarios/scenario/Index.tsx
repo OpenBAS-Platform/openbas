@@ -3,7 +3,7 @@ import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip } from '@mui/mat
 import { makeStyles, useTheme } from '@mui/styles';
 import cronstrue from 'cronstrue';
 import { FunctionComponent, lazy, Suspense, useState } from 'react';
-import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';

@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { useFormatter } from '../../../../../components/i18n';
 import AnimationMenu from '../AnimationMenu';

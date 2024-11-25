@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
 import type { ChallengeHelper } from '../../../../../actions/helper';

@@ -4,7 +4,7 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { searchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';

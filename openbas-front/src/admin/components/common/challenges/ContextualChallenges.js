@@ -10,7 +10,7 @@ import {
 import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';

@@ -2,7 +2,7 @@ import { GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';

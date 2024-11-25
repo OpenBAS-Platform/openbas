@@ -3,7 +3,7 @@ import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecon
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { useFormatter } from '../../../../../components/i18n';

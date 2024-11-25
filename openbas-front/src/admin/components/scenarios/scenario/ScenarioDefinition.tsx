@@ -1,6 +1,6 @@
 import { Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';

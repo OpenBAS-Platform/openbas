@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { importingExercise } from '../../../actions/Exercise';
 import ImportUploader from '../../../components/common/ImportUploader';

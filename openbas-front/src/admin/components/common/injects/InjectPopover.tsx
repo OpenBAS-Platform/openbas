@@ -2,7 +2,7 @@ import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
 import { FunctionComponent, useContext, useState } from 'react';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
