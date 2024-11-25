@@ -246,6 +246,10 @@ public class OpenBASImplantExecutor extends Injector {
 
           if (contract.isPresent()) {
             Payload payload = contract.get().getPayload();
+            if (payload == null) {
+                log.info(String.format("No payload for inject %s was found, skipping", inject.getId()));
+                return;
+            }
             injectExpectationSignatures = spawnSignatures(inject, payload);
             execution.setExpectedCount(
                 payload.getPrerequisites().size()

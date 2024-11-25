@@ -46,12 +46,12 @@ public class InjectExpectationService {
       @NotBlank final String sourceName,
       @NotBlank final String result,
       @NotBlank final Boolean success) {
-    double actual_score =
+    double actualScore =
         success
             ? expectation.getExpectedScore()
             : expectation.getScore() == null ? 0.0 : expectation.getScore();
-    computeResult(expectation, sourceId, sourceType, sourceName, result, actual_score);
-    expectation.setScore(actual_score);
+    computeResult(expectation, sourceId, sourceType, sourceName, result, actualScore);
+    expectation.setScore(actualScore);
     return this.update(expectation);
   }
 
