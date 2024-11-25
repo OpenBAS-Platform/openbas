@@ -14,10 +14,15 @@ public class V3_49__Update_executable_arch_payload_type_command extends BaseJava
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
     statement.execute(
+        "UPDATE payloads SET executable_arch = 'X86_64'  WHERE executable_arch = 'x86_64';");
+    statement.execute(
+        "UPDATE payloads SET executable_arch = 'ARM64'  WHERE executable_arch = 'arm64';");
+    statement.execute(
         "UPDATE payloads SET executable_arch = 'ALL_ARCHITECTURES' WHERE executable_arch IS NULL;");
     statement.execute(
-        "ALTER TABLE payloads RENAME COLUMN executable_arch TO payload_execution_arch");
+        "ALTER TABLE payloads ALTER COLUMN executable_arch SET DEFAULT 'ALL_ARCHITECTURES'");
+    statement.execute("ALTER TABLE payloads ALTER COLUMN executable_arch SET NOT NULL");
     statement.execute(
-        "ALTER TABLE payloads ALTER COLUMN payload_execution_arch SET DEFAULT 'ALL_ARCHITECTURES'");
+        "ALTER TABLE payloads RENAME COLUMN executable_arch TO payload_execution_arch");
   }
 }
