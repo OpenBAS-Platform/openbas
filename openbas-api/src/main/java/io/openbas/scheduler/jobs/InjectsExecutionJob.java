@@ -363,7 +363,7 @@ public class InjectsExecutionJob implements Job {
           mapCondition.put(
               "Execution",
               parent.getStatus().isPresent()
-                  && !parent.getStatus().get().getName().equals(ExecutionStatus.ERROR)
+                  && !ExecutionStatus.ERROR.equals(parent.getStatus().get().getName())
                   && !executionStatusesNotReady.contains(parent.getStatus().get().getName()));
 
           List<InjectExpectation> expectations =

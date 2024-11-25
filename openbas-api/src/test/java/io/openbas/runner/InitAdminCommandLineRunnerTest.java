@@ -27,13 +27,13 @@ public class InitAdminCommandLineRunnerTest {
   @Test
   void adminUserExistTest() {
     Optional<User> adminUser = this.userRepository.findById(ADMIN_UUID);
-    assertThat(adminUser.isPresent()).isEqualTo(true);
+    assertThat(adminUser.isPresent()).isTrue();
   }
 
   @DisplayName("Test if admin token is created")
   @Test
   void adminTokenExistTest() {
     Optional<Token> adminToken = this.tokenRepository.findById(ADMIN_TOKEN_UUID);
-    assertThat(adminToken.isPresent()).isEqualTo(true);
+    assertThat(adminToken.isPresent()).isTrue();
   }
 }

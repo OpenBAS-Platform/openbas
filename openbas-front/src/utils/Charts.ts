@@ -135,6 +135,15 @@ export const lineChartOptions = (
   stroke: {
     curve: 'smooth',
   },
+  markers: {
+    size: 4,
+    strokeWidth: 2,
+    shape: 'circle',
+    hover: {
+      size: 6,
+      sizeOffset: 3,
+    },
+  },
   tooltip: {
     theme: theme.palette.mode,
   },

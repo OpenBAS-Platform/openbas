@@ -62,6 +62,7 @@ const AtomicTestings = () => {
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Atomic testings'), current: true }]} />
       <InjectResultList
+        showActions
         fetchInjects={searchAtomicTestings}
         goTo={injectId => `/admin/atomic_testings/${injectId}`}
         queryableHelpers={queryableHelpers}

@@ -32,7 +32,7 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
 
   let cumulation = 0;
   const injectsTypesScores = R.pipe(
-    R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results)),
+    R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team && n?.inject_expectation_user === null),
     R.map((n: InjectExpectationStore) => R.assoc(
       'inject_expectation_inject',
       injectsMap[n.inject_expectation_inject] || {},
@@ -75,7 +75,6 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
             null,
             undefined,
             false,
-            true,
           )}
           series={injectsTypesScores}
           type="line"

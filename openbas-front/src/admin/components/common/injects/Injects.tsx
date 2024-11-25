@@ -1,4 +1,4 @@
-import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
@@ -532,6 +532,7 @@ const Injects: FunctionComponent<Props> = ({
             classes={{ root: classes.itemHead }}
             divider={false}
             style={{ paddingTop: 0 }}
+            secondaryAction={<>&nbsp;</>}
           >
             <ListItemIcon style={{ minWidth: 40 }}>
               <Checkbox
@@ -552,69 +553,16 @@ const Injects: FunctionComponent<Props> = ({
                 />
               )}
             />
-            <ListItemSecondaryAction />
           </ListItem>
           {injects.map((inject: InjectOutputType, index) => {
             const injectContract = inject.inject_injector_contract?.convertedContent;
             const isContractExposed = injectContract?.config.expose;
             return (
-              <ListItemButton
+              <ListItem
                 key={inject.inject_id}
-                classes={{ root: classes.item }}
                 divider
-                onClick={() => {
-                  if (injectContract && isContractExposed) {
-                    setSelectedInjectId(inject.inject_id);
-                  }
-                }}
-              >
-                <ListItemIcon
-                  style={{ minWidth: 40 }}
-                  onClick={event => (event.shiftKey
-                    ? onRowShiftClick(index, inject, event)
-                    : onToggleEntity(inject, event))}
-                >
-                  <Checkbox
-                    edge="start"
-                    checked={
-                      (selectAll && !(inject.inject_id
-                        in (deSelectedElements || {}))) || inject.inject_id in (selectedElements || {})
-                    }
-                    disableRipple
-                  />
-                </ListItemIcon>
-                <ListItemIcon style={{ paddingTop: 5 }}>
-                  <InjectIcon
-                    isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
-                    type={
-                      inject.inject_injector_contract?.injector_contract_payload
-                        ? inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
-                        || inject.inject_injector_contract?.injector_contract_payload?.payload_type
-                        : inject.inject_type
-                    }
-                    disabled={!injectContract || !isContractExposed || !inject.inject_enabled}
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div className={(!injectContract || !isContractExposed
-                      || !inject.inject_enabled) ? classes.disabled : ''}
-                    >
-                      <div className={classes.bodyItems}>
-                        {headers.map(header => (
-                          <div
-                            key={header.field}
-                            className={classes.bodyItem}
-                            style={inlineStyles[header.field]}
-                          >
-                            {header.value(inject, injectContract)}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                />
-                <ListItemSecondaryAction>
+                classes={{ root: classes.item }}
+                secondaryAction={(
                   <InjectPopover
                     inject={inject}
                     exerciseOrScenarioId={exerciseOrScenarioId}
@@ -625,8 +573,65 @@ const Injects: FunctionComponent<Props> = ({
                     onUpdate={onUpdate}
                     onDelete={onDelete}
                   />
-                </ListItemSecondaryAction>
-              </ListItemButton>
+                )}
+                disablePadding
+              >
+                <ListItemButton
+                  onClick={() => {
+                    if (injectContract && isContractExposed) {
+                      setSelectedInjectId(inject.inject_id);
+                    }
+                  }}
+                >
+                  <ListItemIcon
+                    style={{ minWidth: 40 }}
+                    onClick={event => (event.shiftKey
+                      ? onRowShiftClick(index, inject, event)
+                      : onToggleEntity(inject, event))}
+                  >
+                    <Checkbox
+                      edge="start"
+                      checked={
+                        (selectAll && !(inject.inject_id
+                          in (deSelectedElements || {})))
+                          || inject.inject_id in (selectedElements || {})
+                      }
+                      disableRipple
+                    />
+                  </ListItemIcon>
+                  <ListItemIcon style={{ paddingTop: 5 }}>
+                    <InjectIcon
+                      isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
+                      type={
+                        inject.inject_injector_contract?.injector_contract_payload
+                          ? inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type
+                          || inject.inject_injector_contract?.injector_contract_payload?.payload_type
+                          : inject.inject_type
+                      }
+                      disabled={!injectContract || !isContractExposed || !inject.inject_enabled}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div className={(!injectContract || !isContractExposed
+                        || !inject.inject_enabled) ? classes.disabled : ''}
+                      >
+                        <div className={classes.bodyItems}>
+                          {headers.map(header => (
+                            <div
+                              key={header.field}
+                              className={classes.bodyItem}
+                              style={inlineStyles[header.field]}
+                            >
+                              {header.value(inject, injectContract)}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  />
+                </ListItemButton>
+              </ListItem>
             );
           })}
         </List>

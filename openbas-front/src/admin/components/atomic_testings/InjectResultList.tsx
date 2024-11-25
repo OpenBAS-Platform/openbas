@@ -18,6 +18,7 @@ import type { InjectResultOutput, SearchPaginationInput } from '../../../utils/a
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectorContract from '../common/injects/InjectorContract';
+import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles(() => ({
@@ -65,6 +66,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
+  showActions?: boolean;
   fetchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectResultOutput> }>;
   goTo: (injectId: string) => string;
   queryableHelpers: QueryableHelpers;
@@ -73,6 +75,7 @@ interface Props {
 }
 
 const InjectResultList: FunctionComponent<Props> = ({
+  showActions,
   fetchInjects,
   goTo,
   queryableHelpers,
@@ -181,6 +184,7 @@ const InjectResultList: FunctionComponent<Props> = ({
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={showActions ? <>&nbsp;</> : null}
         >
           <ListItemIcon />
           <ListItemText
@@ -202,6 +206,14 @@ const InjectResultList: FunctionComponent<Props> = ({
                   key={injectResultOutput.inject_id}
                   classes={{ root: classes.item }}
                   divider={injects.length !== index + 1}
+                  secondaryAction={showActions ? (
+                    <AtomicTestingPopover
+                      atomic={injectResultOutput}
+                      actions={['Duplicate', 'Delete']}
+                      onDelete={result => setInjects(injects.filter(e => e.inject_id !== result))}
+                      inList
+                    />
+                  ) : null}
                   disablePadding
                 >
                   <ListItemButton

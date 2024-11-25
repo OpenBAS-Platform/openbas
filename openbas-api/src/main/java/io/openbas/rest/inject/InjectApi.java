@@ -121,7 +121,7 @@ public class InjectApi extends RestBehavior {
     execution.setMessage(input.getMessage());
     execution.setIdentifiers(input.getIdentifiers());
     injectStatus.getTraces().add(execution);
-    if (executionStatus.equals(ExecutionTraceStatus.SUCCESS)) {
+    if (ExecutionTraceStatus.SUCCESS.equals(executionStatus)) {
       injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
     } else {
       injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);

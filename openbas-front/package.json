@@ -77,11 +77,11 @@
     "uuid": "11.0.3",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "3.23.8",
-    "zustand": "4.5.5"
+    "zustand": "5.0.1"
   },
   "devDependencies": {
     "@eslint/js": "9.15.0",
-    "@playwright/test": "1.48.2",
+    "@playwright/test": "1.49.0",
     "@stylistic/eslint-plugin": "2.11.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.0.1",
