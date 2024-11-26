@@ -126,10 +126,6 @@ const PayloadForm: FunctionComponent<Props> = ({
   }
 
   extendedSchema = extendedSchema.refine(input =>
-    !(!input.payload_cleanup_command && input.payload_cleanup_executor), {
-    message: t('Cleanup command and executor must be defined together or none at all'),
-    path: ['payload_cleanup_command'],
-  }).refine(input =>
     !(input.payload_cleanup_command && !input.payload_cleanup_executor), {
     message: t('Cleanup command and executor must be defined together or none at all'),
     path: ['payload_cleanup_executor'],
