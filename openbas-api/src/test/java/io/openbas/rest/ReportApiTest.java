@@ -18,7 +18,7 @@ import io.openbas.rest.report.form.ReportInjectCommentInput;
 import io.openbas.rest.report.form.ReportInput;
 import io.openbas.rest.report.model.Report;
 import io.openbas.rest.report.service.ReportService;
-import io.openbas.service.InjectService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import java.lang.reflect.Field;

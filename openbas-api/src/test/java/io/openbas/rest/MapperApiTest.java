@@ -17,7 +17,7 @@ import io.openbas.rest.mapper.form.ImportMapperUpdateInput;
 import io.openbas.rest.scenario.form.InjectsImportTestInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectImportService;
-import io.openbas.service.InjectService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.MapperService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.mockMapper.MockMapperUtils;

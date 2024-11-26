@@ -10,7 +10,7 @@ import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.service.InjectSearchService;
-import io.openbas.service.InjectService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;

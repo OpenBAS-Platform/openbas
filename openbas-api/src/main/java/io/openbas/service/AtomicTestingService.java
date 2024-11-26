@@ -3,6 +3,7 @@ package io.openbas.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

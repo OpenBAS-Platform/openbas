@@ -181,7 +181,7 @@ public class PayloadApi extends RestBehavior {
         fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     payload.setUpdatedAt(Instant.now());
-    switch (PayloadType.fromString(payload.getType())) {
+    switch (payload.getTypeEnum()) {
       case PayloadType.COMMAND:
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
         payloadCommand.setUpdateAttributes(input);
@@ -247,7 +247,7 @@ public class PayloadApi extends RestBehavior {
                   input.getAttackPatternsExternalIds())));
       existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       existingPayload.setUpdatedAt(Instant.now());
-      switch (PayloadType.fromString(existingPayload.getType())) {
+      switch (existingPayload.getTypeEnum()) {
         case PayloadType.COMMAND:
           Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
           payloadCommand.setUpdateAttributes(input);
@@ -391,3 +391,5 @@ public class PayloadApi extends RestBehavior {
         input.collectorId(), input.processedPayloadExternalIds());
   }
 }
+
+

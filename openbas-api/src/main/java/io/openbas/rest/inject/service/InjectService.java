@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.rest.inject.service;
 
 import static io.openbas.utils.StringUtils.duplicateString;
 import static java.time.Instant.now;

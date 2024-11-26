@@ -199,16 +199,6 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_asset_groups")
   private List<AssetGroup> assetGroups = new ArrayList<>();
 
-  @Getter
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-      name = "injects_payloads",
-      joinColumns = @JoinColumn(name = "inject_id"),
-      inverseJoinColumns = @JoinColumn(name = "payload_id"))
-  @JsonSerialize(using = MultiIdListDeserializer.class)
-  @JsonProperty("inject_payloads")
-  private List<Asset> payloads = new ArrayList<>();
-
   // CascadeType.ALL is required here because of complex relationships
   @Getter
   @OneToMany(

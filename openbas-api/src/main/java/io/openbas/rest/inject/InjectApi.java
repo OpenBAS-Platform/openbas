@@ -28,9 +28,11 @@ import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
+import io.openbas.rest.inject.service.ExecutableInjectService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.rest.inject.service.InjectService;
+import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectSearchService;
-import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -73,13 +75,14 @@ public class InjectApi extends RestBehavior {
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final TeamRepository teamRepository;
-  private final AssetService assetService;
-  private final AssetGroupService assetGroupService;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
+  private final AssetService assetService;
+  private final AssetGroupService assetGroupService;
   private final ExecutionContextService executionContextService;
   private final ScenarioService scenarioService;
   private final InjectService injectService;
+  private final ExecutableInjectService executableInjectService;
   private final InjectSearchService injectSearchService;
   private final InjectDuplicateService injectDuplicateService;
 
@@ -162,6 +165,13 @@ public class InjectApi extends RestBehavior {
     }
     return injectRepository.save(inject);
   }
+
+  @GetMapping(INJECT_URI + "/{injectId}/executable-payload")
+  public Payload getExecutablePayloadInject(@PathVariable @NotBlank final String injectId) {
+    return executableInjectService.getExecutablePayloadInject(injectId);
+  }
+
+  // -- EXERCISES --
 
   @Transactional(rollbackFor = Exception.class)
   @PutMapping(INJECT_URI + "/{exerciseId}/{injectId}")

@@ -11,7 +11,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectImportService;
-import io.openbas.service.InjectService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
