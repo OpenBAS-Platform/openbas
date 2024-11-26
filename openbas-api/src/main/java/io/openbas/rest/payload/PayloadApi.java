@@ -249,7 +249,9 @@ public class PayloadApi extends RestBehavior {
               "Payload type " + existingPayload.getType() + " is not supported");
       }
     } else {
-      switch (PayloadType.fromString(input.getType())) {
+      PayloadType payloadType = PayloadType.fromString(input.getType());
+      validateArchitecture(payloadType.key, input.getExecutionArch());
+      switch (payloadType) {
         case PayloadType.COMMAND:
           Command commandPayload = new Command();
           commandPayload.setUpdateAttributes(input);

@@ -10,7 +10,6 @@ import static io.openbas.injector_contract.fields.ContractTeam.teamField;
 import static io.openbas.injector_contract.fields.ContractTextArea.textareaField;
 
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.Contractor;
@@ -72,7 +71,6 @@ public class OvhSmsContract extends Contractor {
             Map.of(en, "Send a SMS", fr, "Envoyer un SMS"),
             instance,
             List.of(Endpoint.PLATFORM_TYPE.Service),
-            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false));
   }
 

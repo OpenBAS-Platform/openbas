@@ -15,7 +15,6 @@ import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
 
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
 import io.openbas.database.model.Variable.VariableType;
 import io.openbas.injector_contract.*;
 import io.openbas.injector_contract.fields.ContractElement;
@@ -78,7 +77,6 @@ public class EmailContract extends Contractor {
             Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"),
             standardInstance,
             List.of(Endpoint.PLATFORM_TYPE.Service),
-            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false);
     standardEmail.addVariable(documentUriVariable);
     // Global contract
@@ -98,7 +96,6 @@ public class EmailContract extends Contractor {
             Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"),
             globalInstance,
             List.of(Endpoint.PLATFORM_TYPE.Service),
-            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false);
     globalEmail.addVariable(documentUriVariable);
     return List.of(standardEmail, globalEmail);

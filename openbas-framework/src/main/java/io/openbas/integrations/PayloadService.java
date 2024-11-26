@@ -145,7 +145,6 @@ public class PayloadService {
         Map.of(en, payload.getName(), fr, payload.getName()),
         builder.build(),
         Arrays.asList(payload.getPlatforms()),
-        payload.getExecutionArch(),
         true);
   }
 

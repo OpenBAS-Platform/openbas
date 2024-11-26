@@ -14,7 +14,6 @@ import static io.openbas.injector_contract.fields.ContractText.textField;
 import static io.openbas.injector_contract.fields.ContractTextArea.richTextareaField;
 
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
 import io.openbas.expectation.ExpectationBuilderService;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
@@ -100,7 +99,6 @@ public class ChallengeContract extends Contractor {
             Map.of(en, "Publish challenges", fr, "Publier des challenges"),
             publishInstance,
             List.of(Endpoint.PLATFORM_TYPE.Internal),
-            Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES,
             false);
     publishChallenge.setAtomicTesting(false);
     return List.of(publishChallenge);
