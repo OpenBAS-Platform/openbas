@@ -59,9 +59,9 @@ public interface InjectRepository
   @Query(
       value =
           "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city,"
-              + "inject_injector_contract, inject_all_teams, inject_enabled, inject_exercise, inject_depends_from_another, "
+              + "inject_injector_contract, inject_all_teams, inject_enabled, inject_exercise, "
               + "inject_depends_duration, inject_content) "
-              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :exercise, :dependsOn, :dependsDuration, :content)",
+              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :exercise, :dependsDuration, :content)",
       nativeQuery = true)
   void importSaveForExercise(
       @Param("id") String id,
@@ -73,7 +73,6 @@ public interface InjectRepository
       @Param("allTeams") boolean allTeams,
       @Param("enabled") boolean enabled,
       @Param("exercise") String exerciseId,
-      @Param("dependsOn") String dependsOn,
       @Param("dependsDuration") Long dependsDuration,
       @Param("content") String content);
 
@@ -81,9 +80,9 @@ public interface InjectRepository
   @Query(
       value =
           "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city,"
-              + "inject_injector_contract, inject_all_teams, inject_enabled, inject_scenario, inject_depends_from_another, "
+              + "inject_injector_contract, inject_all_teams, inject_enabled, inject_scenario, "
               + "inject_depends_duration, inject_content) "
-              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :scenario, :dependsOn, :dependsDuration, :content)",
+              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :scenario, :dependsDuration, :content)",
       nativeQuery = true)
   void importSaveForScenario(
       @Param("id") String id,
@@ -95,7 +94,6 @@ public interface InjectRepository
       @Param("allTeams") boolean allTeams,
       @Param("enabled") boolean enabled,
       @Param("scenario") String scenarioId,
-      @Param("dependsOn") String dependsOn,
       @Param("dependsDuration") Long dependsDuration,
       @Param("content") String content);
 
