@@ -193,10 +193,8 @@ public class AtomicTestingService {
     return injectMapper.toInjectResultOverviewOutput(saved);
   }
 
-  @Transactional
   public void deleteAtomicTesting(String injectId) {
-    injectDocumentRepository.deleteDocumentsFromInject(injectId);
-    injectRepository.deleteById(injectId);
+    injectService.delete(injectId);
   }
 
   // -- ACTIONS --

@@ -104,11 +104,9 @@ public class InjectService {
 
   @Transactional
   public InjectResultOverviewOutput duplicate(String id) {
-    Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
-    Inject duplicatedInject = InjectUtils.duplicateInject(injectOrigin);
+    Inject duplicatedInject = findAndDuplicateInject(id);
     duplicatedInject.setTitle(duplicateString(duplicatedInject.getTitle()));
     Inject savedInject = injectRepository.save(duplicatedInject);
-
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
@@ -117,30 +115,37 @@ public class InjectService {
     Inject inject = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
     inject.clean();
     inject.setUpdatedAt(Instant.now());
-    Inject savedInject = injectRepository.save(inject);
-
-    InjectStatus injectStatus = setInjectStatusAsQueuing(savedInject);
-    savedInject.setStatus(injectStatus);
-
+    Inject savedInject = saveInjectAndStatusAsQueuing(inject);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
   @Transactional
   public InjectResultOverviewOutput relaunch(String id) {
-    Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
-    Inject duplicatedInject = InjectUtils.duplicateInject(injectOrigin);
-    Inject savedInject = injectRepository.save(duplicatedInject);
-
-    InjectStatus injectStatus = setInjectStatusAsQueuing(savedInject);
-    savedInject.setStatus(injectStatus);
-
-    injectDocumentRepository.deleteDocumentsFromInject(id);
-    injectRepository.deleteById(id);
-
+    Inject duplicatedInject = findAndDuplicateInject(id);
+    Inject savedInject = saveInjectAndStatusAsQueuing(duplicatedInject);
+    delete(id);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
-  private InjectStatus setInjectStatusAsQueuing(Inject inject) {
+  @Transactional
+  public void delete(String id) {
+    injectDocumentRepository.deleteDocumentsFromInject(id);
+    injectRepository.deleteById(id);
+  }
+
+  private Inject findAndDuplicateInject(String id) {
+    Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+    return InjectUtils.duplicateInject(injectOrigin);
+  }
+
+  private Inject saveInjectAndStatusAsQueuing(Inject inject) {
+    Inject savedInject = injectRepository.save(inject);
+    InjectStatus injectStatus = saveInjectStatusAsQueuing(savedInject);
+    savedInject.setStatus(injectStatus);
+    return savedInject;
+  }
+
+  private InjectStatus saveInjectStatusAsQueuing(Inject inject) {
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setInject(inject);
     injectStatus.setTrackingSentDate(Instant.now());
