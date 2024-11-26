@@ -138,7 +138,7 @@ public class KillChainPhaseApi extends RestBehavior {
       @RequestParam(required = false) final String searchText) {
     return fromIterable(
             this.killChainPhaseRepository.findAll(
-                byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+                byName(searchText), Sort.by(Sort.Direction.ASC, "order")))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
