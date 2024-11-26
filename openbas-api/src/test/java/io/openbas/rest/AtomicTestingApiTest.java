@@ -29,8 +29,8 @@ public class AtomicTestingApiTest extends IntegrationTest {
 
   public static final String ATOMIC_TESTINGS_URI = "/api/atomic-testings";
 
-  static Inject INJECT_WITH_PAYLOAD;
-  static Inject INJECT_WITHOUT_PAYLOAD;
+  static Inject INJECT_WITH_STATUS_AND_COMMAND_LINES;
+  static Inject INJECT_WITHOUT_STATUS;
   static InjectStatus INJECT_STATUS;
   static InjectorContract INJECTOR_CONTRACT;
 
@@ -43,22 +43,22 @@ public class AtomicTestingApiTest extends IntegrationTest {
   void beforeAll() {
     INJECTOR_CONTRACT = injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
     Inject injectWithoutPayload = InjectFixture.getInjectForEmailContract(INJECTOR_CONTRACT);
-    INJECT_WITHOUT_PAYLOAD = injectRepository.save(injectWithoutPayload);
+    INJECT_WITHOUT_STATUS = injectRepository.save(injectWithoutPayload);
 
     Inject injectWithPayload = InjectFixture.getInjectForEmailContract(INJECTOR_CONTRACT);
-    INJECT_WITH_PAYLOAD = injectRepository.save(injectWithPayload);
+    INJECT_WITH_STATUS_AND_COMMAND_LINES = injectRepository.save(injectWithPayload);
     InjectStatus injectStatus = InjectStatusFixture.createDefaultInjectStatus();
     injectStatus.setInject(injectWithPayload);
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
   }
 
   @Test
-  @DisplayName("Find an atomic testing without payload")
+  @DisplayName("Find an atomic testing without status")
   @WithMockAdminUser
-  void findAnAtomicTestingWithoutPayload() throws Exception {
+  void findAnAtomicTestingWithoutStatus() throws Exception {
     String response =
         mvc.perform(
-                get(ATOMIC_TESTINGS_URI + "/" + INJECT_WITHOUT_PAYLOAD.getId())
+                get(ATOMIC_TESTINGS_URI + "/" + INJECT_WITHOUT_STATUS.getId())
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
@@ -66,17 +66,17 @@ public class AtomicTestingApiTest extends IntegrationTest {
             .getContentAsString();
     // -- ASSERT --
     assertNotNull(response);
-    assertEquals(INJECT_WITHOUT_PAYLOAD.getId(), JsonPath.read(response, "$.inject_id"));
+    assertEquals(INJECT_WITHOUT_STATUS.getId(), JsonPath.read(response, "$.inject_id"));
     assertNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
   @Test
-  @DisplayName("Find an atomic testing with payload")
+  @DisplayName("Find an atomic testing with status and command lines")
   @WithMockAdminUser
-  void findAnAtomicTestingWithPayload() throws Exception {
+  void findAnAtomicTestingWithStatusAndCommandLines() throws Exception {
     String response =
         mvc.perform(
-                get(ATOMIC_TESTINGS_URI + "/" + INJECT_WITH_PAYLOAD.getId())
+                get(ATOMIC_TESTINGS_URI + "/" + INJECT_WITH_STATUS_AND_COMMAND_LINES.getId())
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
@@ -84,7 +84,8 @@ public class AtomicTestingApiTest extends IntegrationTest {
             .getContentAsString();
     // -- ASSERT --
     assertNotNull(response);
-    assertEquals(INJECT_WITH_PAYLOAD.getId(), JsonPath.read(response, "$.inject_id"));
+    assertEquals(
+        INJECT_WITH_STATUS_AND_COMMAND_LINES.getId(), JsonPath.read(response, "$.inject_id"));
     assertNotNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
@@ -95,7 +96,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
     // Duplicate
     String response =
         mvc.perform(
-                post(ATOMIC_TESTINGS_URI + "/" + INJECT_WITHOUT_PAYLOAD.getId() + "/duplicate")
+                post(ATOMIC_TESTINGS_URI + "/" + INJECT_WITHOUT_STATUS.getId() + "/duplicate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
