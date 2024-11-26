@@ -67,7 +67,13 @@ public class OvhSmsExecutor extends Injector {
                   Matcher matcher = pattern.matcher(callResult);
                   if (matcher.find() && hasText(matcher.group(1))) {
                     String message =
-                        "Sms sent to " + email + " through " + phone + " contains error (" + callResult + ")";
+                        "Sms sent to "
+                            + email
+                            + " through "
+                            + phone
+                            + " contains error ("
+                            + callResult
+                            + ")";
                     execution.addTrace(traceError(message));
                   } else {
                     String message =

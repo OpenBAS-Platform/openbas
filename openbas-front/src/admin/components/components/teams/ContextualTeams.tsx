@@ -1,5 +1,5 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { CSSProperties, useContext, useState } from 'react';
