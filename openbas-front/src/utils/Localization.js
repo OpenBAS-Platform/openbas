@@ -932,6 +932,7 @@ const i18n = {
       'payload_status': 'Statut',
       'payload_tags': 'Tags',
       'payload_updated_at': 'Mis à jour à',
+      'Do you want to delete this payload: ': 'Voulez-vous supprimer cette charge utile: ',
       'executable_arch': 'Architecture',
       // Team
       'team_tags': 'Tags',
@@ -2316,6 +2317,7 @@ const i18n = {
       'payload_status': '状态',
       'payload_tags': '标签',
       'payload_updated_at': '更新于',
+      'Do you want to delete this payload: ': '您要删除此有效负载吗：',
       // Team
       'team_tags': '标签',
       // User

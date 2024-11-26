@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { deletePayload, duplicatePayload, updatePayload } from '../../../actions/Payload';
+import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
@@ -12,7 +13,6 @@ import { documentOptions, platformOptions } from '../../../utils/Option';
 import PayloadForm from './PayloadForm';
 
 const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
-  const [openDelete, setOpenDelete] = useState(false);
   const [openDuplicate, setOpenDuplicate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -55,26 +55,23 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     });
   };
 
-  const handleOpenDelete = () => {
-    setOpenDelete(true);
-    handlePopoverClose();
+  // Deletion
+  const [deletion, setDeletion] = useState(false);
+  const handleOpenDelete = () => setDeletion(true);
+  const handleCloseDelete = () => setDeletion(false);
+  const submitDelete = () => {
+    dispatch(deletePayload(payload.payload_id)).then(() => {
+      handleCloseDelete();
+      if (onDelete) onDelete(payload.payload_id);
+    });
   };
+
   const handleOpenDuplicate = () => {
     setOpenDuplicate(true);
     handlePopoverClose();
   };
-  const handleCloseDelete = () => setOpenDelete(false);
   const handleCloseDuplicate = () => setOpenDuplicate(false);
-  const submitDelete = () => {
-    dispatch(deletePayload(payload.payload_id)).then(
-      () => {
-        if (onDelete) {
-          onDelete(payload.payload_id);
-        }
-      },
-    );
-    handleCloseDelete();
-  };
+
   const submitDuplicate = () => {
     return dispatch(duplicatePayload(payload.payload_id)).then((result) => {
       if (onDuplicate) {
@@ -119,24 +116,12 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
         <MenuItem onClick={handleOpenEdit} disabled={disableUpdate}>{t('Update')}</MenuItem>
         <MenuItem onClick={handleOpenDelete} disabled={disableDelete}>{t('Delete')}</MenuItem>
       </Menu>
-      <Dialog
-        open={openDelete}
-        TransitionComponent={Transition}
-        onClose={handleCloseDelete}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          <DialogContentText>
-            {t('Do you want to delete this payload?')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
-          <Button color="secondary" onClick={submitDelete}>
-            {t('Delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DialogDelete
+        open={deletion}
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={`${t('Do you want to delete this payload: ')} ${payload.payload_name} ?`}
+      />
       <Dialog
         open={openDuplicate}
         TransitionComponent={Transition}
