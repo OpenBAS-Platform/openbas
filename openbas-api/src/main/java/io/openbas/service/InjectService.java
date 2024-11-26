@@ -108,6 +108,7 @@ public class InjectService {
     Inject duplicatedInject = InjectUtils.duplicateInject(injectOrigin);
     duplicatedInject.setTitle(duplicateString(duplicatedInject.getTitle()));
     Inject savedInject = injectRepository.save(duplicatedInject);
+
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
@@ -116,18 +117,18 @@ public class InjectService {
     Inject inject = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
     inject.clean();
     inject.setUpdatedAt(Instant.now());
+    Inject savedInject = injectRepository.save(inject);
 
-    InjectStatus injectStatus = setInjectStatusAsQueuing(inject);
-    inject.setStatus(injectStatus);
+    InjectStatus injectStatus = setInjectStatusAsQueuing(savedInject);
+    savedInject.setStatus(injectStatus);
 
-    return injectMapper.toInjectResultOverviewOutput(injectRepository.save(inject));
+    return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
   @Transactional
   public InjectResultOverviewOutput relaunch(String id) {
     Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
     Inject duplicatedInject = InjectUtils.duplicateInject(injectOrigin);
-
     Inject savedInject = injectRepository.save(duplicatedInject);
 
     InjectStatus injectStatus = setInjectStatusAsQueuing(savedInject);
@@ -136,7 +137,7 @@ public class InjectService {
     injectDocumentRepository.deleteDocumentsFromInject(id);
     injectRepository.deleteById(id);
 
-    return injectMapper.toInjectResultOverviewOutput(injectRepository.save(savedInject));
+    return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
   private InjectStatus setInjectStatusAsQueuing(Inject inject) {
