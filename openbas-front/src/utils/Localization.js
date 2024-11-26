@@ -1332,6 +1332,7 @@ const i18n = {
       'Do you want to delete this lessons learned question?':
         'Souhaitez-vous supprimer cette question de retour d\'expérience ?',
       'x86_64': 'x86_64',
+      'X86_64': 'X86_64',
       'arm64': 'arm64',
       'ALL_ARCHITECTURES': 'Toutes les architectures',
       'Invalid IP addresses': 'Adresses IP invalides',
@@ -2696,6 +2697,7 @@ const i18n = {
       'Do you want to delete this lessons learned question?':
         '你想要删除这个经验教训问题么?',
       'x86_64': 'x86_64',
+      'X86_64': 'X86_64',
       'arm64': 'arm64',
       'ALL_ARCHITECTURES': '所有架构',
       'Invalid IP addresses': '无效IP地址',
