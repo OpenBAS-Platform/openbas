@@ -122,7 +122,9 @@ const Exercise = () => {
           </Grid>
         )}
       </Grid>
-      <ExerciseDistribution exerciseId={exerciseId} />
+      <div style={{ marginBottom: 25 }}>
+        <ExerciseDistribution exerciseId={exerciseId} />
+      </div>
     </>
   );
 };
