@@ -126,7 +126,8 @@ public class ExpectationApi extends RestBehavior {
             "collector",
             collector.getName(),
             input.getResult(),
-            input.getSuccess());
+            input.getIsSuccess(),
+            input.getMetadata());
 
     // Compute potential expectations for asset groups
     Inject inject = injectExpectation.getInject();

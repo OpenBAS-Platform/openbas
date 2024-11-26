@@ -18,6 +18,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -45,12 +46,13 @@ public class InjectExpectationService {
       @NotBlank final String sourceType,
       @NotBlank final String sourceName,
       @NotBlank final String result,
-      @NotBlank final Boolean success) {
+      @NotBlank final Boolean success,
+      final Map<String, String> metadata) {
     double actualScore =
         success
             ? expectation.getExpectedScore()
             : expectation.getScore() == null ? 0.0 : expectation.getScore();
-    computeResult(expectation, sourceId, sourceType, sourceName, result, actualScore);
+    computeResult(expectation, sourceId, sourceType, sourceName, result, actualScore, metadata);
     expectation.setScore(actualScore);
     return this.update(expectation);
   }
@@ -75,7 +77,8 @@ public class InjectExpectationService {
         sourceType,
         sourceName,
         success ? "SUCCESS" : "FAILED",
-        success ? expectationAssetGroup.getExpectedScore() : 0);
+        success ? expectationAssetGroup.getExpectedScore() : 0,
+        null);
     expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0.0);
     this.update(expectationAssetGroup);
   }
