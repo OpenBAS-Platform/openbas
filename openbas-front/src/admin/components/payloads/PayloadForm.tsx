@@ -214,16 +214,21 @@ const PayloadForm: FunctionComponent<Props> = ({
             ) : (
               field.value != null && (
                 <TextField
-                  name="payload_execution_arch"
-                  fullWidth
+                  select
                   disabled
+                  variant="standard"
+                  fullWidth
+                  value={field.value}
                   label={t('Architecture')}
-                  style={{ marginTop: 10 }}
+                  style={{ marginTop: 20 }}
                   error={!!errors.payload_execution_arch}
                   helperText={errors.payload_execution_arch?.message}
                   inputProps={register('payload_execution_arch')}
-                  InputLabelProps={{ required: false }}
-                />
+                  InputLabelProps={{ required: true }}
+                >
+                  {' '}
+                  <MenuItem value="ALL_ARCHITECTURES">{t('ALL_ARCHITECTURES')}</MenuItem>
+                </TextField>
               )
             )}
           </>
