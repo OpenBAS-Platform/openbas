@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 @Component(OpenBASImplantContract.TYPE)
@@ -242,113 +241,22 @@ public class OpenBASImplantExecutor extends Injector {
     List<Expectation> expectations = new ArrayList<>();
     assets.forEach(
         (asset, isInGroup) -> {
+          Optional<InjectorContract> contract = inject.getInjectorContract();
           List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
 
-          inject
-              .getInjectorContract()
-              .ifPresent(
-                  injectorContract -> {
-                    if (injectorContract.getPayload() != null) {
-                      // Put the correct number in inject status
-                      int totalActionsCount = 0;
-                      switch (injectorContract.getPayload().getType()) {
-                        case "Command":
-                          Command payloadCommand =
-                              (Command) Hibernate.unproxy(injectorContract.getPayload());
-                          injectExpectationSignatures.add(
-                              InjectExpectationSignature.builder()
-                                  .type(EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME)
-                                  .value("obas-implant-" + inject.getId())
-                                  .build());
-                          injectExpectationSignatures.add(
-                              InjectExpectationSignature.builder()
-                                  .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
-                                  .value(
-                                      Base64.getEncoder()
-                                          .encodeToString(payloadCommand.getContent().getBytes()))
-                                  .build()); // Add parsing: base64 for example
-                          totalActionsCount = totalActionsCount + 1;
-                          if (payloadCommand.getPrerequisites() != null) {
-                            totalActionsCount =
-                                totalActionsCount + payloadCommand.getPrerequisites().size();
-                          }
-                          if (payloadCommand.getCleanupCommand() != null
-                              && !payloadCommand.getCleanupCommand().isEmpty()) {
-                            totalActionsCount = totalActionsCount + 1;
-                          }
-                          break;
-                        case "Executable":
-                          Executable payloadExecutable =
-                              (Executable) Hibernate.unproxy(injectorContract.getPayload());
-                          injectExpectationSignatures.add(
-                              InjectExpectationSignature.builder()
-                                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                                  .value(payloadExecutable.getExecutableFile().getName())
-                                  .build());
-                          totalActionsCount = totalActionsCount + 2;
-                          if (payloadExecutable.getPrerequisites() != null) {
-                            totalActionsCount =
-                                totalActionsCount + payloadExecutable.getPrerequisites().size();
-                          }
-                          if (payloadExecutable.getCleanupCommand() != null
-                              && !payloadExecutable.getCleanupCommand().isEmpty()) {
-                            totalActionsCount = totalActionsCount + 1;
-                          }
-                          // TODO File hash
-                          break;
-                        case "FileDrop":
-                          FileDrop payloadFileDrop =
-                              (FileDrop) Hibernate.unproxy(injectorContract.getPayload());
-                          injectExpectationSignatures.add(
-                              InjectExpectationSignature.builder()
-                                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                                  .value(payloadFileDrop.getFileDropFile().getName())
-                                  .build());
-                          totalActionsCount = totalActionsCount + 1;
-                          if (payloadFileDrop.getPrerequisites() != null) {
-                            totalActionsCount =
-                                totalActionsCount + payloadFileDrop.getPrerequisites().size();
-                          }
-                          if (payloadFileDrop.getCleanupCommand() != null
-                              && !payloadFileDrop.getCleanupCommand().isEmpty()) {
-                            totalActionsCount = totalActionsCount + 1;
-                          }
-                          // TODO File hash
-                          break;
-                        case "DnsResolution":
-                          DnsResolution payloadDnsResolution =
-                              (DnsResolution) Hibernate.unproxy(injectorContract.getPayload());
-                          // TODO this is only generating the signature for the first hostname
-                          // Problem is: we are not supporting multiple signatures of the same type
-                          // with "AND" parameters, and this can be in multiple alerts downstream in
-                          // security platforms
-                          // Tech pain to refine
-                          injectExpectationSignatures.add(
-                              InjectExpectationSignature.builder()
-                                  .type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME)
-                                  .value(payloadDnsResolution.getHostname().split("\\r?\\n")[0])
-                                  .build());
-                          totalActionsCount =
-                              totalActionsCount
-                                  + payloadDnsResolution.getHostname().split("\\r?\\n").length;
-                          if (payloadDnsResolution.getPrerequisites() != null) {
-                            totalActionsCount =
-                                totalActionsCount + payloadDnsResolution.getPrerequisites().size();
-                          }
-                          if (payloadDnsResolution.getCleanupCommand() != null
-                              && !payloadDnsResolution.getCleanupCommand().isEmpty()) {
-                            totalActionsCount = totalActionsCount + 1;
-                          }
-                          break;
-                        default:
-                          throw new UnsupportedOperationException(
-                              "Payload type "
-                                  + injectorContract.getPayload().getType()
-                                  + " is not supported");
-                      }
-                      execution.setExpectedCount(totalActionsCount);
-                    }
-                  });
+          if (contract.isPresent()) {
+            Payload payload = contract.get().getPayload();
+            if (payload == null) {
+              log.info(
+                  String.format("No payload for inject %s was found, skipping", inject.getId()));
+              return;
+            }
+            injectExpectationSignatures = spawnSignatures(inject, payload);
+            execution.setExpectedCount(
+                payload.getPrerequisites().size()
+                    + (payload.getCleanupCommand() != null ? 1 : 0)
+                    + payload.getNumberOfActions());
+          }
           computeExpectationsForAsset(
               expectations, content, asset, isInGroup, injectExpectationSignatures);
         });
@@ -359,5 +267,29 @@ public class OpenBASImplantExecutor extends Injector {
             computeExpectationsForAssetGroup(
                 expectations, content, assetGroup, new ArrayList<>())));
     return new ExecutionProcess(true, expectations);
+  }
+
+  private List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
+    List<InjectExpectationSignature> signatures = new ArrayList<>();
+    List<String> knownPayloadTypes =
+        Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
+
+    /*
+     * Always add the "Parent process" signature type for the OpenBAS Implant Executor
+     */
+    signatures.add(
+        createSignature(
+            EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME, "obas-implant-" + inject.getId()));
+
+    if (!knownPayloadTypes.contains(payload.getType())) {
+      throw new UnsupportedOperationException(
+          "Payload type " + payload.getType() + " is not supported");
+    }
+    return signatures;
+  }
+
+  private static InjectExpectationSignature createSignature(
+      String signatureType, String signatureValue) {
+    return InjectExpectationSignature.builder().type(signatureType).value(signatureValue).build();
   }
 }

@@ -152,11 +152,6 @@ public class CalderaExecutor extends Injector {
                                           .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
                                           .value(executionEndpoint.getProcessName())
                                           .build());
-                                  injectExpectationSignatures.add(
-                                      InjectExpectationSignature.builder()
-                                          .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
-                                          .value(exploitResult.getCommand())
-                                          .build());
                                   break;
                                 case "Executable":
                                   Executable payloadExecutable =
@@ -201,11 +196,6 @@ public class CalderaExecutor extends Injector {
                                   InjectExpectationSignature.builder()
                                       .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
                                       .value(executionEndpoint.getProcessName())
-                                      .build());
-                              injectExpectationSignatures.add(
-                                  InjectExpectationSignature.builder()
-                                      .type(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE)
-                                      .value(exploitResult.getCommand())
                                       .build());
                             }
                             computeExpectationsForAsset(
