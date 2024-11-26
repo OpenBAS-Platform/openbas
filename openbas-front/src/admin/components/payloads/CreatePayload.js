@@ -39,18 +39,18 @@ class CreatePayload extends Component {
   }
 
   onSubmit(data) {
-      function handleCleanupExecutorValue(payload_cleanup_executor, payload_cleanup_command) {
-          if (payload_cleanup_executor !== '' && handleCleanupCommandValue(payload_cleanup_command) !== null) {
-              return payload_cleanup_executor;
-          }
-          return null;
-      }
+    function handleCleanupCommandValue(payload_cleanup_command) {
+      return payload_cleanup_command === '' ? null : payload_cleanup_command;
+    }
 
-      function handleCleanupCommandValue(payload_cleanup_command) {
-          return payload_cleanup_command === '' ? null : payload_cleanup_command;
+    function handleCleanupExecutorValue(payload_cleanup_executor, payload_cleanup_command) {
+      if (payload_cleanup_executor !== '' && handleCleanupCommandValue(payload_cleanup_command) !== null) {
+        return payload_cleanup_executor;
       }
+      return null;
+    }
 
-      const inputValues = R.pipe(
+    const inputValues = R.pipe(
       R.assoc('payload_type', this.state.selectedType),
       R.assoc('payload_source', 'MANUAL'),
       R.assoc('payload_status', 'VERIFIED'),

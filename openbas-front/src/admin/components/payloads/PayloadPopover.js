@@ -29,16 +29,15 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
-      function handleCleanupExecutorValue(payload_cleanup_executor, payload_cleanup_command) {
-          if (payload_cleanup_executor !== '' && handleCleanupCommandValue(payload_cleanup_command) !== null) {
-              return payload_cleanup_executor;
-          }
-          return null;
+    function handleCleanupCommandValue(payload_cleanup_command) {
+      return payload_cleanup_command === '' ? null : payload_cleanup_command;
+    }
+    function handleCleanupExecutorValue(payload_cleanup_executor, payload_cleanup_command) {
+      if (payload_cleanup_executor !== '' && handleCleanupCommandValue(payload_cleanup_command) !== null) {
+        return payload_cleanup_executor;
       }
-
-      function handleCleanupCommandValue(payload_cleanup_command) {
-          return payload_cleanup_command === '' ? null : payload_cleanup_command;
-      }
+      return null;
+    }
     const inputValues = R.pipe(
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
       R.assoc('payload_tags', data.payload_tags),
