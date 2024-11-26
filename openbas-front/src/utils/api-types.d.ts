@@ -2409,6 +2409,8 @@ export interface Pause {
 
 export interface Payload {
   listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPattern[];
   payload_cleanup_command?: string;
@@ -2445,7 +2447,6 @@ export interface PayloadCreateInput {
   command_content?: string | null;
   command_executor?: string | null;
   dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "Unknown";
   executable_file?: string;
   file_drop_file?: string;
   payload_arguments?: PayloadArgument[];

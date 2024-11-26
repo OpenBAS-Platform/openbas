@@ -37,7 +37,6 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onSubmit,
   title,
   platforms,
-  payloadType,
   payloadArch,
 }) => {
   // Standard hooks
