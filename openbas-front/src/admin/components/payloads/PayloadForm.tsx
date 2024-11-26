@@ -109,7 +109,7 @@ const PayloadForm: FunctionComponent<Props> = ({
           id: z.string().min(1, { message: t('Should not be empty') }),
           label: z.string().min(1, { message: t('Should not be empty') }),
         }),
-        payload_execution_arch: z.enum(['X86_64', 'ARM64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }),
+        payload_execution_arch: z.enum(['X86_64', 'ARM64'], { message: t('Should not be empty') }),
       });
       break;
     case 'FileDrop':
