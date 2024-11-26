@@ -1,8 +1,8 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CSSProperties, useContext, useState } from 'react';
 import * as React from 'react';
+import { CSSProperties, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import type { TeamStore } from '../../../../actions/teams/Team';
@@ -166,6 +166,7 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
           classes={{ root: classes.itemHead }}
           divider={false}
           style={{ paddingTop: 0 }}
+          secondaryAction={<></>}
         >
           <ListItemIcon>
             <span
@@ -210,65 +211,68 @@ const ContextualTeams: React.FC<Props> = ({ teams }) => {
               </>
             )}
           />
-          <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
         {sortedTeams.map((team: TeamStoreExtended) => (
-          <ListItemButton
+          <ListItem
             key={team.team_id}
-            classes={{ root: classes.item }}
-            divider={true}
-            onClick={() => setSelectedTeam(team.team_id)}
-          >
-            <ListItemIcon>
-              <GroupsOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStylesContextual.team_name}
-                  >
-                    {team.team_name}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStylesContextual.team_users_number}
-                  >
-                    {team.team_users_number}
-                  </div>
-                  {computeTeamUsersEnabled && (
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStylesContextual.team_users_enabled_number}
-                    >
-                      {team.team_users_enabled_number}
-                    </div>
-                  )}
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStylesContextual.team_tags}
-                  >
-                    <ItemTags variant="reduced-view" tags={team.team_tags} />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStylesContextual.team_contextual}
-                  >
-                    {team.team_contextual ? <CheckCircleOutlined fontSize="small" /> : '-'}
-                  </div>
-                </>
-              )}
-            />
-            <ListItemSecondaryAction>
+            disablePadding
+            secondaryAction={(
               <TeamPopover
                 team={team}
                 managePlayers={() => setSelectedTeam(team.team_id)}
                 disabled={permissions.readOnly}
                 openEditOnInit={team.team_id === searchId}
               />
-            </ListItemSecondaryAction>
-          </ListItemButton>
+            )}
+          >
+            <ListItemButton
+              classes={{ root: classes.item }}
+              divider
+              onClick={() => setSelectedTeam(team.team_id)}
+            >
+              <ListItemIcon>
+                <GroupsOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStylesContextual.team_name}
+                    >
+                      {team.team_name}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStylesContextual.team_users_number}
+                    >
+                      {team.team_users_number}
+                    </div>
+                    {computeTeamUsersEnabled && (
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStylesContextual.team_users_enabled_number}
+                      >
+                        {team.team_users_enabled_number}
+                      </div>
+                    )}
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStylesContextual.team_tags}
+                    >
+                      <ItemTags variant="reduced-view" tags={team.team_tags} />
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStylesContextual.team_contextual}
+                    >
+                      {team.team_contextual ? <CheckCircleOutlined fontSize="small" /> : '-'}
+                    </div>
+                  </>
+                )}
+              />
+            </ListItemButton>
+          </ListItem>
         ))}
       </List>
       <Drawer
