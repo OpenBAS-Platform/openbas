@@ -29,13 +29,22 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
+    function handleCleanupCommandValue(payload_cleanup_command) {
+      return payload_cleanup_command === '' ? null : payload_cleanup_command;
+    }
+    function handleCleanupExecutorValue(payload_cleanup_executor, payload_cleanup_command) {
+      if (payload_cleanup_executor !== '' && handleCleanupCommandValue(payload_cleanup_command) !== null) {
+        return payload_cleanup_executor;
+      }
+      return null;
+    }
     const inputValues = R.pipe(
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
       R.assoc('payload_tags', data.payload_tags),
       R.assoc('payload_attack_patterns', data.payload_attack_patterns),
       R.assoc('executable_file', data.executable_file?.id),
-      R.assoc('payload_cleanup_executor', data.payload_cleanup_executor === '' ? null : data.payload_cleanup_executor),
-      R.assoc('payload_cleanup_command', data.payload_cleanup_command === '' ? null : data.payload_cleanup_command),
+      R.assoc('payload_cleanup_executor', handleCleanupExecutorValue(data.payload_cleanup_executor, data.payload_cleanup_command)),
+      R.assoc('payload_cleanup_command', handleCleanupCommandValue(data.payload_cleanup_command)),
     )(data);
     return dispatch(updatePayload(payload.payload_id, inputValues)).then((result) => {
       if (onUpdate) {
