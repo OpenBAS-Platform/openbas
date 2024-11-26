@@ -50,6 +50,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 @RequiredArgsConstructor
@@ -94,13 +95,16 @@ public class ExerciseService {
   // -- CREATION --
   @Transactional(rollbackFor = Exception.class)
   public Exercise createExercise(@NotNull final Exercise exercise) {
-    if (imapEnabled) {
-      exercise.setFrom(imapUsername);
-      exercise.setReplyTos(List.of(imapUsername));
-    } else {
-      exercise.setFrom(openBASConfig.getDefaultMailer());
-      exercise.setReplyTos(List.of(openBASConfig.getDefaultReplyTo()));
+    if (!StringUtils.hasText(exercise.getFrom())) {
+      if (imapEnabled) {
+        exercise.setFrom(imapUsername);
+        exercise.setReplyTos(List.of(imapUsername));
+      } else {
+        exercise.setFrom(openBASConfig.getDefaultMailer());
+        exercise.setReplyTos(List.of(openBASConfig.getDefaultReplyTo()));
+      }
     }
+
     this.grantService.computeGrant(exercise);
     return exerciseRepository.save(exercise);
   }

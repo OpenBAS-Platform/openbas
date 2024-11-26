@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { addExercise } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
+import type { LoggedHelper } from '../../../../actions/helper';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { ExerciseCreateInput } from '../../../../utils/api-types';
+import { useHelper } from '../../../../store';
+import type { ExerciseInput, PlatformSettings } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import ExerciseCreationForm from './ExerciseCreationForm';
+import ExerciseForm from './ExerciseForm';
 
 const ExerciseCreation = () => {
   // Standard hooks
@@ -16,12 +18,33 @@ const ExerciseCreation = () => {
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const onSubmit = (data: ExerciseCreateInput) => {
+  const onSubmit = (data: ExerciseInput) => {
     dispatch(addExercise(data)).then((result: { result: string; entities: { scenarios: Record<string, ExerciseStore> } }) => {
       setOpen(false);
       navigate(`/admin/exercises/${result.result}`);
     });
   };
+
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
+    settings: helper.getPlatformSettings(),
+  }));
+
+  // Form
+  const initialValues: ExerciseInput = {
+    exercise_name: '',
+    exercise_subtitle: '',
+    exercise_description: '',
+    exercise_category: 'attack-scenario',
+    exercise_main_focus: 'incident-response',
+    exercise_severity: 'high',
+    exercise_tags: [],
+    exercise_start_date: null,
+    exercise_mail_from: settings.default_mailer,
+    exercise_mails_reply_to: [settings.default_reply_to ? settings.default_reply_to : ''],
+    exercise_message_header: t('SIMULATION HEADER'),
+    exercise_message_footer: t('SIMULATION FOOTER'),
+  };
+
   return (
     <>
       <ButtonCreate onClick={() => setOpen(true)} />
@@ -30,9 +53,11 @@ const ExerciseCreation = () => {
         handleClose={() => setOpen(false)}
         title={t('Create a new simulation')}
       >
-        <ExerciseCreationForm
+        <ExerciseForm
           onSubmit={onSubmit}
           handleClose={() => setOpen(false)}
+          initialValues={initialValues}
+          edit={false}
         />
       </Drawer>
     </>

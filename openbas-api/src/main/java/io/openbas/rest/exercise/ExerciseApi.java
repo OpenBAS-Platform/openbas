@@ -377,7 +377,7 @@ public class ExerciseApi extends RestBehavior {
 
   // region exercises
   @PostMapping(EXERCISE_URI)
-  public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
+  public Exercise createExercise(@Valid @RequestBody ExerciseInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");
     }
@@ -397,7 +397,7 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Exercise updateExerciseInformation(
-      @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInput input) {
+      @PathVariable String exerciseId, @Valid @RequestBody ExerciseInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
