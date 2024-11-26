@@ -57,7 +57,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
       setAssetGroupValues(result.data);
       setLoading(false);
     });
-  }, []);
+  }, [assetGroupIds]);
 
   // Headers
   const headers: Header[] = useMemo(() => [
