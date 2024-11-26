@@ -363,6 +363,7 @@ const PayloadForm: FunctionComponent<Props> = ({
                 label={t('Key')}
                 style={{ marginRight: 20 }}
                 inputProps={register(`payload_arguments.${index}.key` as const)}
+                error={!!errors.payload_arguments?.[index]?.key}
               />
               <TextField
                 variant="standard"
@@ -370,6 +371,7 @@ const PayloadForm: FunctionComponent<Props> = ({
                 label={t('Default Value')}
                 style={{ marginRight: 20 }}
                 inputProps={register(`payload_arguments.${index}.default_value` as const)}
+                error={!!errors.payload_arguments?.[index]?.default_value}
               />
               <IconButton
                 onClick={() => remove(index)}
@@ -413,7 +415,7 @@ const PayloadForm: FunctionComponent<Props> = ({
         </InputLabel>
       </div>
       <List style={{ marginTop: -20 }}>
-        {prerequisitesFields.map((prerequisitesField, prerequisitesIndex) => {
+        {prerequisitesFields.map((_prerequisitesField, prerequisitesIndex) => {
           return (
             <ListItem
               key={`payload_prerequisites_${prerequisitesIndex}`}
@@ -447,6 +449,7 @@ const PayloadForm: FunctionComponent<Props> = ({
                 label={t('Get command')}
                 style={{ marginRight: 20 }}
                 inputProps={register(`payload_prerequisites.${prerequisitesIndex}.get_command` as const)}
+                error={!!errors.payload_prerequisites?.[prerequisitesIndex]?.get_command}
               />
               <TextField
                 variant="standard"
@@ -454,6 +457,7 @@ const PayloadForm: FunctionComponent<Props> = ({
                 label={t('Check command')}
                 style={{ marginRight: 20 }}
                 inputProps={register(`payload_prerequisites.${prerequisitesIndex}.check_command` as const)}
+                error={!!errors.payload_prerequisites?.[prerequisitesIndex]?.check_command}
               />
               <IconButton
                 onClick={() => prerequisitesRemove(prerequisitesIndex)}
