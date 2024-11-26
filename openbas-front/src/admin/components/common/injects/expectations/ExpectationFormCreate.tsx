@@ -95,6 +95,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
   const initialValues: ExpectationInputForm = computeValuesFromType(predefinedTypes[0]);
 
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
@@ -102,7 +103,6 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
     reset,
     getValues,
   } = useForm<ExpectationInputForm>(formProps(initialValues, t));
-  const { control } = useForm<ExpectationInput>();
   const watchType = watch('expectation_type');
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
