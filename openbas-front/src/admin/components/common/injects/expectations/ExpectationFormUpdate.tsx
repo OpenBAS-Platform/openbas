@@ -60,14 +60,13 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
     expiration_time_hours: parseInt(expirationTime.hours, 10),
     expiration_time_minutes: parseInt(expirationTime.minutes, 10),
   };
-
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
     getValues,
   } = useForm<ExpectationInputForm>(formProps(formInitialValues, t));
-  const { control } = useForm<ExpectationInput>();
 
   const handleSubmitWithoutPropagation = (e: SyntheticEvent) => {
     e.preventDefault();

@@ -974,7 +974,6 @@ class InjectDefinition extends Component {
       inject,
       injectorContract,
       endpointsMap,
-      assetGroupsMap,
       documentsMap,
       articlesMap,
       channelsMap,
@@ -1019,9 +1018,6 @@ class InjectDefinition extends Component {
     const hasAssetGroups = injectorContract.fields
       .map(f => f.key)
       .includes('assetgroups');
-    const assetGroups = assetGroupIds
-      .map(a => assetGroupsMap[a])
-      .filter(a => a !== undefined);
     // -- ARTICLES --
     const articles = articlesIds
       .map(a => articlesMap[a])
@@ -1203,7 +1199,7 @@ class InjectDefinition extends Component {
                 {t('Targeted asset groups')}
               </Typography>
               <AssetGroupsList
-                assetGroups={assetGroups}
+                assetGroupIds={assetGroupIds}
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore: Endpoint property handle by EndpointsList
                 actions={
@@ -1566,14 +1562,12 @@ const select = (state) => {
   const helper = storeHelper(state);
   const documentsMap = helper.getDocumentsMap();
   const endpointsMap = helper.getEndpointsMap();
-  const assetGroupsMap = helper.getAssetGroupMaps();
   const channelsMap = helper.getChannelsMap();
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
   return {
     documentsMap,
     endpointsMap,
-    assetGroupsMap,
     articlesMap,
     channelsMap,
     challengesMap,
