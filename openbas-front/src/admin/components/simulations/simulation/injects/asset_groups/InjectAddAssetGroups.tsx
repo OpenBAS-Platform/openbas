@@ -56,7 +56,12 @@ const InjectAddAssetGroups: FunctionComponent<Props> = ({
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
-      <AssetGroupDialogAdding initialState={assetGroupIds} open={openDialog} onClose={handleClose} onSubmit={onSubmit} />
+      <AssetGroupDialogAdding
+        initialState={assetGroupIds}
+        open={openDialog}
+        onClose={handleClose}
+        onSubmit={onSubmit}
+      />
     </>
   );
 };
