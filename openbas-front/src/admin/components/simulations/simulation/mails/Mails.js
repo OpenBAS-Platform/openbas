@@ -12,10 +12,12 @@ import SearchFilter from '../../../../../components/SearchFilter';
 import { useHelper } from '../../../../../store';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
+import { TeamContext } from '../../../common/Context';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
+import teamContextForExercise from '../teams/teamContextForExercise';
 import MailDistributionByInject from './MailDistributionByInject';
 import MailDistributionByPlayer from './MailDistributionByPlayer';
 import MailDistributionByTeam from './MailDistributionByTeam';
@@ -200,6 +202,9 @@ const Mails = () => {
   const sortedInjects = filtering
     .filterAndSort(injects)
     .filter(i => i.inject_communications_number > 0);
+
+  const teamContext = teamContextForExercise(exerciseId, []);
+
   // Rendering
   return (
     <div style={{ marginTop: -13 }}>
@@ -422,7 +427,9 @@ const Mails = () => {
               );
             })}
           </List>
-          <CreateQuickInject exercise={exercise} />
+          <TeamContext.Provider value={teamContext}>
+            <CreateQuickInject exercise={exercise} />
+          </TeamContext.Provider>
         </>
       )}
     </div>

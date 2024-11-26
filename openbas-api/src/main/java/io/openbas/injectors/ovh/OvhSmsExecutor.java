@@ -2,6 +2,7 @@ package io.openbas.injectors.ovh;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
+import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
@@ -18,6 +19,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -58,9 +61,25 @@ public class OvhSmsExecutor extends Injector {
                 try {
                   String callResult = smsService.sendSms(context, phone, smsMessage);
                   isSmsSent.set(true);
-                  String message =
-                      "Sms sent to " + email + " through " + phone + " (" + callResult + ")";
-                  execution.addTrace(traceSuccess(message));
+
+                  // Extraction simplifiée avec regex pour le champ "invalidReceivers"
+                  Pattern pattern = Pattern.compile("\"invalidReceivers\":\\[(.*?)\\]");
+                  Matcher matcher = pattern.matcher(callResult);
+                  if (matcher.find() && hasText(matcher.group(1))) {
+                    String message =
+                        "Sms sent to "
+                            + email
+                            + " through "
+                            + phone
+                            + " contains error ("
+                            + callResult
+                            + ")";
+                    execution.addTrace(traceError(message));
+                  } else {
+                    String message =
+                        "Sms sent to " + email + " through " + phone + " (" + callResult + ")";
+                    execution.addTrace(traceSuccess(message));
+                  }
                 } catch (Exception e) {
                   execution.addTrace(traceError(e.getMessage()));
                 }
