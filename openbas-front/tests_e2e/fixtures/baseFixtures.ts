@@ -1,28 +1,52 @@
-/* eslint-disable  @typescript-eslint/no-explicit-any, no-underscore-dangle */
-import { test as baseTest } from '@playwright/test';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as path from 'path';
+import { Page, test as testBase } from '@playwright/test';
+import MCR from 'monocart-coverage-reports';
 
-const istanbulCLIOutput = path.join(process.cwd(), '.nyc_output');
+import coverageOptions from '../conf/mcr.config';
 
-export function generateUUID(): string {
-  return crypto.randomBytes(16).toString('hex');
-}
+// fixtures
+const test = testBase.extend<{
+  autoTestFixture: string;
+}>({
+  autoTestFixture: [async ({ context }, use) => {
+    const activateCoverage = process.env.E2E_COVERAGE;
+    const isChromium = test.info().project.name === 'chromium';
 
-export const test = baseTest.extend({
-  context: async ({ context }, use) => {
-    await context.addInitScript(() => window.addEventListener('beforeunload', () => (window as any).collectIstanbulCoverage(JSON.stringify((window as any).__coverage__))));
-    await fs.promises.mkdir(istanbulCLIOutput, { recursive: true });
-    await context.exposeFunction('collectIstanbulCoverage', (coverageJSON: string) => {
-      if (coverageJSON) fs.writeFileSync(path.join(istanbulCLIOutput, `playwright_coverage_${generateUUID()}.json`), coverageJSON);
-    });
-    await use(context);
-    for (const page of context.pages()) {
-      // eslint-disable-next-line no-await-in-loop
-      await page.evaluate(() => (window as any).collectIstanbulCoverage(JSON.stringify((window as any).__coverage__)));
+    const handlePageEvent = async (page: Page) => {
+      await Promise.all([
+        page.coverage.startJSCoverage({
+          resetOnNavigation: false,
+        }),
+        page.coverage.startCSSCoverage({
+          resetOnNavigation: false,
+        }),
+      ]);
+    };
+
+    // console.log('autoTestFixture setup...');
+    // coverage API is chromium only
+    if (activateCoverage && isChromium) {
+      context.on('page', handlePageEvent);
     }
-  },
+
+    await use('autoTestFixture');
+
+    // console.log('autoTestFixture teardown...');
+    if (activateCoverage && isChromium) {
+      context.off('page', handlePageEvent);
+      const coverageList = await Promise.all(context.pages().map(async (page) => {
+        const jsCoverage = await page.coverage.stopJSCoverage();
+        const cssCoverage = await page.coverage.stopCSSCoverage();
+        return [...jsCoverage, ...cssCoverage];
+      }));
+      // console.log(coverageList.map((item) => item.url));
+      const mcr = MCR(coverageOptions);
+      await mcr.add(coverageList.flat());
+    }
+  }, {
+    scope: 'test',
+    auto: true,
+  }],
 });
 
-export const { expect } = test;
+// eslint-disable-next-line import/prefer-default-export
+export { test };
