@@ -38,7 +38,6 @@ public class InjectMapper {
         .title(inject.getTitle())
         .description(inject.getDescription())
         .content(inject.getContent())
-        .payloadOutputDto(injectUtils.getCommandsLinesFromInject(inject))
         .type(injectorContract.map(contract -> contract.getInjector().getType()).orElse(null))
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
@@ -83,75 +82,9 @@ public class InjectMapper {
                     .content(contract.getContent())
                     .convertedContent(contract.getConvertedContent())
                     .platforms(contract.getPlatforms())
-                    .payload(toPayloadOutput(Optional.ofNullable(contract.getPayload()), contract))
                     .labels(contract.getLabels())
                     .build())
         .orElse(null);
-  }
-
-  private PayloadOutputDto toPayloadOutput(Optional<Payload> payload, InjectorContract injectorContract) {
-    if (payload.isPresent()) {
-      return payload
-          .map(
-              payloadToOutput -> {
-                PayloadCommandBlockDto.PayloadCommandBlockDtoBuilder payloadCommandBlockBuilder = PayloadCommandBlockDto.builder();
-                PayloadOutputDto.PayloadOutputDtoBuilder payloadOutput = PayloadOutputDto.builder()
-                    .type(payloadToOutput.getType())
-                    .collectorType(payloadToOutput.getCollectorType())
-                    .name(payloadToOutput.getName())
-                    .description(payloadToOutput.getDescription())
-                    .platforms(payloadToOutput.getPlatforms())
-                    .attackPatterns(toAttackPatternSimples(payloadToOutput.getAttackPatterns()))
-                    .cleanupExecutor(payloadToOutput.getCleanupExecutor())
-                    .arguments(payloadToOutput.getArguments())
-                    .prerequisites(payloadToOutput.getPrerequisites())
-                    .externalId(payloadToOutput.getExternalId())
-                    .tags(payloadToOutput.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
-                payloadCommandBlockBuilder.cleanupCommand(List.of(payloadToOutput.getCleanupCommand()));
-                switch (payloadToOutput.getType()) {
-                  case "Command":
-                    Command command = (Command) payloadToOutput;
-                    payloadCommandBlockBuilder.content(command.getContent());
-                    payloadCommandBlockBuilder.executor(command.getExecutor());
-                    break;
-                  case "Executable":
-                    assert payloadToOutput instanceof Executable;
-                    Executable executable = (Executable) payloadToOutput;
-                    payloadOutput.executableFile(executable.getExecutableFile());
-                    payloadOutput.executableArch(executable.getExecutableArch());
-                    break;
-                  case "File":
-                    assert payloadToOutput instanceof FileDrop;
-                    FileDrop fileDrop = (FileDrop) payloadToOutput;
-                    payloadOutput.fileDropFile(fileDrop.getFileDropFile());
-                    break;
-                  case "Dns":
-                    assert payloadToOutput instanceof DnsResolution;
-                    DnsResolution dnsResolution = (DnsResolution) payloadToOutput;
-                    payloadOutput.hostname(dnsResolution.getHostname());
-                    break;
-                  case "Network":
-                    assert payloadToOutput instanceof NetworkTraffic;
-                    NetworkTraffic networkTraffic = (NetworkTraffic) payloadToOutput;
-                    payloadOutput.portSrc(networkTraffic.getPortSrc());
-                    payloadOutput.portDst(networkTraffic.getPortDst());
-                    payloadOutput.protocol(networkTraffic.getProtocol());
-                    payloadOutput.ipSrc(networkTraffic.getIpSrc());
-                    payloadOutput.ipDst(networkTraffic.getIpDst());
-                    break;
-                }
-                payloadOutput.payloadCommandBlock(payloadCommandBlockBuilder.build());
-                return payloadOutput.build();
-              })
-
-          .orElse(null);
-    } else {
-      io.openbas.executors.Injector executor =
-          context.getBean(
-              injectorContract.getInjector().getType(), io.openbas.executors.Injector.class);
-      return executor.getPayloadOutput(injectorContract.getId());
-    }
-
   }
 
   // -- STATUS to STATUSIMPLE --

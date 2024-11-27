@@ -40,10 +40,6 @@ public class InjectResultOverviewOutput {
   @JsonProperty("inject_content")
   private ObjectNode content;
 
-  @Schema(description = "Command lines for inject")
-  @JsonProperty("inject_commands_lines")
-  private PayloadOutputDto payloadOutputDto;
-
   @Schema(description = "Type of inject")
   @JsonProperty("inject_type")
   private String type;

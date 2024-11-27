@@ -1,6 +1,7 @@
 package io.openbas.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.StringUtils.duplicateString;
@@ -32,6 +33,7 @@ import java.util.stream.StreamSupport;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -83,15 +85,61 @@ public class AtomicTestingService {
   }
 
   public PayloadOutputDto findPayloadOutputByInjectId(String injectId) {
-    PayloadOutputDto payloadOutputDto = PayloadOutputDto.builder().build();
     Optional<Inject> inject = injectRepository.findById(injectId);
+    PayloadOutputDto.PayloadOutputDtoBuilder payloadOutputDtoBuilder = PayloadOutputDto.builder();
     if (inject.isPresent()) {
-      Optional<InjectorContract> injectorContract = inject.get().getInjectorContract();
-      AtomicInjectorContractOutput atomicInjectorContractOutput = injectMapper.toInjectorContractOutput(
-          injectorContract);
-      payloadOutputDto = atomicInjectorContractOutput.getPayload();
+      Optional<InjectorContract> injectorContractOpt = inject.get().getInjectorContract();
+      if (injectorContractOpt.isPresent()) {
+        InjectorContract injectorContract = injectorContractOpt.get();
+        inject.map(
+            injectToMap -> {
+              if (injectToMap.getStatus().isPresent() && injectToMap.getStatus().get().getPayloadOutput() != null) {
+                // Commands lines saved because inject has been executed
+                PayloadOutput payloadOutput = injectToMap.getStatus().get().getPayloadOutput();
+                payloadOutputDtoBuilder.cleanupExecutor(payloadOutput.getCleanupExecutor())
+                    .payloadCommandBlocks(payloadOutput.getPayloadCommandBlocks())
+                    .arguments(payloadOutput.getArguments())
+                    .prerequisites(payloadOutput.getPrerequisites())
+                    .externalId(payloadOutput.getExternalId())
+                    .executableFile(payloadOutput.getExecutableFile())
+                    .fileDropFile(payloadOutput.getFileDropFile())
+                    .hostname(payloadOutput.getHostname())
+                    .ipSrc(payloadOutput.getIpSrc())
+                    .ipDst(payloadOutput.getIpDst())
+                    .portSrc(payloadOutput.getPortSrc())
+                    .portDst(payloadOutput.getPortDst())
+                    .protocol(payloadOutput.getProtocol())
+                    .name(injectorContract.getPayload().getName())
+                    .type(injectorContract.getPayload().getType())
+                    .collectorType(injectorContract.getPayload().getCollectorType())
+                    .description(injectorContract.getPayload().getDescription())
+                    .platforms(injectorContract.getPayload().getPlatforms())
+                    .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
+                    .executableArch(injectorContract.getArch());
+                return payloadOutputDtoBuilder.build();
+              } else {
+                return null;
+              }
+            }
+        );
+      }
     }
-    return payloadOutputDto;
+    return null;
+  }
+
+  public List<AttackPatternSimpleDto> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
+    return attackPatterns.stream()
+        .filter(Objects::nonNull)
+        .map(this::toAttackPatternSimple)
+        .toList();
+  }
+
+  private AttackPatternSimpleDto toAttackPatternSimple(AttackPattern attackPattern) {
+    return AttackPatternSimpleDto.builder()
+        .id(attackPattern.getId())
+        .name(attackPattern.getName())
+        .externalId(attackPattern.getExternalId())
+        .build();
   }
 
   @Transactional

@@ -1,6 +1,10 @@
 package io.openbas.utils;
 
 import static io.openbas.database.model.Command.COMMAND_TYPE;
+import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
+import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
+import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
+import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 
 import io.openbas.database.model.*;
 
@@ -9,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.openbas.rest.atomic_testing.form.AttackPatternSimpleDto;
 import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -41,19 +44,46 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        return new PayloadOutput(COMMAND_TYPE, null, null, null, null, null, null, null, null, null,
-            payloadCommand.getTags(), payloadCommand.getExternalId(), payloadCommand.getPrerequisites(),
-            payloadCommand.getArguments(), payloadCommand.getContent() != null && !payloadCommand.getContent().isBlank()
-            ? List.of(payloadCommand.getContent())
-            : null,
-            payloadCommand.getCleanupCommand() != null
-                && !payloadCommand.getCleanupCommand().isBlank()
-                ? List.of(payload.getCleanupCommand())
-                : null,
-            payload.getExternalId(), payloadCommand.getCleanupExecutor(),
-            toAttackPatternSimples(payloadCommand.getAttackPatterns()), payloadCommand.getPlatforms(),
-            payloadCommand.getDescription(), payloadCommand.getName(), payloadCommand.getCollectorType());
+        PayloadCommandBlock payloadCommandBlock = new PayloadCommandBlock(payloadCommand.getExecutor(),
+            payloadCommand.getContent(), List.of(payloadCommand.getCleanupCommand()));
+        return new PayloadOutput(null, null, null, null, null, null, null, null,
+            payloadCommand.getExternalId(), payloadCommand.getPrerequisites(),
+            payloadCommand.getArguments(), List.of(payloadCommandBlock), payloadCommand.getCleanupExecutor());
 
+      } else if (injectorContract.getPayload() != null
+          && EXECUTABLE_TYPE.equals(injectorContract.getPayload().getType())) {
+        // Inject has a command payload
+        Payload payload = injectorContract.getPayload();
+        Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
+        return new PayloadOutput(null, null, null, null, null, null, null, payloadExecutable.getExecutableFile(),
+            null, null,
+            null, null, null);
+      } else if (injectorContract.getPayload() != null
+          && FILE_DROP_TYPE.equals(injectorContract.getPayload().getType())) {
+        // Inject has a command payload
+        Payload payload = injectorContract.getPayload();
+        FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
+        return new PayloadOutput(null, null, null, null, null, null, payloadFileDrop.getFileDropFile(), null,
+            null, null,
+            null, null, null);
+      } else if (injectorContract.getPayload() != null
+          && DNS_RESOLUTION_TYPE.equals(injectorContract.getPayload().getType())) {
+        // Inject has a command payload
+        Payload payload = injectorContract.getPayload();
+        DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
+        return new PayloadOutput(null, null, null, null, null, payloadDnsResolution.getHostname(), null, null,
+            null, null,
+            null, null, null);
+      } else if (injectorContract.getPayload() != null
+          && NETWORK_TRAFFIC_TYPE.equals(injectorContract.getPayload().getType())) {
+        // Inject has a command payload
+        Payload payload = injectorContract.getPayload();
+        NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
+        return new PayloadOutput(payloadNetworkTraffic.getProtocol(), payloadNetworkTraffic.getPortDst(),
+            payloadNetworkTraffic.getPortSrc(), payloadNetworkTraffic.getIpDst(), payloadNetworkTraffic.getIpSrc(),
+            null, null, null,
+            null, null,
+            null, null, null);
       } else {
         // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
         io.openbas.executors.Injector executor =

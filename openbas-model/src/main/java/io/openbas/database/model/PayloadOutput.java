@@ -16,24 +16,6 @@ import java.util.Set;
 @Setter
 public class PayloadOutput {
 
-  @JsonProperty("payload_type")
-  private String type;
-
-  @JsonProperty("payload_collector_type")
-  private String collectorType;
-
-  @JsonProperty("payload_name")
-  private String name;
-
-  @JsonProperty("payload_description")
-  private String description;
-
-  @JsonProperty("payload_platforms")
-  private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
-
-  @JsonProperty("payload_attack_patterns")
-  private List<AttackPatternSimple> attackPatterns = new ArrayList<>();
-
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
@@ -50,15 +32,8 @@ public class PayloadOutput {
   @JsonProperty("payload_external_id")
   private String externalId;
 
-  @JsonProperty("payload_tags")
-  private Set<String> tags;
-
   @JsonProperty("executable_file")
   private Document executableFile;
-
-  @JsonProperty("executable_arch")
-  @Enumerated(EnumType.STRING)
-  private Endpoint.PLATFORM_ARCH executableArch;
 
   @JsonProperty("file_drop_file")
   private Document fileDropFile;
@@ -89,12 +64,10 @@ public class PayloadOutput {
   public PayloadOutput() {
   }
 
-  public PayloadOutput(String type, String protocol, Integer portDst, Integer portSrc, String ipDst, String ipSrc,
-      String hostname, Document fileDropFile, Endpoint.PLATFORM_ARCH executableArch, Document executableFile,
-      Set<String> tags, String externalId, List<PayloadPrerequisite> prerequisites, List<PayloadArgument> arguments,
-      List<PayloadCommandBlock> payloadCommandBlocks, String cleanupExecutor, List<AttackPatternSimple> attackPatterns,
-      Endpoint.PLATFORM_TYPE[] platforms, String description, String name, String collectorType) {
-    this.type = type;
+  public PayloadOutput(String protocol, Integer portDst, Integer portSrc, String ipDst, String ipSrc,
+      String hostname, Document fileDropFile, Document executableFile, String externalId,
+      List<PayloadPrerequisite> prerequisites, List<PayloadArgument> arguments,
+      List<PayloadCommandBlock> payloadCommandBlocks, String cleanupExecutor) {
     this.protocol = protocol;
     this.portDst = portDst;
     this.portSrc = portSrc;
@@ -102,19 +75,12 @@ public class PayloadOutput {
     this.ipSrc = ipSrc;
     this.hostname = hostname;
     this.fileDropFile = fileDropFile;
-    this.executableArch = executableArch;
     this.executableFile = executableFile;
-    this.tags = tags;
     this.externalId = externalId;
     this.prerequisites = prerequisites;
     this.arguments = arguments;
     this.payloadCommandBlocks = payloadCommandBlocks;
     this.cleanupExecutor = cleanupExecutor;
-    this.attackPatterns = attackPatterns;
-    this.platforms = platforms;
-    this.description = description;
-    this.name = name;
-    this.collectorType = collectorType;
   }
 
 
