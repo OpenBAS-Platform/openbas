@@ -14,8 +14,6 @@ public class V3_49__Add_architecture_to_payload extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
     statement.execute(
-        "UPDATE payloads SET executable_arch = 'X86_64'  WHERE executable_arch = 'x86_64';");
-    statement.execute(
         "UPDATE payloads SET executable_arch = 'ARM64'  WHERE executable_arch = 'arm64';");
     statement.execute(
         "UPDATE payloads SET executable_arch = 'ALL_ARCHITECTURES' WHERE executable_arch IS NULL;");
