@@ -49,7 +49,6 @@ public class ScenarioInput {
 
   @JsonProperty("scenario_mail_from")
   @Email
-  @NotBlank
   private String from;
 
   @JsonProperty("scenario_mails_reply_to")
