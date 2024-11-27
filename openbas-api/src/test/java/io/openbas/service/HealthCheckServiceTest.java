@@ -11,6 +11,7 @@ import io.minio.MinioClient;
 import io.minio.errors.*;
 import io.openbas.config.MinioConfig;
 import io.openbas.database.repository.*;
+import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.service.exception.HealthCheckFailureException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -32,6 +33,7 @@ class HealthCheckServiceTest {
   @Mock private MinioClient minioClient;
   @Mock private ConnectionFactory connectionFactory;
   @Mock private Connection connection;
+  @Mock private CalderaExecutorClient calderaExecutorClient;
 
   @InjectMocks private HealthCheckService healthCheckService;
 
@@ -99,6 +101,24 @@ class HealthCheckServiceTest {
         HealthCheckFailureException.class,
         () -> {
           healthCheckService.runRabbitMQCheck(connectionFactory);
+        });
+  }
+
+  @DisplayName("Test runCalderaCheck")
+  @Test
+  void test_runCalderaCheck() throws Exception {
+    healthCheckService.runCalderaCheck();
+    verify(calderaExecutorClient).healthCheck();
+  }
+
+  @DisplayName("Test runCalderaCheck when check fails")
+  @Test
+  void test_runCalderaCheck_WHEN_connection_throws_exception() throws Exception {
+    when(calderaExecutorClient.healthCheck()).thenThrow(new IOException());
+    assertThrows(
+        HealthCheckFailureException.class,
+        () -> {
+          healthCheckService.runCalderaCheck();
         });
   }
 }

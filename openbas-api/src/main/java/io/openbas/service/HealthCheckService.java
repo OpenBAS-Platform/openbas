@@ -9,6 +9,7 @@ import io.minio.errors.*;
 import io.openbas.config.MinioConfig;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.repository.HealthCheckRepository;
+import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.service.exception.HealthCheckFailureException;
 import jakarta.annotation.Resource;
 import java.io.IOException;
@@ -26,26 +27,15 @@ import org.springframework.stereotype.Service;
 @Log
 public class HealthCheckService {
 
-  private HealthCheckRepository healthCheckRepository;
-  private MinioConfig minioConfig;
-  private MinioClient minioClient;
+  @Autowired private HealthCheckRepository healthCheckRepository;
+
+  @Autowired private MinioConfig minioConfig;
+
+  @Autowired private MinioClient minioClient;
+
+  @Autowired private CalderaExecutorClient client;
 
   @Resource private RabbitmqConfig rabbitmqConfig;
-
-  @Autowired
-  public void setMinioConfig(MinioConfig minioConfig) {
-    this.minioConfig = minioConfig;
-  }
-
-  @Autowired
-  public void setMinioClient(MinioClient minioClient) {
-    this.minioClient = minioClient;
-  }
-
-  @Autowired
-  public void setHealthCheckRepository(HealthCheckRepository healthCheckRepository) {
-    this.healthCheckRepository = healthCheckRepository;
-  }
 
   /**
    * Run health checks by testing connection to the service dependencies (database/rabbitMq/file
@@ -56,9 +46,9 @@ public class HealthCheckService {
   public void runHealthCheck() throws HealthCheckFailureException {
     runDatabaseCheck();
     runRabbitMQCheck(createRabbitMQConnectionFactory());
+    runCalderaCheck();
     runFileStorageCheck();
-    //TODO add caldera check
-    //TODO add IMAP check
+    // TODO add IMAP check
   }
 
   @VisibleForTesting
@@ -108,6 +98,16 @@ public class HealthCheckService {
         | ServerException
         | XmlParserException e) {
       throw new HealthCheckFailureException("FileStorage check failure", e);
+    }
+  }
+
+  @VisibleForTesting
+  protected void runCalderaCheck() throws HealthCheckFailureException {
+    try {
+      // TODO add timeout
+      this.client.healthCheck();
+    } catch (Exception e) {
+      throw new HealthCheckFailureException("Caldera check failure", e);
     }
   }
 }

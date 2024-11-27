@@ -22,9 +22,11 @@ import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -40,6 +42,8 @@ public class CalderaExecutorClient {
   // -- AGENTS --
 
   private static final String AGENT_URI = "/agents";
+
+  private static final String HEALTH_URI = "/health";
 
   public List<Agent> agents() {
     try {
@@ -316,6 +320,26 @@ public class CalderaExecutorClient {
       httpClient.execute(httpdelete);
     } catch (IOException e) {
       throw new ClientProtocolException("Unexpected response for request on: " + url);
+    }
+  }
+
+  /**
+   * @return the response
+   * @throws IOException
+   */
+  public String healthCheck() throws Exception {
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+      HttpGet httpGet = new HttpGet(this.config.getRestApiV2Url() + HEALTH_URI);
+
+      // Headers
+      httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
+      CloseableHttpResponse response = httpClient.execute(httpGet);
+      if (!HttpStatus.valueOf(response.getCode()).is2xxSuccessful()) {
+        throw new Exception("Caldera health check request failed");
+      }
+      return response.getEntity().toString();
+    } catch (IOException e) {
+      throw new ClientProtocolException("Unexpected response for request on: " + HEALTH_URI);
     }
   }
 }
