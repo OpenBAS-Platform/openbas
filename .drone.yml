@@ -18,7 +18,7 @@ steps:
       - mvn test -q
 
   - name: frontend-tests
-    image: node:22-alpine
+    image: node:22.11.0-alpine
     volumes:
       - name: cache-node-frontend
         path: /drone/src/openbas-front/node_modules
@@ -52,7 +52,7 @@ steps:
       - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
       - apt update
       - apt install -y yarn
-      - apt install -y nodejs
+      - apt install -y nodejs=22.11.0
       - apt install -y git
       - cd openbas-front
       - yarn install
