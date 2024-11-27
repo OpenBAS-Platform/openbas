@@ -12,14 +12,12 @@ import java.util.List;
 
 public class PayloadFixture {
 
-  private static final Endpoint.PLATFORM_TYPE[] LINUX_PLATFORM =
-          {Endpoint.PLATFORM_TYPE.Linux};
-  private static final Endpoint.PLATFORM_TYPE[] MACOS_PLATFORM =
-          {Endpoint.PLATFORM_TYPE.MacOS};
-  private static final Endpoint.PLATFORM_TYPE[] WINDOWS_PLATFORM =
-          {Endpoint.PLATFORM_TYPE.Windows};
+  private static final Endpoint.PLATFORM_TYPE[] LINUX_PLATFORM = {Endpoint.PLATFORM_TYPE.Linux};
+  private static final Endpoint.PLATFORM_TYPE[] MACOS_PLATFORM = {Endpoint.PLATFORM_TYPE.MacOS};
+  private static final Endpoint.PLATFORM_TYPE[] WINDOWS_PLATFORM = {Endpoint.PLATFORM_TYPE.Windows};
 
-  private static void initializeDefaultPayload(final Payload payload, final Endpoint.PLATFORM_TYPE[] platforms) {
+  private static void initializeDefaultPayload(
+      final Payload payload, final Endpoint.PLATFORM_TYPE[] platforms) {
     payload.setPlatforms(platforms);
     payload.setSource(MANUAL);
     payload.setStatus(VERIFIED);
@@ -51,22 +49,16 @@ public class PayloadFixture {
   }
 
   public static Payload createDefaultDnsResolution() {
-    final DnsResolution dnsResolution = new DnsResolution(
-            "dns-resolution-id",
-            DNS_RESOLUTION_TYPE,
-            "DNS resolution payload"
-    );
+    final DnsResolution dnsResolution =
+        new DnsResolution("dns-resolution-id", DNS_RESOLUTION_TYPE, "DNS resolution payload");
     dnsResolution.setHostname("localhost");
     initializeDefaultPayload(dnsResolution, LINUX_PLATFORM);
     return dnsResolution;
   }
 
   public static Payload createDefaultExecutable() {
-    final Executable executable = new Executable(
-            "executable-id",
-            Executable.EXECUTABLE_TYPE,
-            "Executable payload"
-    );
+    final Executable executable =
+        new Executable("executable-id", Executable.EXECUTABLE_TYPE, "Executable payload");
     executable.setExecutableArch(Endpoint.PLATFORM_ARCH.arm64);
     initializeDefaultPayload(executable, MACOS_PLATFORM);
     return executable;
