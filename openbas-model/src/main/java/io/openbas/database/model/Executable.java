@@ -40,4 +40,12 @@ public class Executable extends Payload {
   public Executable(String id, String type, String name) {
     super(id, type, name);
   }
+
+  /*
+   * return the number of actions a given payload is expected to achieve
+   * by default this is 2 here, one file drop and one execution
+   */
+  public int getNumberOfActions() {
+    return 2;
+  }
 }
