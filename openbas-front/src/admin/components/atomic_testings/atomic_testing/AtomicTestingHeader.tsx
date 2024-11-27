@@ -79,7 +79,8 @@ const AtomicTestingHeader = () => {
     if (!injectResultOverviewOutput.inject_injector_contract) {
       return null;
     }
-    if (injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id) {
+    if (injectResultOverviewOutput.inject_ready) {
+      const launchOrRelaunchKey = !injectResultOverviewOutput.inject_status?.status_id ? 'Launch now' : 'Relaunch now';
       return (
         <Button
           style={{ marginRight: 10 }}
@@ -90,21 +91,7 @@ const AtomicTestingHeader = () => {
           onClick={handleOpenDialog}
           disabled={!canLaunch}
         >
-          {t('Launch now')}
-        </Button>
-      );
-    } else if (injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.status_id) {
-      return (
-        <Button
-          style={{ marginRight: 10 }}
-          startIcon={<PlayArrowOutlined />}
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={handleOpenDialog}
-          disabled={!canLaunch}
-        >
-          {t('Relaunch now')}
+          {t(launchOrRelaunchKey)}
         </Button>
       );
     } else {
