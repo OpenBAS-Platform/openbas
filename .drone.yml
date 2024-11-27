@@ -52,7 +52,7 @@ steps:
       - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
       - apt update
       - apt install -y yarn
-      - apt install -y nodejs=22.11.0
+      - apt install -y nodejs
       - apt install -y git
       - cd openbas-front
       - yarn install
