@@ -17,10 +17,10 @@ import org.springframework.stereotype.Service;
 public class ExecutableInjectService {
 
   private final InjectRepository injectRepository;
+  private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
 
   private List<String> getArgumentsFromCommandLines(String command) {
-    Pattern pattern = Pattern.compile("#\\{([^#{}]+)}");
-    Matcher matcher = pattern.matcher(command);
+    Matcher matcher = argumentsRegex.matcher(command);
     List<String> commandParameters = new ArrayList<>();
 
     while (matcher.find()) {
