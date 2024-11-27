@@ -1,8 +1,11 @@
 package io.openbas.migration;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.converter.PayloadOutputConverter;
 import io.openbas.database.model.PayloadCommandBlock;
 import io.openbas.database.model.PayloadOutput;
+import jakarta.annotation.Resource;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -12,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -21,28 +26,48 @@ public class V3_49__Update_Commands_In_Inject_Status extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Statement select = context.getConnection().createStatement();
 
-    select.execute("ALTER TABLE injects_statuses ADD status_payload_output text;");
+    select.execute("ALTER TABLE injects_statuses ADD status_payload_output jsonb;");
 
+    select.execute("UPDATE injects_statuses SET status_commands_lines=null WHERE status_commands_lines='null';");
     ResultSet results =
-        select.executeQuery("SELECT status_commands_lines FROM injects_statuses");
+        select.executeQuery("SELECT status_id,status_commands_lines FROM injects_statuses");
 
     PreparedStatement statement = context.getConnection().prepareStatement(
-        "INSERT INTO injects_statuses (status_payload_output) VALUES (?) ON CONFLICT DO NOTHING;"
+        "UPDATE injects_statuses SET status_payload_output = ?::jsonb WHERE status_id=?"
     );
 
+    ObjectMapper mapper = new ObjectMapper();
     while (results.next()) {
       String commandLine = results.getString("status_commands_lines");
-      JSONObject jsonObject = new JSONObject(commandLine);
-      String content = jsonObject.getString("content");
-      String cleanupCommand = jsonObject.getString("cleanup_command");
-      String externalId = jsonObject.getString("external_id");
-      PayloadOutput payloadOutput = new PayloadOutput(null, null, null, null, null, null, null, null,
-          externalId, null,
-          null, List.of(new PayloadCommandBlock(null, content, List.of(cleanupCommand))), null);
-      select.executeUpdate("INSERT INTO injects_statuses (status_payload_output) VALUES ('" + payloadOutput
-          + "') ON CONFLICT DO NOTHING;)");
+      String statusId = results.getString("status_id");
+      if (commandLine != null) {
+        JsonNode jsonNode = mapper.readTree(commandLine);
+        JsonNode content = jsonNode.get("content");
+        String contentString = "";
+        if (content.isArray()) {
+          for (JsonNode node : content) {
+            contentString += node.asText();
+          }
+        }
+        JsonNode cleanupCommand = jsonNode.get("cleanup_command");
+        List<String> cleanupCommandList = new ArrayList<>();
+        if (cleanupCommand.isArray()) {
+          for (JsonNode node : cleanupCommand) {
+            cleanupCommandList.add(node.asText());
+          }
+        }
+        String externalId = jsonNode.get("external_id").asText();
+        PayloadOutput payloadOutput = new PayloadOutput(null, null, null, null, null, null, null, null,
+            externalId, null,
+            null, List.of(new PayloadCommandBlock(null, contentString, cleanupCommandList)),
+            null);
+        String value = mapper.writeValueAsString(payloadOutput);
+        statement.setString(1, value);
+        statement.setString(2, statusId);
+        statement.addBatch();
+      }
     }
-
+    statement.executeBatch();
     select.execute("ALTER TABLE injects_statuses DROP column status_commands_lines;");
   }
 
