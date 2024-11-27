@@ -28,6 +28,7 @@ public class HealthCheckApi extends RestBehavior {
     this.healthCheckService = healthCheckService;
   }
 
+  @Autowired
   public void setHealthCheckKey(
       @Value("${openbas.healthcheck.key:#{null}}") String healthCheckKey) {
     this.healthCheckKey = healthCheckKey;
