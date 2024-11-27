@@ -57,6 +57,8 @@ public class HealthCheckService {
     runDatabaseCheck();
     runRabbitMQCheck(createRabbitMQConnectionFactory());
     runFileStorageCheck();
+    //TODO add caldera check
+    //TODO add IMAP check
   }
 
   @VisibleForTesting
@@ -92,6 +94,8 @@ public class HealthCheckService {
   @VisibleForTesting
   protected void runFileStorageCheck() throws HealthCheckFailureException {
     try {
+      // TODO: we should get a new instance to avoid update the timeout on the minio client injected
+      // by spring
       minioClient.setTimeout(2000L, 2000L, 2000L);
       minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioConfig.getBucket()).build());
     } catch (ErrorResponseException
