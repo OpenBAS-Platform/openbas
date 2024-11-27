@@ -50,7 +50,7 @@ public class PayloadFixture {
 
   public static Payload createDefaultDnsResolution() {
     final DnsResolution dnsResolution =
-        new DnsResolution("dns-resolution-id", DNS_RESOLUTION_TYPE, "DNS resolution payload");
+        new DnsResolution("dns-resolution-id", DNS_RESOLUTION_TYPE, "dns resolution payload");
     dnsResolution.setHostname("localhost");
     initializeDefaultPayload(dnsResolution, LINUX_PLATFORM);
     return dnsResolution;
@@ -58,7 +58,7 @@ public class PayloadFixture {
 
   public static Payload createDefaultExecutable() {
     final Executable executable =
-        new Executable("executable-id", Executable.EXECUTABLE_TYPE, "Executable payload");
+        new Executable("executable-id", Executable.EXECUTABLE_TYPE, "executable payload");
     executable.setExecutableArch(Endpoint.PLATFORM_ARCH.arm64);
     initializeDefaultPayload(executable, MACOS_PLATFORM);
     return executable;
