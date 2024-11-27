@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutableInjectService {
 
-  // TODO : type of payload should be an enum objuscator too
-
   private final InjectRepository injectRepository;
 
   private List<String> getArgumentsFromCommandLines(String command) {
@@ -124,23 +122,18 @@ public class ExecutableInjectService {
     }
 
     // Command
-    switch (contract.getPayload().getTypeEnum()) {
-      case PayloadType.COMMAND:
-        Command payloadCommand = (Command) contract.getPayload();
-        payloadCommand.setContent(
-            processAndEncodeCommand(
-                payloadCommand.getContent(),
-                payloadCommand.getExecutor(),
-                contract.getPayload().getArguments(),
-                inject.getContent(),
-                "base64"));
-        return payloadCommand;
-      case PayloadType.EXECUTABLE:
-        // TODO
-        return contract.getPayload();
-      default:
-        throw new UnsupportedOperationException(
-            "Payload type " + contract.getPayload().getType() + " is not supported");
+    if (contract.getPayload().getTypeEnum().equals(PayloadType.COMMAND)) {
+      Command payloadCommand = (Command) contract.getPayload();
+      payloadCommand.setContent(
+          processAndEncodeCommand(
+              payloadCommand.getContent(),
+              payloadCommand.getExecutor(),
+              contract.getPayload().getArguments(),
+              inject.getContent(),
+              "base64"));
+      return payloadCommand;
     }
+
+    return contract.getPayload();
   }
 }
