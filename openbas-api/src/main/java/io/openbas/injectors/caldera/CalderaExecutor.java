@@ -279,34 +279,35 @@ public class CalderaExecutor extends Injector {
   }
 
   @Override
-  public PayloadOutputDto getPayloadOutput(String externalId) {
-    PayloadOutputDto.PayloadOutputBuilder payloadOutputBuilder = PayloadOutputDto.builder();
+  public PayloadOutput getPayloadOutput(String externalId) {
+    PayloadOutput payloadOutput = new PayloadOutput();
     Ability ability = calderaService.findAbilityById(externalId);
     if (ability != null) {
       ability
           .getExecutors()
           .forEach(
               executor -> {
-                PayloadCommandBlock.PayloadCommandBlockBuilder payloadCommandBlockBuilder = PayloadCommandBlock.builder();
+                PayloadCommandBlock payloadCommandBlock = new PayloadCommandBlock();
                 if (executor.getCommand() != null && !executor.getCommand().isBlank()) {
-                  payloadCommandBlockBuilder.content(executor.getCommand());
+                  payloadCommandBlock.setContent(executor.getCommand());
                 }
                 if (executor.getCleanup() != null && !executor.getCleanup().isEmpty()) {
-                  payloadCommandBlockBuilder.cleanupCommand(executor.getCleanup());
+                  payloadCommandBlock.setCleanupCommand(executor.getCleanup());
                 }
                 if (executor.getCommandExecutor() != null && !executor.getCommandExecutor().isBlank()) {
-                  payloadCommandBlockBuilder.executor(executor.getCommandExecutor());
+                  payloadCommandBlock.setExecutor(executor.getCommandExecutor());
                 }
-                payloadOutputBuilder.payloadCommandBlock(payloadCommandBlockBuilder.build());
+                payloadOutput.setPayloadCommandBlocks(Collections.singletonList(payloadCommandBlock));
               });
-      payloadOutputBuilder.name(ability.getName());
-      payloadOutputBuilder.description(ability.getDescription());
-      payloadOutputBuilder.type("Command");
-      payloadOutputBuilder.externalId(externalId);
+
+      /*payloadOutput.setName(ability.getName());
+      payloadOutput.setDescription(ability.getDescription());
+      payloadOutput.setType("Command");*/
+      payloadOutput.setExternalId(externalId);
 
     }
 
-    return payloadOutputBuilder.build();
+    return payloadOutput;
   }
 
   // -- PRIVATE --

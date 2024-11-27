@@ -42,7 +42,7 @@ public class PayloadOutputDto {
 
   @JsonProperty("payload_command_blocks")
   @Singular
-  private List<PayloadCommandBlockDto> payloadCommandBlocks = new ArrayList<>();
+  private List<PayloadCommandBlock> payloadCommandBlocks = new ArrayList<>();
 
   @JsonProperty("payload_arguments")
   private List<PayloadArgument> arguments = new ArrayList<>();
