@@ -10,138 +10,55 @@ import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Scenario.SEVERITY;
 import io.openbas.database.repository.*;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
+import io.openbas.rest.inject.form.InjectDependencyInput;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
 import io.openbas.service.ScenarioService;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Log
+@RequiredArgsConstructor
 public class V1_DataImporter implements Importer {
 
   // region variables
   @Resource protected ObjectMapper mapper;
-  private FileService documentService;
-  private DocumentRepository documentRepository;
-  private TagRepository tagRepository;
-  private ExerciseRepository exerciseRepository;
-  private ScenarioService scenarioService;
-  private TeamRepository teamRepository;
-  private ObjectiveRepository objectiveRepository;
-  private InjectRepository injectRepository;
-  private OrganizationRepository organizationRepository;
-  private UserRepository userRepository;
-  private InjectDocumentRepository injectDocumentRepository;
-  private ChallengeRepository challengeRepository;
-  private ChannelRepository channelRepository;
-  private ArticleRepository articleRepository;
-  private LessonsCategoryRepository lessonsCategoryRepository;
-  private LessonsQuestionRepository lessonsQuestionRepository;
-  private VariableRepository variableRepository;
-
-  // endregion
-
-  // region setter
-  @Autowired
-  public void setLessonsQuestionRepository(LessonsQuestionRepository lessonsQuestionRepository) {
-    this.lessonsQuestionRepository = lessonsQuestionRepository;
-  }
-
-  @Autowired
-  public void setLessonsCategoryRepository(LessonsCategoryRepository lessonsCategoryRepository) {
-    this.lessonsCategoryRepository = lessonsCategoryRepository;
-  }
-
-  @Autowired
-  public void setArticleRepository(ArticleRepository articleRepository) {
-    this.articleRepository = articleRepository;
-  }
-
-  @Autowired
-  public void setChannelRepository(ChannelRepository channelRepository) {
-    this.channelRepository = channelRepository;
-  }
-
-  @Autowired
-  public void setChallengeRepository(ChallengeRepository challengeRepository) {
-    this.challengeRepository = challengeRepository;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setOrganizationRepository(OrganizationRepository organizationRepository) {
-    this.organizationRepository = organizationRepository;
-  }
-
-  @Autowired
-  public void setDocumentRepository(DocumentRepository documentRepository) {
-    this.documentRepository = documentRepository;
-  }
-
-  @Autowired
-  public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
-    this.injectDocumentRepository = injectDocumentRepository;
-  }
-
-  @Autowired
-  public void setDocumentService(FileService documentService) {
-    this.documentService = documentService;
-  }
-
-  @Autowired
-  public void setObjectiveRepository(ObjectiveRepository objectiveRepository) {
-    this.objectiveRepository = objectiveRepository;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
-  }
-
-  @Autowired
-  public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-    this.exerciseRepository = exerciseRepository;
-  }
-
-  @Autowired
-  public void setScenarioService(final ScenarioService scenarioService) {
-    this.scenarioService = scenarioService;
-  }
-
-  @Autowired
-  public void setTeamRepository(TeamRepository teamRepository) {
-    this.teamRepository = teamRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setVariableRepository(@NotNull final VariableRepository variableRepository) {
-    this.variableRepository = variableRepository;
-  }
+  private final FileService documentService;
+  private final DocumentRepository documentRepository;
+  private final TagRepository tagRepository;
+  private final ExerciseRepository exerciseRepository;
+  private final ScenarioService scenarioService;
+  private final TeamRepository teamRepository;
+  private final ObjectiveRepository objectiveRepository;
+  private final InjectRepository injectRepository;
+  private final OrganizationRepository organizationRepository;
+  private final UserRepository userRepository;
+  private final InjectDocumentRepository injectDocumentRepository;
+  private final ChallengeRepository challengeRepository;
+  private final ChannelRepository channelRepository;
+  private final ArticleRepository articleRepository;
+  private final LessonsCategoryRepository lessonsCategoryRepository;
+  private final LessonsQuestionRepository lessonsQuestionRepository;
+  private final VariableRepository variableRepository;
+  private final InjectDependenciesRepository injectDependenciesRepository;
 
   // endregion
 
@@ -456,11 +373,10 @@ public class V1_DataImporter implements Importer {
 
               User existingUser = this.userRepository.findByEmailIgnoreCase(email).orElse(null);
 
-              if (existingUser != null) {
-                baseIds.put(id, existingUser);
-              } else {
-                baseIds.put(id, this.userRepository.save(createUser(nodeUser, baseIds)));
-              }
+              baseIds.put(
+                  id,
+                  Objects.requireNonNullElseGet(
+                      existingUser, () -> this.userRepository.save(createUser(nodeUser, baseIds))));
             });
   }
 
@@ -813,24 +729,65 @@ public class V1_DataImporter implements Importer {
       Exercise savedExercise,
       Scenario savedScenario,
       Map<String, Base> baseIds) {
-    Stream<JsonNode> injectsStream = resolveJsonElements(importNode, prefix + "injects");
+    Supplier<Stream<JsonNode>> injectsStream =
+        () -> resolveJsonElements(importNode, prefix + "injects");
+
+    // Getting a list of all the children of the dependency
+    List<String> children =
+        injectsStream
+            .get()
+            .flatMap(
+                jsonNode -> {
+                  // List of dependencies of the inject
+                  List<JsonNode> dependsOn =
+                      StreamSupport.stream(jsonNode.get("inject_depends_on").spliterator(), false)
+                          .toList();
+
+                  // We return a stream containing all the children of the dependencies of the
+                  // inject
+                  return dependsOn.stream()
+                      .map(
+                          dependency ->
+                              dependency
+                                  .get("dependency_relationship")
+                                  .get("inject_children_id")
+                                  .asText());
+                })
+            .toList();
+
+    // Getting a list of all the injects that have no parents
     Stream<JsonNode> injectsNoParent =
-        injectsStream.filter(jsonNode -> jsonNode.get("inject_depends_on").isNull());
+        injectsStream
+            .get()
+            .filter(jsonNode -> !children.contains(jsonNode.get("inject_id").asText()));
 
     if (savedExercise != null) {
-      importInjects(baseIds, savedExercise.getId(), null, injectsNoParent.toList());
+      importInjects(
+          baseIds,
+          savedExercise.getId(),
+          null,
+          injectsNoParent.toList(),
+          injectsStream.get().toList());
     } else if (savedScenario != null) {
-      importInjects(baseIds, null, savedScenario.getId(), injectsNoParent.toList());
+      importInjects(
+          baseIds,
+          null,
+          savedScenario.getId(),
+          injectsNoParent.toList(),
+          injectsStream.get().toList());
     }
   }
 
   private void importInjects(
-      Map<String, Base> baseIds, String exerciseId, String scenarioId, List<JsonNode> injects) {
-    List<String> injected = new ArrayList<>();
-    injects.forEach(
+      Map<String, Base> baseIds,
+      String exerciseId,
+      String scenarioId,
+      List<JsonNode> injectsToAdd,
+      List<JsonNode> allInjects) {
+    List<String> originalIds = new ArrayList<>();
+    injectsToAdd.forEach(
         injectNode -> {
           String injectId = UUID.randomUUID().toString();
-          injected.add(injectId);
           String id = injectNode.get("inject_id").textValue();
           String title = injectNode.get("inject_title").textValue();
           String description = injectNode.get("inject_description").textValue();
@@ -843,9 +800,6 @@ public class V1_DataImporter implements Importer {
           }
           // If contract is not know, inject can't be imported
           String content = handleInjectContent(baseIds, injectorContractId, injectNode);
-          JsonNode dependsOnNode = injectNode.get("inject_depends_on");
-          String dependsOn =
-              !dependsOnNode.isNull() ? baseIds.get(dependsOnNode.asText()).getId() : null;
           Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
           boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
           if (hasText(exerciseId)) {
@@ -859,7 +813,6 @@ public class V1_DataImporter implements Importer {
                 allTeams,
                 true,
                 exerciseId,
-                dependsOn,
                 dependsDuration,
                 content);
           } else if (hasText(scenarioId)) {
@@ -873,11 +826,38 @@ public class V1_DataImporter implements Importer {
                 allTeams,
                 true,
                 scenarioId,
-                dependsOn,
                 dependsDuration,
                 content);
           }
           baseIds.put(id, new BaseHolder(injectId));
+          originalIds.add(id);
+
+          // Once the inject has been saved, we deal with the dependencies
+          ArrayNode injectDependsOn = (ArrayNode) injectNode.get("inject_depends_on");
+          for (JsonNode dependsOnNode : injectDependsOn) {
+            // If there are dependencies where the added inject is the children, we add it to the
+            // database
+            if (id.equals(
+                dependsOnNode.get("dependency_relationship").get("inject_children_id").asText())) {
+              InjectDependencyInput dependency =
+                  mapper.convertValue(dependsOnNode, InjectDependencyInput.class);
+
+              Optional<Inject> injectParent =
+                  injectRepository.findById(
+                      baseIds.get(dependency.getRelationship().getInjectParentId()).getId());
+              Optional<Inject> injectChildren =
+                  injectRepository.findById(
+                      baseIds.get(dependency.getRelationship().getInjectChildrenId()).getId());
+
+              if (injectParent.isPresent() && injectChildren.isPresent()) {
+                InjectDependency injectDependency = new InjectDependency();
+                injectDependency.getCompositeId().setInjectParent(injectParent.get());
+                injectDependency.getCompositeId().setInjectChildren(injectChildren.get());
+                injectDependency.setInjectDependencyCondition(dependency.getConditions());
+                injectDependenciesRepository.save(injectDependency);
+              }
+            }
+          }
           // Tags
           List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
           injectTagIds.forEach(
@@ -913,17 +893,31 @@ public class V1_DataImporter implements Importer {
                 }
               });
         });
-    // Looking for child of created injects
+    // Looking for children of created injects
     List<JsonNode> childInjects =
-        injects.stream()
+        allInjects.stream()
             .filter(
                 jsonNode -> {
-                  String injectDependsOn = jsonNode.get("inject_depends_on").asText();
-                  return injected.contains(injectDependsOn);
+                  ArrayNode injectDependsOn = (ArrayNode) jsonNode.get("inject_depends_on");
+
+                  // We're getting the parents of this inject
+                  List<String> parents =
+                      StreamSupport.stream(injectDependsOn.spliterator(), false)
+                          .map(
+                              dependency ->
+                                  dependency
+                                      .get("dependency_relationship")
+                                      .get("inject_parent_id")
+                                      .asText())
+                          .toList();
+
+                  // If the parents have been created in this pass, we need to take care of the
+                  // children now
+                  return originalIds.stream().anyMatch(parents::contains);
                 })
             .toList();
     if (!childInjects.isEmpty()) {
-      importInjects(baseIds, exerciseId, scenarioId, childInjects);
+      importInjects(baseIds, exerciseId, scenarioId, childInjects, allInjects);
     }
   }
 
