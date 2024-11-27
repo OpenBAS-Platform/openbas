@@ -361,7 +361,7 @@ public class PayloadApi extends RestBehavior {
     }
     if (Executable.EXECUTABLE_TYPE.equals(payloadType)) {
       if (arch != x86_64 && arch != ARM64) {
-        throw new BadRequestException("Executable architecture must be X86_64 or ARM64.");
+        throw new BadRequestException("Executable architecture must be x86_64 or ARM64.");
       }
     }
   }
