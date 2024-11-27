@@ -42,10 +42,10 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
       <MenuList component="nav">
         <MenuItem
           component={Link}
-          to={`/admin/exercises/${exerciseId}/animation/timeline`}
+          to={`/admin/simulations/${exerciseId}/animation/timeline`}
           selected={
             location.pathname
-            === `/admin/exercises/${exerciseId}/animation/timeline`
+            === `/admin/simulations/${exerciseId}/animation/timeline`
           }
           classes={{ root: classes.item }}
         >
@@ -56,9 +56,9 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
         </MenuItem>
         <MenuItem
           component={Link}
-          to={`/admin/exercises/${exerciseId}/animation/mails`}
+          to={`/admin/simulations/${exerciseId}/animation/mails`}
           selected={location.pathname.includes(
-            `/admin/exercises/${exerciseId}/animation/mails`,
+            `/admin/simulations/${exerciseId}/animation/mails`,
           )}
           classes={{ root: classes.item }}
         >
@@ -69,10 +69,10 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
         </MenuItem>
         <MenuItem
           component={Link}
-          to={`/admin/exercises/${exerciseId}/animation/validations`}
+          to={`/admin/simulations/${exerciseId}/animation/validations`}
           selected={
             location.pathname
-            === `/admin/exercises/${exerciseId}/animation/validations`
+            === `/admin/simulations/${exerciseId}/animation/validations`
           }
           classes={{ root: classes.item }}
         >
@@ -83,10 +83,10 @@ const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
         </MenuItem>
         <MenuItem
           component={Link}
-          to={`/admin/exercises/${exerciseId}/animation/logs`}
+          to={`/admin/simulations/${exerciseId}/animation/logs`}
           selected={
             location.pathname
-            === `/admin/exercises/${exerciseId}/animation/logs`
+            === `/admin/simulations/${exerciseId}/animation/logs`
           }
           classes={{ root: classes.item }}
         >

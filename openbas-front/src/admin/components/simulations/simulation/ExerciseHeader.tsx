@@ -216,7 +216,7 @@ const ExerciseHeader = () => {
         <ExercisePopover
           exercise={exercise}
           actions={actions}
-          onDelete={() => navigate('/admin/exercises')}
+          onDelete={() => navigate('/admin/simulations')}
         />
       </div>
       <div className="clearfix" />

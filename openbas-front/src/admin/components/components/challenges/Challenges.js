@@ -277,7 +277,7 @@ const Challenges = () => {
                               label={exercise.exercise_name}
                               component={Link}
                               clickable={true}
-                              to={`/admin/exercises/${exercise.exercise_id}`}
+                              to={`/admin/simulations/${exercise.exercise_id}`}
                             />
                           </Tooltip>
                         );

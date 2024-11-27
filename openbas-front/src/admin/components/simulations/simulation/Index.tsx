@@ -60,14 +60,14 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
     }),
   };
   let tabValue = location.pathname;
-  if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/definition`)) {
-    tabValue = `/admin/exercises/${exercise.exercise_id}/definition`;
-  } else if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/animation`)) {
-    tabValue = `/admin/exercises/${exercise.exercise_id}/animation`;
-  } else if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/results`)) {
-    tabValue = `/admin/exercises/${exercise.exercise_id}/results`;
-  } else if (location.pathname.includes(`/admin/exercises/${exercise.exercise_id}/tests`)) {
-    tabValue = `/admin/exercises/${exercise.exercise_id}/tests`;
+  if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/definition`)) {
+    tabValue = `/admin/simulations/${exercise.exercise_id}/definition`;
+  } else if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/animation`)) {
+    tabValue = `/admin/simulations/${exercise.exercise_id}/animation`;
+  } else if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/results`)) {
+    tabValue = `/admin/simulations/${exercise.exercise_id}/results`;
+  } else if (location.pathname.includes(`/admin/simulations/${exercise.exercise_id}/tests`)) {
+    tabValue = `/admin/simulations/${exercise.exercise_id}/tests`;
   }
   return (
     <PermissionsContext.Provider value={permissionsContext}>
@@ -76,7 +76,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
           <Breadcrumbs
             variant="object"
             elements={[
-              { label: t('Simulations'), link: '/admin/exercises' },
+              { label: t('Simulations'), link: '/admin/simulations' },
               { label: exercise.exercise_name, current: true },
             ]}
           />
@@ -91,38 +91,38 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
             <Tabs value={tabValue}>
               <Tab
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}`}
-                value={`/admin/exercises/${exercise.exercise_id}`}
+                to={`/admin/simulations/${exercise.exercise_id}`}
+                value={`/admin/simulations/${exercise.exercise_id}`}
                 label={t('Overview')}
               />
               <Tab
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}/definition`}
-                value={`/admin/exercises/${exercise.exercise_id}/definition`}
+                to={`/admin/simulations/${exercise.exercise_id}/definition`}
+                value={`/admin/simulations/${exercise.exercise_id}/definition`}
                 label={t('Definition')}
               />
               <Tab
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}/injects`}
-                value={`/admin/exercises/${exercise.exercise_id}/injects`}
+                to={`/admin/simulations/${exercise.exercise_id}/injects`}
+                value={`/admin/simulations/${exercise.exercise_id}/injects`}
                 label={t('Injects')}
               />
               <Tab
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}/tests`}
-                value={`/admin/exercises/${exercise.exercise_id}/tests`}
+                to={`/admin/simulations/${exercise.exercise_id}/tests`}
+                value={`/admin/simulations/${exercise.exercise_id}/tests`}
                 label={t('Tests')}
               />
               <Tab
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}/animation`}
-                value={`/admin/exercises/${exercise.exercise_id}/animation`}
+                to={`/admin/simulations/${exercise.exercise_id}/animation`}
+                value={`/admin/simulations/${exercise.exercise_id}/animation`}
                 label={t('Animation')}
               />
               <Tab
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}/lessons`}
-                value={`/admin/exercises/${exercise.exercise_id}/lessons`}
+                to={`/admin/simulations/${exercise.exercise_id}/lessons`}
+                value={`/admin/simulations/${exercise.exercise_id}/lessons`}
                 label={t('Lessons learned')}
               />
             </Tabs>

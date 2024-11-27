@@ -380,8 +380,8 @@ const LeftBar = () => {
           <StyledTooltip title={!navOpen && t('Simulations')} placement="right">
             <MenuItem
               component={Link}
-              to="/admin/exercises"
-              selected={location.pathname.includes('/admin/exercises')}
+              to="/admin/simulations"
+              selected={location.pathname.includes('/admin/simulations')}
               dense
               classes={{ root: classes.menuItem }}
             >

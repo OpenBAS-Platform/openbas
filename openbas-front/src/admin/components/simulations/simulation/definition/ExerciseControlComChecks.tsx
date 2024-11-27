@@ -72,7 +72,7 @@ const ExerciseControlComChecks: FunctionComponent<Props> = ({
               classes={{ root: classes.item }}
               divider
               component={Link}
-              to={`/admin/exercises/${exercise.exercise_id}/controls/comchecks/${comcheck.comcheck_id}`}
+              to={`/admin/simulations/${exercise.exercise_id}/controls/comchecks/${comcheck.comcheck_id}`}
             >
               <ListItemIcon>
                 <MarkEmailReadOutlined />

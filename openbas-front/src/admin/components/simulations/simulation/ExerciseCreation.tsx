@@ -21,7 +21,7 @@ const ExerciseCreation = () => {
   const onSubmit = (data: ExerciseInput) => {
     dispatch(addExercise(data)).then((result: { result: string; entities: { scenarios: Record<string, ExerciseStore> } }) => {
       setOpen(false);
-      navigate(`/admin/exercises/${result.result}`);
+      navigate(`/admin/simulations/${result.result}`);
     });
   };
 
