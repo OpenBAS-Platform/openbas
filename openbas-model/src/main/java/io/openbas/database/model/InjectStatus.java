@@ -18,7 +18,7 @@ import lombok.Setter;
 public class InjectStatus extends BaseInjectStatus {
 
   // commands lines tracking
-  @Column(name = "status_payload_output")
+  @Column(name = "status_payload_output", columnDefinition = "jsonb")
   @Convert(converter = PayloadOutputConverter.class)
   @JsonProperty("status_payload_output")
   private PayloadOutput payloadOutput;
