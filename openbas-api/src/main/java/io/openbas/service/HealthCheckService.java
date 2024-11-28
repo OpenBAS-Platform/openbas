@@ -53,6 +53,7 @@ public class HealthCheckService {
 
   @VisibleForTesting
   protected void runDatabaseCheck() {
+    //TODO add timeout
     healthCheckRepository.healthCheck();
   }
 
