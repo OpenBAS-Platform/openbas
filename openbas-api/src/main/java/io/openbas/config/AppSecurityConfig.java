@@ -110,6 +110,8 @@ public class AppSecurityConfig {
             rq ->
                 rq.requestMatchers("/api/health")
                     .permitAll()
+                    .requestMatchers("/api/comcheck/**")
+                    .permitAll()
                     .requestMatchers("/api/player/**")
                     .permitAll()
                     .requestMatchers("/api/player/**")
