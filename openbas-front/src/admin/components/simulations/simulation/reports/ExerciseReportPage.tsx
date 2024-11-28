@@ -81,7 +81,7 @@ const ExerciseReportPage: React.FC = () => {
           color="primary"
           variant="outlined"
           component={Link}
-          to={`/admin/exercises/${exerciseId}`}
+          to={`/admin/simulations/${exerciseId}`}
         >
           {t('Back to administration')}
         </Button>

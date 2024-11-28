@@ -177,7 +177,7 @@ const ExerciseList: FunctionComponent<Props> = ({
               <ListItemButton
                 classes={{ root: classes.item }}
                 component={Link}
-                to={`/admin/exercises/${exercise.exercise_id}`}
+                to={`/admin/simulations/${exercise.exercise_id}`}
               >
                 <ListItemIcon>
                   <HubOutlined color="primary" />

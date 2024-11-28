@@ -72,7 +72,7 @@ const ExerciseControlDryRuns: FunctionComponent<Props> = ({
               classes={{ root: classes.item }}
               divider
               component={Link}
-              to={`/admin/exercises/${exercise.exercise_id}/controls/dryruns/${dryrun.dryrun_id}`}
+              to={`/admin/simulations/${exercise.exercise_id}/controls/dryruns/${dryrun.dryrun_id}`}
             >
               <ListItemIcon>
                 <VideoSettingsOutlined />

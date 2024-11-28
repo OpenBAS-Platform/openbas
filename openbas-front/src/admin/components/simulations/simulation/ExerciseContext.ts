@@ -65,7 +65,7 @@ const injectContextForExercise = (exercise: ExerciseStore) => {
     },
     bulkTestInjects(injectIds: string[]): Promise<{ uri: string; data: InjectTestStatus[] }> {
       return bulkTestInjects(injectIds).then(result => ({
-        uri: `/admin/exercises/${exercise.exercise_id}/tests`,
+        uri: `/admin/simulations/${exercise.exercise_id}/tests`,
         data: result.data,
       }));
     },

@@ -183,7 +183,7 @@ const ScenarioHeader = ({
               setOpenInstantiateSimulationAndStart(false);
               const exercise: Exercise = (await createRunningExerciseFromScenario(scenarioId)).data;
               MESSAGING$.notifySuccess(t('New simulation successfully created and started. Click {here} to view the simulation.', {
-                here: <Link to={`/admin/exercises/${exercise.exercise_id}`}>{t('here')}</Link>,
+                here: <Link to={`/admin/simulations/${exercise.exercise_id}`}>{t('here')}</Link>,
               }));
             }}
           >

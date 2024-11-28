@@ -61,7 +61,7 @@ const ExerciseSettings = () => {
 
   return (
     <>
-      <DefinitionMenu base="/admin/exercises" id={exercise.exercise_id} />
+      <DefinitionMenu base="/admin/simulations" id={exercise.exercise_id} />
       <Grid container spacing={3} style={{ marginBottom: 24 }}>
         <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
           <PaperMetric title={t('Players')} icon={<PersonOutlined />} number={exercise.exercise_users_number ?? '-'} />

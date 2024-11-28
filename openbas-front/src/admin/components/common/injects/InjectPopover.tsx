@@ -134,7 +134,7 @@ const InjectPopover: FunctionComponent<Props> = ({
     testInject(inject.inject_id).then((result: { data: InjectTestStatus }) => {
       if (isExercise) {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
-          itsDedicatedPage: <Link to={`/admin/exercises/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link>,
+          itsDedicatedPage: <Link to={`/admin/simulations/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link>,
         }));
       } else {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {

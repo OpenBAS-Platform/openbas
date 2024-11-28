@@ -240,7 +240,7 @@ const TimelineOverview = () => {
                       classes={{ root: classes.item }}
                       divider
                       component={Link}
-                      to={`/admin/exercises/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/exercises/${exerciseId}/animation/timeline`}
+                      to={`/admin/simulations/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/simulations/${exerciseId}/animation/timeline`}
                     >
                       <ListItemIcon>
                         <InjectIcon

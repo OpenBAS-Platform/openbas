@@ -224,7 +224,7 @@ const Documents = () => {
                                   // prevent parent link from triggering
                                   event.stopPropagation();
                                   event.preventDefault();
-                                  navigate(`/admin/exercises/${exercise.exercise_id}`);
+                                  navigate(`/admin/simulations/${exercise.exercise_id}`);
                                 }
                               }
                             />
