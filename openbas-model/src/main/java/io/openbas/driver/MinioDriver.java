@@ -16,9 +16,9 @@ public class MinioDriver {
   private final MinioConfig minioConfig;
   private final S3Config s3Config;
 
-
   /**
    * Create the Minio Client
+   *
    * @return
    * @throws Exception
    */
@@ -32,16 +32,16 @@ public class MinioDriver {
       IamAwsProvider provider = new IamAwsProvider(stsEndpoint, null);
 
       minioClient =
-              MinioClient.builder()
-                      .endpoint(minioConfig.getEndpoint())
-                      .credentialsProvider(provider)
-                      .build();
+          MinioClient.builder()
+              .endpoint(minioConfig.getEndpoint())
+              .credentialsProvider(provider)
+              .build();
     } else {
       minioClient =
-              MinioClient.builder()
-                      .endpoint(minioConfig.getEndpoint(), minioConfig.getPort(), minioConfig.isSecure())
-                      .credentials(minioConfig.getAccessKey(), minioConfig.getAccessSecret())
-                      .build();
+          MinioClient.builder()
+              .endpoint(minioConfig.getEndpoint(), minioConfig.getPort(), minioConfig.isSecure())
+              .credentials(minioConfig.getAccessKey(), minioConfig.getAccessSecret())
+              .build();
     }
     return minioClient;
   }
