@@ -12,7 +12,6 @@ import io.minio.errors.*;
 import io.openbas.config.MinioConfig;
 import io.openbas.database.repository.*;
 import io.openbas.driver.MinioDriver;
-import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.service.exception.HealthCheckFailureException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -35,7 +34,6 @@ class HealthCheckServiceTest {
   @Mock private MinioClient minioClient;
   @Mock private ConnectionFactory connectionFactory;
   @Mock private Connection connection;
-  @Mock private CalderaExecutorClient calderaExecutorClient;
 
   @InjectMocks private HealthCheckService healthCheckService;
 
@@ -58,8 +56,7 @@ class HealthCheckServiceTest {
   @DisplayName("Test runFileStorageCheck when check fails ")
   @Test
   void test_runFileStorageCheck_WHEN_client_throws_exception()
-      throws HealthCheckFailureException,
-          ServerException,
+      throws ServerException,
           InsufficientDataException,
           ErrorResponseException,
           IOException,
@@ -88,7 +85,7 @@ class HealthCheckServiceTest {
   @DisplayName("Test runRabbitMQCheck when check fails")
   @Test
   void test_runRabbitMQCheck_WHEN_connection_throws_exception()
-      throws HealthCheckFailureException, IOException, TimeoutException {
+      throws IOException, TimeoutException {
     when(connectionFactory.newConnection()).thenThrow(new TimeoutException());
     assertThrows(
         HealthCheckFailureException.class,

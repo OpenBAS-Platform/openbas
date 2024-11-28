@@ -9,7 +9,6 @@ import io.openbas.config.MinioConfig;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.repository.HealthCheckRepository;
 import io.openbas.driver.MinioDriver;
-import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.service.exception.HealthCheckFailureException;
 import jakarta.annotation.Resource;
 import java.io.IOException;
@@ -31,8 +30,6 @@ public class HealthCheckService {
 
   @Autowired private MinioDriver minioDriver;
 
-  @Autowired private CalderaExecutorClient client;
-
   @Resource private RabbitmqConfig rabbitmqConfig;
 
   /**
@@ -49,7 +46,6 @@ public class HealthCheckService {
 
   @VisibleForTesting
   protected void runDatabaseCheck() {
-    // TODO add timeout
     healthCheckRepository.healthCheck();
   }
 
