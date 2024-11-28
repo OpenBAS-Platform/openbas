@@ -11,6 +11,7 @@ import io.minio.MinioClient;
 import io.minio.errors.*;
 import io.openbas.config.MinioConfig;
 import io.openbas.database.repository.*;
+import io.openbas.driver.MinioDriver;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.service.exception.HealthCheckFailureException;
 import java.io.IOException;
@@ -30,6 +31,7 @@ class HealthCheckServiceTest {
 
   @Mock private HealthCheckRepository healthCheckRepository;
   @Mock private MinioConfig minioConfig;
+  @Mock private MinioDriver minioDriver;
   @Mock private MinioClient minioClient;
   @Mock private ConnectionFactory connectionFactory;
   @Mock private Connection connection;
@@ -46,17 +48,8 @@ class HealthCheckServiceTest {
 
   @DisplayName("Test runFileStorageCheck")
   @Test
-  void test_runFileStorageCheck()
-      throws HealthCheckFailureException,
-          ServerException,
-          InsufficientDataException,
-          ErrorResponseException,
-          IOException,
-          NoSuchAlgorithmException,
-          InvalidKeyException,
-          InvalidResponseException,
-          XmlParserException,
-          InternalException {
+  void test_runFileStorageCheck() throws Exception {
+    when(minioDriver.getMinioClient()).thenReturn(minioClient);
     when(minioConfig.getBucket()).thenReturn(BUCKET);
     healthCheckService.runFileStorageCheck();
     verify(minioClient).bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build());

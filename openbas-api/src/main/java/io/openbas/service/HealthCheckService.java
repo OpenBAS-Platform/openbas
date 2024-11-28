@@ -5,16 +5,14 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
-import io.minio.errors.*;
 import io.openbas.config.MinioConfig;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.repository.HealthCheckRepository;
+import io.openbas.driver.MinioDriver;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.service.exception.HealthCheckFailureException;
 import jakarta.annotation.Resource;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -31,7 +29,7 @@ public class HealthCheckService {
 
   @Autowired private MinioConfig minioConfig;
 
-  @Autowired private MinioClient minioClient;
+  @Autowired private MinioDriver minioDriver;
 
   @Autowired private CalderaExecutorClient client;
 
@@ -53,7 +51,7 @@ public class HealthCheckService {
 
   @VisibleForTesting
   protected void runDatabaseCheck() {
-    //TODO add timeout
+    // TODO add timeout
     healthCheckRepository.healthCheck();
   }
 
@@ -79,25 +77,26 @@ public class HealthCheckService {
       connection.createChannel();
     } catch (IOException | TimeoutException e) {
       throw new HealthCheckFailureException("RabbitMQ check failure", e);
+    } finally {
+      if (connection != null) {
+        try {
+          connection.close();
+        } catch (IOException e) {
+          log.severe(
+              "Unable to close RabbitMQ connection. You should worry as this could impact performance");
+        }
+      }
     }
   }
 
   @VisibleForTesting
   protected void runFileStorageCheck() throws HealthCheckFailureException {
     try {
-      // TODO: we should get a new instance to avoid update the timeout on the minio client injected
-      // by spring
+      // we get a new client instance to avoid to update the client injected by Spring
+      MinioClient minioClient = minioDriver.getMinioClient();
       minioClient.setTimeout(2000L, 2000L, 2000L);
       minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioConfig.getBucket()).build());
-    } catch (ErrorResponseException
-        | InsufficientDataException
-        | InternalException
-        | InvalidKeyException
-        | InvalidResponseException
-        | IOException
-        | NoSuchAlgorithmException
-        | ServerException
-        | XmlParserException e) {
+    } catch (Exception e) {
       throw new HealthCheckFailureException("FileStorage check failure", e);
     }
   }
