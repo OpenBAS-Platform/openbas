@@ -104,7 +104,6 @@ public class HealthCheckService {
   @VisibleForTesting
   protected void runCalderaCheck() throws HealthCheckFailureException {
     try {
-      // TODO add timeout
       this.client.healthCheck();
     } catch (Exception e) {
       throw new HealthCheckFailureException("Caldera check failure", e);

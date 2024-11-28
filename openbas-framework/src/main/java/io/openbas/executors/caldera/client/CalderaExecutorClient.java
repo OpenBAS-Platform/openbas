@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
@@ -21,6 +22,7 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -324,13 +326,20 @@ public class CalderaExecutorClient {
   }
 
   /**
-   * @return the response
+   * Call the Caldera health api with a 2s Timeout
+   *
+   * @return the response from caldera
    * @throws IOException
    */
   public String healthCheck() throws Exception {
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
       HttpGet httpGet = new HttpGet(this.config.getRestApiV2Url() + HEALTH_URI);
-
+      RequestConfig requestConfig =
+          RequestConfig.copy(RequestConfig.DEFAULT)
+              .setConnectionRequestTimeout(2L, TimeUnit.SECONDS)
+              .setResponseTimeout(2L, TimeUnit.SECONDS)
+              .build();
+      httpGet.setConfig(requestConfig);
       // Headers
       httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
       CloseableHttpResponse response = httpClient.execute(httpGet);
