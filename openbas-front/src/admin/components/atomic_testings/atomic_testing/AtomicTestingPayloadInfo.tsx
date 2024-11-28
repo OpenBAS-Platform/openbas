@@ -33,11 +33,10 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} style={{ marginBottom: 30 }}>
+      {/* <Grid item xs={12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Payload')}</Typography>
         {injectResultOverviewOutput ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
@@ -120,8 +119,8 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             <Typography variant="body1">{t('No data available')}</Typography>
           </Paper>
         )}
-      </Grid>
-      <Grid item xs={12} style={{ marginBottom: 30 }}>
+      </Grid> */}
+      {/* <Grid item xs={12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Commands')}</Typography>
         {injectResultOverviewOutput ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
@@ -375,7 +374,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             <Typography variant="body1">{t('No data available')}</Typography>
           </Paper>
         )}
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };
