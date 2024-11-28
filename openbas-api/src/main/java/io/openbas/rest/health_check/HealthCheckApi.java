@@ -3,6 +3,9 @@ package io.openbas.rest.health_check;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.HealthCheckService;
 import io.openbas.service.exception.HealthCheckFailureException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +38,14 @@ public class HealthCheckApi extends RestBehavior {
   }
 
   @GetMapping(HEALTH_CHECK_URI)
+  @Operation(
+      summary = "Run an healthcheck ",
+      description = "Tries to connect to dependencies (DB/Minio/RabbitMQ)")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Service is healthy"),
+        @ApiResponse(responseCode = "503", description = "Service is not running properly")
+      })
   public ResponseEntity<?> healthCheck(
       @RequestParam("health_access_key") String requestHealthAccessKey) {
     if (StringUtils.isEmpty(requestHealthAccessKey)
