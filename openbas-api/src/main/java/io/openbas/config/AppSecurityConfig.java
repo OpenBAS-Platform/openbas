@@ -114,8 +114,6 @@ public class AppSecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/player/**")
                     .permitAll()
-                    .requestMatchers("/api/player/**")
-                    .permitAll()
                     .requestMatchers("/api/settings")
                     .permitAll()
                     .requestMatchers("/api/agent/**")
