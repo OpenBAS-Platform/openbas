@@ -96,22 +96,4 @@ class HealthCheckServiceTest {
           healthCheckService.runRabbitMQCheck(connectionFactory);
         });
   }
-
-  @DisplayName("Test runCalderaCheck")
-  @Test
-  void test_runCalderaCheck() throws Exception {
-    healthCheckService.runCalderaCheck();
-    verify(calderaExecutorClient).healthCheck();
-  }
-
-  @DisplayName("Test runCalderaCheck when check fails")
-  @Test
-  void test_runCalderaCheck_WHEN_connection_throws_exception() throws Exception {
-    when(calderaExecutorClient.healthCheck()).thenThrow(new IOException());
-    assertThrows(
-        HealthCheckFailureException.class,
-        () -> {
-          healthCheckService.runCalderaCheck();
-        });
-  }
 }

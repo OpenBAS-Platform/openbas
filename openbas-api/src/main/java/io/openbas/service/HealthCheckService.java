@@ -44,9 +44,7 @@ public class HealthCheckService {
   public void runHealthCheck() throws HealthCheckFailureException {
     runDatabaseCheck();
     runRabbitMQCheck(createRabbitMQConnectionFactory());
-    runCalderaCheck();
     runFileStorageCheck();
-    // TODO add IMAP check
   }
 
   @VisibleForTesting
@@ -98,15 +96,6 @@ public class HealthCheckService {
       minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioConfig.getBucket()).build());
     } catch (Exception e) {
       throw new HealthCheckFailureException("FileStorage check failure", e);
-    }
-  }
-
-  @VisibleForTesting
-  protected void runCalderaCheck() throws HealthCheckFailureException {
-    try {
-      this.client.healthCheck();
-    } catch (Exception e) {
-      throw new HealthCheckFailureException("Caldera check failure", e);
     }
   }
 }

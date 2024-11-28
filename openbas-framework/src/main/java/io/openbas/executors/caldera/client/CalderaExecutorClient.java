@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
@@ -22,13 +21,10 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -45,8 +41,6 @@ public class CalderaExecutorClient {
 
   private static final String AGENT_URI = "/agents";
 
-  private static final String HEALTH_URI = "/health";
-
   public List<Agent> agents() {
     try {
       String jsonResponse = this.get(AGENT_URI);
@@ -60,7 +54,7 @@ public class CalderaExecutorClient {
   public void deleteAgent(Endpoint endpoint) {
     try {
       this.delete(
-          this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
+              this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -84,66 +78,66 @@ public class CalderaExecutorClient {
       List<Map<String, String>> executors = new ArrayList<>();
       Map<String, String> injectorExecutorCommands = injector.getExecutorCommands();
       if (injectorExecutorCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
+              Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
         Map<String, String> executorWindows = new HashMap<>();
         executorWindows.put("platform", "windows");
         executorWindows.put("name", "psh");
         executorWindows.put(
-            "command",
-            injectorExecutorCommands.get(
-                Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
+                "command",
+                injectorExecutorCommands.get(
+                        Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
         executors.add(executorWindows);
       } else if (injectorExecutorCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+              Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
         Map<String, String> executorWindows = new HashMap<>();
         executorWindows.put("platform", "windows");
         executorWindows.put("name", "psh");
         executorWindows.put(
-            "command",
-            injectorExecutorCommands.get(
-                Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                "command",
+                injectorExecutorCommands.get(
+                        Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
         executors.add(executorWindows);
       }
       if (injectorExecutorCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
+              Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
         Map<String, String> executorLinux = new HashMap<>();
         executorLinux.put("platform", "linux");
         executorLinux.put("name", "sh");
         executorLinux.put(
-            "command",
-            injectorExecutorCommands.get(
-                Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
+                "command",
+                injectorExecutorCommands.get(
+                        Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
         executors.add(executorLinux);
       } else if (injectorExecutorCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+              Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
         Map<String, String> executorLinux = new HashMap<>();
         executorLinux.put("platform", "linux");
         executorLinux.put("name", "sh");
         executorLinux.put(
-            "command",
-            injectorExecutorCommands.get(
-                Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                "command",
+                injectorExecutorCommands.get(
+                        Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
         executors.add(executorLinux);
       }
       if (injectorExecutorCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
+              Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
         Map<String, String> executorMac = new HashMap<>();
         executorMac.put("platform", "darwin");
         executorMac.put("name", "sh");
         executorMac.put(
-            "command",
-            injectorExecutorCommands.get(
-                Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
+                "command",
+                injectorExecutorCommands.get(
+                        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
         executors.add(executorMac);
       } else if (injectorExecutorCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+              Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
         Map<String, String> executorMac = new HashMap<>();
         executorMac.put("platform", "darwin");
         executorMac.put("name", "sh");
         executorMac.put(
-            "command",
-            injectorExecutorCommands.get(
-                Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                "command",
+                injectorExecutorCommands.get(
+                        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
         executors.add(executorMac);
       }
       Map<String, Object> body = new HashMap<>();
@@ -164,66 +158,66 @@ public class CalderaExecutorClient {
       List<Map<String, String>> executors = new ArrayList<>();
       Map<String, String> injectorExecutorClearCommands = injector.getExecutorClearCommands();
       if (injectorExecutorClearCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
+              Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
         Map<String, String> executorWindows = new HashMap<>();
         executorWindows.put("platform", "windows");
         executorWindows.put("name", "psh");
         executorWindows.put(
-            "command",
-            injectorExecutorClearCommands.get(
-                Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
+                "command",
+                injectorExecutorClearCommands.get(
+                        Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
         executors.add(executorWindows);
       } else if (injectorExecutorClearCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+              Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
         Map<String, String> executorWindows = new HashMap<>();
         executorWindows.put("platform", "windows");
         executorWindows.put("name", "psh");
         executorWindows.put(
-            "command",
-            injectorExecutorClearCommands.get(
-                Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                "command",
+                injectorExecutorClearCommands.get(
+                        Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
         executors.add(executorWindows);
       }
       if (injectorExecutorClearCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
+              Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
         Map<String, String> executorLinux = new HashMap<>();
         executorLinux.put("platform", "linux");
         executorLinux.put("name", "sh");
         executorLinux.put(
-            "command",
-            injectorExecutorClearCommands.get(
-                Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
+                "command",
+                injectorExecutorClearCommands.get(
+                        Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
         executors.add(executorLinux);
       } else if (injectorExecutorClearCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+              Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
         Map<String, String> executorLinux = new HashMap<>();
         executorLinux.put("platform", "linux");
         executorLinux.put("name", "sh");
         executorLinux.put(
-            "command",
-            injectorExecutorClearCommands.get(
-                Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                "command",
+                injectorExecutorClearCommands.get(
+                        Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
         executors.add(executorLinux);
       }
       if (injectorExecutorClearCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
+              Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64)) {
         Map<String, String> executorMac = new HashMap<>();
         executorMac.put("platform", "darwin");
         executorMac.put("name", "sh");
         executorMac.put(
-            "command",
-            injectorExecutorClearCommands.get(
-                Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
+                "command",
+                injectorExecutorClearCommands.get(
+                        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64));
         executors.add(executorMac);
       } else if (injectorExecutorClearCommands.containsKey(
-          Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
+              Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64)) {
         Map<String, String> executorMac = new HashMap<>();
         executorMac.put("platform", "darwin");
         executorMac.put("name", "sh");
         executorMac.put(
-            "command",
-            injectorExecutorClearCommands.get(
-                Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
+                "command",
+                injectorExecutorClearCommands.get(
+                        Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64));
         executors.add(executorMac);
       }
       Map<String, Object> body = new HashMap<>();
@@ -252,10 +246,10 @@ public class CalderaExecutorClient {
   private static final String EXPLOIT_URI = "/exploit";
 
   public void exploit(
-      @NotBlank final String obfuscator,
-      @NotBlank final String paw,
-      @NotBlank final String abilityId,
-      final List<Map<String, String>> additionalFields) {
+          @NotBlank final String obfuscator,
+          @NotBlank final String paw,
+          @NotBlank final String abilityId,
+          final List<Map<String, String>> additionalFields) {
     try {
       Map<String, Object> body = new HashMap<>();
       body.put("obfuscator", obfuscator);
@@ -284,7 +278,7 @@ public class CalderaExecutorClient {
   }
 
   private String post(@NotBlank final String url, @NotNull final Map<String, Object> body)
-      throws IOException {
+          throws IOException {
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
       HttpPost httpPost = new HttpPost(url);
       // Headers
@@ -300,7 +294,7 @@ public class CalderaExecutorClient {
   }
 
   private void patch(@NotBlank final String url, @NotNull final Map<String, Object> body)
-      throws IOException {
+          throws IOException {
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
       HttpPatch httpPatch = new HttpPatch(url);
       // Headers
@@ -322,33 +316,6 @@ public class CalderaExecutorClient {
       httpClient.execute(httpdelete);
     } catch (IOException e) {
       throw new ClientProtocolException("Unexpected response for request on: " + url);
-    }
-  }
-
-  /**
-   * Call the Caldera health api with a 2s Timeout
-   *
-   * @return the response from caldera
-   * @throws IOException
-   */
-  public String healthCheck() throws Exception {
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-      HttpGet httpGet = new HttpGet(this.config.getRestApiV2Url() + HEALTH_URI);
-      RequestConfig requestConfig =
-          RequestConfig.copy(RequestConfig.DEFAULT)
-              .setConnectionRequestTimeout(2L, TimeUnit.SECONDS)
-              .setResponseTimeout(2L, TimeUnit.SECONDS)
-              .build();
-      httpGet.setConfig(requestConfig);
-      // Headers
-      httpGet.addHeader(KEY_HEADER, this.config.getApiKey());
-      CloseableHttpResponse response = httpClient.execute(httpGet);
-      if (!HttpStatus.valueOf(response.getCode()).is2xxSuccessful()) {
-        throw new Exception("Caldera health check request failed");
-      }
-      return response.getEntity().toString();
-    } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + HEALTH_URI);
     }
   }
 }
