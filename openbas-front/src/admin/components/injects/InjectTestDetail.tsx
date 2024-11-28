@@ -94,7 +94,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
           {test ? (
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <Typography variant="subtitle1" className={classes.header} gutterBottom>
-                {t('Status')}
+                {t('Execution status')}
               </Typography>
               {test.status_name
               && <ItemStatus isInject={true} status={test.status_name} label={t(test.status_name)} />}
