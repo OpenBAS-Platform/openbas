@@ -137,6 +137,24 @@ export interface AssetGroupOutput {
   asset_group_tags?: string[];
 }
 
+/** Full contract */
+export interface AtomicInjectorContractOutput {
+  convertedContent?: object;
+  injector_contract_content: string;
+  injector_contract_id: string;
+  injector_contract_labels: Record<string, string>;
+  injector_contract_platforms?: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
+}
+
 export interface AtomicTestingInput {
   inject_all_teams?: boolean;
   inject_asset_groups?: string[];
@@ -183,7 +201,7 @@ export interface AttackPatternCreateInput {
 }
 
 /** Attack pattern */
-export interface AttackPatternSimple {
+export interface AttackPatternSimpleDto {
   attack_pattern_external_id: string;
   attack_pattern_id: string;
   attack_pattern_name: string;
@@ -199,6 +217,38 @@ export interface AttackPatternUpdateInput {
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
 }
+
+interface BasePayload {
+  listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPattern[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
+  /** @format date-time */
+  payload_created_at: string;
+  payload_description?: string;
+  payload_elevation_required?: boolean;
+  payload_external_id?: string;
+  payload_id: string;
+  payload_name: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  /** @uniqueItems true */
+  payload_tags?: Tag[];
+  payload_type?: string;
+  /** @format date-time */
+  payload_updated_at: string;
+}
+
+type BasePayloadPayloadTypeMapping<Key, Type> = {
+  payload_type: Key;
+} & Type;
 
 export interface Challenge {
   challenge_category?: string;
@@ -393,6 +443,36 @@ export interface ComcheckStatus {
   listened?: boolean;
 }
 
+export interface Command {
+  command_content: string;
+  command_executor: string;
+  listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPattern[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
+  /** @format date-time */
+  payload_created_at: string;
+  payload_description?: string;
+  payload_elevation_required?: boolean;
+  payload_external_id?: string;
+  payload_id: string;
+  payload_name: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  /** @uniqueItems true */
+  payload_tags?: Tag[];
+  payload_type?: string;
+  /** @format date-time */
+  payload_updated_at: string;
+}
+
 export interface Communication {
   communication_ack?: boolean;
   communication_animation?: boolean;
@@ -437,6 +517,35 @@ export interface DirectInjectInput {
   inject_injector_contract?: string;
   inject_title?: string;
   inject_users?: string[];
+}
+
+export interface DnsResolution {
+  dns_resolution_hostname: string;
+  listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPattern[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
+  /** @format date-time */
+  payload_created_at: string;
+  payload_description?: string;
+  payload_elevation_required?: boolean;
+  payload_external_id?: string;
+  payload_id: string;
+  payload_name: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  /** @uniqueItems true */
+  payload_tags?: Tag[];
+  payload_type?: string;
+  /** @format date-time */
+  payload_updated_at: string;
 }
 
 export interface Document {
@@ -617,6 +726,36 @@ export interface Evaluation {
 export interface EvaluationInput {
   /** @format int64 */
   evaluation_score?: number;
+}
+
+export interface Executable {
+  executable_arch: "x86_64" | "arm64" | "Unknown";
+  executable_file?: Document;
+  listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPattern[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
+  /** @format date-time */
+  payload_created_at: string;
+  payload_description?: string;
+  payload_elevation_required?: boolean;
+  payload_external_id?: string;
+  payload_id: string;
+  payload_name: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  /** @uniqueItems true */
+  payload_tags?: Tag[];
+  payload_type?: string;
+  /** @format date-time */
+  payload_updated_at: string;
 }
 
 export interface Executor {
@@ -847,6 +986,35 @@ export interface ExpectationUpdateInput {
 export interface ExportMapperInput {
   export_mapper_name?: string;
   ids_to_export: string[];
+}
+
+export interface FileDrop {
+  file_drop_file?: Document;
+  listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPattern[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
+  /** @format date-time */
+  payload_created_at: string;
+  payload_description?: string;
+  payload_elevation_required?: boolean;
+  payload_external_id?: string;
+  payload_id: string;
+  payload_name: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  /** @uniqueItems true */
+  payload_tags?: Tag[];
+  payload_type?: string;
+  /** @format date-time */
+  payload_updated_at: string;
 }
 
 export interface Filter {
@@ -1233,7 +1401,7 @@ export interface InjectResultOutput {
   inject_expectation_results: ExpectationResultsByType[];
   /** Id of inject */
   inject_id: string;
-  /** Full contract */
+  /** Injector contract */
   inject_injector_contract?: InjectorContractSimple;
   /** Status */
   inject_status?: InjectStatusSimple;
@@ -1251,8 +1419,7 @@ export interface InjectResultOutput {
 
 export interface InjectResultOverviewOutput {
   /** Attack pattern */
-  inject_attack_patterns?: AttackPatternSimple[];
-  inject_commands_lines?: InjectStatusCommandLine;
+  inject_attack_patterns?: AttackPatternSimpleDto[];
   inject_content?: object;
   /** Description of inject */
   inject_description?: string;
@@ -1263,7 +1430,7 @@ export interface InjectResultOverviewOutput {
   /** Id of inject */
   inject_id: string;
   /** Full contract */
-  inject_injector_contract: InjectorContractSimple;
+  inject_injector_contract: AtomicInjectorContractOutput;
   /** Kill chain phases */
   inject_kill_chain_phases?: KillChainPhaseSimple[];
   /** Indicates whether the inject is ready for use */
@@ -1289,7 +1456,6 @@ export interface InjectResultOverviewOutput {
 
 export interface InjectStatus {
   listened?: boolean;
-  status_commands_lines?: InjectStatusCommandLine;
   status_id?: string;
   status_name:
     | "SUCCESS"
@@ -1301,6 +1467,7 @@ export interface InjectStatus {
     | "PENDING"
     | "PARTIAL"
     | "MAYBE_PARTIAL_PREVENTED";
+  status_payload_output?: PayloadOutput;
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -1316,12 +1483,6 @@ export interface InjectStatus {
   tracking_total_execution_time?: number;
   /** @format int32 */
   tracking_total_success?: number;
-}
-
-export interface InjectStatusCommandLine {
-  cleanup_command?: string[];
-  content?: string[];
-  external_id?: string;
 }
 
 export interface InjectStatusExecution {
@@ -1536,7 +1697,7 @@ export interface InjectorContractOutput {
   )[];
 }
 
-/** Full contract */
+/** Injector contract */
 export interface InjectorContractSimple {
   convertedContent?: object;
   injector_contract_content: string;
@@ -1877,6 +2038,41 @@ export interface MitigationUpdateInput {
 
 export interface MitigationUpsertInput {
   mitigations?: MitigationCreateInput[];
+}
+
+export interface NetworkTraffic {
+  listened?: boolean;
+  network_traffic_ip_dst: string;
+  network_traffic_ip_src: string;
+  /** @format int32 */
+  network_traffic_port_dst: number;
+  /** @format int32 */
+  network_traffic_port_src: number;
+  network_traffic_protocol: string;
+  /** @format int32 */
+  numberOfActions?: number;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPattern[];
+  payload_cleanup_command?: string;
+  payload_cleanup_executor?: string;
+  payload_collector?: Collector;
+  payload_collector_type?: string;
+  /** @format date-time */
+  payload_created_at: string;
+  payload_description?: string;
+  payload_elevation_required?: boolean;
+  payload_external_id?: string;
+  payload_id: string;
+  payload_name: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  /** @uniqueItems true */
+  payload_tags?: Tag[];
+  payload_type?: string;
+  /** @format date-time */
+  payload_updated_at: string;
 }
 
 export interface OAuthProvider {
@@ -2357,38 +2553,36 @@ export interface PageableObject {
   unpaged?: boolean;
 }
 
-export interface Payload {
+export interface Pause {
   listened?: boolean;
-  /** @format int32 */
-  numberOfActions?: number;
-  payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: string[];
-  payload_cleanup_command?: string;
-  payload_cleanup_executor?: string;
-  payload_collector?: string;
-  payload_collector_type?: string;
+  log_id?: string;
   /** @format date-time */
-  payload_created_at: string;
-  payload_description?: string;
-  payload_elevation_required?: boolean;
-  payload_external_id?: string;
-  payload_id: string;
-  payload_name: string;
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
-  payload_prerequisites?: PayloadPrerequisite[];
-  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
-  payload_tags?: string[];
-  payload_type?: string;
-  /** @format date-time */
-  payload_updated_at: string;
+  pause_date?: string;
+  /** @format int64 */
+  pause_duration?: number;
+  pause_exercise?: Exercise;
 }
+
+export type Payload = BasePayload &
+  (
+    | BasePayloadPayloadTypeMapping<"Command", Command>
+    | BasePayloadPayloadTypeMapping<"Executable", Executable>
+    | BasePayloadPayloadTypeMapping<"File", FileDrop>
+    | BasePayloadPayloadTypeMapping<"Dns", DnsResolution>
+    | BasePayloadPayloadTypeMapping<"Network", NetworkTraffic>
+  );
 
 export interface PayloadArgument {
   default_value: string;
   description?: string;
   key: string;
   type: string;
+}
+
+export interface PayloadCommandBlock {
+  command_content?: string;
+  command_executor?: string;
+  payload_cleanup_command?: string[];
 }
 
 export interface PayloadCreateInput {
@@ -2410,6 +2604,51 @@ export interface PayloadCreateInput {
   payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   payload_tags?: string[];
   payload_type: string;
+}
+
+export interface PayloadOutput {
+  dns_resolution_hostname?: string;
+  executable_file?: Document;
+  file_drop_file?: Document;
+  network_traffic_ip_dst: string;
+  network_traffic_ip_src: string;
+  /** @format int32 */
+  network_traffic_port_dst: number;
+  /** @format int32 */
+  network_traffic_port_src: number;
+  network_traffic_protocol: string;
+  payload_arguments?: PayloadArgument[];
+  payload_cleanup_executor?: string;
+  payload_command_blocks?: PayloadCommandBlock[];
+  payload_external_id?: string;
+  payload_prerequisites?: PayloadPrerequisite[];
+}
+
+export interface PayloadOutputDto {
+  dns_resolution_hostname?: string;
+  executable_arch?: "x86_64" | "arm64" | "Unknown";
+  executable_file?: Document;
+  file_drop_file?: Document;
+  network_traffic_ip_dst: string;
+  network_traffic_ip_src: string;
+  /** @format int32 */
+  network_traffic_port_dst: number;
+  /** @format int32 */
+  network_traffic_port_src: number;
+  network_traffic_protocol: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPatternSimpleDto[];
+  payload_cleanup_executor?: string;
+  payload_collector_type?: string;
+  payload_command_blocks?: PayloadCommandBlock[];
+  payload_description?: string;
+  payload_external_id?: string;
+  payload_name?: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  /** @uniqueItems true */
+  payload_tags?: string[];
+  payload_type?: string;
 }
 
 export interface PayloadPrerequisite {
