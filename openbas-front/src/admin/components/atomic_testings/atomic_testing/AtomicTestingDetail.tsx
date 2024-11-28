@@ -161,7 +161,7 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
         {injectResultOverviewOutput ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Typography variant="subtitle1" className={classes.header} gutterBottom>
-              {t('Status')}
+              {t('Execution status')}
             </Typography>
             {injectResultOverviewOutput.inject_status?.status_name
             && <ItemStatus isInject={true} status={injectResultOverviewOutput.inject_status?.status_name} label={t(injectResultOverviewOutput.inject_status?.status_name)} />}

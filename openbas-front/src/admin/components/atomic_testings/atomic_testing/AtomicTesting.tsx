@@ -142,7 +142,7 @@ const AtomicTesting = () => {
                 gutterBottom
                 style={{ marginTop: 20 }}
               >
-                {t('Status')}
+                {t('Execution status')}
               </Typography>
               <ItemStatus
                 isInject={true}
