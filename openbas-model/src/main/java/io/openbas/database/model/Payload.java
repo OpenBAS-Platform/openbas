@@ -33,6 +33,9 @@ import org.hibernate.annotations.UuidGenerator;
 @EntityListeners(ModelBaseListener.class)
 public class Payload implements Base {
 
+  private static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_PAYLOAD = 1;
+  protected static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_EXECUTABLE = 2;
+
   public enum PAYLOAD_SOURCE {
     COMMUNITY,
     FILIGRAN,
@@ -190,6 +193,6 @@ public class Payload implements Base {
    * by default this is 1, e.g. one command, one file drop etc...
    */
   public int getNumberOfActions() {
-    return 1;
+    return DEFAULT_NUMBER_OF_ACTIONS_FOR_PAYLOAD;
   }
 }

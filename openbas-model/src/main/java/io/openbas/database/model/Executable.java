@@ -42,10 +42,10 @@ public class Executable extends Payload {
   }
 
   /*
-   * return the number of actions a given payload is expected to achieve
+   * return the number of actions an executable is expected to achieve
    * by default this is 2 here, one file drop and one execution
    */
   public int getNumberOfActions() {
-    return 2;
+    return DEFAULT_NUMBER_OF_ACTIONS_FOR_EXECUTABLE;
   }
 }
