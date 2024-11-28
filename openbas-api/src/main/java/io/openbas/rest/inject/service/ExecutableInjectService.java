@@ -66,7 +66,7 @@ public class ExecutableInjectService {
     String computedCommand = replaceArgumentsByValue(command, defaultArguments, injectContent);
 
     if (executor.equals("cmd")) {
-      computedCommand = computedCommand.replace("\n", " & ");
+      computedCommand = computedCommand.trim().replace("\n", " & ");
     }
 
     if (obfuscator.equals("base64")) {
