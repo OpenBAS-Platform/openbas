@@ -2,6 +2,7 @@ import { Alert, AlertTitle } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Component } from 'react';
 
+import { sendErrorToBackend } from '../utils/Action.ts';
 import { useFormatter } from './i18n';
 
 class ErrorBoundaryComponent extends Component {
@@ -19,7 +20,7 @@ class ErrorBoundaryComponent extends Component {
       stack,
     });
     // Send the error to the backend
-    this.sendErrorToBackend(error, info.componentStack);
+    sendErrorToBackend(error, stack);
   }
 
   render() {
