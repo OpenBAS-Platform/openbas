@@ -7,7 +7,7 @@ import type { CollectorHelper } from '../../../actions/collectors/collector-help
 import { fetchDocuments } from '../../../actions/Document';
 import type { DocumentHelper } from '../../../actions/helper';
 import { searchPayloads } from '../../../actions/Payload';
-import type { PayloadStore } from '../../../actions/payloads/Payload';
+import type { PayloadStatus, PayloadStore } from '../../../actions/payloads/Payload';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
@@ -23,7 +23,6 @@ import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { PayloadStatus } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePayload from './CreatePayload';
