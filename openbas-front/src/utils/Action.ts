@@ -2,6 +2,7 @@ import { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { FORM_ERROR } from 'final-form';
 import { type Schema } from 'normalizr';
 import * as R from 'ramda';
+import { ErrorInfo } from 'react';
 import { createIntl, createIntlCache } from 'react-intl';
 import { type Dispatch } from 'redux';
 import Immutable from 'seamless-immutable';
@@ -258,5 +259,21 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
       });
       notifyError(error);
       throw error;
+    });
+};
+
+export const sendErrorToBackend = async (error: Error, stack: ErrorInfo) => {
+  const errorDetails = {
+    message: error.message,
+    stack: stack,
+    timestamp: new Date().toISOString(),
+  };
+  console.log(errorDetails);
+  simplePostCall('/api/logs/frontend-error', errorDetails)
+    .then((response) => {
+      notifySuccess('Error successfully sent to backend:' + response);
+    })
+    .catch((backendError) => {
+      notifyError(backendError);
     });
 };
