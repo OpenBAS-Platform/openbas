@@ -18,6 +18,8 @@ class ErrorBoundaryComponent extends Component {
       error,
       stack,
     });
+    // Send the error to the backend
+    this.sendErrorToBackend(error, info.componentStack);
   }
 
   render() {
