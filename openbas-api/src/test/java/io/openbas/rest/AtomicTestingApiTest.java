@@ -13,9 +13,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-
 import java.time.Instant;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -32,14 +30,10 @@ public class AtomicTestingApiTest extends IntegrationTest {
   static InjectStatus INJECT_STATUS;
   static String NEW_INJECT_ID;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
-  @Autowired
-  private InjectStatusRepository injectStatusRepository;
+  @Autowired private MockMvc mvc;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectStatusRepository injectStatusRepository;
 
   @BeforeAll
   void beforeAll() {
