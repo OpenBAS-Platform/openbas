@@ -1,5 +1,6 @@
 package io.openbas.utils.mockUser;
 
+import static io.openbas.database.model.User.ADMIN_UUID;
 import static io.openbas.service.UserService.buildAuthenticationToken;
 
 import io.openbas.database.model.User;
@@ -22,6 +23,7 @@ public class WithMockAdminUserSecurityContextFactory
     user.setEmail(MOCK_USER_ADMIN_EMAIL);
     user.setLang(LANG_EN);
     user.setAdmin(true);
+    user.setId(ADMIN_UUID);
     Authentication authentication = buildAuthenticationToken(user);
     SecurityContext context = SecurityContextHolder.createEmptyContext();
     context.setAuthentication(authentication);

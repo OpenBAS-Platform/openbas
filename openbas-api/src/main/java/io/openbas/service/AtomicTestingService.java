@@ -3,7 +3,6 @@ package io.openbas.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,8 +25,6 @@ import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotBlank;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +34,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 @Service
 @Log
@@ -59,6 +55,7 @@ public class AtomicTestingService {
   private final AssetGroupService assetGroupService;
   private final InjectMapper injectMapper;
   private final InjectSearchService injectSearchService;
+  private final InjectService injectService;
 
   private static final String PRE_DEFINE_EXPECTATIONS = "predefinedExpectations";
   private static final String EXPECTATIONS = "expectations";
@@ -196,78 +193,22 @@ public class AtomicTestingService {
     return injectMapper.toInjectResultOverviewOutput(saved);
   }
 
-  @Transactional
   public void deleteAtomicTesting(String injectId) {
-    injectDocumentRepository.deleteDocumentsFromInject(injectId);
-    injectRepository.deleteById(injectId);
+    injectService.delete(injectId);
   }
 
   // -- ACTIONS --
 
-  @Transactional
-  @Validated
-  public InjectResultOverviewOutput getDuplicateAtomicTesting(@NotBlank String id) {
-    Inject injectOrigin = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
-    Inject injectDuplicate = copyInject(injectOrigin, true);
-    injectDuplicate.setExercise(injectOrigin.getExercise());
-    injectDuplicate.setScenario(injectOrigin.getScenario());
-    Inject inject = injectRepository.save(injectDuplicate);
-    return injectMapper.toInjectResultOverviewOutput(inject);
+  public InjectResultOverviewOutput duplicate(String id) {
+    return injectService.duplicate(id);
   }
 
-  public Inject copyInject(@NotNull Inject injectOrigin, boolean isAtomic) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    Inject injectDuplicate = new Inject();
-    injectDuplicate.setUser(injectOrigin.getUser());
-    if (isAtomic) {
-      injectDuplicate.setTitle(duplicateString(injectOrigin.getTitle()));
-    } else {
-      injectDuplicate.setTitle(injectOrigin.getTitle());
-    }
-    injectDuplicate.setDescription(injectOrigin.getDescription());
-    try {
-      ObjectNode content =
-          objectMapper.readValue(
-              objectMapper.writeValueAsString(injectOrigin.getContent()), ObjectNode.class);
-      injectDuplicate.setContent(content);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    injectDuplicate.setAllTeams(injectOrigin.isAllTeams());
-    injectDuplicate.setTeams(injectOrigin.getTeams().stream().toList());
-    injectDuplicate.setEnabled(injectOrigin.isEnabled());
-    injectDuplicate.setDependsDuration(injectOrigin.getDependsDuration());
-    if (injectOrigin.getDependsOn() != null) {
-      injectDuplicate.setDependsOn(injectOrigin.getDependsOn().stream().toList());
-    }
-    injectDuplicate.setCountry(injectOrigin.getCountry());
-    injectDuplicate.setCity(injectOrigin.getCity());
-    injectDuplicate.setInjectorContract(injectOrigin.getInjectorContract().orElse(null));
-    injectDuplicate.setAssetGroups(injectOrigin.getAssetGroups().stream().toList());
-    injectDuplicate.setAssets(injectOrigin.getAssets().stream().toList());
-    injectDuplicate.setCommunications(injectOrigin.getCommunications().stream().toList());
-    injectDuplicate.setPayloads(injectOrigin.getPayloads().stream().toList());
-    injectDuplicate.setTags(new HashSet<>(injectOrigin.getTags()));
-    return injectDuplicate;
+  public InjectResultOverviewOutput launch(String id) {
+    return injectService.launch(id);
   }
 
-  @Transactional
-  public Inject tryInject(String injectId) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-
-    // Reset injects outcome, communications and expectations
-    inject.clean();
-    inject.setUpdatedAt(Instant.now());
-
-    // New inject status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(ExecutionStatus.QUEUING);
-    this.injectStatusRepository.save(injectStatus);
-
-    // Return inject
-    return this.injectRepository.save(inject);
+  public InjectResultOverviewOutput relaunch(String id) {
+    return injectService.relaunch(id);
   }
 
   // -- PAGINATION --

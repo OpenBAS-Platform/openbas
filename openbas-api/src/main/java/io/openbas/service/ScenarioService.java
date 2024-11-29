@@ -612,10 +612,7 @@ public class ScenarioService {
       @NotNull Scenario scenario, @NotNull Scenario scenarioOrign) {
     Set<Inject> injectListForScenario =
         scenarioOrign.getInjects().stream()
-            .map(
-                inject ->
-                    injectDuplicateService.createInjectForScenario(
-                        scenario.getId(), inject.getId(), false))
+            .map(inject -> injectDuplicateService.duplicateInjectForScenario(scenario, inject))
             .collect(Collectors.toSet());
     scenario.setInjects(new HashSet<>(injectListForScenario));
   }
