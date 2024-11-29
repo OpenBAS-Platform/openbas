@@ -226,7 +226,6 @@ const PayloadForm: FunctionComponent<Props> = ({
                   inputProps={register('payload_execution_arch')}
                   InputLabelProps={{ required: true }}
                 >
-                  {' '}
                   <MenuItem value="ALL_ARCHITECTURES">{t('ALL_ARCHITECTURES')}</MenuItem>
                 </TextField>
               )

@@ -2697,6 +2697,7 @@ const i18n = {
         '你想要删除这个经验教训问题么?',
       'x86_64': 'x86_64',
       'arm64': 'arm64',
+      'payload_execution_arch': '架构',
       'ALL_ARCHITECTURES': '所有架构',
       'Invalid IP addresses': '无效IP地址',
       'Invalid MAC addresses': '无效MAC地址',
