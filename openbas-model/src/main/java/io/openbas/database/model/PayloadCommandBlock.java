@@ -1,12 +1,9 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-
 
 @Setter
 @Getter
@@ -21,8 +18,7 @@ public class PayloadCommandBlock {
   @JsonProperty("payload_cleanup_command")
   private List<String> cleanupCommand;
 
-  public PayloadCommandBlock() {
-  }
+  public PayloadCommandBlock() {}
 
   public PayloadCommandBlock(String executor, String content, List<String> cleanupCommand) {
     this.executor = executor;

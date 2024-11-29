@@ -26,14 +26,14 @@ import { Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodes
 import { FunctionComponent, useContext, useEffect, useState } from 'react';
 import * as React from 'react';
 
-import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchAtomicTestingPayload, fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
 import type { Theme } from '../../../../components/Theme';
-import type { InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
+import { InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult, PayloadOutputDto } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
@@ -126,6 +126,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<{ injectExpectation: InjectExpectationsStore; sourceIds: string[] } | null>(null);
   const [selectedResultEdition, setSelectedResultEdition] = useState<{ injectExpectation: InjectExpectationsStore; expectationResult: InjectExpectationResult } | null>(null);
   const [selectedResultDeletion, setSelectedResultDeletion] = useState<{ injectExpectation: InjectExpectationsStore; expectationResult: InjectExpectationResult } | null>(null);
+  const [payloadOutput, setPayloadOutput] = useState<PayloadOutputDto>();
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
@@ -307,12 +308,17 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         />
       );
     }
+    useEffect(() => {
+      fetchAtomicTestingPayload(inject.inject_id).then((result: { data: PayloadOutputDto }) => {
+        setPayloadOutput(result.data);
+      });
+    }, [inject.inject_id]);
     return (
       <InjectIcon
-        isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
-        type={inject.inject_injector_contract?.injector_contract_payload
-          ? inject.inject_injector_contract.injector_contract_payload.payload_collector_type
-          || inject.inject_injector_contract.injector_contract_payload.payload_type
+        isPayload={isNotEmptyField(payloadOutput)}
+        type={payloadOutput
+          ? payloadOutput.payload_collector_type
+          || payloadOutput.payload_type
           : inject.inject_type}
       />
     );

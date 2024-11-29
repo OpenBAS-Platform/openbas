@@ -8,11 +8,9 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.model.ExecutionProcess;
-import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -26,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public abstract class Injector {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
   private FileService fileService;
   private DocumentRepository documentRepository;
 
