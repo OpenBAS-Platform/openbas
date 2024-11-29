@@ -9,19 +9,16 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
-
 import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,8 +35,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class InjectorContractService {
 
-  @PersistenceContext
-  private EntityManager entityManager;
+  @PersistenceContext private EntityManager entityManager;
 
   private final InjectorContractRepository injectorContractRepository;
 
