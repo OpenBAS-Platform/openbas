@@ -3,9 +3,8 @@ package io.openbas.rest.injector_contract.output;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-
 import java.util.*;
+import lombok.Data;
 
 @Data
 public class InjectorContractOutput {

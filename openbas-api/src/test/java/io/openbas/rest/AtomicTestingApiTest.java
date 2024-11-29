@@ -13,10 +13,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-
 import java.time.Instant;
-import java.util.List;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,14 +30,10 @@ public class AtomicTestingApiTest extends IntegrationTest {
   static InjectStatus INJECT_STATUS;
   static String NEW_INJECT_ID;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
-  @Autowired
-  private InjectStatusRepository injectStatusRepository;
+  @Autowired private MockMvc mvc;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectStatusRepository injectStatusRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -68,7 +61,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setName(ExecutionStatus.SUCCESS);
     /*injectStatus.setCommandsLines(
-        new PayloadOutput(List.of("cmd"), List.of("clean cmd"), "id1234567"));*/
+    new PayloadOutput(List.of("cmd"), List.of("clean cmd"), "id1234567"));*/
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
   }
 

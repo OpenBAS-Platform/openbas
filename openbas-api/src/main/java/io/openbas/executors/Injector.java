@@ -14,11 +14,9 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.*;
-import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,15 +25,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class Injector {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
   private FileService fileService;
   private DocumentRepository documentRepository;
   private InjectExpectationRepository injectExpectationRepository;
