@@ -357,12 +357,10 @@ public class PayloadApi extends RestBehavior {
   private static void validateArchitecture(
       String payloadType, Payload.PAYLOAD_EXECUTION_ARCH arch) {
     if (arch == null) {
-      throw new BadRequestException("Executable architecture cannot be null.");
+      throw new BadRequestException("Payload architecture cannot be null.");
     }
-    if (Executable.EXECUTABLE_TYPE.equals(payloadType)) {
-      if (arch != x86_64 && arch != ARM64) {
+    if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != x86_64 && arch != ARM64)) {
         throw new BadRequestException("Executable architecture must be x86_64 or ARM64.");
       }
-    }
   }
 }
