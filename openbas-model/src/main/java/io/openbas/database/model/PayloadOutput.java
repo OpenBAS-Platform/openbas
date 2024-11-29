@@ -1,16 +1,12 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -61,13 +57,22 @@ public class PayloadOutput {
   @NotNull
   private String protocol;
 
-  public PayloadOutput() {
-  }
+  public PayloadOutput() {}
 
-  public PayloadOutput(String protocol, Integer portDst, Integer portSrc, String ipDst, String ipSrc,
-      String hostname, Document fileDropFile, Document executableFile, String externalId,
-      List<PayloadPrerequisite> prerequisites, List<PayloadArgument> arguments,
-      List<PayloadCommandBlock> payloadCommandBlocks, String cleanupExecutor) {
+  public PayloadOutput(
+      String protocol,
+      Integer portDst,
+      Integer portSrc,
+      String ipDst,
+      String ipSrc,
+      String hostname,
+      Document fileDropFile,
+      Document executableFile,
+      String externalId,
+      List<PayloadPrerequisite> prerequisites,
+      List<PayloadArgument> arguments,
+      List<PayloadCommandBlock> payloadCommandBlocks,
+      String cleanupExecutor) {
     this.protocol = protocol;
     this.portDst = portDst;
     this.portSrc = portSrc;
@@ -82,6 +87,4 @@ public class PayloadOutput {
     this.payloadCommandBlocks = payloadCommandBlocks;
     this.cleanupExecutor = cleanupExecutor;
   }
-
-
 }

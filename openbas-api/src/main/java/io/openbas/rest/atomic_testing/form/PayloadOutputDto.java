@@ -5,14 +5,13 @@ import io.openbas.database.model.*;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Singular;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Setter
 @Getter
@@ -88,5 +87,4 @@ public class PayloadOutputDto {
   @JsonProperty("network_traffic_protocol")
   @NotNull
   private String protocol;
-
 }
