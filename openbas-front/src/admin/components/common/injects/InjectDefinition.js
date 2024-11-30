@@ -1188,7 +1188,6 @@ class InjectDefinition extends Component {
                 onSubmit={this.handleAddAssets.bind(this)}
                 disabled={fieldAssets.readOnly}
                 platforms={injectorContract.platforms}
-                payloadType={injectorContract.payloadType}
                 payloadArch={inject.inject_injector_contract?.injector_contract_arch}
               />
             </>

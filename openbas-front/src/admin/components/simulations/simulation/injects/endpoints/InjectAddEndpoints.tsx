@@ -25,7 +25,6 @@ interface Props {
   endpointIds: string[];
   onSubmit: (endpointIds: string[]) => void;
   platforms?: string[];
-  payloadType?: string;
   payloadArch?: string;
 }
 
@@ -34,7 +33,6 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
   endpointIds,
   onSubmit,
   platforms,
-  payloadType,
   payloadArch,
 }) => {
   // Standard hooks
@@ -68,7 +66,6 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
         initialState={endpointIds}
         open={openDialog}
         platforms={platforms}
-        payloadType={payloadType}
         payloadArch={payloadArch}
         onClose={handleClose}
         onSubmit={onSubmit}

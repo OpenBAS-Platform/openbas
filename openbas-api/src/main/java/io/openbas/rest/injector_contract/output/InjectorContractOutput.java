@@ -52,7 +52,6 @@ public class InjectorContractOutput {
     this.platforms = platforms;
     this.payloadType = Optional.ofNullable(collectorType).orElse(payloadType);
     this.injectorType = injectorType;
-
     this.attackPatterns =
         attackPatterns != null ? new ArrayList<>(Arrays.asList(attackPatterns)) : new ArrayList<>();
     this.arch = arch;

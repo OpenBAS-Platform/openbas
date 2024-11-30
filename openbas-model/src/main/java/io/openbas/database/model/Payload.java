@@ -49,7 +49,7 @@ public class Payload implements Base {
   }
 
   public enum PAYLOAD_EXECUTION_ARCH {
-    x86_64,
+    X86_64,
     ARM64,
     ALL_ARCHITECTURES,
   }

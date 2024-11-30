@@ -1332,7 +1332,9 @@ const i18n = {
       'Do you want to delete this lessons learned question?':
         'Souhaitez-vous supprimer cette question de retour d\'expérience ?',
       'x86_64': 'x86_64',
+      'X86_64': 'x86_64',
       'arm64': 'arm64',
+      'All_architectures': 'Toutes les architectures',
       'ALL_ARCHITECTURES': 'Toutes les architectures',
       'Invalid IP addresses': 'Adresses IP invalides',
       'Invalid MAC addresses': 'Adresses MAC invalides',
@@ -2696,8 +2698,10 @@ const i18n = {
       'Do you want to delete this lessons learned question?':
         '你想要删除这个经验教训问题么?',
       'x86_64': 'x86_64',
+      'X86_64': 'x86_64',
       'arm64': 'arm64',
       'payload_execution_arch': '架构',
+      'All_architectures': '所有架构',
       'ALL_ARCHITECTURES': '所有架构',
       'Invalid IP addresses': '无效IP地址',
       'Invalid MAC addresses': '无效MAC地址',
@@ -2893,6 +2897,8 @@ const i18n = {
       'payload_tags': 'Tags',
       'payload_updated_at': 'Updated',
       'payload_execution_arch': 'Architecture',
+      'X86_64': 'x86_64',
+      'All_architectures': 'All architectures',
       'ALL_ARCHITECTURES': 'All architectures',
       // Team
       'team_tags': 'Tags',
