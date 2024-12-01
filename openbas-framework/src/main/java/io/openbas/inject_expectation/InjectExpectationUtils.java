@@ -1,15 +1,17 @@
 package io.openbas.inject_expectation;
 
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
+import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
+import static java.util.Optional.ofNullable;
+
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.model.Expectation;
+import io.openbas.model.expectation.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class InjectExpectationUtils {
 
@@ -41,100 +43,105 @@ public class InjectExpectationUtils {
     }
   }
 
-  public static void extractedExpectations(
-      ExecutableInject executableInject, List<Expectation> expectations) {
-    boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
-    boolean isScheduledInject = !executableInject.isDirect();
-    // Create the expectations
-    List<Team> teams = executableInject.getTeams();
-    List<Asset> assets = executableInject.getAssets();
-    List<AssetGroup> assetGroups = executableInject.getAssetGroups();
-    if ((isScheduledInject || isAtomicTesting) && !expectations.isEmpty()) {
-      if (!teams.isEmpty()) {
-        List<InjectExpectation> injectExpectationsByTeam;
+  // -- CONVERTER --
 
-        List<InjectExpectation> injectExpectationsByUserAndTeam;
-        // If atomicTesting, We create expectation for every player and every team
-        if (isAtomicTesting) {
-          injectExpectationsByTeam =
-              teams.stream()
-                  .flatMap(
-                      team ->
-                          expectations.stream()
-                              .map(
-                                  expectation ->
-                                      expectationConverter(team, executableInject, expectation)))
-                  .collect(Collectors.toList());
+  public static InjectExpectation expectationConverter(
+      @NotNull final ExecutableInject executableInject, Expectation expectation) {
+    InjectExpectation expectationExecution = new InjectExpectation();
+    return expectationConverter(expectationExecution, executableInject, expectation);
+  }
 
-          injectExpectationsByUserAndTeam =
-              teams.stream()
-                  .flatMap(
-                      team ->
-                          team.getUsers().stream()
-                              .flatMap(
-                                  user ->
-                                      expectations.stream()
-                                          .map(
-                                              expectation ->
-                                                  expectationConverter(
-                                                      team, user, executableInject, expectation))))
-                  .toList();
-        } else {
-          // Create expectations for every enabled player in every team
-          injectExpectationsByUserAndTeam =
-              teams.stream()
-                  .flatMap(
-                      team ->
-                          team.getExerciseTeamUsers().stream()
-                              .filter(
-                                  exerciseTeamUser ->
-                                      exerciseTeamUser
-                                          .getExercise()
-                                          .getId()
-                                          .equals(
-                                              executableInject
-                                                  .getInjection()
-                                                  .getExercise()
-                                                  .getId()))
-                              .flatMap(
-                                  exerciseTeamUser ->
-                                      expectations.stream()
-                                          .map(
-                                              expectation ->
-                                                  expectationConverter(
-                                                      team,
-                                                      exerciseTeamUser.getUser(),
-                                                      executableInject,
-                                                      expectation))))
-                  .toList();
+  public static InjectExpectation expectationConverter(
+      @NotNull final Team team,
+      @NotNull final User user,
+      @NotNull final ExecutableInject executableInject,
+      Expectation expectation) {
+    InjectExpectation expectationExecution = new InjectExpectation();
+    expectationExecution.setTeam(team);
+    expectationExecution.setUser(user);
+    return expectationConverter(expectationExecution, executableInject, expectation);
+  }
 
-          // Create a set of teams that have at least one enabled player
-          Set<Team> teamsWithEnabledPlayers =
-              injectExpectationsByUserAndTeam.stream()
-                  .map(InjectExpectation::getTeam)
-                  .collect(Collectors.toSet());
+  public static InjectExpectation expectationConverter(
+      @NotNull final Team team,
+      @NotNull final ExecutableInject executableInject,
+      Expectation expectation) {
+    InjectExpectation expectationExecution = new InjectExpectation();
+    expectationExecution.setTeam(team);
+    return expectationConverter(expectationExecution, executableInject, expectation);
+  }
 
-          // Add only the expectations where the team has at least one enabled player
-          injectExpectationsByTeam =
-              teamsWithEnabledPlayers.stream()
-                  .flatMap(
-                      team ->
-                          expectations.stream()
-                              .map(
-                                  expectation ->
-                                      expectationConverter(team, executableInject, expectation)))
-                  .collect(Collectors.toList());
-        }
-
-        injectExpectationsByTeam.addAll(injectExpectationsByUserAndTeam);
-        this.injectExpectationRepository.saveAll(injectExpectationsByTeam);
-      } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
-        List<InjectExpectation> injectExpectations =
-            expectations.stream()
-                .map(expectation -> expectationConverter(executableInject, expectation))
-                .toList();
-        this.injectExpectationRepository.saveAll(injectExpectations);
+  public static InjectExpectation expectationConverter(
+      @NotNull InjectExpectation expectationExecution,
+      @NotNull final ExecutableInject executableInject,
+      @NotNull final Expectation expectation) {
+    expectationExecution.setExercise(executableInject.getInjection().getExercise());
+    expectationExecution.setInject(executableInject.getInjection().getInject());
+    expectationExecution.setExpectedScore(expectation.getScore());
+    expectationExecution.setExpectationGroup(expectation.isExpectationGroup());
+    expectationExecution.setExpirationTime(
+        ofNullable(expectation.getExpirationTime())
+            .orElse(DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME));
+    switch (expectation.type()) {
+      case ARTICLE -> {
+        expectationExecution.setName(expectation.getName());
+        expectationExecution.setArticle(((ChannelExpectation) expectation).getArticle());
       }
+      case CHALLENGE -> {
+        expectationExecution.setName(expectation.getName());
+        expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
+      }
+      case DOCUMENT -> expectationExecution.setType(InjectExpectation.EXPECTATION_TYPE.DOCUMENT);
+      case TEXT -> expectationExecution.setType(InjectExpectation.EXPECTATION_TYPE.TEXT);
+      case DETECTION -> {
+        DetectionExpectation detectionExpectation = (DetectionExpectation) expectation;
+        expectationExecution.setName(detectionExpectation.getName());
+        expectationExecution.setDetection(
+            detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
+        expectationExecution.setSignatures(detectionExpectation.getInjectExpectationSignatures());
+      }
+      case PREVENTION -> {
+        PreventionExpectation preventionExpectation = (PreventionExpectation) expectation;
+        expectationExecution.setName(preventionExpectation.getName());
+        expectationExecution.setPrevention(
+            preventionExpectation.getAsset(), preventionExpectation.getAssetGroup());
+        expectationExecution.setSignatures(preventionExpectation.getInjectExpectationSignatures());
+      }
+      case MANUAL -> {
+        ManualExpectation manualExpectation = (ManualExpectation) expectation;
+        expectationExecution.setName(((ManualExpectation) expectation).getName());
+        expectationExecution.setManual(
+            manualExpectation.getAsset(), manualExpectation.getAssetGroup());
+        expectationExecution.setDescription(((ManualExpectation) expectation).getDescription());
+      }
+      default -> throw new IllegalStateException("Unexpected value: " + expectation);
     }
+    return expectationExecution;
+  }
+
+  // -- INJECT EXPECTATION SIGNATURE --
+
+  public static List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
+    List<InjectExpectationSignature> signatures = new ArrayList<>();
+    List<String> knownPayloadTypes =
+        Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
+
+    /*
+     * Always add the "Parent process" signature type for the OpenBAS Implant Executor
+     */
+    signatures.add(
+        createSignature(
+            EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME, "obas-implant-" + inject.getId()));
+
+    if (!knownPayloadTypes.contains(payload.getType())) {
+      throw new UnsupportedOperationException(
+          "Payload type " + payload.getType() + " is not supported");
+    }
+    return signatures;
+  }
+
+  private static InjectExpectationSignature createSignature(
+      String signatureType, String signatureValue) {
+    return InjectExpectationSignature.builder().type(signatureType).value(signatureValue).build();
   }
 }

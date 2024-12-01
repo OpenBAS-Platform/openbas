@@ -11,7 +11,7 @@ import io.openbas.database.repository.ArticleRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
-import io.openbas.inject_expectation.InjectExpectationUtils;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.channel.model.ArticleVariable;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.injectors.email.service.EmailService;
@@ -41,6 +41,7 @@ public class ChannelExecutor extends Injector {
   private ArticleRepository articleRepository;
 
   private EmailService emailService;
+  private InjectExpectationService injectExpectationService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
@@ -53,6 +54,11 @@ public class ChannelExecutor extends Injector {
   @Autowired
   public void setEmailService(EmailService emailService) {
     this.emailService = emailService;
+  }
+
+  @Autowired
+  public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
+    this.injectExpectationService = injectExpectationService;
   }
 
   private String buildArticleUri(ExecutionContext context, Article article) {
@@ -154,7 +160,9 @@ public class ChannelExecutor extends Injector {
                           })
                   .toList());
         }
-        InjectExpectationUtils.extractedExpectations(injection, expectations);
+
+        injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
         return new ExecutionProcess(false);
       } else {
         throw new UnsupportedOperationException("Unknown contract " + contract);

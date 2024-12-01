@@ -10,7 +10,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
 import io.openbas.execution.ProtectUser;
-import io.openbas.inject_expectation.InjectExpectationUtils;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.ovh.model.OvhSmsContent;
 import io.openbas.injectors.ovh.service.OvhSmsService;
 import io.openbas.model.ExecutionProcess;
@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 public class OvhSmsExecutor extends Injector {
 
   private final OvhSmsService smsService;
+  private final InjectExpectationService injectExpectationService;
 
   @Override
   public ExecutionProcess process(
@@ -95,7 +96,9 @@ public class OvhSmsExecutor extends Injector {
                         default -> Stream.of();
                       })
               .toList();
-      InjectExpectationUtils.extractedExpectations(injection, expectations);
+
+      injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
       return new ExecutionProcess(false);
     }
     return new ExecutionProcess(false);

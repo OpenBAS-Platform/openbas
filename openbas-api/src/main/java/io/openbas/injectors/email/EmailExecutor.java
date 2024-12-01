@@ -8,7 +8,7 @@ import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
-import io.openbas.inject_expectation.InjectExpectationUtils;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
@@ -28,6 +28,7 @@ public class EmailExecutor extends Injector {
   @Resource private OpenBASConfig openBASConfig;
 
   private EmailService emailService;
+  private InjectExpectationService injectExpectationService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
@@ -35,6 +36,11 @@ public class EmailExecutor extends Injector {
   @Autowired
   public void setEmailService(EmailService emailService) {
     this.emailService = emailService;
+  }
+
+  @Autowired
+  public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
+    this.injectExpectationService = injectExpectationService;
   }
 
   private void sendMulti(
@@ -136,7 +142,9 @@ public class EmailExecutor extends Injector {
                       default -> Stream.of();
                     })
             .toList();
-    InjectExpectationUtils.extractedExpectations(injection, expectations);
+
+    injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
     return new ExecutionProcess(false);
   }
 }
