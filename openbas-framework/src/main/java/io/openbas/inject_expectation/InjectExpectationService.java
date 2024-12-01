@@ -388,7 +388,7 @@ public class InjectExpectationService {
         }
 
         injectExpectationsByTeam.addAll(injectExpectationsByUserAndTeam);
-        this.injectExpectationRepository.saveAll(injectExpectationsByTeam);
+        injectExpectationRepository.saveAll(injectExpectationsByTeam);
       } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
         List<InjectExpectation> injectExpectations =
             expectations.stream()
