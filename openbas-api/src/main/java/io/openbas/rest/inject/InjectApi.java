@@ -23,6 +23,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.helper.InjectHelper;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.model.Expectation;
@@ -87,6 +88,7 @@ public class InjectApi extends RestBehavior {
   private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
   private final InjectExpectationService injectExpectationService;
+  private final InjectHelper injectHelper;
 
   // -- INJECTS --
 
@@ -156,18 +158,21 @@ public class InjectApi extends RestBehavior {
 
       if (successCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.SUCCESS);
-        List<Expectation> expectations = injectExpectationService.generateExpectations(inject);
-        injectExpectationService.buildAndSaveInjectExpectations(null, expectations);
       } else if (successCounter > 0) {
         injectStatus.setName(ExecutionStatus.PARTIAL);
-        List<Expectation> expectations = injectExpectationService.generateExpectations(inject);
-        injectExpectationService.buildAndSaveInjectExpectations(null, expectations);
       } else if (errorCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.ERROR);
       } else if (maybePreventedCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
       } else {
         injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
+      }
+
+      // If injectStatus was SUCCESS or PARTIAL, we build the expectation related to this inject
+      if (successCounter > 0) {
+        List<Expectation> expectations = injectExpectationService.generateExpectations(inject);
+        injectExpectationService.buildAndSaveInjectExpectations(
+            injectHelper.getExecutableInject(inject), expectations);
       }
     }
     return injectRepository.save(inject);
