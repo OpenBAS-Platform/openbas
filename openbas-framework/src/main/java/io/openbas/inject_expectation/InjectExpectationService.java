@@ -101,7 +101,7 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.save(injectExpectation);
   }
 
-  // -- GENERATE EXPECTATION AFTER EXECUTION WITH OPENBAS AGENT --
+  // -- GENERATE EXPECTATIONS AFTER EXECUTION WITH OPENBAS AGENT --
 
   public List<Expectation> generateExpectations(Inject inject) throws Exception {
     Map<Asset, Boolean> assets = assetGroupService.resolveAllAssets(inject);
