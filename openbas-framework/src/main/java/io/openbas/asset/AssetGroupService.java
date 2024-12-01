@@ -9,10 +9,12 @@ import static java.time.Instant.now;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,7 +130,6 @@ public class AssetGroupService {
     return assetGroup;
   }
 
-  /** */
   public Map<String, List<Endpoint>> computeDynamicAssetFromRaw(
       @NotNull Set<RawAssetGroup> assetGroups) {
     if (assetGroups.isEmpty()) {
@@ -148,5 +149,29 @@ public class AssetGroupService {
                       .distinct()
                       .toList();
                 }));
+  }
+
+  // -- FOR OBAS IMPLANT --
+
+  public Map<Asset, Boolean> resolveAllAssets(@NotNull final Inject inject) {
+    Map<Asset, Boolean> assets = new HashMap<>();
+    inject
+        .getAssets()
+        .forEach(
+            (asset -> {
+              assets.put(asset, false);
+            }));
+    inject
+        .getAssetGroups()
+        .forEach(
+            (assetGroup -> {
+              List<Asset> assetsFromGroup = this.assetsFromAssetGroup(assetGroup.getId());
+              // Verify asset validity
+              assetsFromGroup.forEach(
+                  (asset) -> {
+                    assets.put(asset, true);
+                  });
+            }));
+    return assets;
   }
 }

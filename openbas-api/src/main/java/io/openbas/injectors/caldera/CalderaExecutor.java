@@ -267,6 +267,7 @@ public class CalderaExecutor extends Injector {
 
     String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
     execution.addTrace(traceInfo(message, asyncIds));
+    // TODO move expectations
     return new ExecutionProcess(true);
   }
 

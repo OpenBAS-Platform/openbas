@@ -6,7 +6,7 @@ import static io.openbas.injectors.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
-import io.openbas.inject_expectation.InjectExpectationUtils;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.opencti.model.CaseContent;
 import io.openbas.injectors.opencti.service.OpenCTIService;
 import io.openbas.model.ExecutionProcess;
@@ -22,10 +22,16 @@ import org.springframework.stereotype.Component;
 public class OpenCTIExecutor extends Injector {
 
   private OpenCTIService openCTIService;
+  private InjectExpectationService injectExpectationService;
 
   @Autowired
   public void setOpenCTIService(OpenCTIService openCTIService) {
     this.openCTIService = openCTIService;
+  }
+
+  @Autowired
+  public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
+    this.injectExpectationService = injectExpectationService;
   }
 
   private void createCase(
@@ -80,7 +86,9 @@ public class OpenCTIExecutor extends Injector {
                       default -> Stream.of();
                     })
             .toList();
-    InjectExpectationUtils.extractedExpectations(injection, expectations);
+
+    injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
     return new ExecutionProcess(false);
   }
 }
