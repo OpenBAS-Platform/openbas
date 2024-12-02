@@ -360,7 +360,7 @@ public class PayloadApi extends RestBehavior {
       throw new BadRequestException("Payload architecture cannot be null.");
     }
     if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != X86_64 && arch != ARM64)) {
-        throw new BadRequestException("Executable architecture must be x86_64 or ARM64.");
-      }
+      throw new BadRequestException("Executable architecture must be x86_64 or ARM64.");
+    }
   }
 }
