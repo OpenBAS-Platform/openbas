@@ -158,6 +158,9 @@ public class InjectApi extends RestBehavior {
 
       if (successCounter >= injectStatus.getTrackingTotalCount()) {
         injectStatus.setName(ExecutionStatus.SUCCESS);
+        List<Expectation> expectations = injectExpectationService.generateExpectations(inject);
+        injectExpectationService.buildAndSaveInjectExpectations(
+            injectHelper.getExecutableInject(inject), expectations);
       } else if (successCounter > 0) {
         injectStatus.setName(ExecutionStatus.PARTIAL);
       } else if (errorCounter >= injectStatus.getTrackingTotalCount()) {
@@ -166,13 +169,6 @@ public class InjectApi extends RestBehavior {
         injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
       } else {
         injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
-      }
-
-      // If injectStatus was SUCCESS or PARTIAL, we build the expectation related to this inject
-      if (successCounter > 0) {
-        List<Expectation> expectations = injectExpectationService.generateExpectations(inject);
-        injectExpectationService.buildAndSaveInjectExpectations(
-            injectHelper.getExecutableInject(inject), expectations);
       }
     }
     return injectRepository.save(inject);
