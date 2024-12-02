@@ -300,7 +300,7 @@ public class InjectExpectationService {
     }
   }
 
-  // -- BUILD AND SAVE EXPECTATION AFTER INJECT BE EXECUTED --
+  // -- BUILD AND SAVE EXPECTATION AFTER SUCCESSFUL INJECT EXECUTION --
 
   public void buildAndSaveInjectExpectations(
       ExecutableInject executableInject, List<Expectation> expectations) {
