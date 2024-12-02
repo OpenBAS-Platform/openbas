@@ -163,7 +163,7 @@ public class InjectHelper {
         .collect(Collectors.toList());
   }
 
-  public ExecutableInject getExecutableInject(Inject inject) {
+  public ExecutableInject getExecutableInjectForOpenBASImplantExecutor(Inject inject) {
     return new ExecutableInject(
         true,
         false,
