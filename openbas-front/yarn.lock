@@ -2615,6 +2615,50 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@svgdotjs/svg.draggable.js@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@svgdotjs/svg.draggable.js@npm:3.0.4"
+  peerDependencies:
+    "@svgdotjs/svg.js": ^3.2.4
+  checksum: 10c0/0c3237a6f6998f04862fde916d5dddb7d2c00e79c1606551be6abf2d2993b9d21abe86576c9e0374c094af22155b78e86f57ba959f8c9098db32ad31ecd82503
+  languageName: node
+  linkType: hard
+
+"@svgdotjs/svg.filter.js@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "@svgdotjs/svg.filter.js@npm:3.0.8"
+  dependencies:
+    "@svgdotjs/svg.js": "npm:^3.1.1"
+  checksum: 10c0/cc0f737316aa4b71b3b6f32f0944d99c1a8d1b709a674f2a4a99c797c31838389fd4ed330485597be6f11a975327ae9a1e1283234bf43b103b2c7176e8e69db2
+  languageName: node
+  linkType: hard
+
+"@svgdotjs/svg.js@npm:^3.1.1, @svgdotjs/svg.js@npm:^3.2.4":
+  version: 3.2.4
+  resolution: "@svgdotjs/svg.js@npm:3.2.4"
+  checksum: 10c0/35563560998def7fd9b35c434214428f122d1fc11a5d6975fbc9b3c92b3e86700daba74f9106d7abd5dc979eb26c6e6429be71236dd226bc0f2d92e880e8fe2c
+  languageName: node
+  linkType: hard
+
+"@svgdotjs/svg.resize.js@npm:^2.0.2":
+  version: 2.0.4
+  resolution: "@svgdotjs/svg.resize.js@npm:2.0.4"
+  peerDependencies:
+    "@svgdotjs/svg.js": ^3.2.4
+    "@svgdotjs/svg.select.js": ^4.0.1
+  checksum: 10c0/a57de7fd99156b19e9b50b82b8b4c29097baf4cb85489e7368a7b182fa99787ab1eca3aeed0f845504595cda38dd477c658f2912a51b9341eb91d2656bc8b91c
+  languageName: node
+  linkType: hard
+
+"@svgdotjs/svg.select.js@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "@svgdotjs/svg.select.js@npm:4.0.1"
+  peerDependencies:
+    "@svgdotjs/svg.js": ^3.2.4
+  checksum: 10c0/8e619995889d330661762050c3825f34568b48fa68da7943ebaec26fb298fc8c4175b25864ca2cafb5cee05f5aa9f0d7e375fa2c03b82aacb4adfb02d7ff6625
+  languageName: node
+  linkType: hard
+
 "@testing-library/dom@npm:10.4.0":
   version: 10.4.0
   resolution: "@testing-library/dom@npm:10.4.0"
@@ -3521,18 +3565,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:3.51.0":
-  version: 3.51.0
-  resolution: "apexcharts@npm:3.51.0"
+"apexcharts@npm:4.0.0":
+  version: 4.0.0
+  resolution: "apexcharts@npm:4.0.0"
   dependencies:
+    "@svgdotjs/svg.draggable.js": "npm:^3.0.4"
+    "@svgdotjs/svg.filter.js": "npm:^3.0.8"
+    "@svgdotjs/svg.js": "npm:^3.2.4"
+    "@svgdotjs/svg.resize.js": "npm:^2.0.2"
+    "@svgdotjs/svg.select.js": "npm:^4.0.1"
     "@yr/monotone-cubic-spline": "npm:^1.0.3"
-    svg.draggable.js: "npm:^2.2.2"
-    svg.easing.js: "npm:^2.0.0"
-    svg.filter.js: "npm:^2.0.2"
-    svg.pathmorphing.js: "npm:^0.1.3"
-    svg.resize.js: "npm:^1.4.3"
-    svg.select.js: "npm:^3.0.1"
-  checksum: 10c0/52e0d65fefe3df006fbe9de1e888407fb7e2bdbfdc92e4aa72c38291e6422b64dc3a3440a6657b0593c1f8e1e6746db607dda1666a5851d710e33cc78a969d8a
+  checksum: 10c0/723a8b2ceb2b1166588c5821aefb27ea105ca1ee08aaf415234edcd5cc1c279e21f40241622d2e909934b6d6f6b9cda6fee15c16226739b7a3d8b9d7ecf04908
   languageName: node
   linkType: hard
 
@@ -8784,7 +8827,7 @@ __metadata:
     "@uiw/react-md-editor": "npm:4.0.4"
     "@vitejs/plugin-react": "npm:4.3.0"
     "@xyflow/react": "npm:12.3.0"
-    apexcharts: "npm:3.51.0"
+    apexcharts: "npm:4.0.0"
     axios: "npm:1.7.7"
     chokidar: "npm:4.0.1"
     ckeditor5: "npm:43.3.0"
@@ -8829,7 +8872,7 @@ __metadata:
     qs: "npm:6.13.0"
     ramda: "npm:0.30.1"
     react: "npm:18.3.1"
-    react-apexcharts: "npm:1.4.1"
+    react-apexcharts: "patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch"
     react-color: "npm:2.19.3"
     react-csv: "npm:2.2.2"
     react-dom: "npm:18.3.1"
@@ -9399,27 +9442,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-apexcharts@npm:1.4.1":
-  version: 1.4.1
-  resolution: "react-apexcharts@npm:1.4.1"
+"react-apexcharts@npm:1.5.0":
+  version: 1.5.0
+  resolution: "react-apexcharts@npm:1.5.0"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
     apexcharts: ^3.41.0
     react: ">=0.13"
-  checksum: 10c0/fd6d5488eeafe421641f3f0cd6b0daa18675811cc9e0a2719a04a7a363f5a4a55b22df3bdfd1c9d737432b97ec9ea3d740557b3f78468b247a349c763c40cd3d
+  checksum: 10c0/91aef93cfd999053b0fad03b31b32b18dccfe5f08676b07e251cef214ffcc20e8e9cf92821c5ced090521ec5a02c0ca668f0139bf0f76a338cceeab0345889e9
   languageName: node
   linkType: hard
 
-"react-apexcharts@patch:react-apexcharts@npm%3A1.4.1#./.yarn/patches/react-apexcharts-npm-1.4.1-2dc909d883.patch::locator=openbas-front%40workspace%3A.":
-  version: 1.4.1
-  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.4.1#./.yarn/patches/react-apexcharts-npm-1.4.1-2dc909d883.patch::version=1.4.1&hash=5a1794&locator=openbas-front%40workspace%3A."
+"react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch":
+  version: 1.5.0
+  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch::version=1.5.0&hash=85e843"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
     apexcharts: ^3.41.0
     react: ">=0.13"
-  checksum: 10c0/ef834a4a1c80862d9bebaed66586a7320ba5f3677b52b4c9248e5ddc9a7b2d72f0f5d5bf89598ffd5759e9171d24dfe5f338e41c23c201ab7f3cdb69040e035b
+  checksum: 10c0/854d440acadd577735cdd11aafbf50eb1d2c77e14eff5157b191d89bdcf022fd041ae32189d43bd345ebb735e21fce81e1a04e6502430449d1b7cc488cc4c631
   languageName: node
   linkType: hard
 
@@ -10784,77 +10827,6 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 10c0/6c4032340701a9950865f7ae8ef38578d8d7053f5e10518076e6554a9381fa91bd9c6850193695c141f32b21f979c985db07265a758867bac95de05f7d8aeb39
-  languageName: node
-  linkType: hard
-
-"svg.draggable.js@npm:^2.2.2":
-  version: 2.2.2
-  resolution: "svg.draggable.js@npm:2.2.2"
-  dependencies:
-    svg.js: "npm:^2.0.1"
-  checksum: 10c0/b21be608254cb10b56de2867883b11053caab477ffc0b5bc9aab7ae640293413c5ad68bd29c6eeed62e41f424576eb5e8b2ebc50056d7b05a060720446a34556
-  languageName: node
-  linkType: hard
-
-"svg.easing.js@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "svg.easing.js@npm:2.0.0"
-  dependencies:
-    svg.js: "npm:>=2.3.x"
-  checksum: 10c0/5c8b656d0c2956326e03e65448bd77e014b6acbe5fd50aa64ba983b40614145e66b4f27790698f4ef3e64d56498038ff5190ab5829772e823c64d5d70d8c953d
-  languageName: node
-  linkType: hard
-
-"svg.filter.js@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "svg.filter.js@npm:2.0.2"
-  dependencies:
-    svg.js: "npm:^2.2.5"
-  checksum: 10c0/c2b88f05bd2bd8cbf0b4378d8dc41567702242a92d548664893a6239ab887cc2a7cb1da016990bc099982bdb03460fa5dd05ce70cc0d8bd8f3052abf2764949c
-  languageName: node
-  linkType: hard
-
-"svg.js@npm:>=2.3.x, svg.js@npm:^2.0.1, svg.js@npm:^2.2.5, svg.js@npm:^2.4.0, svg.js@npm:^2.6.5":
-  version: 2.7.1
-  resolution: "svg.js@npm:2.7.1"
-  checksum: 10c0/b50eecb4effdf9ad6be4ddbfd0fcf4e44bd1f6318b2dbbffe3fe639cbe556c9ac8253345f6c6e3734ba84b35472b975e359fb689c9795efb11be6cbba9d7bcfd
-  languageName: node
-  linkType: hard
-
-"svg.pathmorphing.js@npm:^0.1.3":
-  version: 0.1.3
-  resolution: "svg.pathmorphing.js@npm:0.1.3"
-  dependencies:
-    svg.js: "npm:^2.4.0"
-  checksum: 10c0/68e7f70fc900365bdb2fdc8aeb4b3fd8e7ac753a58e4cd43f935723991ab778af91a314c94343e64d77a5374638b880ebba3e286e6be3c8debcdec220bba39ab
-  languageName: node
-  linkType: hard
-
-"svg.resize.js@npm:^1.4.3":
-  version: 1.4.3
-  resolution: "svg.resize.js@npm:1.4.3"
-  dependencies:
-    svg.js: "npm:^2.6.5"
-    svg.select.js: "npm:^2.1.2"
-  checksum: 10c0/0ebdb3dd2e93cc14831e9e017c45d435ba0fdf26cd877411d2da7390a18035dd3754ffd5e1a18e50098da9ea5bb72dad49ba8f4993249bf29847efed72b0440a
-  languageName: node
-  linkType: hard
-
-"svg.select.js@npm:^2.1.2":
-  version: 2.1.2
-  resolution: "svg.select.js@npm:2.1.2"
-  dependencies:
-    svg.js: "npm:^2.2.5"
-  checksum: 10c0/6e7dfcca97ed85b5ba0018c192dbb0d08cee9943d532749f4323ca1bde0d6c797e028f0305c8da48385b41812254d6ef237f7dabd8a4c4d3a1a13e35af8e5db2
-  languageName: node
-  linkType: hard
-
-"svg.select.js@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "svg.select.js@npm:3.0.1"
-  dependencies:
-    svg.js: "npm:^2.6.5"
-  checksum: 10c0/c629447aa77dccdc5091adef8d2ce146d6b75c0c0ece383e6dfc14911a7faca6177a091a554f4450c4e4d80c36e18b5fd8b2b15f9f85beec3a95a67c5e87c33f
   languageName: node
   linkType: hard
 
