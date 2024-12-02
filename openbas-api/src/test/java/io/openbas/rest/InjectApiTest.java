@@ -25,11 +25,15 @@ import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Executor;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.DirectInjectInput;
+import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
+import io.openbas.utils.fixtures.InjectFixture;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
@@ -61,6 +65,8 @@ import org.springframework.util.ResourceUtils;
 @ExtendWith(MockitoExtension.class)
 class InjectApiTest extends IntegrationTest {
 
+  public static final String CONTRACT_EXAMPLE = "138ad8f8-32f8-4a22-8114-aaa12322bd09";
+
   static Exercise EXERCISE;
   static Scenario SCENARIO;
   static Document DOCUMENT1;
@@ -75,6 +81,7 @@ class InjectApiTest extends IntegrationTest {
   @SpyBean private Executor executor;
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private InjectRepository injectRepository;
+  @Autowired private InjectStatusRepository injectStatusRepository;
   @Autowired private DocumentRepository documentRepository;
   @Autowired private CommunicationRepository communicationRepository;
   @Autowired private InjectExpectationRepository injectExpectationRepository;
@@ -83,6 +90,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
+  @MockBean private InjectExpectationService injectExpectationService;
 
   @BeforeAll
   void beforeAll() {
@@ -612,5 +620,92 @@ class InjectApiTest extends IntegrationTest {
             .findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId())
             .isEmpty(),
         "There should be no expectations related to the inject in the database");
+  }
+
+  // -- CALLBACK IMPLANT --
+
+  @Test
+  @DisplayName("Creating expectations when the Implant calls Openbas with a Success status")
+  @WithMockAdminUser
+  void buildAndSaveInjectExpectationsWhenImplantSendStatusSuccess() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract =
+        this.injectorContractRepository.findById(CONTRACT_EXAMPLE).orElseThrow();
+
+    Inject inject = new Inject();
+    inject.setTitle("Inject to be executed by agent Openbas");
+    inject.setInjectorContract(injectorContract);
+    inject.setDependsDuration(0L);
+    Inject injectCreated = injectRepository.save(inject);
+
+    InjectStatus injectStatus = new InjectStatus();
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setTrackingTotalSuccess(1);
+    injectStatus.setTrackingTotalError(0);
+    injectStatus.setTrackingTotalCount(2);
+    injectStatus.setName(ExecutionStatus.QUEUING);
+    injectStatus.setInject(injectCreated);
+    injectStatusRepository.save(injectStatus);
+
+    InjectExecutionInput input = InjectFixture.getInjectExecutionInput();
+
+    String response =
+        mvc.perform(
+                post(INJECT_URI + "/execution/callback/" + injectCreated.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(input)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertEquals("PARTIAL", JsonPath.read(response, "$.inject_status.status_name"));
+    // We check if generateExpectations and buildAndSaveInjectExpectations are called
+    verify(injectExpectationService).generateExpectations(inject);
+    verify(injectExpectationService).buildAndSaveInjectExpectations(any(), any());
+  }
+
+  @Test
+  @DisplayName("No expectations are created when the Implant calls Openbas with a status Error")
+  @WithMockAdminUser
+  void NoBuildInjectExpectationsWhenImplantSendStatusERROR() throws Exception {
+    // -- PREPARE --
+    InjectorContract injectorContract =
+        this.injectorContractRepository.findById(CONTRACT_EXAMPLE).orElseThrow();
+
+    Inject inject = new Inject();
+    inject.setTitle("Inject to be executed by agent Openbas");
+    inject.setInjectorContract(injectorContract);
+    inject.setDependsDuration(0L);
+    Inject injectCreated = injectRepository.save(inject);
+
+    InjectStatus injectStatus = new InjectStatus();
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setTrackingTotalSuccess(0);
+    injectStatus.setTrackingTotalError(1);
+    injectStatus.setTrackingTotalCount(1);
+    injectStatus.setName(ExecutionStatus.QUEUING);
+    injectStatus.setInject(injectCreated);
+    injectStatusRepository.save(injectStatus);
+
+    InjectExecutionInput input = InjectFixture.getInjectExecutionInput();
+    input.setStatus("ERROR");
+
+    String response =
+        mvc.perform(
+                post(INJECT_URI + "/execution/callback/" + injectCreated.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(input)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertEquals("ERROR", JsonPath.read(response, "$.inject_status.status_name"));
+    // We check if generateExpectations and buildAndSaveInjectExpectations are never called
+    verify(injectExpectationService, never()).generateExpectations(any());
+    verify(injectExpectationService, never()).buildAndSaveInjectExpectations(any(), any());
   }
 }
