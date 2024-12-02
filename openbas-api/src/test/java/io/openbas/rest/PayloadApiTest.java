@@ -171,7 +171,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(
             result -> {
               String errorMessage = result.getResolvedException().getMessage();
-              assertTrue(errorMessage.contains("Executable architecture must be X86_64 or ARM64"));
+              assertTrue(errorMessage.contains("Executable architecture must be x86_64 or ARM64"));
             });
   }
 
@@ -234,7 +234,7 @@ public class PayloadApiTest extends IntegrationTest {
         .andExpect(
             result -> {
               String errorMessage = result.getResolvedException().getMessage();
-              assertTrue(errorMessage.contains("Executable architecture cannot be null"));
+              assertTrue(errorMessage.contains("Payload architecture cannot be null"));
             });
   }
 
