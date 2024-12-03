@@ -143,6 +143,7 @@ export interface AtomicInjectorContractOutput {
   injector_contract_content: string;
   injector_contract_id: string;
   injector_contract_labels: Record<string, string>;
+  injector_contract_payload?: PayloadSimple;
   injector_contract_platforms?: (
     | "Linux"
     | "Windows"
@@ -201,7 +202,7 @@ export interface AttackPatternCreateInput {
 }
 
 /** Attack pattern */
-export interface AttackPatternSimpleDto {
+export interface AttackPatternSimple {
   attack_pattern_external_id: string;
   attack_pattern_id: string;
   attack_pattern_name: string;
@@ -1419,7 +1420,7 @@ export interface InjectResultOutput {
 
 export interface InjectResultOverviewOutput {
   /** Attack pattern */
-  inject_attack_patterns?: AttackPatternSimpleDto[];
+  inject_attack_patterns?: AttackPatternSimple[];
   inject_content?: object;
   /** Description of inject */
   inject_description?: string;
@@ -1467,7 +1468,7 @@ export interface InjectStatus {
     | "PENDING"
     | "PARTIAL"
     | "MAYBE_PARTIAL_PREVENTED";
-  status_payload_output?: PayloadOutput;
+  status_payload_output?: StatusPayload;
   status_traces?: InjectStatusExecution[];
   /** @format date-time */
   tracking_ack_date?: string;
@@ -2606,51 +2607,6 @@ export interface PayloadCreateInput {
   payload_type: string;
 }
 
-export interface PayloadOutput {
-  dns_resolution_hostname?: string;
-  executable_file?: Document;
-  file_drop_file?: Document;
-  network_traffic_ip_dst: string;
-  network_traffic_ip_src: string;
-  /** @format int32 */
-  network_traffic_port_dst: number;
-  /** @format int32 */
-  network_traffic_port_src: number;
-  network_traffic_protocol: string;
-  payload_arguments?: PayloadArgument[];
-  payload_cleanup_executor?: string;
-  payload_command_blocks?: PayloadCommandBlock[];
-  payload_external_id?: string;
-  payload_prerequisites?: PayloadPrerequisite[];
-}
-
-export interface PayloadOutputDto {
-  dns_resolution_hostname?: string;
-  executable_arch?: "x86_64" | "arm64" | "Unknown";
-  executable_file?: Document;
-  file_drop_file?: Document;
-  network_traffic_ip_dst: string;
-  network_traffic_ip_src: string;
-  /** @format int32 */
-  network_traffic_port_dst: number;
-  /** @format int32 */
-  network_traffic_port_src: number;
-  network_traffic_protocol: string;
-  payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: AttackPatternSimpleDto[];
-  payload_cleanup_executor?: string;
-  payload_collector_type?: string;
-  payload_command_blocks?: PayloadCommandBlock[];
-  payload_description?: string;
-  payload_external_id?: string;
-  payload_name?: string;
-  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
-  payload_prerequisites?: PayloadPrerequisite[];
-  /** @uniqueItems true */
-  payload_tags?: string[];
-  payload_type?: string;
-}
-
 export interface PayloadPrerequisite {
   check_command?: string;
   description?: string;
@@ -3234,6 +3190,51 @@ export interface StatisticElement {
   global_count?: number;
   /** @format int64 */
   progression_count?: number;
+}
+
+export interface StatusPayload {
+  dns_resolution_hostname?: string;
+  executable_file?: Document;
+  file_drop_file?: Document;
+  network_traffic_ip_dst: string;
+  network_traffic_ip_src: string;
+  /** @format int32 */
+  network_traffic_port_dst: number;
+  /** @format int32 */
+  network_traffic_port_src: number;
+  network_traffic_protocol: string;
+  payload_arguments?: PayloadArgument[];
+  payload_cleanup_executor?: string;
+  payload_command_blocks?: PayloadCommandBlock[];
+  payload_external_id?: string;
+  payload_prerequisites?: PayloadPrerequisite[];
+}
+
+export interface StatusPayloadOutput {
+  dns_resolution_hostname?: string;
+  executable_arch?: "x86_64" | "arm64" | "Unknown";
+  executable_file?: Document;
+  file_drop_file?: Document;
+  network_traffic_ip_dst: string;
+  network_traffic_ip_src: string;
+  /** @format int32 */
+  network_traffic_port_dst: number;
+  /** @format int32 */
+  network_traffic_port_src: number;
+  network_traffic_protocol: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: AttackPatternSimple[];
+  payload_cleanup_executor?: string;
+  payload_collector_type?: string;
+  payload_command_blocks?: PayloadCommandBlock[];
+  payload_description?: string;
+  payload_external_id?: string;
+  payload_name?: string;
+  payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  /** @uniqueItems true */
+  payload_tags?: string[];
+  payload_type?: string;
 }
 
 export interface Tag {

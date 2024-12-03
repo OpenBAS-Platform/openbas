@@ -5,9 +5,11 @@ import io.openbas.database.model.*;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +36,7 @@ public class StatusPayloadOutput {
   private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
 
   @JsonProperty("payload_attack_patterns")
-  private List<AttackPatternSimpleDto> attackPatterns = new ArrayList<>();
+  private List<AttackPatternSimple> attackPatterns = new ArrayList<>();
 
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
