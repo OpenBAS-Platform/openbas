@@ -168,7 +168,15 @@ jobs:
     steps:
       - checkout
       - kubernetes/install-kubectl
-      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN -n customer-testing rollout restart deployment
+      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN -n customer-testing rollout restart deployment -l app=openbas
+
+  deploy_prerelease:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - kubernetes/install-kubectl
+      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN_PRE_RELEASE -n customer-prerelease rollout restart deployment -l app=openbas
 
   docker_build_platform:
     working_directory: ~/openbas_docker
@@ -185,22 +193,21 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get -y install git
-            LATEST_VERSION=$(git describe --tags --abbrev=0)
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-installer-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-upgrade-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-upgrade-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-upgrade-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-upgrade-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION}.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-${CIRCLE_TAG:-latest}.exe
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-installer-${CIRCLE_TAG:-latest}.exe
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-installer-${CIRCLE_TAG:-latest}.ps1
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-upgrade-${CIRCLE_TAG:-$LATEST_VERSION}.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-upgrade-${CIRCLE_TAG:-latest}.ps1
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/arm64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-implant/linux/arm64/openbas-implant-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/x86_64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-implant/linux/x86_64/openbas-implant-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/macos/arm64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-implant/macos/arm64/openbas-implant-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/windows/x86_64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION}.exe https://filigran.jfrog.io/artifactory/openbas-implant/windows/x86_64/openbas-implant-${CIRCLE_TAG:-latest}.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG} https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG}
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG} https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG}
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-installer-${CIRCLE_TAG}.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-installer-${CIRCLE_TAG}.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-upgrade-${CIRCLE_TAG}.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-upgrade-${CIRCLE_TAG}.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG} https://filigran.jfrog.io/artifactory/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG}
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG}.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-upgrade-${CIRCLE_TAG}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-upgrade-${CIRCLE_TAG}.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-${CIRCLE_TAG}.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-${CIRCLE_TAG}.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-installer-${CIRCLE_TAG}.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-installer-${CIRCLE_TAG}.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-installer-${CIRCLE_TAG}.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-installer-${CIRCLE_TAG}.ps1
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-upgrade-${CIRCLE_TAG}.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-upgrade-${CIRCLE_TAG}.ps1
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/arm64/openbas-implant-${CIRCLE_TAG} https://filigran.jfrog.io/artifactory/openbas-implant/linux/arm64/openbas-implant-${CIRCLE_TAG}
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/x86_64/openbas-implant-${CIRCLE_TAG} https://filigran.jfrog.io/artifactory/openbas-implant/linux/x86_64/openbas-implant-${CIRCLE_TAG}
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/macos/arm64/openbas-implant-${CIRCLE_TAG} https://filigran.jfrog.io/artifactory/openbas-implant/macos/arm64/openbas-implant-${CIRCLE_TAG}
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/windows/x86_64/openbas-implant-${CIRCLE_TAG}.exe https://filigran.jfrog.io/artifactory/openbas-implant/windows/x86_64/openbas-implant-${CIRCLE_TAG}.exe
       - run:
           name: Install buildx
           command: |
@@ -245,21 +252,21 @@ jobs:
             sudo apt-get update
             sudo apt-get -y install git
             LATEST_VERSION=$(git describe --tags --abbrev=0)
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm64/openbas-agent-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-installer-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-upgrade-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-upgrade-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-upgrade-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-upgrade-${CIRCLE_TAG:-latest}.sh
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION}.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-${CIRCLE_TAG:-latest}.exe
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-installer-${CIRCLE_TAG:-latest}.exe
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-installer-${CIRCLE_TAG:-latest}.ps1
-            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-upgrade-${CIRCLE_TAG:-$LATEST_VERSION}.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-upgrade-${CIRCLE_TAG:-latest}.ps1
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/arm64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-implant/linux/arm64/openbas-implant-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/x86_64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-implant/linux/x86_64/openbas-implant-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/macos/arm64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-implant/macos/arm64/openbas-implant-${CIRCLE_TAG:-latest}
-            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/windows/x86_64/openbas-implant-${CIRCLE_TAG:-$LATEST_VERSION}.exe https://filigran.jfrog.io/artifactory/openbas-implant/windows/x86_64/openbas-implant-${CIRCLE_TAG:-latest}.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm64/openbas-agent-testing
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-testing
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-installer-$LATEST_VERSION.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-installer-testing.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-upgrade-$LATEST_VERSION.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-upgrade-testing.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/macos/arm64/openbas-agent-testing
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-installer-testing.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-upgrade-$LATEST_VERSION.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-upgrade-testing.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-$LATEST_VERSION.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-testing.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-installer-$LATEST_VERSION.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-installer-testing.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-installer-$LATEST_VERSION.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-installer-testing.ps1
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-upgrade-$LATEST_VERSION.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-upgrade-testing.ps1
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/arm64/openbas-implant-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-implant/linux/arm64/openbas-implant-testing
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/x86_64/openbas-implant-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-implant/linux/x86_64/openbas-implant-testing
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/macos/arm64/openbas-implant-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-implant/macos/arm64/openbas-implant-testing
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/windows/x86_64/openbas-implant-$LATEST_VERSION.exe https://filigran.jfrog.io/artifactory/openbas-implant/windows/x86_64/openbas-implant-testing.exe
       - run:
           name: Install buildx
           command: |
@@ -282,6 +289,67 @@ jobs:
           working_directory: ~/openbas_docker
           name: Build Docker image openbas/platform
           command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:rolling --push .
+          no_output_timeout: 30
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+      - ms-teams/report:
+          only_on_fail: true
+          webhook_url: $MS_TEAMS_WEBHOOK_URL
+
+  docker_build_platform_prerelease:
+    working_directory: ~/openbas_docker
+    machine:
+      image: ubuntu-2004:202111-02
+      resource_class: large
+    environment:
+      DOCKER_BUILDKIT: 1
+      BUILDX_PLATFORMS: linux/amd64,linux/arm64
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          command: |
+            sudo apt-get update
+            sudo apt-get -y install git
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/arm64/openbas-agent-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-agent/linux/arm64/openbas-agent-prerelease
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/x86_64/openbas-agent-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-agent/linux/x86_64/openbas-agent-prerelease
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-installer-$LATEST_VERSION.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-installer-prerelease.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/linux/openbas-agent-upgrade-$LATEST_VERSION.sh https://filigran.jfrog.io/artifactory/openbas-agent/linux/openbas-agent-upgrade-prerelease.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/arm64/openbas-agent-${CIRCLE_TAG:-$LATEST_VERSION} https://filigran.jfrog.io/artifactory/openbas-agent/macos/arm64/openbas-agent-prerelease
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-installer-${CIRCLE_TAG:-$LATEST_VERSION}.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-installer-prerelease.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/macos/openbas-agent-upgrade-$LATEST_VERSION.sh https://filigran.jfrog.io/artifactory/openbas-agent/macos/openbas-agent-upgrade-prerelease.sh
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-$LATEST_VERSION.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-prerelease.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/x86_64/openbas-agent-installer-$LATEST_VERSION.exe https://filigran.jfrog.io/artifactory/openbas-agent/windows/x86_64/openbas-agent-installer-prerelease.exe
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-installer-$LATEST_VERSION.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-installer-prerelease.ps1
+            curl -L -o openbas-api/src/main/resources/agents/openbas-agent/windows/openbas-agent-upgrade-$LATEST_VERSION.ps1 https://filigran.jfrog.io/artifactory/openbas-agent/windows/openbas-agent-upgrade-prerelease.ps1
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/arm64/openbas-implant-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-implant/linux/arm64/openbas-implant-prerelease
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/linux/x86_64/openbas-implant-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-implant/linux/x86_64/openbas-implant-prerelease
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/macos/arm64/openbas-implant-$LATEST_VERSION https://filigran.jfrog.io/artifactory/openbas-implant/macos/arm64/openbas-implant-prerelease
+            curl -L -o openbas-api/src/main/resources/implants/openbas-implant/windows/x86_64/openbas-implant-$LATEST_VERSION.exe https://filigran.jfrog.io/artifactory/openbas-implant/windows/x86_64/openbas-implant-prerelease.exe
+      - run:
+          name: Install buildx
+          command: |
+            BUILDX_BINARY_URL="https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.linux-amd64"
+            curl --output docker-buildx \
+              --silent --show-error --location --fail --retry 3 \
+              "$BUILDX_BINARY_URL"
+            mkdir -p ~/.docker/cli-plugins
+            mv docker-buildx ~/.docker/cli-plugins/
+            chmod a+x ~/.docker/cli-plugins/docker-buildx
+            docker buildx install
+            # Run binfmt
+            docker run --rm --privileged tonistiigi/binfmt:latest --install "$BUILDX_PLATFORMS"
+            docker buildx create --name multiarch --driver docker-container --use
+            docker buildx inspect --bootstrap
+      - run:
+          name: Login
+          command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      - run:
+          working_directory: ~/openbas_docker
+          name: Build Docker image openbas/platform
+          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:prerelease --push .
           no_output_timeout: 30
       - slack/notify:
           event: fail
@@ -355,6 +423,13 @@ workflows:
             branches:
               only:
                 - master
+      - docker_build_platform_prerelease:
+          requires:
+            - build_frontend
+          filters:
+            branches:
+              only:
+                - release/*
       - docker_build_platform:
           requires:
             - build_frontend
@@ -366,9 +441,13 @@ workflows:
       - deploy_testing:
           requires:
             - docker_build_platform_rolling
+      - deploy_prerelease:
+          requires:
+            - docker_build_platform_prerelease
       - notify_rolling:
           requires:
             - deploy_testing
+            - deploy_prerelease
             - package_rolling
             - package_rolling_musl
       - notify:
