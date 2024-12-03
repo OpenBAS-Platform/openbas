@@ -7,12 +7,9 @@ import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
 import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 
 import io.openbas.database.model.*;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
