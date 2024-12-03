@@ -295,7 +295,7 @@ public class OperationUtilsJpa {
 
   private static Expression<Boolean> arrayPosition(
       Expression<String[]> paths, CriteriaBuilder cb, Expression<String> text) {
-    return cb.function("array_position", Boolean.class, paths, text);
+    return cb.function("array_position_wrapper", Boolean.class, paths, text);
   }
 
   private static Expression<String> lower(Expression<String> paths, CriteriaBuilder cb) {
@@ -307,7 +307,7 @@ public class OperationUtilsJpa {
   }
 
   private static Expression<String> arrayToString(Expression<?> paths, CriteriaBuilder cb) {
-    return cb.function("array_to_string", String.class, paths, cb.literal(" && "));
+    return cb.function("array_to_string_wrapper", String.class, paths, cb.literal(" && "));
   }
 
   private static Expression<String[]> avals(Expression<String> paths, CriteriaBuilder cb) {

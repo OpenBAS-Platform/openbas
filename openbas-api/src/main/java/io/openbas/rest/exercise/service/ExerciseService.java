@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -384,11 +385,13 @@ public class ExerciseService {
     // Array aggregations
     Join<Base, Base> exerciseTagsJoin = exerciseRoot.join("tags", JoinType.LEFT);
     joinMap.put("tags", exerciseTagsJoin);
-    Expression<String[]> tagIdsExpression = arrayAggOnId(cb, exerciseTagsJoin);
+    Expression<String[]> tagIdsExpression =
+        arrayAggOnId((HibernateCriteriaBuilder) cb, exerciseTagsJoin);
 
     Join<Base, Base> injectsJoin = exerciseRoot.join("injects", JoinType.LEFT);
     joinMap.put("injects", injectsJoin);
-    Expression<String[]> injectIdsExpression = arrayAggOnId(cb, injectsJoin);
+    Expression<String[]> injectIdsExpression =
+        arrayAggOnId((HibernateCriteriaBuilder) cb, injectsJoin);
     // SELECT
     cq.multiselect(
             exerciseRoot.get("id").alias("exercise_id"),
