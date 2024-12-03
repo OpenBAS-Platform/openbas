@@ -271,8 +271,7 @@ public class OpenBASImplantExecutor extends Injector {
             computeExpectationsForAssetGroup(
                 expectations, content, assetGroup, new ArrayList<>())));
 
-    injectExpectationService.buildAndSaveInjectExpectations(
-        injectHelper.getExecutableInjectForOpenBASImplantExecutor(inject), expectations);
+    injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
 
     return new ExecutionProcess(true);
   }

@@ -162,15 +162,4 @@ public class InjectHelper {
     return concat(concat(executableInjects, executableDryInjects), executableAtomicTests)
         .collect(Collectors.toList());
   }
-
-  public ExecutableInject getExecutableInjectForOpenBASImplantExecutor(Inject inject) {
-    return new ExecutableInject(
-        true,
-        false,
-        inject,
-        getInjectTeams(inject),
-        inject.getAssets(),
-        inject.getAssetGroups(),
-        usersFromInjection(inject));
-  }
 }
