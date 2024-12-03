@@ -6,7 +6,9 @@ import io.openbas.database.converter.ContentConverter;
 import io.openbas.database.model.Endpoint;
 import jakarta.persistence.Convert;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.*;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,9 @@ public class AtomicInjectorContractOutput {
 
   @JsonProperty("injector_contract_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms;
+
+  @JsonProperty("injector_contract_payload")
+  private PayloadSimple payload;
 
   @Builder.Default
   @JsonProperty("injector_contract_labels")
