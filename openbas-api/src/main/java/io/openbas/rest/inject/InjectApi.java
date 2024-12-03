@@ -130,7 +130,7 @@ public class InjectApi extends RestBehavior {
     if (ExecutionTraceStatus.SUCCESS.equals(executionStatus)) {
       injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
     } else {
-      injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
+      injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
     }
 
     int currentTotal =
