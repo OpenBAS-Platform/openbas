@@ -16,7 +16,7 @@ import lombok.Singular;
 @Setter
 @Getter
 @Builder
-public class PayloadOutputDto {
+public class StatusPayloadOutput {
 
   @JsonProperty("payload_type")
   private String type;
