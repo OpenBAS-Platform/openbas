@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class AttackPatternSimpleDto {
+public class AttackPatternSimple {
 
   @JsonProperty("attack_pattern_id")
   @NotBlank
