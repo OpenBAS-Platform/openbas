@@ -30,7 +30,7 @@ function getInjectorContractWithEmptyPredefinedExpectations(injectorContractCont
   const fieldsOnlyExpectations = fields.filter(
     (f: { key: string }) => f.key === 'expectations',
   );
-  if (fieldsOnlyExpectations.length === 0 || (fieldsOnlyExpectations.length > 0 && !fieldsOnlyExpectations[0].hasAttribute('predefinedExpectations'))) {
+  if (fieldsOnlyExpectations.length === 0 || (fieldsOnlyExpectations.length > 0 && !Object.prototype.hasOwnProperty.call(fieldsOnlyExpectations[0], 'predefinedExpectations'))) {
     return injectorContract;
   }
   const fieldsWithoutExpectations = fields.filter(
