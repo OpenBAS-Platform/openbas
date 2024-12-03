@@ -1,6 +1,6 @@
 import { Tab, Tabs } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { fetchInject } from '../../../../actions/Inject';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
@@ -22,6 +22,28 @@ interface Props {
   injectId: string;
   isAtomic?: boolean;
   injects?: InjectOutputType[];
+}
+
+function getInjectorContractWithEmptyPredefinedExpectations(injectorContractContent: string) {
+  const injectorContract = JSON.parse(injectorContractContent);
+  const { fields } = injectorContract;
+  const fieldsOnlyExpectations = fields.filter(
+    (f: { key: string }) => f.key === 'expectations',
+  );
+  if (fieldsOnlyExpectations.length === 0 || (fieldsOnlyExpectations.length > 0 && !Object.prototype.hasOwnProperty.call(fieldsOnlyExpectations[0], 'predefinedExpectations'))) {
+    return injectorContract;
+  }
+  const fieldsWithoutExpectations = fields.filter(
+    (f: { key: string }) => f.key !== 'expectations',
+  );
+  const fieldsWithEmptyPredefinedExpectations = [
+    ...fieldsWithoutExpectations,
+    {
+      ...fieldsOnlyExpectations[0],
+      predefinedExpectations: [],
+    },
+  ];
+  return { ...injectorContract, fields: fieldsWithEmptyPredefinedExpectations };
 }
 
 const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, injects, ...props }) => {
@@ -49,7 +71,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
   const [injectorContract, setInjectorContract] = useState(null);
   useEffect(() => {
     if (inject?.inject_injector_contract?.injector_contract_content) {
-      setInjectorContract(JSON.parse(inject.inject_injector_contract?.injector_contract_content));
+      setInjectorContract(getInjectorContractWithEmptyPredefinedExpectations(inject.inject_injector_contract?.injector_contract_content));
     }
   }, [inject]);
   return (

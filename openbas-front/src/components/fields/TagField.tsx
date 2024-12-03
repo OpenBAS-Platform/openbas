@@ -79,11 +79,7 @@ const TagField: FunctionComponent<Props> = ({
         if (result.result) {
           const newTag = result.entities.tags[result.result];
           const newTags = R.append(
-            {
-              id: newTag.tag_id,
-              label: newTag.tag_name,
-              color: newTag.tag_color,
-            },
+            newTag.tag_id,
             fieldValue,
           );
           fieldOnChange(newTags);
