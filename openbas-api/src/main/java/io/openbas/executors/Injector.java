@@ -55,7 +55,7 @@ public abstract class Injector {
   public abstract ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception;
 
-  public PayloadOutput getPayloadOutput(String externalId) {
+  public StatusPayload getPayloadOutput(String externalId) {
     return null;
   }
 

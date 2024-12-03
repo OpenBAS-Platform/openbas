@@ -16,10 +16,10 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.*;
-import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
+import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectMapper;
+import io.openbas.utils.PayloadMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Join;
@@ -47,7 +47,7 @@ public class AtomicTestingService {
 
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
-  private final AtomicTestingUtils atomicTestingUtils;
+  private final PayloadMapper payloadMapper;
   private final InjectRepository injectRepository;
   private final InjectStatusRepository injectStatusRepository;
   private final InjectorContractRepository injectorContractRepository;
@@ -81,9 +81,9 @@ public class AtomicTestingService {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  public PayloadOutputDto findPayloadOutputByInjectId(String injectId) {
+  public StatusPayloadOutput findPayloadOutputByInjectId(String injectId) {
     Optional<Inject> inject = injectRepository.findById(injectId);
-    return atomicTestingUtils.getPayloadOutputFromInject(inject);
+    return payloadMapper.getPayloadOutputFromInject(inject);
   }
 
   @Transactional

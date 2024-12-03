@@ -61,7 +61,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setName(ExecutionStatus.SUCCESS);
     /*injectStatus.setCommandsLines(
-    new PayloadOutput(List.of("cmd"), List.of("clean cmd"), "id1234567"));*/
+    new StatusPayload(List.of("cmd"), List.of("clean cmd"), "id1234567"));*/
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
   }
 
