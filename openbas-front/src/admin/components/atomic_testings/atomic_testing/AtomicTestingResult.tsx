@@ -57,7 +57,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
             IconComponent = TrackChangesOutlined;
             break;
           default:
-            tooltipLabel = t('Human response');
+            tooltipLabel = t('Human Response');
             IconComponent = SensorOccupiedOutlined;
         }
         return (
