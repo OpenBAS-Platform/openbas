@@ -22,7 +22,7 @@ public class MinioDriver {
    * @return
    * @throws Exception
    */
-  public MinioClient getMinioClient() throws Exception {
+  public MinioClient getMinioClient() {
     MinioClient minioClient;
     if (s3Config.isUseAwsRole()) {
       String stsEndpoint = null;

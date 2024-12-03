@@ -5,6 +5,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.minio.BucketExistsArgs;
 import io.minio.MinioClient;
+import io.minio.errors.*;
 import io.openbas.config.MinioConfig;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.repository.HealthCheckRepository;
@@ -12,6 +13,8 @@ import io.openbas.driver.MinioDriver;
 import io.openbas.service.exception.HealthCheckFailureException;
 import jakarta.annotation.Resource;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -85,12 +88,21 @@ public class HealthCheckService {
 
   @VisibleForTesting
   protected void runFileStorageCheck() throws HealthCheckFailureException {
+
+    // we get a new client instance to avoid to update the client injected by Spring
+    MinioClient minioClient = minioDriver.getMinioClient();
+    minioClient.setTimeout(2000L, 2000L, 2000L);
     try {
-      // we get a new client instance to avoid to update the client injected by Spring
-      MinioClient minioClient = minioDriver.getMinioClient();
-      minioClient.setTimeout(2000L, 2000L, 2000L);
       minioClient.bucketExists(BucketExistsArgs.builder().bucket(minioConfig.getBucket()).build());
-    } catch (Exception e) {
+    } catch (ErrorResponseException
+        | InvalidResponseException
+        | InsufficientDataException
+        | InternalException
+        | InvalidKeyException
+        | IOException
+        | NoSuchAlgorithmException
+        | ServerException
+        | XmlParserException e) {
       throw new HealthCheckFailureException("FileStorage check failure", e);
     }
   }

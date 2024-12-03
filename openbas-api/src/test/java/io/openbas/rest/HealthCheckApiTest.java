@@ -2,7 +2,8 @@ package io.openbas.rest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import io.openbas.rest.health_check.HealthCheckApi;
 import io.openbas.service.HealthCheckService;
@@ -65,5 +66,17 @@ public class HealthCheckApiTest {
     assertEquals(
         HttpStatusCode.valueOf(HttpStatus.SERVICE_UNAVAILABLE.value()),
         exceptionThrown.getStatusCode());
+  }
+
+  @DisplayName("Test healthCheck when healthCheckService throws a runtime exception")
+  @Test
+  void test_healthCheck_WHEN_health_check_fails_with_a_runtime() throws Exception {
+    doThrow(new RuntimeException("test")).when(healthCheckService).runHealthCheck();
+
+    assertThrows(
+        RuntimeException.class,
+        () -> {
+          healthCheckApi.healthCheck(KEY);
+        });
   }
 }

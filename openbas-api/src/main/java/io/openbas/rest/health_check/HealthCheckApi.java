@@ -48,8 +48,8 @@ public class HealthCheckApi extends RestBehavior {
       })
   public ResponseEntity<?> healthCheck(
       @RequestParam("health_access_key") String requestHealthAccessKey) {
-    if (StringUtils.isEmpty(requestHealthAccessKey)
-        || StringUtils.isEmpty(healthCheckKey)
+    if (StringUtils.isBlank(requestHealthAccessKey)
+        || StringUtils.isBlank(healthCheckKey)
         || !healthCheckKey.equals(requestHealthAccessKey)) {
       throw new ResponseStatusException(HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()));
     }
