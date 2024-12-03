@@ -5376,13 +5376,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"eslint-plugin-i18next@npm:6.1.0":
-  version: 6.1.0
-  resolution: "eslint-plugin-i18next@npm:6.1.0"
+"eslint-plugin-i18next@npm:6.1.1":
+  version: 6.1.1
+  resolution: "eslint-plugin-i18next@npm:6.1.1"
   dependencies:
     lodash: "npm:^4.17.21"
     requireindex: "npm:~1.1.0"
-  checksum: 10c0/06c36df0de8cc0043c54c3e881d89b51558ed0b8c9dbff6f9cc9028e8df789a254921b7fad1427ce25790bbd8b99089ae413f95742e3536992be6e709cdee302
+  checksum: 10c0/38b29ad0a8385ab4b9cb7667b8ae082fdf59757d697c2532a324a216ebaa0e0b309ef4088741e42aff8160e186b5076cfa0cc159e0fd869aaf79f443608ea8d8
   languageName: node
   linkType: hard
 
@@ -8941,7 +8941,7 @@ __metadata:
     eslint: "npm:9.15.0"
     eslint-import-resolver-oxc: "npm:0.4.0"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
-    eslint-plugin-i18next: "npm:6.1.0"
+    eslint-plugin-i18next: "npm:6.1.1"
     eslint-plugin-import: "npm:2.31.0"
     eslint-plugin-import-newlines: "npm:1.4.0"
     eslint-plugin-playwright: "npm:2.1.0"
