@@ -25,41 +25,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component(ChannelContract.TYPE)
+@RequiredArgsConstructor
 public class ChannelExecutor extends Injector {
 
   public static final String VARIABLE_ARTICLES = "articles";
-
   public static final String VARIABLE_ARTICLE = "article";
 
   @Resource private OpenBASConfig openBASConfig;
-
-  private ArticleRepository articleRepository;
-
-  private EmailService emailService;
-  private InjectExpectationService injectExpectationService;
+  private final ArticleRepository articleRepository;
+  private final EmailService emailService;
+  private final InjectExpectationService injectExpectationService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
-
-  @Autowired
-  public void setArticleRepository(ArticleRepository articleRepository) {
-    this.articleRepository = articleRepository;
-  }
-
-  @Autowired
-  public void setEmailService(EmailService emailService) {
-    this.emailService = emailService;
-  }
-
-  @Autowired
-  public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
-    this.injectExpectationService = injectExpectationService;
-  }
 
   private String buildArticleUri(ExecutionContext context, Article article) {
     String userId = context.getUser().getId();

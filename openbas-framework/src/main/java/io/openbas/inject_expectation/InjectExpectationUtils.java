@@ -119,7 +119,7 @@ public class InjectExpectationUtils {
     return expectationExecution;
   }
 
-  // -- INJECT EXPECTATION SIGNATURE --
+  // -- INJECT EXPECTATION SIGNATURE FOR OBAS IMPLANT EXECUTOR --
 
   public static List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();

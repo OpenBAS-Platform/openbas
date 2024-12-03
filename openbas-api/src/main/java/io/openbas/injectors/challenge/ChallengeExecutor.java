@@ -25,38 +25,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component(ChallengeContract.TYPE)
+@RequiredArgsConstructor
 public class ChallengeExecutor extends Injector {
 
   @Resource private OpenBASConfig openBASConfig;
 
-  private ChallengeRepository challengeRepository;
-
-  private EmailService emailService;
-
-  private InjectExpectationService injectExpectationService;
+  private final ChallengeRepository challengeRepository;
+  private final EmailService emailService;
+  private final InjectExpectationService injectExpectationService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
-
-  @Autowired
-  public void setChallengeRepository(ChallengeRepository challengeRepository) {
-    this.challengeRepository = challengeRepository;
-  }
-
-  @Autowired
-  public void setEmailService(EmailService emailService) {
-    this.emailService = emailService;
-  }
-
-  @Autowired
-  public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
-    this.injectExpectationService = injectExpectationService;
-  }
 
   private String buildChallengeUri(
       ExecutionContext context, Exercise exercise, Challenge challenge) {
