@@ -3,7 +3,6 @@ package io.openbas.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +19,7 @@ import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
 import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -46,9 +46,7 @@ public class AtomicTestingService {
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
   private final InjectRepository injectRepository;
-  private final InjectStatusRepository injectStatusRepository;
   private final InjectorContractRepository injectorContractRepository;
-  private final InjectDocumentRepository injectDocumentRepository;
   private final UserRepository userRepository;
   private final TeamRepository teamRepository;
   private final TagRepository tagRepository;
