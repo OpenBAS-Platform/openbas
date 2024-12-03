@@ -97,7 +97,7 @@
     "@types/seamless-immutable": "7.1.19",
     "@types/uuid": "10.0.0",
     "@typescript-eslint/parser": "8.15.0",
-    "@vitejs/plugin-react": "4.3.0",
+    "@vitejs/plugin-react": "4.3.4",
     "chokidar": "4.0.1",
     "cross-env": "7.0.3",
     "esbuild": "0.24.0",
