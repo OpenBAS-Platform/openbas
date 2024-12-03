@@ -26,11 +26,9 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
-
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.StreamSupport;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -45,8 +43,7 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 public class AtomicTestingService {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
