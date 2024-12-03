@@ -1,8 +1,8 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { CSSProperties, FunctionComponent, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { CSSProperties, useContext, useState } from 'react';
 
 import type { TeamStore } from '../../../../actions/teams/Team';
 import ItemTags from '../../../../components/ItemTags';
