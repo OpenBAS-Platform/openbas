@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.injectors.challenge.model.ChallengeContent;
-import io.openbas.rest.inject.form.InjectExecutionInput;
 import java.util.List;
 
 public class InjectFixture {
@@ -33,14 +32,5 @@ public class InjectFixture {
     content.setChallenges(challengeIds);
     inject.setContent(objectMapper.valueToTree(content));
     return inject;
-  }
-
-  public static InjectExecutionInput getInjectExecutionInput() {
-    InjectExecutionInput input = new InjectExecutionInput();
-    input.setMessage("Response from implant");
-    input.setStatus("SUCCESS");
-    input.setDuration(15);
-    input.setIdentifiers(List.of("obas-implant-test"));
-    return input;
   }
 }

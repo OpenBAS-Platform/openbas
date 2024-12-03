@@ -1,6 +1,5 @@
 package io.openbas.inject_expectation;
 
-import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
 import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
 import static java.util.Optional.ofNullable;
 
@@ -117,31 +116,5 @@ public class InjectExpectationUtils {
       default -> throw new IllegalStateException("Unexpected value: " + expectation);
     }
     return expectationExecution;
-  }
-
-  // -- INJECT EXPECTATION SIGNATURE FOR OBAS IMPLANT EXECUTOR --
-
-  public static List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
-    List<InjectExpectationSignature> signatures = new ArrayList<>();
-    List<String> knownPayloadTypes =
-        Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
-
-    /*
-     * Always add the "Parent process" signature type for the OpenBAS Implant Executor
-     */
-    signatures.add(
-        createSignature(
-            EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME, "obas-implant-" + inject.getId()));
-
-    if (!knownPayloadTypes.contains(payload.getType())) {
-      throw new UnsupportedOperationException(
-          "Payload type " + payload.getType() + " is not supported");
-    }
-    return signatures;
-  }
-
-  private static InjectExpectationSignature createSignature(
-      String signatureType, String signatureValue) {
-    return InjectExpectationSignature.builder().type(signatureType).value(signatureValue).build();
   }
 }

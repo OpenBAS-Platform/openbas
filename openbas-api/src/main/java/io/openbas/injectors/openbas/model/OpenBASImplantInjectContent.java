@@ -1,4 +1,4 @@
-package io.openbas.inject_expectation;
+package io.openbas.injectors.openbas.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.model.inject.form.Expectation;
