@@ -31,7 +31,6 @@ import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.ExecutableInjectService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
-import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.ScenarioService;
 import io.openbas.telemetry.Tracing;
