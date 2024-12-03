@@ -7,26 +7,31 @@ import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
 import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 
 import io.openbas.database.model.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Log
 public class InjectUtils {
 
   private final ApplicationContext context;
 
-  public PayloadOutput getCommandsLinesFromInject(final Inject inject) {
+  public StatusPayload getCommandsLinesFromInject(final Inject inject) {
     if (inject == null) {
       return null;
     }
@@ -46,7 +51,7 @@ public class InjectUtils {
                 payloadCommand.getExecutor(),
                 payloadCommand.getContent(),
                 List.of(payloadCommand.getCleanupCommand()));
-        return new PayloadOutput(
+        return new StatusPayload(
             null,
             null,
             null,
@@ -66,7 +71,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-        return new PayloadOutput(
+        return new StatusPayload(
             null,
             null,
             null,
@@ -85,7 +90,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
-        return new PayloadOutput(
+        return new StatusPayload(
             null,
             null,
             null,
@@ -104,7 +109,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
-        return new PayloadOutput(
+        return new StatusPayload(
             null,
             null,
             null,
@@ -123,7 +128,7 @@ public class InjectUtils {
         // Inject has a command payload
         Payload payload = injectorContract.getPayload();
         NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
-        return new PayloadOutput(
+        return new StatusPayload(
             payloadNetworkTraffic.getProtocol(),
             payloadNetworkTraffic.getPortDst(),
             payloadNetworkTraffic.getPortSrc(),
@@ -138,27 +143,20 @@ public class InjectUtils {
             null,
             null);
       } else {
-        // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
-        io.openbas.executors.Injector executor =
-            context.getBean(
-                injectorContract.getInjector().getType(), io.openbas.executors.Injector.class);
-        return executor.getPayloadOutput(injectorContract.getId());
+        try {
+          // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
+          io.openbas.executors.Injector executor =
+              context.getBean(
+                  injectorContract.getInjector().getType(), io.openbas.executors.Injector.class);
+          return executor.getPayloadOutput(injectorContract.getId());
+        } catch (NoSuchBeanDefinitionException e) {
+          log.info(
+              "No executor found for this injector: " + injectorContract.getInjector().getType());
+          return null;
+        }
       }
     }
     return null;
-  }
-
-  // -- ATTACKPATTERN to ATTACKPATTERNSIMPLE
-  public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
-    return attackPatterns.stream()
-        .filter(Objects::nonNull)
-        .map(this::toAttackPatternSimple)
-        .toList();
-  }
-
-  private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
-    return new AttackPatternSimple(
-        attackPattern.getId(), attackPattern.getName(), attackPattern.getExternalId());
   }
 
   public List<InjectExpectation> getPrimaryExpectations(Inject inject) {
