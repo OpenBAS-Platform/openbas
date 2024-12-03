@@ -138,7 +138,7 @@
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types",
     "test:e2e": "yarn playwright test --workers=1 --retries=2",
     "test:e2e:ui": "yarn playwright test --ui --workers=1",
-    "generate-test-e2e": "yarn playwright codegen http://localhost:3000/",
+    "generate-test-e2e": "yarn playwright codegen http://localhost:3001/",
     "show-report-e2e": "start \"\" test-results/report.html && start \"\" test-results/coverage/index.html",
     "test:e2e:coverage": "E2E_COVERAGE=true yarn playwright test && yarn show-report-e2e"
   },
