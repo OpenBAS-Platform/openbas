@@ -640,9 +640,9 @@ class InjectApiTest extends IntegrationTest {
 
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setTrackingTotalSuccess(1);
+    injectStatus.setTrackingTotalSuccess(0);
     injectStatus.setTrackingTotalError(0);
-    injectStatus.setTrackingTotalCount(2);
+    injectStatus.setTrackingTotalCount(1);
     injectStatus.setName(ExecutionStatus.QUEUING);
     injectStatus.setInject(injectCreated);
     injectStatusRepository.save(injectStatus);
@@ -683,7 +683,7 @@ class InjectApiTest extends IntegrationTest {
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setTrackingTotalSuccess(0);
-    injectStatus.setTrackingTotalError(1);
+    injectStatus.setTrackingTotalError(0);
     injectStatus.setTrackingTotalCount(1);
     injectStatus.setName(ExecutionStatus.QUEUING);
     injectStatus.setInject(injectCreated);
