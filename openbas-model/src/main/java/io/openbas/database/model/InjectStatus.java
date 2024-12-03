@@ -19,7 +19,7 @@ public class InjectStatus extends BaseInjectStatus {
   @Type(JsonType.class)
   @Column(name = "status_payload_output", columnDefinition = "json")
   @JsonProperty("status_payload_output")
-  private PayloadOutput payloadOutput;
+  private StatusPayload payloadOutput;
 
   public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
     InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());

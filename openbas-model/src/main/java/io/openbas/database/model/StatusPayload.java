@@ -10,7 +10,7 @@ import lombok.Singular;
 
 @Getter
 @Setter
-public class PayloadOutput {
+public class StatusPayload {
 
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
@@ -57,9 +57,9 @@ public class PayloadOutput {
   @NotNull
   private String protocol;
 
-  public PayloadOutput() {}
+  public StatusPayload() {}
 
-  public PayloadOutput(
+  public StatusPayload(
       String protocol,
       Integer portDst,
       Integer portSrc,

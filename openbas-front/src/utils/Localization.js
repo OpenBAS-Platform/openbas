@@ -2535,7 +2535,6 @@ const i18n = {
       'Network traffic ip source': '网络流量 IP 源',
       'Network traffic port source': '网络流量端口源',
       'Network traffic protocol': '网络流量协议',
-
       'Payload info': '有效负载信息',
       'Number of simulations': '模拟数量',
       'Performance Overview': '性能概述',

@@ -1,23 +1,14 @@
 package io.openbas.utils;
 
-import static io.openbas.database.model.Command.COMMAND_TYPE;
-import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
-import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
-import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
-import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
-
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.*;
 import io.openbas.expectation.ExpectationType;
-import io.openbas.rest.atomic_testing.form.AttackPatternSimpleDto;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
-import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -581,104 +572,4 @@ public class AtomicTestingUtils {
 
   public record ResultDistribution(
       @NotNull String id, @NotNull String label, @NotNull Integer value) {}
-
-  public PayloadOutputDto getPayloadOutputFromInject(Optional<Inject> inject) {
-    PayloadOutputDto.PayloadOutputDtoBuilder payloadOutputDtoBuilder = PayloadOutputDto.builder();
-    PayloadOutputDto result = payloadOutputDtoBuilder.build();
-    if (inject.isPresent()) {
-      Optional<InjectorContract> injectorContractOpt = inject.get().getInjectorContract();
-      if (injectorContractOpt.isPresent()) {
-        InjectorContract injectorContract = injectorContractOpt.get();
-        if (inject.get().getStatus().isEmpty()) {
-          Payload payload = injectorContract.getPayload();
-          payloadOutputDtoBuilder
-              .arguments(payload.getArguments())
-              .prerequisites(payload.getPrerequisites())
-              .externalId(payload.getExternalId())
-              .cleanupExecutor(payload.getCleanupExecutor())
-              .name(injectorContract.getPayload().getName())
-              .type(injectorContract.getPayload().getType())
-              .collectorType(injectorContract.getPayload().getCollectorType())
-              .description(injectorContract.getPayload().getDescription())
-              .platforms(injectorContract.getPayload().getPlatforms())
-              .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
-              .executableArch(injectorContract.getArch());
-          if (COMMAND_TYPE.equals(injectorContract.getPayload().getType())) {
-            Command payloadCommand = (Command) Hibernate.unproxy(payload);
-            List<PayloadCommandBlock> payloadCommandBlocks = new ArrayList<>();
-            PayloadCommandBlock payloadCommandBlock =
-                new PayloadCommandBlock(
-                    payloadCommand.getExecutor(),
-                    payloadCommand.getContent(),
-                    List.of(payloadCommand.getCleanupCommand()));
-            payloadCommandBlocks.add(payloadCommandBlock);
-            payloadOutputDtoBuilder.payloadCommandBlocks(payloadCommandBlocks);
-          } else if (EXECUTABLE_TYPE.equals(injectorContract.getPayload().getType())) {
-            Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-            payloadOutputDtoBuilder.executableFile(payloadExecutable.getExecutableFile());
-          } else if (FILE_DROP_TYPE.equals(injectorContract.getPayload().getType())) {
-            FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
-            payloadOutputDtoBuilder.fileDropFile(payloadFileDrop.getFileDropFile());
-          } else if (DNS_RESOLUTION_TYPE.equals(injectorContract.getPayload().getType())) {
-            DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
-            payloadOutputDtoBuilder.hostname(payloadDnsResolution.getHostname());
-          } else if (NETWORK_TRAFFIC_TYPE.equals(injectorContract.getPayload().getType())) {
-            NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
-            payloadOutputDtoBuilder
-                .protocol(payloadNetworkTraffic.getProtocol())
-                .portSrc(payloadNetworkTraffic.getPortSrc())
-                .portDst(payloadNetworkTraffic.getPortDst())
-                .ipSrc(payloadNetworkTraffic.getIpSrc())
-                .ipDst(payloadNetworkTraffic.getIpDst());
-          }
-          result = payloadOutputDtoBuilder.build();
-        } else if (inject.get().getStatus().isPresent()
-            && inject.get().getStatus().get().getPayloadOutput() != null) {
-          // Commands lines saved because inject has been executed
-          PayloadOutput payloadOutput = inject.get().getStatus().get().getPayloadOutput();
-          payloadOutputDtoBuilder
-              .cleanupExecutor(payloadOutput.getCleanupExecutor())
-              .payloadCommandBlocks(payloadOutput.getPayloadCommandBlocks())
-              .arguments(payloadOutput.getArguments())
-              .prerequisites(payloadOutput.getPrerequisites())
-              .externalId(payloadOutput.getExternalId())
-              .executableFile(payloadOutput.getExecutableFile())
-              .fileDropFile(payloadOutput.getFileDropFile())
-              .hostname(payloadOutput.getHostname())
-              .ipSrc(payloadOutput.getIpSrc())
-              .ipDst(payloadOutput.getIpDst())
-              .portSrc(payloadOutput.getPortSrc())
-              .portDst(payloadOutput.getPortDst())
-              .protocol(payloadOutput.getProtocol())
-              .name(injectorContract.getPayload().getName())
-              .type(injectorContract.getPayload().getType())
-              .collectorType(injectorContract.getPayload().getCollectorType())
-              .description(injectorContract.getPayload().getDescription())
-              .platforms(injectorContract.getPayload().getPlatforms())
-              .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
-              .executableArch(injectorContract.getArch());
-          result = payloadOutputDtoBuilder.build();
-
-        } else {
-          return null;
-        }
-      }
-    }
-    return result;
-  }
-
-  public List<AttackPatternSimpleDto> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
-    return attackPatterns.stream()
-        .filter(Objects::nonNull)
-        .map(this::toAttackPatternSimple)
-        .toList();
-  }
-
-  private AttackPatternSimpleDto toAttackPatternSimple(AttackPattern attackPattern) {
-    return AttackPatternSimpleDto.builder()
-        .id(attackPattern.getId())
-        .name(attackPattern.getName())
-        .externalId(attackPattern.getExternalId())
-        .build();
-  }
 }
