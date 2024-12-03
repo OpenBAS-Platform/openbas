@@ -172,6 +172,11 @@ public class Payload implements Base {
     return this.collector != null ? this.collector.getType() : null;
   }
 
+  @Transient
+  public PayloadType getTypeEnum() {
+    return PayloadType.fromString(type);
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(id);

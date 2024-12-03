@@ -8,10 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.openbas.database.model.ImportMapper;
 import io.openbas.database.repository.ImportMapperRepository;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.form.InjectsImportInput;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectImportService;
-import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import java.util.Optional;
 import java.util.UUID;

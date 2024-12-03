@@ -62,8 +62,8 @@ public class CalderaInjectorService {
     if (payload.getCleanupCommand() != null) {
       cleanupCommands.add(payload.getCleanupCommand());
     }
-    switch (payload.getType()) {
-      case "Command":
+    switch (payload.getTypeEnum()) {
+      case PayloadType.COMMAND:
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
         Arrays.stream(payloadCommand.getPlatforms())
             .forEach(
@@ -84,7 +84,7 @@ public class CalderaInjectorService {
                   executors.add(executor);
                 });
         break;
-      case "Executable":
+      case PayloadType.EXECUTABLE:
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
         Arrays.stream(payloadExecutable.getPlatforms())
             .forEach(
@@ -127,7 +127,7 @@ public class CalderaInjectorService {
                   executors.add(executor);
                 });
         break;
-      case "FileDrop":
+      case PayloadType.FILE_DROP:
         FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
         Arrays.stream(payloadFileDrop.getPlatforms())
             .forEach(
@@ -164,7 +164,7 @@ public class CalderaInjectorService {
                   executors.add(executor);
                 });
         break;
-      case "DnsResolution":
+      case PayloadType.DNS_RESOLUTION:
         DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
         Arrays.stream(payloadDnsResolution.getPlatforms())
             .forEach(

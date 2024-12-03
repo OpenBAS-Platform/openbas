@@ -1055,7 +1055,6 @@ export interface Inject {
   inject_id: string;
   inject_injector_contract?: InjectorContract;
   inject_kill_chain_phases?: KillChainPhase[];
-  inject_payloads?: Asset[];
   inject_ready?: boolean;
   inject_scenario?: Scenario;
   /** @format date-time */
