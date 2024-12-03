@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -200,6 +201,7 @@ public class InjectExpectationService {
 
   // -- BUILD AND SAVE EXPECTATION AFTER SUCCESSFUL INJECT EXECUTION --
 
+  @Transactional
   public void buildAndSaveInjectExpectations(
       ExecutableInject executableInject, List<Expectation> expectations) {
     boolean isAtomicTesting = executableInject.getInjection().getInject().isAtomicTesting();
