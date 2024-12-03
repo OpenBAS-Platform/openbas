@@ -1,5 +1,11 @@
 package io.openbas.utils;
 
+import static io.openbas.database.model.Command.COMMAND_TYPE;
+import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
+import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
+import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
+import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
+
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -9,17 +15,10 @@ import io.openbas.rest.atomic_testing.form.AttackPatternSimpleDto;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Component;
-
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static io.openbas.database.model.Command.COMMAND_TYPE;
-import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
-import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
-import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
-import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
+import org.hibernate.Hibernate;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AtomicTestingUtils {
@@ -171,7 +170,7 @@ public class AtomicTestingUtils {
                                 defaultExpectationResultsByTypes,
                                 Objects.equals(finalAsset.getAsset_type(), ENDPOINT)
                                     ? Endpoint.PLATFORM_TYPE.valueOf(
-                                    finalAsset.getEndpoint_platform())
+                                        finalAsset.getEndpoint_platform())
                                     : null));
                       }
                     });
@@ -190,7 +189,7 @@ public class AtomicTestingUtils {
                                   defaultExpectationResultsByTypes,
                                   Objects.equals(dynamicAsset.getType(), ENDPOINT)
                                       ? Endpoint.PLATFORM_TYPE.valueOf(
-                                      String.valueOf(dynamicAsset.getPlatform()))
+                                          String.valueOf(dynamicAsset.getPlatform()))
                                       : null)));
             }
 
@@ -263,7 +262,7 @@ public class AtomicTestingUtils {
                           entry.getValue(),
                           Objects.equals(rawAssetMap.get(entry.getKey()).getAsset_type(), ENDPOINT)
                               ? Endpoint.PLATFORM_TYPE.valueOf(
-                              rawAssetMap.get(entry.getKey()).getEndpoint_platform())
+                                  rawAssetMap.get(entry.getKey()).getEndpoint_platform())
                               : null))
               .toList());
     }
@@ -325,9 +324,9 @@ public class AtomicTestingUtils {
                                         rawAssetMap.get(asset).getAsset_name(),
                                         defaultExpectationResultsByTypes,
                                         Objects.equals(
-                                            rawAssetMap.get(asset).getAsset_type(), ENDPOINT)
+                                                rawAssetMap.get(asset).getAsset_type(), ENDPOINT)
                                             ? Endpoint.PLATFORM_TYPE.valueOf(
-                                            rawAssetMap.get(asset).getEndpoint_platform())
+                                                rawAssetMap.get(asset).getEndpoint_platform())
                                             : null));
                               }
                             });
@@ -351,7 +350,7 @@ public class AtomicTestingUtils {
                                           defaultExpectationResultsByTypes,
                                           Objects.equals(dynamicAsset.getType(), ENDPOINT)
                                               ? Endpoint.PLATFORM_TYPE.valueOf(
-                                              String.valueOf(dynamicAsset.getPlatform()))
+                                                  String.valueOf(dynamicAsset.getPlatform()))
                                               : null));
                                 }
                               });
@@ -578,14 +577,10 @@ public class AtomicTestingUtils {
   public record ExpectationResultsByType(
       @NotNull ExpectationType type,
       @NotNull InjectExpectation.EXPECTATION_STATUS avgResult,
-      @NotNull List<ResultDistribution> distribution) {
-
-  }
+      @NotNull List<ResultDistribution> distribution) {}
 
   public record ResultDistribution(
-      @NotNull String id, @NotNull String label, @NotNull Integer value) {
-
-  }
+      @NotNull String id, @NotNull String label, @NotNull Integer value) {}
 
   public PayloadOutputDto getPayloadOutputFromInject(Optional<Inject> inject) {
     PayloadOutputDto.PayloadOutputDtoBuilder payloadOutputDtoBuilder = PayloadOutputDto.builder();
@@ -606,8 +601,7 @@ public class AtomicTestingUtils {
               .collectorType(injectorContract.getPayload().getCollectorType())
               .description(injectorContract.getPayload().getDescription())
               .platforms(injectorContract.getPayload().getPlatforms())
-              .attackPatterns(
-                  toAttackPatternSimples(injectorContract.getAttackPatterns()))
+              .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
               .executableArch(injectorContract.getArch());
           if (COMMAND_TYPE.equals(injectorContract.getPayload().getType())) {
             Command payloadCommand = (Command) Hibernate.unproxy(payload);
@@ -661,8 +655,7 @@ public class AtomicTestingUtils {
               .collectorType(injectorContract.getPayload().getCollectorType())
               .description(injectorContract.getPayload().getDescription())
               .platforms(injectorContract.getPayload().getPlatforms())
-              .attackPatterns(
-                  toAttackPatternSimples(injectorContract.getAttackPatterns()))
+              .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
               .executableArch(injectorContract.getArch());
           result = payloadOutputDtoBuilder.build();
 
@@ -688,5 +681,4 @@ public class AtomicTestingUtils {
         .externalId(attackPattern.getExternalId())
         .build();
   }
-
 }
