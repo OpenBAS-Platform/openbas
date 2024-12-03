@@ -151,7 +151,7 @@ public class AssetGroupService {
                 }));
   }
 
-  // -- FOR OBAS IMPLANT --
+  // -- FOR OBAS IMPLANT EXECUTOR --
 
   public Map<Asset, Boolean> resolveAllAssets(@NotNull final Inject inject) {
     Map<Asset, Boolean> assets = new HashMap<>();

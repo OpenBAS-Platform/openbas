@@ -15,24 +15,15 @@ import io.openbas.model.expectation.ManualExpectation;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component(OpenCTIContract.TYPE)
+@RequiredArgsConstructor
 public class OpenCTIExecutor extends Injector {
 
-  private OpenCTIService openCTIService;
-  private InjectExpectationService injectExpectationService;
-
-  @Autowired
-  public void setOpenCTIService(OpenCTIService openCTIService) {
-    this.openCTIService = openCTIService;
-  }
-
-  @Autowired
-  public void setInjectExpectationService(InjectExpectationService injectExpectationService) {
-    this.injectExpectationService = injectExpectationService;
-  }
+  private final OpenCTIService openCTIService;
+  private final InjectExpectationService injectExpectationService;
 
   private void createCase(
       Execution execution, String name, String description, List<DataAttachment> attachments) {
