@@ -18,6 +18,7 @@ import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.atomic_testing.form.PayloadOutputDto;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -25,9 +26,11 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
+
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.StreamSupport;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -42,10 +45,12 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 public class AtomicTestingService {
 
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
 
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
+  private final AtomicTestingUtils atomicTestingUtils;
   private final InjectRepository injectRepository;
   private final InjectStatusRepository injectStatusRepository;
   private final InjectorContractRepository injectorContractRepository;
@@ -81,64 +86,7 @@ public class AtomicTestingService {
 
   public PayloadOutputDto findPayloadOutputByInjectId(String injectId) {
     Optional<Inject> inject = injectRepository.findById(injectId);
-    PayloadOutputDto.PayloadOutputDtoBuilder payloadOutputDtoBuilder = PayloadOutputDto.builder();
-    Optional<PayloadOutputDto> result = Optional.ofNullable(payloadOutputDtoBuilder.build());
-    if (inject.isPresent()) {
-      Optional<InjectorContract> injectorContractOpt = inject.get().getInjectorContract();
-      if (injectorContractOpt.isPresent()) {
-        InjectorContract injectorContract = injectorContractOpt.get();
-        result =
-            inject.map(
-                injectToMap -> {
-                  if (injectToMap.getStatus().isPresent()
-                      && injectToMap.getStatus().get().getPayloadOutput() != null) {
-                    // Commands lines saved because inject has been executed
-                    PayloadOutput payloadOutput = injectToMap.getStatus().get().getPayloadOutput();
-                    payloadOutputDtoBuilder
-                        .cleanupExecutor(payloadOutput.getCleanupExecutor())
-                        .payloadCommandBlocks(payloadOutput.getPayloadCommandBlocks())
-                        .arguments(payloadOutput.getArguments())
-                        .prerequisites(payloadOutput.getPrerequisites())
-                        .externalId(payloadOutput.getExternalId())
-                        .executableFile(payloadOutput.getExecutableFile())
-                        .fileDropFile(payloadOutput.getFileDropFile())
-                        .hostname(payloadOutput.getHostname())
-                        .ipSrc(payloadOutput.getIpSrc())
-                        .ipDst(payloadOutput.getIpDst())
-                        .portSrc(payloadOutput.getPortSrc())
-                        .portDst(payloadOutput.getPortDst())
-                        .protocol(payloadOutput.getProtocol())
-                        .name(injectorContract.getPayload().getName())
-                        .type(injectorContract.getPayload().getType())
-                        .collectorType(injectorContract.getPayload().getCollectorType())
-                        .description(injectorContract.getPayload().getDescription())
-                        .platforms(injectorContract.getPayload().getPlatforms())
-                        .attackPatterns(
-                            toAttackPatternSimples(injectorContract.getAttackPatterns()))
-                        .executableArch(injectorContract.getArch());
-                    return payloadOutputDtoBuilder.build();
-                  } else {
-                    return null;
-                  }
-                });
-      }
-    }
-    return result.orElse(null);
-  }
-
-  public List<AttackPatternSimpleDto> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
-    return attackPatterns.stream()
-        .filter(Objects::nonNull)
-        .map(this::toAttackPatternSimple)
-        .toList();
-  }
-
-  private AttackPatternSimpleDto toAttackPatternSimple(AttackPattern attackPattern) {
-    return AttackPatternSimpleDto.builder()
-        .id(attackPattern.getId())
-        .name(attackPattern.getName())
-        .externalId(attackPattern.getExternalId())
-        .build();
+    return atomicTestingUtils.getPayloadOutputFromInject(inject);
   }
 
   @Transactional
