@@ -3,10 +3,12 @@ package io.openbas.utils;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -79,10 +81,24 @@ public class InjectMapper {
                     .content(contract.getContent())
                     .convertedContent(contract.getConvertedContent())
                     .platforms(contract.getPlatforms())
+                    .payload(toPayloadSimple(Optional.ofNullable(contract.getPayload())))
                     .labels(contract.getLabels())
                     .build())
         .orElse(null);
   }
+
+  private PayloadSimple toPayloadSimple(Optional<Payload> payload) {
+    return payload
+        .map(
+            payloadToSimple ->
+                PayloadSimple.builder()
+                    .id(payloadToSimple.getId())
+                    .type(payloadToSimple.getType())
+                    .collectorType(payloadToSimple.getCollectorType())
+                    .build())
+        .orElse(null);
+  }
+
 
   // -- STATUS to STATUSIMPLE --
   public InjectStatusOutput toInjectStatusOutput(Optional<InjectStatus> injectStatus) {
@@ -137,15 +153,15 @@ public class InjectMapper {
   }
 
   // -- ATTACKPATTERN to ATTACKPATTERNSIMPLE
-  public List<AttackPatternSimpleDto> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
+  public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
     return attackPatterns.stream()
         .filter(Objects::nonNull)
         .map(this::toAttackPatternSimple)
         .toList();
   }
 
-  private AttackPatternSimpleDto toAttackPatternSimple(AttackPattern attackPattern) {
-    return AttackPatternSimpleDto.builder()
+  private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
+    return AttackPatternSimple.builder()
         .id(attackPattern.getId())
         .name(attackPattern.getName())
         .externalId(attackPattern.getExternalId())

@@ -7,12 +7,14 @@ import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
 import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 
 import io.openbas.database.model.*;
-import io.openbas.rest.atomic_testing.form.AttackPatternSimpleDto;
+import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
 import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
@@ -107,15 +109,15 @@ public class PayloadMapper {
     return result;
   }
 
-  public List<AttackPatternSimpleDto> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
+  public List<AttackPatternSimple> toAttackPatternSimples(List<AttackPattern> attackPatterns) {
     return attackPatterns.stream()
         .filter(Objects::nonNull)
         .map(this::toAttackPatternSimple)
         .toList();
   }
 
-  private AttackPatternSimpleDto toAttackPatternSimple(AttackPattern attackPattern) {
-    return AttackPatternSimpleDto.builder()
+  private AttackPatternSimple toAttackPatternSimple(AttackPattern attackPattern) {
+    return AttackPatternSimple.builder()
         .id(attackPattern.getId())
         .name(attackPattern.getName())
         .externalId(attackPattern.getExternalId())

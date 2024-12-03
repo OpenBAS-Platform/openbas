@@ -2,7 +2,6 @@ import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useContext, useEffect, useState } from 'react';
 
-import { fetchAtomicTestingPayload } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
@@ -10,7 +9,7 @@ import ItemStatus from '../../../../components/ItemStatus';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import SearchFilter from '../../../../components/SearchFilter';
-import { AttackPatternSimpleDto, InjectTargetWithResult, KillChainPhaseSimple, PayloadOutputDto } from '../../../../utils/api-types';
+import { AttackPatternSimple, InjectTargetWithResult, KillChainPhaseSimple } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectIcon from '../../common/injects/InjectIcon';
@@ -47,7 +46,6 @@ const AtomicTesting = () => {
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
-  const [payloadOutput, setPayloadOutput] = useState<PayloadOutputDto>();
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
@@ -56,14 +54,6 @@ const AtomicTesting = () => {
   }, [injectResultOverviewOutput]);
 
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
-
-  useEffect(() => {
-    if (injectResultOverviewOutput) {
-      fetchAtomicTestingPayload(injectResultOverviewOutput.inject_id).then((result: { data: PayloadOutputDto }) => {
-        setPayloadOutput(result.data);
-      });
-    }
-  }, []);
 
   // Handles
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult) => {
@@ -112,12 +102,13 @@ const AtomicTesting = () => {
               </Typography>
               <div style={{ display: 'flex' }}>
                 <InjectIcon
-                  variant="inline"
-                  isPayload={isNotEmptyField(payloadOutput)}
-                  type={payloadOutput
-                    ? payloadOutput.payload_collector_type
-                    || payloadOutput.payload_type
-                    : injectResultOverviewOutput.inject_type}
+                  isPayload={isNotEmptyField(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload)}
+                  type={
+                    injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+                      ? injectResultOverviewOutput.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                      || injectResultOverviewOutput.inject_injector_contract.injector_contract_payload?.payload_type
+                      : injectResultOverviewOutput.inject_type
+                  }
                 />
                 <Tooltip title={tPick(injectResultOverviewOutput.inject_injector_contract?.injector_contract_labels)}>
                   <div style={{
@@ -203,7 +194,7 @@ const AtomicTesting = () => {
                 {t('Attack Patterns')}
               </Typography>
               {(injectResultOverviewOutput.inject_attack_patterns ?? []).length === 0 && '-'}
-              {injectResultOverviewOutput.inject_attack_patterns?.map((attackPattern: AttackPatternSimpleDto) => (
+              {injectResultOverviewOutput.inject_attack_patterns?.map((attackPattern: AttackPatternSimple) => (
                 <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
                   <Chip
                     variant="outlined"

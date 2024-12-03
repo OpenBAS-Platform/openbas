@@ -9,7 +9,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemCopy from '../../../../components/ItemCopy';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { AttackPatternSimpleDto, PayloadArgument, PayloadCommandBlock, PayloadOutputDto, PayloadPrerequisite } from '../../../../utils/api-types';
+import { AttackPatternSimple, PayloadArgument, PayloadCommandBlock, PayloadPrerequisite, StatusPayloadOutput } from '../../../../utils/api-types';
 import { emptyFilled } from '../../../../utils/String';
 
 const useStyles = makeStyles(() => ({
@@ -33,12 +33,12 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
   const classes = useStyles();
   const { t } = useFormatter();
   const { injectId } = useParams();
-  const [payloadOutput, setPayloadOutput] = useState<PayloadOutputDto>();
+  const [payloadOutput, setPayloadOutput] = useState<StatusPayloadOutput>();
 
   // Fetching data
   useEffect(() => {
     if (injectId) {
-      fetchAtomicTestingPayload(injectId).then((result: { data: PayloadOutputDto }) => {
+      fetchAtomicTestingPayload(injectId).then((result: { data: StatusPayloadOutput }) => {
         setPayloadOutput(result.data);
       });
     }
@@ -87,7 +87,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                 >
                   {t('Attack patterns')}
                 </Typography>
-                {payloadOutput.payload_attack_patterns && payloadOutput.payload_attack_patterns.length === 0 ? '-' : payloadOutput.payload_attack_patterns?.map((attackPattern: AttackPatternSimpleDto) => (
+                {payloadOutput.payload_attack_patterns && payloadOutput.payload_attack_patterns.length === 0 ? '-' : payloadOutput.payload_attack_patterns?.map((attackPattern: AttackPatternSimple) => (
                   <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
                     <Chip
                       variant="outlined"
