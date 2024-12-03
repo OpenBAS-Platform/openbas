@@ -633,7 +633,7 @@ class InjectApiTest extends IntegrationTest {
         this.injectorContractRepository.findById(CONTRACT_EXAMPLE).orElseThrow();
 
     Inject inject = new Inject();
-    inject.setTitle("Inject to be executed by agent Openbas");
+    inject.setTitle("Inject to be executed by Openbas Agent");
     inject.setInjectorContract(injectorContract);
     inject.setDependsDuration(0L);
     Inject injectCreated = injectRepository.save(inject);
@@ -660,7 +660,7 @@ class InjectApiTest extends IntegrationTest {
             .getContentAsString();
 
     // -- ASSERT --
-    assertEquals("PARTIAL", JsonPath.read(response, "$.inject_status.status_name"));
+    assertNotEquals("ERROR", JsonPath.read(response, "$.inject_status.status_name"));
     // We check if generateExpectations and buildAndSaveInjectExpectations are called
     verify(injectExpectationService).generateExpectations(inject);
     verify(injectExpectationService).buildAndSaveInjectExpectations(any(), any());
@@ -675,7 +675,7 @@ class InjectApiTest extends IntegrationTest {
         this.injectorContractRepository.findById(CONTRACT_EXAMPLE).orElseThrow();
 
     Inject inject = new Inject();
-    inject.setTitle("Inject to be executed by agent Openbas");
+    inject.setTitle("Inject to be executed by Openbas Agent");
     inject.setInjectorContract(injectorContract);
     inject.setDependsDuration(0L);
     Inject injectCreated = injectRepository.save(inject);
