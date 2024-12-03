@@ -142,13 +142,12 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                 >
                   {t('Command executor')}
                 </Typography>
-                {/* {payloadOutput?.inject_injector_contract?.injector_contract_payload?.command_executor} */}
                 {!payloadOutput.payload_command_blocks?.length ? '-'
                   : (
                       payloadOutput.payload_command_blocks?.map((commandBlock: PayloadCommandBlock) => {
                         return (
                           <Typography key={commandBlock.command_executor} variant="body2">
-                            {commandBlock.command_executor}
+                            {emptyFilled(commandBlock.command_executor)}
                           </Typography>
                         );
                       })
@@ -392,28 +391,33 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
             >
               {t('Cleanup command')}
             </Typography>
-            {!payloadOutput.payload_command_blocks?.length ? '-'
-              : (
-                  payloadOutput.payload_command_blocks?.map((commandBlock: PayloadCommandBlock) => {
-                    return (
-                      <pre key={commandBlock.command_content}>
-                        {
-                          commandBlock.payload_cleanup_command?.map((cleanupCommand: string) => {
-                            return (
-                              <ItemCopy
-                                key={cleanupCommand}
-                                content={
-                                  cleanupCommand ?? ''
-                                }
-                              />
-                            );
-                          })
-                        }
+            {
+              payloadOutput.payload_command_blocks?.map((commandBlock: PayloadCommandBlock) => {
+                return (
+                  !commandBlock.payload_cleanup_command?.length
+                    ? '-'
+                    : (
+                        <pre key={commandBlock.command_content}>
+                          {
+                            commandBlock.payload_cleanup_command?.map((cleanupCommand: string) => {
+                              return (
+                                <ItemCopy
+                                  key={cleanupCommand}
+                                  content={
+                                    cleanupCommand
+                                  }
+                                />
+                              );
+                            })
+                          }
 
-                      </pre>
-                    );
-                  })
-                )}
+                        </pre>
+                      )
+
+                );
+              })
+            }
+
           </Paper>
         ) : (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
