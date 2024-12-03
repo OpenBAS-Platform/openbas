@@ -344,7 +344,7 @@ public class InjectorApi extends RestBehavior {
       }
     }
     if (platform.equals("linux") || platform.equals("macos")) {
-      filename = "openbas-agent-" + version;
+      filename = "openbas-implant-" + version;
       String resourcePath = "/openbas-implant/" + platform + "/" + architecture + "/";
       in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
       if (in == null) { // Dev mode, get from artifactory
