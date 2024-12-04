@@ -5,11 +5,9 @@ import io.openbas.database.model.*;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
