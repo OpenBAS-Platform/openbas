@@ -23,7 +23,7 @@ const ExerciseChallenges = () => {
   };
   return (
     <ChallengeContext.Provider value={context}>
-      <ContextualChallenges challenges={challenges} linkToInjects={`/admin/exercises/${exerciseId}/injects`} />
+      <ContextualChallenges challenges={challenges} linkToInjects={`/admin/simulations/${exerciseId}/injects`} />
     </ChallengeContext.Provider>
   );
 };

@@ -30,6 +30,9 @@ import io.openbas.rest.inject.form.DirectInjectInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
+import io.openbas.utils.fixtures.InjectFixture;
+import io.openbas.utils.fixtures.InjectorContractFixture;
+import io.openbas.utils.fixtures.PayloadFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
@@ -40,7 +43,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -67,10 +73,12 @@ class InjectApiTest extends IntegrationTest {
   static Document DOCUMENT2;
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
-
+  static InjectorContract PAYLOAD_INJECTOR_CONTRACT;
+  @Resource protected ObjectMapper mapper;
   @Autowired private MockMvc mvc;
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
+
   @Autowired private ExerciseRepository exerciseRepository;
   @SpyBean private Executor executor;
   @Autowired private ScenarioRepository scenarioRepository;
@@ -79,6 +87,8 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private CommunicationRepository communicationRepository;
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private TeamRepository teamRepository;
+  @Autowired private PayloadRepository payloadRepository;
+  @Autowired private InjectorRepository injectorRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
@@ -120,6 +130,7 @@ class InjectApiTest extends IntegrationTest {
     this.exerciseRepository.delete(EXERCISE);
     this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
     this.teamRepository.delete(TEAM);
+    this.injectorContractRepository.delete(PAYLOAD_INJECTOR_CONTRACT);
   }
 
   // -- SCENARIOS --
@@ -612,5 +623,65 @@ class InjectApiTest extends IntegrationTest {
             .findAllByInjectAndTeam(createdInject1.getId(), TEAM.getId())
             .isEmpty(),
         "There should be no expectations related to the inject in the database");
+  }
+
+  @Nested
+  @WithMockPlannerUser
+  @DisplayName("Retrieving executable payloads injects")
+  class RetrievingExecutablePayloadInject {
+    @DisplayName("Get encoded command payload with arguments")
+    @Test
+    void getExecutablePayloadInjectWithArguments() throws Exception {
+      // -- PREPARE --
+      PayloadPrerequisite prerequisite = new PayloadPrerequisite();
+      prerequisite.setGetCommand("cd ./src");
+      prerequisite.setExecutor("bash");
+      Command payloadCommand =
+          PayloadFixture.createCommand(
+              "bash", "echo command name #{arg_value}", List.of(prerequisite), "echo cleanup cmd");
+      Payload payloadSaved = payloadRepository.save(payloadCommand);
+
+      Injector injector = injectorRepository.findByType("openbas_implant").orElseThrow();
+      InjectorContract injectorContract =
+          InjectorContractFixture.createPayloadInjectorContract(injector, payloadSaved);
+      PAYLOAD_INJECTOR_CONTRACT = injectorContractRepository.save(injectorContract);
+
+      String argValue = "Hello world";
+      Map<String, String> payloadArguments = new HashMap<>();
+      payloadArguments.put("arg_value", argValue);
+      Inject inject =
+          InjectFixture.createInjectCommandPayload(PAYLOAD_INJECTOR_CONTRACT, payloadArguments);
+
+      Inject injectSaved = injectRepository.save(inject);
+
+      // -- EXECUTE --
+      String response =
+          mvc.perform(
+                  get(INJECT_URI + "/" + injectSaved.getId() + "/executable-payload")
+                      .accept(MediaType.APPLICATION_JSON))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      // -- ASSERT --
+      assertNotNull(response);
+      // Verify prerequisite command
+      String expectedPrerequisiteCmdEncoded =
+          Base64.getEncoder().encodeToString(prerequisite.getGetCommand().getBytes());
+      assertEquals(
+          expectedPrerequisiteCmdEncoded,
+          JsonPath.read(response, "$.payload_prerequisites[0].get_command"));
+
+      // Verify cleanup command
+      String expectedCleanupCmdEncoded =
+          Base64.getEncoder().encodeToString(payloadCommand.getCleanupCommand().getBytes());
+      assertEquals(expectedCleanupCmdEncoded, JsonPath.read(response, "$.payload_cleanup_command"));
+
+      // Verify command
+      String cmdToExecute = payloadCommand.getContent().replace("#{arg_value}", "Hello world");
+      String expectedCmdEncoded = Base64.getEncoder().encodeToString(cmdToExecute.getBytes());
+      assertEquals(expectedCmdEncoded, JsonPath.read(response, "$.command_content"));
+    }
   }
 }

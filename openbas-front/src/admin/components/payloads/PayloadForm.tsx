@@ -53,6 +53,7 @@ const PayloadForm: FunctionComponent<Props> = ({
     payload_attack_patterns: [],
     payload_cleanup_command: '',
     payload_cleanup_executor: '',
+    executable_file: undefined,
     file_drop_file: '',
     dns_resolution_hostname: '',
     payload_tags: [],
@@ -99,6 +100,7 @@ const PayloadForm: FunctionComponent<Props> = ({
       extendedSchema = baseSchema.extend({
         command_executor: z.string().min(1, { message: t('Should not be empty') }),
         command_content: z.string().min(1, { message: t('Should not be empty') }),
+        payload_execution_arch: z.enum(['X86_64', 'ARM64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }),
       });
       break;
     case 'Executable':
@@ -107,7 +109,7 @@ const PayloadForm: FunctionComponent<Props> = ({
           id: z.string().min(1, { message: t('Should not be empty') }),
           label: z.string().min(1, { message: t('Should not be empty') }),
         }),
-        executable_arch: z.enum(['x86_64', 'arm64'], { message: t('Should not be empty') }),
+        payload_execution_arch: z.enum(['X86_64', 'ARM64'], { message: t('Should not be empty') }),
       });
       break;
     case 'FileDrop':
@@ -157,6 +159,8 @@ const PayloadForm: FunctionComponent<Props> = ({
     handleSubmit(onSubmit)(e);
   };
 
+  const updateArchitecture = (type === 'Executable') || (type === 'Command');
+
   return (
     <form id="payloadForm" onSubmit={handleSubmitWithoutDefault}>
       <TextField
@@ -183,29 +187,52 @@ const PayloadForm: FunctionComponent<Props> = ({
         )}
       />
 
-      {type === 'Executable' && (
-        <Controller
-          control={control}
-          name="executable_arch"
-          render={({ field }) => (
-            <TextField
-              select
-              variant="standard"
-              fullWidth
-              value={field.value}
-              label={t('Architecture')}
-              style={{ marginTop: 20 }}
-              error={!!errors.executable_arch}
-              helperText={errors.executable_arch?.message}
-              inputProps={register('executable_arch')}
-              InputLabelProps={{ required: true }}
-            >
-              <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
-              <MenuItem value="arm64">{t('arm64')}</MenuItem>
-            </TextField>
-          )}
-        />
-      )}
+      <Controller
+        control={control}
+        name="payload_execution_arch"
+        render={({ field }) => (
+          <>
+            {updateArchitecture ? (
+              <TextField
+                select
+                variant="standard"
+                fullWidth
+                value={field.value}
+                label={t('Architecture')}
+                style={{ marginTop: 20 }}
+                error={!!errors.payload_execution_arch}
+                helperText={errors.payload_execution_arch?.message}
+                inputProps={register('payload_execution_arch')}
+                InputLabelProps={{ required: true }}
+              >
+                <MenuItem value="X86_64">{t('X86_64')}</MenuItem>
+                <MenuItem value="ARM64">{t('ARM64')}</MenuItem>
+                {type === 'Command' && (
+                  <MenuItem value="ALL_ARCHITECTURES">{t('ALL_ARCHITECTURES')}</MenuItem>
+                )}
+              </TextField>
+            ) : (
+              field.value != null && (
+                <TextField
+                  select
+                  disabled
+                  variant="standard"
+                  fullWidth
+                  value={field.value}
+                  label={t('Architecture')}
+                  style={{ marginTop: 20 }}
+                  error={!!errors.payload_execution_arch}
+                  helperText={errors.payload_execution_arch?.message}
+                  inputProps={register('payload_execution_arch')}
+                  InputLabelProps={{ required: true }}
+                >
+                  <MenuItem value="ALL_ARCHITECTURES">{t('ALL_ARCHITECTURES')}</MenuItem>
+                </TextField>
+              )
+            )}
+          </>
+        )}
+      />
 
       <TextField
         name="payload_description"
@@ -219,65 +246,69 @@ const PayloadForm: FunctionComponent<Props> = ({
         inputProps={register('payload_description')}
       />
 
-      {type === 'Command' && (
-        <>
-          <SelectField
-            variant="standard"
-            label={t('Command executor')}
-            name="command_executor"
-            control={control}
-            fullWidth={true}
-            style={{ marginTop: 20 }}
-            error={!!errors.command_executor}
-            helperText={t('Should not be empty')}
-            InputLabelProps={{ required: true }}
-          >
-            <MenuItem value="psh">
-              {t('PowerShell')}
-            </MenuItem>
-            <MenuItem value="cmd">
-              {t('Command Prompt')}
-            </MenuItem>
-            <MenuItem value="bash">
-              {t('Bash')}
-            </MenuItem>
-            <MenuItem value="sh">
-              {t('Sh')}
-            </MenuItem>
-          </SelectField>
-          <TextField
-            name="command_content"
-            multiline
-            fullWidth
-            rows={3}
-            label={t('Command')}
-            style={{ marginTop: 20 }}
-            error={!!errors.command_content}
-            helperText={t('To put arguments in the command line, use #{argument_key}')}
-            InputLabelProps={{ required: true }}
-            inputProps={register('command_content')}
-          />
-        </>
-      )}
-      {type === 'Executable' && (
-        <Controller
-          control={control}
-          name="executable_file"
-          render={({ field: { onChange } }) => (
-            <FileLoader
-              name="executable_file"
-              label={t('Executable file')}
-              setFieldValue={(_name, document) => {
-                onChange(document);
-              }}
-              initialValue={{ id: initialValues.executable_file?.id }}
+      {
+        type === 'Command' && (
+          <>
+            <SelectField
+              variant="standard"
+              label={t('Command executor')}
+              name="command_executor"
+              control={control}
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+              error={!!errors.command_executor}
+              helperText={t('Should not be empty')}
               InputLabelProps={{ required: true }}
-              error={!!errors.executable_file}
+            >
+              <MenuItem value="psh">
+                {t('PowerShell')}
+              </MenuItem>
+              <MenuItem value="cmd">
+                {t('Command Prompt')}
+              </MenuItem>
+              <MenuItem value="bash">
+                {t('Bash')}
+              </MenuItem>
+              <MenuItem value="sh">
+                {t('Sh')}
+              </MenuItem>
+            </SelectField>
+            <TextField
+              name="command_content"
+              multiline
+              fullWidth
+              rows={3}
+              label={t('Command')}
+              style={{ marginTop: 20 }}
+              error={!!errors.command_content}
+              helperText={t('To put arguments in the command line, use #{argument_key}')}
+              InputLabelProps={{ required: true }}
+              inputProps={register('command_content')}
             />
-          )}
-        />
+          </>
+        )
+      }
+      {
+        type === 'Executable' && (
+          <Controller
+            control={control}
+            name="executable_file"
+            render={({ field: { onChange } }) => (
+              <FileLoader
+                name="executable_file"
+                label={t('Executable file')}
+                setFieldValue={(_name, document) => {
+                  onChange(document);
+                }}
+                initialValue={{ id: initialValues.executable_file?.id }}
+                InputLabelProps={{ required: true }}
+                error={!!errors.executable_file}
+              />
+            )}
+          />
 
-      )}
+        )
+      }
       {type === 'FileDrop' && (
         <Controller
           control={control}

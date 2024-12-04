@@ -165,7 +165,7 @@ public class PayloadService {
   }
 
   private Payload generateDuplicatedPayload(Payload originalPayload) {
-    return switch (PayloadType.fromString(originalPayload.getType())) {
+    return switch (originalPayload.getTypeEnum()) {
       case PayloadType.COMMAND -> {
         Command originCommand = (Command) Hibernate.unproxy(originalPayload);
         Command duplicateCommand = new Command();

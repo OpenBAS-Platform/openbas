@@ -1,3 +1,3 @@
-const wordsToExclude = ['MacOS', 'x86_64', 'arm64'];
+const wordsToExcludeFromTranslation = ['MacOS', 'x86_64', 'arm64'];
 
-export default wordsToExclude;
+export default wordsToExcludeFromTranslation;

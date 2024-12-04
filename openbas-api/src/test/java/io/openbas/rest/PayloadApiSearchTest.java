@@ -197,7 +197,7 @@ public class PayloadApiSearchTest extends IntegrationTest {
           given_filter_input_by_arch_should_return_a_page_of_executable_payloads_filtered_by_architecture()
               throws Exception {
         SearchPaginationInput searchPaginationInput =
-            PaginationFixture.simpleFilter("executable_arch", valueOf(arm64), contains);
+            PaginationFixture.simpleFilter("payload_execution_arch", valueOf(arm64), contains);
 
         mvc.perform(
                 post(PAYLOAD_URI + "/search")

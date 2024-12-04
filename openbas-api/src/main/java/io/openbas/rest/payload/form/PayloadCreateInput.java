@@ -3,8 +3,8 @@ package io.openbas.rest.payload.form;
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.Payload;
 import io.openbas.database.model.Payload.PAYLOAD_SOURCE;
 import io.openbas.database.model.Payload.PAYLOAD_STATUS;
 import io.openbas.database.model.PayloadArgument;
@@ -42,6 +42,10 @@ public class PayloadCreateInput {
   @JsonProperty("payload_platforms")
   private PLATFORM_TYPE[] platforms;
 
+  @JsonProperty("payload_execution_arch")
+  private Payload.PAYLOAD_EXECUTION_ARCH executionArch =
+      Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
+
   @JsonProperty("payload_description")
   private String description;
 
@@ -52,9 +56,6 @@ public class PayloadCreateInput {
   @JsonProperty("command_content")
   @Schema(nullable = true)
   private String content;
-
-  @JsonProperty("executable_arch")
-  private Endpoint.PLATFORM_ARCH executableArch;
 
   @JsonProperty("executable_file")
   private String executableFile;

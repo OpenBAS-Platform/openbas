@@ -33,6 +33,9 @@ import org.hibernate.annotations.UuidGenerator;
 @EntityListeners(ModelBaseListener.class)
 public class Payload implements Base {
 
+  private static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_PAYLOAD = 1;
+  protected static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_EXECUTABLE = 2;
+
   public enum PAYLOAD_SOURCE {
     COMMUNITY,
     FILIGRAN,
@@ -43,6 +46,12 @@ public class Payload implements Base {
     UNVERIFIED,
     VERIFIED,
     DEPRECATED
+  }
+
+  public enum PAYLOAD_EXECUTION_ARCH {
+    X86_64,
+    ARM64,
+    ALL_ARCHITECTURES,
   }
 
   @Id
@@ -134,6 +143,13 @@ public class Payload implements Base {
   @NotNull
   private PAYLOAD_STATUS status;
 
+  @Queryable(filterable = true, searchable = true)
+  @Column(name = "payload_execution_arch", nullable = false)
+  @JsonProperty("payload_execution_arch")
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private PAYLOAD_EXECUTION_ARCH executionArch = Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
+
   // -- COLLECTOR --
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -172,6 +188,11 @@ public class Payload implements Base {
     return this.collector != null ? this.collector.getType() : null;
   }
 
+  @Transient
+  public PayloadType getTypeEnum() {
+    return PayloadType.fromString(type);
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(id);
@@ -190,6 +211,6 @@ public class Payload implements Base {
    * by default this is 1, e.g. one command, one file drop etc...
    */
   public int getNumberOfActions() {
-    return 1;
+    return DEFAULT_NUMBER_OF_ACTIONS_FOR_PAYLOAD;
   }
 }

@@ -94,9 +94,9 @@ const Index = () => {
               <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
               <Route path="" element={errorWrapper(Dashboard)()} />
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
-              <Route path="exercises" element={errorWrapper(Exercises)()} />
-              <Route path="exercises/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
-              <Route path="exercises/:exerciseId/injects/:injectId/*" element={errorWrapper(InjectIndex)()} />
+              <Route path="simulations" element={errorWrapper(Exercises)()} />
+              <Route path="simulations/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
+              <Route path="simulations/:exerciseId/injects/:injectId/*" element={errorWrapper(InjectIndex)()} />
               <Route path="atomic_testings" element={errorWrapper(AtomicTestings)()} />
               <Route path="atomic_testings/:injectId/*" element={errorWrapper(IndexAtomicTesting)()} />
               <Route path="scenarios" element={errorWrapper(Scenarios)()} />

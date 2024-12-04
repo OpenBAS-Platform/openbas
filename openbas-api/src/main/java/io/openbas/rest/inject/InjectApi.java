@@ -28,10 +28,10 @@ import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
+import io.openbas.rest.inject.service.ExecutableInjectService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
-import io.openbas.service.AtomicTestingService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectSearchService;
-import io.openbas.service.InjectService;
 import io.openbas.service.ScenarioService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -74,15 +74,15 @@ public class InjectApi extends RestBehavior {
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final TeamRepository teamRepository;
-  private final AssetService assetService;
-  private final AssetGroupService assetGroupService;
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
+  private final AssetService assetService;
+  private final AssetGroupService assetGroupService;
   private final ExecutionContextService executionContextService;
   private final ScenarioService scenarioService;
   private final InjectService injectService;
+  private final ExecutableInjectService executableInjectService;
   private final InjectSearchService injectSearchService;
-  private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
 
   // -- INJECTS --
@@ -165,10 +165,13 @@ public class InjectApi extends RestBehavior {
     return injectRepository.save(inject);
   }
 
-  @GetMapping("/api/injects/try/{injectId}")
-  public Inject tryInject(@PathVariable String injectId) {
-    return atomicTestingService.tryInject(injectId);
+  @GetMapping(INJECT_URI + "/{injectId}/executable-payload")
+  @Tracing(name = "Get payload ready to be executed", layer = "api", operation = "GET")
+  public Payload getExecutablePayloadInject(@PathVariable @NotBlank final String injectId) {
+    return executableInjectService.getExecutablePayloadInject(injectId);
   }
+
+  // -- EXERCISES --
 
   @Transactional(rollbackFor = Exception.class)
   @PutMapping(INJECT_URI + "/{exerciseId}/{injectId}")
@@ -375,8 +378,10 @@ public class InjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   public Inject duplicateInjectForExercise(
-      @PathVariable final String exerciseId, @PathVariable final String injectId) {
-    return injectDuplicateService.createInjectForExercise(exerciseId, injectId, true);
+      @PathVariable @NotBlank final String exerciseId,
+      @PathVariable @NotBlank final String injectId) {
+    return injectDuplicateService.duplicateInjectForExerciseWithDuplicateWordInTitle(
+        exerciseId, injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -606,8 +611,10 @@ public class InjectApi extends RestBehavior {
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject duplicateInjectForScenario(
-      @PathVariable final String scenarioId, @PathVariable final String injectId) {
-    return injectDuplicateService.createInjectForScenario(scenarioId, injectId, true);
+      @PathVariable @NotBlank final String scenarioId,
+      @PathVariable @NotBlank final String injectId) {
+    return injectDuplicateService.duplicateInjectForScenarioWithDuplicateWordInTitle(
+        scenarioId, injectId);
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects")

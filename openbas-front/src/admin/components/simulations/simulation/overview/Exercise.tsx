@@ -51,7 +51,7 @@ const Exercise = () => {
     fetchExerciseExpectationResult(exerciseId).then((result: { data: ExpectationResultsByType[] }) => setResults(result.data));
     fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: InjectExpectationResultsByAttackPatternStore[] }) => setInjectResults(result.data));
   }, [exerciseId]);
-  const goToLink = `/admin/exercises/${exerciseId}/injects`;
+  const goToLink = `/admin/simulations/${exerciseId}/injects`;
   let resultAttackPatternIds = [];
   if (injectResults) {
     resultAttackPatternIds = R.uniq(
@@ -93,7 +93,7 @@ const Exercise = () => {
           <Paper variant="outlined" style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
             {!results
               ? <Loader variant="inElement" />
-              : <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/exercises/${exerciseId}/animation/validations`} />}
+              : <ResponsePie expectationResultsByTypes={results} humanValidationLink={`/admin/simulations/${exerciseId}/animation/validations`} />}
           </Paper>
         </Grid>
         {injectResults && resultAttackPatternIds.length > 0 && (
@@ -114,7 +114,7 @@ const Exercise = () => {
             <Paper classes={{ root: classes.paper }} variant="outlined">
               <InjectResultList
                 fetchInjects={input => searchExerciseInjects(exerciseId, input)}
-                goTo={injectId => `/admin/exercises/${exerciseId}/injects/${injectId}`}
+                goTo={injectId => `/admin/simulations/${exerciseId}/injects/${injectId}`}
                 queryableHelpers={queryableHelpers}
                 searchPaginationInput={searchPaginationInput}
               />

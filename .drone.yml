@@ -18,7 +18,7 @@ steps:
       - mvn test -q
 
   - name: frontend-tests
-    image: node:20-alpine
+    image: node:22.11.0-alpine
     volumes:
       - name: cache-node-frontend
         path: /drone/src/openbas-front/node_modules
@@ -49,7 +49,7 @@ steps:
       - apt update && apt install -y gnupg
       - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
       - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-      - curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+      - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
       - apt update
       - apt install -y yarn
       - apt install -y nodejs
@@ -65,7 +65,7 @@ steps:
       - frontend-tests
 
   - name: frontend-e2e-tests
-    image: node:20.18.0
+    image: node:22.11.0
     volumes:
       - name: cache-node-frontend-e2e
         path: /drone/src/openbas-front/node_modules

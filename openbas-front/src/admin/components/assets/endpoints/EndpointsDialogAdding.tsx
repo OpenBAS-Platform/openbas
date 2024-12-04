@@ -37,7 +37,6 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   onSubmit,
   title,
   platforms,
-  payloadType,
   payloadArch,
 }) => {
   // Standard hooks
@@ -123,7 +122,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       buildFilter('endpoint_platform', platforms ?? [], 'contains'),
     ],
   };
-  if (quickFilter.filters && payloadType === 'Executable' && payloadArch) {
+  if (quickFilter.filters && payloadArch) {
     quickFilter.filters?.push(buildFilter('endpoint_arch', [payloadArch], 'contains'));
   }
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({

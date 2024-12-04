@@ -1,8 +1,8 @@
 package io.openbas.rest.injector_contract.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
+import io.openbas.database.model.Payload;
 import jakarta.validation.constraints.NotBlank;
 import java.util.*;
 import lombok.Data;
@@ -34,7 +34,7 @@ public class InjectorContractOutput {
   private List<String> attackPatterns;
 
   @JsonProperty("injector_contract_arch")
-  private Endpoint.PLATFORM_ARCH arch;
+  private Payload.PAYLOAD_EXECUTION_ARCH arch;
 
   public InjectorContractOutput(
       String id,
@@ -45,14 +45,13 @@ public class InjectorContractOutput {
       String collectorType,
       String injectorType,
       String[] attackPatterns,
-      Endpoint.PLATFORM_ARCH arch) {
+      Payload.PAYLOAD_EXECUTION_ARCH arch) {
     this.id = id;
     this.labels = labels;
     this.content = content;
     this.platforms = platforms;
     this.payloadType = Optional.ofNullable(collectorType).orElse(payloadType);
     this.injectorType = injectorType;
-
     this.attackPatterns =
         attackPatterns != null ? new ArrayList<>(Arrays.asList(attackPatterns)) : new ArrayList<>();
     this.arch = arch;

@@ -61,7 +61,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
   const onSubmitComcheck = async (data: ComcheckInput) => {
     const result = await dispatch(addComcheck(exerciseId, data));
     navigate(
-      `/admin/exercises/${exerciseId}/controls/comchecks/${result.result}`,
+      `/admin/simulations/${exerciseId}/controls/comchecks/${result.result}`,
     );
   };
 
@@ -73,7 +73,7 @@ const CreateControl: React.FC<Props> = ({ exerciseId, variant }) => {
 
     const result = await dispatch(addDryrun(exerciseId, inputValues));
     navigate(
-      `/admin/exercises/${exerciseId}/controls/dryruns/${result.result}`,
+      `/admin/simulations/${exerciseId}/controls/dryruns/${result.result}`,
     );
   };
 

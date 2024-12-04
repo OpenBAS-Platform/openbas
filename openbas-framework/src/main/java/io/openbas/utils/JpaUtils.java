@@ -7,6 +7,7 @@ import io.openbas.utils.schema.PropertySchema;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 
 public class JpaUtils {
 
@@ -89,12 +90,10 @@ public class JpaUtils {
   // -- FUNCTION --
 
   public static <T, U> Expression<String[]> arrayAggOnId(
-      @NotNull final CriteriaBuilder cb, @NotNull final Join<T, U> join) {
-    return cb.function(
-        "array_remove",
-        String[].class,
-        cb.function("array_agg", String[].class, join.get("id")),
-        cb.nullLiteral(String.class));
+      @NotNull final HibernateCriteriaBuilder cb, @NotNull final Join<T, U> join) {
+    Expression<String> nullString = cb.nullLiteral(String.class);
+    Expression<String[]> arr = cb.arrayAgg(null, join.get("id"));
+    return cb.arrayRemove(arr, nullString);
   }
 
   // -- JOIN --
@@ -106,6 +105,6 @@ public class JpaUtils {
   public static <X, Y> Expression<String[]> createJoinArrayAggOnId(
       CriteriaBuilder cb, Root<X> root, String attributeName) {
     Join<X, Y> join = createLeftJoin(root, attributeName);
-    return arrayAggOnId(cb, join);
+    return arrayAggOnId((HibernateCriteriaBuilder) cb, join);
   }
 }

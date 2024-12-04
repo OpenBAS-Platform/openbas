@@ -60,8 +60,8 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
   };
 
   const breadcrumbs: BreadcrumbsElement[] = [
-    { label: t('Simulations'), link: '/admin/exercises' },
-    { label: t(exercise.exercise_name), link: `/admin/exercises/${exercise.exercise_id}` },
+    { label: t('Simulations'), link: '/admin/simulations' },
+    { label: t(exercise.exercise_name), link: `/admin/simulations/${exercise.exercise_id}` },
   ];
   if (backlabel && backuri) {
     breadcrumbs.push({ label: backlabel, link: backuri });
@@ -84,15 +84,15 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
           <Tabs value={tabValue}>
             <Tab
               component={Link}
-              to={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}`}
-              value={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}`}
+              to={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}`}
+              value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}`}
               label={t('Overview')}
               className={classes.item}
             />
             <Tab
               component={Link}
-              to={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`}
-              value={`/admin/exercises/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`}
+              to={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`}
+              value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`}
               label={t('Execution details')}
               className={classes.item}
             />

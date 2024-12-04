@@ -13,7 +13,7 @@ const useEntityLink = (entity: string, id: string, searchTerm: string) => {
     case 'Scenario':
       return `/admin/scenarios/${id}}`;
     case 'Exercise':
-      return `/admin/exercises/${id}`;
+      return `/admin/simulations/${id}`;
     default:
       return ('');
   }

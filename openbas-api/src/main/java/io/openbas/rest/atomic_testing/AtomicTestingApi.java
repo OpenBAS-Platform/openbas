@@ -1,7 +1,6 @@
 package io.openbas.rest.atomic_testing;
 
 import io.openbas.aop.LogExecutionTime;
-import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
@@ -55,12 +54,6 @@ public class AtomicTestingApi extends RestBehavior {
     return this.atomicTestingService.createOrUpdate(input, null);
   }
 
-  @PostMapping("/{atomicTestingId}")
-  public InjectResultOverviewOutput duplicateAtomicTesting(
-      @PathVariable final String atomicTestingId) {
-    return atomicTestingService.getDuplicateAtomicTesting(atomicTestingId);
-  }
-
   @PutMapping("/{injectId}")
   @Transactional(rollbackFor = Exception.class)
   public InjectResultOverviewOutput updateAtomicTesting(
@@ -74,9 +67,25 @@ public class AtomicTestingApi extends RestBehavior {
     atomicTestingService.deleteAtomicTesting(injectId);
   }
 
-  @GetMapping("/try/{injectId}")
-  public Inject tryAtomicTesting(@PathVariable String injectId) {
-    return atomicTestingService.tryInject(injectId);
+  @Tracing(name = "Duplicate an atomic testing", layer = "api", operation = "POST")
+  @PostMapping("/{atomicTestingId}/duplicate")
+  public InjectResultOverviewOutput duplicateAtomicTesting(
+      @PathVariable @NotBlank final String atomicTestingId) {
+    return atomicTestingService.duplicate(atomicTestingId);
+  }
+
+  @Tracing(name = "Launch an atomic testing", layer = "api", operation = "POST")
+  @PostMapping("/{atomicTestingId}/launch")
+  public InjectResultOverviewOutput launchAtomicTesting(
+      @PathVariable @NotBlank final String atomicTestingId) {
+    return atomicTestingService.launch(atomicTestingId);
+  }
+
+  @Tracing(name = "Relaunch an atomic testing", layer = "api", operation = "POST")
+  @PostMapping("/{atomicTestingId}/relaunch")
+  public InjectResultOverviewOutput relaunchAtomicTesting(
+      @PathVariable @NotBlank final String atomicTestingId) {
+    return atomicTestingService.relaunch(atomicTestingId);
   }
 
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}")

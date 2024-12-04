@@ -1,9 +1,12 @@
 package io.openbas.rest.payload;
 
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.ARM64;
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.X86_64;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
@@ -22,8 +25,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,66 +36,40 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Secured(ROLE_USER)
+@RequiredArgsConstructor
 public class PayloadApi extends RestBehavior {
 
   public static final String PAYLOAD_URI = "/api/payloads";
 
-  private PayloadRepository payloadRepository;
-  private TagRepository tagRepository;
-  private PayloadService payloadService;
-  private AttackPatternRepository attackPatternRepository;
-  private DocumentRepository documentRepository;
+  private final PayloadRepository payloadRepository;
+  private final TagRepository tagRepository;
+  private final PayloadService payloadService;
+  private final AttackPatternRepository attackPatternRepository;
+  private final DocumentRepository documentRepository;
   private final CollectorRepository collectorRepository;
 
-  public PayloadApi(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
-  }
-
-  @Autowired
-  public void setPayloadRepository(PayloadRepository payloadRepository) {
-    this.payloadRepository = payloadRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setPayloadService(PayloadService payloadService) {
-    this.payloadService = payloadService;
-  }
-
-  @Autowired
-  public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
-    this.attackPatternRepository = attackPatternRepository;
-  }
-
-  @Autowired
-  public void setDocumentRepository(DocumentRepository documentRepository) {
-    this.documentRepository = documentRepository;
-  }
-
-  @PostMapping("/api/payloads/search")
+  @PostMapping(PAYLOAD_URI + "/search")
   public Page<Payload> payloads(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         (Specification<Payload> specification, Pageable pageable) ->
             this.payloadRepository.findAll(specification, pageable),
-        searchPaginationInput,
+        handleArchitectureFilter(searchPaginationInput),
         Payload.class);
   }
 
-  @GetMapping("/api/payloads/{payloadId}")
+  @GetMapping(PAYLOAD_URI + "/{payloadId}")
   public Payload payload(@PathVariable String payloadId) {
     return payloadRepository.findById(payloadId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @PostMapping("/api/payloads")
+  @PostMapping(PAYLOAD_URI)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
-    switch (PayloadType.fromString(input.getType())) {
+    PayloadType payloadType = PayloadType.fromString(input.getType());
+    validateArchitecture(payloadType.key, input.getExecutionArch());
+    switch (payloadType) {
       case PayloadType.COMMAND:
         Command commandPayload = new Command();
         commandPayload.setUpdateAttributes(input);
@@ -104,15 +81,12 @@ public class PayloadApi extends RestBehavior {
         return commandPayload;
       case PayloadType.EXECUTABLE:
         Executable executablePayload = new Executable();
-        PayloadCreateInput validatedInput = validateExecutableCreateInput(input);
-        executablePayload.setUpdateAttributes(validatedInput);
+        executablePayload.setUpdateAttributes(input);
         executablePayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
-        executablePayload.setTags(
-            iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
+            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+        executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         executablePayload.setExecutableFile(
-            documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
+            documentRepository.findById(input.getExecutableFile()).orElseThrow());
         executablePayload = payloadRepository.save(executablePayload);
         this.payloadService.updateInjectorContractsForPayload(executablePayload);
         return executablePayload;
@@ -151,25 +125,7 @@ public class PayloadApi extends RestBehavior {
     }
   }
 
-  private static PayloadCreateInput validateExecutableCreateInput(PayloadCreateInput input) {
-    Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
-    if (maybeArch.isPresent()) {
-      return input;
-    } else {
-      throw new BadRequestException("Executable arch is missing");
-    }
-  }
-
-  private static PayloadUpdateInput validateExecutableUpdateInput(PayloadUpdateInput input) {
-    Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
-    if (maybeArch.isPresent()) {
-      return input;
-    } else {
-      throw new BadRequestException("Executable arch is missing");
-    }
-  }
-
-  @PutMapping("/api/payloads/{payloadId}")
+  @PutMapping(PAYLOAD_URI + "/{payloadId}")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(
@@ -181,7 +137,10 @@ public class PayloadApi extends RestBehavior {
         fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     payload.setUpdatedAt(Instant.now());
-    switch (PayloadType.fromString(payload.getType())) {
+
+    PayloadType payloadType = PayloadType.fromString(payload.getType());
+    validateArchitecture(payloadType.key, input.getExecutionArch());
+    switch (payloadType) {
       case PayloadType.COMMAND:
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
         payloadCommand.setUpdateAttributes(input);
@@ -189,11 +148,10 @@ public class PayloadApi extends RestBehavior {
         this.payloadService.updateInjectorContractsForPayload(payloadCommand);
         return payloadCommand;
       case PayloadType.EXECUTABLE:
-        PayloadUpdateInput validatedInput = validateExecutableUpdateInput(input);
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-        payloadExecutable.setUpdateAttributes(validatedInput);
+        payloadExecutable.setUpdateAttributes(input);
         payloadExecutable.setExecutableFile(
-            documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
+            documentRepository.findById(input.getExecutableFile()).orElseThrow());
         payloadExecutable = payloadRepository.save(payloadExecutable);
         this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
         return payloadExecutable;
@@ -230,7 +188,7 @@ public class PayloadApi extends RestBehavior {
     return this.payloadService.duplicate(payloadId);
   }
 
-  @PostMapping("/api/payloads/upsert")
+  @PostMapping(PAYLOAD_URI + "/upsert")
   @PreAuthorize("isPlanner()")
   @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
   public Payload upsertPayload(@Valid @RequestBody PayloadUpsertInput input) {
@@ -247,7 +205,10 @@ public class PayloadApi extends RestBehavior {
                   input.getAttackPatternsExternalIds())));
       existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       existingPayload.setUpdatedAt(Instant.now());
-      switch (PayloadType.fromString(existingPayload.getType())) {
+
+      PayloadType payloadType = PayloadType.fromString(existingPayload.getType());
+      validateArchitecture(payloadType.key, input.getExecutionArch());
+      switch (payloadType) {
         case PayloadType.COMMAND:
           Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
           payloadCommand.setUpdateAttributes(input);
@@ -288,7 +249,9 @@ public class PayloadApi extends RestBehavior {
               "Payload type " + existingPayload.getType() + " is not supported");
       }
     } else {
-      switch (PayloadType.fromString(input.getType())) {
+      PayloadType payloadType = PayloadType.fromString(input.getType());
+      validateArchitecture(payloadType.key, input.getExecutionArch());
+      switch (payloadType) {
         case PayloadType.COMMAND:
           Command commandPayload = new Command();
           commandPayload.setUpdateAttributes(input);
@@ -377,7 +340,7 @@ public class PayloadApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @DeleteMapping("/api/payloads/{payloadId}")
+  @DeleteMapping(PAYLOAD_URI + "/{payloadId}")
   public void deletePayload(@PathVariable String payloadId) {
     payloadRepository.deleteById(payloadId);
   }
@@ -389,5 +352,15 @@ public class PayloadApi extends RestBehavior {
       @Valid @RequestBody PayloadsDeprecateInput input) {
     this.payloadService.deprecateNonProcessedPayloadsByCollector(
         input.collectorId(), input.processedPayloadExternalIds());
+  }
+
+  private static void validateArchitecture(
+      String payloadType, Payload.PAYLOAD_EXECUTION_ARCH arch) {
+    if (arch == null) {
+      throw new BadRequestException("Payload architecture cannot be null.");
+    }
+    if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != X86_64 && arch != ARM64)) {
+      throw new BadRequestException("Executable architecture must be x86_64 or ARM64.");
+    }
   }
 }

@@ -145,15 +145,15 @@ public class CalderaExecutor extends Injector {
                             List<InjectExpectationSignature> injectExpectationSignatures =
                                 new ArrayList<>();
                             if (injectorContract.getPayload() != null) {
-                              switch (injectorContract.getPayload().getType()) {
-                                case "Command":
+                              switch (injectorContract.getPayload().getTypeEnum()) {
+                                case PayloadType.COMMAND:
                                   injectExpectationSignatures.add(
                                       InjectExpectationSignature.builder()
                                           .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
                                           .value(executionEndpoint.getProcessName())
                                           .build());
                                   break;
-                                case "Executable":
+                                case PayloadType.EXECUTABLE:
                                   Executable payloadExecutable =
                                       (Executable) Hibernate.unproxy(injectorContract.getPayload());
                                   injectExpectationSignatures.add(
@@ -163,7 +163,7 @@ public class CalderaExecutor extends Injector {
                                           .build());
                                   // TODO File hash
                                   break;
-                                case "FileDrop":
+                                case PayloadType.FILE_DROP:
                                   FileDrop payloadFileDrop =
                                       (FileDrop) Hibernate.unproxy(injectorContract.getPayload());
                                   injectExpectationSignatures.add(
@@ -173,7 +173,7 @@ public class CalderaExecutor extends Injector {
                                           .build());
                                   // TODO File hash
                                   break;
-                                case "DnsResolution":
+                                case PayloadType.DNS_RESOLUTION:
                                   DnsResolution payloadDnsResolution =
                                       (DnsResolution)
                                           Hibernate.unproxy(injectorContract.getPayload());
