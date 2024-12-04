@@ -190,7 +190,6 @@ const UpdateInjectDetails = ({
     inject_depends_duration_hours: duration.hours,
     inject_depends_duration_minutes: duration.minutes,
   };
-
   // Enrich initialValues with default contract value
   const builtInFields = [
     'teams',

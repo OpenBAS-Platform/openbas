@@ -3,6 +3,7 @@ package io.openbas.rest.injector_contract;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 
 import io.openbas.database.model.InjectorContract;
@@ -47,7 +48,7 @@ public class InjectorContractApi extends RestBehavior {
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationCriteriaBuilder(
         this.injectorContractService::injectorContracts,
-        searchPaginationInput,
+        handleArchitectureFilter(searchPaginationInput),
         InjectorContract.class);
   }
 

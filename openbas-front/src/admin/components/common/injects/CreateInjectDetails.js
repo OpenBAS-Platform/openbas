@@ -339,14 +339,14 @@ const CreateInjectDetails = ({
                       values={values}
                       submitting={submitting}
                       inject={{
-                        inject_injector_contract: { injector_contract_id: contractId },
+                        inject_injector_contract: { injector_contract_id: contractId, injector_contract_arch: contract.injector_contract_arch },
                         inject_type: contractContent.config.type,
                         inject_teams: [],
                         inject_assets: [],
                         inject_asset_groups: [],
                         inject_documents: [],
                       }}
-                      injectorContract={{ ...contractContent, payloadType: contract.injector_contract_payload_type, payloadArch: contract.injector_contract_arch }}
+                      injectorContract={{ ...contractContent }}
                       handleClose={handleClose}
                       tagsMap={tagsMap}
                       permissions={permissions}
