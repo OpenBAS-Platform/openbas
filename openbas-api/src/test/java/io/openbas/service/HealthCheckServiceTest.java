@@ -65,6 +65,7 @@ class HealthCheckServiceTest {
           InvalidResponseException,
           XmlParserException,
           InternalException {
+    when(minioDriver.getMinioClient()).thenReturn(minioClient);
     when(minioConfig.getBucket()).thenReturn(BUCKET);
     when(minioClient.bucketExists(BucketExistsArgs.builder().bucket(BUCKET).build()))
         .thenThrow(new IOException("test"));
