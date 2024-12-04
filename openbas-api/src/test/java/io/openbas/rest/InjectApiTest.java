@@ -25,7 +25,6 @@ import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Executor;
-import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.DirectInjectInput;
 import io.openbas.rest.inject.form.InjectInput;
@@ -76,7 +75,6 @@ class InjectApiTest extends IntegrationTest {
   @SpyBean private Executor executor;
   @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private InjectRepository injectRepository;
-  @Autowired private InjectStatusRepository injectStatusRepository;
   @Autowired private DocumentRepository documentRepository;
   @Autowired private CommunicationRepository communicationRepository;
   @Autowired private InjectExpectationRepository injectExpectationRepository;
@@ -85,7 +83,6 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
-  @MockBean private InjectExpectationService injectExpectationService;
 
   @BeforeAll
   void beforeAll() {
