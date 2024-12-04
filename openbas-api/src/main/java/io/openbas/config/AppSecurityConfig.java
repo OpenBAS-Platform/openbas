@@ -108,7 +108,9 @@ public class AppSecurityConfig {
         .securityContext((securityContext) -> securityContext.requireExplicitSave(false))
         .authorizeHttpRequests(
             rq ->
-                rq.requestMatchers("/api/comcheck/**")
+                rq.requestMatchers("/api/health")
+                    .permitAll()
+                    .requestMatchers("/api/comcheck/**")
                     .permitAll()
                     .requestMatchers("/api/player/**")
                     .permitAll()

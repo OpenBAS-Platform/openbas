@@ -16,8 +16,13 @@ public class MinioDriver {
   private final MinioConfig minioConfig;
   private final S3Config s3Config;
 
-  @Bean
-  public MinioClient minioClient() throws Exception {
+  /**
+   * Create the Minio Client
+   *
+   * @return
+   * @throws Exception
+   */
+  public MinioClient getMinioClient() {
     MinioClient minioClient;
     if (s3Config.isUseAwsRole()) {
       String stsEndpoint = null;
@@ -38,6 +43,12 @@ public class MinioDriver {
               .credentials(minioConfig.getAccessKey(), minioConfig.getAccessSecret())
               .build();
     }
+    return minioClient;
+  }
+
+  @Bean
+  public MinioClient minioClient() throws Exception {
+    MinioClient minioClient = getMinioClient();
     // Make bucket if not exist.
     BucketExistsArgs bucketExistsArgs =
         BucketExistsArgs.builder().bucket(minioConfig.getBucket()).build();
