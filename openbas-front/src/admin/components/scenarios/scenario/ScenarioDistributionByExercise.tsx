@@ -1,80 +1,108 @@
 import { useTheme } from '@mui/styles';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { ExerciseSimpleStore } from '../../../../actions/exercises/Exercise';
+import { fetchScenarioStatistic } from '../../../../actions/scenarios/scenario-actions';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
+import Loader from '../../../../components/Loader';
 import type { Theme } from '../../../../components/Theme';
+import { GlobalScoreBySimulationEndDate, ScenarioStatistic } from '../../../../utils/api-types';
 import { verticalBarsChartOptions } from '../../../../utils/Charts';
 
 interface Props {
-  exercises: ExerciseSimpleStore[];
+  scenarioId: string;
+}
+
+function generateFakeDataFromDates(dates: string[], percentage: number): GlobalScoreBySimulationEndDate[] {
+  return dates.map(date => ({
+    simulation_end_date: date,
+    global_score_success_percentage: percentage,
+  }));
+}
+
+const generateFakeData = (): Record<string, GlobalScoreBySimulationEndDate[]> => {
+  const now = new Date();
+  const dates = Array.from({ length: 5 }, (_, i) => {
+    const newDate = new Date(now);
+    newDate.setHours(now.getHours() + i + 1);
+    return newDate.toISOString();
+  });
+  const prevention = { PREVENTION: generateFakeDataFromDates(dates, 0.69) };
+  const detection = { DETECTION: generateFakeDataFromDates(dates, 0.84) };
+  const humanResponse = { HUMAN_RESPONSE: generateFakeDataFromDates(dates, 0.46) };
+  return ({
+    ...prevention,
+    ...detection,
+    ...humanResponse,
+  });
+};
+
+function generateSeriesData(globalScores: GlobalScoreBySimulationEndDate[]) {
+  return globalScores.map((globalScore, index) => ({
+    x: `${index}|${globalScore.simulation_end_date}`,
+    y: globalScore.global_score_success_percentage,
+  }));
 }
 
 const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
-  exercises = [],
+  scenarioId,
 }) => {
   // Standard hooks
-  const { t, nsdt } = useFormatter();
+  const { t, fsd } = useFormatter();
   const theme: Theme = useTheme();
-  const generateFakeData = (): ExerciseSimpleStore[] => {
-    const now = new Date();
-    return Array.from(Array(5), (e, i) => {
-      now.setHours(now.getHours() + 1);
-      return {
-        exercise_id: `fake-${i}`,
-        exercise_name: 'fake',
-        exercise_start_date: now.toISOString(),
-        exercise_global_score: [
-          { type: 'PREVENTION', distribution: [{ id: 'PARTIAL_ID', value: 0.69, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'DETECTION', distribution: [{ id: 'PARTIAL_ID', value: 0.84, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'HUMAN_RESPONSE', distribution: [{ id: 'PARTIAL_ID', value: 0.46, label: t('Unknown') }], avgResult: 'PARTIAL' },
-        ],
-        exercise_targets: [],
-        exercise_tags: undefined,
-      };
-    });
+
+  const [loadingScenarioStatistics, setLoadingScenarioStatistics] = useState(true);
+  const [statistic, setStatistic] = useState<ScenarioStatistic>();
+  const fetchStatistics = () => {
+    setLoadingScenarioStatistics(true);
+    fetchScenarioStatistic(scenarioId).then((result: { data: ScenarioStatistic }) => setStatistic(result.data)).finally(() => setLoadingScenarioStatistics(false));
   };
-  const data = exercises.length > 0 ? exercises : generateFakeData();
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
+
+  const preventionData = statistic?.simulations_results_latest.global_scores_by_expectation_type['PREVENTION'];
+  const globalScoresByExpectationType = preventionData && preventionData.length > 0 ? statistic?.simulations_results_latest.global_scores_by_expectation_type : generateFakeData();
+  const isStatisticsDataEmpty = preventionData && preventionData.length === 0;
+
   const series = [
     {
       name: t('Prevention'),
-      data: data.map(exercise => ({
-        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter(score => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 0,
-      })),
+      data: generateSeriesData(globalScoresByExpectationType['PREVENTION']),
     },
     {
       name: t('Detection'),
-      data: data.map(exercise => ({
-        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter(score => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 0,
-      })),
+      data: generateSeriesData(globalScoresByExpectationType['DETECTION']),
     },
     {
       name: t('Human Response'),
-      data: data.map(exercise => ({
-        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter(score => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 0,
-      })),
+      data: generateSeriesData(globalScoresByExpectationType['HUMAN_RESPONSE']),
     },
   ];
+
   return (
     <>
-      {data.length > 0 ? (
+      {loadingScenarioStatistics && (<Loader variant="inElement" />)}
+      {(!loadingScenarioStatistics && series[0].data.length > 0) && (
         <Chart
           options={verticalBarsChartOptions(
             theme,
-            nsdt,
+            (rawData: string) => {
+              if (!rawData) {
+                return rawData;
+              }
+              const splitRawData = rawData.split('|');
+              return splitRawData.length > 0 ? fsd(splitRawData[1]) : rawData;
+            },
             (value: number) => `${value * 100}%`,
             false,
-            true,
+            false,
             false,
             true,
             'dataPoints',
             true,
-            exercises.length === 0,
+            isStatisticsDataEmpty,
             1,
             t('No data to display'),
           )}
@@ -83,7 +111,8 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
           width="100%"
           height={300}
         />
-      ) : (
+      )}
+      {(!loadingScenarioStatistics && series[0].data.length === 0) && (
         <Empty
           message={t(
             'No data to display',
