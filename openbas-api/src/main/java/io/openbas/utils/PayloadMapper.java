@@ -9,12 +9,10 @@ import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
 import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
