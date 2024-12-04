@@ -9,7 +9,7 @@ import { Link, useParams } from 'react-router';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
-import { fetchScenarioExercises, searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
+import { searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -21,15 +21,12 @@ import ItemCategory from '../../../../components/ItemCategory';
 import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
-import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import type { Theme } from '../../../../components/Theme';
 import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
 import type { KillChainPhase, SearchPaginationInput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isEmptyField } from '../../../../utils/utils';
 import ExerciseList from '../../simulations/ExerciseList';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
@@ -63,19 +60,12 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
   // Fetching data
-  const { scenario, exercises: exercisesFromStore } = useHelper((helper: ScenariosHelper & ExercisesHelper) => ({
+  const { scenario } = useHelper((helper: ScenariosHelper & ExercisesHelper) => ({
     scenario: helper.getScenario(scenarioId),
-    exercises: helper.getExercisesMap(),
   }));
-  const [loadingScenarioExercises, setLoadingScenarioExercises] = useState(true);
-  useDataLoader(() => {
-    setLoadingScenarioExercises(true);
-    dispatch(fetchScenarioExercises(scenarioId)).finally(() => setLoadingScenarioExercises(false));
-  });
-  const scenarioExercises = scenario.scenario_exercises?.map((exerciseId: string) => exercisesFromStore[exerciseId]).filter((ex: ExerciseStore) => !!ex);
+  const scenarioHasExercises = scenario.scenario_exercises?.length > 0;
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
 
   // Exercises
@@ -215,14 +205,13 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
         </Grid>
         <Grid item xs={6} style={{ paddingTop: 10 }}>
           <Typography variant="h4" gutterBottom style={{ margin: '9px 0 17px 0' }}>
-            {t('Simulations Results')}
+            {t('Latest 10 Simulations Results')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
-            {loadingScenarioExercises && (<Loader variant="inElement" />)}
-            {!loadingScenarioExercises && (<ScenarioDistributionByExercise exercises={scenarioExercises} />)}
+            <ScenarioDistributionByExercise scenarioId={scenarioId} />
           </Paper>
         </Grid>
-        {(scenarioExercises ?? 0).length > 0 && (
+        {scenarioHasExercises && (
           <Grid item xs={12} style={{ marginTop: 35 }}>
             <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
               {t('Simulations')}
@@ -247,7 +236,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
           </Grid>
         )}
       </Grid>
-      {(scenarioExercises ?? 0).length === 0 && !scenario.scenario_recurrence && (
+      {!scenarioHasExercises && !scenario.scenario_recurrence && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>
             {t('This scenario has never run, schedule or run it now!')}
@@ -264,7 +253,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
           </Button>
         </div>
       )}
-      {(scenarioExercises ?? 0).length === 0 && scenario.scenario_recurrence && (
+      {!scenarioHasExercises && scenario.scenario_recurrence && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>
             {t('This scenario is scheduled to run, results will appear soon.')}

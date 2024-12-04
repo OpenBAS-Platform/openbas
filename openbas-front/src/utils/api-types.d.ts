@@ -893,6 +893,13 @@ export interface FullTextSearchResult {
   tags?: Tag[];
 }
 
+export interface GlobalScoreBySimulationEndDate {
+  /** @format double */
+  global_score_success_percentage: number;
+  /** @format date-time */
+  simulation_end_date: string;
+}
+
 export interface Grant {
   grant_exercise?: string;
   grant_group?: string;
@@ -2868,9 +2875,7 @@ export interface ScenarioSimple {
 }
 
 export interface ScenarioStatistic {
-  scenarios_attack_scenario_count?: Record<string, number>;
-  /** @format int64 */
-  scenarios_global_count?: number;
+  simulations_results_latest: SimulationsResultsLatest;
 }
 
 export interface ScenarioTeamPlayersEnableInput {
@@ -2977,6 +2982,10 @@ export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
   platform_theme: string;
+}
+
+export interface SimulationsResultsLatest {
+  global_scores_by_expectation_type: Record<string, GlobalScoreBySimulationEndDate[]>;
 }
 
 /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
