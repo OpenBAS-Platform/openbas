@@ -62,7 +62,7 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
         }
         return (
           <Tooltip key={index} title={tooltipLabel}>
-            <IconComponent key={index} style={{ color, marginRight: 10, fontSize: 22 }} />
+            <IconComponent style={{ color, marginRight: 10, fontSize: 22 }} />
           </Tooltip>
         );
       })}
