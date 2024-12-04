@@ -62,8 +62,6 @@ import org.springframework.util.ResourceUtils;
 @ExtendWith(MockitoExtension.class)
 class InjectApiTest extends IntegrationTest {
 
-  public static final String CONTRACT_EXAMPLE = "138ad8f8-32f8-4a22-8114-aaa12322bd09";
-
   static Exercise EXERCISE;
   static Scenario SCENARIO;
   static Document DOCUMENT1;
