@@ -11,7 +11,7 @@ import type { UserHelper } from '../../../../actions/helper';
 import SearchFilter from '../../../../components/SearchFilter';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import type { Asset } from '../../../../utils/api-types';
+import type { Endpoint } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -55,7 +55,7 @@ interface Props {
   assetGroupId: string;
   handleClose: () => void;
   onUpdate?: (result: AssetGroupStore) => void;
-  onRemoveEndpointFromAssetGroup?: (assetId: Asset['asset_id']) => void;
+  onRemoveEndpointFromAssetGroup?: (assetId: Endpoint['asset_id']) => void;
 }
 
 const AssetGroupManagement: FunctionComponent<Props> = ({
