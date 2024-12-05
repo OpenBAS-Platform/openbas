@@ -1159,6 +1159,7 @@ export interface InjectExpectation {
 
 export interface InjectExpectationResult {
   date?: string;
+  metadata?: Record<string, string>;
   result: string;
   /** @format double */
   score?: number;
@@ -1191,8 +1192,8 @@ export interface InjectExpectationSimple {
 export interface InjectExpectationUpdateInput {
   collector_id: string;
   is_success: boolean;
+  metadata?: Record<string, string>;
   result: string;
-  success?: boolean;
 }
 
 export interface InjectImporter {
@@ -2408,10 +2409,10 @@ export interface Pause {
   pause_exercise?: Exercise;
 }
 
-export type PayloadStatus =  "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
-
 export interface Payload {
   listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPattern[];
   payload_cleanup_command?: string;
@@ -2428,7 +2429,7 @@ export interface Payload {
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: PayloadStatus;
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   /** @uniqueItems true */
   payload_tags?: Tag[];
   payload_type?: string;
@@ -2459,7 +2460,7 @@ export interface PayloadCreateInput {
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   payload_tags?: string[];
   payload_type: string;
 }
@@ -2513,9 +2514,14 @@ export interface PayloadUpsertInput {
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   payload_tags?: string[];
   payload_type: string;
+}
+
+export interface PayloadsDeprecateInput {
+  collector_id: string;
+  payload_external_ids: string[];
 }
 
 export interface PlatformSettings {
@@ -2886,7 +2892,7 @@ export interface ScenarioInput {
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;
-  scenario_mail_from: string;
+  scenario_mail_from?: string;
   scenario_mails_reply_to?: string[];
   scenario_main_focus?: string;
   scenario_message_footer?: string;

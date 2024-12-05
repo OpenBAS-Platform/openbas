@@ -50,7 +50,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
         scenario_tags: z.string().array().optional(),
         scenario_external_reference: z.string().optional(),
         scenario_external_url: z.string().optional(),
-        scenario_mail_from: z.string().email(t('Should be a valid email address')),
+        scenario_mail_from: z.string().email(t('Should be a valid email address')).optional(),
         scenario_mails_reply_to: z.array(z.string().email(t('Should be a valid email address'))).optional(),
         scenario_message_header: z.string().optional(),
         scenario_message_footer: z.string().optional(),
