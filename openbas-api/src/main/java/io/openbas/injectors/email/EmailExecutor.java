@@ -8,6 +8,7 @@ import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
@@ -17,24 +18,20 @@ import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component(EmailContract.TYPE)
+@RequiredArgsConstructor
 public class EmailExecutor extends Injector {
 
   @Resource private OpenBASConfig openBASConfig;
-
-  private EmailService emailService;
+  private final EmailService emailService;
+  private final InjectExpectationService injectExpectationService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
-
-  @Autowired
-  public void setEmailService(EmailService emailService) {
-    this.emailService = emailService;
-  }
 
   private void sendMulti(
       Execution execution,
@@ -135,6 +132,9 @@ public class EmailExecutor extends Injector {
                       default -> Stream.of();
                     })
             .toList();
-    return new ExecutionProcess(false, expectations);
+
+    injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
+    return new ExecutionProcess(false);
   }
 }

@@ -50,6 +50,6 @@ public class LadeExecutor extends Injector {
     } catch (Exception e) {
       execution.addTrace(traceError(e.getMessage()));
     }
-    return new ExecutionProcess(true, List.of());
+    return new ExecutionProcess(true);
   }
 }

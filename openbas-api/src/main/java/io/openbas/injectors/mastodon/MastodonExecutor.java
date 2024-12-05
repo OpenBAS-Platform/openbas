@@ -41,6 +41,6 @@ public class MastodonExecutor extends Injector {
     } catch (Exception e) {
       execution.addTrace(traceError(e.getMessage()));
     }
-    return new ExecutionProcess(false, List.of());
+    return new ExecutionProcess(false);
   }
 }

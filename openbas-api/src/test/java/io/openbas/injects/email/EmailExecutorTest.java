@@ -3,13 +3,13 @@ package io.openbas.injects.email;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.User;
+import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.execution.ExecutableInject;
@@ -17,9 +17,9 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.injectors.email.EmailExecutor;
 import io.openbas.injectors.email.model.EmailContent;
-import io.openbas.model.ExecutionProcess;
 import io.openbas.model.inject.form.Expectation;
 import jakarta.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ public class EmailExecutorTest {
   @Autowired private EmailExecutor emailExecutor;
   @Autowired private UserRepository userRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private ExecutionContextService executionContextService;
   @Resource protected ObjectMapper mapper;
 
@@ -61,10 +62,10 @@ public class EmailExecutorTest {
     Execution execution = new Execution(executableInject.isRuntime());
 
     // -- EXECUTE --
-    ExecutionProcess executionProcess = this.emailExecutor.process(execution, executableInject);
+    emailExecutor.process(execution, executableInject);
 
     // -- ASSERT --
-    assertNotNull(executionProcess.getExpectations());
-    assertEquals(10, executionProcess.getExpectations().get(0).getScore());
+    // No injectExpectation should be created.
+    assertEquals(Collections.emptyList(), injectExpectationRepository.findAll());
   }
 }

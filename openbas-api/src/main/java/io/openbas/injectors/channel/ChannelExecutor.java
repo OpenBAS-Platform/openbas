@@ -11,6 +11,7 @@ import io.openbas.database.repository.ArticleRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.channel.model.ArticleVariable;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.injectors.email.service.EmailService;
@@ -24,35 +25,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component(ChannelContract.TYPE)
+@RequiredArgsConstructor
 public class ChannelExecutor extends Injector {
 
   public static final String VARIABLE_ARTICLES = "articles";
-
   public static final String VARIABLE_ARTICLE = "article";
 
   @Resource private OpenBASConfig openBASConfig;
-
-  private ArticleRepository articleRepository;
-
-  private EmailService emailService;
+  private final ArticleRepository articleRepository;
+  private final EmailService emailService;
+  private final InjectExpectationService injectExpectationService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
-
-  @Autowired
-  public void setArticleRepository(ArticleRepository articleRepository) {
-    this.articleRepository = articleRepository;
-  }
-
-  @Autowired
-  public void setEmailService(EmailService emailService) {
-    this.emailService = emailService;
-  }
 
   private String buildArticleUri(ExecutionContext context, Article article) {
     String userId = context.getUser().getId();
@@ -153,13 +143,16 @@ public class ChannelExecutor extends Injector {
                           })
                   .toList());
         }
-        return new ExecutionProcess(false, expectations);
+
+        injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
+        return new ExecutionProcess(false);
       } else {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
       execution.addTrace(traceError(e.getMessage()));
     }
-    return new ExecutionProcess(false, List.of());
+    return new ExecutionProcess(false);
   }
 }

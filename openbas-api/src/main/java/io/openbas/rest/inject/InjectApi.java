@@ -23,7 +23,10 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.execution.Executor;
+import io.openbas.helper.InjectHelper;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injector_contract.ContractType;
+import io.openbas.model.Expectation;
 import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -84,6 +87,8 @@ public class InjectApi extends RestBehavior {
   private final InjectSearchService injectSearchService;
   private final AtomicTestingService atomicTestingService;
   private final InjectDuplicateService injectDuplicateService;
+  private final InjectExpectationService injectExpectationService;
+  private final InjectHelper injectHelper;
 
   // -- INJECTS --
 
@@ -109,7 +114,8 @@ public class InjectApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
   public Inject injectExecutionCallback(
-      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input)
+      throws Exception {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
@@ -124,7 +130,7 @@ public class InjectApi extends RestBehavior {
     if (ExecutionTraceStatus.SUCCESS.equals(executionStatus)) {
       injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
     } else {
-      injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalSuccess() + 1);
+      injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
     }
 
     int currentTotal =
@@ -160,6 +166,14 @@ public class InjectApi extends RestBehavior {
         injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
       } else {
         injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
+      }
+
+      // If the injectStatus is different from ERROR, we build the expectations related to this
+      // inject
+      if (!ExecutionStatus.ERROR.equals(injectStatus.getName())) {
+        List<Expectation> expectations = injectExpectationService.generateExpectations(inject);
+        injectExpectationService.buildAndSaveInjectExpectations(
+            injectHelper.getExecutableInjectForOpenBASImplantExecutor(inject), expectations);
       }
     }
     return injectRepository.save(inject);

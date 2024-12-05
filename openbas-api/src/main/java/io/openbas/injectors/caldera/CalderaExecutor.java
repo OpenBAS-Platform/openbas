@@ -19,6 +19,7 @@ import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.ExploitResult;
@@ -51,6 +52,7 @@ public class CalderaExecutor extends Injector {
   private final CalderaInjectorService calderaService;
   private final EndpointService endpointService;
   private final AssetGroupService assetGroupService;
+  private final InjectExpectationService injectExpectationService;
   private final InjectRepository injectRepository;
 
   @Override
@@ -264,9 +266,11 @@ public class CalderaExecutor extends Injector {
         (assetGroup ->
             computeExpectationsForAssetGroup(
                 expectations, content, assetGroup, new ArrayList<>())));
+
     String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
     execution.addTrace(traceInfo(message, asyncIds));
-    return new ExecutionProcess(true, expectations);
+    injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+    return new ExecutionProcess(true);
   }
 
   @Override
