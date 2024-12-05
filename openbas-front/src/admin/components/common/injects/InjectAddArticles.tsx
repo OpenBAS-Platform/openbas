@@ -16,7 +16,7 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useContext, useState } from 'react';
 
-import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
+import type { FullArticleStore } from '../../../../actions/channels/Article';
 import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
@@ -25,6 +25,7 @@ import { useFormatter } from '../../../../components/i18n';
 import SearchFilter from '../../../../components/SearchFilter';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
+import { Article } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { truncate } from '../../../../utils/String';
@@ -54,7 +55,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  articles: ArticleStore[];
+  articles: Article[];
   handleAddArticles: (articleIds: string[]) => void;
   injectArticlesIds: string[];
 }
