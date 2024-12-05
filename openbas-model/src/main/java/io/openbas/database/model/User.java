@@ -2,7 +2,6 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.StreamSupport.stream;
 import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,7 +20,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
