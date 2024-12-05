@@ -14,6 +14,9 @@ const styles = () => ({
     height: '100%',
     display: 'table',
   },
+  containerInElementTiny: {
+    width: 'auto',
+  },
   loader: {
     width: '100%',
     margin: 0,
@@ -37,40 +40,58 @@ const styles = () => ({
   },
 });
 
+const inElementVariants = ['inElement', 'inElementTiny'];
+
 class Loader extends Component {
   render() {
     const { classes, variant, withRightPadding } = this.props;
     return (
       <div
-        className={
-          variant === 'inElement'
-            ? classes.containerInElement
-            : classes.container
-        }
+        className={this.getContainer(variant, classes)}
         style={
-          variant === 'inElement'
+          inElementVariants.includes(variant)
             ? { paddingRight: withRightPadding ? 200 : 0 }
             : {}
         }
       >
         <div
           className={
-            variant === 'inElement' ? classes.loaderInElement : classes.loader
+            inElementVariants.includes(variant) ? classes.loaderInElement : classes.loader
           }
           style={
-            variant !== 'inElement'
+            !inElementVariants.includes(variant)
               ? { paddingRight: withRightPadding ? 100 : 0 }
               : {}
           }
         >
           <CircularProgress
-            size={variant === 'inElement' ? 40 : 80}
+            size={this.getSize(variant)}
             thickness={1}
             className={this.props.classes.loaderCircle}
           />
         </div>
       </div>
     );
+  }
+
+  getContainer(variant, classes) {
+    if (variant === 'inElement') {
+      return classes.containerInElement;
+    }
+    if (variant === 'inElementTiny') {
+      return classes.containerInElementTiny;
+    }
+    return classes.container;
+  }
+
+  getSize(variant) {
+    if (variant === 'inElement') {
+      return 40;
+    }
+    if (variant === 'inElementTiny') {
+      return '1rem';
+    }
+    return 80;
   }
 }
 

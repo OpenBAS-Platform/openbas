@@ -830,6 +830,14 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
+export interface ExercisesGlobalScoresInput {
+  exercise_ids: string[];
+}
+
+export interface ExercisesGlobalScoresOutput {
+  global_scores_by_exercise_ids: Record<string, ExpectationResultsByType[]>;
+}
+
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   distribution: ResultDistribution[];
