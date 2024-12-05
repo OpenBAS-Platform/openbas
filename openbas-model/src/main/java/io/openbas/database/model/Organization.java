@@ -10,6 +10,8 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -57,6 +59,7 @@ public class Organization implements Base {
   @JsonIgnore
   private List<User> users = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Setter
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
@@ -87,6 +90,7 @@ public class Organization implements Base {
             .collect(Collectors.toList());
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("organization_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<Inject> getOrganizationInject() {

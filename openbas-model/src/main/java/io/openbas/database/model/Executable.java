@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class Executable extends Payload {
   @JoinColumn(name = "executable_file")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("executable_file")
+  @Schema(type = "string")
   private Document executableFile;
 
   @Queryable(filterable = true, searchable = true)

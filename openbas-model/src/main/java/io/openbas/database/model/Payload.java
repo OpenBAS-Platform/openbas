@@ -14,6 +14,8 @@ import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -78,6 +80,7 @@ public class Payload implements Base {
   @JsonProperty("payload_platforms")
   private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -143,10 +146,12 @@ public class Payload implements Base {
   @JoinColumn(name = "payload_collector")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("payload_collector")
+  @Schema(type = "string")
   private Collector collector;
 
   // -- TAG --
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Queryable(filterable = true, dynamicValues = true)
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(

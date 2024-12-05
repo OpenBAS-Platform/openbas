@@ -39,12 +39,14 @@ public class LessonsCategory implements Base {
   @JoinColumn(name = "lessons_category_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("lessons_category_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "lessons_category_scenario")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("lessons_category_scenario")
+  @Schema(type = "string")
   private Scenario scenario;
 
   @Column(name = "lessons_category_created_at")

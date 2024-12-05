@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,6 +42,7 @@ public class InjectImporter implements Base {
   @JsonProperty("inject_importer_injector_contract")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @NotNull
+  @Schema(type = "string")
   private InjectorContract injectorContract;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

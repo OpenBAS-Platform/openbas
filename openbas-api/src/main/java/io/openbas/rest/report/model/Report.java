@@ -9,6 +9,7 @@ import io.openbas.database.model.Base;
 import io.openbas.database.model.Exercise;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -69,6 +70,7 @@ public class Report implements Base {
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
   @JsonProperty("report_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private Exercise exercise;
 
   @OneToMany(

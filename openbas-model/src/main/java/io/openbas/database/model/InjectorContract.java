@@ -13,6 +13,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -101,8 +103,10 @@ public class InjectorContract implements Base {
   @JsonProperty("injector_contract_injector")
   @Queryable(filterable = true, dynamicValues = true)
   @NotNull
+  @Schema(type = "string")
   private Injector injector;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Setter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(

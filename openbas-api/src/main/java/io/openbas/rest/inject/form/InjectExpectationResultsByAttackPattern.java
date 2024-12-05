@@ -7,6 +7,7 @@ import io.openbas.database.model.Inject;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class InjectExpectationResultsByAttackPattern {
 
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_attack_pattern")
+  @Schema(type = "string")
   private AttackPattern attackPattern;
 
   @Data

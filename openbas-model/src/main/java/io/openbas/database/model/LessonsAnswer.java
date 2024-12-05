@@ -35,8 +35,8 @@ public class LessonsAnswer implements Base {
   @JoinColumn(name = "lessons_answer_question")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("lessons_answer_question")
-  @Schema(type = "string")
   @NotNull
+  @Schema(type = "string")
   private LessonsQuestion question;
 
   @ManyToOne(fetch = FetchType.LAZY)

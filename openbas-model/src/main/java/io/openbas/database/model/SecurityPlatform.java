@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -45,12 +46,14 @@ public class SecurityPlatform extends Asset {
   @JoinColumn(name = "security_platform_logo_light")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("security_platform_logo_light")
+  @Schema(type = "string")
   private Document logoLight;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "security_platform_logo_dark")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("security_platform_logo_dark")
+  @Schema(type = "string")
   private Document logoDark;
 
   public SecurityPlatform() {}

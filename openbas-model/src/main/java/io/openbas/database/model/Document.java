@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.*;
@@ -58,6 +60,7 @@ public class Document implements Base {
   @NotBlank
   private String type;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "documents_tags",
@@ -68,6 +71,7 @@ public class Document implements Base {
   @Queryable(sortable = true)
   private Set<Tag> tags = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "exercises_documents",
@@ -77,6 +81,7 @@ public class Document implements Base {
   @JsonProperty("document_exercises")
   private Set<Exercise> exercises = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "scenarios_documents",

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +25,7 @@ public class FileDrop extends Payload {
   @JoinColumn(name = "file_drop_file")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("file_drop_file")
+  @Schema(type = "string")
   private Document fileDropFile;
 
   public FileDrop() {}

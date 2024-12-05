@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -68,9 +70,11 @@ public class Comcheck implements Base {
   @JoinColumn(name = "comcheck_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("comcheck_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   // CascadeType.ALL is required here because comcheck statuses are embedded
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "comcheck", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("comcheck_statuses")

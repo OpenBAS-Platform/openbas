@@ -16,6 +16,8 @@ import io.openbas.helper.InjectStatisticsHelper;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -150,12 +152,14 @@ public class Scenario implements Base {
   @JsonIgnore
   private List<Grant> grants = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonProperty("scenario_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @Getter(NONE)
   private Set<Inject> injects = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "scenarios_teams",
@@ -178,6 +182,7 @@ public class Scenario implements Base {
   @JsonIgnore
   private List<Objective> objectives = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "scenarios_tags",
@@ -188,6 +193,7 @@ public class Scenario implements Base {
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "scenarios_documents",
@@ -197,16 +203,19 @@ public class Scenario implements Base {
   @JsonProperty("scenario_documents")
   private List<Document> documents = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_articles")
   private List<Article> articles = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "scenario", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("scenario_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "scenarios_exercises",
@@ -229,12 +238,14 @@ public class Scenario implements Base {
 
   // -- SECURITY --
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("scenario_planners")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getPlanners() {
     return getUsersByType(this.getGrants(), PLANNER);
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("scenario_observers")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getObservers() {
@@ -258,6 +269,7 @@ public class Scenario implements Base {
     return getTeamUsers().stream().map(ScenarioTeamUser::getUser).distinct().count();
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("scenario_users")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getUsers() {

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,12 +37,14 @@ public class Log implements Base {
   @JoinColumn(name = "log_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("log_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "log_user")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("log_user")
+  @Schema(type = "string")
   private User user;
 
   @Column(name = "log_title")
@@ -63,6 +67,7 @@ public class Log implements Base {
   @NotNull
   private Instant updated = now();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "logs_tags",

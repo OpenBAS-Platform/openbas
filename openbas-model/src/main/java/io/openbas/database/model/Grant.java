@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,18 +41,21 @@ public class Grant implements Base {
   @JoinColumn(name = "grant_group")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("grant_group")
+  @Schema(type = "string")
   private Group group;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "grant_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("grant_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "grant_scenario")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("grant_scenario")
+  @Schema(type = "string")
   private Scenario scenario;
 
   @Override
