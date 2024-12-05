@@ -128,7 +128,6 @@ public class AssetGroupService {
     return assetGroup;
   }
 
-  /** */
   public Map<String, List<Endpoint>> computeDynamicAssetFromRaw(
       @NotNull Set<RawAssetGroup> assetGroups) {
     if (assetGroups.isEmpty()) {

@@ -4,7 +4,6 @@ public enum ExecutionTraceStatus {
   SUCCESS,
   ERROR,
   MAYBE_PREVENTED,
-
   INFO,
   COMMAND_NOT_FOUND,
   COMMAND_CANNOT_BE_EXECUTED,
