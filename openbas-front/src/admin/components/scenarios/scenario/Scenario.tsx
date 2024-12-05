@@ -232,6 +232,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 queryableHelpers={queryableHelpers}
                 secondaryAction={secondaryAction}
                 loading={loadingExercises}
+                isGlobalScoreAsync={true}
               />
             </Paper>
           </Grid>
