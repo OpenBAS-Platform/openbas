@@ -2,7 +2,6 @@ package io.openbas.rest.injector_contract.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import jakarta.validation.constraints.NotBlank;
 import java.util.*;
 import lombok.Data;
@@ -22,7 +21,7 @@ public class InjectorContractOutput {
   private String content;
 
   @JsonProperty("injector_contract_platforms")
-  private PLATFORM_TYPE[] platforms;
+  private Endpoint.PLATFORM_TYPE[] platforms;
 
   @JsonProperty("injector_contract_payload_type")
   private String payloadType;
@@ -40,7 +39,7 @@ public class InjectorContractOutput {
       String id,
       Map<String, String> labels,
       String content,
-      PLATFORM_TYPE[] platforms,
+      Endpoint.PLATFORM_TYPE[] platforms,
       String payloadType,
       String collectorType,
       String injectorType,

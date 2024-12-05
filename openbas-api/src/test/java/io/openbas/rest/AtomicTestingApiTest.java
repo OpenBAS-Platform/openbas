@@ -14,7 +14,6 @@ import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -61,8 +60,8 @@ public class AtomicTestingApiTest extends IntegrationTest {
     injectStatus.setInject(injectToCreate2);
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setName(ExecutionStatus.SUCCESS);
-    injectStatus.setCommandsLines(
-        new InjectStatusCommandLine(List.of("cmd"), List.of("clean cmd"), "id1234567"));
+    /*injectStatus.setCommandsLines(
+    new StatusPayload(List.of("cmd"), List.of("clean cmd"), "id1234567"));*/
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
   }
 
@@ -82,7 +81,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(INJECT_WITHOUT_PAYLOAD.getId(), JsonPath.read(response, "$.inject_id"));
-    assertNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
   @DisplayName("Find an atomic testing with payload")
@@ -101,7 +99,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(INJECT_WITH_PAYLOAD.getId(), JsonPath.read(response, "$.inject_id"));
-    assertNotNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
   @DisplayName("Duplicate and delete an atomic testing")

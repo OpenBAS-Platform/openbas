@@ -5,7 +5,7 @@ import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
+import io.openbas.executors.Injector;
 import io.openbas.injectors.mastodon.model.MastodonContent;
 import io.openbas.injectors.mastodon.service.MastodonService;
 import io.openbas.model.ExecutionProcess;

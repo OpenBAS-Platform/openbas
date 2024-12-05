@@ -4,10 +4,7 @@ import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.inject_expectation.InjectExpectationService;
-import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultOutput;
-import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
+import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.telemetry.Tracing;
@@ -46,6 +43,13 @@ public class AtomicTestingApi extends RestBehavior {
   @Tracing(name = "Get a atomic testing", layer = "api", operation = "GET")
   public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
+  }
+
+  @LogExecutionTime
+  @GetMapping("/{injectId}/payload")
+  @Tracing(name = "Get the payload of an atomic testing", layer = "api", operation = "GET")
+  public StatusPayloadOutput findAtomicTestingPayload(@PathVariable String injectId) {
+    return atomicTestingService.findPayloadOutputByInjectId(injectId);
   }
 
   @PostMapping()

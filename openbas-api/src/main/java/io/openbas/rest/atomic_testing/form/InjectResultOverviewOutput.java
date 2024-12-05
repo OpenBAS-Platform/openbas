@@ -2,7 +2,6 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.database.model.InjectStatusCommandLine;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -38,10 +37,6 @@ public class InjectResultOverviewOutput {
   @JsonProperty("inject_content")
   private ObjectNode content;
 
-  @Schema(description = "Command lines for inject")
-  @JsonProperty("inject_commands_lines")
-  private InjectStatusCommandLine commandsLines;
-
   @Schema(description = "Type of inject")
   @JsonProperty("inject_type")
   private String type;
@@ -57,7 +52,7 @@ public class InjectResultOverviewOutput {
   @Schema(description = "Full contract")
   @JsonProperty("inject_injector_contract")
   @NotNull
-  private InjectorContractSimple injectorContract;
+  private AtomicInjectorContractOutput injectorContract;
 
   @Schema(description = "status")
   @JsonProperty("inject_status")

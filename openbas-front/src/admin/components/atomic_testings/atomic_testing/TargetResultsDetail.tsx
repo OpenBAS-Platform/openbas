@@ -33,7 +33,7 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
 import type { Theme } from '../../../../components/Theme';
-import type { InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
+import { InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
@@ -307,12 +307,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         />
       );
     }
+
     return (
       <InjectIcon
         isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
         type={inject.inject_injector_contract?.injector_contract_payload
-          ? inject.inject_injector_contract.injector_contract_payload.payload_collector_type
-          || inject.inject_injector_contract.injector_contract_payload.payload_type
+          ? inject.inject_injector_contract?.injector_contract_payload.payload_collector_type
+          || inject.inject_injector_contract?.injector_contract_payload.payload_type
           : inject.inject_type}
       />
     );
