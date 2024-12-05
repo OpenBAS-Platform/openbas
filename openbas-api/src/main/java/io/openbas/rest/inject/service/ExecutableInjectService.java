@@ -18,6 +18,7 @@ public class ExecutableInjectService {
 
   private final InjectRepository injectRepository;
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
+  private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
 
   private List<String> getArgumentsFromCommandLines(String command) {
     Matcher matcher = argumentsRegex.matcher(command);
@@ -57,6 +58,19 @@ public class ExecutableInjectService {
     return command;
   }
 
+  public static String replaceCmdVariables(String cmd) {
+    Matcher matcher = cmdVariablesRegex.matcher(cmd);
+
+    StringBuilder result = new StringBuilder();
+    while (matcher.find()) {
+      String variableName = matcher.group(1);
+      matcher.appendReplacement(result, "!" + variableName + "!");
+    }
+    matcher.appendTail(result);
+
+    return result.toString();
+  }
+
   private String processAndEncodeCommand(
       String command,
       String executor,
@@ -66,6 +80,7 @@ public class ExecutableInjectService {
     String computedCommand = replaceArgumentsByValue(command, defaultArguments, injectContent);
 
     if (executor.equals("cmd")) {
+      computedCommand = replaceCmdVariables(computedCommand);
       computedCommand = computedCommand.trim().replace("\n", " & ");
     }
 
@@ -88,7 +103,8 @@ public class ExecutableInjectService {
         .getPrerequisites()
         .forEach(
             prerequisite -> {
-              if (prerequisite.getCheckCommand() != null) {
+              if (prerequisite.getCheckCommand() != null
+                  && !prerequisite.getCheckCommand().isEmpty()) {
                 prerequisite.setCheckCommand(
                     processAndEncodeCommand(
                         prerequisite.getCheckCommand(),
@@ -97,7 +113,7 @@ public class ExecutableInjectService {
                         inject.getContent(),
                         "base64"));
               }
-              if (prerequisite.getGetCommand() != null) {
+              if (prerequisite.getGetCommand() != null && !prerequisite.getGetCommand().isEmpty()) {
                 prerequisite.setGetCommand(
                     processAndEncodeCommand(
                         prerequisite.getGetCommand(),
