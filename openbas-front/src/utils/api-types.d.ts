@@ -43,20 +43,20 @@ export interface AiResult {
 
 export interface Article {
   article_author?: string;
-  article_channel: Channel;
+  article_channel: string;
   /** @format int32 */
   article_comments?: number;
   article_content?: string;
   /** @format date-time */
   article_created_at: string;
-  article_documents?: Document[];
-  article_exercise?: Exercise;
+  article_documents?: string[];
+  article_exercise?: string;
   article_id: string;
   article_is_scheduled?: boolean;
   /** @format int32 */
   article_likes?: number;
   article_name?: string;
-  article_scenario?: Scenario;
+  article_scenario?: string;
   /** @format int32 */
   article_shares?: number;
   /** @format date-time */
@@ -96,50 +96,24 @@ export interface ArticleUpdateInput {
   article_shares?: number;
 }
 
-export interface Asset {
-  asset_active?: boolean;
-  asset_children?: Asset[];
-  /** @format date-time */
-  asset_cleared_at?: string;
-  /** @format date-time */
-  asset_created_at: string;
-  asset_description?: string;
-  asset_executor?: Executor;
-  asset_external_reference?: string;
-  asset_id: string;
-  asset_inject?: Inject;
-  /** @format date-time */
-  asset_last_seen?: string;
-  asset_name: string;
-  asset_parent?: Asset;
-  asset_process_name?: string;
-  /** @uniqueItems true */
-  asset_tags?: Tag[];
-  asset_type?: string;
-  /** @format date-time */
-  asset_updated_at: string;
-  listened?: boolean;
-}
-
 export interface AssetAgentJob {
-  asset_agent_asset?: Asset;
+  asset_agent_asset?: string;
   asset_agent_command: string;
   asset_agent_id: string;
-  asset_agent_inject?: Inject;
+  asset_agent_inject?: string;
   listened?: boolean;
 }
 
 export interface AssetGroup {
-  asset_group_assets?: Asset[];
+  asset_group_assets?: string[];
   /** @format date-time */
   asset_group_created_at: string;
   asset_group_description?: string;
-  asset_group_dynamic_assets?: Asset[];
+  asset_group_dynamic_assets?: string[];
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
-  /** @uniqueItems true */
-  asset_group_tags?: Tag[];
+  asset_group_tags?: string[];
   /** @format date-time */
   asset_group_updated_at: string;
   listened?: boolean;
@@ -186,9 +160,9 @@ export interface AttackPattern {
   attack_pattern_description?: string;
   attack_pattern_external_id: string;
   attack_pattern_id: string;
-  attack_pattern_kill_chain_phases?: KillChainPhase[];
+  attack_pattern_kill_chain_phases?: string[];
   attack_pattern_name: string;
-  attack_pattern_parent?: AttackPattern;
+  attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
   attack_pattern_stix_id: string;
@@ -231,7 +205,7 @@ export interface Challenge {
   challenge_content?: string;
   /** @format date-time */
   challenge_created_at: string;
-  challenge_documents?: Document[];
+  challenge_documents?: string[];
   challenge_exercises?: string[];
   challenge_flags: ChallengeFlag[];
   challenge_id: string;
@@ -241,8 +215,7 @@ export interface Challenge {
   challenge_scenarios?: string[];
   /** @format double */
   challenge_score?: number;
-  /** @uniqueItems true */
-  challenge_tags?: Tag[];
+  challenge_tags?: string[];
   /** @format date-time */
   challenge_updated_at: string;
   /** @format date-time */
@@ -251,7 +224,7 @@ export interface Challenge {
 }
 
 export interface ChallengeFlag {
-  flag_challenge?: Challenge;
+  flag_challenge?: string;
   /** @format date-time */
   flag_created_at?: string;
   flag_id?: string;
@@ -304,8 +277,8 @@ export interface Channel {
   channel_created_at: string;
   channel_description?: string;
   channel_id: string;
-  channel_logo_dark?: Document;
-  channel_logo_light?: Document;
+  channel_logo_dark?: string;
+  channel_logo_light?: string;
   channel_mode?: string;
   channel_name?: string;
   channel_primary_color_dark?: string;
@@ -383,14 +356,14 @@ export interface CollectorUpdateInput {
 export interface Comcheck {
   /** @format date-time */
   comcheck_end_date: string;
-  comcheck_exercise?: Exercise;
+  comcheck_exercise?: string;
   comcheck_id: string;
   comcheck_message?: string;
   comcheck_name?: string;
   /** @format date-time */
   comcheck_start_date: string;
   comcheck_state?: "RUNNING" | "EXPIRED" | "FINISHED";
-  comcheck_statuses?: ComcheckStatus[];
+  comcheck_statuses?: string[];
   comcheck_subject?: string;
   /** @format int64 */
   comcheck_users_number?: number;
@@ -407,7 +380,7 @@ export interface ComcheckInput {
 }
 
 export interface ComcheckStatus {
-  comcheckstatus_comcheck?: Comcheck;
+  comcheckstatus_comcheck?: string;
   comcheckstatus_id?: string;
   /** @format date-time */
   comcheckstatus_receive_date?: string;
@@ -416,7 +389,7 @@ export interface ComcheckStatus {
   /** @format int32 */
   comcheckstatus_sent_retry?: number;
   comcheckstatus_state?: "RUNNING" | "SUCCESS" | "FAILURE";
-  comcheckstatus_user?: User;
+  comcheckstatus_user?: string;
   listened?: boolean;
 }
 
@@ -429,7 +402,7 @@ export interface Communication {
   communication_exercise?: string;
   communication_from: string;
   communication_id: string;
-  communication_inject?: Inject;
+  communication_inject?: string;
   communication_message_id: string;
   /** @format date-time */
   communication_received_at: string;
@@ -437,7 +410,7 @@ export interface Communication {
   communication_sent_at: string;
   communication_subject?: string;
   communication_to: string;
-  communication_users?: User[];
+  communication_users?: string[];
   listened?: boolean;
 }
 
@@ -468,14 +441,11 @@ export interface DirectInjectInput {
 
 export interface Document {
   document_description?: string;
-  /** @uniqueItems true */
-  document_exercises?: Exercise[];
+  document_exercises?: string[];
   document_id: string;
   document_name: string;
-  /** @uniqueItems true */
-  document_scenarios?: Scenario[];
-  /** @uniqueItems true */
-  document_tags?: Tag[];
+  document_scenarios?: string[];
+  document_tags?: string[];
   document_target?: string;
   document_type: string;
   listened?: boolean;
@@ -502,8 +472,8 @@ export interface DocumentUpdateInput {
 export interface DryInject {
   /** @format date-time */
   dryinject_date: string;
-  dryinject_dryrun?: Dryrun;
-  dryinject_exercise?: Exercise;
+  dryinject_dryrun?: string;
+  dryinject_exercise?: string;
   dryinject_id?: string;
   dryinject_inject?: Inject;
   dryinject_status?: DryInjectStatus;
@@ -545,7 +515,7 @@ export interface Dryrun {
   dryrun_date: string;
   /** @format date-time */
   dryrun_end_date?: string;
-  dryrun_exercise?: Exercise;
+  dryrun_exercise?: string;
   dryrun_finished?: boolean;
   dryrun_id: string;
   dryrun_name?: string;
@@ -553,7 +523,7 @@ export interface Dryrun {
   dryrun_speed?: number;
   /** @format date-time */
   dryrun_start_date?: string;
-  dryrun_users?: User[];
+  dryrun_users?: string[];
   /** @format int64 */
   dryrun_users_number?: number;
   listened?: boolean;
@@ -566,23 +536,22 @@ export interface DryrunCreateInput {
 
 export interface Endpoint {
   asset_active?: boolean;
-  asset_children?: Asset[];
+  asset_children?: string[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: Executor;
+  asset_executor?: string;
   asset_external_reference?: string;
   asset_id: string;
-  asset_inject?: Inject;
+  asset_inject?: string;
   /** @format date-time */
   asset_last_seen?: string;
   asset_name: string;
-  asset_parent?: Asset;
+  asset_parent?: string;
   asset_process_name?: string;
-  /** @uniqueItems true */
-  asset_tags?: Tag[];
+  asset_tags?: string[];
   asset_type?: string;
   /** @format date-time */
   asset_updated_at: string;
@@ -636,12 +605,12 @@ export interface Evaluation {
   /** @format date-time */
   evaluation_created_at: string;
   evaluation_id: string;
-  evaluation_objective: Objective;
+  evaluation_objective: string;
   /** @format int64 */
   evaluation_score?: number;
   /** @format date-time */
   evaluation_updated_at: string;
-  evaluation_user: User;
+  evaluation_user: string;
   listened?: boolean;
 }
 
@@ -678,26 +647,26 @@ export interface ExecutorUpdateInput {
 export interface Exercise {
   /** @format int64 */
   exercise_all_users_number?: number;
-  exercise_articles?: Article[];
+  exercise_articles?: string[];
   exercise_category?: string;
   /** @format int64 */
   exercise_communications_number?: number;
   /** @format date-time */
   exercise_created_at: string;
   exercise_description?: string;
-  exercise_documents?: Document[];
+  exercise_documents?: string[];
   /** @format date-time */
   exercise_end_date?: string;
   exercise_id: string;
-  exercise_injects?: Inject[];
+  exercise_injects?: string[];
   exercise_injects_statistics?: Record<string, number>;
   exercise_kill_chain_phases?: KillChainPhase[];
   exercise_lessons_anonymized?: boolean;
   /** @format int64 */
   exercise_lessons_answers_number?: number;
-  exercise_lessons_categories?: LessonsCategory[];
-  exercise_logo_dark?: Document;
-  exercise_logo_light?: Document;
+  exercise_lessons_categories?: string[];
+  exercise_logo_dark?: string;
+  exercise_logo_light?: string;
   /** @format int64 */
   exercise_logs_number?: number;
   exercise_mail_from: string;
@@ -709,11 +678,11 @@ export interface Exercise {
   /** @format date-time */
   exercise_next_inject_date?: string;
   exercise_next_possible_status?: ("SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED")[];
-  exercise_observers?: User[];
-  exercise_pauses?: Pause[];
-  exercise_planners?: User[];
+  exercise_observers?: string[];
+  exercise_pauses?: string[];
+  exercise_planners?: string[];
   exercise_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
-  exercise_scenario?: Scenario;
+  exercise_scenario?: string;
   /** @format double */
   exercise_score?: number;
   exercise_severity?: "low" | "medium" | "high" | "critical";
@@ -721,13 +690,12 @@ export interface Exercise {
   exercise_start_date?: string;
   exercise_status: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
   exercise_subtitle?: string;
-  /** @uniqueItems true */
-  exercise_tags?: Tag[];
+  exercise_tags?: string[];
   exercise_teams?: string[];
   exercise_teams_users?: ExerciseTeamUser[];
   /** @format date-time */
   exercise_updated_at: string;
-  exercise_users?: User[];
+  exercise_users?: string[];
   /** @format int64 */
   exercise_users_number?: number;
   listened?: boolean;
@@ -835,9 +803,9 @@ export interface ExerciseTeamPlayersEnableInput {
 }
 
 export interface ExerciseTeamUser {
-  exercise_id?: Exercise;
-  team_id?: Team;
-  user_id?: User;
+  exercise_id?: string;
+  team_id?: string;
+  user_id?: string;
 }
 
 export interface ExerciseUpdateLogoInput {
@@ -926,11 +894,11 @@ export interface FullTextSearchResult {
 }
 
 export interface Grant {
-  grant_exercise?: Exercise;
-  grant_group?: Group;
+  grant_exercise?: string;
+  grant_group?: string;
   grant_id: string;
   grant_name: "OBSERVER" | "PLANNER";
-  grant_scenario?: Scenario;
+  grant_scenario?: string;
   listened?: boolean;
 }
 
@@ -946,8 +914,8 @@ export interface Group {
   group_grants?: Grant[];
   group_id: string;
   group_name: string;
-  group_organizations?: Organization[];
-  group_users?: User[];
+  group_organizations?: string[];
+  group_users?: string[];
   listened?: boolean;
 }
 
@@ -1026,11 +994,11 @@ export interface Inject {
   footer?: string;
   header?: string;
   inject_all_teams?: boolean;
-  inject_asset_groups?: AssetGroup[];
-  inject_assets?: Asset[];
+  inject_asset_groups?: string[];
+  inject_assets?: string[];
   inject_attack_patterns?: AttackPattern[];
   inject_city?: string;
-  inject_communications?: Communication[];
+  inject_communications?: string[];
   /** @format int64 */
   inject_communications_not_ack_number?: number;
   /** @format int64 */
@@ -1048,22 +1016,21 @@ export interface Inject {
   inject_depends_duration: number;
   inject_depends_on?: InjectDependency[];
   inject_description?: string;
-  inject_documents?: InjectDocument[];
+  inject_documents?: string[];
   inject_enabled?: boolean;
-  inject_exercise?: Exercise;
-  inject_expectations?: InjectExpectation[];
+  inject_exercise?: string;
+  inject_expectations?: string[];
   inject_id: string;
   inject_injector_contract?: InjectorContract;
   inject_kill_chain_phases?: KillChainPhase[];
-  inject_payloads?: Asset[];
+  inject_payloads?: string[];
   inject_ready?: boolean;
-  inject_scenario?: Scenario;
+  inject_scenario?: string;
   /** @format date-time */
   inject_sent_at?: string;
   inject_status?: InjectStatus;
-  /** @uniqueItems true */
-  inject_tags?: Tag[];
-  inject_teams?: Team[];
+  inject_tags?: string[];
+  inject_teams?: string[];
   inject_testable?: boolean;
   inject_title: string;
   /** @format date-time */
@@ -1071,7 +1038,7 @@ export interface Inject {
   inject_type?: string;
   /** @format date-time */
   inject_updated_at: string;
-  inject_user?: User;
+  inject_user?: string;
   /** @format int64 */
   inject_users_number?: number;
   listened?: boolean;
@@ -1106,13 +1073,6 @@ export interface InjectDependencyInput {
   dependency_relationship?: InjectDependencyIdInput;
 }
 
-export interface InjectDocument {
-  document_attached?: boolean;
-  document_id?: Document;
-  document_name?: string;
-  inject_id?: Inject;
-}
-
 export interface InjectDocumentInput {
   document_attached?: boolean;
   document_id?: string;
@@ -1127,30 +1087,30 @@ export interface InjectExecutionInput {
 }
 
 export interface InjectExpectation {
-  inject_expectation_article?: Article;
-  inject_expectation_asset?: Asset;
-  inject_expectation_asset_group?: AssetGroup;
-  inject_expectation_challenge?: Challenge;
+  inject_expectation_article?: string;
+  inject_expectation_asset?: string;
+  inject_expectation_asset_group?: string;
+  inject_expectation_challenge?: string;
   /** @format date-time */
   inject_expectation_created_at?: string;
   inject_expectation_description?: string;
-  inject_expectation_exercise?: Exercise;
+  inject_expectation_exercise?: string;
   /** @format double */
   inject_expectation_expected_score: number;
   inject_expectation_group?: boolean;
   inject_expectation_id: string;
-  inject_expectation_inject?: Inject;
+  inject_expectation_inject?: string;
   inject_expectation_name?: string;
   inject_expectation_results?: InjectExpectationResult[];
   /** @format double */
   inject_expectation_score?: number;
   inject_expectation_signatures?: InjectExpectationSignature[];
   inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
-  inject_expectation_team?: Team;
+  inject_expectation_team?: string;
   inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
   inject_expectation_updated_at?: string;
-  inject_expectation_user?: User;
+  inject_expectation_user?: string;
   /** @format int64 */
   inject_expiration_time: number;
   listened?: boolean;
@@ -1159,6 +1119,7 @@ export interface InjectExpectation {
 
 export interface InjectExpectationResult {
   date?: string;
+  metadata?: Record<string, string>;
   result: string;
   /** @format double */
   score?: number;
@@ -1168,7 +1129,7 @@ export interface InjectExpectationResult {
 }
 
 export interface InjectExpectationResultsByAttackPattern {
-  inject_attack_pattern?: AttackPattern;
+  inject_attack_pattern?: string;
   inject_expectation_results?: InjectExpectationResultsByType[];
 }
 
@@ -1191,15 +1152,15 @@ export interface InjectExpectationSimple {
 export interface InjectExpectationUpdateInput {
   collector_id: string;
   is_success: boolean;
+  metadata?: Record<string, string>;
   result: string;
-  success?: boolean;
 }
 
 export interface InjectImporter {
   /** @format date-time */
   inject_importer_created_at?: string;
   inject_importer_id: string;
-  inject_importer_injector_contract: InjectorContract;
+  inject_importer_injector_contract: string;
   inject_importer_rule_attributes?: RuleAttribute[];
   inject_importer_type_value: string;
   /** @format date-time */
@@ -1503,14 +1464,14 @@ export interface InjectorContract {
   convertedContent?: object;
   injector_contract_arch?: "x86_64" | "arm64" | "Unknown";
   injector_contract_atomic_testing?: boolean;
-  injector_contract_attack_patterns?: AttackPattern[];
+  injector_contract_attack_patterns?: string[];
   injector_contract_content: string;
   /** @format date-time */
   injector_contract_created_at: string;
   injector_contract_custom?: boolean;
   injector_contract_id: string;
   injector_contract_import_available?: boolean;
-  injector_contract_injector: Injector;
+  injector_contract_injector: string;
   injector_contract_injector_type?: string;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
@@ -1725,12 +1686,12 @@ export interface LessonsCategory {
   /** @format date-time */
   lessons_category_created_at: string;
   lessons_category_description?: string;
-  lessons_category_exercise?: Exercise;
+  lessons_category_exercise?: string;
   lessons_category_name: string;
   /** @format int32 */
   lessons_category_order?: number;
   lessons_category_questions?: string[];
-  lessons_category_scenario?: Scenario;
+  lessons_category_scenario?: string;
   lessons_category_teams?: string[];
   /** @format date-time */
   lessons_category_updated_at: string;
@@ -1763,7 +1724,7 @@ export interface LessonsInput {
 
 export interface LessonsQuestion {
   lessons_question_answers?: string[];
-  lessons_question_category: LessonsCategory;
+  lessons_question_category: string;
   lessons_question_content: string;
   /** @format date-time */
   lessons_question_created_at: string;
@@ -1815,8 +1776,8 @@ export interface LessonsTemplateCategory {
   lessons_template_category_name: string;
   /** @format int32 */
   lessons_template_category_order: number;
-  lessons_template_category_questions?: LessonsTemplateQuestion[];
-  lessons_template_category_template?: LessonsTemplate;
+  lessons_template_category_questions?: string[];
+  lessons_template_category_template?: string;
   /** @format date-time */
   lessons_template_category_updated_at: string;
   lessonstemplatecategory_id: string;
@@ -1836,7 +1797,7 @@ export interface LessonsTemplateInput {
 }
 
 export interface LessonsTemplateQuestion {
-  lessons_template_question_category?: LessonsTemplateCategory;
+  lessons_template_question_category?: string;
   lessons_template_question_content: string;
   /** @format date-time */
   lessons_template_question_created_at: string;
@@ -1861,14 +1822,13 @@ export interface Log {
   log_content: string;
   /** @format date-time */
   log_created_at: string;
-  log_exercise?: Exercise;
+  log_exercise?: string;
   log_id: string;
-  /** @uniqueItems true */
-  log_tags?: Tag[];
+  log_tags?: string[];
   log_title: string;
   /** @format date-time */
   log_updated_at: string;
-  log_user?: User;
+  log_user?: string;
 }
 
 export interface LogCreateInput {
@@ -1884,7 +1844,7 @@ export interface LoginUserInput {
 
 export interface Mitigation {
   listened?: boolean;
-  mitigation_attack_patterns?: AttackPattern[];
+  mitigation_attack_patterns?: string[];
   /** @format date-time */
   mitigation_created_at: string;
   mitigation_description?: string;
@@ -1930,12 +1890,12 @@ export interface Objective {
   /** @format date-time */
   objective_created_at: string;
   objective_description?: string;
-  objective_evaluations?: Evaluation[];
-  objective_exercise?: Exercise;
+  objective_evaluations?: string[];
+  objective_exercise?: string;
   objective_id: string;
   /** @format int32 */
   objective_priority?: number;
-  objective_scenario?: Scenario;
+  objective_scenario?: string;
   /** @format double */
   objective_score?: number;
   objective_title?: string;
@@ -1961,12 +1921,11 @@ export interface Organization {
   organization_created_at: string;
   organization_description?: string;
   organization_id: string;
-  organization_injects?: Inject[];
+  organization_injects?: string[];
   /** @format int64 */
   organization_injects_number?: number;
   organization_name: string;
-  /** @uniqueItems true */
-  organization_tags?: Tag[];
+  organization_tags?: string[];
   /** @format date-time */
   organization_updated_at: string;
 }
@@ -2398,25 +2357,15 @@ export interface PageableObject {
   unpaged?: boolean;
 }
 
-export interface Pause {
-  listened?: boolean;
-  log_id?: string;
-  /** @format date-time */
-  pause_date?: string;
-  /** @format int64 */
-  pause_duration?: number;
-  pause_exercise?: Exercise;
-}
-
-export type PayloadStatus =  "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
-
 export interface Payload {
   listened?: boolean;
+  /** @format int32 */
+  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: AttackPattern[];
+  payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
   payload_cleanup_executor?: string;
-  payload_collector?: Collector;
+  payload_collector?: string;
   payload_collector_type?: string;
   /** @format date-time */
   payload_created_at: string;
@@ -2428,9 +2377,8 @@ export interface Payload {
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: PayloadStatus;
-  /** @uniqueItems true */
-  payload_tags?: Tag[];
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  payload_tags?: string[];
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
@@ -2459,7 +2407,7 @@ export interface PayloadCreateInput {
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   payload_tags?: string[];
   payload_type: string;
 }
@@ -2513,9 +2461,14 @@ export interface PayloadUpsertInput {
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   payload_tags?: string[];
   payload_type: string;
+}
+
+export interface PayloadsDeprecateInput {
+  collector_id: string;
+  payload_external_ids: string[];
 }
 
 export interface PlatformSettings {
@@ -2734,7 +2687,7 @@ export interface Report {
   listened?: boolean;
   /** @format date-time */
   report_created_at: string;
-  report_exercise?: Exercise;
+  report_exercise?: string;
   report_global_observation?: string;
   report_id: string;
   report_informations?: ReportInformation[];
@@ -2747,7 +2700,7 @@ export interface Report {
 export interface ReportInformation {
   id: string;
   listened?: boolean;
-  report: Report;
+  report: string;
   report_informations_display?: boolean;
   report_informations_type:
     | "MAIN_INFORMATION"
@@ -2830,31 +2783,31 @@ export interface Scenario {
   listened?: boolean;
   /** @format int64 */
   scenario_all_users_number?: number;
-  scenario_articles?: Article[];
+  scenario_articles?: string[];
   scenario_category?: string;
   /** @format int64 */
   scenario_communications_number?: number;
   /** @format date-time */
   scenario_created_at: string;
   scenario_description?: string;
-  scenario_documents?: Document[];
-  scenario_exercises?: Exercise[];
+  scenario_documents?: string[];
+  scenario_exercises?: string[];
   scenario_external_reference?: string;
   scenario_external_url?: string;
   scenario_id: string;
-  scenario_injects?: Inject[];
+  scenario_injects?: string[];
   scenario_injects_statistics?: Record<string, number>;
   scenario_kill_chain_phases?: KillChainPhase[];
   scenario_lessons_anonymized?: boolean;
-  scenario_lessons_categories?: LessonsCategory[];
+  scenario_lessons_categories?: string[];
   scenario_mail_from: string;
   scenario_mails_reply_to?: string[];
   scenario_main_focus?: string;
   scenario_message_footer?: string;
   scenario_message_header?: string;
   scenario_name: string;
-  scenario_observers?: User[];
-  scenario_planners?: User[];
+  scenario_observers?: string[];
+  scenario_planners?: string[];
   scenario_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   scenario_recurrence?: string;
   /** @format date-time */
@@ -2863,13 +2816,12 @@ export interface Scenario {
   scenario_recurrence_start?: string;
   scenario_severity?: "low" | "medium" | "high" | "critical";
   scenario_subtitle?: string;
-  /** @uniqueItems true */
-  scenario_tags?: Tag[];
-  scenario_teams?: Team[];
+  scenario_tags?: string[];
+  scenario_teams?: string[];
   scenario_teams_users?: ScenarioTeamUser[];
   /** @format date-time */
   scenario_updated_at: string;
-  scenario_users?: User[];
+  scenario_users?: string[];
   /** @format int64 */
   scenario_users_number?: number;
 }
@@ -2886,7 +2838,7 @@ export interface ScenarioInput {
   scenario_description?: string;
   scenario_external_reference?: string;
   scenario_external_url?: string;
-  scenario_mail_from: string;
+  scenario_mail_from?: string;
   scenario_mails_reply_to?: string[];
   scenario_main_focus?: string;
   scenario_message_footer?: string;
@@ -2909,8 +2861,7 @@ export interface ScenarioSimple {
   scenario_id?: string;
   scenario_name?: string;
   scenario_subtitle?: string;
-  /** @uniqueItems true */
-  scenario_tags?: Tag[];
+  scenario_tags?: string[];
 }
 
 export interface ScenarioStatistic {
@@ -2924,9 +2875,9 @@ export interface ScenarioTeamPlayersEnableInput {
 }
 
 export interface ScenarioTeamUser {
-  scenario_id?: Scenario;
-  team_id?: Team;
-  user_id?: User;
+  scenario_id?: string;
+  team_id?: string;
+  user_id?: string;
 }
 
 export interface ScenarioUpdateTagsInput {
@@ -2963,29 +2914,28 @@ export interface SearchTerm {
 
 export interface SecurityPlatform {
   asset_active?: boolean;
-  asset_children?: Asset[];
+  asset_children?: string[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: Executor;
+  asset_executor?: string;
   asset_external_reference?: string;
   asset_id: string;
-  asset_inject?: Inject;
+  asset_inject?: string;
   /** @format date-time */
   asset_last_seen?: string;
   asset_name: string;
-  asset_parent?: Asset;
+  asset_parent?: string;
   asset_process_name?: string;
-  /** @uniqueItems true */
-  asset_tags?: Tag[];
+  asset_tags?: string[];
   asset_type?: string;
   /** @format date-time */
   asset_updated_at: string;
   listened?: boolean;
-  security_platform_logo_dark?: Document;
-  security_platform_logo_light?: Document;
+  security_platform_logo_dark?: string;
+  security_platform_logo_light?: string;
   security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
 }
 
@@ -3077,13 +3027,13 @@ export interface Team {
   /** @format date-time */
   team_created_at: string;
   team_description?: string;
-  team_exercise_injects?: Inject[];
+  team_exercise_injects?: string[];
   /** @format int64 */
   team_exercise_injects_number?: number;
-  team_exercises?: Exercise[];
-  team_exercises_users?: ExerciseTeamUser[];
+  team_exercises?: string[];
+  team_exercises_users?: string[];
   team_id: string;
-  team_inject_expectations?: InjectExpectation[];
+  team_inject_expectations?: string[];
   /** @format int64 */
   team_injects_expectations_number?: number;
   /** @format double */
@@ -3093,16 +3043,15 @@ export interface Team {
   team_injects_expectations_total_score: number;
   team_injects_expectations_total_score_by_exercise: Record<string, number>;
   team_name: string;
-  team_organization?: Organization;
-  team_scenario_injects?: Inject[];
+  team_organization?: string;
+  team_scenario_injects?: string[];
   /** @format int64 */
   team_scenario_injects_number?: number;
-  team_scenarios?: Scenario[];
-  /** @uniqueItems true */
-  team_tags?: Tag[];
+  team_scenarios?: string[];
+  team_tags?: string[];
   /** @format date-time */
   team_updated_at: string;
-  team_users?: User[];
+  team_users?: string[];
   /** @format int64 */
   team_users_number?: number;
 }
@@ -3157,7 +3106,7 @@ export interface Token {
   /** @format date-time */
   token_created_at: string;
   token_id: string;
-  token_user?: User;
+  token_user?: string;
   token_value: string;
 }
 
@@ -3206,22 +3155,18 @@ export interface UpdateUsersTeamInput {
 
 export interface User {
   user_phone2?: string;
-  injects?: Inject[];
   listened?: boolean;
   user_admin?: boolean;
   user_city?: string;
-  user_communications?: Communication[];
+  user_communications?: string[];
   user_country?: string;
   /** @format date-time */
   user_created_at: string;
   user_email: string;
   user_firstname?: string;
   user_gravatar?: string;
-  user_groups?: Group[];
+  user_groups?: string[];
   user_id: string;
-  user_injects?: Inject[];
-  /** @format int64 */
-  user_injects_number?: number;
   user_is_external?: boolean;
   user_is_manager?: boolean;
   user_is_observer?: boolean;
@@ -3232,14 +3177,13 @@ export interface User {
   /** @format date-time */
   user_last_comcheck?: string;
   user_lastname?: string;
-  user_organization?: Organization;
+  user_organization?: string;
   user_pgp_key?: string;
   user_phone?: string;
   /** @format int32 */
   user_status: number;
-  /** @uniqueItems true */
-  user_tags?: Tag[];
-  user_teams?: Team[];
+  user_tags?: string[];
+  user_teams?: string[];
   user_theme?: string;
   /** @format date-time */
   user_updated_at: string;
@@ -3265,11 +3209,11 @@ export interface Variable {
   /** @format date-time */
   variable_created_at: string;
   variable_description?: string;
-  variable_exercise?: Exercise;
+  variable_exercise?: string;
   variable_id: string;
   /** @pattern ^[a-z_]+$ */
   variable_key: string;
-  variable_scenario?: Scenario;
+  variable_scenario?: string;
   variable_type: "String" | "Object";
   /** @format date-time */
   variable_updated_at: string;
