@@ -13,7 +13,6 @@ import {
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 
-import type { TeamStore } from '../../../../actions/teams/Team';
 import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -24,7 +23,6 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Theme } from '../../../../components/Theme';
 import type { TeamOutput } from '../../../../utils/api-types';
-import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import CreateTeam from '../../components/teams/CreateTeam';
 import { PermissionsContext, TeamContext } from '../Context';
 
@@ -82,19 +80,19 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   const removeTeam = (teamId: string) => setSelectedTeamValues(selectedTeamValues.filter(v => v.team_id !== teamId));
 
   // Headers
-  const elements: SelectListElements<EndpointStore> = useMemo(() => ({
+  const elements: SelectListElements<TeamOutput> = useMemo(() => ({
     icon: {
       value: () => <GroupsOutlined />,
     },
     headers: [
       {
         field: 'team_name',
-        value: (team: TeamStore) => team.team_name,
+        value: (team: TeamOutput) => team.team_name,
         width: 70,
       },
       {
         field: 'team_tags',
-        value: (team: TeamStore) => <ItemTags variant="reduced-view" tags={team.team_tags} />,
+        value: (team: TeamOutput) => <ItemTags variant="reduced-view" tags={team.team_tags} />,
         width: 30,
       },
     ],

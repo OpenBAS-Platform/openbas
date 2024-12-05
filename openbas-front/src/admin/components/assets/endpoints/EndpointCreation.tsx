@@ -8,9 +8,8 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { EndpointInput } from '../../../../utils/api-types';
+import { Endpoint, EndpointInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { EndpointStore } from './Endpoint';
 import EndpointForm from './EndpointForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   inline?: boolean;
-  onCreate?: (result: EndpointStore) => void;
+  onCreate?: (result: Endpoint) => void;
 }
 
 const EndpointCreation: FunctionComponent<Props> = ({
@@ -38,7 +37,7 @@ const EndpointCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: EndpointInput) => {
     dispatch(addEndpoint(data)).then(
-      (result: { result: string; entities: { endpoints: Record<string, EndpointStore> } }) => {
+      (result: { result: string; entities: { endpoints: Record<string, Endpoint> } }) => {
         if (result.entities) {
           if (onCreate) {
             const endpointCreated = result.entities.endpoints[result.result];
