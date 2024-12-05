@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router';
 
 import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';

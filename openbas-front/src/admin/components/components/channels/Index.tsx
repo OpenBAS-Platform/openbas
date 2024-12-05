@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import { lazy } from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useParams } from 'react-router';
 
 import { fetchChannel } from '../../../../actions/channels/channel-action';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';

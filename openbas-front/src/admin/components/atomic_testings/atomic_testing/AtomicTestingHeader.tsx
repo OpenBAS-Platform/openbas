@@ -2,7 +2,7 @@ import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import {
   launchAtomicTesting,

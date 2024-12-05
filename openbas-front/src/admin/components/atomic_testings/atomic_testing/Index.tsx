@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Link, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 import { interval } from 'rxjs';
 
 import { fetchInjectResultOverviewOutput } from '../../../../actions/atomic_testings/atomic-testing-actions';

@@ -1,5 +1,5 @@
 import { makeStyles } from '@mui/styles';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 
 import { errorWrapper } from '../components/Error';
 import NotFound from '../components/NotFound';

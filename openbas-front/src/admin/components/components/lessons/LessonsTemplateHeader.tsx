@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import type { UserHelper } from '../../../../actions/helper';
 import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';

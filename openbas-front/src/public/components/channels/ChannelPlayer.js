@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChannel } from '../../../actions/channels/channel-action';

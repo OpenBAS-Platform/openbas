@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { importMapper } from '../../../../actions/mapper/mapper-actions';
 import ImportUploader from '../../../../components/common/ImportUploader';

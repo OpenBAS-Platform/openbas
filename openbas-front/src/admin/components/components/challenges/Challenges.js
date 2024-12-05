@@ -3,7 +3,7 @@ import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemTe
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { fetchChallenges } from '../../../../actions/Challenge';
 import { fetchDocuments } from '../../../../actions/Document';

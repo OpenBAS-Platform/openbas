@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { lazy, Suspense, useEffect } from 'react';
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router';
 
 import { fetchAttackPatterns } from '../actions/AttackPattern';
 import type { LoggedHelper } from '../actions/helper';

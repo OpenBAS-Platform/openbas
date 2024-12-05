@@ -1,7 +1,7 @@
 import { makeStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import { lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 
 import { errorWrapper } from '../components/Error';
 import Loader from '../components/Loader';

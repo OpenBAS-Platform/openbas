@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 import { lazy } from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useParams } from 'react-router';
 
 import { fetchInjector } from '../../../../actions/Injectors';
 import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';

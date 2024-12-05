@@ -4,7 +4,7 @@ import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { addLog, fetchLogs } from '../../../../../actions/Log';
 import { fetchExerciseObjectives } from '../../../../../actions/Objective';

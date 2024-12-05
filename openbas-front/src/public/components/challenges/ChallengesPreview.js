@@ -33,7 +33,7 @@ import * as R from 'ramda';
 import { useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchObserverChallenges, tryChallenge } from '../../../actions/Challenge';

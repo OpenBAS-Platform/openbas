@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { deleteLessonsTemplate, updateLessonsTemplate } from '../../../../actions/Lessons';
 import ButtonPopover from '../../../../components/common/ButtonPopover';

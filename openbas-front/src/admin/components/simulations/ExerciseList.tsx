@@ -3,7 +3,7 @@ import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent } from 'react';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';

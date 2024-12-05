@@ -3,7 +3,7 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { forwardRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';

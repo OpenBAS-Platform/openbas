@@ -1,9 +1,7 @@
 import { composeWithDevTools } from '@redux-devtools/extension';
-import { createBrowserHistory } from 'history';
 import * as R from 'ramda';
 import { useSelector } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
-import { createReduxHistoryContext } from 'redux-first-history';
 import { thunk } from 'redux-thunk';
 import Immutable from 'seamless-immutable';
 
@@ -20,22 +18,18 @@ const initialState = {
   referential: entitiesInitializer,
 };
 
-const { createReduxHistory, routerMiddleware, routerReducer } = createReduxHistoryContext({
-  history: createBrowserHistory(),
-});
-
 const initStore = () => {
   if (process.env.NODE_ENV === 'development') {
     return createStore(
-      createRootReducer(routerReducer),
+      createRootReducer(),
       initialState,
-      composeWithDevTools(applyMiddleware(routerMiddleware, thunk)),
+      composeWithDevTools(applyMiddleware(thunk)),
     );
   }
   return createStore(
-    createRootReducer(routerReducer),
+    createRootReducer(),
     initialState,
-    applyMiddleware(routerMiddleware, thunk),
+    applyMiddleware(thunk),
   );
 };
 
@@ -44,5 +38,3 @@ const initStore = () => {
 export const useHelper = (selector: any) => useSelector(state => selector(storeHelper(state)), R.equals);
 
 export const store = initStore();
-
-export const history = createReduxHistory(store);

@@ -1,7 +1,7 @@
 import { Alert, Button, Paper, ToggleButtonGroup, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import { updateReportForExercise, updateReportInjectCommentForExercise } from '../../../../../actions/reports/report-actions';
 import ExportPdfButton from '../../../../../components/ExportPdfButton';

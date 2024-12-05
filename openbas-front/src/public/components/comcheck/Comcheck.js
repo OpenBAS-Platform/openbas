@@ -3,7 +3,7 @@ import { AppBar, Paper, Toolbar } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
 import { useFormatter } from '../../../components/i18n';

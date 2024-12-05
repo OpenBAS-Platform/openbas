@@ -3,7 +3,7 @@ import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import { Form } from 'react-final-form';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { ViewLessonContext } from '../../../admin/components/common/Context';
 import Transition from '../../../components/common/Transition';

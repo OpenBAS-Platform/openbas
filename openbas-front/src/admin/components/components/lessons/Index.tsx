@@ -1,4 +1,4 @@
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useParams } from 'react-router';
 
 import { fetchLessonsTemplates } from '../../../../actions/Lessons';
 import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';

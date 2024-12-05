@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { importScenario } from '../../../actions/scenarios/scenario-actions';
 import ImportUploader from '../../../components/common/ImportUploader';

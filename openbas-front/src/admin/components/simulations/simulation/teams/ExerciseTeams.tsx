@@ -1,7 +1,7 @@
 import { Paper, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';

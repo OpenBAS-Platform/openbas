@@ -4,7 +4,7 @@ import { Alert, Button, Dialog, DialogActions, DialogContent, List, ListItem, Li
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import type { Contract } from '../../../../../actions/contract/contract';
 import type { UserHelper } from '../../../../../actions/helper';
