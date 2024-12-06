@@ -39,6 +39,9 @@ public class ExecutorApi extends RestBehavior {
   @Value("${info.app.version:unknown}")
   String version;
 
+  @Value("${executor.openbas.version:local}")
+  private String executorOpenbasVersion;
+
   private ExecutorRepository executorRepository;
   private EndpointService endpointService;
   private FileService fileService;
@@ -137,25 +140,17 @@ public class ExecutorApi extends RestBehavior {
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
-    InputStream in = null;
-    String filename = null;
-    if (platform.equals("windows") && architecture.equals("x86_64")) {
-      filename = "openbas-agent-" + version + ".exe";
-      String resourcePath = "/openbas-agent/windows/x86_64/";
+    InputStream in;
+    String resourcePath = "/openbas-agent/" + platform + "/" + architecture + "/";
+    String filename;
+
+    if (executorOpenbasVersion.equals("local")) { // if we want the local version
+      filename = "openbas-agent-" + version + (platform.equals("windows") ? ".exe" : "");
       in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-      if (in == null) { // Dev mode, get from artifactory
-        filename = "openbas-agent-latest.exe";
-        in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-      }
-    }
-    if (platform.equals("linux") || platform.equals("macos")) {
-      filename = "openbas-agent-" + version;
-      String resourcePath = "/openbas-agent/" + platform + "/" + architecture + "/";
-      in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-      if (in == null) { // Dev mode, get from artifactory
-        filename = "openbas-agent-latest";
-        in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-      }
+    } else { // if we want a specific version from artifactory
+      filename =
+          "openbas-agent-" + executorOpenbasVersion + (platform.equals("windows") ? ".exe" : "");
+      in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     if (in != null) {
       HttpHeaders headers = new HttpHeaders();
@@ -176,19 +171,24 @@ public class ExecutorApi extends RestBehavior {
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
     byte[] file = null;
     String filename = null;
-    if (platform.equals("windows") && architecture.equals("x86_64")) {
-      filename = "openbas-agent-installer-" + version + ".exe";
-      String resourcePath = "/openbas-agent/windows/x86_64/";
-      InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-      if (in != null) {
-        file = IOUtils.toByteArray(in);
-      } else { // Dev mode, get from artifactory
-        filename = "openbas-agent-installer-latest.exe";
+
+    if (platform.equals("windows")) {
+      InputStream in;
+      String resourcePath = "/openbas-agent/windows/" + architecture + "/";
+      if (executorOpenbasVersion.equals("local")) { // if we want the local version
+        filename = "openbas-agent-" + version + ".exe";
+        in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
+      } else { // if we want a specific version from artifactory
+        filename = "openbas-agent-" + executorOpenbasVersion + ".exe";
         in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-        file = IOUtils.toByteArray(in);
       }
+      if (in == null) {
+        throw new UnsupportedOperationException(
+            "Agent version " + executorOpenbasVersion + " not found");
+      }
+      file = IOUtils.toByteArray(in);
     }
-    // linux - No package needed
+    // linux & macos - No package needed
     if (file != null) {
       HttpHeaders headers = new HttpHeaders();
       headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);

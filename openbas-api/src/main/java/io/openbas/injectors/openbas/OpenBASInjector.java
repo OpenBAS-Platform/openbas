@@ -71,6 +71,19 @@ public class OpenBASInjector {
             + dlUri(openBASConfig, "linux", "x86_64")
             + " > $location/$filename;chmod +x $location/$filename;$location/$filename --uri $server --token $token --unsecured-certificate $unsecured_certificate --with-proxy $with_proxy --inject-id #{inject} &");
     executorCommands.put(
+        Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.arm64,
+        "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-#{inject};"
+            + serverVar
+            + ";"
+            + tokenVar
+            + ";"
+            + unsecuredCertificateVar
+            + ";"
+            + withProxyVar
+            + ";curl -s -X GET "
+            + dlUri(openBASConfig, "linux", "x86_64")
+            + " > $location/$filename;chmod +x $location/$filename;$location/$filename --uri $server --token $token --unsecured-certificate $unsecured_certificate --with-proxy $with_proxy --inject-id #{inject} &");
+    executorCommands.put(
         Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
         "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-#{inject};"
             + serverVar

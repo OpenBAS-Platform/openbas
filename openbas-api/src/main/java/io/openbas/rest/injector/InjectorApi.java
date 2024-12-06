@@ -58,6 +58,9 @@ public class InjectorApi extends RestBehavior {
   @Value("${info.app.version:unknown}")
   String version;
 
+  @Value("${executor.openbas.version:local}")
+  private String executorOpenbasVersion;
+
   @Resource private RabbitmqConfig rabbitmqConfig;
 
   private AttackPatternRepository attackPatternRepository;
@@ -332,26 +335,19 @@ public class InjectorApi extends RestBehavior {
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasImplant(
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
-    InputStream in = null;
+    InputStream in;
     String filename = null;
-    if (platform.equals("windows") && architecture.equals("x86_64")) {
-      filename = "openbas-implant-" + version + ".exe";
-      String resourcePath = "/openbas-implant/windows/x86_64/";
+    String resourcePath = "/openbas-implant/" + platform + "/" + architecture + "/";
+
+    if (executorOpenbasVersion.equals("local")) { // if we want the local version
+      filename = "openbas-implant-" + version + (platform.equals("windows") ? ".exe" : "");
       in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
-      if (in == null) { // Dev mode, get from artifactory
-        filename = "openbas-implant-latest.exe";
-        in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-      }
+    } else { // if we want a specific version from artifactory
+      filename =
+          "openbas-implant-" + executorOpenbasVersion + (platform.equals("windows") ? ".exe" : "");
+      in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
-    if (platform.equals("linux") || platform.equals("macos")) {
-      filename = "openbas-implant-" + version;
-      String resourcePath = "/openbas-implant/" + platform + "/" + architecture + "/";
-      in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
-      if (in == null) { // Dev mode, get from artifactory
-        filename = "openbas-implant-latest";
-        in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-      }
-    }
+
     if (in != null) {
       HttpHeaders headers = new HttpHeaders();
       headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
