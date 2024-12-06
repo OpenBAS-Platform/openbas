@@ -140,8 +140,8 @@ export const updateScenarioRecurrence = (
 
 // -- STATISTIC --
 
-export const fetchScenarioStatistic = () => {
-  const uri = `${SCENARIO_URI}/statistics`;
+export const fetchScenarioStatistic = (scenarioId: Scenario['scenario_id']) => {
+  const uri = `${SCENARIO_URI}/${scenarioId}/statistics`;
   return simpleCall(uri);
 };
 

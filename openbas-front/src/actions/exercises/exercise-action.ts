@@ -3,6 +3,7 @@ import { Dispatch } from 'redux';
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import type {
   Exercise,
+  ExercisesGlobalScoresInput,
   InjectsImportInput,
   LessonsAnswerCreateInput,
   LessonsCategoryCreateInput,
@@ -164,4 +165,10 @@ export const addLessonsAnswers = (
 ) => (dispatch: Dispatch) => {
   const uri = `/api/player/lessons/exercise/${exerciseId}/lessons_categories/${lessonsCategoryId}/lessons_questions/${lessonsQuestionId}/lessons_answers?userId=${userId}`;
   return postReferential(schema.arrayOfLessonsAnswers, uri, data)(dispatch);
+};
+
+export const fetchExercisesGlobalScores = (exercisesGlobalScoresInput: ExercisesGlobalScoresInput) => {
+  const data = exercisesGlobalScoresInput;
+  const uri = `${EXERCISE_URI}/global-scores`;
+  return simplePostCall(uri, data);
 };
