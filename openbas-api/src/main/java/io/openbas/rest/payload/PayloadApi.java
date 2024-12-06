@@ -1,7 +1,7 @@
 package io.openbas.rest.payload;
 
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.AMD64;
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.ARM64;
-import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.X86_64;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -304,7 +304,7 @@ public class PayloadApi extends RestBehavior {
     if (arch == null) {
       throw new BadRequestException("Payload architecture cannot be null.");
     }
-    if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != X86_64 && arch != ARM64)) {
+    if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != AMD64 && arch != ARM64)) {
       throw new BadRequestException("Executable architecture must be x86_64 or ARM64.");
     }
   }

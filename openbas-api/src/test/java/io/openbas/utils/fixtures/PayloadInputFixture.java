@@ -38,7 +38,7 @@ public class PayloadInputFixture {
     input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
     input.setAttackPatternsIds(Collections.emptyList());
     input.setTagIds(Collections.emptyList());
-    input.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.X86_64);
+    input.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.AMD64);
     return input;
   }
 
