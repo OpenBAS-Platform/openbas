@@ -1,10 +1,11 @@
 import { createContext, ReactElement } from 'react';
 
-import type { ArticleStore, FullArticleStore } from '../../../actions/channels/Article';
+import type { FullArticleStore } from '../../../actions/channels/Article';
 import type { InjectOutputType, InjectStore } from '../../../actions/injects/Inject';
 import type { TeamStore } from '../../../actions/teams/Team';
 import { Page } from '../../../components/common/queryable/Page';
 import type {
+  Article,
   ArticleCreateInput,
   ArticleUpdateInput,
   Evaluation,
@@ -43,8 +44,8 @@ export type PermissionsContextType = {
 export type ArticleContextType = {
   previewArticleUrl: (article: FullArticleStore) => string;
   onAddArticle: (data: ArticleCreateInput) => Promise<{ result: string }>;
-  onUpdateArticle: (article: ArticleStore, data: ArticleUpdateInput) => string;
-  onDeleteArticle: (article: ArticleStore) => string;
+  onUpdateArticle: (article: Article, data: ArticleUpdateInput) => string;
+  onDeleteArticle: (article: Article) => string;
 };
 
 export type ChallengeContextType = {
@@ -133,10 +134,10 @@ export const ArticleContext = createContext<ArticleContextType>({
   onAddArticle(_data: ArticleCreateInput): Promise<{ result: string }> {
     return Promise.resolve({ result: '' });
   },
-  onDeleteArticle(_article: ArticleStore): string {
+  onDeleteArticle(_article: Article): string {
     return '';
   },
-  onUpdateArticle(_article: ArticleStore, _data: ArticleUpdateInput): string {
+  onUpdateArticle(_article: Article, _data: ArticleUpdateInput): string {
     return '';
   },
   previewArticleUrl(_article: FullArticleStore): string {

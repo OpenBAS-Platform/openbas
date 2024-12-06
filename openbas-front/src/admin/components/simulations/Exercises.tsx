@@ -15,7 +15,6 @@ import { useQueryableWithLocalStorage } from '../../../components/common/queryab
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import type { FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
-import type { EndpointStore } from '../assets/endpoints/Endpoint';
 import ExerciseList from './ExerciseList';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import ExerciseCreation from './simulation/ExerciseCreation';
@@ -31,7 +30,7 @@ const Exercises = () => {
   }));
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [exercises, setExercises] = useState<EndpointStore[]>([]);
+  const [exercises, setExercises] = useState<ExerciseStore[]>([]);
 
   // Filters
   const availableFilterNames = [

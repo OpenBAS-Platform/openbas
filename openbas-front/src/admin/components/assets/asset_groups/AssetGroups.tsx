@@ -20,8 +20,7 @@ import { Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
-import type { AssetGroupOutput } from '../../../../utils/api-types';
-import type { AssetGroupStore } from './AssetGroup';
+import type { AssetGroup, AssetGroupOutput } from '../../../../utils/api-types';
 import AssetGroupCreation from './AssetGroupCreation';
 import AssetGroupManagement from './AssetGroupManagement';
 import AssetGroupPopover from './AssetGroupPopover';
@@ -133,7 +132,7 @@ const AssetGroups = () => {
   const classes = useStyles();
   const { t } = useFormatter();
 
-  const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroupStore['asset_group_id'] | undefined>(undefined);
+  const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroup['asset_group_id'] | undefined>(undefined);
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -181,7 +180,7 @@ const AssetGroups = () => {
     'asset_group_tags',
   ];
 
-  const [assetGroups, setAssetGroups] = useState<AssetGroupStore[]>([]);
+  const [assetGroups, setAssetGroups] = useState<AssetGroup[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('asset-groups', buildSearchPagination({
     sorts: initSorting('asset_group_name'),
     textSearch: search,

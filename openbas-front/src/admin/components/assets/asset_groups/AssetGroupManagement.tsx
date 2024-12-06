@@ -11,14 +11,13 @@ import type { UserHelper } from '../../../../actions/helper';
 import SearchFilter from '../../../../components/SearchFilter';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import type { Endpoint } from '../../../../utils/api-types';
+import type { AssetGroup, Endpoint } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import TagsFilter from '../../common/filters/TagsFilter';
 import EndpointPopover from '../endpoints/EndpointPopover';
 import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList';
-import type { AssetGroupStore } from './AssetGroup';
 import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -54,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   assetGroupId: string;
   handleClose: () => void;
-  onUpdate?: (result: AssetGroupStore) => void;
+  onUpdate?: (result: AssetGroup) => void;
   onRemoveEndpointFromAssetGroup?: (assetId: Endpoint['asset_id']) => void;
 }
 
@@ -131,7 +130,6 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
                 inline
                 assetGroupId={assetGroup?.asset_group_id}
                 assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-                onUpdate={onUpdate}
                 onRemoveEndpointFromAssetGroup={onRemoveEndpointFromAssetGroup}
               />
             )

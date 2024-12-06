@@ -6,7 +6,7 @@ import * as R from 'ramda';
 import { Fragment, FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
+import type { FullArticleStore } from '../../../../actions/channels/Article';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -16,6 +16,7 @@ import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import ChannelColor from '../../../../public/components/channels/ChannelColor';
 import { useHelper } from '../../../../store';
+import { Article } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -50,7 +51,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  articles: ArticleStore[];
+  articles: Article[];
 }
 
 const Articles: FunctionComponent<Props> = ({ articles }) => {

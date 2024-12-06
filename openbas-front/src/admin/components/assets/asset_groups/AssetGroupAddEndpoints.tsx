@@ -3,15 +3,15 @@ import { FunctionComponent, useState } from 'react';
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
+import type { AssetGroup } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { UserStore } from '../../teams/players/Player';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
-import type { AssetGroupStore } from './AssetGroup';
 
 interface Props {
   assetGroupId: string;
   assetGroupEndpointIds: string[];
-  onUpdate?: (result: AssetGroupStore) => void;
+  onUpdate?: (result: AssetGroup) => void;
 }
 
 const AssetGroupAddEndpoints: FunctionComponent<Props> = ({

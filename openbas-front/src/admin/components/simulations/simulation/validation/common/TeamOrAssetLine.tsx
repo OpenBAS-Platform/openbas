@@ -17,11 +17,9 @@ import { fetchExerciseTeams } from '../../../../../../actions/Exercise';
 import type { ChallengeHelper } from '../../../../../../actions/helper';
 import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import { useHelper } from '../../../../../../store';
-import type { Inject, Team } from '../../../../../../utils/api-types';
+import type { AssetGroup, Endpoint, Inject, Team } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
-import type { AssetGroupStore } from '../../../../assets/asset_groups/AssetGroup';
-import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import ChallengeExpectation from '../expectations/ChallengeExpectation';
 import ChannelExpectation from '../expectations/ChannelExpectation';
@@ -89,8 +87,8 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
   });
 
   const team: Team = teamsMap[id];
-  const asset: EndpointStore = assetsMap[id];
-  const assetGroup: AssetGroupStore = assetGroupsMap[id];
+  const asset: Endpoint = assetsMap[id];
+  const assetGroup: AssetGroup = assetGroupsMap[id];
 
   const groupByExpectationName = (es: InjectExpectationsStore[]) => {
     return es.reduce((group, expectation) => {
