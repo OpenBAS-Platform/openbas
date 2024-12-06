@@ -14,6 +14,6 @@ public class V3_52__Rename_arch_amd64 extends BaseJavaMigration {
     Connection connection = context.getConnection();
     Statement statement = connection.createStatement();
     statement.execute(
-        "UPDATE payloads SET executable_arch = 'AMD64'  WHERE executable_arch = 'X86_64';");
+        "UPDATE payloads SET payload_execution_arch = 'AMD64' WHERE payload_execution_arch = 'X86_64';");
   }
 }
