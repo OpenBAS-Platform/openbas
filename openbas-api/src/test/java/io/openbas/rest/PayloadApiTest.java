@@ -70,7 +70,7 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"));
+        .andExpect(jsonPath("$.payload_execution_arch").value("AMD64"));
   }
 
   @Test
@@ -119,7 +119,7 @@ class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
+            .andExpect(jsonPath("$.payload_execution_arch").value("AMD64"))
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -386,7 +386,7 @@ class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
+            .andExpect(jsonPath("$.payload_execution_arch").value("AMD64"))
             .andExpect(jsonPath("$.payload_source").value("COMMUNITY"))
             .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
             .andReturn()
@@ -399,7 +399,7 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("My Executable Payload (duplicate)"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
+        .andExpect(jsonPath("$.payload_execution_arch").value("AMD64"))
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"));
   }
