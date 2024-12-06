@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -155,6 +156,7 @@ public class InjectExpectation implements Base {
   @JoinColumn(name = "exercise_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @Setter
@@ -162,6 +164,7 @@ public class InjectExpectation implements Base {
   @JoinColumn(name = "inject_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_inject")
+  @Schema(type = "string")
   private Inject inject;
 
   @Setter
@@ -169,6 +172,7 @@ public class InjectExpectation implements Base {
   @JoinColumn(name = "user_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_user")
+  @Schema(type = "string")
   private User user;
 
   @Setter
@@ -176,6 +180,7 @@ public class InjectExpectation implements Base {
   @JoinColumn(name = "team_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_team")
+  @Schema(type = "string")
   private Team team;
 
   @Setter
@@ -183,6 +188,7 @@ public class InjectExpectation implements Base {
   @JoinColumn(name = "asset_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_asset")
+  @Schema(type = "string")
   private Asset asset;
 
   @Setter
@@ -190,6 +196,7 @@ public class InjectExpectation implements Base {
   @JoinColumn(name = "asset_group_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_asset_group")
+  @Schema(type = "string")
   private AssetGroup assetGroup;
 
   // endregion
@@ -198,12 +205,14 @@ public class InjectExpectation implements Base {
   @JoinColumn(name = "article_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_article")
+  @Schema(type = "string")
   private Article article;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "challenge_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_challenge")
+  @Schema(type = "string")
   private Challenge challenge;
 
   public void setArticle(Article article) {

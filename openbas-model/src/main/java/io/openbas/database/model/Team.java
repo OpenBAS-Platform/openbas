@@ -10,6 +10,8 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -61,6 +63,7 @@ public class Team implements Base {
   @NotNull
   private Instant updatedAt = now();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -75,8 +78,10 @@ public class Team implements Base {
   @JoinColumn(name = "team_organization")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("team_organization")
+  @Schema(type = "string")
   private Organization organization;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "users_teams",
@@ -86,6 +91,7 @@ public class Team implements Base {
   @JsonProperty("team_users")
   private List<User> users = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "exercises_teams",
@@ -95,6 +101,7 @@ public class Team implements Base {
   @JsonProperty("team_exercises")
   private List<Exercise> exercises = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "scenarios_teams",
@@ -108,6 +115,7 @@ public class Team implements Base {
   @JsonProperty("team_contextual")
   private Boolean contextual = false;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(
       mappedBy = "team",
       fetch = FetchType.LAZY,
@@ -123,6 +131,7 @@ public class Team implements Base {
   }
 
   // region transient
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("team_exercise_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<Inject> getExercisesInjects() {
@@ -139,6 +148,7 @@ public class Team implements Base {
     return getExercisesInjects().size();
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("team_scenario_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<Inject> getScenariosInjects() {
@@ -155,6 +165,7 @@ public class Team implements Base {
     return getScenariosInjects().size();
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_inject_expectations")

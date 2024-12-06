@@ -6,6 +6,8 @@ import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Tag;
 import io.openbas.database.raw.RawScenario;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +27,7 @@ public class ScenarioSimple {
   @JsonProperty("scenario_subtitle")
   private String subtitle;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("scenario_tags")
   private Set<Tag> tags = new HashSet<>();

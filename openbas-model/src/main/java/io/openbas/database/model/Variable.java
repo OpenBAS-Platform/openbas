@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -60,12 +61,14 @@ public class Variable implements Base {
   @JoinColumn(name = "variable_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("variable_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "variable_scenario")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("variable_scenario")
+  @Schema(type = "string")
   private Scenario scenario;
 
   // -- AUDIT --

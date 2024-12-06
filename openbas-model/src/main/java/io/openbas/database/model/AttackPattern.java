@@ -9,6 +9,8 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -79,8 +81,10 @@ public class AttackPattern implements Base {
   @JoinColumn(name = "attack_pattern_parent")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("attack_pattern_parent")
+  @Schema(type = "string")
   private AttackPattern parent;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "attack_patterns_kill_chain_phases",

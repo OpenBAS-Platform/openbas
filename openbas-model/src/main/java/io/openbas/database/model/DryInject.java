@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -44,6 +45,7 @@ public class DryInject implements Base, Injection {
   @JoinColumn(name = "dryinject_dryrun")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("dryinject_dryrun")
+  @Schema(type = "string")
   private Dryrun run;
 
   @Getter
@@ -60,6 +62,7 @@ public class DryInject implements Base, Injection {
   @Override
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("dryinject_exercise")
+  @Schema(type = "string")
   public Exercise getExercise() {
     return getInject().getExercise();
   }

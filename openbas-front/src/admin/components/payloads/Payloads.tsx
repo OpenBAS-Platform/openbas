@@ -23,7 +23,7 @@ import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { PayloadStatus } from '../../../utils/api-types';
+import { Payload as PayloadType } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePayload from './CreatePayload';
@@ -111,7 +111,7 @@ const chipSx = {
   width: 120,
 };
 
-const fromPayloadStatusToChipColor = (payloadStatus: PayloadStatus) => {
+const fromPayloadStatusToChipColor = (payloadStatus: PayloadType['payload_status']) => {
   switch (payloadStatus) {
     case 'VERIFIED':
       return 'success';

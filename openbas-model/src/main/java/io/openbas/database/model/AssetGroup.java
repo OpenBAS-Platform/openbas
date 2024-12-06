@@ -11,6 +11,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.model.Filters.FilterGroup;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -58,6 +60,7 @@ public class AssetGroup implements Base {
   @JsonProperty("asset_group_dynamic_filter")
   private FilterGroup dynamicFilter;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "asset_groups_assets",
@@ -73,6 +76,7 @@ public class AssetGroup implements Base {
   private List<Asset> dynamicAssets = new ArrayList<>();
 
   // Getter is Mandatory when we use @Transient annotation
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<Asset> getDynamicAssets() {
     return this.dynamicAssets;
@@ -80,6 +84,7 @@ public class AssetGroup implements Base {
 
   // -- TAG --
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "asset_groups_tags",

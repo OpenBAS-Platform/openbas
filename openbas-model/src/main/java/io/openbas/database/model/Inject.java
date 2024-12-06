@@ -14,6 +14,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.database.converter.ContentConverter;
 import io.openbas.database.raw.*;
 import io.openbas.helper.*;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -113,6 +115,7 @@ public class Inject implements Base, Injection {
   @JoinColumn(name = "inject_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @Getter
@@ -120,6 +123,7 @@ public class Inject implements Base, Injection {
   @JoinColumn(name = "inject_scenario")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_scenario")
+  @Schema(type = "string")
   private Scenario scenario;
 
   @Getter
@@ -150,6 +154,7 @@ public class Inject implements Base, Injection {
   @JoinColumn(name = "inject_user")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_user")
+  @Schema(type = "string")
   private User user;
 
   // CascadeType.ALL is required here because inject status are embedded
@@ -158,6 +163,7 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, sortable = true)
   private InjectStatus status;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -169,6 +175,7 @@ public class Inject implements Base, Injection {
   @Queryable(filterable = true, dynamicValues = true)
   private Set<Tag> tags = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -179,6 +186,7 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_teams")
   private List<Team> teams = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -189,6 +197,7 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_assets")
   private List<Asset> assets = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -199,6 +208,7 @@ public class Inject implements Base, Injection {
   @JsonProperty("inject_asset_groups")
   private List<AssetGroup> assetGroups = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -210,6 +220,7 @@ public class Inject implements Base, Injection {
   private List<Asset> payloads = new ArrayList<>();
 
   // CascadeType.ALL is required here because of complex relationships
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @OneToMany(
       mappedBy = "inject",
@@ -221,6 +232,7 @@ public class Inject implements Base, Injection {
   private List<InjectDocument> documents = new ArrayList<>();
 
   // CascadeType.ALL is required here because communications are embedded
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @OneToMany(
       mappedBy = "inject",
@@ -232,6 +244,7 @@ public class Inject implements Base, Injection {
   private List<Communication> communications = new ArrayList<>();
 
   // CascadeType.ALL is required here because expectations are embedded
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @OneToMany(
       mappedBy = "inject",

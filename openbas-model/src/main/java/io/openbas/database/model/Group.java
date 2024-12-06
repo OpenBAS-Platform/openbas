@@ -6,6 +6,8 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -69,6 +71,7 @@ public class Group implements Base {
   @Fetch(value = FetchMode.SUBSELECT)
   private List<Grant> grants = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "users_groups",
@@ -79,6 +82,7 @@ public class Group implements Base {
   @Fetch(value = FetchMode.SUBSELECT)
   private List<User> users = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "groups_organizations",

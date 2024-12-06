@@ -127,6 +127,7 @@ public class Exercise implements Base {
   @JoinColumn(name = "exercise_logo_dark")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("exercise_logo_dark")
+  @Schema(type = "string")
   private Document logoDark;
 
   @Getter
@@ -134,6 +135,7 @@ public class Exercise implements Base {
   @JoinColumn(name = "exercise_logo_light")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("exercise_logo_light")
+  @Schema(type = "string")
   private Document logoLight;
 
   @Getter
@@ -151,6 +153,7 @@ public class Exercise implements Base {
       inverseJoinColumns = @JoinColumn(name = "scenario_id"))
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("exercise_scenario")
+  @Schema(type = "string")
   @Queryable(filterable = true, dynamicValues = true)
   private Scenario scenario;
 
@@ -176,6 +179,7 @@ public class Exercise implements Base {
   @JsonIgnore
   private List<Grant> grants = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
   @JsonProperty("exercise_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -212,12 +216,14 @@ public class Exercise implements Base {
   @JsonIgnore
   private List<Log> logs = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
   @JsonProperty("exercise_pauses")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   private List<Pause> pauses = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -229,6 +235,7 @@ public class Exercise implements Base {
   @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -239,12 +246,14 @@ public class Exercise implements Base {
   @JsonProperty("exercise_documents")
   private List<Document> documents = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("exercise_articles")
   private List<Article> articles = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Getter
   @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -267,12 +276,14 @@ public class Exercise implements Base {
         .count();
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("exercise_planners")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getPlanners() {
     return getUsersByType(this.getGrants(), PLANNER);
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("exercise_observers")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getObservers() {
@@ -305,6 +316,7 @@ public class Exercise implements Base {
     return getTeamUsers().stream().map(ExerciseTeamUser::getUser).distinct().count();
   }
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("exercise_users")
   @JsonSerialize(using = MultiIdListDeserializer.class)
   public List<User> getUsers() {

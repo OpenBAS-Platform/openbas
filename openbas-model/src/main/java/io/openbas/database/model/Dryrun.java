@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -50,12 +52,14 @@ public class Dryrun implements Base {
   @JoinColumn(name = "dryrun_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("dryrun_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @OneToMany(mappedBy = "run", fetch = FetchType.LAZY)
   @JsonIgnore
   private List<DryInject> injects = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "dryruns_users",

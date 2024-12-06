@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
@@ -31,6 +32,7 @@ public class Pause implements Base {
   @JoinColumn(name = "pause_exercise")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("pause_exercise")
+  @Schema(type = "string")
   private Exercise exercise;
 
   @Override

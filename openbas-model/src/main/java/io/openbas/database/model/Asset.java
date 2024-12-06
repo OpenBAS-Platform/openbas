@@ -11,6 +11,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -75,6 +77,7 @@ public class Asset implements Base {
 
   // -- TAG --
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @Queryable(filterable = true, sortable = true, dynamicValues = true, path = "tags.id")
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
@@ -90,14 +93,17 @@ public class Asset implements Base {
   @JoinColumn(name = "asset_executor")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_executor")
+  @Schema(type = "string")
   private Executor executor;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_parent")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_parent")
+  @Schema(type = "string")
   private Asset parent;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_parent")
   @JsonSerialize(using = MultiIdListDeserializer.class)
@@ -108,6 +114,7 @@ public class Asset implements Base {
   @JoinColumn(name = "asset_inject")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_inject")
+  @Schema(type = "string")
   private Inject inject;
 
   @JsonProperty("asset_active")
