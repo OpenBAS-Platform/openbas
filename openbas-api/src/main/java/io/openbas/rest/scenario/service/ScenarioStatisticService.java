@@ -9,8 +9,11 @@ import io.openbas.rest.scenario.response.SimulationsResultsLatest;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingUtils.ResultDistribution;
 import io.openbas.utils.ResultUtils;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
 import java.util.*;
-import java.util.function.BinaryOperator;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,116 +25,126 @@ public class ScenarioStatisticService {
 
   private final ResultUtils resultUtils;
 
+  private static final int GLOBAL_SCORE_PERCENTAGE_NUMBER_OF_DECIMALS = 1;
+  private static final int PERCENTAGE_MULTIPLIER = 100;
+
   public ScenarioStatistic getStatistics(String scenarioId) {
-    return getLatestSimulationsStatistics(scenarioId);
+    return new ScenarioStatistic(getSimulationsResultsLatest(scenarioId));
   }
 
-  private ScenarioStatistic getLatestSimulationsStatistics(String scenarioId) {
-    List<RawFinishedExerciseWithInjects> rawFinishedExercises =
-        exerciseRepository.rawLatestFinishedExercisesWithInjectsByScenarioId(scenarioId);
-    Collections.reverse(rawFinishedExercises);
+  private SimulationsResultsLatest getSimulationsResultsLatest(String scenarioId) {
+    List<FinishedExerciseWithInjects> orderedFinishedExercises =
+        getOrderedFinishedExercises(scenarioId);
 
-    Map<ExpectationType, List<GlobalScoreBySimulationEndDate>>
-        initialGlobalScoresByExpectationType = new HashMap<>();
-    initialGlobalScoresByExpectationType.put(ExpectationType.PREVENTION, new ArrayList<>());
-    initialGlobalScoresByExpectationType.put(ExpectationType.DETECTION, new ArrayList<>());
-    initialGlobalScoresByExpectationType.put(ExpectationType.HUMAN_RESPONSE, new ArrayList<>());
+    Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> globalScoresByExpectationTypes =
+        getGlobalScoresByExpectationTypes(orderedFinishedExercises);
 
-    Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> globalScoresByExpectationType =
-        rawFinishedExercises.stream()
-            .reduce(
-                initialGlobalScoresByExpectationType,
-                (scoresByType, rawFinishedExercise) ->
-                    addGlobalScores(
-                        scoresByType,
-                        rawFinishedExercise,
-                        resultUtils.getResultsByTypes(rawFinishedExercise.getInject_ids())),
-                getMapBinaryOperator());
-
-    return new ScenarioStatistic(new SimulationsResultsLatest(globalScoresByExpectationType));
+    return new SimulationsResultsLatest(globalScoresByExpectationTypes);
   }
 
-  private static Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> addGlobalScores(
-      Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> globalScoresByExpectationType,
-      RawFinishedExerciseWithInjects rawFinishedExercise,
-      List<ExpectationResultsByType> expectationResultsByType) {
+  private Map<ExpectationType, List<GlobalScoreBySimulationEndDate>>
+      getGlobalScoresByExpectationTypes(List<FinishedExerciseWithInjects> finishedExercises) {
+    List<ExpectationTypeAndGlobalScore> allGlobalScores = getAllGlobalScores(finishedExercises);
 
-    updateGlobalScores(
-        globalScoresByExpectationType,
-        rawFinishedExercise,
-        expectationResultsByType,
-        ExpectationType.PREVENTION);
+    List<GlobalScoreBySimulationEndDate> preventionGlobalScores =
+        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.PREVENTION);
+    List<GlobalScoreBySimulationEndDate> detectionGlobalScores =
+        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.DETECTION);
+    List<GlobalScoreBySimulationEndDate> humanResponseGlobalScores =
+        getGlobalScoresForExpectationType(allGlobalScores, ExpectationType.HUMAN_RESPONSE);
 
-    updateGlobalScores(
-        globalScoresByExpectationType,
-        rawFinishedExercise,
-        expectationResultsByType,
-        ExpectationType.DETECTION);
-
-    updateGlobalScores(
-        globalScoresByExpectationType,
-        rawFinishedExercise,
-        expectationResultsByType,
-        ExpectationType.HUMAN_RESPONSE);
-
-    return globalScoresByExpectationType;
+    return new HashMap<>(
+        Map.of(
+            ExpectationType.PREVENTION, preventionGlobalScores,
+            ExpectationType.DETECTION, detectionGlobalScores,
+            ExpectationType.HUMAN_RESPONSE, humanResponseGlobalScores));
   }
 
-  private static void updateGlobalScores(
-      Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> globalScoresByExpectationType,
-      RawFinishedExerciseWithInjects rawFinishedExercise,
-      List<ExpectationResultsByType> expectationResultsByType,
-      ExpectationType expectationType) {
-    List<GlobalScoreBySimulationEndDate> globalScores =
-        getGlobalScoresBySimulationEndDates(
-            rawFinishedExercise, expectationResultsByType, expectationType);
-    updateGlobalScoresByExpectationType(
-        globalScoresByExpectationType, globalScores, expectationType);
+  private List<ExpectationTypeAndGlobalScore> getAllGlobalScores(
+      List<FinishedExerciseWithInjects> finishedExercises) {
+    return finishedExercises.stream().flatMap(this::getExpectationTypeAndGlobalScores).toList();
   }
 
-  private static void updateGlobalScoresByExpectationType(
-      Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> globalScoresByType,
-      List<GlobalScoreBySimulationEndDate> globalScores,
-      ExpectationType expectationType) {
-    List<GlobalScoreBySimulationEndDate> previousGlobalScores =
-        globalScoresByType.getOrDefault(expectationType, new ArrayList<>());
-    previousGlobalScores.addAll(globalScores);
-    globalScoresByType.put(expectationType, previousGlobalScores);
-  }
-
-  private static List<GlobalScoreBySimulationEndDate> getGlobalScoresBySimulationEndDates(
-      RawFinishedExerciseWithInjects rawFinishedExercise,
-      List<ExpectationResultsByType> expectationResultsByType,
-      ExpectationType expectationType) {
-
-    return expectationResultsByType.stream()
-        .filter(expectationResultByType -> expectationResultByType.type() == expectationType)
+  private Stream<ExpectationTypeAndGlobalScore> getExpectationTypeAndGlobalScores(
+      FinishedExerciseWithInjects finishedExercise) {
+    return resultUtils.getResultsByTypes(finishedExercise.injectIds()).stream()
         .map(
             expectationResultByType ->
-                new GlobalScoreBySimulationEndDate(
-                    rawFinishedExercise.getExercise_end_date(),
-                    getPercentageOfInjectsOnSuccess(expectationResultByType)))
+                getExpectationTypeAndGlobalScore(finishedExercise, expectationResultByType));
+  }
+
+  private static ExpectationTypeAndGlobalScore getExpectationTypeAndGlobalScore(
+      FinishedExerciseWithInjects finishedExercise,
+      ExpectationResultsByType expectationResultByType) {
+    return new ExpectationTypeAndGlobalScore(
+        expectationResultByType.type(),
+        new GlobalScoreBySimulationEndDate(
+            finishedExercise.endDate(), getPercentageOfInjectsOnSuccess(expectationResultByType)));
+  }
+
+  private static List<GlobalScoreBySimulationEndDate> getGlobalScoresForExpectationType(
+      List<ExpectationTypeAndGlobalScore> allGlobalScores, ExpectationType expectationType) {
+    return allGlobalScores.stream()
+        .filter(typeAndScore -> typeAndScore.expectationType == expectationType)
+        .map(typeAndScore -> typeAndScore.globalScoreBySimulationEndDate)
         .toList();
   }
+
+  private List<FinishedExerciseWithInjects> getOrderedFinishedExercises(String scenarioId) {
+    List<RawFinishedExerciseWithInjects> rawFinishedExercises =
+        exerciseRepository.rawLatestFinishedExercisesWithInjectsByScenarioId(scenarioId);
+    return rawFinishedExercises.stream()
+        .map(
+            exercise ->
+                new FinishedExerciseWithInjects(
+                    exercise.getExercise_end_date(), exercise.getInject_ids()))
+        .sorted(Collections.reverseOrder())
+        .toList();
+  }
+
+  private record ExpectationTypeAndGlobalScore(
+      ExpectationType expectationType,
+      GlobalScoreBySimulationEndDate globalScoreBySimulationEndDate) {}
 
   private static float getPercentageOfInjectsOnSuccess(
       ExpectationResultsByType expectationResultByType) {
     if (expectationResultByType.distribution().isEmpty()) {
       return 0;
     }
-    var totalNumberOfInjects =
-        expectationResultByType.distribution().stream()
-            .map(ResultDistribution::value)
-            .reduce(0, Integer::sum);
-    var numberOfInjectsOnSuccess = expectationResultByType.distribution().getFirst().value();
-    return (float) numberOfInjectsOnSuccess / totalNumberOfInjects;
+    return getRoundedPercentage(expectationResultByType);
   }
 
-  private static BinaryOperator<Map<ExpectationType, List<GlobalScoreBySimulationEndDate>>>
-      getMapBinaryOperator() {
-    return (m1, m2) -> {
-      m1.putAll(m2);
-      return m1;
-    };
+  private static float getRoundedPercentage(ExpectationResultsByType expectationResultByType) {
+    float percentage =
+        ((float) getNumberOfInjectsOnSuccess(expectationResultByType)
+                / getTotalNumberOfInjects(expectationResultByType))
+            * PERCENTAGE_MULTIPLIER;
+    return truncatePercentageDecimals(percentage);
+  }
+
+  private static float truncatePercentageDecimals(float percentage) {
+    return new BigDecimal(percentage)
+        .setScale(GLOBAL_SCORE_PERCENTAGE_NUMBER_OF_DECIMALS, RoundingMode.UP)
+        .floatValue();
+  }
+
+  private static int getNumberOfInjectsOnSuccess(ExpectationResultsByType expectationResultByType) {
+    return expectationResultByType.distribution().getFirst().value();
+  }
+
+  private static int getTotalNumberOfInjects(ExpectationResultsByType expectationResultByType) {
+    return expectationResultByType.distribution().stream()
+        .map(ResultDistribution::value)
+        .reduce(0, Integer::sum);
+  }
+
+  private record FinishedExerciseWithInjects(Instant endDate, Set<String> injectIds)
+      implements Comparable<FinishedExerciseWithInjects> {
+    @Override
+    public int compareTo(FinishedExerciseWithInjects exercise) {
+      if (this.endDate.isBefore(exercise.endDate)) return 1;
+      if (this.endDate.isAfter(exercise.endDate)) return -1;
+      return 0;
+    }
   }
 }
