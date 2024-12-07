@@ -87,7 +87,7 @@
     "@testing-library/react": "16.0.1",
     "@types/d3-hierarchy": "3.1.7",
     "@types/eslint__js": "8.42.3",
-    "@types/node": "20.17.1",
+    "@types/node": "20.17.9",
     "@types/pdfmake": "0.2.9",
     "@types/qs": "6",
     "@types/react": "18.3.12",
