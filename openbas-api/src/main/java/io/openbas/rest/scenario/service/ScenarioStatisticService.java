@@ -9,6 +9,8 @@ import io.openbas.rest.scenario.response.SimulationsResultsLatest;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.AtomicTestingUtils.ResultDistribution;
 import io.openbas.utils.ResultUtils;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +24,20 @@ public class ScenarioStatisticService {
 
   private final ResultUtils resultUtils;
 
+  private static final int GLOBAL_SCORE_PERCENTAGE_NUMBER_OF_DECIMALS = 1;
+
   public ScenarioStatistic getStatistics(String scenarioId) {
+    return new ScenarioStatistic(getSimulationsResultsLatest(scenarioId));
+  }
+
+  private SimulationsResultsLatest getSimulationsResultsLatest(String scenarioId) {
     List<RawFinishedExerciseWithInjects> orderedRawFinishedExercises =
         getOrderedRawFinishedExercises(scenarioId);
 
     Map<ExpectationType, List<GlobalScoreBySimulationEndDate>> globalScoresByExpectationTypes =
         getGlobalScoresByExpectationTypes(orderedRawFinishedExercises);
 
-    return new ScenarioStatistic(new SimulationsResultsLatest(globalScoresByExpectationTypes));
+    return new SimulationsResultsLatest(globalScoresByExpectationTypes);
   }
 
   private Map<ExpectationType, List<GlobalScoreBySimulationEndDate>>
@@ -97,11 +105,25 @@ public class ScenarioStatisticService {
     if (expectationResultByType.distribution().isEmpty()) {
       return 0;
     }
-    int totalNumberOfInjects =
-        expectationResultByType.distribution().stream()
-            .map(ResultDistribution::value)
-            .reduce(0, Integer::sum);
-    int numberOfInjectsOnSuccess = expectationResultByType.distribution().getFirst().value();
-    return (float) numberOfInjectsOnSuccess / totalNumberOfInjects;
+    return getRoundedPercentage(expectationResultByType);
+  }
+
+  private static float getRoundedPercentage(ExpectationResultsByType expectationResultByType) {
+    return new BigDecimal(
+            (getNumberOfInjectsOnSuccess(expectationResultByType)
+                    / getTotalNumberOfInjects(expectationResultByType))
+                * 100)
+        .setScale(GLOBAL_SCORE_PERCENTAGE_NUMBER_OF_DECIMALS, RoundingMode.UP)
+        .floatValue();
+  }
+
+  private static int getNumberOfInjectsOnSuccess(ExpectationResultsByType expectationResultByType) {
+    return expectationResultByType.distribution().getFirst().value();
+  }
+
+  private static int getTotalNumberOfInjects(ExpectationResultsByType expectationResultByType) {
+    return expectationResultByType.distribution().stream()
+        .map(ResultDistribution::value)
+        .reduce(0, Integer::sum);
   }
 }
