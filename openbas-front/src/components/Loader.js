@@ -14,7 +14,7 @@ const styles = () => ({
     height: '100%',
     display: 'table',
   },
-  containerInElementTiny: {
+  containerSizeXS: {
     width: 'auto',
   },
   loader: {
@@ -40,32 +40,30 @@ const styles = () => ({
   },
 });
 
-const inElementVariants = ['inElement', 'inElementTiny'];
-
 class Loader extends Component {
   render() {
-    const { classes, variant, withRightPadding } = this.props;
+    const { classes, variant, withRightPadding, size } = this.props;
     return (
       <div
-        className={this.getContainer(variant, classes)}
+        className={this.getContainer(variant, size, classes)}
         style={
-          inElementVariants.includes(variant)
+          variant === 'inElement'
             ? { paddingRight: withRightPadding ? 200 : 0 }
             : {}
         }
       >
         <div
           className={
-            inElementVariants.includes(variant) ? classes.loaderInElement : classes.loader
+            variant === 'inElement' ? classes.loaderInElement : classes.loader
           }
           style={
-            !inElementVariants.includes(variant)
+            variant !== 'inElement'
               ? { paddingRight: withRightPadding ? 100 : 0 }
               : {}
           }
         >
           <CircularProgress
-            size={this.getSize(variant)}
+            size={this.getSize(variant, size)}
             thickness={1}
             className={this.props.classes.loaderCircle}
           />
@@ -74,22 +72,22 @@ class Loader extends Component {
     );
   }
 
-  getContainer(variant, classes) {
+  getContainer(variant, size, classes) {
+    if (size === 'xs') {
+      return classes.containerSizeXS;
+    }
     if (variant === 'inElement') {
       return classes.containerInElement;
-    }
-    if (variant === 'inElementTiny') {
-      return classes.containerInElementTiny;
     }
     return classes.container;
   }
 
-  getSize(variant) {
+  getSize(variant, size) {
+    if (size === 'xs') {
+      return '1rem';
+    }
     if (variant === 'inElement') {
       return 40;
-    }
-    if (variant === 'inElementTiny') {
-      return '1rem';
     }
     return 80;
   }
@@ -99,6 +97,7 @@ Loader.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
   withRightPadding: PropTypes.bool,
+  size: PropTypes.string,
 };
 
 export default withStyles(styles)(Loader);

@@ -72,7 +72,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   const [loadingExercises, setLoadingExercises] = useState(true);
   const [exercises, setExercises] = useState<ExerciseStore[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({
-    sorts: initSorting('exercise_start_date'),
+    sorts: initSorting('exercise_updated_at', 'DESC'),
   }));
   const search = (scenarioId: ScenarioStore['scenario_id'], input: SearchPaginationInput) => {
     setLoadingExercises(true);
@@ -205,7 +205,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
         </Grid>
         <Grid item xs={6} style={{ paddingTop: 10 }}>
           <Typography variant="h4" gutterBottom style={{ margin: '9px 0 17px 0' }}>
-            {t('Latest 10 Simulations Results')}
+            {t('Latest 10 Finished Simulations')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
             <ScenarioDistributionByExercise scenarioId={scenarioId} />

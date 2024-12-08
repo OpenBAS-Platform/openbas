@@ -36,9 +36,9 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
   if (!expectations || expectations.length === 0) {
     return (
       <div className={classes.inline}>
-        <ShieldOutlined style={{ color: getColor('PENDING'), marginRight: 10 }} />
-        <TrackChangesOutlined style={{ color: getColor('PENDING'), marginRight: 10 }} />
-        <SensorOccupiedOutlined style={{ color: getColor('PENDING'), marginRight: 10 }} />
+        <ShieldOutlined style={{ color: getColor('PENDING'), marginRight: 10, fontSize: 22 }} />
+        <TrackChangesOutlined style={{ color: getColor('PENDING'), marginRight: 10, fontSize: 22 }} />
+        <SensorOccupiedOutlined style={{ color: getColor('PENDING'), marginRight: 10, fontSize: 22 }} />
       </div>
     );
   }

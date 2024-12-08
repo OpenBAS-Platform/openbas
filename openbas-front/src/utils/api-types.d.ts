@@ -902,7 +902,7 @@ export interface FullTextSearchResult {
 }
 
 export interface GlobalScoreBySimulationEndDate {
-  /** @format double */
+  /** @format float */
   global_score_success_percentage: number;
   /** @format date-time */
   simulation_end_date: string;

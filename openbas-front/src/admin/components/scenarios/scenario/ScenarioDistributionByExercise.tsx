@@ -8,7 +8,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import type { Theme } from '../../../../components/Theme';
 import { GlobalScoreBySimulationEndDate, ScenarioStatistic } from '../../../../utils/api-types';
-import { verticalBarsChartOptions } from '../../../../utils/Charts';
+import { CustomTooltipFunction, CustomTooltipOptions, verticalBarsChartOptions } from '../../../../utils/Charts';
 
 interface Props {
   scenarioId: string;
@@ -28,29 +28,67 @@ const generateFakeData = (): Record<string, GlobalScoreBySimulationEndDate[]> =>
     newDate.setHours(now.getHours() + i + 1);
     return newDate.toISOString();
   });
-  const prevention = { PREVENTION: generateFakeDataFromDates(dates, 0.69) };
-  const detection = { DETECTION: generateFakeDataFromDates(dates, 0.84) };
-  const humanResponse = { HUMAN_RESPONSE: generateFakeDataFromDates(dates, 0.46) };
   return ({
-    ...prevention,
-    ...detection,
-    ...humanResponse,
+    ...({ PREVENTION: generateFakeDataFromDates(dates, 69.0) }),
+    ...({ DETECTION: generateFakeDataFromDates(dates, 84.0) }),
+    ...({ HUMAN_RESPONSE: generateFakeDataFromDates(dates, 46.0) }),
   });
 };
 
-function generateSeriesData(globalScores: GlobalScoreBySimulationEndDate[]) {
+function generateSeriesData(globalScores: GlobalScoreBySimulationEndDate[], successfulExpectationLabel: string) {
+  const { fldt } = useFormatter();
   return globalScores.map((globalScore, index) => ({
     x: `${index}|${globalScore.simulation_end_date}`,
-    y: globalScore.global_score_success_percentage,
+    y: globalScore.global_score_success_percentage / 100,
+    simulationEndDate: fldt(globalScore.simulation_end_date),
+    simulationSuccessPercentage: globalScore.global_score_success_percentage,
+    successfulExpectationLabel: successfulExpectationLabel,
   }));
+}
+
+type SeriesData = { simulationEndDate: string; simulationSuccessPercentage: string; successfulExpectationLabel: string };
+
+const customTooltip = (simulationEndDateLabel: string): CustomTooltipFunction => {
+  return function ({ _, seriesIndex, dataPointIndex, w }: CustomTooltipOptions) {
+    const { simulationEndDate, simulationSuccessPercentage, successfulExpectationLabel } = w.globals.initialSeries[seriesIndex].data[dataPointIndex] as SeriesData;
+
+    return `<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">
+            ${simulationEndDateLabel}: <b>${simulationEndDate}</b>
+          </div>
+          <div class="apexcharts-tooltip-series-group" style="order: 1; display: flex;">
+            <div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">
+              <div class="apexcharts-tooltip-y-group">
+                <span class="apexcharts-tooltip-text-y-label">${successfulExpectationLabel}: </span>
+                <span class="apexcharts-tooltip-text-y-value">${Number.parseFloat(simulationSuccessPercentage).toFixed(1)}%</span>
+              </div>
+           </div>
+          </div>`;
+  };
+};
+
+function getXFormatter() {
+  const { fsd } = useFormatter();
+  return (rawData: string) => {
+    if (!rawData) {
+      return rawData;
+    }
+    const splitRawData = rawData.split('|');
+    return splitRawData.length > 0 ? fsd(splitRawData[1]) : rawData;
+  };
+}
+
+function getYFormatter() {
+  return (value: number) => `${value * 100}%`;
 }
 
 const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   scenarioId,
 }) => {
   // Standard hooks
-  const { t, fsd } = useFormatter();
+  const { t } = useFormatter();
   const theme: Theme = useTheme();
+
+  const simulationEndDateLabel = t('Simulation end date');
 
   const [loadingScenarioStatistics, setLoadingScenarioStatistics] = useState(true);
   const [statistic, setStatistic] = useState<ScenarioStatistic>();
@@ -69,15 +107,15 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   const series = [
     {
       name: t('Prevention'),
-      data: generateSeriesData(globalScoresByExpectationType['PREVENTION']),
+      data: generateSeriesData(globalScoresByExpectationType['PREVENTION'], t('Blocked')),
     },
     {
       name: t('Detection'),
-      data: generateSeriesData(globalScoresByExpectationType['DETECTION']),
+      data: generateSeriesData(globalScoresByExpectationType['DETECTION'], t('Detected')),
     },
     {
       name: t('Human Response'),
-      data: generateSeriesData(globalScoresByExpectationType['HUMAN_RESPONSE']),
+      data: generateSeriesData(globalScoresByExpectationType['HUMAN_RESPONSE'], t('Successful')),
     },
   ];
 
@@ -88,14 +126,8 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
         <Chart
           options={verticalBarsChartOptions(
             theme,
-            (rawData: string) => {
-              if (!rawData) {
-                return rawData;
-              }
-              const splitRawData = rawData.split('|');
-              return splitRawData.length > 0 ? fsd(splitRawData[1]) : rawData;
-            },
-            (value: number) => `${value * 100}%`,
+            getXFormatter(),
+            getYFormatter(),
             false,
             false,
             false,
@@ -105,6 +137,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             isStatisticsDataEmpty,
             1,
             t('No data to display'),
+            customTooltip(simulationEndDateLabel),
           )}
           series={series}
           type="bar"

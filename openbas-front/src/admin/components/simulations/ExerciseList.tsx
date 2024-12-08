@@ -72,15 +72,19 @@ const getInlineStyles = (variant: string): Record<string, CSSProperties> => ({
 
 function getGlobalScoreComponent(
   exercise: ExerciseSimple,
-  isGlobalScoreAsync: boolean,
+) {
+  return (<AtomicTestingResult expectations={exercise.exercise_global_score} />);
+}
+
+function getGlobalScoreComponentAsync(
+  exercise: ExerciseSimple,
   loadingGlobalScores: boolean,
   globalScores: Record<string, ExpectationResultsByType[]> | undefined,
 ) {
   return (
     <>
-      {!isGlobalScoreAsync && <AtomicTestingResult expectations={exercise.exercise_global_score} />}
-      {(isGlobalScoreAsync && loadingGlobalScores) && <Loader variant="inElementTiny" />}
-      {(isGlobalScoreAsync && !loadingGlobalScores && globalScores) && <AtomicTestingResult expectations={globalScores[exercise.exercise_id]} />}
+      {(loadingGlobalScores) && <Loader variant="inElement" size="xs" />}
+      {(!loadingGlobalScores && globalScores) && <AtomicTestingResult expectations={globalScores[exercise.exercise_id]} />}
     </>
   );
 }
@@ -159,7 +163,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_global_score',
       label: 'Global score',
       isSortable: false,
-      value: (exercise: ExerciseSimple) => getGlobalScoreComponent(exercise, isGlobalScoreAsync, loadingGlobalScores, globalScores),
+      value: (exercise: ExerciseSimple) => isGlobalScoreAsync ? getGlobalScoreComponentAsync(exercise, loadingGlobalScores, globalScores) : getGlobalScoreComponent(exercise),
     },
     {
       field: 'exercise_tags',
