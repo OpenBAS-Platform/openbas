@@ -24,12 +24,10 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -50,44 +48,31 @@ public class ExerciseApiStatusTest {
   static Inject SAVED_INJECT5;
   static LessonsAnswer LESSON_ANSWER;
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ExerciseRepository exerciseRepository;
+  @Autowired private ExerciseRepository exerciseRepository;
 
-  @Autowired
-  private InjectRepository injectRepository;
+  @Autowired private InjectRepository injectRepository;
 
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
 
-  @Autowired
-  private InjectStatusRepository injectStatusRepository;
+  @Autowired private InjectStatusRepository injectStatusRepository;
 
-  @Autowired
-  private LessonsAnswerRepository lessonsAnswerRepository;
+  @Autowired private LessonsAnswerRepository lessonsAnswerRepository;
 
-  @Autowired
-  private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
 
-  @Autowired
-  private LessonsQuestionRepository lessonsQuestionRepository;
+  @Autowired private LessonsQuestionRepository lessonsQuestionRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private TeamRepository teamRepository;
+  @Autowired private TeamRepository teamRepository;
 
-  @Autowired
-  private PauseRepository pauseRepository;
+  @Autowired private PauseRepository pauseRepository;
 
-  @Autowired
-  private InjectHelper injectHelper;
+  @Autowired private InjectHelper injectHelper;
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   @BeforeAll
   void beforeAll() {
