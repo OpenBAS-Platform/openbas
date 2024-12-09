@@ -14,10 +14,9 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { FilterGroup } from '../../../../utils/api-types';
+import type { Endpoint, FilterGroup } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import type { EndpointStore } from './Endpoint';
 
 interface Props {
   initialState: string[];
@@ -51,7 +50,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
     dispatch(fetchEndpoints());
   });
 
-  const [endpointValues, setEndpointValues] = useState<EndpointStore[]>(initialState.map(id => endpointsMap[id]));
+  const [endpointValues, setEndpointValues] = useState<Endpoint[]>(initialState.map(id => endpointsMap[id]));
   useEffect(() => {
     setEndpointValues(initialState.map(id => endpointsMap[id]));
   }, [open, initialState]);
@@ -75,19 +74,19 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   };
 
   // Headers
-  const elements: SelectListElements<EndpointStore> = useMemo(() => ({
+  const elements: SelectListElements<Endpoint> = useMemo(() => ({
     icon: {
       value: () => <DevicesOtherOutlined color="primary" />,
     },
     headers: [
       {
         field: 'asset_name',
-        value: (endpoint: EndpointStore) => endpoint.asset_name,
+        value: (endpoint: Endpoint) => endpoint.asset_name,
         width: 50,
       },
       {
         field: 'endpoint_platform',
-        value: (endpoint: EndpointStore) => (
+        value: (endpoint: Endpoint) => (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
             {endpoint.endpoint_platform}
@@ -97,19 +96,19 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       },
       {
         field: 'endpoint_arch',
-        value: (endpoint: EndpointStore) => endpoint.endpoint_arch,
+        value: (endpoint: Endpoint) => endpoint.endpoint_arch,
         width: 20,
       },
       {
         field: 'asset_tags',
-        value: (endpoint: EndpointStore) => <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />,
+        value: (endpoint: Endpoint) => <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />,
         width: 30,
       },
     ],
   }), []);
 
   // Pagination
-  const [endpoints, setEndpoints] = useState<EndpointStore[]>([]);
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
 
   const availableFilterNames = [
     'asset_tags',

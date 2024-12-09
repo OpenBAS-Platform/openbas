@@ -8,10 +8,9 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { AssetGroupInput } from '../../../../utils/api-types';
+import type { AssetGroup, AssetGroupInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import type { UserStore } from '../../teams/players/Player';
-import type { AssetGroupStore } from './AssetGroup';
 import AssetGroupForm from './AssetGroupForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -24,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   inline?: boolean;
-  onCreate?: (result: AssetGroupStore) => void;
+  onCreate?: (result: AssetGroup) => void;
 }
 
 const AssetGroupCreation: FunctionComponent<Props> = ({

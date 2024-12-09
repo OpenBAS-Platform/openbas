@@ -1,7 +1,7 @@
-import type { AssetGroupStore } from '../../admin/components/assets/asset_groups/AssetGroup';
+import type { AssetGroup } from '../../utils/api-types';
 
 export interface AssetGroupsHelper {
-  getAssetGroups: () => AssetGroupStore[];
-  getAssetGroupMaps: () => Record<string, AssetGroupStore>;
-  getAssetGroup: (assetGroupId: string) => AssetGroupStore | undefined;
+  getAssetGroups: () => AssetGroup[];
+  getAssetGroupMaps: () => Record<string, AssetGroup>;
+  getAssetGroup: (assetGroupId: string) => AssetGroup | undefined;
 }

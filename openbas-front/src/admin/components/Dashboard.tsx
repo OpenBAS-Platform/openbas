@@ -7,7 +7,7 @@ import Chart from 'react-apexcharts';
 import { fetchStatistics } from '../../actions/Application';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
 import { searchExercises } from '../../actions/Exercise';
-import type { InjectExpectationResultsByAttackPatternStore } from '../../actions/exercises/Exercise';
+import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../actions/exercises/Exercise';
 import type { StatisticsHelper } from '../../actions/statistics/statistics-helper';
 import { initSorting, type Page } from '../../components/common/queryable/Page';
 import Empty from '../../components/Empty';
@@ -15,12 +15,11 @@ import { useFormatter } from '../../components/i18n';
 import Loader from '../../components/Loader';
 import type { Theme } from '../../components/Theme';
 import { useHelper } from '../../store';
-import type { AttackPattern, ExerciseSimple, PlatformStatistic } from '../../utils/api-types';
+import { AttackPattern, ExerciseSimple, PlatformStatistic } from '../../utils/api-types';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
 import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
-import type { EndpointStore } from './assets/endpoints/Endpoint';
 import ResponsePie from './common/injects/ResponsePie';
 import MitreMatrix from './common/matrix/MitreMatrix';
 import PaperMetric from './common/simulate/PaperMetric';
@@ -70,7 +69,7 @@ const Dashboard = () => {
 
   // Exercises
   const [loadingExercises, setLoadingExercises] = useState(true);
-  const [exercises, setExercises] = useState<EndpointStore[]>([]);
+  const [exercises, setExercises] = useState<ExerciseStore[]>([]);
   const searchPaginationInput = {
     sorts: initSorting('exercise_updated_at', 'DESC'),
     page: 0,

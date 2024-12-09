@@ -17,11 +17,10 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
+import type { Endpoint, SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
-import type { EndpointStore } from './Endpoint';
 import EndpointCreation from './EndpointCreation';
 import EndpointPopover from './EndpointPopover';
 
@@ -107,7 +106,7 @@ const Endpoints = () => {
     { field: 'asset_status', label: 'Status', isSortable: false },
   ];
 
-  const [endpoints, setEndpoints] = useState<EndpointStore[]>([]);
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
@@ -158,7 +157,7 @@ const Endpoints = () => {
           />
           <ListItemSecondaryAction />
         </ListItem>
-        {endpoints.map((endpoint: EndpointStore) => {
+        {endpoints.map((endpoint: Endpoint) => {
           const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
           return (
             <ListItem

@@ -14,7 +14,6 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Team, TeamOutput } from '../../../../utils/api-types';
-import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import { TeamContext } from '../../common/Context';
 import CreateTeam from './CreateTeam';
 
@@ -72,19 +71,19 @@ const UpdateTeams: React.FC<Props> = ({
   const removeTeam = (teamId: string) => setSelectedTeamValues(selectedTeamValues.filter(v => v.team_id !== teamId));
 
   // Headers
-  const elements: SelectListElements<EndpointStore> = useMemo(() => ({
+  const elements: SelectListElements<TeamOutput> = useMemo(() => ({
     icon: {
       value: () => <GroupsOutlined />,
     },
     headers: [
       {
         field: 'team_name',
-        value: (team: TeamStore) => team.team_name,
+        value: (team: TeamOutput) => team.team_name,
         width: 70,
       },
       {
         field: 'team_tags',
-        value: (team: TeamStore) => <ItemTags variant="reduced-view" tags={team.team_tags} />,
+        value: (team: TeamOutput) => <ItemTags variant="reduced-view" tags={team.team_tags} />,
         width: 30,
       },
     ],

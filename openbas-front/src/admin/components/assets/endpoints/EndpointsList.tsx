@@ -6,7 +6,7 @@ import * as React from 'react';
 
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type { EndpointStore } from './Endpoint';
+import { Endpoint } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -45,7 +45,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-export type EndpointStoreWithType = EndpointStore & { type: string };
+export type EndpointStoreWithType = Endpoint & { type: string };
 
 interface Props {
   endpoints: EndpointStoreWithType[];
@@ -59,7 +59,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
 
-  const component = (endpoint: EndpointStore) => {
+  const component = (endpoint: Endpoint) => {
     return React.cloneElement(actions as React.ReactElement, { endpoint });
   };
 

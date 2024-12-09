@@ -9,9 +9,8 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { EndpointInput } from '../../../../utils/api-types';
+import type { Endpoint, EndpointInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { EndpointStore } from './Endpoint';
 import EndpointForm from './EndpointForm';
 import { EndpointStoreWithType } from './EndpointsList';
 
@@ -23,7 +22,7 @@ interface Props {
   onRemoveEndpointFromInject?: (assetId: string) => void;
   onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
-  onUpdate?: (result: EndpointStore) => void;
+  onUpdate?: (result: Endpoint) => void;
   onDelete?: (result: string) => void;
 }
 
@@ -65,7 +64,7 @@ const EndpointPopover: React.FC<Props> = ({
   };
   const submitEdit = (data: EndpointInput) => {
     dispatch(updateEndpoint(endpoint.asset_id, data)).then(
-      (result: { result: string; entities: { endpoints: Record<string, EndpointStore> } }) => {
+      (result: { result: string; entities: { endpoints: Record<string, Endpoint> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const endpointUpdated = result.entities.endpoints[result.result];
