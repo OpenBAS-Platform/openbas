@@ -16,9 +16,10 @@ import io.openbas.asset.AssetGroupService;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import io.openbas.database.model.PayloadCommandBlock;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
+import io.openbas.executors.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
@@ -274,28 +275,32 @@ public class CalderaExecutor extends Injector {
   }
 
   @Override
-  public InjectStatusCommandLine getCommandsLines(String externalId) {
-    InjectStatusCommandLine commandLine = new InjectStatusCommandLine();
-    Set<String> contents = new HashSet<>();
-    Set<String> cleanCommands = new HashSet<>();
+  public StatusPayload getPayloadOutput(String externalId) {
+    StatusPayload statusPayload = new StatusPayload();
     Ability ability = calderaService.findAbilityById(externalId);
     if (ability != null) {
       ability
           .getExecutors()
           .forEach(
               executor -> {
+                PayloadCommandBlock payloadCommandBlock = new PayloadCommandBlock();
                 if (executor.getCommand() != null && !executor.getCommand().isBlank()) {
-                  contents.add(executor.getCommand());
+                  payloadCommandBlock.setContent(executor.getCommand());
                 }
                 if (executor.getCleanup() != null && !executor.getCleanup().isEmpty()) {
-                  cleanCommands.addAll(executor.getCleanup());
+                  payloadCommandBlock.setCleanupCommand(executor.getCleanup());
                 }
+                if (executor.getCommandExecutor() != null
+                    && !executor.getCommandExecutor().isBlank()) {
+                  payloadCommandBlock.setExecutor(executor.getCommandExecutor());
+                }
+                statusPayload.setPayloadCommandBlocks(
+                    Collections.singletonList(payloadCommandBlock));
               });
+      statusPayload.setExternalId(externalId);
     }
-    commandLine.setExternalId(externalId);
-    commandLine.setContent(contents.stream().toList());
-    commandLine.setCleanupCommand(cleanCommands.stream().toList());
-    return commandLine;
+
+    return statusPayload;
   }
 
   // -- PRIVATE --

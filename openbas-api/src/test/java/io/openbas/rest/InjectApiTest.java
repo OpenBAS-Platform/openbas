@@ -24,7 +24,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Executor;
+import io.openbas.executors.Executor;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.DirectInjectInput;
 import io.openbas.rest.inject.form.InjectInput;

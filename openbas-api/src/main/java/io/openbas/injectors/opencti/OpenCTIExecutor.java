@@ -5,7 +5,7 @@ import static io.openbas.injectors.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
+import io.openbas.executors.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.opencti.model.CaseContent;
 import io.openbas.injectors.opencti.service.OpenCTIService;
