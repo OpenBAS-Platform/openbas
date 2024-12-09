@@ -2,7 +2,7 @@ package io.openbas.database.model;
 
 import static jakarta.persistence.DiscriminatorType.STRING;
 import static java.time.Instant.now;
-import static lombok.AccessLevel.NONE;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -19,8 +19,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.util.*;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -203,7 +205,8 @@ public class Payload implements Base {
     return Objects.hash(id);
   }
 
-  public Payload() {}
+  public Payload() {
+  }
 
   public Payload(String id, String type, String name) {
     this.name = name;
