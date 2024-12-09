@@ -77,11 +77,6 @@ public class Inject implements Base, Injection {
   private String city;
 
   @Getter
-  @Column(name = "inject_architecture_request")
-  @JsonProperty("inject_architecture_request")
-  private Payload.PAYLOAD_EXECUTION_ARCH architectureRequest;
-
-  @Getter
   @Column(name = "inject_enabled")
   @JsonProperty("inject_enabled")
   private boolean enabled = true;
