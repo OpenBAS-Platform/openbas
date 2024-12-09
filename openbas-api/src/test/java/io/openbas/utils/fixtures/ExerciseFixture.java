@@ -1,5 +1,8 @@
 package io.openbas.utils.fixtures;
 
+import static java.time.Instant.now;
+import static java.time.temporal.ChronoUnit.MINUTES;
+
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Team;
@@ -41,6 +44,72 @@ public class ExerciseFixture {
     exercise.setFrom("exercise@mail.fr");
     exercise.setCategory("incident-response");
     exercise.setStatus(ExerciseStatus.SCHEDULED);
+    exercise.setStart(Instant.now());
+    return exercise;
+  }
+
+  public static Exercise createDefaultAttackExercise() {
+    Exercise exercise = new Exercise();
+    exercise.setName("Draft incident response exercise");
+    exercise.setDescription("An incident response exercise for my enterprise");
+    exercise.setSubtitle("An incident response exercise");
+    exercise.setFrom("exercise@mail.fr");
+    exercise.setCategory("attack-scenario");
+    exercise.setMainFocus("incident-response");
+    exercise.setStatus(ExerciseStatus.SCHEDULED);
+    exercise.setStart(Instant.now());
+    return exercise;
+  }
+
+  public static Exercise createRunningAttackExercise() {
+    Exercise exercise = new Exercise();
+    exercise.setName("Draft incident response exercise");
+    exercise.setDescription("An incident response exercise for my enterprise");
+    exercise.setSubtitle("An incident response exercise");
+    exercise.setFrom("exercise@mail.fr");
+    exercise.setCategory("attack-scenario");
+    exercise.setMainFocus("incident-response");
+    exercise.setStatus(ExerciseStatus.RUNNING);
+    exercise.setStart(Instant.now());
+    return exercise;
+  }
+
+  public static Exercise createCanceledAttackExercise() {
+    Exercise exercise = new Exercise();
+    exercise.setName("Draft incident response exercise");
+    exercise.setDescription("An incident response exercise for my enterprise");
+    exercise.setSubtitle("An incident response exercise");
+    exercise.setFrom("exercise@mail.fr");
+    exercise.setCategory("attack-scenario");
+    exercise.setMainFocus("incident-response");
+    exercise.setStatus(ExerciseStatus.CANCELED);
+    exercise.setStart(Instant.now());
+    return exercise;
+  }
+
+  public static Exercise createFinishedAttackExercise() {
+    Exercise exercise = new Exercise();
+    exercise.setName("Draft incident response exercise");
+    exercise.setDescription("An incident response exercise for my enterprise");
+    exercise.setSubtitle("An incident response exercise");
+    exercise.setFrom("exercise@mail.fr");
+    exercise.setCategory("attack-scenario");
+    exercise.setMainFocus("incident-response");
+    exercise.setStatus(ExerciseStatus.FINISHED);
+    exercise.setStart(Instant.now());
+    return exercise;
+  }
+
+  public static Exercise createPausedAttackExercise() {
+    Exercise exercise = new Exercise();
+    exercise.setCurrentPause(now().truncatedTo(MINUTES).minus(1, MINUTES));
+    exercise.setName("Draft incident response exercise");
+    exercise.setDescription("An incident response exercise for my enterprise");
+    exercise.setSubtitle("An incident response exercise");
+    exercise.setFrom("exercise@mail.fr");
+    exercise.setCategory("attack-scenario");
+    exercise.setMainFocus("incident-response");
+    exercise.setStatus(ExerciseStatus.PAUSED);
     exercise.setStart(Instant.now());
     return exercise;
   }
