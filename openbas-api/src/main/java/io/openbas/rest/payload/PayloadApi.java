@@ -40,6 +40,7 @@ public class PayloadApi extends RestBehavior {
   private PayloadRepository payloadRepository;
   private TagRepository tagRepository;
   private PayloadService payloadService;
+  private PayloadCreationService payloadCreationService;
   private AttackPatternRepository attackPatternRepository;
   private DocumentRepository documentRepository;
   private final CollectorRepository collectorRepository;
@@ -73,6 +74,11 @@ public class PayloadApi extends RestBehavior {
     this.documentRepository = documentRepository;
   }
 
+  @Autowired
+  public void setPayloadCreationService(PayloadCreationService payloadCreationService) {
+    this.payloadCreationService = payloadCreationService;
+  }
+
   @PostMapping("/api/payloads/search")
   public Page<Payload> payloads(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
@@ -92,72 +98,7 @@ public class PayloadApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
-    switch (PayloadType.fromString(input.getType())) {
-      case PayloadType.COMMAND:
-        Command commandPayload = new Command();
-        commandPayload.setUpdateAttributes(input);
-        commandPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        commandPayload = payloadRepository.save(commandPayload);
-        this.payloadService.updateInjectorContractsForPayload(commandPayload);
-        return commandPayload;
-      case PayloadType.EXECUTABLE:
-        Executable executablePayload = new Executable();
-        PayloadCreateInput validatedInput = validateExecutableCreateInput(input);
-        executablePayload.setUpdateAttributes(validatedInput);
-        executablePayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
-        executablePayload.setTags(
-            iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
-        executablePayload.setExecutableFile(
-            documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
-        executablePayload = payloadRepository.save(executablePayload);
-        this.payloadService.updateInjectorContractsForPayload(executablePayload);
-        return executablePayload;
-      case PayloadType.FILE_DROP:
-        FileDrop fileDropPayload = new FileDrop();
-        fileDropPayload.setUpdateAttributes(input);
-        fileDropPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        fileDropPayload.setFileDropFile(
-            documentRepository.findById(input.getFileDropFile()).orElseThrow());
-        fileDropPayload = payloadRepository.save(fileDropPayload);
-        this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
-        return fileDropPayload;
-      case PayloadType.DNS_RESOLUTION:
-        DnsResolution dnsResolutionPayload = new DnsResolution();
-        dnsResolutionPayload.setUpdateAttributes(input);
-        dnsResolutionPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
-        this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
-        return dnsResolutionPayload;
-      case PayloadType.NETWORK_TRAFFIC:
-        NetworkTraffic networkTrafficPayload = new NetworkTraffic();
-        networkTrafficPayload.setUpdateAttributes(input);
-        networkTrafficPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        networkTrafficPayload = payloadRepository.save(networkTrafficPayload);
-        this.payloadService.updateInjectorContractsForPayload(networkTrafficPayload);
-        return networkTrafficPayload;
-      default:
-        throw new UnsupportedOperationException(
-            "Payload type " + input.getType() + " is not supported");
-    }
-  }
-
-  private static PayloadCreateInput validateExecutableCreateInput(PayloadCreateInput input) {
-    Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
-    if (maybeArch.isPresent()) {
-      return input;
-    } else {
-      throw new BadRequestException("Executable arch is missing");
-    }
+    return this.payloadCreationService.createPayload(input);
   }
 
   private static PayloadUpdateInput validateExecutableUpdateInput(PayloadUpdateInput input) {

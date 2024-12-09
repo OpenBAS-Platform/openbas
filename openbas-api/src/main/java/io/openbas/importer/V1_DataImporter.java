@@ -1,9 +1,12 @@
 package io.openbas.importer;
 
+import static io.openbas.database.specification.InjectorContractSpecification.byPayloadExternalId;
+import static io.openbas.database.specification.InjectorContractSpecification.byPayloadId;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 import static io.openbas.rest.exercise.exports.ExerciseFileExport.EXERCISE_VARIABLES;
+import static io.openbas.rest.payload.PayloadUtils.buildPayload;
 import static io.openbas.rest.scenario.export.ScenarioFileExport.SCENARIO_VARIABLES;
 import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasText;
@@ -18,6 +21,8 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.form.InjectDependencyInput;
+import io.openbas.rest.payload.PayloadCreationService;
+import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
 import io.openbas.service.ScenarioService;
@@ -31,6 +36,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +55,7 @@ public class V1_DataImporter implements Importer {
   private final TeamRepository teamRepository;
   private final ObjectiveRepository objectiveRepository;
   private final InjectRepository injectRepository;
+  private final InjectorContractRepository injectorContractRepository;
   private final OrganizationRepository organizationRepository;
   private final UserRepository userRepository;
   private final InjectDocumentRepository injectDocumentRepository;
@@ -59,6 +66,7 @@ public class V1_DataImporter implements Importer {
   private final LessonsQuestionRepository lessonsQuestionRepository;
   private final VariableRepository variableRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
+  private final PayloadCreationService payloadCreationService;
 
   // endregion
 
@@ -210,16 +218,16 @@ public class V1_DataImporter implements Importer {
     scenario.setSubtitle(scenarioNode.get("scenario_subtitle").textValue());
     scenario.setCategory(scenarioNode.get("scenario_category").textValue());
     scenario.setMainFocus(scenarioNode.get("scenario_main_focus").textValue());
-    Optional.ofNullable(scenarioNode.get("scenario_severity"))
+    ofNullable(scenarioNode.get("scenario_severity"))
         .map(JsonNode::textValue)
         .ifPresent(severity -> scenario.setSeverity(SEVERITY.valueOf(severity)));
-    Optional.ofNullable(scenarioNode.get("scenario_recurrence"))
+    ofNullable(scenarioNode.get("scenario_recurrence"))
         .map(JsonNode::textValue)
         .ifPresent(scenario::setRecurrence);
-    Optional.ofNullable(scenarioNode.get("scenario_recurrence_start"))
+    ofNullable(scenarioNode.get("scenario_recurrence_start"))
         .map(JsonNode::textValue)
         .ifPresent(recurrenceStart -> scenario.setRecurrenceStart(Instant.parse(recurrenceStart)));
-    Optional.ofNullable(scenarioNode.get("scenario_recurrence_end"))
+    ofNullable(scenarioNode.get("scenario_recurrence_end"))
         .map(JsonNode::textValue)
         .ifPresent(recurrenceEnd -> scenario.setRecurrenceEnd(Instant.parse(recurrenceEnd)));
     scenario.setHeader(scenarioNode.get("scenario_message_header").textValue());
@@ -793,11 +801,54 @@ public class V1_DataImporter implements Importer {
           String description = injectNode.get("inject_description").textValue();
           String country = injectNode.get("inject_country").textValue();
           String city = injectNode.get("inject_city").textValue();
-          String injectorContractId = null;
+          boolean enabled = injectNode.get("inject_enabled").booleanValue();
+          String injectorContractIdFromNode = null;
           JsonNode injectContractNode = injectNode.get("inject_injector_contract");
           if (injectContractNode != null) {
-            injectorContractId = injectContractNode.get("injector_contract_id").textValue();
+            injectorContractIdFromNode = injectContractNode.get("injector_contract_id").textValue();
           }
+
+          // Check If inject contract exists
+          if (injectorContractIdFromNode == null) {
+            log.warning(
+                "Import Inject Failed: Missing injector contract ID on inject: " + injectId);
+            return;
+          }
+          Optional<InjectorContract> injectorContract =
+              this.injectorContractRepository.findById(injectorContractIdFromNode);
+
+          String injectorContractId;
+
+          // If not, rely on payload
+          if (injectorContract.isEmpty()) {
+            JsonNode payloadNode = injectContractNode.get("injector_contract_payload");
+            String externalId = payloadNode.get("payload_external_id").textValue();
+            // Rely on external collector
+            if (hasText(externalId)) {
+              Optional<InjectorContract> injectorContractFromPayload =
+                  this.injectorContractRepository.findOne(byPayloadExternalId(externalId));
+              if (injectorContractFromPayload.isPresent()) {
+                injectorContractId = injectorContractFromPayload.get().getId();
+                // Create new payload
+              } else {
+                log.info(
+                    "Inject comes from a collector not set up in your environment, a new payload has been created.");
+                injectorContractId = importPayload(payloadNode);
+              }
+              // Create new payload
+            } else {
+              injectorContractId = importPayload(payloadNode);
+            }
+          } else {
+            injectorContractId = injectorContract.get().getId();
+          }
+
+          if (injectorContractId == null) {
+            log.warning(
+                "Import Inject Failed: Unresolved injector contract ID on inject: " + injectId);
+            return;
+          }
+
           // If contract is not know, inject can't be imported
           String content = handleInjectContent(baseIds, injectorContractId, injectNode);
           Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
@@ -811,7 +862,7 @@ public class V1_DataImporter implements Importer {
                 city,
                 injectorContractId,
                 allTeams,
-                true,
+                enabled,
                 exerciseId,
                 dependsDuration,
                 content);
@@ -824,7 +875,7 @@ public class V1_DataImporter implements Importer {
                 city,
                 injectorContractId,
                 allTeams,
-                true,
+                enabled,
                 scenarioId,
                 dependsDuration,
                 content);
@@ -921,6 +972,19 @@ public class V1_DataImporter implements Importer {
     }
   }
 
+  private String importPayload(@NotNull final JsonNode payloadNode) {
+    PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
+    Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
+    Optional<InjectorContract> injectorContractFromPayload =
+        this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
+    if (injectorContractFromPayload.isPresent()) {
+      return injectorContractFromPayload.get().getId();
+    } else {
+      log.warning("An error has occurred when importing the payload: " + payload.getName());
+      return null;
+    }
+  }
+
   private void importVariables(
       JsonNode importNode,
       Exercise savedExercise,
@@ -949,7 +1013,7 @@ public class V1_DataImporter implements Importer {
   }
 
   private String getNodeValue(JsonNode importNode) {
-    return Optional.ofNullable(importNode).map(JsonNode::textValue).orElse(null);
+    return ofNullable(importNode).map(JsonNode::textValue).orElse(null);
   }
 
   private static class BaseHolder implements Base {

@@ -80,7 +80,6 @@ public class InjectorContract implements Base {
         .map(payload -> ((Executable) payload).getExecutableArch())
         .orElse(null);
   }
-  ;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "injector_contract_payload")
