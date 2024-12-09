@@ -14,6 +14,9 @@ const styles = () => ({
     height: '100%',
     display: 'table',
   },
+  containerSizeXS: {
+    width: 'auto',
+  },
   loader: {
     width: '100%',
     margin: 0,
@@ -39,14 +42,10 @@ const styles = () => ({
 
 class Loader extends Component {
   render() {
-    const { classes, variant, withRightPadding } = this.props;
+    const { classes, variant, withRightPadding, size } = this.props;
     return (
       <div
-        className={
-          variant === 'inElement'
-            ? classes.containerInElement
-            : classes.container
-        }
+        className={this.getContainer(variant, size, classes)}
         style={
           variant === 'inElement'
             ? { paddingRight: withRightPadding ? 200 : 0 }
@@ -64,7 +63,7 @@ class Loader extends Component {
           }
         >
           <CircularProgress
-            size={variant === 'inElement' ? 40 : 80}
+            size={this.getSize(variant, size)}
             thickness={1}
             className={this.props.classes.loaderCircle}
           />
@@ -72,12 +71,33 @@ class Loader extends Component {
       </div>
     );
   }
+
+  getContainer(variant, size, classes) {
+    if (size === 'xs') {
+      return classes.containerSizeXS;
+    }
+    if (variant === 'inElement') {
+      return classes.containerInElement;
+    }
+    return classes.container;
+  }
+
+  getSize(variant, size) {
+    if (size === 'xs') {
+      return '1rem';
+    }
+    if (variant === 'inElement') {
+      return 40;
+    }
+    return 80;
+  }
 }
 
 Loader.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
   withRightPadding: PropTypes.bool,
+  size: PropTypes.string,
 };
 
 export default withStyles(styles)(Loader);

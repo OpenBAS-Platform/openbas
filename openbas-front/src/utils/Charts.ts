@@ -70,12 +70,6 @@ export const resultColors = (temp: Temp) => [
   C.lightBlue[temp],
 ];
 
-export const simulationsColors = [
-  'rgb(107, 235, 112)',
-  'rgb(70,152,74)',
-  'rgb(46,99,48)',
-];
-
 const toolbarOptions = {
   show: false,
   export: {
@@ -283,10 +277,7 @@ export interface CustomTooltipOptions {
 
 export type CustomTooltipFunction = (options: CustomTooltipOptions) => unknown | undefined;
 
-function getColors(theme: Theme, isResult: boolean, distributed: boolean, isSimulationsResults: boolean) {
-  if (isSimulationsResults) {
-    return simulationsColors;
-  }
+function getColors(theme: Theme, isResult: boolean, distributed: boolean) {
   if (isResult) {
     return resultColors(theme.palette.mode === 'dark' ? 400 : 600);
   }
@@ -310,7 +301,6 @@ function getColors(theme: Theme, isResult: boolean, distributed: boolean, isSimu
  * @param {number} max
  * @param {string} emptyChartText
  * @param {function} customTooltip
- * @param {boolean} isSimulationsResults
  */
 export const verticalBarsChartOptions = (
   theme: Theme,
@@ -326,7 +316,6 @@ export const verticalBarsChartOptions = (
   max: ApexYAxis['max'] = undefined,
   emptyChartText = '',
   customTooltip?: CustomTooltipFunction,
-  isSimulationsResults = false,
 ): ApexOptions => ({
   chart: {
     type: 'bar',
@@ -349,7 +338,7 @@ export const verticalBarsChartOptions = (
   dataLabels: {
     enabled: false,
   },
-  colors: getColors(theme, isResult, distributed, isSimulationsResults),
+  colors: getColors(theme, isResult, distributed),
   states: {
     hover: {
       filter: {

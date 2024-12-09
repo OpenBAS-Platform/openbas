@@ -138,7 +138,6 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
             1,
             t('No data to display'),
             customTooltip(simulationEndDateLabel),
-            true,
           )}
           series={series}
           type="bar"

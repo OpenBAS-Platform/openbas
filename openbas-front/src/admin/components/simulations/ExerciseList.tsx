@@ -13,6 +13,7 @@ import { Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
+import Loader from '../../../components/Loader';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import type {
   ExercisesGlobalScoresOutput,
@@ -82,7 +83,7 @@ function getGlobalScoreComponentAsync(
 ) {
   return (
     <>
-      {(loadingGlobalScores) && <AtomicTestingResult expectations={[]} />}
+      {(loadingGlobalScores) && <Loader variant="inElement" size="xs" />}
       {(!loadingGlobalScores && globalScores) && <AtomicTestingResult expectations={globalScores[exercise.exercise_id]} />}
     </>
   );
