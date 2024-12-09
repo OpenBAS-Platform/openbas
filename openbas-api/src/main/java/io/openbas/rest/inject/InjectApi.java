@@ -372,6 +372,7 @@ public class InjectApi extends RestBehavior {
                 exercise.getDocuments().add(document.getDocument());
               }
             });
+    inject.setArchitectureRequest(input.getArchitectureRequest());
     return injectRepository.save(inject);
   }
 
@@ -605,6 +606,7 @@ public class InjectApi extends RestBehavior {
                 scenario.getDocuments().add(document.getDocument());
               }
             });
+    inject.setArchitectureRequest(input.getArchitectureRequest());
     return injectRepository.save(inject);
   }
 

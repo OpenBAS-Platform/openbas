@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
+import io.openbas.database.model.Payload;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,9 @@ public class InjectInput {
   @JsonProperty("inject_city")
   private String city;
 
+  @JsonProperty("inject_architecture_request")
+  private Payload.PAYLOAD_EXECUTION_ARCH architectureRequest;
+
   @JsonProperty("inject_tags")
   private List<String> tagIds = new ArrayList<>();
 
@@ -66,6 +70,7 @@ public class InjectInput {
     inject.setAllTeams(isAllTeams());
     inject.setCountry(getCountry());
     inject.setCity(getCity());
+    inject.setArchitectureRequest(getArchitectureRequest());
     return inject;
   }
 }
