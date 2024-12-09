@@ -5,7 +5,6 @@ import static io.openbas.injectors.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.opencti.model.CaseContent;
@@ -14,8 +13,10 @@ import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
