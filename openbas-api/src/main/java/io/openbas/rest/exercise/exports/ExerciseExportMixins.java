@@ -69,6 +69,7 @@ public class ExerciseExportMixins {
         "inject_description",
         "inject_country",
         "inject_city",
+        "inject_enabled",
         "inject_injector_contract",
         "inject_all_teams",
         "inject_depends_on",

@@ -30,7 +30,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 @TestInstance(PER_CLASS)
-public class PayloadApiTest extends IntegrationTest {
+class PayloadApiTest extends IntegrationTest {
 
   private static final String PAYLOAD_URI = "/api/payloads";
   private static Document EXECUTABLE_FILE;

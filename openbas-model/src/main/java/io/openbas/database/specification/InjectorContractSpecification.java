@@ -1,7 +1,8 @@
 package io.openbas.database.specification;
 
 import io.openbas.database.model.InjectorContract;
-import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 public class InjectorContractSpecification {
@@ -12,10 +13,24 @@ public class InjectorContractSpecification {
     return (root, query, cb) -> cb.equal(root.get("attackPatterns").get("id"), attackPatternId);
   }
 
-  public static Specification<InjectorContract> fromKillChainPhase(String killChainPhaseId) {
-    return (root, query, criteriaBuilder) -> {
-      Path<Object> path = root.join("attackPatterns").join("killChainPhases").get("id");
-      return criteriaBuilder.equal(path, killChainPhaseId);
+  public static Specification<InjectorContract> byPayloadId(final String payloadId) {
+    if (payloadId == null || payloadId.isEmpty()) {
+      throw new IllegalArgumentException("Payload ID must not be null or empty");
+    }
+    return (root, query, cb) -> {
+      Join<Object, Object> payload = root.join("payload", JoinType.LEFT);
+      return cb.equal(payload.get("id"), payloadId);
+    };
+  }
+
+  public static Specification<InjectorContract> byPayloadExternalId(
+      final String payloadExternalId) {
+    if (payloadExternalId == null || payloadExternalId.isEmpty()) {
+      throw new IllegalArgumentException("Payload external ID must not be null or empty");
+    }
+    return (root, query, cb) -> {
+      Join<Object, Object> payload = root.join("payload", JoinType.LEFT);
+      return cb.equal(payload.get("externalId"), payloadExternalId);
     };
   }
 }
