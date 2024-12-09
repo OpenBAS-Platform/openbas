@@ -1,5 +1,7 @@
 package io.openbas.rest.inject.service;
 
+import static org.springframework.util.StringUtils.hasText;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
@@ -103,8 +105,7 @@ public class ExecutableInjectService {
         .getPrerequisites()
         .forEach(
             prerequisite -> {
-              if (prerequisite.getCheckCommand() != null
-                  && !prerequisite.getCheckCommand().isEmpty()) {
+              if (hasText(prerequisite.getCheckCommand())) {
                 prerequisite.setCheckCommand(
                     processAndEncodeCommand(
                         prerequisite.getCheckCommand(),
@@ -113,7 +114,7 @@ public class ExecutableInjectService {
                         inject.getContent(),
                         "base64"));
               }
-              if (prerequisite.getGetCommand() != null && !prerequisite.getGetCommand().isEmpty()) {
+              if (hasText(prerequisite.getGetCommand())) {
                 prerequisite.setGetCommand(
                     processAndEncodeCommand(
                         prerequisite.getGetCommand(),
