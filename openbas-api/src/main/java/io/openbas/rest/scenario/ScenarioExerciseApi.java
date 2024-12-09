@@ -52,7 +52,7 @@ public class ScenarioExerciseApi {
         (Specification<Exercise> specification,
             Specification<Exercise> specificationCount,
             Pageable pageable) ->
-            this.exerciseService.exercises(
+            this.exerciseService.exercisesWithEmptyGlobalScore(
                 fromScenario(scenarioId).and(specification),
                 fromScenario(scenarioId).and(specificationCount),
                 pageable,

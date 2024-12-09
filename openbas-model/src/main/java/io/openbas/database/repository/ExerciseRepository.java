@@ -1,10 +1,7 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Exercise;
-import io.openbas.database.raw.RawExercise;
-import io.openbas.database.raw.RawExerciseSimple;
-import io.openbas.database.raw.RawGlobalInjectExpectation;
-import io.openbas.database.raw.RawInjectExpectation;
+import io.openbas.database.raw.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
@@ -313,4 +310,21 @@ public interface ExerciseRepository
   @Transactional
   void removeTeams(
       @Param("exerciseId") final String exerciseId, @Param("teamIds") final List<String> teamIds);
+
+  @Query(
+      value =
+          " SELECT ex.exercise_end_date, "
+              + " array_agg(distinct ie.inject_id) FILTER ( WHERE ie.inject_id IS NOT NULL ) as inject_ids "
+              + "FROM exercises ex "
+              + "LEFT JOIN scenarios_exercises s ON s.exercise_id = ex.exercise_id "
+              + "LEFT JOIN injects_expectations ie ON ex.exercise_id = ie.exercise_id "
+              + "WHERE s.scenario_id = :scenarioId "
+              + "AND ex.exercise_status = 'FINISHED' "
+              + "AND ex.exercise_end_date IS NOT NULL "
+              + "GROUP BY ex.exercise_id, ex.exercise_end_date "
+              + "ORDER BY ex.exercise_end_date DESC "
+              + "LIMIT 10 ;",
+      nativeQuery = true)
+  List<RawFinishedExerciseWithInjects> rawLatestFinishedExercisesWithInjectsByScenarioId(
+      @Param("scenarioId") String scenarioId);
 }

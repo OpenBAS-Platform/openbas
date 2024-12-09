@@ -1,11 +1,15 @@
 package io.openbas.rest.exercise;
 
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseTeamUser;
 import io.openbas.database.model.Team;
@@ -14,13 +18,12 @@ import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.ExerciseTeamUserRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.fixtures.TeamFixture;
 import io.openbas.utils.fixtures.UserFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -92,6 +95,41 @@ public class ExerciseApiTest {
               jsonPath("$[*].user_id")
                   .value(
                       org.hamcrest.Matchers.containsInAnyOrder(userTom.getId(), userBen.getId())));
+    }
+
+    @Test
+    @DisplayName("Get global score for exercises")
+    @WithMockAdminUser
+    void getGlobalScoreForExercises() throws Exception {
+      Exercise exercise1 = ExerciseFixture.createDefaultCrisisExercise();
+      Exercise exercise1Saved = exerciseRepository.save(exercise1);
+      EXERCISE_IDS.add(exercise1Saved.getId());
+
+      Exercise exercise2 = ExerciseFixture.createDefaultIncidentResponseExercise();
+      Exercise exercise2Saved = exerciseRepository.save(exercise2);
+      EXERCISE_IDS.add(exercise2Saved.getId());
+
+      ExercisesGlobalScoresInput input =
+          new ExercisesGlobalScoresInput(List.of(exercise1Saved.getId(), exercise2Saved.getId()));
+
+      String response =
+          mvc.perform(
+                  post(EXERCISE_URI + "/global-scores")
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(asJsonString(input)))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      assertEquals(
+          "[]",
+          JsonPath.read(response, "$.global_scores_by_exercise_ids." + exercise1Saved.getId())
+              .toString());
+      assertEquals(
+          "[]",
+          JsonPath.read(response, "$.global_scores_by_exercise_ids." + exercise2Saved.getId())
+              .toString());
     }
   }
 }
