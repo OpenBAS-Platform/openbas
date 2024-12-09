@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
@@ -35,12 +36,14 @@ public class ComcheckStatus implements Base {
   @JoinColumn(name = "status_user")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("comcheckstatus_user")
+  @Schema(type = "string")
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "status_comcheck")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("comcheckstatus_comcheck")
+  @Schema(type = "string")
   private Comcheck comcheck;
 
   @Column(name = "status_sent_date")

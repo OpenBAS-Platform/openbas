@@ -8,6 +8,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -75,6 +77,7 @@ public class Challenge implements Base {
   @NotEmpty
   private List<ChallengeFlag> flags = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "challenges_tags",
@@ -84,6 +87,7 @@ public class Challenge implements Base {
   @JsonProperty("challenge_tags")
   private Set<Tag> tags = new HashSet<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "challenges_documents",

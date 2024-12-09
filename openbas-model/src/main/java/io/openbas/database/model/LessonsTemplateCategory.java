@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +35,7 @@ public class LessonsTemplateCategory implements Base {
   @JoinColumn(name = "lessons_template_category_template")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("lessons_template_category_template")
+  @Schema(type = "string")
   private LessonsTemplate template;
 
   @Column(name = "lessons_template_category_created_at")
@@ -59,6 +62,7 @@ public class LessonsTemplateCategory implements Base {
   @NotNull
   private int order;
 
+  @ArraySchema(schema = @Schema(type = "string"))
   @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
   @JsonProperty("lessons_template_category_questions")
   @JsonSerialize(using = MultiIdListDeserializer.class)

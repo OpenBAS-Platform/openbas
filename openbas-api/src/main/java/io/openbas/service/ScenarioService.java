@@ -13,6 +13,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteri
 import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
+import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -106,7 +107,7 @@ public class ScenarioService {
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
-    if (!org.springframework.util.StringUtils.hasText(scenario.getFrom())) {
+    if (!hasText(scenario.getFrom())) {
       if (this.imapEnabled) {
         scenario.setFrom(this.imapUsername);
         scenario.setReplyTos(List.of(this.imapUsername));

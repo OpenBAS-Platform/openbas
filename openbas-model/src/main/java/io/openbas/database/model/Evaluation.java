@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +36,7 @@ public class Evaluation implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("evaluation_objective")
   @NotNull
+  @Schema(type = "string")
   private Objective objective;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -42,6 +44,7 @@ public class Evaluation implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("evaluation_user")
   @NotNull
+  @Schema(type = "string")
   private User user;
 
   @Column(name = "evaluation_score")

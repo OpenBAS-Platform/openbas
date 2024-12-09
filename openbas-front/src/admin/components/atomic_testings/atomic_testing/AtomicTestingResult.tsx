@@ -1,7 +1,9 @@
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 
+import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, InjectResultOutput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
@@ -18,6 +20,8 @@ interface Props {
 }
 
 const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
+  const { t } = useFormatter();
+  let tooltipLabel: string = '';
   const classes = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
@@ -45,16 +49,21 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
         let IconComponent;
         switch (expectation.type) {
           case 'PREVENTION':
+            tooltipLabel = t('Prevention');
             IconComponent = ShieldOutlined;
             break;
           case 'DETECTION':
+            tooltipLabel = t('Detection');
             IconComponent = TrackChangesOutlined;
             break;
           default:
+            tooltipLabel = t('Human Response');
             IconComponent = SensorOccupiedOutlined;
         }
         return (
-          <IconComponent key={index} style={{ color, marginRight: 10, fontSize: 22 }} />
+          <Tooltip key={index} title={tooltipLabel}>
+            <IconComponent style={{ color, marginRight: 10, fontSize: 22 }} />
+          </Tooltip>
         );
       })}
     </div>

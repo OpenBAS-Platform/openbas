@@ -3,6 +3,7 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +33,7 @@ public class Token implements Base {
   @JoinColumn(name = "token_user")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("token_user")
+  @Schema(type = "string")
   private User user;
 
   @Column(name = "token_value")

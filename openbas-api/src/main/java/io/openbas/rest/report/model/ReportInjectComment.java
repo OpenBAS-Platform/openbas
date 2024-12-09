@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.model.Inject;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class ReportInjectComment {
   @JsonIgnore // Ignore Inject object in JSON
   @JsonSerialize(using = MonoIdDeserializer.class)
   @NotNull
+  @Schema(type = "string")
   private Inject inject;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -29,6 +31,7 @@ public class ReportInjectComment {
   @JsonIgnore // Ignore Inject object in JSON
   @JsonSerialize(using = MonoIdDeserializer.class)
   @NotNull
+  @Schema(type = "string")
   private Report report;
 
   @Column(name = "comment")

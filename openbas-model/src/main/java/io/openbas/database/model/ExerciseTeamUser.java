@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.raw.RawExerciseTeamUser;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.util.Objects;
 
@@ -18,6 +19,7 @@ public class ExerciseTeamUser {
   @JoinColumn(name = "exercise_id")
   @JsonProperty("exercise_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private Exercise exercise;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -25,6 +27,7 @@ public class ExerciseTeamUser {
   @JoinColumn(name = "team_id")
   @JsonProperty("team_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private Team team;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -32,6 +35,7 @@ public class ExerciseTeamUser {
   @JoinColumn(name = "user_id")
   @JsonProperty("user_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private User user;
 
   public ExerciseTeamUserId getCompositeId() {

@@ -2954,6 +2954,9 @@ const i18n = {
       'New simulation successfully created and started. Click {here} to view the simulation.': 'New simulation successfully created and started. Click {here} to view the simulation.',
       'Do you want to launch this atomic testing: {title}?': 'Do you want to launch this atomic testing: {title}?',
       'Do you want to relaunch this atomic testing: {title}?': 'Do you want to relaunch this atomic testing: {title}?',
+      'The element already exists': 'The element already exists',
+      'Internal error': 'Internal error',
+      'Something went wrong. Please refresh the page or try again later.': 'Something went wrong. Please refresh the page or try again later.',
     },
   },
 };

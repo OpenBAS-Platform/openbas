@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.util.Objects;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class InjectDocument {
   @JoinColumn(name = "inject_id")
   @JsonProperty("inject_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private Inject inject;
 
   @ManyToOne(fetch = FetchType.EAGER)
@@ -29,6 +31,7 @@ public class InjectDocument {
   @JoinColumn(name = "document_id")
   @JsonProperty("document_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private Document document;
 
   @Column(name = "document_attached")

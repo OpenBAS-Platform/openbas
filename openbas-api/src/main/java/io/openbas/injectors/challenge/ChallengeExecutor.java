@@ -11,6 +11,7 @@ import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.challenge.model.ChallengeVariable;
 import io.openbas.injectors.email.service.EmailService;
@@ -24,31 +25,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component(ChallengeContract.TYPE)
+@RequiredArgsConstructor
 public class ChallengeExecutor extends Injector {
 
   @Resource private OpenBASConfig openBASConfig;
 
-  private ChallengeRepository challengeRepository;
-
-  private EmailService emailService;
+  private final ChallengeRepository challengeRepository;
+  private final EmailService emailService;
+  private final InjectExpectationService injectExpectationService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
-
-  @Autowired
-  public void setChallengeRepository(ChallengeRepository challengeRepository) {
-    this.challengeRepository = challengeRepository;
-  }
-
-  @Autowired
-  public void setEmailService(EmailService emailService) {
-    this.emailService = emailService;
-  }
 
   private String buildChallengeUri(
       ExecutionContext context, Exercise exercise, Challenge challenge) {
@@ -147,13 +139,16 @@ public class ChallengeExecutor extends Injector {
                           })
                   .toList());
         }
-        return new ExecutionProcess(false, expectations);
+
+        injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
+        return new ExecutionProcess(false);
       } else {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
       execution.addTrace(traceError(e.getMessage()));
     }
-    return new ExecutionProcess(false, List.of());
+    return new ExecutionProcess(false);
   }
 }

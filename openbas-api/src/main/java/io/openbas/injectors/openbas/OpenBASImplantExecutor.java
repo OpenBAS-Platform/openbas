@@ -14,6 +14,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.Injector;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
@@ -34,6 +35,7 @@ public class OpenBASImplantExecutor extends Injector {
 
   private final AssetGroupService assetGroupService;
   private final InjectRepository injectRepository;
+  private final InjectExpectationService injectExpectationService;
 
   private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
     Map<Asset, Boolean> assets = new HashMap<>();
@@ -266,7 +268,10 @@ public class OpenBASImplantExecutor extends Injector {
         (assetGroup ->
             computeExpectationsForAssetGroup(
                 expectations, content, assetGroup, new ArrayList<>())));
-    return new ExecutionProcess(true, expectations);
+
+    injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
+
+    return new ExecutionProcess(true);
   }
 
   private List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {

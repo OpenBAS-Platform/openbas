@@ -41,6 +41,7 @@ public class LessonsQuestion implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("lessons_question_category")
   @NotNull
+  @Schema(type = "string")
   private LessonsCategory category;
 
   @Column(name = "lessons_question_created_at")

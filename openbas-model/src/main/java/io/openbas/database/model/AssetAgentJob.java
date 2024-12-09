@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Objects;
@@ -30,6 +31,7 @@ public class AssetAgentJob implements Base {
   @JoinColumn(name = "asset_agent_inject")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_agent_inject")
+  @Schema(type = "string")
   private Inject inject;
 
   @Getter
@@ -37,6 +39,7 @@ public class AssetAgentJob implements Base {
   @JoinColumn(name = "asset_agent_asset")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("asset_agent_asset")
+  @Schema(type = "string")
   private Asset asset;
 
   @Getter

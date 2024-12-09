@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class ScenarioTeamUser {
   @JoinColumn(name = "scenario_id")
   @JsonProperty("scenario_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private Scenario scenario;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -26,6 +28,7 @@ public class ScenarioTeamUser {
   @JoinColumn(name = "team_id")
   @JsonProperty("team_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private Team team;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -33,5 +36,6 @@ public class ScenarioTeamUser {
   @JoinColumn(name = "user_id")
   @JsonProperty("user_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
   private User user;
 }
