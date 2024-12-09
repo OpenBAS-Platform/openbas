@@ -7,8 +7,8 @@ import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
-import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.executors.Injector;
+import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.email.model.EmailContent;
 import io.openbas.injectors.email.service.EmailService;
 import io.openbas.model.ExecutionProcess;
@@ -16,10 +16,8 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,8 +26,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EmailExecutor extends Injector {
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
   private final EmailService emailService;
   private final InjectExpectationService injectExpectationService;
 
@@ -112,17 +109,19 @@ public class EmailExecutor extends Injector {
         .getInjectorContract()
         .map(InjectorContract::getId)
         .orElseThrow(() -> new UnsupportedOperationException("Inject does not have a contract"))) {
-      case EMAIL_GLOBAL -> sendMulti(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
-      default -> sendSingle(
-          execution,
-          users,
-          from,
-          replyTos,
-          inReplyTo,
-          mustBeEncrypted,
-          subject,
-          message,
-          attachments);
+      case EMAIL_GLOBAL ->
+          sendMulti(execution, users, from, replyTos, inReplyTo, subject, message, attachments);
+      default ->
+          sendSingle(
+              execution,
+              users,
+              from,
+              replyTos,
+              inReplyTo,
+              mustBeEncrypted,
+              subject,
+              message,
+              attachments);
     }
     List<Expectation> expectations =
         content.getExpectations().stream()
