@@ -2,7 +2,7 @@ package io.openbas.database.model;
 
 import static jakarta.persistence.DiscriminatorType.STRING;
 import static java.time.Instant.now;
-
+import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
