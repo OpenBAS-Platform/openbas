@@ -801,7 +801,8 @@ public class V1_DataImporter implements Importer {
           String description = injectNode.get("inject_description").textValue();
           String country = injectNode.get("inject_country").textValue();
           String city = injectNode.get("inject_city").textValue();
-          boolean enabled = injectNode.get("inject_enabled").booleanValue();
+          boolean enabled =
+              ofNullable(injectNode.get("inject_enabled")).map(JsonNode::booleanValue).orElse(true);
           String injectorContractIdFromNode = null;
           JsonNode injectContractNode = injectNode.get("inject_injector_contract");
           if (injectContractNode != null) {
