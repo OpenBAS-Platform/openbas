@@ -35,15 +35,15 @@ public class OpenCTIApiTest {
    * entities such as (case incidents, groupings, reports, malwares, incidents, campaigns, intrusion
    * sets, threat actor groups, threat actors individuals):
    *
-   * - KillChainPhasesApi -> killChainPhases [GET: /api/kill-chain-phases/] - AttackPatternApi ->
-   * attackPatterns [GET: /api/attack_patterns/] - AttackPatternApi -> injectorContracts [GET:
-   * /api/attack_patterns/{attackPatternId}/injector_contracts] - InjectorContractApi ->
-   * injectorContracts [POST: /api/injector_contracts/search] - ScenarioApi -> creationScenario
-   * [POST: /api/scenarios/] - InjectApi -> createInjectForScenario [POST:
-   * /api/injects/{scenarioId}/injects] - OpenCTIApi -> latestExerciseByExternalId [GET:
-   * /api/opencti/v1/exercises/latest/{externalReferenceId}]
+   * - KillChainPhasesApi -> killChainPhases [GET: /api/kill-chain-phases/]
+   * - AttackPatternApi -> attackPatterns [GET: /api/attack_patterns/]
+   * - AttackPatternApi -> injectorContracts [GET: /api/attack_patterns/{attackPatternId}/injector_contracts]
+   * - InjectorContractApi -> injectorContracts [POST: /api/injector_contracts/search]
+   * - ScenarioApi -> creationScenario [POST: /api/scenarios/]
+   * - InjectApi -> createInjectForScenario [POST: /api/injects/{scenarioId}/injects]
+   * - OpenCTIApi -> latestExerciseByExternalId [GET: /api/opencti/v1/exercises/latest/{externalReferenceId}]
    *
-   * These no regression tests will help us maintain control over any modifications to these
+   * These non-regression tests will help us maintain control over any modifications to these
    * endpoints.
    */
 

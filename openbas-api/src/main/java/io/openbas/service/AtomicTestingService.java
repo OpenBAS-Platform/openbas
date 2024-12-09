@@ -133,7 +133,6 @@ public class AtomicTestingService {
             .filter(Objects::nonNull)
             .toList();
     injectToSave.getDocuments().addAll(injectDocuments);
-    injectToSave.setArchitectureRequest(input.getArchitectureRequest());
     Inject inject = injectRepository.save(injectToSave);
     return injectMapper.toInjectResultOverviewOutput(inject);
   }

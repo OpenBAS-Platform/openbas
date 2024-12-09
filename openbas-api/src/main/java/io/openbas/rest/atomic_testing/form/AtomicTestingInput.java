@@ -2,7 +2,6 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.database.model.Payload;
 import io.openbas.rest.inject.form.InjectDocumentInput;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,4 @@ public class AtomicTestingInput {
 
   @JsonProperty("inject_tags")
   private List<String> tagIds = new ArrayList<>();
-
-  @JsonProperty("inject_architecture_request")
-  private Payload.PAYLOAD_EXECUTION_ARCH architectureRequest;
 }
