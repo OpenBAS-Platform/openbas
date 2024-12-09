@@ -10,7 +10,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.ChallengeRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
-import io.openbas.execution.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.challenge.model.ChallengeContent;
@@ -22,12 +21,13 @@ import io.openbas.model.expectation.ChallengeExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +35,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChallengeExecutor extends Injector {
 
-  @Resource private OpenBASConfig openBASConfig;
+  @Resource
+  private OpenBASConfig openBASConfig;
 
   private final ChallengeRepository challengeRepository;
   private final EmailService emailService;
@@ -43,16 +44,6 @@ public class ChallengeExecutor extends Injector {
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
-
-  @Autowired
-  public void setChallengeRepository(ChallengeRepository challengeRepository) {
-    this.challengeRepository = challengeRepository;
-  }
-
-  @Autowired
-  public void setEmailService(EmailService emailService) {
-    this.emailService = emailService;
-  }
 
   private String buildChallengeUri(
       ExecutionContext context, Exercise exercise, Challenge challenge) {
@@ -141,12 +132,11 @@ public class ChallengeExecutor extends Injector {
                       (entry) ->
                           switch (entry.getType()) {
                             case MANUAL -> Stream.of((Expectation) new ManualExpectation(entry));
-                            case CHALLENGE ->
-                                challenges.stream()
-                                    .map(
-                                        challenge ->
-                                            (Expectation)
-                                                new ChallengeExpectation(entry, challenge));
+                            case CHALLENGE -> challenges.stream()
+                                .map(
+                                    challenge ->
+                                        (Expectation)
+                                            new ChallengeExpectation(entry, challenge));
                             default -> Stream.of();
                           })
                   .toList());
