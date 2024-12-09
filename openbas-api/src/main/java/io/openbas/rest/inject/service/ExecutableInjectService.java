@@ -57,6 +57,38 @@ public class ExecutableInjectService {
     return command;
   }
 
+  private static String formatMultilineCommand(String command) {
+    String[] lines = command.split("\n");
+    StringBuilder formattedCommand = new StringBuilder();
+    boolean insideBlock = false;
+
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      String trimmedLine = line.trim();
+      if (trimmedLine.isEmpty()) {
+        continue;
+      }
+      formattedCommand.append(trimmedLine);
+
+      if (trimmedLine.endsWith("(")) {
+        insideBlock = true;
+      }
+
+      if (trimmedLine.endsWith(")")) {
+        insideBlock = false;
+      }
+
+      boolean isLastLine = (i == lines.length - 1);
+      if (!insideBlock && !isLastLine) {
+        formattedCommand.append(" & ");
+      } else {
+        formattedCommand.append(" ");
+      }
+    }
+
+    return formattedCommand.toString();
+  }
+
   private String processAndEncodeCommand(
       String command,
       String executor,
@@ -66,7 +98,7 @@ public class ExecutableInjectService {
     String computedCommand = replaceArgumentsByValue(command, defaultArguments, injectContent);
 
     if (executor.equals("cmd")) {
-      computedCommand = computedCommand.trim().replace("\n", " & ");
+      computedCommand = formatMultilineCommand(computedCommand);
     }
 
     if (obfuscator.equals("base64")) {
