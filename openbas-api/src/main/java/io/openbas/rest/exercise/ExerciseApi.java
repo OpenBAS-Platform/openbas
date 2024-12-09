@@ -878,6 +878,15 @@ public class ExerciseApi extends RestBehavior {
     }
     // Injects
     List<Inject> injects = exercise.getInjects();
+    injects.forEach(
+        inject -> {
+          exerciseTags.addAll(inject.getTags());
+          inject
+              .getInjectorContract()
+              .ifPresent(
+                  injectorContract -> exerciseTags.addAll(injectorContract.getPayload().getTags()));
+          exerciseTags.addAll(inject.getTags());
+        });
     exerciseTags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
     importExport.setInjects(injects);
     objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
