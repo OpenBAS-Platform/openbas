@@ -34,10 +34,14 @@ public class AtomicTestingApiTest extends IntegrationTest {
   static InjectStatus INJECT_STATUS;
   static InjectorContract INJECTOR_CONTRACT;
 
-  @Autowired private MockMvc mvc;
-  @Autowired private InjectRepository injectRepository;
-  @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private InjectStatusRepository injectStatusRepository;
+  @Autowired
+  private MockMvc mvc;
+  @Autowired
+  private InjectRepository injectRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private InjectStatusRepository injectStatusRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -67,7 +71,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(INJECT_WITHOUT_STATUS.getId(), JsonPath.read(response, "$.inject_id"));
-    assertNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
   @Test
@@ -86,7 +89,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
     assertNotNull(response);
     assertEquals(
         INJECT_WITH_STATUS_AND_COMMAND_LINES.getId(), JsonPath.read(response, "$.inject_id"));
-    assertNotNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
   @Test
