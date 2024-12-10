@@ -26,6 +26,8 @@ public class InjectExpectationResultsByAttackPattern {
 
   @Data
   public static class InjectExpectationResultsByType {
+    @JsonProperty("inject_id")
+    private String injectId;
 
     @JsonProperty("inject_title")
     private String injectTitle;
@@ -41,6 +43,7 @@ public class InjectExpectationResultsByAttackPattern {
             .map(
                 inject -> {
                   InjectExpectationResultsByType result = new InjectExpectationResultsByType();
+                  result.setInjectId(inject.getId());
                   result.setInjectTitle(inject.getTitle());
                   result.setResults(
                       AtomicTestingUtils.getExpectationResultByTypes(inject.getExpectations()));
