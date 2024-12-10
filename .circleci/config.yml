@@ -231,7 +231,7 @@ jobs:
             LATEST_VERSION=$(git describe --tags --abbrev=0)
             TAGS="-t openbas/platform:${CIRCLE_TAG}"
             [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS -t openbas/platform:latest"
-            docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci $TAGS --push .
+            docker buildx build --progress=plain --platform $BUILDX_PLATFORMS -f Dockerfile_circleci $TAGS --push .
           no_output_timeout: 30m
       - slack/notify:
           event: fail
@@ -292,7 +292,7 @@ jobs:
       - run:
           working_directory: ~/openbas_docker
           name: Build Docker image openbas/platform
-          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:rolling --push .
+          command: docker buildx build --progress=plain --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:rolling --push .
           no_output_timeout: 30
       - slack/notify:
           event: fail
@@ -353,7 +353,7 @@ jobs:
       - run:
           working_directory: ~/openbas_docker
           name: Build Docker image openbas/platform
-          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:prerelease --push .
+          command: docker buildx build --progress=plain --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:prerelease --push .
           no_output_timeout: 30
       - slack/notify:
           event: fail
