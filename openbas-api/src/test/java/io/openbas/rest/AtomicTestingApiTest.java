@@ -34,14 +34,10 @@ public class AtomicTestingApiTest extends IntegrationTest {
   static InjectStatus INJECT_STATUS;
   static InjectorContract INJECTOR_CONTRACT;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
-  @Autowired
-  private InjectStatusRepository injectStatusRepository;
+  @Autowired private MockMvc mvc;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectStatusRepository injectStatusRepository;
 
   @BeforeAll
   void beforeAll() {
