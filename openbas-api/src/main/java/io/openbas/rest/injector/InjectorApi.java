@@ -58,8 +58,11 @@ public class InjectorApi extends RestBehavior {
   @Value("${info.app.version:unknown}")
   String version;
 
-  @Value("${executor.openbas.version:local}")
-  private String executorOpenbasVersion;
+  @Value("${executor.openbas.binaries.origin:local}")
+  private String executorOpenbasBinariesOrigin;
+
+  @Value("${executor.openbas.binaries.version:${info.app.version:unknown}}")
+  private String executorOpenbasBinariesVersion;
 
   @Resource private RabbitmqConfig rabbitmqConfig;
 
@@ -335,16 +338,19 @@ public class InjectorApi extends RestBehavior {
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasImplant(
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
-    InputStream in;
-    String filename = null;
+    InputStream in = null;
+    String filename = "";
     String resourcePath = "/openbas-implant/" + platform + "/" + architecture + "/";
 
-    if (executorOpenbasVersion.equals("local")) { // if we want the local version
+    if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
       filename = "openbas-implant-" + version + (platform.equals("windows") ? ".exe" : "");
       in = getClass().getResourceAsStream("/implants" + resourcePath + filename);
-    } else { // if we want a specific version from artifactory
+    } else if (executorOpenbasBinariesOrigin.equals(
+        "repository")) { // if we want a specific version from artifactory
       filename =
-          "openbas-implant-" + executorOpenbasVersion + (platform.equals("windows") ? ".exe" : "");
+          "openbas-implant-"
+              + executorOpenbasBinariesVersion
+              + (platform.equals("windows") ? ".exe" : "");
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
 

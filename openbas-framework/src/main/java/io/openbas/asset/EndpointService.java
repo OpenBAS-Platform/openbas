@@ -37,8 +37,11 @@ public class EndpointService {
   @Value("${info.app.version:unknown}")
   String version;
 
-  @Value("${executor.openbas.version:local}")
-  private String executorOpenbasVersion;
+  @Value("${executor.openbas.binaries.origin:local}")
+  private String executorOpenbasBinariesOrigin;
+
+  @Value("${executor.openbas.binaries.version:${info.app.version:unknown}}")
+  private String executorOpenbasBinariesVersion;
 
   private final EndpointRepository endpointRepository;
 
@@ -104,20 +107,21 @@ public class EndpointService {
           case "linux", "macos" -> "sh";
           default -> throw new UnsupportedOperationException("");
         };
-    InputStream in;
+    InputStream in = null;
     String filename;
     String resourcePath = "/openbas-agent/" + platform.toLowerCase() + "/";
 
-    if (executorOpenbasVersion.equals("local")) { // if we want the local version
+    if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
       filename = file + "-" + version + "." + extension;
       in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-    } else { // if we want a specific version from artifactory
-      filename = file + "-" + executorOpenbasVersion + "." + extension;
+    } else if (executorOpenbasBinariesOrigin.equals(
+        "repository")) { // if we want a specific version from artifactory
+      filename = file + "-" + executorOpenbasBinariesVersion + "." + extension;
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     if (in == null) {
       throw new UnsupportedOperationException(
-          "Agent installer version " + executorOpenbasVersion + " not found");
+          "Agent installer version " + executorOpenbasBinariesVersion + " not found");
     }
 
     return IOUtils.toString(in, StandardCharsets.UTF_8)

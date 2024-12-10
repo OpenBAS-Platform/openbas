@@ -39,8 +39,11 @@ public class ExecutorApi extends RestBehavior {
   @Value("${info.app.version:unknown}")
   String version;
 
-  @Value("${executor.openbas.version:local}")
-  private String executorOpenbasVersion;
+  @Value("${executor.openbas.binaries.origin:local}")
+  private String executorOpenbasBinariesOrigin;
+
+  @Value("${executor.openbas.binaries.version:${info.app.version:unknown}}")
+  private String executorOpenbasBinariesVersion;
 
   private ExecutorRepository executorRepository;
   private EndpointService endpointService;
@@ -140,16 +143,19 @@ public class ExecutorApi extends RestBehavior {
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
-    InputStream in;
+    InputStream in = null;
     String resourcePath = "/openbas-agent/" + platform + "/" + architecture + "/";
-    String filename;
+    String filename = "";
 
-    if (executorOpenbasVersion.equals("local")) { // if we want the local version
+    if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
       filename = "openbas-agent-" + version + (platform.equals("windows") ? ".exe" : "");
       in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-    } else { // if we want a specific version from artifactory
+    } else if (executorOpenbasBinariesOrigin.equals(
+        "repository")) { // if we want a specific version from artifactory
       filename =
-          "openbas-agent-" + executorOpenbasVersion + (platform.equals("windows") ? ".exe" : "");
+          "openbas-agent-"
+              + executorOpenbasBinariesVersion
+              + (platform.equals("windows") ? ".exe" : "");
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     if (in != null) {
@@ -173,18 +179,19 @@ public class ExecutorApi extends RestBehavior {
     String filename = null;
 
     if (platform.equals("windows")) {
-      InputStream in;
+      InputStream in = null;
       String resourcePath = "/openbas-agent/windows/" + architecture + "/";
-      if (executorOpenbasVersion.equals("local")) { // if we want the local version
+      if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
         filename = "openbas-agent-" + version + ".exe";
         in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-      } else { // if we want a specific version from artifactory
-        filename = "openbas-agent-" + executorOpenbasVersion + ".exe";
+      } else if (executorOpenbasBinariesOrigin.equals(
+          "repository")) { // if we want a specific version from artifactory
+        filename = "openbas-agent-" + executorOpenbasBinariesVersion + ".exe";
         in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
       }
       if (in == null) {
         throw new UnsupportedOperationException(
-            "Agent version " + executorOpenbasVersion + " not found");
+            "Agent version " + executorOpenbasBinariesVersion + " not found");
       }
       file = IOUtils.toByteArray(in);
     }
