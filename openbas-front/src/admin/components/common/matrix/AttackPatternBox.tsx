@@ -159,7 +159,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
               <MenuItem
                 key={`inject-result-${idx}`}
                 component={Link}
-                to={goToLink + "/" + result.inject_id}
+                to={goToLink + '/' + result.inject_id}
                 style={{ display: 'flex', gap: 8 }}
               >
                 {content()}
