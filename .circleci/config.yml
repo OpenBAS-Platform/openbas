@@ -227,7 +227,11 @@ jobs:
           command: echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
       - run:
           name: Build Docker image openbas/platform
-          command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:latest -t openbas/platform:${CIRCLE_TAG} --push .
+          command: |
+            LATEST_VERSION=$(git describe --tags --abbrev=0)
+            TAGS="-t openbas/platform:${CIRCLE_TAG}"
+            [ "$CIRCLE_TAG" = "$LATEST_VERSION" ] && TAGS="$TAGS -t openbas/platform:latest"
+            docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci $TAGS --push .
           no_output_timeout: 30m
       - slack/notify:
           event: fail
