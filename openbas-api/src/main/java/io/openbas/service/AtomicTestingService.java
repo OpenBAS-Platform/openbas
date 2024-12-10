@@ -24,10 +24,8 @@ import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
-
 import java.util.*;
 import java.util.stream.StreamSupport;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +39,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AtomicTestingService {
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
