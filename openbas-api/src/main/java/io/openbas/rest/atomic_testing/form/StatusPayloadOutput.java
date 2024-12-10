@@ -5,9 +5,11 @@ import io.openbas.database.model.*;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +62,7 @@ public class StatusPayloadOutput {
 
   @JsonProperty("executable_arch")
   @Enumerated(EnumType.STRING)
-  private Endpoint.PLATFORM_ARCH executableArch;
+  private Payload.PAYLOAD_EXECUTION_ARCH executableArch = Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
 
   @JsonProperty("file_drop_file")
   private Document fileDropFile;

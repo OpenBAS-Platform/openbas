@@ -14,20 +14,20 @@ import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
-import io.openbas.rest.atomic_testing.form.AtomicTestingInput;
-import io.openbas.rest.atomic_testing.form.AtomicTestingUpdateTagsInput;
-import io.openbas.rest.atomic_testing.form.InjectResultOutput;
-import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
+import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.InjectMapper;
+import io.openbas.utils.PayloadMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
+
 import java.util.*;
 import java.util.stream.StreamSupport;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -41,10 +41,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AtomicTestingService {
 
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
 
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
+  private final PayloadMapper payloadMapper;
   private final InjectRepository injectRepository;
   private final InjectorContractRepository injectorContractRepository;
   private final UserRepository userRepository;
@@ -75,6 +77,11 @@ public class AtomicTestingService {
     return inject
         .map(injectMapper::toInjectResultOverviewOutput)
         .orElseThrow(ElementNotFoundException::new);
+  }
+
+  public StatusPayloadOutput findPayloadOutputByInjectId(String injectId) {
+    Optional<Inject> inject = injectRepository.findById(injectId);
+    return payloadMapper.getPayloadOutputFromInject(inject);
   }
 
   @Transactional
