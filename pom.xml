@@ -64,6 +64,12 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+            <version>42.6.2</version>
+        </dependency>
     </dependencies>
 
     <build>

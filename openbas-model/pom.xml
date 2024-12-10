@@ -49,12 +49,6 @@
             <version>3.9.0</version>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-            <version>42.6.1</version>
-        </dependency>
-        <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>${minio.version}</version>
