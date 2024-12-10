@@ -100,7 +100,7 @@ const PayloadForm: FunctionComponent<Props> = ({
       extendedSchema = baseSchema.extend({
         command_executor: z.string().min(1, { message: t('Should not be empty') }),
         command_content: z.string().min(1, { message: t('Should not be empty') }),
-        payload_execution_arch: z.enum(['AMD64', 'ARM64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }),
+        payload_execution_arch: z.enum(['x86_64', 'arm64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }),
       });
       break;
     case 'Executable':
@@ -109,7 +109,7 @@ const PayloadForm: FunctionComponent<Props> = ({
           id: z.string().min(1, { message: t('Should not be empty') }),
           label: z.string().min(1, { message: t('Should not be empty') }),
         }),
-        payload_execution_arch: z.enum(['AMD64', 'ARM64'], { message: t('Should not be empty') }),
+        payload_execution_arch: z.enum(['x86_64', 'arm64'], { message: t('Should not be empty') }),
       });
       break;
     case 'FileDrop':
@@ -205,8 +205,8 @@ const PayloadForm: FunctionComponent<Props> = ({
                 inputProps={register('payload_execution_arch')}
                 InputLabelProps={{ required: true }}
               >
-                <MenuItem value="AMD64">{t('AMD64')}</MenuItem>
-                <MenuItem value="ARM64">{t('ARM64')}</MenuItem>
+                <MenuItem value="x86_64">{'x86_64'}</MenuItem>
+                <MenuItem value="arm64">{'arm64'}</MenuItem>
                 {type === 'Command' && (
                   <MenuItem value="ALL_ARCHITECTURES">{t('ALL_ARCHITECTURES')}</MenuItem>
                 )}

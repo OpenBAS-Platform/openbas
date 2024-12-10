@@ -38,7 +38,7 @@ public class PayloadInputFixture {
     input.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.Linux});
     input.setAttackPatternsIds(Collections.emptyList());
     input.setTagIds(Collections.emptyList());
-    input.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.AMD64);
+    input.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.x86_64);
     return input;
   }
 
@@ -46,7 +46,7 @@ public class PayloadInputFixture {
     PayloadUpdateInput updateInput = new PayloadUpdateInput();
     updateInput.setName("My Updated Executable Payload");
     updateInput.setPlatforms(new Endpoint.PLATFORM_TYPE[] {Endpoint.PLATFORM_TYPE.MacOS});
-    updateInput.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.ARM64);
+    updateInput.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.arm64);
     return updateInput;
   }
 
