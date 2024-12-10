@@ -2,7 +2,7 @@ import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHe
 import { makeStyles } from '@mui/styles';
 import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { FunctionComponent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchAtomicTestingPayload } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../components/i18n';
