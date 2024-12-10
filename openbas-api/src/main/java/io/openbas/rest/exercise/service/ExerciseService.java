@@ -473,8 +473,7 @@ public class ExerciseService {
     }
 
     Set<String> exerciseIds = getExerciseIds(exercises);
-    MappingsByExerciseIds mappingsByExerciseIds =
-        getResultsByExerciseIds(getExerciseIds(exercises));
+    MappingsByExerciseIds mappingsByExerciseIds = getResultsByExerciseIds(exerciseIds);
 
     Map<String, List<RawInjectExpectation>> expectationsByExerciseIds =
         getExpectationsByExerciseId(exerciseIds);
@@ -496,7 +495,7 @@ public class ExerciseService {
         getResultsByExerciseIds(getExerciseIds(exercises));
 
     for (ExerciseSimple exercise : exercises) {
-      setEmptyGlobalScore(exercise);
+      exercise.setExpectationResultByTypes(new ArrayList<>());
 
       setTargets(exercise, mappingsByExerciseIds);
     }
@@ -556,10 +555,6 @@ public class ExerciseService {
     exercise.setExpectationResultByTypes(
         AtomicTestingUtils.getExpectationResultByTypesFromRaw(
             expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList())));
-  }
-
-  private static void setEmptyGlobalScore(ExerciseSimple exercise) {
-    exercise.setExpectationResultByTypes(new ArrayList<>());
   }
 
   private void setTargets(ExerciseSimple exercise, MappingsByExerciseIds mappingsByExerciseIds) {
