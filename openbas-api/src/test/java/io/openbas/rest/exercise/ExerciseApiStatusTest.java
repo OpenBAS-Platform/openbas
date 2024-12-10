@@ -89,7 +89,6 @@ public class ExerciseApiStatusTest {
     content.setSubject("Subject email");
     content.setBody("A body");
     inject1.setContent(this.mapper.valueToTree(content));
-    inject1.setDependsDuration(180L);
     inject1.setExercise(scheduledExercise);
 
     Inject inject2 = getInjectForEmailContract(injectorContract);
@@ -98,7 +97,6 @@ public class ExerciseApiStatusTest {
 
     Inject inject3 = getInjectForEmailContract(injectorContract);
     inject3.setContent(this.mapper.valueToTree(content));
-    inject3.setDependsDuration(180L);
     inject3.setExercise(pausedExercise);
 
     Inject inject4 = getInjectForEmailContract(injectorContract);
@@ -192,6 +190,7 @@ public class ExerciseApiStatusTest {
             .getContentAsString();
 
     // -- ASSERT --
+    Thread.sleep(2000);
     List<ExecutableInject> injects = injectHelper.getInjectsToRun();
     Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
     assertEquals(nextMinute.toString(), JsonPath.read(response, "$.exercise_start_date"));
@@ -278,6 +277,7 @@ public class ExerciseApiStatusTest {
             .getContentAsString();
 
     // --ASSERT--
+    Thread.sleep(2000);
     List<ExecutableInject> injects = injectHelper.getInjectsToRun();
     List<Pause> pauses = pauseRepository.findAllForExercise(PAUSED_EXERCISE.getId());
     Exercise responseExercise =
