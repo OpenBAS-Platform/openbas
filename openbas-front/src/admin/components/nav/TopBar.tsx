@@ -3,7 +3,7 @@ import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar,
 import { makeStyles, useTheme } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';

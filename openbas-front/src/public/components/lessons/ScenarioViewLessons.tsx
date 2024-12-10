@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../actions/Application';
 import type { UserHelper } from '../../../actions/helper';

@@ -1,7 +1,7 @@
 import { AutoModeOutlined, SubscriptionsOutlined } from '@mui/icons-material';
 import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { fetchInjectors } from '../../../actions/Injectors';
 import type { InjectorHelper } from '../../../actions/injectors/injector-helper';

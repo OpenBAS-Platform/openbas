@@ -3,7 +3,7 @@ import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, List
 import { makeStyles } from '@mui/styles';
 import { CSSProperties } from 'react';
 import { CSVLink } from 'react-csv';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import type { OrganizationHelper, TagHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';

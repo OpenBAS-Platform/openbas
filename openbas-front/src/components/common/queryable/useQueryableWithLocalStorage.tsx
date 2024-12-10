@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { useLocalStorage } from 'usehooks-ts';
 
 import type { FilterGroup, SearchPaginationInput, SortField } from '../../../utils/api-types';

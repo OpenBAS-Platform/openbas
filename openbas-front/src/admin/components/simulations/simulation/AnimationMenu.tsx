@@ -2,7 +2,7 @@ import { FactCheckOutlined, MailOutlined, NoteAltOutlined, TheatersOutlined } fr
 import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';

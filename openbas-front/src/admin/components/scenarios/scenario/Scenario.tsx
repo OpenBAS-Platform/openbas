@@ -4,7 +4,7 @@ import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 import * as React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';

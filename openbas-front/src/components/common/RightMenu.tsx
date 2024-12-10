@@ -2,7 +2,7 @@ import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/mat
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 
 import { isNotEmptyField } from '../../utils/utils';
 import { useFormatter } from '../i18n';

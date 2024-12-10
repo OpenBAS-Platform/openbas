@@ -4,7 +4,7 @@ import { green, orange } from '@mui/material/colors';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { Fragment, FunctionComponent, useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import type { ArticleStore, FullArticleStore } from '../../../../actions/channels/Article';
 import { fetchChannels } from '../../../../actions/channels/channel-action';

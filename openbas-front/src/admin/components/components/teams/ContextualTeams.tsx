@@ -1,9 +1,8 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import * as React from 'react';
-import { CSSProperties, useContext, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { CSSProperties, FunctionComponent, useContext, useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 import type { TeamStore } from '../../../../actions/teams/Team';
 import ItemTags from '../../../../components/ItemTags';
@@ -127,7 +126,7 @@ interface TeamStoreExtended extends TeamStore {
   team_users_enabled_number: number;
 }
 
-const ContextualTeams: React.FC<Props> = ({ teams }) => {
+const ContextualTeams: FunctionComponent<Props> = ({ teams }) => {
   // Standard hooks
   const classes = useStyles();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);

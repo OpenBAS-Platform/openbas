@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
 import type { UserHelper } from '../../../actions/helper';

@@ -2,7 +2,7 @@ import { Grid, Paper, Skeleton, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import { updateChannel, updateChannelLogos } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
