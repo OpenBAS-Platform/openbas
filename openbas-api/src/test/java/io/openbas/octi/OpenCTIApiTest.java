@@ -23,23 +23,27 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 /**
  * Feature: OCTI OBAS - GENERATION SCENARIOS
  *
- * Currently, OCTI uses the following endpoints to simulate scenarios from different types of
+ * <p>Currently, OCTI uses the following endpoints to simulate scenarios from different types of
  * entities such as (case incidents, groupings, reports, malwares, incidents, campaigns, intrusion
  * sets, threat actor groups, threat actors individuals):
  *
- * - KillChainPhasesApi -> killChainPhases [GET: /api/kill-chain-phases/]
- * - AttackPatternApi -> attackPatterns [GET: /api/attack_patterns/]
- * - AttackPatternApi -> injectorContracts [GET: /api/attack_patterns/{attackPatternId}/injector_contracts]
- * - InjectorContractApi -> injectorContracts [POST: /api/injector_contracts/search]
- * - ScenarioApi -> creationScenario [POST: /api/scenarios/]
- * - InjectApi -> createInjectForScenario [POST: /api/injects/{scenarioId}/injects]
- * - OpenCTIApi -> latestExerciseByExternalId [GET: /api/opencti/v1/exercises/latest/{externalReferenceId}]
+ * <ul>
+ *   <li>KillChainPhasesApi -> killChainPhases [GET: /api/kill-chain-phases/]
+ *   <li>AttackPatternApi -> attackPatterns [GET: /api/attack_patterns/]
+ *   <li>AttackPatternApi -> injectorContracts
+ *       [GET:/api/attack_patterns/{attackPatternId}/injector_contracts]
+ *   <li>InjectorContractApi -> injectorContracts [POST: /api/injector_contracts/search]
+ *   <li>ScenarioApi -> creationScenario [POST: /api/scenarios/]
+ *   <li>InjectApi -> createInjectForScenario [POST: /api/injects/{scenarioId}/injects]
+ *   <li>OpenCTIApi -> latestExerciseByExternalId
+ *       [GET:/api/opencti/v1/exercises/latest/{externalReferenceId}]
+ * </ul>
  *
- * These non-regression tests will help us maintain control over any modifications to these
+ * <p>These non-regression tests will help us maintain control over any modifications to these
  * endpoints.
  */
 @ExtendWith(MockitoExtension.class)
-public class OpenCTIApiTest {
+class OpenCTIApiTest {
 
   @Mock InjectApi injectApi;
   @Mock ScenarioApi scenarioApi;
