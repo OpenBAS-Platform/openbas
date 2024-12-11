@@ -32,8 +32,8 @@ public class ArchitectureFilterUtils {
 
     filterOpt.ifPresent(
         payloadFilter -> {
-          if (payloadFilter.getValues().contains(Payload.PAYLOAD_EXECUTION_ARCH.x86_64)
-              || payloadFilter.getValues().contains(Payload.PAYLOAD_EXECUTION_ARCH.arm64)) {
+          if (payloadFilter.getValues().contains(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name())
+              || payloadFilter.getValues().contains(Payload.PAYLOAD_EXECUTION_ARCH.arm64.name())) {
             payloadFilter.getValues().add(ALL_ARCHITECTURES);
           }
         });
