@@ -13,8 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PayloadUtils {
 
-  private PayloadUtils() {
-  }
+  private PayloadUtils() {}
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
