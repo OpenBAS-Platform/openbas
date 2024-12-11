@@ -167,7 +167,8 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping(INJECT_URI + "/{injectId}/executable-payload")
   @Tracing(name = "Get payload ready to be executed", layer = "api", operation = "GET")
-  public Payload getExecutablePayloadInject(@PathVariable @NotBlank final String injectId) {
+  public Payload getExecutablePayloadInject(@PathVariable @NotBlank final String injectId)
+      throws Exception {
     return executableInjectService.getExecutablePayloadInject(injectId);
   }
 
