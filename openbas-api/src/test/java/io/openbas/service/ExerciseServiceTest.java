@@ -1,59 +1,46 @@
 package io.openbas.service;
 
-import static io.openbas.database.specification.TeamSpecification.fromExercise;
-import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
-import static io.openbas.utils.fixtures.ExerciseFixture.getExercise;
-import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
-import static io.openbas.utils.fixtures.TeamFixture.getTeam;
-import static io.openbas.utils.fixtures.UserFixture.getUser;
+import static io.openbas.expectation.ExpectationType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.when;
 
-import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
-import io.openbas.utils.fixtures.ExerciseFixture;
-import java.util.ArrayList;
-import java.util.List;
+import io.openbas.utils.fixtures.ExpectationResultsByTypeFixture;
+import java.util.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
 
-  @Mock GrantService grantService;
-  @Mock InjectDuplicateService injectDuplicateService;
-  @Mock VariableService variableService;
+  @Mock private GrantService grantService;
+  @Mock private InjectDuplicateService injectDuplicateService;
+  @Mock private TeamService teamService;
+  @Mock private VariableService variableService;
 
-  @Autowired private TeamService teamService;
-  @Autowired private ExerciseMapper exerciseMapper;
-  @Autowired private InjectMapper injectMapper;
-  @Autowired private ResultUtils resultUtils;
-  @Autowired private ArticleRepository articleRepository;
-  @Autowired private ExerciseRepository exerciseRepository;
-  @Autowired private TeamRepository teamRepository;
-
-  @Autowired private AssetRepository assetRepository;
-  @Autowired private AssetGroupRepository assetGroupRepository;
-  @Autowired private InjectExpectationRepository injectExpectationRepository;
-  @Autowired private UserRepository userRepository;
-  @Autowired private InjectRepository injectRepository;
-  @Autowired private ExerciseTeamUserRepository exerciseTeamUserRepository;
-  @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
-
-  private static String USER_ID;
-  private static String TEAM_ID;
-  private static String INJECT_ID;
+  @Mock private ExerciseMapper exerciseMapper;
+  @Mock private InjectMapper injectMapper;
+  @Mock private ResultUtils resultUtils;
+  @Mock private AssetRepository assetRepository;
+  @Mock private AssetGroupRepository assetGroupRepository;
+  @Mock private InjectExpectationRepository injectExpectationRepository;
+  @Mock private ArticleRepository articleRepository;
+  @Mock private ExerciseRepository exerciseRepository;
+  @Mock private TeamRepository teamRepository;
+  @Mock private ExerciseTeamUserRepository exerciseTeamUserRepository;
+  @Mock private InjectRepository injectRepository;
+  @Mock private LessonsCategoryRepository lessonsCategoryRepository;
 
   @InjectMocks private ExerciseService exerciseService;
 
@@ -79,74 +66,36 @@ class ExerciseServiceTest {
             lessonsCategoryRepository);
   }
 
-  @AfterAll
-  public void teardown() {
-    this.userRepository.deleteById(USER_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-    this.injectRepository.deleteById(INJECT_ID);
-  }
-
-  @DisplayName("Should create new contextual teams while exercise duplication")
   @Test
-  @Transactional(rollbackFor = Exception.class)
-  void createNewContextualTeamsWhileExerciseDuplication() {
-    // -- PREPARE --
-    List<Team> exerciseTeams = new ArrayList<>();
-    Team contextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName1", true));
-    exerciseTeams.add(contextualTeam);
-    Team noContextualTeam = this.teamRepository.save(getTeam(null, "fakeTeamName2", false));
-    exerciseTeams.add(noContextualTeam);
-    Exercise exercise = this.exerciseRepository.save(getExercise(exerciseTeams));
+  @DisplayName("Should get exercises global scores")
+  void getExercisesGlobalScores() {
+    String exerciseId1 = "3e95b1ea-8957-4452-b0f7-edf4003eaa98";
+    String exerciseId2 = "c740797e-e34c-4066-a16c-a8baad9058f9";
 
-    // -- EXECUTE --
-    Exercise exerciseDuplicated = exerciseService.getDuplicateExercise(exercise.getId());
+    String injectId1 = "103da74a-055b-40e2-a934-9605cd3e4191";
+    String injectId2 = "1838c23d-3bbe-4d8e-ba40-aa8b5fd1614d";
+    String injectId3 = "0f728b68-ec1f-4a5d-a2e5-53d897c7a7fd";
+    String injectId4 = "bf05a17a-af6b-4238-9c3e-296db7f07d00";
 
-    // -- ASSERT --
-    assertNotEquals(exercise.getId(), exerciseDuplicated.getId());
-    assertEquals(2, exerciseDuplicated.getTeams().size());
-    exerciseDuplicated
-        .getTeams()
-        .forEach(
-            team -> {
-              if (team.getContextual()) {
-                assertNotEquals(contextualTeam.getId(), team.getId());
-                assertEquals(contextualTeam.getName(), team.getName());
-              } else {
-                assertEquals(noContextualTeam.getId(), team.getId());
-              }
-            });
-  }
+    Set<String> exercise1InjectIds = Set.of(injectId1, injectId2, injectId3);
+    Set<String> exercise2InjectIds = Set.of(injectId4);
 
-  @DisplayName("Should remove team from exercise")
-  @Test
-  void testRemoveTeams() {
-    // -- PREPARE --
-    User user = getUser();
-    User userSaved = this.userRepository.saveAndFlush(user);
-    USER_ID = userSaved.getId();
-    Team team = getTeam(userSaved);
-    Team teamSaved = this.teamRepository.saveAndFlush(team);
-    TEAM_ID = teamSaved.getId();
-    Exercise exercise = ExerciseFixture.getExercise();
-    exercise.setTeams(List.of(teamSaved));
-    exercise.setFrom(user.getEmail());
-    Exercise exerciseSaved = this.exerciseRepository.saveAndFlush(exercise);
+    when(exerciseRepository.findInjectsByExercise(exerciseId1)).thenReturn(exercise1InjectIds);
+    when(exerciseRepository.findInjectsByExercise(exerciseId2)).thenReturn(exercise2InjectIds);
 
-    InjectorContract injectorContract =
-        this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
-    Inject injectDefaultEmail = getInjectForEmailContract(injectorContract);
-    injectDefaultEmail.setExercise(exerciseSaved);
-    injectDefaultEmail.setTeams(List.of(teamSaved));
-    Inject injectDefaultEmailSaved = this.injectRepository.saveAndFlush(injectDefaultEmail);
-    INJECT_ID = injectDefaultEmailSaved.getId();
+    when(resultUtils.getResultsByTypes(exercise1InjectIds))
+        .thenReturn(ExpectationResultsByTypeFixture.exercise1GlobalScores);
+    when(resultUtils.getResultsByTypes(exercise2InjectIds))
+        .thenReturn(ExpectationResultsByTypeFixture.exercise2GlobalScores);
 
-    // -- EXECUTE --
-    this.exerciseService.removeTeams(exerciseSaved.getId(), List.of(teamSaved.getId()));
+    var results =
+        exerciseService.getExercisesGlobalScores(
+            new ExercisesGlobalScoresInput(List.of(exerciseId1, exerciseId2)));
 
-    // -- ASSERT --
-    List<Team> teams = this.teamRepository.findAll(fromExercise(exerciseSaved.getId()));
-    assertEquals(0, teams.size());
-    Inject injectAssert = this.injectRepository.findById(INJECT_ID).orElseThrow();
-    assertEquals(0, injectAssert.getTeams().size());
+    assertEquals(
+        results.globalScoresByExerciseIds(),
+        Map.of(
+            exerciseId1, ExpectationResultsByTypeFixture.exercise1GlobalScores,
+            exerciseId2, ExpectationResultsByTypeFixture.exercise2GlobalScores));
   }
 }

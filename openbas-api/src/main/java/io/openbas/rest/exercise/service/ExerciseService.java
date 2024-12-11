@@ -21,6 +21,8 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
+import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
+import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.service.GrantService;
 import io.openbas.service.TeamService;
@@ -39,6 +41,7 @@ import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -340,6 +343,41 @@ public class ExerciseService {
       Specification<Exercise> specificationCount,
       Pageable pageable,
       Map<String, Join<Base, Base>> joinMap) {
+    CriteriaBuilderAndExercises result =
+        getCriteriaBuilderAndExercises(specification, pageable, joinMap);
+
+    setComputedAttributes(result.exercises());
+
+    return getExerciseSimples(specificationCount, pageable, result);
+  }
+
+  public Page<ExerciseSimple> exercisesWithEmptyGlobalScore(
+      Specification<Exercise> specification,
+      Specification<Exercise> specificationCount,
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
+    CriteriaBuilderAndExercises result =
+        getCriteriaBuilderAndExercises(specification, pageable, joinMap);
+
+    setComputedAttributesWithEmptyGlobalScore(result.exercises());
+
+    return getExerciseSimples(specificationCount, pageable, result);
+  }
+
+  private PageImpl<ExerciseSimple> getExerciseSimples(
+      Specification<Exercise> specificationCount,
+      Pageable pageable,
+      CriteriaBuilderAndExercises result) {
+    // -- Count Query --
+    Long total = countQuery(result.cb(), this.entityManager, Exercise.class, specificationCount);
+
+    return new PageImpl<>(result.exercises(), pageable, total);
+  }
+
+  private CriteriaBuilderAndExercises getCriteriaBuilderAndExercises(
+      Specification<Exercise> specification,
+      Pageable pageable,
+      Map<String, Join<Base, Base>> joinMap) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Tuple> cq = cb.createTupleQuery();
@@ -368,13 +406,10 @@ public class ExerciseService {
     // -- EXECUTION --
     List<ExerciseSimple> exercises = execution(query);
 
-    setComputedAttribute(exercises);
-
-    // -- Count Query --
-    Long total = countQuery(cb, this.entityManager, Exercise.class, specificationCount);
-
-    return new PageImpl<>(exercises, pageable, total);
+    return new CriteriaBuilderAndExercises(cb, exercises);
   }
+
+  private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}
 
   // -- SELECT --
   private void select(
@@ -431,67 +466,120 @@ public class ExerciseService {
   }
 
   // -- COMPUTED ATTRIBUTES --
-  private void setComputedAttribute(List<ExerciseSimple> exercises) {
-    // -- MAP TO GENERATE TARGETSIMPLEs
-    Set<String> exerciseIds =
-        exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
-
-    if (!exerciseIds.isEmpty()) {
-      Map<String, List<Object[]>> teamMap =
-          ofNullable(teamRepository.teamsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
-              .filter(row -> 0 < row.length && row[0] != null)
-              .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-      Map<String, List<Object[]>> assetMap =
-          ofNullable(assetRepository.assetsByExerciseIds(exerciseIds)).orElse(emptyList()).stream()
-              .filter(row -> 0 < row.length && row[0] != null)
-              .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-      Map<String, List<Object[]>> assetGroupMap =
-          ofNullable(assetGroupRepository.assetGroupsByExerciseIds(exerciseIds))
-              .orElse(emptyList())
-              .stream()
-              .filter(row -> 0 < row.length && row[0] != null)
-              .collect(Collectors.groupingBy(row -> (String) row[0]));
-
-      Map<String, List<RawInjectExpectation>> expectationMap =
-          ofNullable(injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds))
-              .orElse(emptyList())
-              .stream()
-              .filter(Objects::nonNull)
-              .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
-
-      for (ExerciseSimple exercise : exercises) {
-        if (exercise.getId() != null) {
-          // -- GLOBAL SCORE ---
-          exercise.setExpectationResultByTypes(
-              AtomicTestingUtils.getExpectationResultByTypesFromRaw(
-                  expectationMap.getOrDefault(exercise.getId(), emptyList())));
-
-          // -- TARGETS --
-          List<TargetSimple> allTargets =
-              Stream.concat(
-                      injectMapper
-                          .toTargetSimple(
-                              teamMap.getOrDefault(exercise.getId(), emptyList()), TargetType.TEAMS)
-                          .stream(),
-                      Stream.concat(
-                          injectMapper
-                              .toTargetSimple(
-                                  assetMap.getOrDefault(exercise.getId(), emptyList()),
-                                  TargetType.ASSETS)
-                              .stream(),
-                          injectMapper
-                              .toTargetSimple(
-                                  assetGroupMap.getOrDefault(exercise.getId(), emptyList()),
-                                  TargetType.ASSETS_GROUPS)
-                              .stream()))
-                  .toList();
-
-          exercise.getTargets().addAll(allTargets);
-        }
-      }
+  private void setComputedAttributes(List<ExerciseSimple> originalExercises) {
+    List<ExerciseSimple> exercises = getExercisesWithId(originalExercises);
+    if (exercises.isEmpty()) {
+      return;
     }
+
+    Set<String> exerciseIds = getExerciseIds(exercises);
+    MappingsByExerciseIds mappingsByExerciseIds = getResultsByExerciseIds(exerciseIds);
+
+    Map<String, List<RawInjectExpectation>> expectationsByExerciseIds =
+        getExpectationsByExerciseId(exerciseIds);
+
+    for (ExerciseSimple exercise : exercises) {
+      setGlobalScore(exercise, expectationsByExerciseIds);
+
+      setTargets(exercise, mappingsByExerciseIds);
+    }
+  }
+
+  private void setComputedAttributesWithEmptyGlobalScore(List<ExerciseSimple> originalExercises) {
+    List<ExerciseSimple> exercises = getExercisesWithId(originalExercises);
+    if (exercises.isEmpty()) {
+      return;
+    }
+
+    MappingsByExerciseIds mappingsByExerciseIds =
+        getResultsByExerciseIds(getExerciseIds(exercises));
+
+    for (ExerciseSimple exercise : exercises) {
+      exercise.setExpectationResultByTypes(new ArrayList<>());
+
+      setTargets(exercise, mappingsByExerciseIds);
+    }
+  }
+
+  private static List<ExerciseSimple> getExercisesWithId(List<ExerciseSimple> exercises) {
+    return exercises.stream().filter(exercise -> exercise.getId() != null).toList();
+  }
+
+  private static Set<String> getExerciseIds(List<ExerciseSimple> exercises) {
+    return exercises.stream().map(ExerciseSimple::getId).collect(Collectors.toSet());
+  }
+
+  private MappingsByExerciseIds getResultsByExerciseIds(Set<String> exerciseIds) {
+    Map<String, List<Object[]>> teamsByExerciseIds =
+        getTeamsOrAssetsOrAssetGroupsByExerciseIds(teamRepository.teamsByExerciseIds(exerciseIds));
+
+    Map<String, List<Object[]>> assetsByExerciseIds =
+        getTeamsOrAssetsOrAssetGroupsByExerciseIds(
+            assetRepository.assetsByExerciseIds(exerciseIds));
+
+    Map<String, List<Object[]>> assetGroupByExerciseIds =
+        getTeamsOrAssetsOrAssetGroupsByExerciseIds(
+            assetGroupRepository.assetGroupsByExerciseIds(exerciseIds));
+
+    return new MappingsByExerciseIds(
+        teamsByExerciseIds, assetsByExerciseIds, assetGroupByExerciseIds);
+  }
+
+  private Map<String, List<Object[]>> getTeamsOrAssetsOrAssetGroupsByExerciseIds(
+      List<Object[]> rawTeamsOrAssetsOrAssetGroups) {
+    return ofNullable(rawTeamsOrAssetsOrAssetGroups).orElse(emptyList()).stream()
+        .filter(
+            rawTeamOrAssetOrAssetGroup ->
+                0 < rawTeamOrAssetOrAssetGroup.length && rawTeamOrAssetOrAssetGroup[0] != null)
+        .collect(
+            Collectors.groupingBy(
+                rawTeamOrAssetOrAssetGroup -> (String) rawTeamOrAssetOrAssetGroup[0]));
+  }
+
+  private record MappingsByExerciseIds(
+      Map<String, List<Object[]>> teamsByExerciseIds,
+      Map<String, List<Object[]>> assetsByExerciseIds,
+      Map<String, List<Object[]>> assetGroupsByExerciseIds) {}
+
+  private Map<String, List<RawInjectExpectation>> getExpectationsByExerciseId(
+      Set<String> exerciseIds) {
+    return ofNullable(injectExpectationRepository.rawForComputeGlobalByExerciseIds(exerciseIds))
+        .orElse(emptyList())
+        .stream()
+        .filter(Objects::nonNull)
+        .collect(Collectors.groupingBy(RawInjectExpectation::getExercise_id));
+  }
+
+  private static void setGlobalScore(
+      ExerciseSimple exercise, Map<String, List<RawInjectExpectation>> expectationsByExerciseIds) {
+    exercise.setExpectationResultByTypes(
+        AtomicTestingUtils.getExpectationResultByTypesFromRaw(
+            expectationsByExerciseIds.getOrDefault(exercise.getId(), emptyList())));
+  }
+
+  private void setTargets(ExerciseSimple exercise, MappingsByExerciseIds mappingsByExerciseIds) {
+    List<TargetSimple> allTargets =
+        Stream.of(
+                getTargets(exercise, mappingsByExerciseIds.teamsByExerciseIds, TargetType.TEAMS)
+                    .stream(),
+                getTargets(exercise, mappingsByExerciseIds.assetsByExerciseIds, TargetType.ASSETS)
+                    .stream(),
+                getTargets(
+                    exercise,
+                    mappingsByExerciseIds.assetGroupsByExerciseIds,
+                    TargetType.ASSETS_GROUPS)
+                    .stream())
+            .flatMap(Function.identity())
+            .toList();
+    exercise.getTargets().addAll(allTargets);
+  }
+
+  private List<TargetSimple> getTargets(
+      ExerciseSimple exercise,
+      Map<String, List<Object[]>> targetsByExerciseIds,
+      TargetType targetType) {
+    return injectMapper.toTargetSimple(
+        targetsByExerciseIds.getOrDefault(exercise.getId(), emptyList()), targetType);
   }
 
   // -- SCENARIO EXERCISES --
@@ -503,6 +591,13 @@ public class ExerciseService {
   // -- GLOBAL RESULTS --
   public List<ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
     return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
+  }
+
+  public ExercisesGlobalScoresOutput getExercisesGlobalScores(ExercisesGlobalScoresInput input) {
+    Map<String, List<ExpectationResultsByType>> globalScoresByExerciseIds =
+        input.exerciseIds().stream()
+            .collect(Collectors.toMap(Function.identity(), this::getGlobalResults));
+    return new ExercisesGlobalScoresOutput(globalScoresByExerciseIds);
   }
 
   // -- TEAMS --

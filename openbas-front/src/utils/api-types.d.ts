@@ -830,6 +830,14 @@ export interface ExerciseUpdateTeamsInput {
   exercise_teams?: string[];
 }
 
+export interface ExercisesGlobalScoresInput {
+  exercise_ids: string[];
+}
+
+export interface ExercisesGlobalScoresOutput {
+  global_scores_by_exercise_ids: Record<string, ExpectationResultsByType[]>;
+}
+
 export interface ExpectationResultsByType {
   avgResult: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   distribution: ResultDistribution[];
@@ -891,6 +899,13 @@ export interface FullTextSearchResult {
   name: string;
   /** @uniqueItems true */
   tags?: Tag[];
+}
+
+export interface GlobalScoreBySimulationEndDate {
+  /** @format float */
+  global_score_success_percentage: number;
+  /** @format date-time */
+  simulation_end_date: string;
 }
 
 export interface Grant {
@@ -2868,9 +2883,7 @@ export interface ScenarioSimple {
 }
 
 export interface ScenarioStatistic {
-  scenarios_attack_scenario_count?: Record<string, number>;
-  /** @format int64 */
-  scenarios_global_count?: number;
+  simulations_results_latest: SimulationsResultsLatest;
 }
 
 export interface ScenarioTeamPlayersEnableInput {
@@ -2977,6 +2990,10 @@ export interface SettingsUpdateInput {
   platform_lang: string;
   platform_name: string;
   platform_theme: string;
+}
+
+export interface SimulationsResultsLatest {
+  global_scores_by_expectation_type: Record<string, GlobalScoreBySimulationEndDate[]>;
 }
 
 /** List of sort fields : a field is composed of a property (for instance "label" and an optional direction ("asc" is assumed if no direction is specified) : ("desc", "asc") */
