@@ -132,15 +132,15 @@
     "build": "node builder/prod/prod.js",
     "lint": "cross-env DEBUG=eslint:eslint TIMING=1 eslint --max-warnings 0 --cache --rule \"{'import/namespace': 'error', 'import/no-cycle': ['error', {'ignoreExternal': true, 'disableScc': true}]}\" .",
     "control": "yarn audit --groups dependencies --summary",
-    "test": "vitest run",
     "check-ts": "tsc --noEmit",
     "i18n-checker": "node i18n-checker.js",
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types",
+    "test": "vitest run",
     "test:e2e": "yarn playwright test --workers=1 --retries=2",
     "test:e2e:ui": "yarn playwright test --ui --workers=1",
+    "test:e2e:coverage": "E2E_COVERAGE=true yarn playwright test && yarn show-report-e2e",
     "generate-test-e2e": "yarn playwright codegen http://localhost:3001/",
-    "show-report-e2e": "start \"\" test-results/report.html && start \"\" test-results/coverage/index.html",
-    "test:e2e:coverage": "E2E_COVERAGE=true yarn playwright test && yarn show-report-e2e"
+    "show-report-e2e": "start \"\" test-results/report.html && start \"\" test-results/coverage/index.html"
   },
   "resolutions": {
     "mini-css-extract-plugin": "2.9.2",
