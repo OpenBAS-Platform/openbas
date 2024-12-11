@@ -37,6 +37,12 @@ public class EndpointService {
   @Value("${info.app.version:unknown}")
   String version;
 
+  @Value("${executor.openbas.binaries.origin:local}")
+  private String executorOpenbasBinariesOrigin;
+
+  @Value("${executor.openbas.binaries.version:${info.app.version:unknown}}")
+  private String executorOpenbasBinariesVersion;
+
   private final EndpointRepository endpointRepository;
 
   public Endpoint createEndpoint(@NotNull final Endpoint endpoint) {
@@ -101,13 +107,23 @@ public class EndpointService {
           case "linux", "macos" -> "sh";
           default -> throw new UnsupportedOperationException("");
         };
-    String filename = file + "-" + version + "." + extension;
+    InputStream in = null;
+    String filename;
     String resourcePath = "/openbas-agent/" + platform.toLowerCase() + "/";
-    InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-    if (in == null) { // Dev mode, get from artifactory
-      filename = file + "-latest." + extension;
+
+    if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
+      filename = file + "-" + version + "." + extension;
+      in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
+    } else if (executorOpenbasBinariesOrigin.equals(
+        "repository")) { // if we want a specific version from artifactory
+      filename = file + "-" + executorOpenbasBinariesVersion + "." + extension;
       in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
+    if (in == null) {
+      throw new UnsupportedOperationException(
+          "Agent installer version " + executorOpenbasBinariesVersion + " not found");
+    }
+
     return IOUtils.toString(in, StandardCharsets.UTF_8)
         .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
         .replace("${OPENBAS_TOKEN}", adminToken)
