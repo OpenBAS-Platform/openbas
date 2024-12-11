@@ -68,7 +68,7 @@ public class PayloadApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(@Valid @RequestBody PayloadCreateInput input) {
-      return this.payloadCreationService.createPayload(input);
+    return this.payloadCreationService.createPayload(input);
   }
 
   @PutMapping(PAYLOAD_URI + "/{payloadId}")
@@ -300,8 +300,7 @@ public class PayloadApi extends RestBehavior {
         input.collectorId(), input.processedPayloadExternalIds());
   }
 
-  private static void validateArchitecture(
-      String payloadType, Payload.PAYLOAD_EXECUTION_ARCH arch) {
+  public static void validateArchitecture(String payloadType, Payload.PAYLOAD_EXECUTION_ARCH arch) {
     if (arch == null) {
       throw new BadRequestException("Payload architecture cannot be null.");
     }

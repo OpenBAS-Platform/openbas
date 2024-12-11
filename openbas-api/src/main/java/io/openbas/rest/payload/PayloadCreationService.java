@@ -2,6 +2,7 @@ package io.openbas.rest.payload;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.rest.payload.PayloadApi.validateArchitecture;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -9,12 +10,9 @@ import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.integrations.PayloadService;
-import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -29,7 +27,9 @@ public class PayloadCreationService {
 
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(PayloadCreateInput input) {
-    switch (PayloadType.fromString(input.getType())) {
+    PayloadType payloadType = PayloadType.fromString(input.getType());
+    validateArchitecture(payloadType.key, input.getExecutionArch());
+    switch (payloadType) {
       case PayloadType.COMMAND:
         Command commandPayload = new Command();
         commandPayload.setUpdateAttributes(input);
@@ -41,15 +41,12 @@ public class PayloadCreationService {
         return commandPayload;
       case PayloadType.EXECUTABLE:
         Executable executablePayload = new Executable();
-        PayloadCreateInput validatedInput = validateExecutableCreateInput(input);
-        executablePayload.setUpdateAttributes(validatedInput);
+        executablePayload.setUpdateAttributes(input);
         executablePayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllById(validatedInput.getAttackPatternsIds())));
-        executablePayload.setTags(
-            iterableToSet(tagRepository.findAllById(validatedInput.getTagIds())));
+            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
+        executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         executablePayload.setExecutableFile(
-            documentRepository.findById(validatedInput.getExecutableFile()).orElseThrow());
+            documentRepository.findById(input.getExecutableFile()).orElseThrow());
         executablePayload = payloadRepository.save(executablePayload);
         this.payloadService.updateInjectorContractsForPayload(executablePayload);
         return executablePayload;
@@ -85,16 +82,6 @@ public class PayloadCreationService {
       default:
         throw new UnsupportedOperationException(
             "Payload type " + input.getType() + " is not supported");
-    }
-  }
-
-  private static PayloadCreateInput validateExecutableCreateInput(
-      @NotNull final PayloadCreateInput input) {
-    Optional<Endpoint.PLATFORM_ARCH> maybeArch = Optional.ofNullable(input.getExecutableArch());
-    if (maybeArch.isPresent()) {
-      return input;
-    } else {
-      throw new BadRequestException("Executable arch is missing");
     }
   }
 }
