@@ -3,6 +3,7 @@ package io.openbas.utils;
 import static java.util.Optional.ofNullable;
 
 import io.openbas.database.model.Filters;
+import io.openbas.database.model.Payload;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +32,8 @@ public class ArchitectureFilterUtils {
 
     filterOpt.ifPresent(
         payloadFilter -> {
-          if (payloadFilter.getValues().contains("X86_64")
-              || payloadFilter.getValues().contains("ARM64")) {
+          if (payloadFilter.getValues().contains(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name())
+              || payloadFilter.getValues().contains(Payload.PAYLOAD_EXECUTION_ARCH.arm64.name())) {
             payloadFilter.getValues().add(ALL_ARCHITECTURES);
           }
         });

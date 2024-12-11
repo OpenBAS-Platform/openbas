@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,17 +30,13 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @Secured(ROLE_USER)
 public class KillChainPhaseApi extends RestBehavior {
 
   public static final String KILL_CHAIN_PHASE_URI = "/api/kill_chain_phases";
 
-  private KillChainPhaseRepository killChainPhaseRepository;
-
-  @Autowired
-  public void setKillChainPhaseRepository(KillChainPhaseRepository killChainPhaseRepository) {
-    this.killChainPhaseRepository = killChainPhaseRepository;
-  }
+  private final KillChainPhaseRepository killChainPhaseRepository;
 
   @GetMapping("/api/kill_chain_phases")
   public Iterable<KillChainPhase> killChainPhases() {
