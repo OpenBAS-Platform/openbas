@@ -112,30 +112,21 @@ public class CalderaExecutorService implements Runnable {
           this.client.agents().stream()
               .filter(agent -> !agent.getExe_name().contains("implant"))
               .toList();
-      List<Endpoint> endpoints = toEndpoint(agents).stream().filter(Asset::getActive).toList();
       log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
-      endpoints.forEach(
-          endpoint -> {
-            List<Endpoint> existingEndpoints =
-                this.endpointService
-                    .findAssetsForInjectionByHostname(endpoint.getHostname())
-                    .stream()
-                    .filter(
-                        endpoint1 ->
-                            Arrays.stream(endpoint1.getIps())
-                                .anyMatch(
-                                    s -> Arrays.stream(endpoint.getIps()).toList().contains(s)))
-                    .toList();
-            if (existingEndpoints.isEmpty()) {
+      agents.forEach(
+          agent -> {
+            Endpoint existingEndpoint = findExistingEndpointForAnAgent(agent);
+
+            if (existingEndpoint == null) {
               Optional<Endpoint> endpointByExternalReference =
-                  endpointService.findByExternalReference(endpoint.getExternalReference());
+                  endpointService.findByExternalReference(agent.getPaw());
               if (endpointByExternalReference.isPresent()) {
-                this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
+                this.updateEndpoint(agent, endpointByExternalReference.get());
               } else {
-                this.endpointService.createEndpoint(endpoint);
+                this.endpointService.createEndpoint(toEndpoint(agent));
               }
             } else {
-              this.updateEndpoint(endpoint, existingEndpoints);
+              this.updateEndpoint(agent, existingEndpoint);
             }
           });
       List<Endpoint> inactiveEndpoints =
@@ -162,56 +153,67 @@ public class CalderaExecutorService implements Runnable {
 
   // -- PRIVATE --
 
+  private Endpoint findExistingEndpointForAnAgent(@NotNull final Agent agent){
+    return  this.endpointService
+            .findAssetsForInjectionByHostname(agent.getHost())
+            .stream()
+            .filter(
+                    endpoint ->
+                            Arrays.stream(endpoint.getIps())
+                                    .anyMatch(Arrays.asList(agent.getHost_ip_addrs())::contains)
+                                    && CALDERA_EXECUTOR_TYPE.equals(endpoint.getExecutor().getType()))
+            .toList().getFirst();
+  }
+
+  private Endpoint toEndpoint(@NotNull final Agent agent) {
+    Endpoint endpoint = new Endpoint();
+    endpoint.setExecutor(this.executor);
+    endpoint.setExternalReference(agent.getPaw());
+    endpoint.setName(agent.getHost());
+    endpoint.setDescription("Asset collected by Caldera executor context.");
+    endpoint.setIps(agent.getHost_ip_addrs());
+    endpoint.setHostname(agent.getHost());
+    endpoint.setPlatform(toPlatform(agent.getPlatform()));
+    endpoint.setArch(toArch(agent.getArchitecture()));
+    endpoint.setProcessName(agent.getExe_name());
+    endpoint.setLastSeen(toInstant(agent.getLast_seen()));
+    return endpoint;
+  }
   private List<Endpoint> toEndpoint(@NotNull final List<Agent> agents) {
     return agents.stream()
-        .map(
-            (agent) -> {
-              Endpoint endpoint = new Endpoint();
-              endpoint.setExecutor(this.executor);
-              endpoint.setExternalReference(agent.getPaw());
-              endpoint.setName(agent.getHost());
-              endpoint.setDescription("Asset collected by Caldera executor context.");
-              endpoint.setIps(agent.getHost_ip_addrs());
-              endpoint.setHostname(agent.getHost());
-              endpoint.setPlatform(toPlatform(agent.getPlatform()));
-              endpoint.setArch(toArch(agent.getArchitecture()));
-              endpoint.setProcessName(agent.getExe_name());
-              endpoint.setLastSeen(toInstant(agent.getLast_seen()));
-              return endpoint;
-            })
+        .map(this::toEndpoint)
         .toList();
   }
 
   private void updateEndpoint(
-      @NotNull final Endpoint external, @NotNull final List<Endpoint> existingList) {
-    Endpoint matchingExistingEndpoint = existingList.getFirst();
-    matchingExistingEndpoint.setLastSeen(external.getLastSeen());
-    matchingExistingEndpoint.setExternalReference(external.getExternalReference());
-    matchingExistingEndpoint.setName(external.getName());
-    matchingExistingEndpoint.setIps(external.getIps());
-    matchingExistingEndpoint.setHostname(external.getHostname());
-    matchingExistingEndpoint.setProcessName(external.getProcessName());
-    matchingExistingEndpoint.setPlatform(external.getPlatform());
-    matchingExistingEndpoint.setArch(external.getArch());
-    matchingExistingEndpoint.setExecutor(this.executor);
-    if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli())
+      @NotNull final Agent agent, @NotNull final Endpoint existingEndpoint) {
+    existingEndpoint.setLastSeen(toInstant(agent.getLast_seen()));
+    existingEndpoint.setExternalReference(agent.getPaw());
+    existingEndpoint.setName(agent.getHost());
+    existingEndpoint.setIps(agent.getHost_ip_addrs());
+    existingEndpoint.setHostname(agent.getHost());
+    existingEndpoint.setProcessName(agent.getExe_name());
+    existingEndpoint.setPlatform(toPlatform(agent.getPlatform()));
+    existingEndpoint.setArch(toArch(agent.getArchitecture()));
+    existingEndpoint.setExecutor(this.executor);
+    if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli())
         > CLEAR_TTL) {
       try {
-        log.info("Clearing endpoint " + matchingExistingEndpoint.getHostname());
+        log.info("Clearing endpoint " + existingEndpoint.getHostname());
         Iterable<Injector> injectors = injectorService.injectors();
         injectors.forEach(
             injector -> {
               if (injector.getExecutorClearCommands() != null) {
                 this.calderaExecutorContextService.launchExecutorClear(
-                    injector, matchingExistingEndpoint);
+                    injector, existingEndpoint);
               }
             });
-        matchingExistingEndpoint.setClearedAt(now());
+        existingEndpoint.setClearedAt(now());
       } catch (RuntimeException e) {
         log.info("Failed clear agents");
       }
     }
-    this.endpointService.updateEndpoint(matchingExistingEndpoint);
+    this.endpointService.updateEndpoint(existingEndpoint);
   }
 
   private Instant toInstant(@NotNull final String lastSeen) {
