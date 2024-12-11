@@ -175,8 +175,10 @@ public class OpenCTIApiTest {
   // -- LAST EXERCISE BY EXTERNAL ID --
   @Test
   public void testGetLatestExerciseByExternalReference_Success() throws Exception {
+    // -- PREPARE --
     String externalReferenceId = "valid-id";
 
+    // -- EXECUTE --
     mockMvc
         .perform(
             get("/api/opencti/v1/exercises/latest/{externalReferenceId}", externalReferenceId)
