@@ -39,6 +39,12 @@ public class ExecutorApi extends RestBehavior {
   @Value("${info.app.version:unknown}")
   String version;
 
+  @Value("${executor.openbas.binaries.origin:local}")
+  private String executorOpenbasBinariesOrigin;
+
+  @Value("${executor.openbas.binaries.version:${info.app.version:unknown}}")
+  private String executorOpenbasBinariesVersion;
+
   private ExecutorRepository executorRepository;
   private EndpointService endpointService;
   private FileService fileService;
@@ -138,24 +144,19 @@ public class ExecutorApi extends RestBehavior {
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
     InputStream in = null;
-    String filename = null;
-    if (platform.equals("windows") && architecture.equals("x86_64")) {
-      filename = "openbas-agent-" + version + ".exe";
-      String resourcePath = "/openbas-agent/windows/x86_64/";
+    String resourcePath = "/openbas-agent/" + platform + "/" + architecture + "/";
+    String filename = "";
+
+    if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
+      filename = "openbas-agent-" + version + (platform.equals("windows") ? ".exe" : "");
       in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-      if (in == null) { // Dev mode, get from artifactory
-        filename = "openbas-agent-latest.exe";
-        in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-      }
-    }
-    if (platform.equals("linux") || platform.equals("macos")) {
-      filename = "openbas-agent-" + version;
-      String resourcePath = "/openbas-agent/" + platform + "/" + architecture + "/";
-      in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-      if (in == null) { // Dev mode, get from artifactory
-        filename = "openbas-agent-latest";
-        in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-      }
+    } else if (executorOpenbasBinariesOrigin.equals(
+        "repository")) { // if we want a specific version from artifactory
+      filename =
+          "openbas-agent-"
+              + executorOpenbasBinariesVersion
+              + (platform.equals("windows") ? ".exe" : "");
+      in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
     }
     if (in != null) {
       HttpHeaders headers = new HttpHeaders();
@@ -176,19 +177,25 @@ public class ExecutorApi extends RestBehavior {
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
     byte[] file = null;
     String filename = null;
-    if (platform.equals("windows") && architecture.equals("x86_64")) {
-      filename = "openbas-agent-installer-" + version + ".exe";
-      String resourcePath = "/openbas-agent/windows/x86_64/";
-      InputStream in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
-      if (in != null) {
-        file = IOUtils.toByteArray(in);
-      } else { // Dev mode, get from artifactory
-        filename = "openbas-agent-installer-latest.exe";
+
+    if (platform.equals("windows")) {
+      InputStream in = null;
+      String resourcePath = "/openbas-agent/windows/" + architecture + "/";
+      if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
+        filename = "openbas-agent-installer-" + version + ".exe";
+        in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
+      } else if (executorOpenbasBinariesOrigin.equals(
+          "repository")) { // if we want a specific version from artifactory
+        filename = "openbas-agent-installer-" + executorOpenbasBinariesVersion + ".exe";
         in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
-        file = IOUtils.toByteArray(in);
       }
+      if (in == null) {
+        throw new UnsupportedOperationException(
+            "Agent version " + executorOpenbasBinariesVersion + " not found");
+      }
+      file = IOUtils.toByteArray(in);
     }
-    // linux - No package needed
+    // linux & macos - No package needed
     if (file != null) {
       HttpHeaders headers = new HttpHeaders();
       headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
