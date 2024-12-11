@@ -1133,6 +1133,7 @@ export interface InjectExpectationResultsByAttackPattern {
 }
 
 export interface InjectExpectationResultsByType {
+  inject_id?: string;
   inject_title?: string;
   results?: ExpectationResultsByType[];
 }
@@ -2382,6 +2383,7 @@ export interface Payload {
   payload_type?: string;
   /** @format date-time */
   payload_updated_at: string;
+  typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
 export interface PayloadArgument {

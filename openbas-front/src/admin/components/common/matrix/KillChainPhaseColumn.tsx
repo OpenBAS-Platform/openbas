@@ -24,6 +24,7 @@ interface KillChainPhaseComponentProps {
 }
 
 const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
+  goToLink,
   killChainPhase,
   attackPatterns,
   injectResults,
@@ -53,6 +54,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
         {[...attackPatterns].sort(sortAttackPattern)
           .map(attackPattern => (
             <AttackPatternBox
+              goToLink={goToLink}
               key={attackPattern.attack_pattern_id}
               attackPattern={attackPattern}
               injectResult={getInjectResult(attackPattern)}
