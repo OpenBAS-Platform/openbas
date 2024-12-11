@@ -1,4 +1,4 @@
-import { Chip, Grid, Paper, Typography } from '@mui/material';
+import {Button, Chip, Grid, Paper, Typography } from '@mui/material';
 import * as R from 'ramda';
 import * as React from 'react';
 
@@ -9,20 +9,37 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type { Exercise, KillChainPhase } from '../../../../utils/api-types';
+import type { Exercise, KillChainPhase, Scenario } from '../../../../utils/api-types';
+import {Link} from "react-router";
+import {makeStyles} from "@mui/styles";
+import { truncate } from '../../../../utils/String';
 
 interface Props {
   exercise: Exercise;
+  scenario: Scenario;
 }
 
-const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
+const useStyles = makeStyles(() => ({
+  button: {
+    textTransform: 'none',
+    height: 20,
+  },
+  dialogPaper: {
+    minHeight: '90vh',
+    maxHeight: '90vh',
+  },
+}));
+
+const ExerciseMainInformation: React.FC<Props> = ({ exercise, scenario }) => {
   const { t } = useFormatter();
+  const classes = useStyles();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
+  const scenarioBaseUri = "/admin/scenarios"
 
   return (
     <Paper sx={{ padding: '15px' }} variant="outlined">
       <Grid id="main_information" container spacing={3}>
-        <Grid item xs={12} style={{ paddingTop: 10 }}>
+        <Grid item xs={8} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -37,9 +54,31 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
         </Grid>
         <Grid item xs={4} style={{ paddingTop: 10 }}>
           <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+          >
+            {t('Originating scenario')}
+          </Typography>
+          {scenario ? (
+          <Button
+              component={Link}
+              to={scenarioBaseUri + '/' + scenario.scenario_id}
+              color="primary"
+              variant="text"
+              className={classes.button}
+          >
+            { truncate(scenario.scenario_name, 25) }
+          </Button>) : '-'}
+        </Grid>
+        <Grid item xs={4} style={{ paddingTop: 10 }}>
+          <Typography
             variant="h3"
             gutterBottom
             style={{ marginTop: 20 }}
+            sx = {{
+              width: "100%"
+            }}
           >
             {t('Severity')}
           </Typography>
