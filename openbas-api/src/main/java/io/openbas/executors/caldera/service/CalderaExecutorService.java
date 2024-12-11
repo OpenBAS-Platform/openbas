@@ -3,6 +3,7 @@ package io.openbas.executors.caldera.service;
 import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 
+import com.cronutils.utils.VisibleForTesting;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
@@ -112,12 +113,12 @@ public class CalderaExecutorService implements Runnable {
           this.client.agents().stream()
               .filter(agent -> !agent.getExe_name().contains("implant"))
               .toList();
-      log.info("Caldera executor provisioning based on " + endpoints.size() + " assets");
+      log.info("Caldera executor provisioning based on " + agents.size() + " assets");
       agents.forEach(
           agent -> {
-            Endpoint existingEndpoint = findExistingEndpointForAnAgent(agent);
+            Optional<Endpoint> existingEndpoint = findExistingEndpointForAnAgent(agent);
 
-            if (existingEndpoint == null) {
+            if (existingEndpoint.isEmpty()) {
               Optional<Endpoint> endpointByExternalReference =
                   endpointService.findByExternalReference(agent.getPaw());
               if (endpointByExternalReference.isPresent()) {
@@ -126,7 +127,7 @@ public class CalderaExecutorService implements Runnable {
                 this.endpointService.createEndpoint(toEndpoint(agent));
               }
             } else {
-              this.updateEndpoint(agent, existingEndpoint);
+              this.updateEndpoint(agent, existingEndpoint.get());
             }
           });
       List<Endpoint> inactiveEndpoints =
@@ -153,16 +154,15 @@ public class CalderaExecutorService implements Runnable {
 
   // -- PRIVATE --
 
-  private Endpoint findExistingEndpointForAnAgent(@NotNull final Agent agent){
-    return  this.endpointService
-            .findAssetsForInjectionByHostname(agent.getHost())
-            .stream()
-            .filter(
-                    endpoint ->
-                            Arrays.stream(endpoint.getIps())
-                                    .anyMatch(Arrays.asList(agent.getHost_ip_addrs())::contains)
-                                    && CALDERA_EXECUTOR_TYPE.equals(endpoint.getExecutor().getType()))
-            .toList().getFirst();
+  @VisibleForTesting
+  protected Optional<Endpoint> findExistingEndpointForAnAgent(@NotNull final Agent agent) {
+    return this.endpointService.findAssetsForInjectionByHostname(agent.getHost()).stream()
+        .filter(
+            endpoint ->
+                Arrays.stream(endpoint.getIps())
+                        .anyMatch(Arrays.asList(agent.getHost_ip_addrs())::contains)
+                    && CALDERA_EXECUTOR_TYPE.equals(endpoint.getExecutor().getType()))
+        .findFirst();
   }
 
   private Endpoint toEndpoint(@NotNull final Agent agent) {
@@ -179,10 +179,9 @@ public class CalderaExecutorService implements Runnable {
     endpoint.setLastSeen(toInstant(agent.getLast_seen()));
     return endpoint;
   }
+
   private List<Endpoint> toEndpoint(@NotNull final List<Agent> agents) {
-    return agents.stream()
-        .map(this::toEndpoint)
-        .toList();
+    return agents.stream().map(this::toEndpoint).toList();
   }
 
   private void updateEndpoint(
@@ -196,16 +195,14 @@ public class CalderaExecutorService implements Runnable {
     existingEndpoint.setPlatform(toPlatform(agent.getPlatform()));
     existingEndpoint.setArch(toArch(agent.getArchitecture()));
     existingEndpoint.setExecutor(this.executor);
-    if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli())
-        > CLEAR_TTL) {
+    if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
       try {
         log.info("Clearing endpoint " + existingEndpoint.getHostname());
         Iterable<Injector> injectors = injectorService.injectors();
         injectors.forEach(
             injector -> {
               if (injector.getExecutorClearCommands() != null) {
-                this.calderaExecutorContextService.launchExecutorClear(
-                    injector, existingEndpoint);
+                this.calderaExecutorContextService.launchExecutorClear(injector, existingEndpoint);
               }
             });
         existingEndpoint.setClearedAt(now());
@@ -216,11 +213,16 @@ public class CalderaExecutorService implements Runnable {
     this.endpointService.updateEndpoint(existingEndpoint);
   }
 
-  private Instant toInstant(@NotNull final String lastSeen) {
+  @VisibleForTesting
+  protected Instant toInstant(@NotNull final String lastSeen) {
     String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault());
     LocalDateTime localDateTime = LocalDateTime.parse(lastSeen, dateTimeFormatter);
     ZonedDateTime zonedDateTime = localDateTime.atZone(UTC);
     return zonedDateTime.toInstant();
+  }
+
+  public void setExecutor(Executor executor) {
+    this.executor = executor;
   }
 }
