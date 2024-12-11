@@ -11,6 +11,7 @@ import io.openbas.rest.injector_contract.InjectorContractApi;
 import io.openbas.rest.kill_chain_phase.KillChainPhaseApi;
 import io.openbas.rest.scenario.ScenarioApi;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -73,6 +74,7 @@ class OpenCTIApiTest {
 
   // -- KILL CHAIN PHASES --
   @Test
+  @DisplayName("Test to validate existence of the KillChainPhases endpoint")
   public void testGetKillChainPhases_Sucess() throws Exception {
     // -- EXECUTE --
     mockMvc
@@ -82,6 +84,7 @@ class OpenCTIApiTest {
 
   // -- ATTACK PATTERNS  --
   @Test
+  @DisplayName("Test to validate existence of the AttackPatterns endpoint")
   public void testGetAttackPatterns_Sucess() throws Exception {
     // -- EXECUTE --
     mockMvc
@@ -91,6 +94,7 @@ class OpenCTIApiTest {
 
   // -- INJECTOR CONTRACTS --
   @Test
+  @DisplayName("Test to validate existence of the InjectorContracts endpoint")
   public void testGetInjectorContracts_Success() throws Exception {
     // -- PREPARE --
     String attackPatternId = "attackPatternId";
@@ -103,6 +107,8 @@ class OpenCTIApiTest {
   }
 
   @Test
+  @DisplayName(
+      "Test to validate existence of the InjectorContracts Search endpoint and validate SearchInput")
   public void testSearchInjectorContracts_ValidInput() throws Exception {
     // -- PREPARE --
     String jsonInput =
@@ -131,6 +137,8 @@ class OpenCTIApiTest {
 
   // -- SCENARIO --
   @Test
+  @DisplayName(
+      "Test to validate existence of the 'Creation Scenario' endpoint and validate ScenarioInput")
   public void testCreateScenario_ValidInput() throws Exception {
     // -- PREPARE --
     String jsonInput =
@@ -154,6 +162,8 @@ class OpenCTIApiTest {
 
   // -- INJECTS --
   @Test
+  @DisplayName(
+      "Test to validate existence of 'Add Inject to Scenario' endpoint and validate InjectInput")
   public void testCreateInjectForScenario_ValidInput() throws Exception {
     // -- PREPARE --
     String jsonInput =
@@ -178,6 +188,7 @@ class OpenCTIApiTest {
 
   // -- LAST EXERCISE BY EXTERNAL ID --
   @Test
+  @DisplayName("Test to validate existence of the Get Last Exercise Result endpoint")
   public void testGetLatestExerciseByExternalReference_Success() throws Exception {
     // -- PREPARE --
     String externalReferenceId = "valid-id";
