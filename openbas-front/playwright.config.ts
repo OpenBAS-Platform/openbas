@@ -54,6 +54,7 @@ export default defineConfig({
   projects: [
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
     {
+      // Do not change the project name as it is hardcoded in the baseFixtures
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
