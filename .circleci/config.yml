@@ -176,7 +176,7 @@ jobs:
     steps:
       - checkout
       - kubernetes/install-kubectl
-      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN_PRE_RELEASE -n customer-prerelease-openbas rollout restart deployment -l app=openbas
+      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN_PRE_RELEASE -n customer-prerelease-obas rollout restart deployment -l app=openbas
 
   docker_build_platform:
     working_directory: ~/openbas_docker
