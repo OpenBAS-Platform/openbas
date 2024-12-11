@@ -39,9 +39,10 @@ public class PayloadUtils {
     if (payloadNode.has("command_content")) {
       payloadCreateInput.setContent(payloadNode.get("command_content").textValue());
     }
-    if (payloadNode.has("executable_arch")) {
-      payloadCreateInput.setExecutableArch(
-          Endpoint.PLATFORM_ARCH.valueOf(payloadNode.get("executable_arch").textValue()));
+    if (payloadNode.has("payload_execution_arch")) {
+      payloadCreateInput.setExecutionArch(
+          Payload.PAYLOAD_EXECUTION_ARCH.valueOf(
+              (payloadNode.get("payload_execution_arch").textValue())));
     }
     if (payloadNode.has("executable_file")) {
       payloadCreateInput.setExecutableFile(payloadNode.get("executable_file").textValue());
