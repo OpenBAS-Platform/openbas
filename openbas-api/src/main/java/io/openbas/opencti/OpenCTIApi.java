@@ -46,6 +46,7 @@ public class OpenCTIApi {
   @Tracing(name = "Get latest exercise by external reference", layer = "api", operation = "GET")
   public ExerciseSimple latestExerciseByExternalReference(
       @PathVariable @NotBlank final String externalReferenceId) {
-    return scenarioService.latestExerciseByExternalReference(externalReferenceId);
+    ExerciseSimple simple = scenarioService.latestExerciseByExternalReference(externalReferenceId);
+    return simple;
   }
 }

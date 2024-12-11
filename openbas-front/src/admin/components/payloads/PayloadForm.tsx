@@ -205,8 +205,8 @@ const PayloadForm: FunctionComponent<Props> = ({
                 inputProps={register('payload_execution_arch')}
                 InputLabelProps={{ required: true }}
               >
-                <MenuItem value="x86_64">{'x86_64'}</MenuItem>
-                <MenuItem value="arm64">{'arm64'}</MenuItem>
+                <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+                <MenuItem value="arm64">{t('arm64')}</MenuItem>
                 {type === 'Command' && (
                   <MenuItem value="ALL_ARCHITECTURES">{t('ALL_ARCHITECTURES')}</MenuItem>
                 )}
