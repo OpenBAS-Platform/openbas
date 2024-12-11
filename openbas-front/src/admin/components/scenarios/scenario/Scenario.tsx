@@ -31,7 +31,6 @@ import type { KillChainPhase, SearchPaginationInput } from '../../../../utils/ap
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isEmptyField } from '../../../../utils/utils';
-import type { EndpointStore } from '../../assets/endpoints/Endpoint';
 import ExerciseList from '../../simulations/ExerciseList';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
 import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
@@ -81,7 +80,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
 
   // Exercises
   const [loadingExercises, setLoadingExercises] = useState(true);
-  const [exercises, setExercises] = useState<EndpointStore[]>([]);
+  const [exercises, setExercises] = useState<ExerciseStore[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({
     sorts: initSorting('exercise_start_date'),
   }));

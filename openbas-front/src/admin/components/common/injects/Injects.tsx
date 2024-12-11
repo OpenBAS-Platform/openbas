@@ -5,7 +5,6 @@ import { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 
 import * as React from 'react';
 import { Link } from 'react-router';
 
-import type { ArticleStore } from '../../../../actions/channels/Article';
 import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import type { TeamStore } from '../../../../actions/teams/Team';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
@@ -20,7 +19,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type { FilterGroup, Inject, InjectTestStatus, Variable } from '../../../../utils/api-types';
+import type { Article, FilterGroup, Inject, InjectTestStatus, Variable } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { splitDuration } from '../../../../utils/Time';
@@ -96,7 +95,7 @@ interface Props {
   setViewMode?: (mode: string) => void;
   availableButtons: string[];
   teams: TeamStore[];
-  articles: ArticleStore[];
+  articles: Article[];
   variables: Variable[];
   uriVariable: string;
   allUsersNumber?: number;

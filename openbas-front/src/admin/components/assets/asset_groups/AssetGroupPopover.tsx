@@ -9,10 +9,9 @@ import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../components/i18n';
-import type { AssetGroupInput, AssetGroupOutput } from '../../../../utils/api-types';
+import type { AssetGroup, AssetGroupInput, AssetGroupOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
-import type { AssetGroupStore } from './AssetGroup';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
 
@@ -26,11 +25,11 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   inline?: boolean;
-  assetGroup: AssetGroupStore | AssetGroupOutput;
+  assetGroup: AssetGroup | AssetGroupOutput;
   onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
   onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
-  onUpdate?: (result: AssetGroupStore) => void;
+  onUpdate?: (result: AssetGroup) => void;
   onDelete?: (result: string) => void;
 }
 
@@ -72,7 +71,7 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
   };
   const submitEdit = (data: AssetGroupInput) => {
     dispatch(updateAssetGroup(assetGroup.asset_group_id, data)).then(
-      (result: { result: string; entities: { asset_groups: Record<string, AssetGroupStore> } }) => {
+      (result: { result: string; entities: { asset_groups: Record<string, AssetGroup> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const updated = result.entities.asset_groups[result.result];

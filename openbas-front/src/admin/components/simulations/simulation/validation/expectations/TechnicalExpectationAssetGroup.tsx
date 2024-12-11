@@ -6,9 +6,7 @@ import { FunctionComponent } from 'react';
 import type { EndpointHelper } from '../../../../../../actions/assets/asset-helper';
 import type { Contract } from '../../../../../../actions/contract/contract';
 import { useHelper } from '../../../../../../store';
-import type { Team } from '../../../../../../utils/api-types';
-import type { AssetGroupStore } from '../../../../assets/asset_groups/AssetGroup';
-import type { EndpointStore } from '../../../../assets/endpoints/Endpoint';
+import type { AssetGroup, Endpoint, Team } from '../../../../../../utils/api-types';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import { typeIcon } from '../../../../common/injects/expectations/ExpectationUtils';
 import ExpectationLine from './ExpectationLine';
@@ -31,7 +29,7 @@ interface Props {
   injectContract: Contract;
   relatedExpectations: InjectExpectationsStore[];
   team: Team;
-  assetGroup: AssetGroupStore;
+  assetGroup: AssetGroup;
 }
 
 const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
@@ -62,7 +60,7 @@ const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
         icon={typeIcon(expectation.inject_expectation_type)}
       />
       {Array.from(groupedByAsset(relatedExpectations)).map(([groupedId, groupedExpectations]) => {
-        const relatedAsset: EndpointStore = assetsMap[groupedId];
+        const relatedAsset: Endpoint = assetsMap[groupedId];
         return (
           <div key={relatedAsset?.asset_id}>
             <ListItem
