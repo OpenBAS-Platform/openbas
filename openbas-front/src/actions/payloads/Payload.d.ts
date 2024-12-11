@@ -10,3 +10,5 @@ export type PayloadStore = Omit<Payload, 'payload_collector'> & {
   payload_execution_arch?: string;
   payload_attack_patterns?: string[];
 };
+
+export type PayloadStatus = 'UNVERIFIED' | 'VERIFIED' | 'DEPRECATED';

@@ -67,7 +67,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(INJECT_WITHOUT_STATUS.getId(), JsonPath.read(response, "$.inject_id"));
-    assertNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
   @Test
@@ -86,7 +85,6 @@ public class AtomicTestingApiTest extends IntegrationTest {
     assertNotNull(response);
     assertEquals(
         INJECT_WITH_STATUS_AND_COMMAND_LINES.getId(), JsonPath.read(response, "$.inject_id"));
-    assertNotNull(JsonPath.read(response, "$.inject_commands_lines"));
   }
 
   @Test

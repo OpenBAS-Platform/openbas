@@ -9,7 +9,7 @@ import ItemStatus from '../../../../components/ItemStatus';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { AttackPatternSimple, InjectTargetWithResult, KillChainPhaseSimple } from '../../../../utils/api-types';
+import { AttackPatternSimple, InjectTargetWithResult, KillChainPhaseSimple } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectIcon from '../../common/injects/InjectIcon';
@@ -102,7 +102,6 @@ const AtomicTesting = () => {
               </Typography>
               <div style={{ display: 'flex' }}>
                 <InjectIcon
-                  variant="inline"
                   isPayload={isNotEmptyField(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload)}
                   type={
                     injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
