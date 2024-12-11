@@ -237,8 +237,8 @@ const EndpointForm: React.FC<Props> = ({
             inputProps={register('endpoint_arch')}
             InputLabelProps={{ required: true }}
           >
-            <MenuItem value="x86_64">{'x86_64'}</MenuItem>
-            <MenuItem value="arm64">{'arm64'}</MenuItem>
+            <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+            <MenuItem value="arm64">{t('arm64')}</MenuItem>
           </TextField>
         )}
       />
