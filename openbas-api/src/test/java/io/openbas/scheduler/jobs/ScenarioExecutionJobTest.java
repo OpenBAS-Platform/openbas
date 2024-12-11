@@ -81,11 +81,7 @@ class ScenarioExecutionJobTest {
     hourToStart = hourToStart % 24;
 
     scenario.setRecurrence(
-        "0 "
-            + minuteToStart
-            + " "
-            + hourToStart
-            + " * * *"); // Every day now + 1 minute
+        "0 " + minuteToStart + " " + hourToStart + " * * *"); // Every day now + 1 minute
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_2 = scenarioSaved.getId();
 
