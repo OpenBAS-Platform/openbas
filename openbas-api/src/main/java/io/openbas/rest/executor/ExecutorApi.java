@@ -182,11 +182,11 @@ public class ExecutorApi extends RestBehavior {
       InputStream in = null;
       String resourcePath = "/openbas-agent/windows/" + architecture + "/";
       if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
-        filename = "openbas-agent-" + version + ".exe";
+        filename = "openbas-agent-installer-" + version + ".exe";
         in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
       } else if (executorOpenbasBinariesOrigin.equals(
           "repository")) { // if we want a specific version from artifactory
-        filename = "openbas-agent-" + executorOpenbasBinariesVersion + ".exe";
+        filename = "openbas-agent-installer-" + executorOpenbasBinariesVersion + ".exe";
         in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
       }
       if (in == null) {

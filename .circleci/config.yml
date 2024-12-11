@@ -176,7 +176,7 @@ jobs:
     steps:
       - checkout
       - kubernetes/install-kubectl
-      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN_PRE_RELEASE -n customer-prerelease-openbas rollout restart deployment -l app=openbas
+      - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN_PRE_RELEASE -n customer-prerelease-obas rollout restart deployment -l app=openbas
 
   docker_build_platform:
     working_directory: ~/openbas_docker
@@ -293,7 +293,7 @@ jobs:
           working_directory: ~/openbas_docker
           name: Build Docker image openbas/platform
           command: docker buildx build --progress=plain --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:rolling --push .
-          no_output_timeout: 30
+          no_output_timeout: 30m
       - slack/notify:
           event: fail
           template: basic_fail_1
@@ -354,7 +354,7 @@ jobs:
           working_directory: ~/openbas_docker
           name: Build Docker image openbas/platform
           command: docker buildx build --progress=plain --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openbas/platform:prerelease --push .
-          no_output_timeout: 30
+          no_output_timeout: 30m
       - slack/notify:
           event: fail
           template: basic_fail_1
