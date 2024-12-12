@@ -40,8 +40,6 @@ public class InjectorService {
 
   private AttackPatternRepository attackPatternRepository;
 
-  private PayloadService payloadService;
-
   @Resource
   public void setFileService(FileService fileService) {
     this.fileService = fileService;
@@ -60,11 +58,6 @@ public class InjectorService {
   @Autowired
   public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
     this.injectorContractRepository = injectorContractRepository;
-  }
-
-  @Autowired
-  public void setPayloadService(PayloadService payloadService) {
-    this.payloadService = payloadService;
   }
 
   @Transactional
