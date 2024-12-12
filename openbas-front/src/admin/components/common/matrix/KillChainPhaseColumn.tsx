@@ -1,7 +1,6 @@
 import { makeStyles, useTheme } from '@mui/styles';
 import { FunctionComponent } from 'react';
 
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import type { Theme } from '../../../../components/Theme';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
@@ -44,8 +43,8 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
     return 0;
   };
   // Inject Results
-  const getInjectResult = (attack: AttackPatternStore) => {
-    return injectResults.find(injectResult => injectResult.inject_attack_pattern === attack.attack_pattern_id);
+  const getInjectResult = (attack: AttackPattern) => {
+    return injectResults.find(injectResult => injectResult.inject_attack_pattern?.includes(attack.attack_pattern_id));
   };
   return (
     <div style={{ marginBottom: 16 }}>
