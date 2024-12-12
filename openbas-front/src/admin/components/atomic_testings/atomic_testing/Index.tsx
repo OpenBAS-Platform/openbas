@@ -108,7 +108,7 @@ const Index = () => {
                 className={classes.item}
               />
               {
-                injectResultOverviewOutput.inject_type !== 'openbas_email' && injectResultOverviewOutput.inject_type !== 'openbas_ovh_sms' && (
+                injectResultOverviewOutput.inject_type !== 'openbas_email' && injectResultOverviewOutput.inject_type !== 'openbas_ovh_sms' && injectResultOverviewOutput.inject_type !== 'openbas_mastodon' && (
                   <Tab
                     component={Link}
                     to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
