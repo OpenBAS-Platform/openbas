@@ -265,6 +265,28 @@ export const areaChartOptions = (
   },
 });
 
+export interface CustomTooltipOptions {
+  _: unknown[];
+  seriesIndex: number;
+  dataPointIndex: number; w: {
+    globals: {
+      initialSeries: Array<{ data: object[] }>;
+    };
+  };
+}
+
+export type CustomTooltipFunction = (options: CustomTooltipOptions) => unknown | undefined;
+
+function getColors(theme: Theme, isResult: boolean, distributed: boolean) {
+  if (isResult) {
+    return resultColors(theme.palette.mode === 'dark' ? 400 : 600);
+  }
+  if (distributed) {
+    return colors(theme.palette.mode === 'dark' ? 400 : 600);
+  }
+  return [theme.palette.primary.main];
+}
+
 /**
  * @param {Theme} theme
  * @param {function} xFormatter
@@ -278,6 +300,7 @@ export const areaChartOptions = (
  * @param {boolean} isFakeData
  * @param {number} max
  * @param {string} emptyChartText
+ * @param {function} customTooltip
  */
 export const verticalBarsChartOptions = (
   theme: Theme,
@@ -292,6 +315,7 @@ export const verticalBarsChartOptions = (
   isFakeData = false,
   max: ApexYAxis['max'] = undefined,
   emptyChartText = '',
+  customTooltip?: CustomTooltipFunction,
 ): ApexOptions => ({
   chart: {
     type: 'bar',
@@ -314,8 +338,7 @@ export const verticalBarsChartOptions = (
   dataLabels: {
     enabled: false,
   },
-  // eslint-disable-next-line no-nested-ternary
-  colors: isResult ? resultColors(theme.palette.mode === 'dark' ? 400 : 600) : distributed ? colors(theme.palette.mode === 'dark' ? 400 : 600) : [theme.palette.primary.main],
+  colors: getColors(theme, isResult, distributed),
   states: {
     hover: {
       filter: {
@@ -352,6 +375,7 @@ export const verticalBarsChartOptions = (
   tooltip: {
     theme: theme.palette.mode,
     enabled: !isFakeData,
+    custom: customTooltip,
   },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',

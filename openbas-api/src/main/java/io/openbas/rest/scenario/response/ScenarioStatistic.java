@@ -1,15 +1,8 @@
 package io.openbas.rest.scenario.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Map;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-public class ScenarioStatistic {
-
-  @JsonProperty("scenarios_global_count")
-  private long scenariosGlobalCount;
-
-  @JsonProperty("scenarios_attack_scenario_count")
-  private Map<String, Long> scenariosCategoriesCount;
-}
+public record ScenarioStatistic(
+    @JsonProperty("simulations_results_latest") @NotNull
+        SimulationsResultsLatest simulationsResultsLatest) {}
