@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../../../../actions/exercises/Exercise';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { buildEmptyFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
@@ -21,11 +20,6 @@ import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
 import ExerciseMainInformation from '../ExerciseMainInformation';
 import ExerciseDistribution from './ExerciseDistribution';
-import type {ScenariosHelper} from "../../../../../actions/scenarios/scenario-helper";
-import useDataLoader from "../../../../../utils/hooks/useDataLoader";
-import {fetchScenarioArticles} from "../../../../../actions/channels/article-action";
-import {fetchScenario} from "../../../../../actions/scenarios/scenario-actions";
-import {useAppDispatch} from "../../../../../utils/hooks";
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -46,22 +40,12 @@ const Exercise = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
-  const dispatch = useAppDispatch();
 
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({
     exercise: helper.getExercise(exerciseId),
   }));
-  const scenario = useHelper((helper: ScenariosHelper) => {
-    console.log(exercise.exercise_scenario)
-    return helper.getScenario(exercise.exercise_scenario);
-  });
-
-  useDataLoader(() => {
-    dispatch(fetchScenario(exercise.exercise_scenario));
-  })
-
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
   const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPatternStore[] | null>(null);
   useEffect(() => {
@@ -101,7 +85,7 @@ const Exercise = () => {
           <Typography variant="h4" gutterBottom>
             {t('Information')}
           </Typography>
-          <ExerciseMainInformation exercise={exercise} scenario={scenario} />
+          <ExerciseMainInformation exercise={exercise} />
         </Grid>
         <Grid item xs={6} style={{ display: 'flex', flexDirection: 'column', paddingTop: 10 }}>
           <Typography variant="h4" gutterBottom>

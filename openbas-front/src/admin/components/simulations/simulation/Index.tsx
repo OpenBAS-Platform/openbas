@@ -5,6 +5,7 @@ import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-rou
 
 import { fetchExercise } from '../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
@@ -173,6 +174,9 @@ const Index = () => {
       setLoading(false);
     });
   });
+  useDataLoader(() => {
+    dispatch(fetchScenario(exercise.exercise_scenario));
+  }, [exercise]);
 
   const exerciseInjectContext = injectContextForExercise(exercise);
 

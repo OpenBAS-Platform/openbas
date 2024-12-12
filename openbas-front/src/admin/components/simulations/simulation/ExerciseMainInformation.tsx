@@ -1,7 +1,10 @@
-import {Button, Chip, Grid, Paper, Typography } from '@mui/material';
+import { Button, Chip, Grid, Paper, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import * as React from 'react';
+import { Link } from 'react-router';
 
+import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import ItemCategory from '../../../../components/ItemCategory';
@@ -9,14 +12,12 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type { Exercise, KillChainPhase, Scenario } from '../../../../utils/api-types';
-import {Link} from "react-router";
-import {makeStyles} from "@mui/styles";
+import { useHelper } from '../../../../store';
+import type { Exercise, KillChainPhase } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 
 interface Props {
   exercise: Exercise;
-  scenario: Scenario;
 }
 
 const useStyles = makeStyles(() => ({
@@ -24,17 +25,19 @@ const useStyles = makeStyles(() => ({
     textTransform: 'none',
     height: 20,
   },
-  dialogPaper: {
-    minHeight: '90vh',
-    maxHeight: '90vh',
-  },
 }));
 
-const ExerciseMainInformation: React.FC<Props> = ({ exercise, scenario }) => {
+const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
   const { t } = useFormatter();
   const classes = useStyles();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
-  const scenarioBaseUri = "/admin/scenarios"
+  const scenarioBaseUri = '/admin/scenarios';
+  const scenarioId: string = exercise.exercise_scenario || '';
+  const { scenario } = scenarioId
+    ? useHelper((helper: ScenariosHelper) => ({
+      scenario: helper.getScenario(scenarioId),
+    }))
+    : undefined;
 
   return (
     <Paper sx={{ padding: '15px' }} variant="outlined">
@@ -54,30 +57,31 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise, scenario }) => {
         </Grid>
         <Grid item xs={4} style={{ paddingTop: 10 }}>
           <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: 20 }}
+            variant="h3"
+            gutterBottom
+            style={{ marginTop: 20 }}
           >
             {t('Originating scenario')}
           </Typography>
           {scenario ? (
-          <Button
+            <Button
               component={Link}
               to={scenarioBaseUri + '/' + scenario.scenario_id}
               color="primary"
-              variant="text"
+              variant="outlined"
               className={classes.button}
-          >
-            { truncate(scenario.scenario_name, 25) }
-          </Button>) : '-'}
+            >
+              { truncate(scenario.scenario_name, 23) }
+            </Button>
+          ) : '-'}
         </Grid>
         <Grid item xs={4} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
             style={{ marginTop: 20 }}
-            sx = {{
-              width: "100%"
+            sx={{
+              width: '100%',
             }}
           >
             {t('Severity')}
