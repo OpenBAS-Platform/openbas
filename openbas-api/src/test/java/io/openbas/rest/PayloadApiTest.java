@@ -70,7 +70,9 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"));
+        .andExpect(
+            jsonPath("$.payload_execution_arch")
+                .value(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name()));
   }
 
   @Test
@@ -86,7 +88,7 @@ class PayloadApiTest extends IntegrationTest {
 
   @Test
   @DisplayName(
-      "Creating an executable Payload with an arch different from x86_64 or ARM64 should fail")
+      "Creating an executable Payload with an arch different from x86_64 or arm64 should fail")
   @WithMockAdminUser
   void createExecutablePayloadWithoutArch() throws Exception {
     PayloadCreateInput input = PayloadInputFixture.createDefaultPayloadCreateInputForExecutable();
@@ -99,7 +101,7 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(
             result -> {
               String errorMessage = result.getResolvedException().getMessage();
-              assertTrue(errorMessage.contains("Executable architecture must be x86_64 or ARM64"));
+              assertTrue(errorMessage.contains("Executable architecture must be x86_64 or arm64"));
             });
   }
 
@@ -119,7 +121,9 @@ class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
+            .andExpect(
+                jsonPath("$.payload_execution_arch")
+                    .value(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name()))
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -136,7 +140,9 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("My Updated Executable Payload"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
-        .andExpect(jsonPath("$.payload_execution_arch").value("ARM64"));
+        .andExpect(
+            jsonPath("$.payload_execution_arch")
+                .value(Payload.PAYLOAD_EXECUTION_ARCH.arm64.name()));
   }
 
   @Test
@@ -171,7 +177,7 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(
             result -> {
               String errorMessage = result.getResolvedException().getMessage();
-              assertTrue(errorMessage.contains("Executable architecture must be x86_64 or ARM64"));
+              assertTrue(errorMessage.contains("Executable architecture must be x86_64 or arm64"));
             });
   }
 
@@ -204,7 +210,9 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("Updated Command line payload"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("MacOS"))
-        .andExpect(jsonPath("$.payload_execution_arch").value("ALL_ARCHITECTURES"));
+        .andExpect(
+            jsonPath("$.payload_execution_arch")
+                .value(Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES.name()));
   }
 
   @Test
@@ -222,7 +230,9 @@ class PayloadApiTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(upsertInput)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.payload_execution_arch").value("ALL_ARCHITECTURES"));
+        .andExpect(
+            jsonPath("$.payload_execution_arch")
+                .value(Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES.name()));
 
     // -- With property architecture and null value
     upsertInput.setExecutionArch(null);
@@ -386,7 +396,9 @@ class PayloadApiTest extends IntegrationTest {
             .andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.payload_name").value("My Executable Payload"))
             .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-            .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
+            .andExpect(
+                jsonPath("$.payload_execution_arch")
+                    .value(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name()))
             .andExpect(jsonPath("$.payload_source").value("COMMUNITY"))
             .andExpect(jsonPath("$.payload_status").value("VERIFIED"))
             .andReturn()
@@ -399,7 +411,9 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful())
         .andExpect(jsonPath("$.payload_name").value("My Executable Payload (duplicate)"))
         .andExpect(jsonPath("$.payload_platforms.[0]").value("Linux"))
-        .andExpect(jsonPath("$.payload_execution_arch").value("X86_64"))
+        .andExpect(
+            jsonPath("$.payload_execution_arch")
+                .value(Payload.PAYLOAD_EXECUTION_ARCH.x86_64.name()))
         .andExpect(jsonPath("$.payload_source").value("MANUAL"))
         .andExpect(jsonPath("$.payload_status").value("UNVERIFIED"));
   }
