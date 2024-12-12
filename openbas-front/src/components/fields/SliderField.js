@@ -41,6 +41,9 @@ renderSliderField.propTypes = {
   disabled: PropTypes.bool,
 };
 
+/**
+ * @deprecated The component use old form library react-final-form
+ */
 const SliderField = props => (
   <Field component={renderSliderField} {...props} />
 );
