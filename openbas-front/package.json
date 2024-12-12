@@ -140,11 +140,11 @@
     "test:e2e:coverage": "npx nyc report --reporter=html && start \"\" coverage/index.html"
   },
   "resolutions": {
-    "mini-css-extract-plugin": "2.9.1",
+    "mini-css-extract-plugin": "2.9.2",
     "react-transition-group": "4.4.5"
   },
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@4.5.1"
+  "packageManager": "yarn@4.5.3"
 }

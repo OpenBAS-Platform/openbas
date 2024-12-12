@@ -433,7 +433,7 @@ workflows:
           filters:
             branches:
               only:
-                - release/*
+                - /^release\/\d+\.\d+\.\d+$/
       - docker_build_platform:
           requires:
             - build_frontend
