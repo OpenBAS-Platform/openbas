@@ -65,7 +65,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   const { scenario } = useHelper((helper: ScenariosHelper & ExercisesHelper) => ({
     scenario: helper.getScenario(scenarioId),
   }));
-  const scenarioHasExercises = scenario.scenario_exercises?.length > 0;
+  const areAnyExercisesInScenario = scenario.scenario_exercises?.length > 0;
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
 
   // Exercises
@@ -211,7 +211,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
             <ScenarioDistributionByExercise scenarioId={scenarioId} />
           </Paper>
         </Grid>
-        {scenarioHasExercises && (
+        {areAnyExercisesInScenario && (
           <Grid item xs={12} style={{ marginTop: 35 }}>
             <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
               {t('Simulations')}
@@ -237,7 +237,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
           </Grid>
         )}
       </Grid>
-      {!scenarioHasExercises && !scenario.scenario_recurrence && (
+      {!areAnyExercisesInScenario && !scenario.scenario_recurrence && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>
             {t('This scenario has never run, schedule or run it now!')}
@@ -254,7 +254,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
           </Button>
         </div>
       )}
-      {!scenarioHasExercises && scenario.scenario_recurrence && (
+      {!areAnyExercisesInScenario && scenario.scenario_recurrence && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>
             {t('This scenario is scheduled to run, results will appear soon.')}
