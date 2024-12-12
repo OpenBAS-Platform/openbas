@@ -200,7 +200,7 @@ public class InjectsExecutionJob implements Job {
               errorMsg -> finalStatus.getTraces().add(InjectStatusExecution.traceError(errorMsg)));
       finalStatus.setName(ExecutionStatus.ERROR);
       finalStatus.setTrackingSentDate(Instant.now());
-      finalStatus.setPayloadOutput(injectUtils.getCommandsLinesFromInject(inject));
+      finalStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
       injectStatusRepository.save(finalStatus);
     } else {
       setInjectStatusAndExecuteInject(executableInject, inject);
@@ -276,7 +276,7 @@ public class InjectsExecutionJob implements Job {
     }
     injectStatus.setName(status);
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setPayloadOutput(injectUtils.getCommandsLinesFromInject(inject));
+    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     injectStatusRepository.save(injectStatus);
     inject.setStatus(injectStatus);
   }

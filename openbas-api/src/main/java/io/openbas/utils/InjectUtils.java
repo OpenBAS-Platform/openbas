@@ -33,7 +33,7 @@ public class InjectUtils {
 
   private final ApplicationContext context;
 
-  public StatusPayload getCommandsLinesFromInject(final Inject inject) {
+  public StatusPayload getStatusPayloadFromInject(final Inject inject) {
     if (inject == null) {
       return null;
     }
@@ -50,9 +50,10 @@ public class InjectUtils {
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
         PayloadCommandBlock payloadCommandBlock =
             new PayloadCommandBlock(
-                payloadCommand.getExecutor(),
-                payloadCommand.getContent(),
-                List.of(payloadCommand.getCleanupCommand()));
+                payloadCommand.getExecutor(), payloadCommand.getContent(), null);
+        if (payloadCommand.getCleanupCommand() != null) {
+          payloadCommandBlock.setCleanupCommand(List.of(payloadCommand.getCleanupCommand()));
+        }
         return new StatusPayload(
             null,
             null,

@@ -9,9 +9,7 @@ import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 
-@Component
 public class AtomicTestingUtils {
 
   public static final String ENDPOINT = "Endpoint";

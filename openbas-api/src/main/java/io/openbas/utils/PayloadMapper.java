@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PayloadMapper {
 
-  public StatusPayloadOutput getPayloadOutputFromInject(Optional<Inject> inject) {
+  public StatusPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
     StatusPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
         StatusPayloadOutput.builder();
     StatusPayloadOutput result = statusPayloadOutputBuilder.build();

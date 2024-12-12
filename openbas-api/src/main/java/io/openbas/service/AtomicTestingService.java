@@ -78,7 +78,7 @@ public class AtomicTestingService {
 
   public StatusPayloadOutput findPayloadOutputByInjectId(String injectId) {
     Optional<Inject> inject = injectRepository.findById(injectId);
-    return payloadMapper.getPayloadOutputFromInject(inject);
+    return payloadMapper.getStatusPayloadOutputFromInject(inject);
   }
 
   @Transactional
