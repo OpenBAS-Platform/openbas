@@ -26,6 +26,7 @@ import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.exercise.form.*;
+import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.helper.TeamHelper;
@@ -609,6 +610,14 @@ public class ExerciseApi extends RestBehavior {
   @Tracing(name = "Get the global result for an exercise", layer = "api", operation = "GET")
   public List<ExpectationResultsByType> globalResults(@NotBlank @PathVariable String exerciseId) {
     return exerciseService.getGlobalResults(exerciseId);
+  }
+
+  @LogExecutionTime
+  @PostMapping(EXERCISE_URI + "/global-scores")
+  @Tracing(name = "Get the global scores for exercises", layer = "api", operation = "POST")
+  public ExercisesGlobalScoresOutput getExercisesGlobalScores(
+      @Valid @RequestBody ExercisesGlobalScoresInput input) {
+    return exerciseService.getExercisesGlobalScores(input);
   }
 
   @LogExecutionTime
