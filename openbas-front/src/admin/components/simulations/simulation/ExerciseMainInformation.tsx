@@ -1,5 +1,5 @@
+import { MovieFilterOutlined } from '@mui/icons-material';
 import { Button, Chip, Grid, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -20,16 +20,8 @@ interface Props {
   exercise: Exercise;
 }
 
-const useStyles = makeStyles(() => ({
-  button: {
-    textTransform: 'none',
-    height: 20,
-  },
-}));
-
 const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
   const scenarioBaseUri = '/admin/scenarios';
   const scenarioId: string = exercise.exercise_scenario || '';
@@ -61,7 +53,7 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
             gutterBottom
             style={{ marginTop: 20 }}
           >
-            {t('Originating scenario')}
+            {t('Parent scenario')}
           </Typography>
           {scenario ? (
             <Button
@@ -69,9 +61,20 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
               to={scenarioBaseUri + '/' + scenario.scenario_id}
               color="primary"
               variant="outlined"
-              className={classes.button}
+              startIcon={<MovieFilterOutlined color="primary" />}
+              sx={{
+                width: '100%',
+              }}
             >
-              { truncate(scenario.scenario_name, 23) }
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                }}
+              >
+                { truncate(scenario.scenario_name, 150) }
+              </Typography>
             </Button>
           ) : '-'}
         </Grid>
