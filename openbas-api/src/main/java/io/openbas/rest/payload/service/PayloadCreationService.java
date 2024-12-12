@@ -1,4 +1,4 @@
-package io.openbas.rest.payload;
+package io.openbas.rest.payload.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
@@ -9,7 +9,6 @@ import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
-import io.openbas.integrations.PayloadService;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

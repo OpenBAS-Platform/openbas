@@ -21,7 +21,7 @@ import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.form.InjectDependencyInput;
-import io.openbas.rest.payload.PayloadCreationService;
+import io.openbas.rest.payload.service.PayloadCreationService;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;

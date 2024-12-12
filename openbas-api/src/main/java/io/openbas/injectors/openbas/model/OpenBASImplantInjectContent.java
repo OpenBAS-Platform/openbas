@@ -16,4 +16,12 @@ public class OpenBASImplantInjectContent {
 
   @JsonProperty("expectations")
   private List<Expectation> expectations = new ArrayList<>();
+
+  public static String getDefaultObfuscator() {
+    return "base64";
+  }
+
+  public static List<String> getObfuscatorList() {
+    return List.of("base64", "plain-text");
+  }
 }
