@@ -40,7 +40,6 @@ const Exercise = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
-
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({
