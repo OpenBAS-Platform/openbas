@@ -8,7 +8,7 @@ import io.openbas.database.model.Execution;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
+import io.openbas.executors.Injector;
 import io.openbas.injectors.lade.service.LadeService;
 import io.openbas.model.ExecutionProcess;
 import jakarta.validation.constraints.NotNull;

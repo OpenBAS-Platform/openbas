@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +17,8 @@ public class InjectMapper {
 
   private final InjectUtils injectUtils;
   private final ResultUtils resultUtils;
+
+  private final ApplicationContext context;
 
   public InjectResultOverviewOutput toInjectResultOverviewOutput(Inject inject) {
     // --
@@ -32,11 +35,10 @@ public class InjectMapper {
         .title(inject.getTitle())
         .description(inject.getDescription())
         .content(inject.getContent())
-        .commandsLines(injectUtils.getCommandsLinesFromInject(inject))
         .type(injectorContract.map(contract -> contract.getInjector().getType()).orElse(null))
         .tagIds(inject.getTags().stream().map(Tag::getId).toList())
         .documentIds(documentIds)
-        .injectorContract(toInjectorContractSimple(injectorContract))
+        .injectorContract(toInjectorContractOutput(injectorContract))
         .status(toInjectStatusOutput(inject.getStatus()))
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
@@ -67,12 +69,12 @@ public class InjectMapper {
   }
 
   // -- INJECTORCONTRACT to INJECTORCONTRACT SIMPLE --
-  public InjectorContractSimple toInjectorContractSimple(
+  public AtomicInjectorContractOutput toInjectorContractOutput(
       Optional<InjectorContract> injectorContract) {
     return injectorContract
         .map(
             contract ->
-                InjectorContractSimple.builder()
+                AtomicInjectorContractOutput.builder()
                     .id(contract.getId())
                     .content(contract.getContent())
                     .convertedContent(contract.getConvertedContent())

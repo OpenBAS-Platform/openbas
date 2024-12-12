@@ -2,6 +2,8 @@ import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useContext, useEffect, useState } from 'react';
 
+import { fetchDocuments } from '../../../../actions/Document';
+import { DocumentHelper } from '../../../../actions/helper';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
@@ -9,7 +11,10 @@ import ItemStatus from '../../../../components/ItemStatus';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { AttackPatternSimple, InjectTargetWithResult, KillChainPhaseSimple } from '../../../../utils/api-types';
+import { useHelper } from '../../../../store';
+import { AttackPatternSimple, InjectTargetWithResult, KillChainPhaseSimple } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
+import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectIcon from '../../common/injects/InjectIcon';
@@ -42,10 +47,18 @@ const useStyles = makeStyles(() => ({
 const AtomicTesting = () => {
   // Standard hooks
   const classes = useStyles();
+  const dispatch = useAppDispatch();
   const { t, tPick, fldt } = useFormatter();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
+
+  const { documentMap } = useHelper((helper: DocumentHelper) => ({
+    documentMap: helper.getDocumentsMap(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchDocuments());
+  });
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
@@ -79,7 +92,7 @@ const AtomicTesting = () => {
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
           <Grid container spacing={3}>
-            <Grid item xs={12} style={{ paddingTop: 10 }}>
+            <Grid item xs={8} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -98,11 +111,24 @@ const AtomicTesting = () => {
                 gutterBottom
                 style={{ marginTop: 20 }}
               >
+                {t('Execution status')}
+              </Typography>
+              <ItemStatus
+                isInject={true}
+                status={injectResultOverviewOutput.inject_status?.status_name}
+                label={t(injectResultOverviewOutput.inject_status?.status_name ?? 'Unknown')}
+              />
+            </Grid>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
                 {t('Type')}
               </Typography>
               <div style={{ display: 'flex' }}>
                 <InjectIcon
-                  variant="inline"
                   isPayload={isNotEmptyField(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload)}
                   type={
                     injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
@@ -137,18 +163,24 @@ const AtomicTesting = () => {
               </div>
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>
-              <Typography
-                variant="h3"
-                gutterBottom
-                style={{ marginTop: 20 }}
-              >
-                {t('Execution status')}
+              <Typography variant="h3" gutterBottom style={{ marginTop: 20 }}>
+                {t('Documents')}
               </Typography>
-              <ItemStatus
-                isInject={true}
-                status={injectResultOverviewOutput.inject_status?.status_name}
-                label={t(injectResultOverviewOutput.inject_status?.status_name ?? 'Unknown')}
-              />
+              {
+                injectResultOverviewOutput.injects_documents !== undefined && injectResultOverviewOutput.injects_documents.length > 0
+                  ? injectResultOverviewOutput.injects_documents.map((documentId) => {
+                    const document = documentMap[documentId];
+                    return (
+                      <Typography key={documentId} variant="body1">
+                        {document?.document_name ?? '-'}
+                      </Typography>
+                    );
+                  }) : (
+                    <Typography variant="body1" gutterBottom>
+                      -
+                    </Typography>
+                  )
+              }
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>
               <Typography

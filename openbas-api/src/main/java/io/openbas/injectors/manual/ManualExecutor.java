@@ -2,7 +2,7 @@ package io.openbas.injectors.manual;
 
 import io.openbas.database.model.Execution;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.Injector;
+import io.openbas.executors.Injector;
 import io.openbas.model.ExecutionProcess;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;

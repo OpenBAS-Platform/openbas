@@ -15,6 +15,7 @@ import { FIVE_SECONDS } from '../../../../utils/Time';
 import { TeamContext } from '../../common/Context';
 import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
 import AtomicTestingHeader from './AtomicTestingHeader';
+import AtomicTestingPayloadInfo from './AtomicTestingPayloadInfo';
 import teamContextForAtomicTesting from './context/TeamContextForAtomicTesting';
 
 const interval$ = interval(FIVE_SECONDS);
@@ -106,12 +107,24 @@ const Index = () => {
                 label={t('Execution details')}
                 className={classes.item}
               />
+              {
+                injectResultOverviewOutput.inject_type !== 'openbas_email' && injectResultOverviewOutput.inject_type !== 'openbas_ovh_sms' && injectResultOverviewOutput.inject_type !== 'openbas_mastodon' && injectResultOverviewOutput.inject_type !== 'openbas_http_query' && (
+                  <Tab
+                    component={Link}
+                    to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
+                    value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
+                    label={t('Payload info')}
+                    className={classes.item}
+                  />
+                )
+              }
             </Tabs>
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(AtomicTesting)()} />
               <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
+              <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>
