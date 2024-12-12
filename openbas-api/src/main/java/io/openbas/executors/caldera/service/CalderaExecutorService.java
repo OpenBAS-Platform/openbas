@@ -161,6 +161,7 @@ public class CalderaExecutorService implements Runnable {
             endpoint ->
                 Arrays.stream(endpoint.getIps())
                         .anyMatch(Arrays.asList(agent.getHost_ip_addrs())::contains)
+                    && endpoint.getExecutor() != null
                     && CALDERA_EXECUTOR_TYPE.equals(endpoint.getExecutor().getType()))
         .findFirst();
   }
