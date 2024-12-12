@@ -77,12 +77,11 @@ class ScenarioExecutionJobTest {
 
     Scenario scenario = ScenarioFixture.getScenario();
     int minuteToStart = (zonedDateTime.getMinute() + 1) % 60;
+    int hourToStart = zonedDateTime.getHour() + ((zonedDateTime.getMinute() + 1) / 60);
+    hourToStart = hourToStart % 24;
+
     scenario.setRecurrence(
-        "0 "
-            + minuteToStart
-            + " "
-            + zonedDateTime.getHour()
-            + " * * *"); // Every day now + 1 minute
+        "0 " + minuteToStart + " " + hourToStart + " * * *"); // Every day now + 1 minute
     Scenario scenarioSaved = this.scenarioService.createScenario(scenario);
     SCENARIO_ID_2 = scenarioSaved.getId();
 
