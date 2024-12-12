@@ -271,10 +271,10 @@ const UpdateInjectDetails = ({
     mode: 'onTouched',
     resolver: zodResolver(
       z.object({
-        inject_title: z.string().min(1, { message: t('This field is required.') }),
-        inject_depends_duration_days: z.number().int().min(0, { message: t('This field is required.') }),
-        inject_depends_duration_hours: z.number().int().min(0, { message: t('This field is required.') }),
-        inject_depends_duration_minutes: z.number().int().min(0, { message: t('This field is required.') }),
+        inject_title: z.string().min(1, { message: t('This field is required') }),
+        inject_depends_duration_days: z.number().int().min(0, { message: t('This field is required') }),
+        inject_depends_duration_hours: z.number().int().min(0, { message: t('This field is required') }),
+        inject_depends_duration_minutes: z.number().int().min(0, { message: t('This field is required') }),
         ...Object.keys(initialValues).reduce((acc, key) => {
           acc[key] = z.any();
           return acc;
