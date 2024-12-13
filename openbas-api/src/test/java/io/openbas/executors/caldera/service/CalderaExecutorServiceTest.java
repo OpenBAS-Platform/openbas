@@ -138,4 +138,13 @@ public class CalderaExecutorServiceTest {
     Optional<Endpoint> result = calderaExecutorService.findExistingEndpointForAnAgent(calderaAgent);
     assertTrue(result.isEmpty());
   }
+
+  @Test
+  void test_findExistingEndpointForAnAgent_WITH_1_enpdoint_with_null_executor() throws Exception {
+    randomEndpoint.setExecutor(null);
+    randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);
+    randomEndpoint.setIps(new String[] {CALDERA_AGENT_IP});
+    Optional<Endpoint> result = calderaExecutorService.findExistingEndpointForAnAgent(calderaAgent);
+    assertEquals(calderaEndpoint, result.get());
+  }
 }
