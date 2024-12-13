@@ -143,8 +143,6 @@
     "show-report-e2e": "start \"\" test-results/report.html && start \"\" test-results/coverage/index.html"
   },
   "resolutions": {
-    "mini-css-extract-plugin": "2.9.2",
-    "react-transition-group": "4.4.5",
     "react-apexcharts@1.4.1": "patch:react-apexcharts@npm%3A1.4.1#./.yarn/patches/react-apexcharts-npm-1.4.1-2dc909d883.patch"
   },
   "workspaces": [
