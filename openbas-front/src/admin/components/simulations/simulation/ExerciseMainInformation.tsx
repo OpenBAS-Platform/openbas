@@ -24,12 +24,9 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
   const { t } = useFormatter();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
   const scenarioBaseUri = '/admin/scenarios';
-  const scenarioId: string = exercise.exercise_scenario || '';
-  const { scenario } = scenarioId
-    ? useHelper((helper: ScenariosHelper) => ({
-      scenario: helper.getScenario(scenarioId),
-    }))
-    : undefined;
+  const { scenario } = useHelper((helper: ScenariosHelper) => ({
+    scenario: helper.getScenario(exercise.exercise_scenario || ''),
+  }));
 
   return (
     <Paper sx={{ padding: '15px' }} variant="outlined">

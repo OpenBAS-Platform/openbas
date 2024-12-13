@@ -174,6 +174,7 @@ const Index = () => {
       setLoading(false);
     });
   });
+
   useDataLoader(() => {
     dispatch(fetchScenario(exercise.exercise_scenario));
   }, [exercise]);
