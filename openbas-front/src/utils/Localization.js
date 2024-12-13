@@ -918,6 +918,7 @@ const i18n = {
       'scenario_severity': 'Sévérité',
       'scenario_tags': 'Tags',
       'scenario_updated_at': 'Mis à jour à',
+      'Parent scenario': 'Scénario parent',
       // Exercise
       'exercise_kill_chain_phases': 'Phase de kill chain',
       'exercise_name': 'Nom',
@@ -2321,6 +2322,7 @@ const i18n = {
       'scenario_severity': '严重性',
       'scenario_tags': '标签',
       'scenario_updated_at': '更新于',
+      'Parent scenario': '母体情景',
       // Exercise
       'exercise_kill_chain_phases': '杀伤链阶段',
       'exercise_name': '名称',

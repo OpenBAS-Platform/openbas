@@ -1,7 +1,9 @@
-import { Chip, Grid, Paper, Typography } from '@mui/material';
+import { Chip, Grid, Link as MUILink, Paper, Typography } from '@mui/material';
 import * as R from 'ramda';
 import * as React from 'react';
+import { Link } from 'react-router';
 
+import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import ItemCategory from '../../../../components/ItemCategory';
@@ -9,7 +11,9 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
+import { useHelper } from '../../../../store';
 import type { Exercise, KillChainPhase } from '../../../../utils/api-types';
+import { truncate } from '../../../../utils/String';
 
 interface Props {
   exercise: Exercise;
@@ -18,11 +22,15 @@ interface Props {
 const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
   const { t } = useFormatter();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
+  const scenarioBaseUri = '/admin/scenarios';
+  const { scenario } = useHelper((helper: ScenariosHelper) => ({
+    scenario: helper.getScenario(exercise.exercise_scenario || ''),
+  }));
 
   return (
     <Paper sx={{ padding: '15px' }} variant="outlined">
       <Grid id="main_information" container spacing={3}>
-        <Grid item xs={12} style={{ paddingTop: 10 }}>
+        <Grid item xs={8} style={{ paddingTop: 10 }}>
           <Typography
             variant="h3"
             gutterBottom
@@ -40,6 +48,31 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
             variant="h3"
             gutterBottom
             style={{ marginTop: 20 }}
+          >
+            {t('Parent scenario')}
+          </Typography>
+          {scenario ? (
+            <MUILink
+              component={Link}
+              to={scenarioBaseUri + '/' + scenario.scenario_id}
+            >
+              <Typography
+                overflow="hidden"
+                textOverflow="ellipsis"
+              >
+                { truncate(scenario.scenario_name, 30) }
+              </Typography>
+            </MUILink>
+          ) : '-'}
+        </Grid>
+        <Grid item xs={4} style={{ paddingTop: 10 }}>
+          <Typography
+            variant="h3"
+            gutterBottom
+            style={{ marginTop: 20 }}
+            sx={{
+              width: '100%',
+            }}
           >
             {t('Severity')}
           </Typography>
