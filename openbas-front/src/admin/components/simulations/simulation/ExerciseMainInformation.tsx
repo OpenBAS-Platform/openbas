@@ -1,5 +1,4 @@
-import { MovieFilterOutlined } from '@mui/icons-material';
-import { Button, Chip, Grid, Paper, Typography } from '@mui/material';
+import { Chip, Grid, Link as MUILink, Paper, Typography } from '@mui/material';
 import * as R from 'ramda';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -53,26 +52,17 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
             {t('Parent scenario')}
           </Typography>
           {scenario ? (
-            <Button
+            <MUILink
               component={Link}
               to={scenarioBaseUri + '/' + scenario.scenario_id}
-              color="primary"
-              variant="outlined"
-              startIcon={<MovieFilterOutlined color="primary" />}
-              sx={{
-                width: '100%',
-              }}
             >
               <Typography
-                sx={{
-                  fontSize: 12,
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                }}
+                overflow="hidden"
+                textOverflow="ellipsis"
               >
-                { truncate(scenario.scenario_name, 150) }
+                { truncate(scenario.scenario_name, 30) }
               </Typography>
-            </Button>
+            </MUILink>
           ) : '-'}
         </Grid>
         <Grid item xs={4} style={{ paddingTop: 10 }}>

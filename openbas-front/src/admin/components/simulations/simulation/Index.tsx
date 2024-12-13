@@ -176,7 +176,9 @@ const Index = () => {
   });
 
   useDataLoader(() => {
-    dispatch(fetchScenario(exercise.exercise_scenario));
+    if (exercise?.exercise_scenario) {
+      dispatch(fetchScenario(exercise?.exercise_scenario));
+    }
   }, [exercise]);
 
   const exerciseInjectContext = injectContextForExercise(exercise);
