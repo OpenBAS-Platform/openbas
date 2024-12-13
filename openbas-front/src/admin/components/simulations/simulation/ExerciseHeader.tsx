@@ -1,8 +1,8 @@
-import { CancelOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } from '@mui/icons-material';
+import { CancelOutlined, MovieFilterOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 
 import { updateExerciseStatus } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
@@ -30,10 +30,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
+const Buttons = ({ exerciseId, exerciseStatus, exerciseName, exerciseScenarioId }: {
   exerciseId: ExerciseStore['exercise_id'];
   exerciseStatus: ExerciseStore['exercise_status'];
   exerciseName: ExerciseStore['exercise_name'];
+  exerciseScenarioId: ExerciseStore['exercise_scenario'];
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -44,6 +45,8 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
     dispatch(updateExerciseStatus(exerciseId, status));
     setOpenChangeStatus(null);
   };
+  const scenarioBaseUri = '/admin/scenarios';
+
   const executionButton = () => {
     switch (exerciseStatus) {
       case 'SCHEDULED': {
@@ -158,6 +161,18 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
   };
   return (
     <>
+      {exerciseScenarioId && (
+        <Button
+          component={Link}
+          to={scenarioBaseUri + '/' + exerciseScenarioId}
+          color="primary"
+          variant="outlined"
+          style={{ marginRight: 10 }}
+          startIcon={<MovieFilterOutlined color="primary" />}
+        >
+          {t('scenario_back_to_parent')}
+        </Button>
+      )}
       {executionButton()}
       {dangerousButton()}
       <Dialog
@@ -212,7 +227,12 @@ const ExerciseHeader = () => {
       <div style={{ float: 'left', margin: '3px 10px 0 8px', color: theme.palette.text?.disabled, borderLeft: `1px solid ${theme.palette.text?.disabled}`, height: 20 }} />
       <ExerciseStatus exerciseStatus={exercise.exercise_status} exerciseStartDate={exercise.exercise_start_date} />
       <div className={classes.actions}>
-        <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />
+        <Buttons
+          exerciseId={exercise.exercise_id}
+          exerciseStatus={exercise.exercise_status}
+          exerciseName={exercise.exercise_name}
+          exerciseScenarioId={exercise.exercise_scenario}
+        />
         <ExercisePopover
           exercise={exercise}
           actions={actions}
