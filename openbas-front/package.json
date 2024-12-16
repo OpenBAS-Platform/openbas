@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
-    "@ckeditor/ckeditor5-react": "9.3.1",
+    "@ckeditor/ckeditor5-react": "9.4.0",
     "@dagrejs/dagre": "1.1.4",
     "@emotion/react": "11.13.3",
     "@emotion/styled": "11.13.0",

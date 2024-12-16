@@ -681,12 +681,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-integrations-common@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@ckeditor/ckeditor5-integrations-common@npm:2.1.0"
+"@ckeditor/ckeditor5-integrations-common@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "@ckeditor/ckeditor5-integrations-common@npm:2.2.2"
   peerDependencies:
     ckeditor5: ">=42.0.0 || ^0.0.0-nightly"
-  checksum: 10c0/4c18fc6e89731b9fa9cffd4c5d452f94774947d17b65877eed5a1b9024004ef0b16572352001f39a715a93d2bbfffce9f0c7a18f7070da4dcccb407f88e7687d
+  checksum: 10c0/cb4e33ad0719ad190d46ed149dc3ca5a6c98871ccc67f00398b68c64d46518e8a02e4d9de163ec7c85efedb2eabf51588c10c9e7ec216616ee134a674fe4ab95
   languageName: node
   linkType: hard
 
@@ -829,16 +829,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-react@npm:9.3.1":
-  version: 9.3.1
-  resolution: "@ckeditor/ckeditor5-react@npm:9.3.1"
+"@ckeditor/ckeditor5-react@npm:9.4.0":
+  version: 9.4.0
+  resolution: "@ckeditor/ckeditor5-react@npm:9.4.0"
   dependencies:
-    "@ckeditor/ckeditor5-integrations-common": "npm:^2.1.0"
+    "@ckeditor/ckeditor5-integrations-common": "npm:^2.2.2"
     prop-types: "npm:^15.7.2"
   peerDependencies:
     ckeditor5: ">=42.0.0 || ^0.0.0-nightly"
     react: ^16.13.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/8230d92b5a988d0d05b104a1870bcc552b322f6809657cc185133bf3b9a1724cf19f4bc15a4fcaa466bd1047769d3c48081e271399dd1ef1f4aed98b068c353d
+  checksum: 10c0/d58308095d9d84ee1289dba40bd0d607d7f1789b9e6fb3d52c2c83734677e1bec7a0947eb9486eb3096651a8e7ca14fe9de27aa228a2ce2ddd2833960d55c183
   languageName: node
   linkType: hard
 
@@ -8908,7 +8908,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "openbas-front@workspace:."
   dependencies:
-    "@ckeditor/ckeditor5-react": "npm:9.3.1"
+    "@ckeditor/ckeditor5-react": "npm:9.4.0"
     "@dagrejs/dagre": "npm:1.1.4"
     "@emotion/react": "npm:11.13.3"
     "@emotion/styled": "npm:11.13.0"
