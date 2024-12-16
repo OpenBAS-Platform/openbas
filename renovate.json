@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "labels": [
     "dependencies",
@@ -54,7 +54,7 @@
         "openbas-front/package.json"
       ],
       "matchStrings": [
-        "xlsx\": \"https:\/\/cdn\\.sheetjs\\.com\/xlsx-(?<currentValue>[\\d.]+)\/xlsx"
+        "xlsx\": \"https://cdn\\.sheetjs\\.com/xlsx-(?<currentValue>[\\d.]+)/xlsx"
       ],
       "registryUrlTemplate": "https://git.sheetjs.com",
       "depNameTemplate": "sheetjs/sheetjs",
@@ -62,8 +62,9 @@
     }
   ],
   "schedule": [
-    "after 10pm and before 5am every weekday",
-    "every weekend"
+    "after 10pm every weekday",
+    "every weekend",
+    "before 5am every weekday"
   ],
   "updateNotScheduled": false
 }
