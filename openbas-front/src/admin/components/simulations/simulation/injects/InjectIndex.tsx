@@ -16,6 +16,7 @@ import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../..
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import isInjectWithPayloadInfo from '../../../../../utils/inject/injectUtils';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
 import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/AtomicTestingPayloadInfo';
@@ -98,7 +99,7 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
               className={classes.item}
             />
             {
-              injectResultOverviewOutput.inject_type !== 'openbas_email' && injectResultOverviewOutput.inject_type !== 'openbas_ovh_sms' && injectResultOverviewOutput.inject_type !== 'openbas_mastodon' && injectResultOverviewOutput.inject_type !== 'openbas_http_query' && (
+              isInjectWithPayloadInfo(injectResultOverviewOutput) && (
                 <Tab
                   component={Link}
                   to={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`}
