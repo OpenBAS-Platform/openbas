@@ -223,7 +223,8 @@ public class CalderaExecutorService implements Runnable {
     return zonedDateTime.toInstant();
   }
 
-  public void setExecutor(Executor executor) {
+  @VisibleForTesting
+  protected void setExecutor(Executor executor) {
     this.executor = executor;
   }
 }
