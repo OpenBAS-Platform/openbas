@@ -83,7 +83,6 @@ public class ExecutableInjectService {
       String base64 = Base64.getEncoder().encodeToString(utf16Bytes);
       System.out.println(base64);
       obfuscatedCommand = String.format("powershell -Enc %s", base64);
-      // TODO ==> obfuscatedCommand = String.format("powershell -Enc %s 2>$null", base64);
     } else if (executor.equals("bash") || executor.equals("sh")) {
       obfuscatedCommand =
           String.format(
