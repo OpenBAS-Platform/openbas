@@ -55,7 +55,7 @@ const ExerciseLessons = () => {
   const processToGenericSource = (exercise: ExerciseStore) => {
     return {
       id: exercise.exercise_id,
-      type: 'exercise',
+      type: 'simulation',
       name: exercise.exercise_name,
       score: exercise.exercise_score,
       lessons_answers_number: exercise.exercise_lessons_answers_number,
