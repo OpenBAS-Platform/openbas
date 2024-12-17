@@ -11,7 +11,6 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.rest.payload.service.PayloadService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
@@ -20,6 +19,7 @@ import io.openbas.rest.payload.form.PayloadUpdateInput;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import io.openbas.rest.payload.form.PayloadsDeprecateInput;
 import io.openbas.rest.payload.service.PayloadCreationService;
+import io.openbas.rest.payload.service.PayloadService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

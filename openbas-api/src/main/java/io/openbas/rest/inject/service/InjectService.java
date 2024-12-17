@@ -20,11 +20,10 @@ import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -87,8 +86,8 @@ public class InjectService {
     injectDocumentRepository.deleteAll(updatedInjects);
   }
 
-  public <T> T convertInjectContent(
-          @NotNull final Inject inject, @NotNull final Class<T> converter) throws Exception {
+  public <T> T convertInjectContent(@NotNull final Inject inject, @NotNull final Class<T> converter)
+      throws Exception {
     ObjectNode content = inject.getContent();
     return this.mapper.treeToValue(content, converter);
   }

@@ -33,7 +33,7 @@ public class ContractSelect extends ContractCardinalityElement {
     ContractSelect contractSelect = new ContractSelect(key, label, ContractCardinality.One);
 
     Map<String, String> choices =
-            choiceInformations.keySet().stream().collect(Collectors.toMap(k -> k, k -> k));
+        choiceInformations.keySet().stream().collect(Collectors.toMap(k -> k, k -> k));
 
     contractSelect.setChoices(choices);
     contractSelect.setDefaultValue(List.of(def));
