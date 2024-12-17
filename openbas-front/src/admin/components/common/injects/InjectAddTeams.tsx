@@ -105,7 +105,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
 
   const paginationComponent = (
     <PaginationComponentV2
-      fetch={input => searchTeams(input, true)}
+      fetch={input => searchTeams(input, false)}
       searchPaginationInput={searchPaginationInput}
       setContent={setTeamValues}
       entityPrefix="team"
