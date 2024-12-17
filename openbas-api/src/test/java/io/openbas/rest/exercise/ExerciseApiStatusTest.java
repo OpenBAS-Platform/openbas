@@ -214,8 +214,9 @@ public class ExerciseApiStatusTest {
         mockedInstant.when(Instant::now).thenReturn(instantAfterSetRun);
 
         List<ExecutableInject> injects = injectHelper.getInjectsToRun();
-        Instant nextMinute = instantBeforeSetRun.truncatedTo(MINUTES).plus(1, MINUTES);
-        assertEquals(nextMinute.toString(), JsonPath.read(response, "$.exercise_start_date"));
+        Instant expectedStartTime = instantBeforeSetRun.truncatedTo(MINUTES).plus(1, MINUTES);
+        assertEquals(
+            expectedStartTime.toString(), JsonPath.read(response, "$.exercise_start_date"));
         assertEquals(
             Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.PAUSED.name()),
             JsonPath.read(response, "$.exercise_next_possible_status"));
