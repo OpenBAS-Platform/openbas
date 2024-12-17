@@ -1,6 +1,5 @@
 package io.openbas.utils.fixtures;
 
-import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 import io.openbas.database.model.Exercise;
@@ -37,6 +36,10 @@ public class ExerciseFixture {
   }
 
   public static Exercise createDefaultIncidentResponseExercise() {
+    return createDefaultIncidentResponseExercise(Instant.now());
+  }
+
+  public static Exercise createDefaultIncidentResponseExercise(Instant startTime) {
     Exercise exercise = new Exercise();
     exercise.setName("Incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -44,11 +47,15 @@ public class ExerciseFixture {
     exercise.setFrom("exercise@mail.fr");
     exercise.setCategory("incident-response");
     exercise.setStatus(ExerciseStatus.SCHEDULED);
-    exercise.setStart(Instant.now());
+    exercise.setStart(startTime);
     return exercise;
   }
 
   public static Exercise createDefaultAttackExercise() {
+    return createDefaultAttackExercise(Instant.now());
+  }
+
+  public static Exercise createDefaultAttackExercise(Instant startTime) {
     Exercise exercise = new Exercise();
     exercise.setName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -57,11 +64,15 @@ public class ExerciseFixture {
     exercise.setCategory("attack-scenario");
     exercise.setMainFocus("incident-response");
     exercise.setStatus(ExerciseStatus.SCHEDULED);
-    exercise.setStart(Instant.now());
+    exercise.setStart(startTime);
     return exercise;
   }
 
   public static Exercise createRunningAttackExercise() {
+    return createRunningAttackExercise(Instant.now());
+  }
+
+  public static Exercise createRunningAttackExercise(Instant startTime) {
     Exercise exercise = new Exercise();
     exercise.setName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -70,11 +81,15 @@ public class ExerciseFixture {
     exercise.setCategory("attack-scenario");
     exercise.setMainFocus("incident-response");
     exercise.setStatus(ExerciseStatus.RUNNING);
-    exercise.setStart(Instant.now());
+    exercise.setStart(startTime);
     return exercise;
   }
 
   public static Exercise createCanceledAttackExercise() {
+    return createCanceledAttackExercise(Instant.now());
+  }
+
+  public static Exercise createCanceledAttackExercise(Instant startTime) {
     Exercise exercise = new Exercise();
     exercise.setName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -83,11 +98,15 @@ public class ExerciseFixture {
     exercise.setCategory("attack-scenario");
     exercise.setMainFocus("incident-response");
     exercise.setStatus(ExerciseStatus.CANCELED);
-    exercise.setStart(Instant.now());
+    exercise.setStart(startTime);
     return exercise;
   }
 
   public static Exercise createFinishedAttackExercise() {
+    return createFinishedAttackExercise(Instant.now());
+  }
+
+  public static Exercise createFinishedAttackExercise(Instant startTime) {
     Exercise exercise = new Exercise();
     exercise.setName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
@@ -96,13 +115,17 @@ public class ExerciseFixture {
     exercise.setCategory("attack-scenario");
     exercise.setMainFocus("incident-response");
     exercise.setStatus(ExerciseStatus.FINISHED);
-    exercise.setStart(Instant.now());
+    exercise.setStart(startTime);
     return exercise;
   }
 
   public static Exercise createPausedAttackExercise() {
+    return createPausedAttackExercise(Instant.now());
+  }
+
+  public static Exercise createPausedAttackExercise(Instant startTime) {
     Exercise exercise = new Exercise();
-    exercise.setCurrentPause(now().truncatedTo(MINUTES).minus(1, MINUTES));
+    exercise.setCurrentPause(startTime.truncatedTo(MINUTES).minus(1, MINUTES));
     exercise.setName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
     exercise.setSubtitle("An incident response exercise");
@@ -110,7 +133,7 @@ public class ExerciseFixture {
     exercise.setCategory("attack-scenario");
     exercise.setMainFocus("incident-response");
     exercise.setStatus(ExerciseStatus.PAUSED);
-    exercise.setStart(Instant.now());
+    exercise.setStart(startTime);
     return exercise;
   }
 }
