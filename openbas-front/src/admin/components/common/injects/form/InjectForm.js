@@ -4,9 +4,9 @@ import * as R from 'ramda';
 import { Component } from 'react';
 import { Controller } from 'react-hook-form';
 
-import TagField from '../../../../components/fields/TagField';
-import TextField from '../../../../components/fields/TextField';
-import inject18n from '../../../../components/i18n';
+import TagField from '../../../../../components/fields/TagField';
+import TextField from '../../../../../components/fields/TextField';
+import inject18n from '../../../../../components/i18n';
 
 const styles = theme => ({
   duration: {

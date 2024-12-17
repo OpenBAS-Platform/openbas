@@ -111,14 +111,12 @@ public class PayloadService {
   }
 
   private ContractSelect obfuscatorField() {
-    List<String> obfuscators = OpenBASImplantInjectContent.getObfuscatorList();
-    Map<String, String> obfuscatorChoices =
-        obfuscators.stream()
-            .collect(Collectors.toMap(obfuscator -> obfuscator, obfuscator -> obfuscator));
-    return ContractSelect.selectFieldWithDefault(
+    Map<String, String> obfuscatorState = OpenBASImplantInjectContent.getObfuscatorState();
+
+    return ContractSelect.selectFieldWithChoiceInformations(
         "obfuscator",
         "Obfuscators",
-        obfuscatorChoices,
+        obfuscatorState,
         OpenBASImplantInjectContent.getDefaultObfuscator());
   }
 

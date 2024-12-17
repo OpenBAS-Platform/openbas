@@ -3,7 +3,9 @@ package io.openbas.injectors.openbas.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.model.inject.form.Expectation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,10 +20,13 @@ public class OpenBASImplantInjectContent {
   private List<Expectation> expectations = new ArrayList<>();
 
   public static String getDefaultObfuscator() {
-    return "base64";
+    return "plain-text";
   }
 
-  public static List<String> getObfuscatorList() {
-    return List.of("base64", "plain-text");
+  public static Map<String, String> getObfuscatorState() {
+    Map<String, String> obfuscatorMap = new HashMap<>();
+    obfuscatorMap.put("base64", "CMD does not support base64 obfuscation");
+    obfuscatorMap.put("plain-text", "");
+    return obfuscatorMap;
   }
 }
