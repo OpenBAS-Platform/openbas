@@ -1,7 +1,5 @@
 import {
   AttachmentOutlined,
-  ControlPointOutlined,
-  DeleteOutlined,
   EmojiEventsOutlined,
   GroupsOutlined,
   HelpOutlineOutlined,
@@ -12,14 +10,12 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
-  InputLabel,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
-  MenuItem,
   Switch,
   Tooltip,
   Typography,
@@ -30,39 +26,34 @@ import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { fetchChallenges } from '../../../../actions/Challenge';
-import { fetchChannels } from '../../../../actions/channels/channel-action';
-import { fetchDocuments } from '../../../../actions/Document';
-import { fetchInjectTeams } from '../../../../actions/Inject';
-import { storeHelper } from '../../../../actions/Schema';
-import FieldArray from '../../../../components/fields/FieldArray';
-import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
-import RichTextField from '../../../../components/fields/RichTextField';
-import SelectField from '../../../../components/fields/SelectField';
-import SwitchField from '../../../../components/fields/SwitchField';
-import TextField from '../../../../components/fields/TextField';
-import inject18n from '../../../../components/i18n';
-import ItemBoolean from '../../../../components/ItemBoolean';
-import ItemTags from '../../../../components/ItemTags';
-import Loader from '../../../../components/Loader';
-import arraysEqual from '../../../../utils/ArrayUtils';
-import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
-import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
-import EndpointPopover from '../../assets/endpoints/EndpointPopover';
-import EndpointsList from '../../assets/endpoints/EndpointsList';
-import ChallengePopover from '../../components/challenges/ChallengePopover';
-import ChannelIcon from '../../components/channels/ChannelIcon';
-import DocumentPopover from '../../components/documents/DocumentPopover';
-import DocumentType from '../../components/documents/DocumentType';
-import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
-import InjectAddEndpoints from '../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
-import AvailableVariablesDialog from '../../simulations/simulation/variables/AvailableVariablesDialog';
-import ArticlePopover from '../articles/ArticlePopover';
-import InjectExpectations from './expectations/InjectExpectations';
-import InjectAddArticles from './InjectAddArticles';
-import InjectAddChallenges from './InjectAddChallenges';
-import InjectAddTeams from './InjectAddTeams';
-import InjectTeamsList from './teams/InjectTeamsList';
+import { fetchChallenges } from '../../../../../actions/Challenge.js';
+import { fetchChannels } from '../../../../../actions/channels/channel-action.js';
+import { fetchDocuments } from '../../../../../actions/Document';
+import { fetchInjectTeams } from '../../../../../actions/Inject';
+import { storeHelper } from '../../../../../actions/Schema.js';
+import MultipleFileLoader from '../../../../../components/fields/MultipleFileLoader';
+import inject18n from '../../../../../components/i18n.js';
+import ItemBoolean from '../../../../../components/ItemBoolean';
+import ItemTags from '../../../../../components/ItemTags';
+import Loader from '../../../../../components/Loader';
+import arraysEqual from '../../../../../utils/ArrayUtils';
+import AssetGroupPopover from '../../../assets/asset_groups/AssetGroupPopover';
+import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
+import EndpointPopover from '../../../assets/endpoints/EndpointPopover';
+import EndpointsList from '../../../assets/endpoints/EndpointsList';
+import ChallengePopover from '../../../components/challenges/ChallengePopover';
+import DocumentPopover from '../../../components/documents/DocumentPopover';
+import DocumentType from '../../../components/documents/DocumentType';
+import InjectAddAssetGroups from '../../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
+import InjectAddEndpoints from '../../../simulations/simulation/injects/endpoints/InjectAddEndpoints';
+import AvailableVariablesDialog from '../../../simulations/simulation/variables/AvailableVariablesDialog';
+import ArticlePopover from '../../articles/ArticlePopover';
+import InjectExpectations from '../expectations/InjectExpectations';
+import InjectAddArticles from '../InjectAddArticles';
+import InjectAddChallenges from '../InjectAddChallenges';
+import InjectAddTeams from '../InjectAddTeams';
+import InjectTeamsList from '../teams/InjectTeamsList';
+import InjectContentFieldComponent from './InjectContentFieldComponent';
 
 const styles = theme => ({
   header: {
@@ -83,11 +74,6 @@ const styles = theme => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  tuple: {
-    marginTop: 5,
-    paddingTop: 0,
-    paddingLeft: 0,
   },
   bodyItem: {
     height: '100%',
@@ -251,6 +237,15 @@ const inlineStyles = {
 class InjectDefinition extends Component {
   constructor(props) {
     super(props);
+    this.builtInFields = [
+      'teams',
+      'assets',
+      'assetgroups',
+      'articles',
+      'challenges',
+      'attachments',
+      'expectations',
+    ];
     this.state = {
       allTeams: props.inject.inject_all_teams,
       teamsIds: props.inject.inject_teams || [],
@@ -267,6 +262,7 @@ class InjectDefinition extends Component {
       challengesSortBy: 'challenge_name',
       challengesOrderAsc: true,
       openVariables: false,
+      dynamicFields: this.getDynamicFields(),
     };
   }
 
@@ -408,286 +404,28 @@ class InjectDefinition extends Component {
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
-  renderFields(renderedFields, values, attachedDocs) {
-    const { classes, t, control, register } = this.props;
-    return (
-      <>
-        {renderedFields.map((field) => {
-          switch (field.type) {
-            case 'textarea':
-              return field.richText
-                ? (
-                    <RichTextField
-                      key={field.key}
-                      name={field.key}
-                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                      fullWidth={true}
-                      style={{ marginTop: 20, height: 250 }}
-                      disabled={this.props.permissions.readOnly || field.readOnly}
-                      askAi={true}
-                      inInject={true}
-                      control={control}
-                    />
-                  )
-                : (
-                    <TextField
-                      variant="standard"
-                      key={field.key}
-                      inputProps={register(field.key)}
-                      fullWidth={true}
-                      multiline={true}
-                      rows={10}
-                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                      style={{ marginTop: 20 }}
-                      disabled={this.props.permissions.readOnly || field.readOnly}
-                      askAi={true}
-                      inInject={true}
-                      control={this.props.control}
-                    />
-                  );
-            case 'number':
-              return (
-                <TextField
-                  variant="standard"
-                  key={field.key}
-                  inputProps={register(field.key)}
-                  fullWidth={true}
-                  type="number"
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                  control={control}
-                />
-              );
-            case 'checkbox':
-              return (
-                <SwitchField
-                  key={field.key}
-                  name={field.key}
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                  control={control}
-                />
-              );
-            case 'tuple': {
-              return (
-                <div key={field.key}>
-                  <FieldArray
-                    name={field.key}
-                    control={control}
-                    renderLabel={(append) => {
-                      return (
-                        <div style={{ marginTop: 20 }}>
-                          <InputLabel
-                            variant="standard"
-                            shrink={true}
-                            disabled={this.props.permissions.readOnly}
-                          >
-                            {`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                            {field.cardinality === 'n' && (
-                              <IconButton
-                                onClick={() => append({
-                                  type: 'text',
-                                  key: '',
-                                  value: '',
-                                })}
-                                aria-haspopup="true"
-                                size="medium"
-                                style={{ marginTop: -2 }}
-                                disabled={this.props.permissions.readOnly || field.readOnly}
-                                color="primary"
-                              >
-                                <ControlPointOutlined />
-                              </IconButton>
-                            )}
-                          </InputLabel>
-                        </div>
-                      );
-                    }}
-                    renderField={(name, index, remove) => {
-                      return (
-                        <List key={name.id} style={{ marginTop: -20 }}>
-                          <ListItem
-                            key={`${field.key}_list_${index}`}
-                            classes={{ root: classes.tuple }}
-                            divider={false}
-                          >
-                            <SelectField
-                              variant="standard"
-                              name={`${field.key}.${index}.type`}
-                              fullWidth={true}
-                              label={t('Type')}
-                              style={{ marginRight: 20 }}
-                              disabled={this.props.permissions.readOnly || field.readOnly}
-                              control={control}
-                            >
-                              <MenuItem key="text" value="text">
-                                <ListItemText>{t('Text')}</ListItemText>
-                              </MenuItem>
-                              {field.contractAttachment && (
-                                <MenuItem
-                                  key="attachment"
-                                  value="attachment"
-                                >
-                                  <ListItemText>
-                                    {t('Attachment')}
-                                  </ListItemText>
-                                </MenuItem>
-                              )}
-                            </SelectField>
-                            <TextField
-                              variant="standard"
-                              fullWidth={true}
-                              label={t('Key')}
-                              style={{ marginRight: 20 }}
-                              disabled={this.props.permissions.readOnly || field.readOnly}
-                              inputProps={register(`${field.key}.${index}.key`)}
-                              control={control}
-                            />
-                            {values
-                            && values[field.key]
-                            && values[field.key][index]
-                            && values[field.key][index].type
-                            === 'attachment' ? (
-                                  <TextField
-                                    variant="standard"
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={this.props.permissions.readOnly || field.readOnly}
-                                    inputProps={register(`${field.key}.${index}.value`)}
-                                    control={control}
-                                  >
-                                    {attachedDocs.map(doc => (
-                                      <MenuItem
-                                        key={doc.document_id}
-                                        value={doc.document_id}
-                                      >
-                                        <ListItemText>
-                                          {doc.document_name}
-                                        </ListItemText>
-                                      </MenuItem>
-                                    ))}
-                                  </TextField>
-                                ) : (
-                                  <TextField
-                                    variant="standard"
-                                    fullWidth={true}
-                                    label={t('Value')}
-                                    style={{ marginRight: 20 }}
-                                    disabled={this.props.permissions.readOnly || field.readOnly}
-                                    inputProps={register(`${field.key}.${index}.value`)}
-                                    control={control}
-                                  />
-                                )}
-                            {field.cardinality === 'n' && (
-                              <IconButton
-                                onClick={() => remove(index)}
-                                aria-haspopup="true"
-                                size="small"
-                                disabled={this.props.permissions.readOnly || field.readOnly}
-                                color="primary"
-                              >
-                                <DeleteOutlined />
-                              </IconButton>
-                            )}
-                          </ListItem>
-                        </List>
-                      );
-                    }}
-                  />
-                </div>
-              );
-            }
-            case 'select': {
-              const renderMultipleValuesFct = v => v.map(a => field.choices[a]).join(', ');
-              const renderSingleValueFct = v => (field.expectation
-                ? t(field.choices[v] || 'Unknown')
-                : field.choices[v]);
-              const renderValueFct = field.cardinality === 'n' ? renderMultipleValuesFct : renderSingleValueFct;
-              const multipleItemDisplayFct = v => field.expectation ? t(v || 'Unknown') : v;
-
-              return (
-                <SelectField
-                  variant="standard"
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  key={field.key}
-                  multiple={field.cardinality === 'n'}
-                  renderValue={v => renderValueFct(v)}
-                  name={field.key}
-                  fullWidth={true}
-                  style={{ marginTop: 20 }}
-                  control={control}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                >
-                  {Object.entries(field.choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.cardinality === 'n' ? v : multipleItemDisplayFct(v)}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </SelectField>
-              );
-            }
-            case 'dependency-select': {
-              const depValue = values[field.dependencyField];
-              const choices = field.choices[depValue] ?? {};
-              const renderMultipleValuesFct = v => v.map(a => choices[a]).join(', ');
-              const renderSingleValueFct = v => (field.expectation ? t(choices[v] || 'Unknown') : choices[v]);
-              const renderValueFct = field.cardinality === 'n' ? renderMultipleValuesFct : renderSingleValueFct;
-              const multipleItemDisplayFct = v => field.expectation ? t(v || 'Unknown') : v;
-
-              return (
-                <SelectField
-                  variant="standard"
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  key={field.key}
-                  multiple={field.cardinality === 'n'}
-                  renderValue={v => renderValueFct(v)}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                  name={field.key}
-                  fullWidth={true}
-                  control={control}
-                  style={{ marginTop: 20 }}
-                >
-                  {Object.entries(choices)
-                    .sort((a, b) => a[1].localeCompare(b[1]))
-                    .map(([k, v]) => (
-                      <MenuItem key={k} value={k}>
-                        <ListItemText>
-                          {field.cardinality === 'n' ? multipleItemDisplayFct(v) : v}
-                        </ListItemText>
-                      </MenuItem>
-                    ))}
-                </SelectField>
-              );
-            }
-            default:
-              return (
-                <TextField
-                  variant="standard"
-                  key={field.key}
-                  inputProps={register(field.key)}
-                  fullWidth={true}
-                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                  style={{ marginTop: 20 }}
-                  disabled={this.props.permissions.readOnly || field.readOnly}
-                  control={control}
-                />
-              );
-          }
-        })}
-      </>
+  getDynamicFields = () => this.props.injectorContract.fields
+    .filter(f => !this.builtInFields.includes(f.key) && !f.expectation)
+    .filter(f =>
+      f.linkedFields.every((linkedField) => {
+        const fieldValue = this.props.getValues(linkedField.key);
+        if (linkedField.type === 'checkbox') {
+          return fieldValue;
+        }
+        if (linkedField.type === 'select') {
+          f.linkedValues.includes(fieldValue);
+        }
+        return true;
+      }),
     );
-  }
 
-  resetDefaultvalues(setFieldValue, builtInFields, injectorContract) {
+  setDynamicFields = () => {
+    this.setState({ dynamicFields: this.getDynamicFields() });
+  };
+
+  resetDefaultvalues(setFieldValue, injectorContract) {
     injectorContract.fields
-      .filter(f => !builtInFields.includes(f.key) && !f.expectation)
+      .filter(f => !this.builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
         let defaultValue = field.cardinality === '1' ? R.head(field.defaultValue) : field.defaultValue;
         if (
@@ -739,6 +477,7 @@ class InjectDefinition extends Component {
       expectations,
       documentsSortBy,
       documentsOrderAsc,
+      dynamicFields,
       articlesOrderAsc,
       articlesSortBy,
       articlesIds,
@@ -824,15 +563,7 @@ class InjectDefinition extends Component {
     const expectationsNotManual = injectorContract.fields.filter(
       f => f.expectation === true,
     );
-    const builtInFields = [
-      'teams',
-      'assets',
-      'assetgroups',
-      'articles',
-      'challenges',
-      'attachments',
-      'expectations',
-    ];
+
     return (
       <>
         {hasTeams && (
@@ -1088,7 +819,7 @@ class InjectDefinition extends Component {
                 color="primary"
                 variant="outlined"
                 disabled={submitting || this.props.permissions.readOnly}
-                onClick={() => this.resetDefaultvalues(setValue, builtInFields, injectorContract)}
+                onClick={() => this.resetDefaultvalues(setValue, injectorContract)}
                 size="small"
                 style={{ margin: '-12px 0 0 5px' }}
               >
@@ -1110,39 +841,20 @@ class InjectDefinition extends Component {
           </div>
           <div className="clearfix" />
         </div>
-        <>
-          {this.renderFields(
-            injectorContract.fields
-              .filter(
-                f => !builtInFields.includes(f.key) && !f.expectation,
-              )
-              .filter((f) => {
-                // Filter display if linked fields
-                for (
-                  let index = 0;
-                  index < f.linkedFields.length;
-                  index += 1
-                ) {
-                  const linkedField = f.linkedFields[index];
-                  if (
-                    linkedField.type === 'checkbox'
-                    && values[linkedField.key] === false
-                  ) {
-                    return false;
-                  }
-                  if (
-                    linkedField.type === 'select'
-                    && !f.linkedValues.includes(values[linkedField.key])
-                  ) {
-                    return false;
-                  }
-                }
-                return true;
-              }),
-            values,
-            attachedDocs,
-          )}
-        </>
+        {
+          dynamicFields.map(field => (
+            <InjectContentFieldComponent
+              key={field.key}
+              control={this.props.control}
+              register={this.props.register}
+              field={field}
+              values={values}
+              attachedDocs={attachedDocs}
+              onSelectOrCheckboxFieldChange={() => this.setDynamicFields()}
+              readOnly={this.props.permissions.readOnly || field.readOnly}
+            />
+          ))
+        }
         {(hasExpectations || expectationsNotManual.length > 0) && (
           <>
             <Typography variant="h5" style={{ marginTop: 20, fontWeight: 500 }}>

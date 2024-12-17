@@ -16,4 +16,8 @@ public class CalderaInjectContent {
 
   @JsonProperty("expectations")
   private List<Expectation> expectations = new ArrayList<>();
+
+  public static String getDefaultObfuscator() {
+    return "plain-text";
+  }
 }

@@ -262,6 +262,10 @@ const i18n = {
       'Update the document': 'Modifier le document',
       'Inject data': 'Données du stimuli',
       'Update teams': 'Modifier les équipes',
+      'Obfuscator': 'Obfuscateur',
+      'Obfuscators': 'Obfuscateurs',
+      'CMD does not support base64 obfuscation': 'CMD ne prend pas en charge l\'obfuscation en base64',
+      'Update teams': 'Modifier les équipe',
       'Add target teams in this inject':
         'Ajouter des équipes cibles dans ce stimuli',
       'Modify target teams in this inject':

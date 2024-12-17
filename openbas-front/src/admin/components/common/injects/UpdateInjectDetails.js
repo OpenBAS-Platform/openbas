@@ -14,8 +14,8 @@ import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import { isEmptyField } from '../../../../utils/utils';
 import { PermissionsContext } from '../Context';
-import InjectDefinition from './InjectDefinition';
-import InjectForm from './InjectForm';
+import InjectDefinition from './form/InjectDefinition';
+import InjectForm from './form/InjectForm';
 
 const useStyles = makeStyles(theme => ({
   details: {
@@ -315,6 +315,7 @@ const UpdateInjectDetails = ({
                 register={register}
                 values={getValues()}
                 setValue={setValue}
+                getValues={key => getValues(key)}
                 submitting={isSubmitting}
                 inject={initialValues}
                 injectorContract={contractContent}
