@@ -3,10 +3,9 @@ import {
   Box,
   Grid,
   LinearProgress,
-  List,
+  List, ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemSecondaryAction,
   ListItemText,
   Paper,
   Typography,
@@ -53,50 +52,52 @@ const LessonsObjectives = ({
           {sortedObjectives.length > 0 ? (
             <List style={{ padding: 0 }}>
               {sortedObjectives.map(objective => (
-                <ListItemButton
+                <ListItem
                   key={objective.objective_id}
-                  divider
-                  onClick={() => setSelectedObjective
-                    && setSelectedObjective(objective.objective_id)}
-                >
-                  <ListItemIcon>
-                    <FlagOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                    style={{ width: '50%' }}
-                    primary={objective.objective_title}
-                    secondary={objective.objective_description}
-                  />
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      width: '30%',
-                      marginRight: 1,
-                    }}
-                  >
-                    <Box sx={{ width: '100%', mr: 1 }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={objective.objective_score}
-                      />
-                    </Box>
-                    <Box sx={{ minWidth: 35 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {objective.objective_score}
-                        %
-                      </Typography>
-                    </Box>
-                  </Box>
-                  {!isReport && (
-                    <ListItemSecondaryAction>
-                      <ObjectivePopover
-                        isReadOnly={source.isReadOnly}
-                        objective={objective}
-                      />
-                    </ListItemSecondaryAction>
+                  secondaryAction={!isReport && (
+                    <ObjectivePopover
+                      isReadOnly={source.isReadOnly}
+                      objective={objective}
+                    />
                   )}
-                </ListItemButton>
+                >
+                  <ListItemButton
+                    divider
+                    onClick={() => setSelectedObjective
+                      && setSelectedObjective(objective.objective_id)}
+                  >
+                    <ListItemIcon>
+                      <FlagOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      style={{ width: '50%' }}
+                      primary={objective.objective_title}
+                      secondary={objective.objective_description}
+                    />
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: '30%',
+                        marginRight: 1,
+                      }}
+                    >
+                      <Box sx={{ width: '100%', mr: 1 }}>
+                        <LinearProgress
+                          variant="determinate"
+                          value={objective.objective_score}
+                        />
+                      </Box>
+                      <Box sx={{ minWidth: 35 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {objective.objective_score}
+                          %
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </ListItemButton>
+                </ListItem>
+
               ))}
             </List>
           ) : (
