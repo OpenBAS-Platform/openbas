@@ -121,7 +121,8 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       buildFilter('endpoint_platform', platforms ?? [], 'contains'),
     ],
   };
-  if (quickFilter.filters && payloadArch) {
+  // only add an architecture filter if the payload is not compatible with all archs
+  if (quickFilter.filters && payloadArch && payloadArch != 'ALL_ARCHITECTURES') {
     quickFilter.filters?.push(buildFilter('endpoint_arch', [payloadArch], 'contains'));
   }
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({
