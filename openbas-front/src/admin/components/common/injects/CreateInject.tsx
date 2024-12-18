@@ -46,6 +46,7 @@ const useStyles = makeStyles(() => ({
     textTransform: 'uppercase',
     borderRadius: 4,
     width: 80,
+    marginRight: 5,
   },
   goIcon: {
     position: 'absolute',
