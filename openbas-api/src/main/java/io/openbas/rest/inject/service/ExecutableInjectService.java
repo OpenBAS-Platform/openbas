@@ -78,11 +78,12 @@ public class ExecutableInjectService {
 
   private String obfuscateCommandBase64(String command, String executor) {
     String obfuscatedCommand = command;
+
     if (executor.equals("psh") || executor.equals("cmd")) {
       byte[] utf16Bytes = command.getBytes(StandardCharsets.UTF_16LE);
       String base64 = Base64.getEncoder().encodeToString(utf16Bytes);
-      System.out.println(base64);
       obfuscatedCommand = String.format("powershell -Enc %s", base64);
+
     } else if (executor.equals("bash") || executor.equals("sh")) {
       obfuscatedCommand =
           String.format(
