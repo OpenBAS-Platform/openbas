@@ -3,10 +3,9 @@ import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 
-import type { AttackPatternStore } from '../../../actions/attack_patterns/AttackPattern';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../admin/components/common/filters/MitreFilter';
 import mitreAttack from '../../../static/images/misc/attack.png';
-import type { Filter, SearchPaginationInput } from '../../../utils/api-types';
+import type { AttackPattern, Filter, SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../i18n';
 import SearchFilter from '../../SearchFilter';
 import Drawer from '../Drawer';
@@ -52,7 +51,7 @@ interface Props<T> {
   availableFilters?: string[];
   helpers?: FilterHelpers;
   children?: React.ReactElement | null;
-  attackPatterns?: AttackPatternStore[];
+  attackPatterns?: AttackPattern[];
 }
 
 /**
@@ -124,7 +123,7 @@ const PaginationComponent = <T extends object>({
       (f: Filter) => f.key === MITRE_FILTER_KEY,
     )?.[0]?.values?.map(
       (externalId: string) => attackPatterns?.find(
-        (a: AttackPatternStore) => a.attack_pattern_external_id === externalId,
+        (a: AttackPattern) => a.attack_pattern_external_id === externalId,
       )?.attack_pattern_name,
     );
   };

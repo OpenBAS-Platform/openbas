@@ -2,7 +2,6 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { useHelper } from '../../../../store';
@@ -39,7 +38,7 @@ const MitreMatrixDummy: FunctionComponent = () => {
     return (k1.phase_order ?? 0) - (k2.phase_order ?? 0);
   };
   const getAttackPatterns = (killChainPhase: KillChainPhase) => {
-    return R.take(random(3, 6), attackPatterns.filter((attackPattern: AttackPatternStore) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id)));
+    return R.take(random(3, 6), attackPatterns.filter((attackPattern: AttackPattern) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id)));
   };
   return (
     <div className={classes.container}>

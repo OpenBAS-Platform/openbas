@@ -2,7 +2,6 @@ import { Button, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useEffect } from 'react';
 
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
 import { fetchInjectorsContracts } from '../../../../actions/InjectorContracts';
@@ -173,7 +172,7 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
 
   // Attack Pattern
   const getAttackPatterns = (killChainPhase: KillChainPhase) => {
-    return attackPatterns.filter((attackPattern: AttackPatternStore) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id));
+    return attackPatterns.filter((attackPattern: AttackPattern) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id));
   };
 
   return (
