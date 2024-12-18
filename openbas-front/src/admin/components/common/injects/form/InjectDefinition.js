@@ -42,6 +42,7 @@ import AssetGroupsList from '../../../assets/asset_groups/AssetGroupsList';
 import EndpointPopover from '../../../assets/endpoints/EndpointPopover';
 import EndpointsList from '../../../assets/endpoints/EndpointsList';
 import ChallengePopover from '../../../components/challenges/ChallengePopover';
+import ChannelIcon from '../../../components/channels/ChannelIcon';
 import DocumentPopover from '../../../components/documents/DocumentPopover';
 import DocumentType from '../../../components/documents/DocumentType';
 import InjectAddAssetGroups from '../../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
