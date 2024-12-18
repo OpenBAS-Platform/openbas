@@ -127,7 +127,7 @@ public class EndpointService {
 
     return IOUtils.toString(in, StandardCharsets.UTF_8)
         .replace("${OPENBAS_URL}", openBASConfig.getBaseUrlForAgent())
-        .replace("${OPENBAS_TOKEN}", adminToken)
+        .replace("${OPENBAS_TOKEN}", adminToken) //todo agent token
         .replace(
             "${OPENBAS_UNSECURED_CERTIFICATE}",
             String.valueOf(openBASConfig.isUnsecuredCertificate()))
