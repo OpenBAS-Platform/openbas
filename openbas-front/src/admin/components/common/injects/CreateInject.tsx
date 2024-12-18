@@ -249,7 +249,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                 classes={{ root: classes.itemHead }}
                 divider={false}
                 style={{ paddingTop: 0 }}
-                secondaryAction={<>&nbsp;</>}
                 disabled={true}
               >
                 <ListItemIcon />
