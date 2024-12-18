@@ -244,11 +244,12 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               attackPatterns={attackPatterns}
             />
             <List>
-              <ListItem
+              <ListItemButton
                 classes={{ root: classes.itemHead }}
                 divider={false}
                 style={{ paddingTop: 0 }}
                 secondaryAction={<>&nbsp;</>}
+                disabled={true}
               >
                 <ListItemIcon />
                 <ListItemText
@@ -260,7 +261,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                     />
                   )}
                 />
-              </ListItem>
+              </ListItemButton>
               {contracts.map((contract, index) => {
                 const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
                 // eslint-disable-next-line max-len
