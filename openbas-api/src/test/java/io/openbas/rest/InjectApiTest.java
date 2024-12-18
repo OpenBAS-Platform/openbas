@@ -75,6 +75,7 @@ class InjectApiTest extends IntegrationTest {
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
   static InjectorContract PAYLOAD_INJECTOR_CONTRACT;
+  static InjectorContract PAYLOAD_INJECTOR_CONTRACT_2;
   @Resource protected ObjectMapper mapper;
   @Autowired private MockMvc mvc;
   @Autowired private ScenarioService scenarioService;
@@ -131,7 +132,8 @@ class InjectApiTest extends IntegrationTest {
     this.exerciseRepository.delete(EXERCISE);
     this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
     this.teamRepository.delete(TEAM);
-    this.injectorContractRepository.delete(PAYLOAD_INJECTOR_CONTRACT);
+    this.injectorContractRepository.deleteAll(
+        List.of(PAYLOAD_INJECTOR_CONTRACT, PAYLOAD_INJECTOR_CONTRACT_2));
   }
 
   // -- SCENARIOS --
@@ -697,12 +699,12 @@ class InjectApiTest extends IntegrationTest {
       InjectorContract injectorContract =
           InjectorContractFixture.createPayloadInjectorContractWithObfuscator(
               injector, payloadSaved);
-      PAYLOAD_INJECTOR_CONTRACT = injectorContractRepository.save(injectorContract);
+      PAYLOAD_INJECTOR_CONTRACT_2 = injectorContractRepository.save(injectorContract);
 
       Map<String, String> payloadArguments = new HashMap<>();
       payloadArguments.put("obfuscator", "base64");
       Inject inject =
-          InjectFixture.createInjectCommandPayload(PAYLOAD_INJECTOR_CONTRACT, payloadArguments);
+          InjectFixture.createInjectCommandPayload(PAYLOAD_INJECTOR_CONTRACT_2, payloadArguments);
 
       Inject injectSaved = injectRepository.save(inject);
 
