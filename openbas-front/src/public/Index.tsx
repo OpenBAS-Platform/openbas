@@ -42,7 +42,7 @@ const Index = () => {
             <Route path="reset" element={errorWrapper(Reset)()} />
             <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
             <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
-            <Route path="lessons/exercise/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
+            <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
             <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
             <Route path="*" element={<Login />} />
           </Routes>

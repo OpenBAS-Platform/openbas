@@ -72,7 +72,7 @@ const Root = () => {
                 <Route path="comcheck/:statusId" element={errorWrapper(Comcheck)()} />
                 <Route path="channels/:exerciseId/:channelId" element={errorWrapper(Channel)()} />
                 <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
-                <Route path="lessons/exercise/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
+                <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                 <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
                 <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(ExerciseReport)()} />
                 {/* Not found */}

@@ -35,7 +35,7 @@ const ExerciseViewLessons = () => {
     if (!exercise) return undefined;
     return {
       id: exerciseId,
-      type: 'exercise',
+      type: 'simulation',
       name: exercise.exercise_name,
       subtitle: exercise.exercise_subtitle,
       userId,

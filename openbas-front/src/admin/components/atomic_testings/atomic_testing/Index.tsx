@@ -11,6 +11,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
+import isInjectWithPayloadInfo from '../../../../utils/inject/injectUtils';
 import { FIVE_SECONDS } from '../../../../utils/Time';
 import { TeamContext } from '../../common/Context';
 import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
@@ -108,7 +109,7 @@ const Index = () => {
                 className={classes.item}
               />
               {
-                injectResultOverviewOutput.inject_type !== 'openbas_email' && injectResultOverviewOutput.inject_type !== 'openbas_ovh_sms' && injectResultOverviewOutput.inject_type !== 'openbas_mastodon' && injectResultOverviewOutput.inject_type !== 'openbas_http_query' && (
+                isInjectWithPayloadInfo(injectResultOverviewOutput) && (
                   <Tab
                     component={Link}
                     to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}

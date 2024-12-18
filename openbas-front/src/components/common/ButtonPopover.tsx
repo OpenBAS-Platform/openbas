@@ -62,7 +62,7 @@ const ButtonPopover: FunctionComponent<Props> = ({
           style={{ ...buttonProps }}
           disabled={disabled}
         >
-          <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
+          <MoreVert color={disabled ? 'disabled' : 'primary'} />
         </IconButton>
       )}
       <Menu

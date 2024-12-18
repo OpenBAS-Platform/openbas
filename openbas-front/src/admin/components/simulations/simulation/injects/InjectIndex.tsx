@@ -16,8 +16,10 @@ import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../..
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
+import isInjectWithPayloadInfo from '../../../../../utils/inject/injectUtils';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
+import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/AtomicTestingPayloadInfo';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
 import { PermissionsContext, PermissionsContextType } from '../../../common/Context';
 import InjectHeader from '../../../injects/InjectHeader';
@@ -96,12 +98,24 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
               label={t('Execution details')}
               className={classes.item}
             />
+            {
+              isInjectWithPayloadInfo(injectResultOverviewOutput) && (
+                <Tab
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`}
+                  value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`}
+                  label={t('Payload info')}
+                  className={classes.item}
+                />
+              )
+            }
           </Tabs>
         </Box>
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="" element={errorWrapper(AtomicTesting)()} />
             <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
+            <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
             {/* Not found */}
             <Route path="*" element={<NotFound />} />
           </Routes>

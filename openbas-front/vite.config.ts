@@ -1,6 +1,5 @@
 import react from '@vitejs/plugin-react';
 import { createLogger, defineConfig, loadEnv, transformWithEsbuild } from 'vite';
-import IstanbulPlugin from 'vite-plugin-istanbul';
 
 const logger = createLogger();
 const loggerError = logger.error;
@@ -27,6 +26,7 @@ export default ({ mode }: { mode: string }) => {
     build: {
       target: ['chrome58'],
       sourcemap: true,
+      minify: false,
     },
 
     resolve: {
@@ -118,11 +118,6 @@ export default ({ mode }: { mode: string }) => {
         },
       },
       react(),
-      [IstanbulPlugin({
-        include: 'src/*',
-        exclude: ['node_modules', 'test/'],
-        extension: ['.js', '.jsx', '.ts', '.tsx'],
-      })],
     ],
 
     server: {
