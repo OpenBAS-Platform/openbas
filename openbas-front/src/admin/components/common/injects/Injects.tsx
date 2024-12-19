@@ -483,6 +483,13 @@ const Injects: FunctionComponent<Props> = ({
     });
   };
 
+  const selectedInjects = () => {
+    const selectedInjectIds = Object.keys(selectedElements);
+    return injects.filter(inject => selectedInjectIds.includes(inject.inject_id));
+  };
+
+  const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
+
   return (
     <>
       <PaginationComponentV2
@@ -495,10 +502,11 @@ const Injects: FunctionComponent<Props> = ({
         reloadContentCount={reloadInjectCount}
         topBarButtons={(
           <InjectsListButtons
-            injects={injects}
+            selectedInjects={selectedInjects()}
             availableButtons={availableButtons}
             setViewMode={setViewMode}
             onImportedInjects={() => setReloadInjectCount(prev => prev + 1)}
+            isAtLeastOneValidInject={atLeastOneValidInject}
           />
         )}
       />
