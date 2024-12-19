@@ -1,5 +1,5 @@
 import { KeyboardArrowRight } from '@mui/icons-material';
-import { Chip, Grid, List, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { Chip, Grid, List, ListItemButton, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -245,11 +245,10 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               attackPatterns={attackPatterns}
             />
             <List>
-              <ListItemButton
+              <ListItem
                 classes={{ root: classes.itemHead }}
                 divider={false}
                 style={{ paddingTop: 0 }}
-                disabled={true}
               >
                 <ListItemIcon />
                 <ListItemText
@@ -261,7 +260,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                     />
                   )}
                 />
-              </ListItemButton>
+              </ListItem>
               {contracts.map((contract, index) => {
                 const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
                 // eslint-disable-next-line max-len
