@@ -27,8 +27,11 @@ const renderSwitch = ({
   </FormControl>
 );
 
-const SwitchField = props => (
+/**
+ * @deprecated The component use old form library react-final-form
+ */
+const OldSwitchField = props => (
   <Field name={props.name} component={renderSwitch} {...props} />
 );
 
-export default SwitchField;
+export default OldSwitchField;

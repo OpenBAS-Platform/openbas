@@ -5,9 +5,9 @@ import { Component } from 'react';
 import { Form } from 'react-final-form';
 
 import DateTimePicker from '../../../../../components/DateTimePicker';
+import OldRichTextField from '../../../../../components/fields/OldRichTextField';
 import OldSelectField from '../../../../../components/fields/OldSelectField';
 import OldTextField from '../../../../../components/fields/OldTextField';
-import RichTextField from '../../../../../components/fields/RichTextField';
 import inject18n from '../../../../../components/i18n';
 
 class ComcheckForm extends Component {
@@ -98,7 +98,7 @@ class ComcheckForm extends Component {
               label={t('Subject')}
               style={{ marginTop: 20 }}
             />
-            <RichTextField
+            <OldRichTextField
               name="comcheck_message"
               label={t('Message')}
               fullWidth={true}

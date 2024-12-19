@@ -1,8 +1,8 @@
 import { Button } from '@mui/material';
 import { Form } from 'react-final-form';
 
+import OldRichTextField from '../../../../../components/fields/OldRichTextField';
 import OldTextField from '../../../../../components/fields/OldTextField';
-import RichTextField from '../../../../../components/fields/RichTextField';
 import FileField from '../../../../../components/FileField';
 import { useFormatter } from '../../../../../components/i18n';
 
@@ -41,7 +41,7 @@ const CommunicationForm = ({ onSubmit, handleClose, initialValues }) => {
             label={t('Subject')}
             disabled={true}
           />
-          <RichTextField
+          <OldRichTextField
             name="communication_content"
             label={t('Content')}
             fullWidth={true}

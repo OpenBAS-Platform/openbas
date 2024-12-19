@@ -2,10 +2,11 @@ import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
+import { Controller } from 'react-hook-form';
 
-import OldTextField from '../../../../components/fields/OldTextField';
+import TagField from '../../../../components/fields/TagField';
+import TextField from '../../../../components/fields/TextField';
 import inject18n from '../../../../components/i18n';
-import TagField from '../../../../components/TagField';
 
 const styles = theme => ({
   duration: {
@@ -56,66 +57,77 @@ class InjectForm extends Component {
   render() {
     const {
       t,
-      values,
-      form,
+      control,
+      register,
       classes,
       disabled,
       isAtomic = false,
     } = this.props;
     return (
       <>
-        <OldTextField
+        <TextField
           variant="standard"
-          name="inject_title"
+          inputProps={register('inject_title')}
           fullWidth={true}
           label={t('Title')}
           disabled={disabled}
+          control={control}
         />
-        <OldTextField
+        <TextField
           variant="standard"
-          name="inject_description"
+          inputProps={register('inject_description')}
           fullWidth={true}
           multiline={true}
           rows={2}
           label={t('Description')}
           style={{ marginTop: 20 }}
           disabled={disabled}
+          control={control}
         />
-        <TagField
+        <Controller
+          control={control}
           name="inject_tags"
-          label={t('Tags')}
-          values={values}
-          setFieldValue={form.mutators.setValue}
-          style={{ marginTop: 20 }}
-          disabled={disabled}
+          render={({ field: { onChange, value } }) => (
+            <TagField
+              name="inject_tags"
+              label={t('Tags')}
+              fieldValue={value ?? []}
+              fieldOnChange={onChange}
+              style={{ marginTop: 20 }}
+              errors={{}}
+            />
+          )}
         />
         {!isAtomic
         && (
           <div className={disabled ? classes.durationDisabled : classes.duration}>
             <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
-            <OldTextField
+            <TextField
               variant="standard"
-              name="inject_depends_duration_days"
+              inputProps={register('inject_depends_duration_days')}
               type="number"
               label={t('Days')}
               style={{ width: '20%' }}
               disabled={disabled}
+              control={control}
             />
-            <OldTextField
+            <TextField
               variant="standard"
-              name="inject_depends_duration_hours"
+              inputProps={register('inject_depends_duration_hours')}
               type="number"
               label={t('Hours')}
               style={{ width: '20%' }}
               disabled={disabled}
+              control={control}
             />
-            <OldTextField
+            <TextField
               variant="standard"
-              name="inject_depends_duration_minutes"
+              inputProps={register('inject_depends_duration_minutes')}
               type="number"
               label={t('Minutes')}
               style={{ width: '20%' }}
               disabled={disabled}
+              control={control}
             />
           </div>
         )}
@@ -125,13 +137,13 @@ class InjectForm extends Component {
 }
 
 InjectForm.propTypes = {
+  control: PropTypes.object,
+  register: PropTypes.func,
+  setValue: PropTypes.func,
+  disabled: PropTypes.bool,
+  isAtomic: PropTypes.bool,
   classes: PropTypes.object,
   t: PropTypes.func,
-  tPick: PropTypes.func,
-  handleClose: PropTypes.func,
-  editing: PropTypes.bool,
-  injectorContractsMap: PropTypes.object,
-  isAtomic: PropTypes.bool,
 };
 
 export default R.compose(inject18n, withStyles(styles))(InjectForm);

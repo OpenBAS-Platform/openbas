@@ -1,6 +1,4 @@
 import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
   AttachmentOutlined,
   ControlPointOutlined,
   DeleteOutlined,
@@ -30,7 +28,6 @@ import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
-import { FieldArray } from 'react-final-form-arrays';
 import { connect } from 'react-redux';
 
 import { fetchChallenges } from '../../../../actions/Challenge';
@@ -38,11 +35,12 @@ import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchInjectTeams } from '../../../../actions/Inject';
 import { storeHelper } from '../../../../actions/Schema';
+import FieldArray from '../../../../components/fields/FieldArray';
 import MultipleFileLoader from '../../../../components/fields/MultipleFileLoader';
-import OldSelectField from '../../../../components/fields/OldSelectField';
-import OldTextField from '../../../../components/fields/OldTextField';
 import RichTextField from '../../../../components/fields/RichTextField';
+import SelectField from '../../../../components/fields/SelectField';
 import SwitchField from '../../../../components/fields/SwitchField';
+import TextField from '../../../../components/fields/TextField';
 import inject18n from '../../../../components/i18n';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
@@ -128,103 +126,6 @@ const styles = theme => ({
     color: theme.palette.primary.main,
   },
 });
-
-const inlineStylesHeaders = {
-  iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
-    padding: 0,
-    top: '0px',
-  },
-  team_name: {
-    float: 'left',
-    width: '30%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_users_number: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_users_enabled_number: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  team_tags: {
-    float: 'left',
-    width: '30%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  article_channel_type: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  article_channel_name: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  article_name: {
-    float: 'left',
-    width: '30%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  article_author: {
-    float: 'left',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  challenge_category: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  challenge_name: {
-    float: 'left',
-    width: '35%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  challenge_tags: {
-    float: 'left',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  document_name: {
-    float: 'left',
-    width: '35%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  document_type: {
-    float: 'left',
-    width: '20%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  document_tags: {
-    float: 'left',
-    width: '30%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  document_attached: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-};
 
 const inlineStyles = {
   team_name: {
@@ -507,113 +408,8 @@ class InjectDefinition extends Component {
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
-  articlesReverseBy(field) {
-    this.setState({
-      articlesSortBy: field,
-      articlesOrderAsc: !this.state.articlesOrderAsc,
-    });
-  }
-
-  articlesSortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { articlesSortBy, articlesOrderAsc } = this.state;
-    const sortComponent = articlesOrderAsc
-      ? (
-          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-        )
-      : (
-          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-        );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.articlesReverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {articlesSortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
-  challengesReverseBy(field) {
-    this.setState({
-      challengesSortBy: field,
-      challengesOrderAsc: !this.state.challengesOrderAsc,
-    });
-  }
-
-  challengesSortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { challengesSortBy, challengesOrderAsc } = this.state;
-    const sortComponent = challengesOrderAsc
-      ? (
-          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-        )
-      : (
-          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-        );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.challengesReverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {challengesSortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
-  documentsReverseBy(field) {
-    this.setState({
-      documentsSortBy: field,
-      documentsOrderAsc: !this.state.documentsOrderAsc,
-    });
-  }
-
-  documentsSortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { documentsSortBy, documentsOrderAsc } = this.state;
-    const sortComponent = documentsOrderAsc
-      ? (
-          <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-        )
-      : (
-          <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-        );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.documentsReverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {documentsSortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
   renderFields(renderedFields, values, attachedDocs) {
-    const { classes, t } = this.props;
+    const { classes, t, control, register } = this.props;
     return (
       <>
         {renderedFields.map((field) => {
@@ -630,13 +426,14 @@ class InjectDefinition extends Component {
                       disabled={this.props.permissions.readOnly || field.readOnly}
                       askAi={true}
                       inInject={true}
+                      control={control}
                     />
                   )
                 : (
-                    <OldTextField
+                    <TextField
                       variant="standard"
                       key={field.key}
-                      name={field.key}
+                      inputProps={register(field.key)}
                       fullWidth={true}
                       multiline={true}
                       rows={10}
@@ -645,19 +442,21 @@ class InjectDefinition extends Component {
                       disabled={this.props.permissions.readOnly || field.readOnly}
                       askAi={true}
                       inInject={true}
+                      control={this.props.control}
                     />
                   );
             case 'number':
               return (
-                <OldTextField
+                <TextField
                   variant="standard"
                   key={field.key}
-                  name={field.key}
+                  inputProps={register(field.key)}
                   fullWidth={true}
                   type="number"
                   label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
+                  control={control}
                 />
               );
             case 'checkbox':
@@ -668,14 +467,17 @@ class InjectDefinition extends Component {
                   label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
+                  control={control}
                 />
               );
-            case 'tuple':
+            case 'tuple': {
               return (
                 <div key={field.key}>
-                  <FieldArray name={field.key}>
-                    {({ fields, meta }) => (
-                      <div>
+                  <FieldArray
+                    name={field.key}
+                    control={control}
+                    renderLabel={(append) => {
+                      return (
                         <div style={{ marginTop: 20 }}>
                           <InputLabel
                             variant="standard"
@@ -685,7 +487,7 @@ class InjectDefinition extends Component {
                             {`${t(field.label)}${field.mandatory ? '*' : ''}`}
                             {field.cardinality === 'n' && (
                               <IconButton
-                                onClick={() => fields.push({
+                                onClick={() => append({
                                   type: 'text',
                                   key: '',
                                   value: '',
@@ -699,214 +501,182 @@ class InjectDefinition extends Component {
                                 <ControlPointOutlined />
                               </IconButton>
                             )}
-                            {meta.error && meta.touched && (
-                              <div className={classes.errorColor}>
-                                {meta.error}
-                              </div>
-                            )}
                           </InputLabel>
                         </div>
-                        <List style={{ marginTop: -20 }}>
-                          {fields.map((name, index) => {
-                            return (
-                              <ListItem
-                                key={`${field.key}_list_${index}`}
-                                classes={{ root: classes.tuple }}
-                                divider={false}
-                              >
-                                <OldSelectField
-                                  variant="standard"
-                                  name={`${name}.type`}
-                                  fullWidth={true}
-                                  label={t('Type')}
-                                  style={{ marginRight: 20 }}
-                                  disabled={this.props.permissions.readOnly || field.readOnly}
+                      );
+                    }}
+                    renderField={(name, index, remove) => {
+                      return (
+                        <List key={name.id} style={{ marginTop: -20 }}>
+                          <ListItem
+                            key={`${field.key}_list_${index}`}
+                            classes={{ root: classes.tuple }}
+                            divider={false}
+                          >
+                            <SelectField
+                              variant="standard"
+                              name={`${field.key}.${index}.type`}
+                              fullWidth={true}
+                              label={t('Type')}
+                              style={{ marginRight: 20 }}
+                              disabled={this.props.permissions.readOnly || field.readOnly}
+                              control={control}
+                            >
+                              <MenuItem key="text" value="text">
+                                <ListItemText>{t('Text')}</ListItemText>
+                              </MenuItem>
+                              {field.contractAttachment && (
+                                <MenuItem
+                                  key="attachment"
+                                  value="attachment"
                                 >
-                                  <MenuItem key="text" value="text">
-                                    <ListItemText>{t('Text')}</ListItemText>
-                                  </MenuItem>
-                                  {field.contractAttachment && (
-                                    <MenuItem
-                                      key="attachment"
-                                      value="attachment"
-                                    >
-                                      <ListItemText>
-                                        {t('Attachment')}
-                                      </ListItemText>
-                                    </MenuItem>
-                                  )}
-                                </OldSelectField>
-                                <OldTextField
-                                  variant="standard"
-                                  name={`${name}.key`}
-                                  fullWidth={true}
-                                  label={t('Key')}
-                                  style={{ marginRight: 20 }}
-                                  disabled={this.props.permissions.readOnly || field.readOnly}
-                                />
-                                {values
-                                && values[field.key]
-                                && values[field.key][index]
-                                && values[field.key][index].type
-                                === 'attachment' ? (
-                                      <OldSelectField
-                                        variant="standard"
-                                        name={`${name}.value`}
-                                        fullWidth={true}
-                                        label={t('Value')}
-                                        style={{ marginRight: 20 }}
-                                        disabled={this.props.permissions.readOnly || field.readOnly}
-                                      >
-                                        {attachedDocs.map(doc => (
-                                          <MenuItem
-                                            key={doc.document_id}
-                                            value={doc.document_id}
-                                          >
-                                            <ListItemText>
-                                              {doc.document_name}
-                                            </ListItemText>
-                                          </MenuItem>
-                                        ))}
-                                      </OldSelectField>
-                                    ) : (
-                                      <OldTextField
-                                        variant="standard"
-                                        name={`${name}.value`}
-                                        fullWidth={true}
-                                        label={t('Value')}
-                                        style={{ marginRight: 20 }}
-                                        disabled={this.props.permissions.readOnly || field.readOnly}
-                                      />
-                                    )}
-                                {field.cardinality === 'n' && (
-                                  <IconButton
-                                    onClick={() => fields.remove(index)}
-                                    aria-haspopup="true"
-                                    size="small"
+                                  <ListItemText>
+                                    {t('Attachment')}
+                                  </ListItemText>
+                                </MenuItem>
+                              )}
+                            </SelectField>
+                            <TextField
+                              variant="standard"
+                              fullWidth={true}
+                              label={t('Key')}
+                              style={{ marginRight: 20 }}
+                              disabled={this.props.permissions.readOnly || field.readOnly}
+                              inputProps={register(`${field.key}.${index}.key`)}
+                              control={control}
+                            />
+                            {values
+                            && values[field.key]
+                            && values[field.key][index]
+                            && values[field.key][index].type
+                            === 'attachment' ? (
+                                  <TextField
+                                    variant="standard"
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
                                     disabled={this.props.permissions.readOnly || field.readOnly}
-                                    color="primary"
+                                    inputProps={register(`${field.key}.${index}.value`)}
+                                    control={control}
                                   >
-                                    <DeleteOutlined />
-                                  </IconButton>
+                                    {attachedDocs.map(doc => (
+                                      <MenuItem
+                                        key={doc.document_id}
+                                        value={doc.document_id}
+                                      >
+                                        <ListItemText>
+                                          {doc.document_name}
+                                        </ListItemText>
+                                      </MenuItem>
+                                    ))}
+                                  </TextField>
+                                ) : (
+                                  <TextField
+                                    variant="standard"
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={this.props.permissions.readOnly || field.readOnly}
+                                    inputProps={register(`${field.key}.${index}.value`)}
+                                    control={control}
+                                  />
                                 )}
-                              </ListItem>
-                            );
-                          })}
+                            {field.cardinality === 'n' && (
+                              <IconButton
+                                onClick={() => remove(index)}
+                                aria-haspopup="true"
+                                size="small"
+                                disabled={this.props.permissions.readOnly || field.readOnly}
+                                color="primary"
+                              >
+                                <DeleteOutlined />
+                              </IconButton>
+                            )}
+                          </ListItem>
                         </List>
-                      </div>
-                    )}
-                  </FieldArray>
+                      );
+                    }}
+                  />
                 </div>
               );
-            case 'select':
-              return field.cardinality === 'n'
-                ? (
-                    <OldSelectField
-                      variant="standard"
-                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                      key={field.key}
-                      multiple
-                      renderValue={v => v.map(a => field.choices[a]).join(', ')}
-                      name={field.key}
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                      disabled={this.props.permissions.readOnly || field.readOnly}
-                    >
-                      {Object.entries(field.choices)
-                        .sort((a, b) => a[1].localeCompare(b[1]))
-                        .map(([k, v]) => (
-                          <MenuItem key={k} value={k}>
-                            <ListItemText>
-                              {field.expectation ? t(v || 'Unknown') : v}
-                            </ListItemText>
-                          </MenuItem>
-                        ))}
-                    </OldSelectField>
-                  )
-                : (
-                    <OldSelectField
-                      variant="standard"
-                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                      key={field.key}
-                      renderValue={v => (field.expectation
-                        ? t(field.choices[v] || 'Unknown')
-                        : field.choices[v])}
-                      name={field.key}
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                      disabled={this.props.permissions.readOnly}
-                    >
-                      {Object.entries(field.choices)
-                        .sort((a, b) => a[1].localeCompare(b[1]))
-                        .map(([k, v]) => (
-                          <MenuItem key={k} value={k}>
-                            <ListItemText>
-                              {field.expectation ? t(v || 'Unknown') : v}
-                            </ListItemText>
-                          </MenuItem>
-                        ))}
-                    </OldSelectField>
-                  );
-            case 'dependency-select':
-              // eslint-disable-next-line no-case-declarations
+            }
+            case 'select': {
+              const renderMultipleValuesFct = v => v.map(a => field.choices[a]).join(', ');
+              const renderSingleValueFct = v => (field.expectation
+                ? t(field.choices[v] || 'Unknown')
+                : field.choices[v]);
+              const renderValueFct = field.cardinality === 'n' ? renderMultipleValuesFct : renderSingleValueFct;
+              const multipleItemDisplayFct = v => field.expectation ? t(v || 'Unknown') : v;
+
+              return (
+                <SelectField
+                  variant="standard"
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                  key={field.key}
+                  multiple={field.cardinality === 'n'}
+                  renderValue={v => renderValueFct(v)}
+                  name={field.key}
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                  control={control}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
+                >
+                  {Object.entries(field.choices)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .map(([k, v]) => (
+                      <MenuItem key={k} value={k}>
+                        <ListItemText>
+                          {field.cardinality === 'n' ? v : multipleItemDisplayFct(v)}
+                        </ListItemText>
+                      </MenuItem>
+                    ))}
+                </SelectField>
+              );
+            }
+            case 'dependency-select': {
               const depValue = values[field.dependencyField];
-              // eslint-disable-next-line no-case-declarations
               const choices = field.choices[depValue] ?? {};
-              return field.cardinality === 'n'
-                ? (
-                    <OldSelectField
-                      variant="standard"
-                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                      key={field.key}
-                      multiple
-                      renderValue={v => v.map(a => choices[a]).join(', ')}
-                      name={field.key}
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                      disabled={this.props.permissions.readOnly || field.readOnly}
-                    >
-                      {Object.entries(choices)
-                        .sort((a, b) => a[1].localeCompare(b[1]))
-                        .map(([k, v]) => (
-                          <MenuItem key={k} value={k}>
-                            <ListItemText>{v}</ListItemText>
-                          </MenuItem>
-                        ))}
-                    </OldSelectField>
-                  )
-                : (
-                    <OldSelectField
-                      variant="standard"
-                      label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-                      key={field.key}
-                      renderValue={v => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])}
-                      disabled={this.props.permissions.readOnly || field.readOnly}
-                      name={field.key}
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                    >
-                      {Object.entries(choices)
-                        .sort((a, b) => a[1].localeCompare(b[1]))
-                        .map(([k, v]) => (
-                          <MenuItem key={k} value={k}>
-                            <ListItemText>
-                              {field.expectation ? t(v || 'Unknown') : v}
-                            </ListItemText>
-                          </MenuItem>
-                        ))}
-                    </OldSelectField>
-                  );
+              const renderMultipleValuesFct = v => v.map(a => choices[a]).join(', ');
+              const renderSingleValueFct = v => (field.expectation ? t(choices[v] || 'Unknown') : choices[v]);
+              const renderValueFct = field.cardinality === 'n' ? renderMultipleValuesFct : renderSingleValueFct;
+              const multipleItemDisplayFct = v => field.expectation ? t(v || 'Unknown') : v;
+
+              return (
+                <SelectField
+                  variant="standard"
+                  label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                  key={field.key}
+                  multiple={field.cardinality === 'n'}
+                  renderValue={v => renderValueFct(v)}
+                  disabled={this.props.permissions.readOnly || field.readOnly}
+                  name={field.key}
+                  fullWidth={true}
+                  control={control}
+                  style={{ marginTop: 20 }}
+                >
+                  {Object.entries(choices)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .map(([k, v]) => (
+                      <MenuItem key={k} value={k}>
+                        <ListItemText>
+                          {field.cardinality === 'n' ? multipleItemDisplayFct(v) : v}
+                        </ListItemText>
+                      </MenuItem>
+                    ))}
+                </SelectField>
+              );
+            }
             default:
               return (
-                <OldTextField
+                <TextField
                   variant="standard"
                   key={field.key}
-                  name={field.key}
+                  inputProps={register(field.key)}
                   fullWidth={true}
                   label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
                   style={{ marginTop: 20 }}
                   disabled={this.props.permissions.readOnly || field.readOnly}
-
+                  control={control}
                 />
               );
           }
@@ -915,52 +685,29 @@ class InjectDefinition extends Component {
     );
   }
 
-  resetDefaultvalues(setFieldValue, builtInFields) {
-    const { injectorContract } = this.props;
+  resetDefaultvalues(setFieldValue, builtInFields, injectorContract) {
     injectorContract.fields
       .filter(f => !builtInFields.includes(f.key) && !f.expectation)
       .forEach((field) => {
-        if (field.cardinality && field.cardinality === '1') {
-          let defaultValue = R.head(field.defaultValue);
-          if (
-            field.type === 'textarea'
-            && field.richText
-            && defaultValue
-            && defaultValue.length > 0
-          ) {
-            defaultValue = defaultValue
-              .replaceAll(
-                '<#list challenges as challenge>',
-                '&lt;#list challenges as challenge&gt;',
-              )
-              .replaceAll(
-                '<#list articles as article>',
-                '&lt;#list articles as article&gt;',
-              )
-              .replaceAll('</#list>', '&lt;/#list&gt;');
-          }
-          setFieldValue(field.key, defaultValue);
-        } else {
-          let { defaultValue } = field;
-          if (
-            field.type === 'textarea'
-            && field.richText
-            && defaultValue
-            && defaultValue.length > 0
-          ) {
-            defaultValue = defaultValue
-              .replaceAll(
-                '<#list challenges as challenge>',
-                '&lt;#list challenges as challenge&gt;',
-              )
-              .replaceAll(
-                '<#list articles as article>',
-                '&lt;#list articles as article&gt;',
-              )
-              .replaceAll('</#list>', '&lt;/#list&gt;');
-          }
-          setFieldValue(field.key, defaultValue);
+        let defaultValue = field.cardinality === '1' ? R.head(field.defaultValue) : field.defaultValue;
+        if (
+          field.type === 'textarea'
+          && field.richText
+          && defaultValue
+          && defaultValue.length > 0
+        ) {
+          defaultValue = defaultValue
+            .replaceAll(
+              '<#list challenges as challenge>',
+              '&lt;#list challenges as challenge&gt;',
+            )
+            .replaceAll(
+              '<#list articles as article>',
+              '&lt;#list articles as article&gt;',
+            )
+            .replaceAll('</#list>', '&lt;/#list&gt;');
         }
+        setFieldValue(field.key, defaultValue);
       });
   }
 
@@ -968,7 +715,7 @@ class InjectDefinition extends Component {
     const {
       t,
       classes,
-      form,
+      setValue,
       values,
       submitting,
       inject,
@@ -1092,435 +839,433 @@ class InjectDefinition extends Component {
     ];
     return (
       <>
-        <>
-          {hasTeams && (
-            <div style={{ marginTop: 25 }}>
-              <Typography variant="h5" style={{ fontWeight: 500, float: 'left' }}>
-                {t('Targeted teams')}
-              </Typography>
-              <FormGroup row={true} classes={{ root: classes.allTeams }}>
-                <FormControlLabel
-                  control={(
-                    <Switch
-                      checked={allTeams}
-                      onChange={this.toggleAll.bind(this)}
-                      color="primary"
-                      size="small"
-                      disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
-                    />
-                  )}
-                  label={<strong>{t('All teams')}</strong>}
-                />
-              </FormGroup>
-              <div className="clearfix" />
-              <List>
-                {allTeams ? (
-                  <ListItem classes={{ root: classes.item }} divider={true}>
-                    <ListItemIcon>
-                      <GroupsOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={(
-                        <>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.team_name}
-                          >
-                            <i>{t('All teams')}</i>
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.team_users_number}
-                          >
-                            <strong>
-                              {this.props.allUsersNumber}
-                            </strong>
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.team_users_enabled_number}
-                          >
-                            <strong>
-                              {this.props.usersNumber}
-                            </strong>
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.team_tags}
-                          >
-                            <ItemTags variant="reduced-view" tags={[]} />
-                          </div>
-                        </>
-                      )}
-                    />
-                    <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-                  </ListItem>
-                ) : (
-                  <>
-                    <InjectTeamsList
-                      teamIds={teamsIds}
-                      handleRemoveTeam={this.handleRemoveTeam.bind(this)}
-                    />
-                    <InjectAddTeams
-                      injectTeamsIds={teamsIds}
-                      handleAddTeams={this.handleAddTeams.bind(this)}
-                    />
-                  </>
-                )}
-              </List>
-            </div>
-          )}
-          {hasAssets && (
-            <>
-              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams ? 20 : 0 }}>
-                {t('Targeted assets')}
-              </Typography>
-              <EndpointsList
-                endpoints={assets}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore: Endpoint property handle by EndpointsList
-                actions={
-                  <EndpointPopover inline onRemoveEndpointFromInject={this.handleRemoveAsset.bind(this)} onDelete={this.handleRemoveAsset.bind(this)} />
-                }
-              />
-              <InjectAddEndpoints
-                endpointIds={assetIds}
-                onSubmit={this.handleAddAssets.bind(this)}
-                disabled={fieldAssets.readOnly}
-                platforms={injectorContract.platforms}
-                payloadArch={inject.inject_injector_contract?.injector_contract_arch}
-              />
-            </>
-          )}
-          {hasAssetGroups && (
-            <>
-              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets ? 20 : 0 }}>
-                {t('Targeted asset groups')}
-              </Typography>
-              <AssetGroupsList
-                assetGroupIds={assetGroupIds}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore: Endpoint property handle by EndpointsList
-                actions={
-                  <AssetGroupPopover inline onRemoveAssetGroupFromInject={this.handleRemoveAssetGroup.bind(this)} />
-                }
-              />
-              <InjectAddAssetGroups assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />
-            </>
-          )}
-          {hasArticles && (
-            <>
-              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0 }}>
-                {t('Media pressure to publish')}
-              </Typography>
-              <List>
-                {sortedArticles.map(article => (
-                  <ListItem
-                    key={article.article_id}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                  >
-                    <ListItemIcon>
-                      <ChannelIcon
-                        type={article.article_channel_type}
-                        variant="inline"
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={(
-                        <>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.article_channel_type}
-                          >
-                            {t(article.article_channel_type || 'Unknown')}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.article_channel_name}
-                          >
-                            {article.article_channel_name}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.article_name}
-                          >
-                            {article.article_name}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.article_author}
-                          >
-                            {article.article_author}
-                          </div>
-                        </>
-                      )}
-                    />
-                    <ListItemSecondaryAction>
-                      <ArticlePopover
-                        article={article}
-                        onRemoveArticle={this.handleRemoveArticle.bind(this)}
-                        disabled={this.props.permissions.readOnly || fieldArticles.readOnly}
-                      />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-                <InjectAddArticles
-                  articles={articlesFromExerciseOrScenario}
-                  injectArticlesIds={articlesIds}
-                  handleAddArticles={this.handleAddArticles.bind(this)}
-                />
-              </List>
-            </>
-          )}
-          {hasChallenges && (
-            <>
-              <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0 }}>
-                {t('Challenges to publish')}
-              </Typography>
-              <List>
-                {sortedChallenges.map(challenge => (
-                  <ListItem
-                    key={challenge.challenge_id}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                  >
-                    <ListItemIcon>
-                      <EmojiEventsOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={(
-                        <>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.challenge_category}
-                          >
-                            {t(challenge.challenge_category || 'Unknown')}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.challenge_name}
-                          >
-                            {challenge.challenge_name}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.challenge_tags}
-                          >
-                            <ItemTags
-                              variant="reduced-view"
-                              tags={challenge.challenge_tags}
-                            />
-                          </div>
-                        </>
-                      )}
-                    />
-                    <ListItemSecondaryAction>
-                      <ChallengePopover
-                        inline
-                        challenge={challenge}
-                        onRemoveChallenge={this.handleRemoveChallenge.bind(
-                          this,
-                        )}
-                        disabled={this.props.permissions.readOnly || fieldChallenges.readOnly}
-                      />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-                <InjectAddChallenges
-                  injectChallengesIds={challengesIds}
-                  handleAddChallenges={this.handleAddChallenges.bind(
-                    this,
-                  )}
-                />
-              </List>
-            </>
-          )}
-          <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
-            <div style={{ float: 'left' }}>
-              <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
-            </div>
-            <div style={{ float: 'left' }}>
-              <Tooltip title={t('Reset to default values')}>
-                <IconButton
-                  color="primary"
-                  variant="outlined"
-                  disabled={submitting || this.props.permissions.readOnly}
-                  onClick={this.resetDefaultvalues.bind(this, form.mutators.setValue, builtInFields)}
-                  size="small"
-                  style={{ margin: '-12px 0 0 5px' }}
-                >
-                  <RotateLeftOutlined />
-                </IconButton>
-              </Tooltip>
-            </div>
-            <div style={{ float: 'right' }}>
-              <Button
-                color="primary"
-                variant="outlined"
-                size="small"
-                onClick={this.handleOpenVariables.bind(this)}
-                startIcon={<HelpOutlineOutlined />}
-                style={{ marginTop: -10 }}
-              >
-                {t('Available variables')}
-              </Button>
-            </div>
-            <div className="clearfix" />
-          </div>
+        {hasTeams && (
           <>
-            {this.renderFields(
-              injectorContract.fields
-                .filter(
-                  f => !builtInFields.includes(f.key) && !f.expectation,
-                )
-                .filter((f) => {
-                // Filter display if linked fields
-                  for (
-                    let index = 0;
-                    index < f.linkedFields.length;
-                    index += 1
-                  ) {
-                    const linkedField = f.linkedFields[index];
-                    if (
-                      linkedField.type === 'checkbox'
-                      && values[linkedField.key] === false
-                    ) {
-                      return false;
-                    }
-                    if (
-                      linkedField.type === 'select'
-                      && !f.linkedValues.includes(values[linkedField.key])
-                    ) {
-                      return false;
-                    }
-                  }
-                  return true;
-                }),
-              values,
-              attachedDocs,
-            )}
-          </>
-          {(hasExpectations || expectationsNotManual.length > 0) && (
-            <>
-              <Typography variant="h5" style={{ marginTop: 20, fontWeight: 500 }}>
-                {t('Inject expectations')}
-              </Typography>
-              {expectationsNotManual.length > 0 && (
-                <>
-                  <div style={{ marginTop: -15 }}>
-                    {this.renderFields(
-                      expectationsNotManual.filter((f) => {
-                      // Filter display if linked fields
-                        for (let index = 0; index < f.linkedFields.length; index += 1) {
-                          const linkedField = f.linkedFields[index];
-                          if (linkedField.type === 'checkbox' && values[linkedField.key] === false) {
-                            return false;
-                          }
-                          if (linkedField.type === 'select' && !f.linkedValues.includes(values[linkedField.key])) {
-                            return false;
-                          }
-                        }
-                        return true;
-                      }),
-                      values,
-                      attachedDocs,
+            <Typography variant="h5" style={{ fontWeight: 500, float: 'left' }}>
+              {t('Targeted teams')}
+            </Typography>
+            <FormGroup row={true} classes={{ root: classes.allTeams }}>
+              <FormControlLabel
+                control={(
+                  <Switch
+                    checked={allTeams}
+                    onChange={this.toggleAll.bind(this)}
+                    color="primary"
+                    size="small"
+                    disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
+                  />
+                )}
+                label={<strong>{t('All teams')}</strong>}
+              />
+            </FormGroup>
+            <div className="clearfix" />
+            <List>
+              {allTeams ? (
+                <ListItem classes={{ root: classes.item }} divider={true}>
+                  <ListItemIcon>
+                    <GroupsOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.team_name}
+                        >
+                          <i>{t('All teams')}</i>
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.team_users_number}
+                        >
+                          <strong>
+                            {this.props.allUsersNumber}
+                          </strong>
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.team_users_enabled_number}
+                        >
+                          <strong>
+                            {this.props.usersNumber}
+                          </strong>
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.team_tags}
+                        >
+                          <ItemTags variant="reduced-view" tags={[]} />
+                        </div>
+                      </>
                     )}
-                  </div>
+                  />
+                  <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+                </ListItem>
+              ) : (
+                <>
+                  <InjectTeamsList
+                    teamIds={teamsIds}
+                    handleRemoveTeam={this.handleRemoveTeam.bind(this)}
+                  />
+                  <InjectAddTeams
+                    injectTeamsIds={teamsIds}
+                    handleAddTeams={this.handleAddTeams.bind(this)}
+                  />
                 </>
               )}
-              {hasExpectations && (
-                <InjectExpectations
-                  predefinedExpectationDatas={predefinedExpectations}
-                  expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
-                  handleExpectations={this.handleExpectations.bind(this)}
-                />
-              )}
-            </>
-          )}
-          {!isAtomic && (
-            <>
-              <Typography variant="h5" style={{ fontWeight: 500, marginTop: 20 }}>
-                {t('Inject documents')}
-              </Typography>
-              <List>
-                {sortedDocuments.map(document => (
-                  <ListItemButton
-                    key={document.document_id}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                    component="a"
-                    href={`/api/documents/${document.document_id}/file`}
-                  >
-                    <ListItemIcon>
-                      <AttachmentOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={(
-                        <>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.document_name}
-                          >
-                            {document.document_name}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.document_type}
-                          >
-                            <DocumentType
-                              type={document.document_type}
-                              variant="list"
-                            />
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.document_tags}
-                          >
-                            <ItemTags
-                              variant="reduced-view"
-                              tags={document.document_tags}
-                            />
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={inlineStyles.document_attached}
-                          >
-                            <ItemBoolean
-                              status={hasAttachments ? document.document_attached : null}
-                              label={document.document_attached ? t('Yes') : t('No')}
-                              variant="inList"
-                              onClick={(event) => {
-                                event.preventDefault();
-                                this.toggleAttachment(document.document_id);
-                              }}
-                              disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly) || !hasAttachments}
-                            />
-                          </div>
-                        </>
-                      )}
+            </List>
+          </>
+        )}
+        {hasAssets && (
+          <>
+            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams ? 20 : 0 }}>
+              {t('Targeted assets')}
+            </Typography>
+            <EndpointsList
+              endpoints={assets}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore: Endpoint property handle by EndpointsList
+              actions={
+                <EndpointPopover inline onRemoveEndpointFromInject={this.handleRemoveAsset.bind(this)} onDelete={this.handleRemoveAsset.bind(this)} />
+              }
+            />
+            <InjectAddEndpoints
+              endpointIds={assetIds}
+              onSubmit={this.handleAddAssets.bind(this)}
+              disabled={fieldAssets.readOnly}
+              platforms={injectorContract.platforms}
+              payloadArch={inject.inject_injector_contract?.injector_contract_arch}
+            />
+          </>
+        )}
+        {hasAssetGroups && (
+          <>
+            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets ? 20 : 0 }}>
+              {t('Targeted asset groups')}
+            </Typography>
+            <AssetGroupsList
+              assetGroupIds={assetGroupIds}
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore: Endpoint property handle by EndpointsList
+              actions={
+                <AssetGroupPopover inline onRemoveAssetGroupFromInject={this.handleRemoveAssetGroup.bind(this)} />
+              }
+            />
+            <InjectAddAssetGroups assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />
+          </>
+        )}
+        {hasArticles && (
+          <>
+            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0 }}>
+              {t('Media pressure to publish')}
+            </Typography>
+            <List>
+              {sortedArticles.map(article => (
+                <ListItem
+                  key={article.article_id}
+                  classes={{ root: classes.item }}
+                  divider={true}
+                >
+                  <ListItemIcon>
+                    <ChannelIcon
+                      type={article.article_channel_type}
+                      variant="inline"
                     />
-                    <ListItemSecondaryAction>
-                      <DocumentPopover
-                        inline
-                        document={document}
-                        onRemoveDocument={this.handleRemoveDocument.bind(this)}
-                        onToggleAttach={hasAttachments ? this.toggleAttachment.bind(this) : null}
-                        attached={document.document_attached}
-                        disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly)}
-                      />
-                    </ListItemSecondaryAction>
-                  </ListItemButton>
-                ))}
-                <MultipleFileLoader
-                  initialDocumentIds={documents.filter(a => !a.inject_document_attached).map(d => d.document_id)}
-                  handleAddDocuments={this.handleAddDocuments.bind(this)}
-                  hasAttachments={hasAttachments}
-                />
-              </List>
-            </>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.article_channel_type}
+                        >
+                          {t(article.article_channel_type || 'Unknown')}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.article_channel_name}
+                        >
+                          {article.article_channel_name}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.article_name}
+                        >
+                          {article.article_name}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.article_author}
+                        >
+                          {article.article_author}
+                        </div>
+                      </>
+                    )}
+                  />
+                  <ListItemSecondaryAction>
+                    <ArticlePopover
+                      article={article}
+                      onRemoveArticle={this.handleRemoveArticle.bind(this)}
+                      disabled={this.props.permissions.readOnly || fieldArticles.readOnly}
+                    />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+              <InjectAddArticles
+                articles={articlesFromExerciseOrScenario}
+                injectArticlesIds={articlesIds}
+                handleAddArticles={this.handleAddArticles.bind(this)}
+              />
+            </List>
+          </>
+        )}
+        {hasChallenges && (
+          <>
+            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0 }}>
+              {t('Challenges to publish')}
+            </Typography>
+            <List>
+              {sortedChallenges.map(challenge => (
+                <ListItem
+                  key={challenge.challenge_id}
+                  classes={{ root: classes.item }}
+                  divider={true}
+                >
+                  <ListItemIcon>
+                    <EmojiEventsOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.challenge_category}
+                        >
+                          {t(challenge.challenge_category || 'Unknown')}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.challenge_name}
+                        >
+                          {challenge.challenge_name}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.challenge_tags}
+                        >
+                          <ItemTags
+                            variant="reduced-view"
+                            tags={challenge.challenge_tags}
+                          />
+                        </div>
+                      </>
+                    )}
+                  />
+                  <ListItemSecondaryAction>
+                    <ChallengePopover
+                      inline
+                      challenge={challenge}
+                      onRemoveChallenge={this.handleRemoveChallenge.bind(
+                        this,
+                      )}
+                      disabled={this.props.permissions.readOnly || fieldChallenges.readOnly}
+                    />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+              <InjectAddChallenges
+                injectChallengesIds={challengesIds}
+                handleAddChallenges={this.handleAddChallenges.bind(
+                  this,
+                )}
+              />
+            </List>
+          </>
+        )}
+        <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
+          <div style={{ float: 'left' }}>
+            <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
+          </div>
+          <div style={{ float: 'left' }}>
+            <Tooltip title={t('Reset to default values')}>
+              <IconButton
+                color="primary"
+                variant="outlined"
+                disabled={submitting || this.props.permissions.readOnly}
+                onClick={() => this.resetDefaultvalues(setValue, builtInFields, injectorContract)}
+                size="small"
+                style={{ margin: '-12px 0 0 5px' }}
+              >
+                <RotateLeftOutlined />
+              </IconButton>
+            </Tooltip>
+          </div>
+          <div style={{ float: 'right' }}>
+            <Button
+              color="primary"
+              variant="outlined"
+              size="small"
+              onClick={this.handleOpenVariables.bind(this)}
+              startIcon={<HelpOutlineOutlined />}
+              style={{ marginTop: -10 }}
+            >
+              {t('Available variables')}
+            </Button>
+          </div>
+          <div className="clearfix" />
+        </div>
+        <>
+          {this.renderFields(
+            injectorContract.fields
+              .filter(
+                f => !builtInFields.includes(f.key) && !f.expectation,
+              )
+              .filter((f) => {
+                // Filter display if linked fields
+                for (
+                  let index = 0;
+                  index < f.linkedFields.length;
+                  index += 1
+                ) {
+                  const linkedField = f.linkedFields[index];
+                  if (
+                    linkedField.type === 'checkbox'
+                    && values[linkedField.key] === false
+                  ) {
+                    return false;
+                  }
+                  if (
+                    linkedField.type === 'select'
+                    && !f.linkedValues.includes(values[linkedField.key])
+                  ) {
+                    return false;
+                  }
+                }
+                return true;
+              }),
+            values,
+            attachedDocs,
           )}
         </>
+        {(hasExpectations || expectationsNotManual.length > 0) && (
+          <>
+            <Typography variant="h5" style={{ marginTop: 20, fontWeight: 500 }}>
+              {t('Inject expectations')}
+            </Typography>
+            {expectationsNotManual.length > 0 && (
+              <>
+                <div style={{ marginTop: -15 }}>
+                  {this.renderFields(
+                    expectationsNotManual.filter((f) => {
+                      // Filter display if linked fields
+                      for (let index = 0; index < f.linkedFields.length; index += 1) {
+                        const linkedField = f.linkedFields[index];
+                        if (linkedField.type === 'checkbox' && values[linkedField.key] === false) {
+                          return false;
+                        }
+                        if (linkedField.type === 'select' && !f.linkedValues.includes(values[linkedField.key])) {
+                          return false;
+                        }
+                      }
+                      return true;
+                    }),
+                    values,
+                    attachedDocs,
+                  )}
+                </div>
+              </>
+            )}
+            {hasExpectations && (
+              <InjectExpectations
+                predefinedExpectationDatas={predefinedExpectations}
+                expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
+                handleExpectations={this.handleExpectations.bind(this)}
+              />
+            )}
+          </>
+        )}
+        {!isAtomic && (
+          <>
+            <Typography variant="h5" style={{ fontWeight: 500, marginTop: 20 }}>
+              {t('Inject documents')}
+            </Typography>
+            <List>
+              {sortedDocuments.map(document => (
+                <ListItemButton
+                  key={document.document_id}
+                  classes={{ root: classes.item }}
+                  divider={true}
+                  component="a"
+                  href={`/api/documents/${document.document_id}/file`}
+                >
+                  <ListItemIcon>
+                    <AttachmentOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.document_name}
+                        >
+                          {document.document_name}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.document_type}
+                        >
+                          <DocumentType
+                            type={document.document_type}
+                            variant="list"
+                          />
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.document_tags}
+                        >
+                          <ItemTags
+                            variant="reduced-view"
+                            tags={document.document_tags}
+                          />
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.document_attached}
+                        >
+                          <ItemBoolean
+                            status={hasAttachments ? document.document_attached : null}
+                            label={document.document_attached ? t('Yes') : t('No')}
+                            variant="inList"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              this.toggleAttachment(document.document_id);
+                            }}
+                            disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly) || !hasAttachments}
+                          />
+                        </div>
+                      </>
+                    )}
+                  />
+                  <ListItemSecondaryAction>
+                    <DocumentPopover
+                      inline
+                      document={document}
+                      onRemoveDocument={this.handleRemoveDocument.bind(this)}
+                      onToggleAttach={hasAttachments ? this.toggleAttachment.bind(this) : null}
+                      attached={document.document_attached}
+                      disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly)}
+                    />
+                  </ListItemSecondaryAction>
+                </ListItemButton>
+              ))}
+              <MultipleFileLoader
+                initialDocumentIds={documents.filter(a => !a.inject_document_attached).map(d => d.document_id)}
+                handleAddDocuments={this.handleAddDocuments.bind(this)}
+                hasAttachments={hasAttachments}
+              />
+            </List>
+          </>
+        )}
         <AvailableVariablesDialog
           uriVariable={this.props.uriVariable}
           variables={this.props.variablesFromExerciseOrScenario}
