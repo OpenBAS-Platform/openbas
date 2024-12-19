@@ -46,6 +46,7 @@ const useStyles = makeStyles(() => ({
     textTransform: 'uppercase',
     borderRadius: 4,
     width: 80,
+    marginRight: 5,
   },
   goIcon: {
     position: 'absolute',
@@ -248,7 +249,6 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
                 classes={{ root: classes.itemHead }}
                 divider={false}
                 style={{ paddingTop: 0 }}
-                secondaryAction={<>&nbsp;</>}
               >
                 <ListItemIcon />
                 <ListItemText
