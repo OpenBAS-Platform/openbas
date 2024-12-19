@@ -143,7 +143,6 @@ const InjectTestList: FunctionComponent<Props> = ({
           return (
             <ListItem
               key={test.status_id}
-              classes={{ root: classes.item }}
               divider
               secondaryAction={(
                 <InjectTestPopover
