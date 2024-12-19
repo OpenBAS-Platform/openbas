@@ -24,7 +24,9 @@ import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.GrantService;
+import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.AtomicTestingUtils;
@@ -68,6 +70,8 @@ public class ExerciseService {
   private final InjectDuplicateService injectDuplicateService;
   private final TeamService teamService;
   private final VariableService variableService;
+  private final TagRuleService tagRuleService;
+  private final InjectService injectService;
 
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
@@ -613,5 +617,43 @@ public class ExerciseService {
     // Remove all association between lessons learned and teams
     this.lessonsCategoryRepository.removeTeamsForExercise(exerciseId, teamIds);
     return teamRepository.findAllById(teamIds);
+  }
+
+  /**
+   * Update the simulation and each of the injects to add/remove default assets
+   *
+   * @param exercise
+   * @param currentTags list of the tags before the update
+   * @return
+   */
+  @Transactional
+  public Exercise updateExerciceAndApplyRule(
+      @NotNull final Exercise exercise, @NotNull final Set<Tag> currentTags) {
+    // Get assets from the TagRule of the added tags
+    List<Asset> defaultAssetsToAdd =
+        tagRuleService.getAssetsFromTagIds(
+            exercise.getTags().stream()
+                .filter(tag -> !currentTags.contains(tag))
+                .map(Tag::getId)
+                .toList());
+
+    // Get assets from the TagRule of the removed tags
+    List<Asset> defaultAssetsToRemove =
+        tagRuleService.getAssetsFromTagIds(
+            currentTags.stream()
+                .filter(tag -> !exercise.getTags().contains(tag))
+                .map(Tag::getId)
+                .toList());
+
+    // Add/remove the default assets to/from the injects
+    exercise
+        .getInjects()
+        .forEach(
+            inject ->
+                injectService.applyDefaultAssetsToInject(
+                    inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
+
+    exercise.setUpdatedAt(now());
+    return exerciseRepository.save(exercise);
   }
 }

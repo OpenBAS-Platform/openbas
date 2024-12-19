@@ -1,17 +1,24 @@
-package io.openbas.service;
+package io.openbas.rest.exercise.service;
 
-import static io.openbas.expectation.ExpectationType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.openbas.database.model.Asset;
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
-import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.rest.inject.service.InjectService;
+import io.openbas.service.GrantService;
+import io.openbas.service.TagRuleService;
+import io.openbas.service.TeamService;
+import io.openbas.service.VariableService;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
-import io.openbas.utils.fixtures.ExpectationResultsByTypeFixture;
+import io.openbas.utils.fixtures.*;
 import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +48,8 @@ class ExerciseServiceTest {
   @Mock private ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Mock private InjectRepository injectRepository;
   @Mock private LessonsCategoryRepository lessonsCategoryRepository;
+  @Mock private TagRuleService tagRuleService;
+  @Mock private InjectService injectService;
 
   @InjectMocks private ExerciseService exerciseService;
 
@@ -52,6 +61,8 @@ class ExerciseServiceTest {
             injectDuplicateService,
             teamService,
             variableService,
+            tagRuleService,
+            injectService,
             exerciseMapper,
             injectMapper,
             resultUtils,
@@ -97,5 +108,34 @@ class ExerciseServiceTest {
         Map.of(
             exerciseId1, ExpectationResultsByTypeFixture.exercise1GlobalScores,
             exerciseId2, ExpectationResultsByTypeFixture.exercise2GlobalScores));
+  }
+
+  @Test
+  public void testUpdateExerciseAndApplyRule_WITH_AddedAndRemovedTags() {
+    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
+    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
+    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+    io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
+    io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
+    io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
+    Exercise exercise = ExerciseFixture.getExerciseWithInjects();
+    exercise.setTags(Set.of(tag1, tag2));
+    Set<Tag> currentTags = Set.of(tag2, tag3);
+    List<Asset> assetsToAdd = List.of(asset1, asset2);
+    List<Asset> assetsToRemove = List.of(asset3);
+
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag1.getId()))).thenReturn(assetsToAdd);
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag3.getId()))).thenReturn(assetsToRemove);
+    when(exerciseRepository.save(exercise)).thenReturn(exercise);
+
+    exerciseService.updateExerciceAndApplyRule(exercise, currentTags);
+
+    exercise
+        .getInjects()
+        .forEach(
+            inject ->
+                verify(injectService)
+                    .applyDefaultAssetsToInject(inject.getId(), assetsToAdd, assetsToRemove));
+    verify(exerciseRepository).save(exercise);
   }
 }

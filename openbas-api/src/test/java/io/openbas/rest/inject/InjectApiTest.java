@@ -1,4 +1,4 @@
-package io.openbas.rest;
+package io.openbas.rest.inject;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.ExerciseStatus.RUNNING;
@@ -44,14 +44,12 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -95,6 +93,8 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private UserRepository userRepository;
   @Resource private ObjectMapper objectMapper;
   @MockBean private JavaMailSender javaMailSender;
+
+  @InjectMocks private InjectApi injectApiWithMock;
 
   @BeforeAll
   void beforeAll() {
