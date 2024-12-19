@@ -27,6 +27,7 @@ interface Props {
   setViewMode?: (mode: string) => void;
   availableButtons: string[];
   onImportedInjects?: () => void;
+  selectedInjectIds: string[];
 }
 
 const InjectsListButtons: FunctionComponent<Props> = ({
@@ -34,6 +35,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
   setViewMode,
   availableButtons,
   onImportedInjects,
+  selectedInjectIds,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -60,7 +62,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
       'inject_tags',
       'inject_content',
     ],
-    injects,
+    injects.filter(inject => selectedInjectIds.includes(inject.inject_id)),
     tagsMap,
   );
   const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });

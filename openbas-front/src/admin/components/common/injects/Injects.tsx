@@ -499,6 +499,7 @@ const Injects: FunctionComponent<Props> = ({
             availableButtons={availableButtons}
             setViewMode={setViewMode}
             onImportedInjects={() => setReloadInjectCount(prev => prev + 1)}
+            selectedInjectIds={Object.keys(selectedElements)}
           />
         )}
       />
