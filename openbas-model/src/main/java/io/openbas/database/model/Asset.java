@@ -59,10 +59,6 @@ public class Asset implements Base {
   @JsonProperty("asset_description")
   private String description;
 
-  @Column(name = "asset_last_seen")
-  @JsonProperty("asset_last_seen")
-  private Instant lastSeen;
-
   @Column(name = "asset_external_reference")
   @JsonProperty("asset_external_reference")
   private String externalReference;
@@ -88,14 +84,6 @@ public class Asset implements Base {
   @JsonProperty("asset_tags")
   private Set<Tag> tags = new HashSet<>();
 
-  @Queryable(sortable = true)
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "asset_executor")
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("asset_executor")
-  @Schema(type = "string")
-  private Executor executor;
-
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "asset_parent")
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -116,12 +104,6 @@ public class Asset implements Base {
   @JsonProperty("asset_inject")
   @Schema(type = "string")
   private Inject inject;
-
-  @JsonProperty("asset_active")
-  public boolean getActive() {
-    return this.getLastSeen() != null
-        && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
-  }
 
   // -- AUDIT --
 

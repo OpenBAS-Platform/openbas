@@ -63,11 +63,6 @@ public class Endpoint extends Asset {
   private String hostname;
 
   @Queryable(filterable = true, sortable = true)
-  @Column(name = "endpoint_agent_version")
-  @JsonProperty("endpoint_agent_version")
-  private String agentVersion;
-
-  @Queryable(filterable = true, sortable = true)
   @Column(name = "endpoint_platform")
   @JsonProperty("endpoint_platform")
   @Enumerated(EnumType.STRING)
