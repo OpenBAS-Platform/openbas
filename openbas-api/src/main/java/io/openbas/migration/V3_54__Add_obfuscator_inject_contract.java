@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_53__Add_obfuscator_inject_contract extends BaseJavaMigration {
+public class V3_54__Add_obfuscator_inject_contract extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
