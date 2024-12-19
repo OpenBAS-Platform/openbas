@@ -1,12 +1,12 @@
 package io.openbas.migration;
 
-import org.flywaydb.core.api.migration.BaseJavaMigration;
-import org.flywaydb.core.api.migration.Context;
-import org.springframework.stereotype.Component;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.UUID;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
 @Component
 public class V3_54__Add_table_agents extends BaseJavaMigration {
@@ -33,29 +33,38 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
 
     // Migration datas
     ResultSet resultAgentExecutor =
-            select.executeQuery("SELECT executor_id FROM executors where executor_type='openbas_caldera'");
+        select.executeQuery(
+            "SELECT executor_id FROM executors where executor_type='openbas_caldera'");
     String executorCalderaId = "";
-    if(resultAgentExecutor.next()) {
+    if (resultAgentExecutor.next()) {
       executorCalderaId = resultAgentExecutor.getString("executor_id");
     }
     ResultSet results =
-        select.executeQuery("SELECT * FROM assets WHERE asset_type = 'Endpoint'");
+        select.executeQuery(
+            "SELECT * FROM assets WHERE asset_type='Endpoint' AND asset_executor IS NOT NULL");
     PreparedStatement statement =
         context
             .getConnection()
             .prepareStatement(
                 """
                 INSERT INTO agents(agent_id, agent_asset_id, agent_privilege, agent_deployment_mode, agent_executed_by_user, agent_executor_id, agent_version, agent_last_seen)
-                VALUES (${UUID.randomUUID().toString}::uuid, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """);
     while (results.next()) {
-      statement.setString(1, results.getString("asset_id"));
-      statement.setString(2, "ADMIN");
-      statement.setString(3, executorCalderaId.equals(results.getString("asset_executor")) ? "SESSION" : "SERVICE");
-      statement.setString(4, "Windows".equals(results.getString("endpoint_platform")) ? "nt authority\\system" : "root");
-      statement.setString(5, results.getString("asset_executor"));
-      statement.setString(6, results.getString("endpoint_agent_version"));
-      statement.setTimestamp(7, results.getTimestamp("asset_last_seen"));
+      UUID generatedUUID = UUID.randomUUID();
+      statement.setObject(1, generatedUUID);
+      statement.setString(2, results.getString("asset_id"));
+      statement.setString(3, "ADMIN");
+      statement.setString(
+          4, executorCalderaId.equals(results.getString("asset_executor")) ? "SESSION" : "SERVICE");
+      statement.setString(
+          5,
+          "Windows".equals(results.getString("endpoint_platform"))
+              ? "nt authority\\system"
+              : "root");
+      statement.setString(6, results.getString("asset_executor"));
+      statement.setString(7, results.getString("endpoint_agent_version"));
+      statement.setTimestamp(8, results.getTimestamp("asset_last_seen"));
       statement.addBatch();
     }
     statement.executeBatch();
@@ -63,6 +72,10 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
     // Remove old columns
     Statement removeColumns = context.getConnection().createStatement();
     removeColumns.execute(
-            "ALTER TABLE assets DROP COLUMN asset_last_seen, asset_executor, endpoint_agent_version");
+        """
+        ALTER TABLE assets DROP COLUMN asset_last_seen;
+        ALTER TABLE assets DROP COLUMN asset_executor;
+        ALTER TABLE assets DROP COLUMN endpoint_agent_version;
+""");
   }
 }
