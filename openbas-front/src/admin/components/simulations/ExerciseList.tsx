@@ -210,38 +210,38 @@ const ExerciseList: FunctionComponent<Props> = ({
         loading
           ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} />
           : exercises.map((exercise: ExerciseStore, index) => (
-            <ListItem
-              key={exercise.exercise_id}
-              secondaryAction={secondaryAction && secondaryAction(exercise)}
-              disablePadding
-              divider={exercises.length !== index + 1}
-            >
-              <ListItemButton
-                classes={{ root: classes.item }}
-                component={Link}
-                to={`/admin/simulations/${exercise.exercise_id}`}
+              <ListItem
+                key={exercise.exercise_id}
+                secondaryAction={secondaryAction && secondaryAction(exercise)}
+                disablePadding
+                divider={exercises.length !== index + 1}
               >
-                <ListItemIcon>
-                  <HubOutlined color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div className={classes.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          className={classes.bodyItem}
-                          style={inlineStyles[header.field]}
-                        >
-                          {header.value?.(exercise)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))
+                <ListItemButton
+                  classes={{ root: classes.item }}
+                  component={Link}
+                  to={`/admin/simulations/${exercise.exercise_id}`}
+                >
+                  <ListItemIcon>
+                    <HubOutlined color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div className={classes.bodyItems}>
+                        {headers.map(header => (
+                          <div
+                            key={header.field}
+                            className={classes.bodyItem}
+                            style={inlineStyles[header.field]}
+                          >
+                            {header.value?.(exercise)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))
       }
     </List>
   );
