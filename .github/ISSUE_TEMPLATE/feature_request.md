@@ -7,6 +7,14 @@ assignees: ''
 
 ---
 
+## Context
+
+<!-- 
+- Why is this solution needed?
+- What value or benefits will the end-users gain from this change?
+- Is this change a technical improvement? just for internal use, or does it impact users as well?
+-->
+
 ## Use case
 
 <!-- Please describe the use case for which you need a solution -->

@@ -49,14 +49,14 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
     ...inject,
     inject_depends_to: injects !== undefined
       ? injects
-        .filter(currentInject => currentInject.inject_depends_on !== undefined
-          && currentInject.inject_depends_on !== null
-          && currentInject.inject_depends_on
-            .find(searchInject => searchInject.dependency_relationship?.inject_parent_id === inject.inject_id)
-            !== undefined)
-        .flatMap((currentInject) => {
-          return currentInject.inject_depends_on;
-        })
+          .filter(currentInject => currentInject.inject_depends_on !== undefined
+            && currentInject.inject_depends_on !== null
+            && currentInject.inject_depends_on
+              .find(searchInject => searchInject.dependency_relationship?.inject_parent_id === inject.inject_id)
+              !== undefined)
+          .flatMap((currentInject) => {
+            return currentInject.inject_depends_on;
+          })
       : undefined,
     inject_depends_on: inject.inject_depends_on,
   };
@@ -75,17 +75,17 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
 
     const injectsWithoutDependencies = injects
       ? injects
-        .filter(currentInject => currentInject.inject_depends_on !== null
-          && currentInject.inject_depends_on?.find(searchInject => searchInject.dependency_relationship?.inject_parent_id === data.inject_id) !== undefined
-          && !childrenIds.includes(currentInject.inject_id))
-        .map((currentInject) => {
-          return {
-            ...injectsMap[currentInject.inject_id],
-            inject_id: currentInject.inject_id,
-            inject_injector_contract: currentInject.inject_injector_contract?.injector_contract_id,
-            inject_depends_on: undefined,
-          } as unknown as Inject;
-        })
+          .filter(currentInject => currentInject.inject_depends_on !== null
+            && currentInject.inject_depends_on?.find(searchInject => searchInject.dependency_relationship?.inject_parent_id === data.inject_id) !== undefined
+            && !childrenIds.includes(currentInject.inject_id))
+          .map((currentInject) => {
+            return {
+              ...injectsMap[currentInject.inject_id],
+              inject_id: currentInject.inject_id,
+              inject_injector_contract: currentInject.inject_injector_contract?.injector_contract_id,
+              inject_depends_on: undefined,
+            } as unknown as Inject;
+          })
       : [];
 
     injectsToUpdate.push(...injectsWithoutDependencies);
