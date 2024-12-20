@@ -215,6 +215,7 @@ public class ExecutorApi extends RestBehavior {
     if (resolvedToken.isEmpty()) {
       throw new UnsupportedOperationException("Invalid token");
     }
+    //todo pass agent token
     String installCommand = this.endpointService.generateInstallCommand(platform, token);
     return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(installCommand);
   }
