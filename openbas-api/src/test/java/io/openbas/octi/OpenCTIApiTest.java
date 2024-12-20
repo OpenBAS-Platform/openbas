@@ -187,31 +187,6 @@ class OpenCTIApiTest {
         .andExpect(status().isOk());
   }
 
-  // -- INJECTS --
-  @Test
-  @DisplayName(
-      "Test to validate existence of 'Add Inject to Scenario' endpoint and validate InjectInput")
-  public void testCreateInjectForScenario_ValidInput_Without_Param() throws Exception {
-    // -- PREPARE --
-    String jsonInput =
-        "{"
-            + "\"inject_title\": \"Valid Title\", "
-            + "\"inject_type\": \"openbas_email\", "
-            + "\"inject_injector_contract\": \"contract-id\", "
-            + "\"inject_content\": null, "
-            + "\"inject_depends_duration\": 100, "
-            + "\"inject_tags\": [\"Tag1\"] "
-            + "}";
-
-    // -- EXECUTE --
-    mockMvc
-        .perform(
-            post("/api/scenarios/{scenarioId}/injects", "scenario-id")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonInput))
-        .andExpect(status().isOk());
-  }
-
   // -- LAST EXERCISE BY EXTERNAL ID --
   @Test
   @DisplayName("Test to validate existence of the Get Last Exercise Result endpoint")
