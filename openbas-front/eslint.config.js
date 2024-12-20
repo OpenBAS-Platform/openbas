@@ -42,7 +42,6 @@ export default [
       'import/resolver': 'oxc',
       'import/ignore': [
         'react-apexcharts', // ignore react-apexcharts as the default export is broken
-        'dompurify',
       ],
     },
   },
