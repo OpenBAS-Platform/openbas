@@ -152,6 +152,22 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                         );
                       })
                     )}
+                { payloadOutput.payload_obfuscator
+                && (
+                  <>
+                    <Typography
+                      variant="h3"
+                      gutterBottom
+                      style={{ marginTop: 20 }}
+                    >
+                      {t('Obfuscator')}
+                    </Typography>
+                    <Typography key="obfuscator" variant="body2">
+                      {payloadOutput.payload_obfuscator}
+                    </Typography>
+                  </>
+
+                )}
                 <Typography
                   variant="h3"
                   gutterBottom

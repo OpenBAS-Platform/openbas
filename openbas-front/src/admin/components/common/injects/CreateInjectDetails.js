@@ -11,8 +11,8 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { isEmptyField, isNotEmptyField } from '../../../../utils/utils';
 import { PermissionsContext } from '../Context';
-import InjectDefinition from './InjectDefinition';
-import InjectForm from './InjectForm';
+import InjectDefinition from './form/InjectDefinition';
+import InjectForm from './form/InjectForm';
 import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles(theme => ({

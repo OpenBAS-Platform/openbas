@@ -4,6 +4,7 @@ import static io.openbas.utils.StringUtils.duplicateString;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectDocument;
@@ -19,6 +20,7 @@ import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Stream;
@@ -82,6 +84,12 @@ public class InjectService {
                 })
             .toList();
     injectDocumentRepository.deleteAll(updatedInjects);
+  }
+
+  public <T> T convertInjectContent(@NotNull final Inject inject, @NotNull final Class<T> converter)
+      throws Exception {
+    ObjectNode content = inject.getContent();
+    return this.mapper.treeToValue(content, converter);
   }
 
   public void cleanInjectsDocScenario(String scenarioId, String documentId) {

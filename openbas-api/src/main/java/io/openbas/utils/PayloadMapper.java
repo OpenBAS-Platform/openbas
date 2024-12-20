@@ -5,6 +5,7 @@ import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
 import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
 import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
 import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
+import static java.util.Optional.ofNullable;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
@@ -27,6 +28,14 @@ public class PayloadMapper {
       Optional<InjectorContract> injectorContractOpt = inject.get().getInjectorContract();
       if (injectorContractOpt.isPresent()) {
         InjectorContract injectorContract = injectorContractOpt.get();
+
+        if (ofNullable(inject.get().getContent())
+            .map(c -> c.has("obfuscator"))
+            .orElse(Boolean.FALSE)) {
+          String obfuscator = inject.get().getContent().findValue("obfuscator").asText();
+          statusPayloadOutputBuilder.obfuscator(obfuscator);
+        }
+
         if (inject.get().getStatus().isEmpty()) {
           Payload payload = injectorContract.getPayload();
           statusPayloadOutputBuilder

@@ -46,6 +46,9 @@ public class StatusPayloadOutput {
   @JsonProperty("payload_arguments")
   private List<PayloadArgument> arguments = new ArrayList<>();
 
+  @JsonProperty("payload_obfuscator")
+  private String obfuscator;
+
   @JsonProperty("payload_prerequisites")
   private List<PayloadPrerequisite> prerequisites = new ArrayList<>();
 
