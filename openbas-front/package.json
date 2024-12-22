@@ -96,7 +96,7 @@
     "@types/uuid": "10.0.0",
     "@typescript-eslint/parser": "8.18.1",
     "@vitejs/plugin-react": "4.3.4",
-    "chokidar": "4.0.1",
+    "chokidar": "4.0.3",
     "cross-env": "7.0.3",
     "esbuild": "0.24.0",
     "eslint": "9.15.0",
