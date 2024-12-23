@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Setter
@@ -28,17 +27,15 @@ public class TagRule implements Base {
   @NotBlank
   private String id;
 
-  @OneToOne(
-          fetch = FetchType.EAGER)
+  @OneToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "tag_id")
   private Tag tag;
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-          name = "tag_rule_assets",
-          joinColumns = @JoinColumn(name = "tag_rule_id"),
-          inverseJoinColumns = @JoinColumn(name = "asset_id")
-  )
+      name = "tag_rule_assets",
+      joinColumns = @JoinColumn(name = "tag_rule_id"),
+      inverseJoinColumns = @JoinColumn(name = "asset_id"))
   private List<Asset> assets = new ArrayList<>();
 
   @JsonIgnore
