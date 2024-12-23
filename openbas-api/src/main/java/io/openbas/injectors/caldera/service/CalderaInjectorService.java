@@ -8,6 +8,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.client.model.*;
+import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.model.Obfuscator;
 import io.openbas.injectors.caldera.model.ResultStatus;
 import jakarta.validation.constraints.NotBlank;

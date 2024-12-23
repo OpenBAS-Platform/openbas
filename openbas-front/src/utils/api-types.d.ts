@@ -233,7 +233,7 @@ interface BasePayload {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -461,7 +461,7 @@ export interface Command {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -537,7 +537,7 @@ export interface DnsResolution {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -649,7 +649,6 @@ export interface DryrunCreateInput {
 
 export interface Endpoint {
   asset_active?: boolean;
-  asset_children?: string[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
@@ -747,7 +746,7 @@ export interface Executable {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -1015,7 +1014,7 @@ export interface FileDrop {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -2081,7 +2080,7 @@ export interface NetworkTraffic {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -3118,7 +3117,6 @@ export interface SearchTerm {
 
 export interface SecurityPlatform {
   asset_active?: boolean;
-  asset_children?: string[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
@@ -3225,7 +3223,7 @@ export interface StatusPayload {
 
 export interface StatusPayloadOutput {
   dns_resolution_hostname?: string;
-  executable_arch?: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   executable_file?: Document;
   file_drop_file?: Document;
   network_traffic_ip_dst: string;
