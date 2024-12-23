@@ -35,7 +35,7 @@ public class V3_54__TagRule extends BaseJavaMigration {
                        asset_id varchar(255) not null
                            constraint asset_id_fk
                                references assets,
-                       primary key (tag_rule_id)
+                       primary key (tag_rule_id, asset_id)
                    );
                 """);
   }
