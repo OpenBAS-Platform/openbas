@@ -1,5 +1,7 @@
 package io.openbas.service;
 
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 import com.cronutils.utils.VisibleForTesting;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Tag;
@@ -14,15 +16,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 @RequiredArgsConstructor
 @Service
@@ -41,14 +40,15 @@ public class TagRuleService {
     return tagRuleRepository.findById(id);
   }
 
-    /**
-     * Finn all the TagRules
-     * @return
-     */
-    public List<TagRule> findAll() {
-      return StreamSupport.stream(tagRuleRepository.findAll().spliterator(), false)
-              .collect(Collectors.toList());
-    }
+  /**
+   * Finn all the TagRules
+   *
+   * @return
+   */
+  public List<TagRule> findAll() {
+    return StreamSupport.stream(tagRuleRepository.findAll().spliterator(), false)
+        .collect(Collectors.toList());
+  }
 
   /**
    * Create a TagRule
@@ -94,16 +94,16 @@ public class TagRuleService {
 
   /**
    * Search TagRule
+   *
    * @param searchPaginationInput
    * @return
    */
   public Page<TagRule> searchTagRule(SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-            (Specification<TagRule> specification, Pageable pageable) ->
-                    this.tagRuleRepository.findAll(specification, pageable),
-            searchPaginationInput,
-            TagRule.class);
-
+        (Specification<TagRule> specification, Pageable pageable) ->
+            this.tagRuleRepository.findAll(specification, pageable),
+        searchPaginationInput,
+        TagRule.class);
   }
 
   /**
