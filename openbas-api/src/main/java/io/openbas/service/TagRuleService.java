@@ -12,6 +12,7 @@ import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -143,7 +144,7 @@ public class TagRuleService {
   @VisibleForTesting
   protected List<Asset> getAssets(final List<String> assetIds) {
     return assetIds == null
-        ? List.of()
+        ? new ArrayList<>()
         : assetIds.stream()
             .map(
                 id ->
