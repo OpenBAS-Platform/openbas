@@ -9,8 +9,8 @@ import io.openbas.database.model.TagRule;
 import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TagRuleRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +81,7 @@ public class TagRuleService {
         tagRuleRepository
             .findById(tagRuleId)
             .orElseThrow(
-                () -> new EntityNotFoundException("TagRule not found with id: " + tagRuleId));
+                () -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
 
     // if the tag doesn't exist we create it
     tagRule.setTag(getOrCreateTag(tagName));
@@ -142,14 +142,16 @@ public class TagRuleService {
    */
   @VisibleForTesting
   protected List<Asset> getAssets(final List<String> assetIds) {
-    return assetIds.stream()
-        .map(
-            id ->
-                assetRepository
-                    .findById(id)
-                    .orElseThrow(
-                        () -> new EntityNotFoundException("Asset not found with id: " + id)))
-        .toList();
+    return assetIds == null
+        ? List.of()
+        : assetIds.stream()
+            .map(
+                id ->
+                    assetRepository
+                        .findById(id)
+                        .orElseThrow(
+                            () -> new ElementNotFoundException("Asset not found with id: " + id)))
+            .toList();
   }
 
   @Autowired

@@ -13,9 +13,9 @@ import io.openbas.database.model.TagRule;
 import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TagRuleRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.fixtures.TagRuleFixture;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -111,7 +111,7 @@ public class TagRuleServiceTest {
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.empty()));
     assertThrows(
-        EntityNotFoundException.class,
+            ElementNotFoundException.class,
         () -> {
           TagRule result =
               tagRuleService.createTagRule(
@@ -173,7 +173,7 @@ public class TagRuleServiceTest {
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.empty()));
     assertThrows(
-        EntityNotFoundException.class,
+            ElementNotFoundException.class,
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
@@ -187,7 +187,7 @@ public class TagRuleServiceTest {
     TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
     when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.empty());
     assertThrows(
-        EntityNotFoundException.class,
+            ElementNotFoundException.class,
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
