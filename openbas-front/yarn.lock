@@ -3434,9 +3434,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@uiw/react-md-editor@npm:4.0.4":
-  version: 4.0.4
-  resolution: "@uiw/react-md-editor@npm:4.0.4"
+"@uiw/react-md-editor@npm:4.0.5":
+  version: 4.0.5
+  resolution: "@uiw/react-md-editor@npm:4.0.5"
   dependencies:
     "@babel/runtime": "npm:^7.14.6"
     "@uiw/react-markdown-preview": "npm:^5.0.6"
@@ -3445,7 +3445,7 @@ __metadata:
   peerDependencies:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
-  checksum: 10c0/2c52458f2efa1ff64f5c399cce10ac21f07600f7f93ff2b80173b7156c9e95a091a4b025b4beaf099489421656d9930adce2922d6753d37528fc8b0c3e2198d5
+  checksum: 10c0/33ba0eed9de77bb276977773a1ec0aa1dfdef3d93f3ac9bc6f1bffd61599d08ecd9ed912b4a923dc831bf8769aff51e518ca7cd385fccea9f506a9b22639df48
   languageName: node
   linkType: hard
 
@@ -8959,7 +8959,7 @@ __metadata:
     "@types/seamless-immutable": "npm:7.1.19"
     "@types/uuid": "npm:10.0.0"
     "@typescript-eslint/parser": "npm:8.18.1"
-    "@uiw/react-md-editor": "npm:4.0.4"
+    "@uiw/react-md-editor": "npm:4.0.5"
     "@vitejs/plugin-react": "npm:4.3.4"
     "@xyflow/react": "npm:12.3.6"
     apexcharts: "npm:4.0.0"
