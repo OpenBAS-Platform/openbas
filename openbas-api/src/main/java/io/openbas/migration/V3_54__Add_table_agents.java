@@ -18,17 +18,22 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
         """
                         CREATE TABLE agents (
                             agent_id UUID NOT NULL CONSTRAINT agents_pkey PRIMARY KEY,
-                            agent_asset_id VARCHAR(255) NOT NULL REFERENCES assets(asset_id) ON DELETE CASCADE,
+                            agent_asset VARCHAR(255) NOT NULL CONSTRAINT agent_asset_id_fk REFERENCES assets ON DELETE CASCADE,
                             agent_privilege VARCHAR(255) NOT NULL,
                             agent_deployment_mode VARCHAR(255) NOT NULL,
                             agent_executed_by_user VARCHAR(255) NOT NULL,
-                            agent_executor_id VARCHAR(255) NOT NULL REFERENCES executors(executor_id) ON DELETE CASCADE,
-                            agent_version VARCHAR(255) NOT NULL,
+                            agent_executor VARCHAR(255) NOT NULL CONSTRAINT agent_executor_id_fk REFERENCES executors ON DELETE CASCADE,
+                            agent_version VARCHAR(255),
+                            agent_parent VARCHAR(255) CONSTRAINT agent_parent_id_fk REFERENCES agents ON DELETE CASCADE,
+                            agent_inject VARCHAR(255) CONSTRAINT agent_inject_id_fk REFERENCES injects ON DELETE CASCADE,
+                            agent_process_name VARCHAR(255),
+                            agent_external_reference VARCHAR(255) NOT NULL,
                             agent_last_seen TIMESTAMP,
                             agent_created_at TIMESTAMP DEFAULT now(),
                             agent_updated_at TIMESTAMP DEFAULT now()
                           );
                           CREATE INDEX idx_agents ON agents(agent_id);
+                          CREATE INDEX idx_agent_assets ON agents(agent_asset);
                 """);
 
     // Migration datas
@@ -47,12 +52,12 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
             .getConnection()
             .prepareStatement(
                 """
-                INSERT INTO agents(agent_id, agent_asset_id, agent_privilege, agent_deployment_mode, agent_executed_by_user, agent_executor_id, agent_version, agent_last_seen)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO agents(agent_id, agent_asset, agent_privilege, agent_deployment_mode, agent_executed_by_user, agent_executor, 
+                                   agent_version, agent_parent, agent_inject, agent_process_name, agent_external_reference, agent_last_seen)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """);
     while (results.next()) {
-      UUID generatedUUID = UUID.randomUUID();
-      statement.setObject(1, generatedUUID);
+      statement.setObject(1, UUID.randomUUID());
       statement.setString(2, results.getString("asset_id"));
       statement.setString(3, "ADMIN");
       statement.setString(
@@ -64,7 +69,11 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
               : "root");
       statement.setString(6, results.getString("asset_executor"));
       statement.setString(7, results.getString("endpoint_agent_version"));
-      statement.setTimestamp(8, results.getTimestamp("asset_last_seen"));
+      statement.setString(8, results.getString("asset_parent"));
+      statement.setString(9, results.getString("asset_inject"));
+      statement.setString(10, results.getString("asset_process_name"));
+      statement.setString(11, results.getString("asset_external_reference"));
+      statement.setTimestamp(12, results.getTimestamp("asset_last_seen"));
       statement.addBatch();
     }
     statement.executeBatch();
@@ -76,6 +85,10 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
         ALTER TABLE assets DROP COLUMN asset_last_seen;
         ALTER TABLE assets DROP COLUMN asset_executor;
         ALTER TABLE assets DROP COLUMN endpoint_agent_version;
+        ALTER TABLE assets DROP COLUMN asset_external_reference;
+        ALTER TABLE assets DROP COLUMN asset_parent;
+        ALTER TABLE assets DROP COLUMN asset_inject;
+        ALTER TABLE assets DROP COLUMN asset_process_name;
 """);
   }
 }
