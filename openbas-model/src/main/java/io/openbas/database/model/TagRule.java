@@ -14,11 +14,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Setter
+@Getter
 @Table(name = "tag_rules")
 @EntityListeners(ModelBaseListener.class)
 public class TagRule implements Base {
 
-  @Setter
   @Id
   @Column(name = "tag_rule_id")
   @GeneratedValue(generator = "UUID")
@@ -27,13 +28,11 @@ public class TagRule implements Base {
   @NotBlank
   private String id;
 
-  @Getter
   @OneToOne(
           fetch = FetchType.EAGER)
   @JoinColumn(name = "tag_id")
   private Tag tag;
 
-  @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
           name = "tag_rule_assets",
