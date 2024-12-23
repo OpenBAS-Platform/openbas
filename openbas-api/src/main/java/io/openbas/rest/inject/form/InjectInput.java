@@ -56,6 +56,9 @@ public class InjectInput {
   @JsonProperty("inject_tags")
   private List<String> tagIds = new ArrayList<>();
 
+  @JsonProperty("inject_enabled")
+  private boolean enabled = true;
+
   public Inject toInject(@NotNull final InjectorContract injectorContract) {
     Inject inject = new Inject();
     inject.setTitle(getTitle());
@@ -66,6 +69,7 @@ public class InjectInput {
     inject.setAllTeams(isAllTeams());
     inject.setCountry(getCountry());
     inject.setCity(getCity());
+    inject.setEnabled(isEnabled());
     return inject;
   }
 }

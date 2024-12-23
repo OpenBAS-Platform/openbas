@@ -164,7 +164,7 @@ class OpenCTIApiTest {
   @Test
   @DisplayName(
       "Test to validate existence of 'Add Inject to Scenario' endpoint and validate InjectInput")
-  public void testCreateInjectForScenario_ValidInput() throws Exception {
+  public void testCreateInjectForScenario_ValidInput_Additional_param() throws Exception {
     // -- PREPARE --
     String jsonInput =
         "{"
@@ -174,6 +174,7 @@ class OpenCTIApiTest {
             + "\"inject_content\": null, "
             + "\"inject_depends_duration\": 100, "
             + "\"inject_tags\": [\"Tag1\"], "
+            + "\"inject_enabled\": false, "
             + "\"inject_additional_param\": \"additional_param\""
             + "}";
 
