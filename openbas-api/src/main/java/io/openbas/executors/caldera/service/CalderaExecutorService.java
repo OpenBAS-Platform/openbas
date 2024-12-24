@@ -131,7 +131,7 @@ public class CalderaExecutorService implements Runnable {
             }
           });
       List<Endpoint> inactiveEndpoints =
-          toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
+          toEndpoint(agents).stream().filter(endpoint -> !endpoint.getAgents().getFirst().getActive()).toList();
       inactiveEndpoints.forEach(
           endpoint -> {
             Optional<Endpoint> optionalExistingEndpoint =
@@ -177,7 +177,8 @@ public class CalderaExecutorService implements Runnable {
     endpoint.setPlatform(toPlatform(agent.getPlatform()));
     endpoint.setArch(toArch(agent.getArchitecture()));
     endpoint.setProcessName(agent.getExe_name());
-    endpoint.setLastSeen(toInstant(agent.getLast_seen()));
+    io.openbas.database.model.Agent agentEndpoint = new io.openbas.database.model.Agent();
+    agentEndpoint.setLastSeen(toInstant(agent.getLast_seen()));
     return endpoint;
   }
 
@@ -187,7 +188,7 @@ public class CalderaExecutorService implements Runnable {
 
   private void updateEndpoint(
       @NotNull final Agent agent, @NotNull final Endpoint existingEndpoint) {
-    existingEndpoint.setLastSeen(toInstant(agent.getLast_seen()));
+    existingEndpoint.getAgents().getFirst().setLastSeen(toInstant(agent.getLast_seen()));
     existingEndpoint.setExternalReference(agent.getPaw());
     existingEndpoint.setName(agent.getHost());
     existingEndpoint.setIps(agent.getHost_ip_addrs());

@@ -118,7 +118,7 @@ const Endpoints = () => {
     exportKeys: [
       'asset_name',
       'asset_description',
-      'asset_last_seen',
+      'asset_last_seen', // TODO KO here : keep this attribute in asset java object (do like getActive) or rework the export ? Are there imports here ?
       'endpoint_ips',
       'endpoint_hostname',
       'endpoint_platform',
@@ -196,7 +196,7 @@ const Endpoints = () => {
                       <ItemTags variant="list" tags={endpoint.asset_tags} />
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
+                      <AssetStatus variant="list" status={!endpoint.asset_agents || !endpoint.asset_agents[0].agent_active ? 'Inactive' : 'Active'} />
                     </div>
                   </div>
                 )}
