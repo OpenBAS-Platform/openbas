@@ -25,6 +25,11 @@ import type { Theme } from '../../../../components/Theme';
 import type { TeamOutput } from '../../../../utils/api-types';
 import CreateTeam from '../../components/teams/CreateTeam';
 import { PermissionsContext, TeamContext } from '../Context';
+import { useAppDispatch } from '../../../../utils/hooks';
+import { fetchTeams } from '../../../../actions/teams/team-actions';
+import {useHelper} from "../../../../store";
+import {TeamsHelper} from "../../../../actions/teams/team-helper";
+import useDataLoader from "../../../../utils/hooks/useDataLoader";
 
 const useStyles = makeStyles((theme: Theme) => ({
   item: {
@@ -39,15 +44,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  handleAddTeams: (teamIds: string[]) => void;
+  handleModifyTeams: (teamIds: string[]) => void;
   injectTeamsIds: string[];
+  availableTeamIds: string[];
 }
 
 const InjectAddTeams: FunctionComponent<Props> = ({
-  handleAddTeams,
+  handleModifyTeams,
   injectTeamsIds,
+  availableTeamIds,
 }) => {
   // Standard hooks
+  const dispatch = useAppDispatch()
   const { t } = useFormatter();
   const classes = useStyles();
   const { permissions } = useContext(PermissionsContext);
@@ -55,6 +63,13 @@ const InjectAddTeams: FunctionComponent<Props> = ({
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
   const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);
+
+  console.log("availableTeamIds = {}", availableTeamIds)
+  const allTeams = useHelper((helper: TeamsHelper) => helper.getTeams().filter(t => availableTeamIds.length > 0 ? availableTeamIds.includes(t.team_id) : true));
+  useDataLoader(() => {
+    dispatch(fetchTeams()).finally(() => {
+    });
+  });
 
   // Dialog
   const [open, setOpen] = useState(false);
@@ -65,13 +80,14 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   };
 
   const submitAddTeams = () => {
-    handleAddTeams(selectedTeamValues.map(v => v.team_id).filter(id => !injectTeamsIds.includes(id)));
+    handleModifyTeams(selectedTeamValues.map(v => v.team_id));
     handleClose();
   };
 
   useEffect(() => {
     if (open) {
       findTeams(injectTeamsIds).then(result => setSelectedTeamValues(result.data));
+      setTeamValues(allTeams);
     }
   }, [open, injectTeamsIds]);
 
@@ -127,7 +143,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add target teams')}
+          primary={t('Modify target teams')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
@@ -145,7 +161,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
           },
         }}
       >
-        <DialogTitle>{t('Add target teams in this inject')}</DialogTitle>
+        <DialogTitle>{t('Modify target teams in this inject')}</DialogTitle>
         <DialogContent>
           <Box sx={{ marginTop: 2 }}>
             <SelectList
@@ -171,7 +187,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
         <DialogActions>
           <Button onClick={handleClose}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitAddTeams}>
-            {t('Add')}
+            {t('Update')}
           </Button>
         </DialogActions>
       </Dialog>
