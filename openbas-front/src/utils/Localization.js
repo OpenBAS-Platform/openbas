@@ -261,13 +261,16 @@ const i18n = {
         'Souhaitez-vous supprimer ce document ?',
       'Update the document': 'Modifier le document',
       'Inject data': 'Données du stimuli',
-      'Update teams': 'Modifier les équipe',
+      'Update teams': 'Modifier les équipes',
       'Add target teams in this inject':
         'Ajouter des équipes cibles dans ce stimuli',
+      'Modify target teams in this inject':
+          'Modifier les équipes cibles dans ce stimuli',
       'Targeted teams': 'Equipes ciblées',
       'Test the inject': 'Tester le stimuli',
       'All teams': 'Toutes les équipes',
       'Add target teams': 'Ajouter des équipes cibles',
+      'Modify target teams': 'Modifier les équipes cibles',
       'Trigger after': 'Se déclenche après',
       'Create a new inject': 'Créer un nouveau stimuli',
       'Remove from the team': 'Retirer de l\'équipe',
@@ -1699,10 +1702,13 @@ const i18n = {
       'Update teams': '编辑团队',
       'Add target teams in this inject':
         '在这个注入里添加目标团队',
+      'Modify target teams in this inject':
+          '在此注入中修改目标团队',
       'Targeted teams': '目标团队',
       'Test the inject': '测试注入',
       'All teams': '所有团队',
       'Add target teams': '添加目标团队',
+      'Modify target teams': '修改目标团队',
       'Trigger after': '在之后触发',
       'Create a new inject': '创建新注入',
       'Remove from the team': '从团队移除',

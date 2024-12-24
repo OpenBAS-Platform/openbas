@@ -352,6 +352,7 @@ class InjectDefinition extends Component {
     super(props);
     this.state = {
       allTeams: props.inject.inject_all_teams,
+      availableTeamIds: props.availableTeamIds || [],
       teamsIds: props.inject.inject_teams || [],
       assetIds: props.inject.inject_assets || [],
       assetGroupIds: props.inject.inject_asset_groups || [],
@@ -412,9 +413,9 @@ class InjectDefinition extends Component {
   }
 
   // Teams
-  handleAddTeams(teamsIds) {
+  handleModifyTeams(teamsIds) {
     this.setState({
-      teamsIds: [...this.state.teamsIds, ...teamsIds],
+      teamsIds: [...teamsIds],
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -987,6 +988,7 @@ class InjectDefinition extends Component {
     const {
       allTeams,
       teamsIds,
+      availableTeamIds,
       assetIds,
       assetGroupIds,
       documents,
@@ -1163,7 +1165,8 @@ class InjectDefinition extends Component {
                     />
                     <InjectAddTeams
                       injectTeamsIds={teamsIds}
-                      handleAddTeams={this.handleAddTeams.bind(this)}
+                      availableTeamIds={availableTeamIds}
+                      handleModifyTeams={this.handleModifyTeams.bind(this)}
                     />
                   </>
                 )}
@@ -1538,6 +1541,7 @@ InjectDefinition.propTypes = {
   nsdt: PropTypes.func,
   injectId: PropTypes.string,
   inject: PropTypes.object,
+  availableTeamIds: PropTypes.array,
   fetchInjectTeams: PropTypes.func,
   fetchChannels: PropTypes.func,
   fetchChallenges: PropTypes.func,
