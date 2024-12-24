@@ -3,6 +3,8 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Filters;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 public class PaginationFixture {
 
@@ -19,5 +21,9 @@ public class PaginationFixture {
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     filterGroup.setFilters(List.of(filter));
     return getDefault().filterGroup(filterGroup).build();
+  }
+
+  public static <T> Page<T> pagedOutput(List<T> output) {
+    return new PageImpl<>(output);
   }
 }
