@@ -51,6 +51,7 @@ const useStyles = makeStyles(theme => ({
 const UpdateInjectDetails = ({
   contractContent,
   inject,
+  availableTeamIds,
   handleClose,
   onUpdateInject,
   isAtomic = false,
@@ -317,6 +318,7 @@ const UpdateInjectDetails = ({
                       values={values}
                       submitting={submitting}
                       inject={initialValues}
+                      availableTeamIds={availableTeamIds}
                       injectorContract={contractContent}
                       handleClose={handleClose}
                       tagsMap={tagsMap}
