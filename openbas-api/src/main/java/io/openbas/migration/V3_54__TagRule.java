@@ -34,7 +34,8 @@ public class V3_54__TagRule extends BaseJavaMigration {
                                references tag_rules,
                        asset_id varchar(255) not null
                            constraint asset_id_fk
-                               references assets,
+                               references assets
+                                 on delete cascade,
                        primary key (tag_rule_id, asset_id)
                    );
                 """);

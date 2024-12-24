@@ -27,8 +27,7 @@ public class TagRule implements Base {
   @NotBlank
   private String id;
 
-  @ManyToOne(
-      fetch = FetchType.EAGER)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "tag_id")
   private Tag tag;
 
