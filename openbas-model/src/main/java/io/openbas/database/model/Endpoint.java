@@ -10,6 +10,8 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -89,6 +91,16 @@ public class Endpoint extends Asset {
   @JsonProperty("asset_agents")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
+
+  @JsonProperty("asset_last_seen")
+  public Instant getLastSeen() {
+    return this.agents.getFirst().getLastSeen();
+  }
+
+  @JsonProperty("asset_active")
+  public boolean getActive() {
+    return this.agents.getFirst().getActive();
+  }
 
   public Endpoint() {}
 

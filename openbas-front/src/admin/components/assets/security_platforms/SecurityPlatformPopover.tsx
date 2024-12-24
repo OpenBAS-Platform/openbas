@@ -48,7 +48,6 @@ const SecurityPlatformPopover: React.FC<Props> = ({
     asset_description,
     security_platform_logo_light,
     security_platform_logo_dark,
-    asset_last_seen,
     asset_tags,
   }) => ({
     asset_name,
@@ -56,7 +55,6 @@ const SecurityPlatformPopover: React.FC<Props> = ({
     security_platform_type,
     security_platform_logo_light,
     security_platform_logo_dark,
-    asset_last_seen: asset_last_seen ?? undefined,
     asset_tags,
   }))(securityPlatform);
 

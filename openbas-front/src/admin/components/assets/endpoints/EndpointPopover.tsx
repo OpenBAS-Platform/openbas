@@ -46,7 +46,7 @@ const EndpointPopover: React.FC<Props> = ({
   const initialValues = {
     asset_name: endpoint.asset_name,
     asset_description: endpoint.asset_description ?? '',
-    asset_last_seen: endpoint.asset_agents ? endpoint.asset_agents[0].agent_last_seen ?? undefined : undefined,
+    asset_last_seen: endpoint.asset_last_seen,
     asset_tags: endpoint.asset_tags,
     endpoint_hostname: endpoint.endpoint_hostname,
     endpoint_ips: endpoint.endpoint_ips,

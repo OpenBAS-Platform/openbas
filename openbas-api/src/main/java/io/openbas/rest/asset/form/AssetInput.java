@@ -20,10 +20,6 @@ public abstract class AssetInput {
   @JsonProperty("asset_description")
   private String description;
 
-  @Schema(nullable = true)
-  @JsonProperty("asset_last_seen")
-  private Instant lastSeen;
-
   @JsonProperty("asset_tags")
   private List<String> tagIds = new ArrayList<>();
 }
