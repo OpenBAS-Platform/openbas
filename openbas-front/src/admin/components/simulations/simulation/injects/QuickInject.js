@@ -39,10 +39,10 @@ import { addInjectForExercise } from '../../../../../actions/Inject';
 import { storeHelper } from '../../../../../actions/Schema';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import MultipleFileLoader from '../../../../../components/fields/MultipleFileLoader';
+import OldRichTextField from '../../../../../components/fields/OldRichTextField';
 import OldSelectField from '../../../../../components/fields/OldSelectField';
+import OldSwitchField from '../../../../../components/fields/OldSwitchField';
 import OldTextField from '../../../../../components/fields/OldTextField';
-import RichTextField from '../../../../../components/fields/RichTextField';
-import SwitchField from '../../../../../components/fields/SwitchField';
 import inject18n from '../../../../../components/i18n';
 import ItemBoolean from '../../../../../components/ItemBoolean';
 import ItemTags from '../../../../../components/ItemTags';
@@ -479,7 +479,7 @@ class QuickInject extends Component {
             case 'textarea':
               return field.richText
                 ? (
-                    <RichTextField
+                    <OldRichTextField
                       key={field.key}
                       name={field.key}
                       label={t(field.label)}
@@ -516,7 +516,7 @@ class QuickInject extends Component {
               );
             case 'checkbox':
               return (
-                <SwitchField
+                <OldSwitchField
                   key={field.key}
                   name={field.key}
                   label={t(field.label)}

@@ -2,8 +2,8 @@ import { Button } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 
+import OldSwitchField from '../../../../components/fields/OldSwitchField';
 import OldTextField from '../../../../components/fields/OldTextField';
-import SwitchField from '../../../../components/fields/SwitchField';
 import { useFormatter } from '../../../../components/i18n';
 import OrganizationField from '../../../../components/OrganizationField';
 import TagField from '../../../../components/TagField';
@@ -107,7 +107,7 @@ const UserForm = (props) => {
             setFieldValue={form.mutators.setValue}
             style={{ marginTop: 20 }}
           />
-          <SwitchField
+          <OldSwitchField
             name="user_admin"
             label={t('Administrator')}
             style={{ marginTop: 20 }}

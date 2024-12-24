@@ -3,8 +3,8 @@ import * as PropTypes from 'prop-types';
 import { Component } from 'react';
 import { Form } from 'react-final-form';
 
+import OldRichTextField from '../../../components/fields/OldRichTextField';
 import OldTextField from '../../../components/fields/OldTextField';
-import RichTextField from '../../../components/fields/RichTextField';
 import inject18n from '../../../components/i18n';
 
 class SendLessonsForm extends Component {
@@ -43,7 +43,7 @@ class SendLessonsForm extends Component {
               label={t('Subject')}
               style={{ marginTop: 20 }}
             />
-            <RichTextField
+            <OldRichTextField
               name="body"
               label={t('Message')}
               fullWidth

@@ -72,8 +72,8 @@ const RichTextFieldBase = ({
 /**
  * @deprecated The component use old form libnary react-final-form
  */
-const RichTextField = props => (
+const OldRichTextField = props => (
   <Field name={props.name} component={RichTextFieldBase} {...props} />
 );
 
-export default RichTextField;
+export default OldRichTextField;
