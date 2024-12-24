@@ -17,14 +17,14 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
     select.execute(
         """
                         CREATE TABLE agents (
-                            agent_id UUID NOT NULL CONSTRAINT agents_pkey PRIMARY KEY,
+                            agent_id VARCHAR(255) NOT NULL CONSTRAINT agents_pkey PRIMARY KEY,
                             agent_asset VARCHAR(255) NOT NULL CONSTRAINT agent_asset_id_fk REFERENCES assets ON DELETE CASCADE,
                             agent_privilege VARCHAR(255) NOT NULL,
                             agent_deployment_mode VARCHAR(255) NOT NULL,
                             agent_executed_by_user VARCHAR(255) NOT NULL,
                             agent_executor VARCHAR(255) NOT NULL CONSTRAINT agent_executor_id_fk REFERENCES executors ON DELETE CASCADE,
                             agent_version VARCHAR(255),
-                            agent_parent VARCHAR(255) CONSTRAINT agent_parent_id_fk REFERENCES agents ON DELETE CASCADE,
+                            agent_parent VARCHAR(255),
                             agent_inject VARCHAR(255) CONSTRAINT agent_inject_id_fk REFERENCES injects ON DELETE CASCADE,
                             agent_process_name VARCHAR(255),
                             agent_external_reference VARCHAR(255) NOT NULL,
@@ -32,8 +32,8 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
                             agent_created_at TIMESTAMP DEFAULT now(),
                             agent_updated_at TIMESTAMP DEFAULT now()
                           );
-                          CREATE INDEX idx_agents ON agents(agent_id);
                           CREATE INDEX idx_agent_assets ON agents(agent_asset);
+                          ALTER TABLE agents ADD CONSTRAINT agent_parent_id_fk FOREIGN KEY (agent_parent) REFERENCES agents(agent_id) ON DELETE CASCADE;
                 """);
 
     // Migration datas
@@ -52,12 +52,12 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
             .getConnection()
             .prepareStatement(
                 """
-                INSERT INTO agents(agent_id, agent_asset, agent_privilege, agent_deployment_mode, agent_executed_by_user, agent_executor, 
+                INSERT INTO agents(agent_id, agent_asset, agent_privilege, agent_deployment_mode, agent_executed_by_user, agent_executor,
                                    agent_version, agent_parent, agent_inject, agent_process_name, agent_external_reference, agent_last_seen)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """);
     while (results.next()) {
-      statement.setObject(1, UUID.randomUUID());
+      statement.setObject(1, UUID.randomUUID().toString());
       statement.setString(2, results.getString("asset_id"));
       statement.setString(3, "ADMIN");
       statement.setString(
@@ -82,13 +82,13 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
     Statement removeColumns = context.getConnection().createStatement();
     removeColumns.execute(
         """
-        ALTER TABLE assets DROP COLUMN asset_last_seen;
-        ALTER TABLE assets DROP COLUMN asset_executor;
         ALTER TABLE assets DROP COLUMN endpoint_agent_version;
-        ALTER TABLE assets DROP COLUMN asset_external_reference;
-        ALTER TABLE assets DROP COLUMN asset_parent;
-        ALTER TABLE assets DROP COLUMN asset_inject;
-        ALTER TABLE assets DROP COLUMN asset_process_name;
+        --ALTER TABLE assets DROP COLUMN asset_last_seen;
+        --ALTER TABLE assets DROP COLUMN asset_executor;
+        --ALTER TABLE assets DROP COLUMN asset_external_reference;
+        --ALTER TABLE assets DROP COLUMN asset_parent;
+        --ALTER TABLE assets DROP COLUMN asset_inject;
+        --ALTER TABLE assets DROP COLUMN asset_process_name;
 """);
   }
 }

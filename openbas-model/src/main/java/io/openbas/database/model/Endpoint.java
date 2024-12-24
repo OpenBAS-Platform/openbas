@@ -1,13 +1,17 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Ipv4OrIpv6Constraint;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
@@ -63,11 +67,6 @@ public class Endpoint extends Asset {
   private String hostname;
 
   @Queryable(filterable = true, sortable = true)
-  @Column(name = "endpoint_agent_version")
-  @JsonProperty("endpoint_agent_version")
-  private String agentVersion;
-
-  @Queryable(filterable = true, sortable = true)
   @Column(name = "endpoint_platform")
   @JsonProperty("endpoint_platform")
   @Enumerated(EnumType.STRING)
@@ -85,6 +84,11 @@ public class Endpoint extends Asset {
   @Column(name = "endpoint_mac_addresses")
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
+
+  @OneToMany(mappedBy = "asset")
+  @JsonProperty("asset_agents")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  private List<Agent> agents = new ArrayList<>();
 
   public Endpoint() {}
 

@@ -34,6 +34,10 @@ public interface EndpointRepository
       nativeQuery = true)
   List<Endpoint> findForExecutionByHostname(@NotBlank final @Param("hostname") String hostname);
 
+  @Query(
+      value =
+          "select e.* from assets e left join agents a on e.asset_id = a.agent_asset where a.agent_external_reference = :externalReference",
+      nativeQuery = true)
   Optional<Endpoint> findByExternalReference(@Param("externalReference") String externalReference);
 
   @Override
