@@ -13,6 +13,8 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import UpdateInjectDetails from './UpdateInjectDetails';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
+import {ExercisesHelper} from "../../../../actions/exercises/exercise-helper";
+import {fetchExercise} from "../../../../actions/Exercise";
 
 interface Props {
   open: boolean;
@@ -57,10 +59,16 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
   const { inject } = useHelper((helper: InjectHelper) => ({
     inject: helper.getInject(injectId),
   }));
+  const { simulation } = useHelper((helper: ExercisesHelper) => ({
+    simulation: helper.getExercise(inject.inject_exercise)
+  }));
+  const availableTeamIds = simulation?.exercise_teams || []
 
   useDataLoader(() => {
     setIsInjectLoading(true);
-    dispatch(fetchInject(injectId)).finally(() => setIsInjectLoading(false));
+    dispatch(fetchInject(injectId));
+    dispatch(fetchExercise(inject.inject_exercise));
+    setIsInjectLoading(false);
   });
 
   // Selection
@@ -100,6 +108,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             contractContent={injectorContractContent}
             injectId={injectId}
             inject={inject}
+            availableTeamIds={availableTeamIds}
             handleClose={handleClose}
             onUpdateInject={onUpdateInject}
             isAtomic={isAtomic}
