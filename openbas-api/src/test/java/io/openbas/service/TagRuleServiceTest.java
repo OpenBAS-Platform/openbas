@@ -111,7 +111,7 @@ public class TagRuleServiceTest {
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.empty()));
     assertThrows(
-            ElementNotFoundException.class,
+        ElementNotFoundException.class,
         () -> {
           TagRule result =
               tagRuleService.createTagRule(
@@ -173,7 +173,7 @@ public class TagRuleServiceTest {
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.empty()));
     assertThrows(
-            ElementNotFoundException.class,
+        ElementNotFoundException.class,
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
@@ -187,7 +187,7 @@ public class TagRuleServiceTest {
     TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
     when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.empty());
     assertThrows(
-            ElementNotFoundException.class,
+        ElementNotFoundException.class,
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
