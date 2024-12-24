@@ -894,7 +894,6 @@ const i18n = {
       'endpoint_ips': 'Addresse Ips',
       'endpoint_platform': 'Platforme',
       'endpoint_arch': 'Architecture',
-      'endpoint_agent_version': 'Version de l\'agent',
       // Inject
       'inject_kill_chain_phases': 'Phase de kill chain',
       'inject_injector_contract': 'Injector',
@@ -2299,7 +2298,6 @@ const i18n = {
       'endpoint_ips': 'IP地址',
       'endpoint_platform': '平台',
       'endpoint_arch': '架构',
-      'endpoint_agent_version': 'agent版本',
       // Inject
       'inject_kill_chain_phases': '杀伤链阶段',
       'inject_injector_contract': '注入器',
@@ -2877,7 +2875,6 @@ const i18n = {
       'endpoint_ips': 'IP addresses',
       'endpoint_platform': 'Platform',
       'endpoint_arch': 'Architecture',
-      'endpoint_agent_version': 'Agent version',
       // Inject
       'inject_kill_chain_phases': 'Kill chain phase',
       'inject_injector_contract': 'Injector',

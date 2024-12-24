@@ -23,7 +23,6 @@ const DynamicAssetField: FunctionComponent<Props> = ({
   const [filterGroup, helpers] = useFiltersState(value ?? emptyFilterGroup, undefined, onChange);
 
   const availableFilterNames = [
-    'endpoint_agent_version',
     'endpoint_arch',
     'endpoint_hostname',
     'endpoint_ips',

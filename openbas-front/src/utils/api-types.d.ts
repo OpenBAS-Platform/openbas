@@ -9,6 +9,28 @@
  * ---------------------------------------------------------------
  */
 
+export interface Agent {
+  agent_active?: boolean;
+  agent_asset: string;
+  /** @format date-time */
+  agent_created_at: string;
+  agent_deployment_mode: string;
+  agent_executed_by_user: string;
+  agent_executor: string;
+  agent_external_reference: string;
+  agent_id: string;
+  agent_inject?: string;
+  /** @format date-time */
+  agent_last_seen?: string;
+  agent_parent?: string;
+  agent_privilege: string;
+  agent_process_name?: string;
+  /** @format date-time */
+  agent_updated_at: string;
+  agent_version?: string;
+  listened?: boolean;
+}
+
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
@@ -649,6 +671,7 @@ export interface DryrunCreateInput {
 
 export interface Endpoint {
   asset_active?: boolean;
+  asset_agents?: Agent[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
@@ -667,7 +690,6 @@ export interface Endpoint {
   asset_type?: string;
   /** @format date-time */
   asset_updated_at: string;
-  endpoint_agent_version?: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   endpoint_ips: string[];
