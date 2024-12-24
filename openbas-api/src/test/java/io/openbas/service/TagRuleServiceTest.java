@@ -19,13 +19,11 @@ import io.openbas.utils.fixtures.TagRuleFixture;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-@TestInstance(PER_CLASS)
 public class TagRuleServiceTest {
   private static final String TAG_RULE_ID = "tagruleid";
   private static final String TAG_RULE_ID_2 = "tagruleid2";
