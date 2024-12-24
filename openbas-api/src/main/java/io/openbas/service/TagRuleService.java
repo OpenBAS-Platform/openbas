@@ -42,7 +42,7 @@ public class TagRuleService {
   }
 
   /**
-   * Finn all the TagRules
+   * Find all the TagRules
    *
    * @return
    */
@@ -120,7 +120,6 @@ public class TagRuleService {
   protected Tag createtag(final String tagName) {
     Tag tag = new Tag();
     tag.setName(tagName);
-    tag.setColor("");
     return tag;
   }
 
@@ -131,8 +130,11 @@ public class TagRuleService {
    * @return
    */
   @VisibleForTesting
-  protected Tag getOrCreateTag(final String tagName) {
-    return tagRepository.findByName(tagName).orElse(tagRepository.save(createtag(tagName)));
+  protected Tag getOrCreateTag(@NotBlank final String tagName) {
+    // TODO: tag name normalization needs to be implemented in a reusable method
+    return tagRepository
+        .findByName(tagName.toLowerCase())
+        .orElseGet(() -> tagRepository.save(createtag(tagName)));
   }
 
   /**
