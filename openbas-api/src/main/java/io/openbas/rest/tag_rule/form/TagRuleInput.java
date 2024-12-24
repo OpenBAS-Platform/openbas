@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
