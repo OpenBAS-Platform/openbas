@@ -84,6 +84,7 @@ public class CalderaExecutorServiceTest {
 
   private Endpoint createEndpoint(Agent agent, Executor executor) {
     Endpoint endpoint = new Endpoint();
+    io.openbas.database.model.Agent agentEndpoint = new io.openbas.database.model.Agent();
     endpoint.setExecutor(executor);
     endpoint.setExternalReference(agent.getPaw());
     endpoint.setName(agent.getHost());
@@ -93,7 +94,8 @@ public class CalderaExecutorServiceTest {
     endpoint.setPlatform(CalderaExecutorService.toPlatform("windows"));
     endpoint.setArch(CalderaExecutorService.toArch("amd64"));
     endpoint.setProcessName(agent.getExe_name());
-    endpoint.setLastSeen(calderaExecutorService.toInstant(DATE));
+    agentEndpoint.setLastSeen(calderaExecutorService.toInstant(DATE));
+    endpoint.setAgents(List.of(agentEndpoint));
     return endpoint;
   }
 

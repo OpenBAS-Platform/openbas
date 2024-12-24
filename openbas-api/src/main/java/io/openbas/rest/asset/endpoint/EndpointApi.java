@@ -54,10 +54,13 @@ public class EndpointApi {
   @Transactional(rollbackOn = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
+    Agent agent = new Agent();
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
     endpoint.setArch(input.getArch());
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    agent.setLastSeen(input.getLastSeen());
+    endpoint.setAgents(List.of(agent));
     return this.endpointService.createEndpoint(endpoint);
   }
 
@@ -79,7 +82,7 @@ public class EndpointApi {
       endpoint.setName(input.getName());
       endpoint.getAgents().getFirst().setVersion(input.getAgentVersion());
       endpoint.setDescription(input.getDescription());
-      endpoint.setLastSeen(Instant.now());
+      endpoint.getAgents().getFirst().setLastSeen(Instant.now());
       endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
     } else {
       endpoint = new Endpoint();
@@ -87,7 +90,7 @@ public class EndpointApi {
       agent.setVersion(input.getAgentVersion());
       agent.setExternalReference(input.getExternalReference());
       endpoint.setUpdateAttributes(input);
-      endpoint.setLastSeen(Instant.now());
+      agent.setLastSeen(Instant.now());
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
       endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
       endpoint.setAgents(List.of(agent));
@@ -155,6 +158,7 @@ public class EndpointApi {
     endpoint.setPlatform(input.getPlatform());
     endpoint.setArch(input.getArch());
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    endpoint.getAgents().getFirst().setLastSeen(input.getLastSeen());
     return this.endpointService.updateEndpoint(endpoint);
   }
 
