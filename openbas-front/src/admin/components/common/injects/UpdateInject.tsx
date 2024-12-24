@@ -2,6 +2,8 @@ import { Tab, Tabs } from '@mui/material';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { fetchExercise } from '../../../../actions/Exercise';
+import { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { fetchInject } from '../../../../actions/Inject';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
@@ -13,8 +15,6 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import UpdateInjectDetails from './UpdateInjectDetails';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
-import {ExercisesHelper} from "../../../../actions/exercises/exercise-helper";
-import {fetchExercise} from "../../../../actions/Exercise";
 
 interface Props {
   open: boolean;
@@ -60,9 +60,9 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
     inject: helper.getInject(injectId),
   }));
   const { simulation } = useHelper((helper: ExercisesHelper) => ({
-    simulation: helper.getExercise(inject.inject_exercise)
+    simulation: helper.getExercise(inject.inject_exercise),
   }));
-  const availableTeamIds = simulation?.exercise_teams || []
+  const availableTeamIds = simulation?.exercise_teams || [];
 
   useDataLoader(() => {
     setIsInjectLoading(true);
