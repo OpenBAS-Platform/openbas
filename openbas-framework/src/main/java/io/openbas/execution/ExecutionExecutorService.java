@@ -75,7 +75,7 @@ public class ExecutionExecutorService {
     Executor executor = asset.getExecutor();
     if (executor == null) {
       log.log(Level.SEVERE, "Cannot find the executor for the asset " + asset.getName());
-    } else if (asset instanceof Endpoint && !((Endpoint)asset).getAgents().getFirst().getActive()) {
+    } else if (asset instanceof Endpoint && !((Endpoint)asset).getAgents().getFirst().getActive()) { // TODO DGO fix
       throw new RuntimeException("Asset error: " + asset.getName() + " is inactive");
     } else {
       switch (executor.getType()) {

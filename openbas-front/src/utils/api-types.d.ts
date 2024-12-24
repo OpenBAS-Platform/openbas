@@ -670,6 +670,7 @@ export interface DryrunCreateInput {
 }
 
 export interface Endpoint {
+  asset_active?: boolean;
   asset_agents?: Agent[];
   /** @format date-time */
   asset_cleared_at?: string;
@@ -680,6 +681,8 @@ export interface Endpoint {
   asset_external_reference?: string;
   asset_id: string;
   asset_inject?: string;
+  /** @format date-time */
+  asset_last_seen?: string;
   asset_name: string;
   asset_parent?: string;
   asset_process_name?: string;
@@ -3159,8 +3162,6 @@ export interface SecurityPlatform {
 
 export interface SecurityPlatformInput {
   asset_description?: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
@@ -3171,8 +3172,6 @@ export interface SecurityPlatformInput {
 export interface SecurityPlatformUpsertInput {
   asset_description?: string;
   asset_external_reference?: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
