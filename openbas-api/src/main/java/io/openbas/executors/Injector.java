@@ -1,7 +1,5 @@
 package io.openbas.executors;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
@@ -11,15 +9,17 @@ import io.openbas.model.ExecutionProcess;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
-import java.io.InputStream;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
 public abstract class Injector {
 
@@ -73,12 +73,6 @@ public abstract class Injector {
   }
 
   // region utils
-  private boolean isInInjectableRange(Injection injection) {
-    Instant now = Instant.now();
-    Instant start = now.minus(Duration.parse("PT1H"));
-    Instant injectWhen = injection.getDate().orElseThrow();
-    return injectWhen.isAfter(start) && injectWhen.isBefore(now);
-  }
 
   public <T> T contentConvert(
       @NotNull final ExecutableInject injection, @NotNull final Class<T> converter)
