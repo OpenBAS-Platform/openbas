@@ -100,7 +100,7 @@
     "cross-env": "7.0.3",
     "esbuild": "0.24.0",
     "eslint": "9.15.0",
-    "eslint-import-resolver-oxc": "0.6.0",
+    "eslint-import-resolver-oxc": "0.7.0",
     "eslint-plugin-custom-rules": "link:packages/eslint-plugin-custom-rules",
     "eslint-plugin-i18next": "6.1.1",
     "eslint-plugin-import": "2.31.0",
