@@ -1,5 +1,5 @@
 import { ControlPointOutlined, GroupsOutlined } from '@mui/icons-material';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItemButton, ListItemIcon, ListItemText, } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 
