@@ -10,7 +10,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.ArticleRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
-import io.openbas.execution.Injector;
+import io.openbas.executors.Injector;
 import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.channel.model.ArticleVariable;
 import io.openbas.injectors.channel.model.ChannelContent;

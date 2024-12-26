@@ -1,19 +1,25 @@
 import { HubOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CSSProperties, FunctionComponent } from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import * as React from 'react';
 import { Link } from 'react-router';
 
 import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
+import { fetchExercisesGlobalScores } from '../../../actions/exercises/exercise-action';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
+import Loader from '../../../components/Loader';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { ExerciseSimple } from '../../../utils/api-types';
+import type {
+  ExercisesGlobalScoresOutput,
+  ExerciseSimple,
+  ExpectationResultsByType,
+} from '../../../utils/api-types';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ExerciseStatus from './simulation/ExerciseStatus';
 
@@ -64,6 +70,25 @@ const getInlineStyles = (variant: string): Record<string, CSSProperties> => ({
   },
 });
 
+function getGlobalScoreComponent(
+  exercise: ExerciseSimple,
+) {
+  return (<AtomicTestingResult expectations={exercise.exercise_global_score} />);
+}
+
+function getGlobalScoreComponentAsync(
+  exercise: ExerciseSimple,
+  loadingGlobalScores: boolean,
+  globalScores: Record<string, ExpectationResultsByType[]> | undefined,
+) {
+  return (
+    <>
+      {(loadingGlobalScores) && <Loader variant="inElement" size="xs" />}
+      {(!loadingGlobalScores && globalScores) && <AtomicTestingResult expectations={globalScores[exercise.exercise_id]} />}
+    </>
+  );
+}
+
 interface Props {
   exercises: ExerciseSimpleStore[];
   queryableHelpers?: QueryableHelpers;
@@ -71,6 +96,7 @@ interface Props {
   variant?: string;
   secondaryAction?: (exercise: ExerciseStore) => React.ReactNode;
   loading: boolean;
+  isGlobalScoreAsync?: boolean;
 }
 
 const ExerciseList: FunctionComponent<Props> = ({
@@ -80,11 +106,27 @@ const ExerciseList: FunctionComponent<Props> = ({
   variant = 'list',
   secondaryAction,
   loading,
+  isGlobalScoreAsync = false,
 }) => {
   // Standard hooks
   const classes = useStyles();
   const inlineStyles = getInlineStyles(variant);
   const { nsdt, vnsdt } = useFormatter();
+
+  const [loadingGlobalScores, setLoadingGlobalScores] = useState(true);
+  const [globalScores, setGlobalScores] = useState<Record<string, ExpectationResultsByType[]>>();
+  const fetchGlobalScores = (exerciseIds: string[]) => {
+    setLoadingGlobalScores(true);
+    fetchExercisesGlobalScores({ exercise_ids: exerciseIds })
+      .then((result: { data: ExercisesGlobalScoresOutput }) => setGlobalScores(result.data.global_scores_by_exercise_ids))
+      .finally(() => setLoadingGlobalScores(false));
+  };
+
+  useEffect(() => {
+    if (exercises.length > 0) {
+      fetchGlobalScores(exercises.map(exercise => exercise.exercise_id));
+    }
+  }, [exercises]);
 
   // Headers
   const headers: Header[] = [
@@ -121,7 +163,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       field: 'exercise_global_score',
       label: 'Global score',
       isSortable: false,
-      value: (exercise: ExerciseSimple) => <AtomicTestingResult expectations={exercise.exercise_global_score} />,
+      value: (exercise: ExerciseSimple) => isGlobalScoreAsync ? getGlobalScoreComponentAsync(exercise, loadingGlobalScores, globalScores) : getGlobalScoreComponent(exercise),
     },
     {
       field: 'exercise_tags',

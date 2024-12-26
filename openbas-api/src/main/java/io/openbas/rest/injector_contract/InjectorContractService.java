@@ -48,10 +48,13 @@ public class InjectorContractService {
   @EventListener(ApplicationReadyEvent.class)
   public void initImportAvailableOnStartup() {
     List<String> listOfInjectorImportAvailable = new ArrayList<>();
-    if (mailImportEnabled)
+    if (mailImportEnabled) {
       listOfInjectorImportAvailable.addAll(
           Arrays.asList(EmailContract.EMAIL_GLOBAL, EmailContract.EMAIL_DEFAULT));
-    if (smsImportEnabled) listOfInjectorImportAvailable.add(OvhSmsContract.OVH_DEFAULT);
+    }
+    if (smsImportEnabled) {
+      listOfInjectorImportAvailable.add(OvhSmsContract.OVH_DEFAULT);
+    }
 
     List<InjectorContract> listInjectorContract = new ArrayList<>();
     injectorContractRepository.findAll().spliterator().forEachRemaining(listInjectorContract::add);

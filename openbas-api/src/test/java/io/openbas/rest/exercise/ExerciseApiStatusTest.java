@@ -9,6 +9,8 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,11 +26,14 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.*;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +52,7 @@ public class ExerciseApiStatusTest {
   static Exercise CANCELED_EXERCISE;
   static Inject SAVED_INJECT5;
   static LessonsAnswer LESSON_ANSWER;
+  static Instant REFERENCE_TIME;
 
   @Autowired private MockMvc mvc;
 
@@ -76,11 +82,13 @@ public class ExerciseApiStatusTest {
 
   @BeforeEach
   void beforeAll() {
-    Exercise scheduledExercise = ExerciseFixture.createDefaultAttackExercise();
-    Exercise runningExercise = ExerciseFixture.createRunningAttackExercise();
-    Exercise pausedExercise = ExerciseFixture.createPausedAttackExercise();
-    Exercise canceledExercise = ExerciseFixture.createCanceledAttackExercise();
-    Exercise finishedExercise = ExerciseFixture.createFinishedAttackExercise();
+    REFERENCE_TIME =
+        Instant.now(Clock.fixed(Instant.parse("2024-12-17T10:30:45Z"), ZoneId.of("UTC")));
+    Exercise scheduledExercise = ExerciseFixture.createDefaultAttackExercise(REFERENCE_TIME);
+    Exercise runningExercise = ExerciseFixture.createRunningAttackExercise(REFERENCE_TIME);
+    Exercise pausedExercise = ExerciseFixture.createPausedAttackExercise(REFERENCE_TIME);
+    Exercise canceledExercise = ExerciseFixture.createCanceledAttackExercise(REFERENCE_TIME);
+    Exercise finishedExercise = ExerciseFixture.createFinishedAttackExercise(REFERENCE_TIME);
 
     InjectorContract injectorContract =
         this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
@@ -176,28 +184,50 @@ public class ExerciseApiStatusTest {
     // -- PREPARE--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
     input.setStatus(ExerciseStatus.RUNNING);
+    Instant instantBeforeSetRun = REFERENCE_TIME;
+    Instant instantAfterSetRun = REFERENCE_TIME.plus(1, MINUTES);
+    Clock clock = Clock.fixed(REFERENCE_TIME, ZoneId.of("UTC"));
 
-    // -- EXECUTE --
-    String response =
-        mvc.perform(
-                put(EXERCISE_URI + "/" + SCHEDULED_EXERCISE.getId() + "/status")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+    try (MockedStatic<Instant> mockedInstant = mockStatic(Instant.class, CALLS_REAL_METHODS)) {
+      try (MockedStatic<Clock> mockedClock = mockStatic(Clock.class, CALLS_REAL_METHODS)) {
 
-    // -- ASSERT --
-    Thread.sleep(2000);
-    List<ExecutableInject> injects = injectHelper.getInjectsToRun();
-    Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
-    assertEquals(nextMinute.toString(), JsonPath.read(response, "$.exercise_start_date"));
-    assertEquals(
-        Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.PAUSED.name()),
-        JsonPath.read(response, "$.exercise_next_possible_status"));
-    assertEquals(1, injects.size());
+        mockedInstant.when(Instant::now).thenReturn(instantBeforeSetRun);
+        // we need this other mock because the production code
+        // inconsistently calls Instant.now() and LocalDateTime.now()
+        mockedClock.when(Clock::systemDefaultZone).thenReturn(clock);
+
+        // -- EXECUTE --
+        String response =
+            mvc.perform(
+                    put(EXERCISE_URI + "/" + SCHEDULED_EXERCISE.getId() + "/status")
+                        .content(asJsonString(input))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        // -- ASSERT --
+
+        // NOTE: we are changing the time of Instant.now() here to fast forward in the future
+        mockedInstant.when(Instant::now).thenReturn(instantAfterSetRun);
+
+        List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+        Instant expectedStartTime = instantBeforeSetRun.truncatedTo(MINUTES).plus(1, MINUTES);
+        assertEquals(
+            expectedStartTime.toString(), JsonPath.read(response, "$.exercise_start_date"));
+        assertEquals(
+            Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.PAUSED.name()),
+            JsonPath.read(response, "$.exercise_next_possible_status"));
+        assertEquals(
+            1,
+            injects.stream()
+                .filter((ij) -> SCHEDULED_EXERCISE.getId().equals(ij.getExercise().getId()))
+                .toList()
+                .size());
+      }
+    }
   }
 
   @DisplayName("Check an exercise from canceled to scheduled")
@@ -263,37 +293,52 @@ public class ExerciseApiStatusTest {
     // --PREPARE--
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
     input.setStatus(ExerciseStatus.RUNNING);
+    Instant instantBeforeSetRun = REFERENCE_TIME;
+    Instant instantAfterSetRun = REFERENCE_TIME.plus(1, MINUTES);
+    Clock clock = Clock.fixed(REFERENCE_TIME, ZoneId.of("UTC"));
 
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                put(EXERCISE_URI + "/" + PAUSED_EXERCISE.getId() + "/status")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+    try (MockedStatic<Instant> mockedInstant = mockStatic(Instant.class, CALLS_REAL_METHODS)) {
+      try (MockedStatic<Clock> mockedClock = mockStatic(Clock.class, CALLS_REAL_METHODS)) {
 
-    // --ASSERT--
-    Thread.sleep(2000);
-    List<ExecutableInject> injects = injectHelper.getInjectsToRun();
-    List<Pause> pauses = pauseRepository.findAllForExercise(PAUSED_EXERCISE.getId());
-    Optional<Exercise> exercise =
-        exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
-    if (exercise.isPresent()) {
-      Exercise responseExercise = exercise.get();
-      assertEquals(Optional.empty(), responseExercise.getCurrentPause());
+        mockedInstant.when(Instant::now).thenReturn(instantBeforeSetRun);
+        // we need this other mock because the production code
+        // inconsistently calls Instant.now() and LocalDateTime.now()
+        mockedClock.when(Clock::systemDefaultZone).thenReturn(clock);
+
+        // --EXECUTE--
+        String response =
+            mvc.perform(
+                    put(EXERCISE_URI + "/" + PAUSED_EXERCISE.getId() + "/status")
+                        .content(asJsonString(input))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        // --ASSERT--
+        // NOTE: we are changing the time of Instant.now() here to fast forward in the future
+        mockedInstant.when(Instant::now).thenReturn(instantAfterSetRun);
+
+        List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+        List<Pause> pauses = pauseRepository.findAllForExercise(PAUSED_EXERCISE.getId());
+        Optional<Exercise> exercise =
+            exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
+        if (exercise.isPresent()) {
+          Exercise responseExercise = exercise.get();
+          assertEquals(Optional.empty(), responseExercise.getCurrentPause());
+        }
+        assertEquals(1, pauses.size());
+        assertEquals(
+            Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.PAUSED.name()),
+            JsonPath.read(response, "$.exercise_next_possible_status"));
+        assertEquals(1, injects.size());
+
+        // --CLEAN--
+        pauseRepository.delete(pauses.getFirst());
+      }
     }
-    assertEquals(1, pauses.size());
-    assertEquals(
-        Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.PAUSED.name()),
-        JsonPath.read(response, "$.exercise_next_possible_status"));
-    assertEquals(1, injects.size());
-
-    // --CLEAN--
-    pauseRepository.delete(pauses.getFirst());
   }
 
   @DisplayName("Check an exercise from running to paused")

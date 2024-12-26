@@ -120,11 +120,7 @@ const Payload: FunctionComponent<Props> = ({
         >
           {t('External ID')}
         </Typography>
-        {selectedPayload?.payload_external_id && selectedPayload?.payload_external_id.length > 0 ? (
-          <pre>
-            <ItemCopy content={selectedPayload?.payload_external_id} />
-          </pre>
-        ) : '-'}
+        {emptyFilled(selectedPayload?.payload_external_id)}
       </Grid>
       <Grid item xs={12} style={{ paddingTop: 10 }}>
         <Typography
@@ -140,7 +136,7 @@ const Payload: FunctionComponent<Props> = ({
           gutterBottom
           style={{ marginTop: 20 }}
         >
-          {t('Attack commands')}
+          {t('Attack command')}
         </Typography>
         <pre>
           <ItemCopy content={
@@ -181,7 +177,9 @@ const Payload: FunctionComponent<Props> = ({
                                 {argument.key}
                               </TableCell>
                               <TableCell>
-                                {argument.default_value}
+                                <pre>
+                                  <ItemCopy content={argument.default_value} />
+                                </pre>
                               </TableCell>
                             </TableRow>
                           </>
@@ -204,7 +202,7 @@ const Payload: FunctionComponent<Props> = ({
           selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
             : (
                 <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }}>
+                  <Table sx={{ minWidth: 650, justifyContent: 'center' }}>
                     <TableHead>
                       <TableRow sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>
                         <TableCell width="30%">{t('Command executor')}</TableCell>
@@ -223,10 +221,18 @@ const Payload: FunctionComponent<Props> = ({
                                 {prerequisite.executor}
                               </TableCell>
                               <TableCell>
-                                {prerequisite.get_command}
+                                <pre>
+                                  <ItemCopy content={prerequisite.get_command} />
+                                </pre>
                               </TableCell>
                               <TableCell>
-                                {prerequisite.check_command}
+                                {prerequisite.check_command !== undefined
+                                  ? (
+                                      <pre>
+                                        <ItemCopy content={prerequisite.check_command} />
+                                      </pre>
+                                    ) : '-'}
+
                               </TableCell>
                             </TableRow>
                           </>
@@ -244,13 +250,13 @@ const Payload: FunctionComponent<Props> = ({
         >
           {t('Cleanup executor')}
         </Typography>
-        {selectedPayload?.payload_cleanup_executor}
+        {emptyFilled(selectedPayload?.payload_cleanup_executor)}
         <Typography
           variant="h3"
           gutterBottom
           style={{ marginTop: 20 }}
         >
-          {t('Cleanup commands')}
+          {t('Cleanup command')}
         </Typography>
         {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
           ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}

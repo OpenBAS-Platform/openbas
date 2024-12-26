@@ -1,89 +1,151 @@
 import { useTheme } from '@mui/styles';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { ExerciseSimpleStore } from '../../../../actions/exercises/Exercise';
+import { fetchScenarioStatistic } from '../../../../actions/scenarios/scenario-actions';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
+import Loader from '../../../../components/Loader';
 import type { Theme } from '../../../../components/Theme';
-import { verticalBarsChartOptions } from '../../../../utils/Charts';
+import { GlobalScoreBySimulationEndDate, ScenarioStatistic } from '../../../../utils/api-types';
+import { CustomTooltipFunction, CustomTooltipOptions, verticalBarsChartOptions } from '../../../../utils/Charts';
 
 interface Props {
-  exercises: ExerciseSimpleStore[];
+  scenarioId: string;
+}
+
+function generateFakeDataFromDates(dates: string[], percentage: number): GlobalScoreBySimulationEndDate[] {
+  return dates.map(date => ({
+    simulation_end_date: date,
+    global_score_success_percentage: percentage,
+  }));
+}
+
+const generateFakeData = (): Record<string, GlobalScoreBySimulationEndDate[]> => {
+  const now = new Date();
+  const dates = Array.from({ length: 5 }, (_, i) => {
+    const newDate = new Date(now);
+    newDate.setHours(now.getHours() + i + 1);
+    return newDate.toISOString();
+  });
+  return ({
+    ...({ PREVENTION: generateFakeDataFromDates(dates, 69.0) }),
+    ...({ DETECTION: generateFakeDataFromDates(dates, 84.0) }),
+    ...({ HUMAN_RESPONSE: generateFakeDataFromDates(dates, 46.0) }),
+  });
+};
+
+function generateSeriesData(globalScores: GlobalScoreBySimulationEndDate[], successfulExpectationLabel: string) {
+  const { fldt } = useFormatter();
+  return globalScores.map((globalScore, index) => ({
+    x: `${index}|${globalScore.simulation_end_date}`,
+    y: globalScore.global_score_success_percentage / 100,
+    simulationEndDate: fldt(globalScore.simulation_end_date),
+    simulationSuccessPercentage: globalScore.global_score_success_percentage,
+    successfulExpectationLabel: successfulExpectationLabel,
+  }));
+}
+
+type SeriesData = { simulationEndDate: string; simulationSuccessPercentage: string; successfulExpectationLabel: string };
+
+const customTooltip = (simulationEndDateLabel: string): CustomTooltipFunction => {
+  return function ({ _, seriesIndex, dataPointIndex, w }: CustomTooltipOptions) {
+    const { simulationEndDate, simulationSuccessPercentage, successfulExpectationLabel } = w.globals.initialSeries[seriesIndex].data[dataPointIndex] as SeriesData;
+
+    return `<div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">
+            ${simulationEndDateLabel}: <b>${simulationEndDate}</b>
+          </div>
+          <div class="apexcharts-tooltip-series-group" style="order: 1; display: flex;">
+            <div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">
+              <div class="apexcharts-tooltip-y-group">
+                <span class="apexcharts-tooltip-text-y-label">${successfulExpectationLabel}: </span>
+                <span class="apexcharts-tooltip-text-y-value">${Number.parseFloat(simulationSuccessPercentage).toFixed(1)}%</span>
+              </div>
+           </div>
+          </div>`;
+  };
+};
+
+function getXFormatter() {
+  const { fsd } = useFormatter();
+  return (rawData: string) => {
+    if (!rawData) {
+      return rawData;
+    }
+    const splitRawData = rawData.split('|');
+    return splitRawData.length > 0 ? fsd(splitRawData[1]) : rawData;
+  };
+}
+
+function getYFormatter() {
+  return (value: number) => `${value * 100}%`;
 }
 
 const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
-  exercises = [],
+  scenarioId,
 }) => {
   // Standard hooks
-  const { t, nsdt } = useFormatter();
+  const { t } = useFormatter();
   const theme: Theme = useTheme();
-  const generateFakeData = (): ExerciseSimpleStore[] => {
-    const now = new Date();
-    return Array.from(Array(5), (e, i) => {
-      now.setHours(now.getHours() + 1);
-      return {
-        exercise_id: `fake-${i}`,
-        exercise_name: 'fake',
-        exercise_start_date: now.toISOString(),
-        exercise_global_score: [
-          { type: 'PREVENTION', distribution: [{ id: 'PARTIAL_ID', value: 0.69, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'DETECTION', distribution: [{ id: 'PARTIAL_ID', value: 0.84, label: t('Unknown') }], avgResult: 'PARTIAL' },
-          { type: 'HUMAN_RESPONSE', distribution: [{ id: 'PARTIAL_ID', value: 0.46, label: t('Unknown') }], avgResult: 'PARTIAL' },
-        ],
-        exercise_targets: [],
-        exercise_tags: undefined,
-      };
-    });
+
+  const simulationEndDateLabel = t('Simulation end date');
+
+  const [loadingScenarioStatistics, setLoadingScenarioStatistics] = useState(true);
+  const [statistic, setStatistic] = useState<ScenarioStatistic>();
+  const fetchStatistics = () => {
+    setLoadingScenarioStatistics(true);
+    fetchScenarioStatistic(scenarioId).then((result: { data: ScenarioStatistic }) => setStatistic(result.data)).finally(() => setLoadingScenarioStatistics(false));
   };
-  const data = exercises.length > 0 ? exercises : generateFakeData();
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
+
+  const preventionData = statistic?.simulations_results_latest.global_scores_by_expectation_type['PREVENTION'];
+  const globalScoresByExpectationType = preventionData && preventionData.length > 0 ? statistic?.simulations_results_latest.global_scores_by_expectation_type : generateFakeData();
+  const isStatisticsDataEmpty = preventionData && preventionData.length === 0;
+
   const series = [
     {
       name: t('Prevention'),
-      data: data.map(exercise => ({
-        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter(score => score.type === 'PREVENTION').at(0)?.distribution?.[0]?.value ?? 0,
-      })),
+      data: generateSeriesData(globalScoresByExpectationType['PREVENTION'], t('Blocked')),
     },
     {
       name: t('Detection'),
-      data: data.map(exercise => ({
-        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter(score => score.type === 'DETECTION').at(0)?.distribution?.[0]?.value ?? 0,
-      })),
+      data: generateSeriesData(globalScoresByExpectationType['DETECTION'], t('Detected')),
     },
     {
       name: t('Human Response'),
-      data: data.map(exercise => ({
-        x: exercise.exercise_start_date ? new Date(exercise.exercise_start_date) : new Date(),
-        y: exercise.exercise_global_score?.filter(score => score.type === 'HUMAN_RESPONSE').at(0)?.distribution?.[0]?.value ?? 0,
-      })),
+      data: generateSeriesData(globalScoresByExpectationType['HUMAN_RESPONSE'], t('Successful')),
     },
   ];
+
   return (
     <>
-      {data.length > 0 ? (
+      {loadingScenarioStatistics && (<Loader variant="inElement" />)}
+      {(!loadingScenarioStatistics && series[0].data.length > 0) && (
         <Chart
           options={verticalBarsChartOptions(
             theme,
-            nsdt,
-            (value: number) => `${value * 100}%`,
+            getXFormatter(),
+            getYFormatter(),
             false,
-            true,
+            false,
             false,
             true,
             'dataPoints',
             true,
-            exercises.length === 0,
+            isStatisticsDataEmpty,
             1,
             t('No data to display'),
+            customTooltip(simulationEndDateLabel),
           )}
           series={series}
           type="bar"
           width="100%"
           height={300}
         />
-      ) : (
+      )}
+      {(!loadingScenarioStatistics && series[0].data.length === 0) && (
         <Empty
           message={t(
             'No data to display',

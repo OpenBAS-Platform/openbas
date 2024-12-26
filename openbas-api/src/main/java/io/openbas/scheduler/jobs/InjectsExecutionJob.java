@@ -148,10 +148,10 @@ public class InjectsExecutionJob implements Job {
         .getInjectorContract()
         .ifPresent(
             injectorContract -> {
-              io.openbas.execution.Injector executor =
+              io.openbas.executors.Injector executor =
                   context.getBean(
                       injectorContract.getInjector().getType(),
-                      io.openbas.execution.Injector.class);
+                      io.openbas.executors.Injector.class);
               Execution execution = executor.executeInjection(executableInject);
               // After execution, expectations are already created
               // Injection status is filled after complete execution
@@ -200,7 +200,7 @@ public class InjectsExecutionJob implements Job {
               errorMsg -> finalStatus.getTraces().add(InjectStatusExecution.traceError(errorMsg)));
       finalStatus.setName(ExecutionStatus.ERROR);
       finalStatus.setTrackingSentDate(Instant.now());
-      finalStatus.setCommandsLines(injectUtils.getCommandsLinesFromInject(inject));
+      finalStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
       injectStatusRepository.save(finalStatus);
     } else {
       setInjectStatusAndExecuteInject(executableInject, inject);
@@ -276,7 +276,7 @@ public class InjectsExecutionJob implements Job {
     }
     injectStatus.setName(status);
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setCommandsLines(injectUtils.getCommandsLinesFromInject(inject));
+    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     injectStatusRepository.save(injectStatus);
     inject.setStatus(injectStatus);
   }

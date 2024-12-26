@@ -1,4 +1,4 @@
-package io.openbas.execution;
+package io.openbas.executors;
 
 import static io.openbas.database.model.InjectStatusExecution.traceError;
 
@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.DocumentRepository;
+import io.openbas.execution.ExecutableInject;
 import io.openbas.model.ExecutionProcess;
-import io.openbas.model.expectation.*;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
@@ -40,7 +40,7 @@ public abstract class Injector {
   public abstract ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception;
 
-  public InjectStatusCommandLine getCommandsLines(String externalId) {
+  public StatusPayload getPayloadOutput(String externalId) {
     return null;
   }
 

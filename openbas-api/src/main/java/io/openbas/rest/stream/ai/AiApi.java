@@ -54,6 +54,7 @@ public class AiApi extends RestBehavior {
             .POST(HttpRequest.BodyPublishers.ofString(body))
             .header("Authorization", "Bearer " + aiConfig.getToken())
             .header("Accept", "text/event-stream")
+            .header("Content-Type", "application/json")
             .build();
     Flux<AiResult> dataFlux =
         Flux.create(

@@ -11,10 +11,12 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
+import isInjectWithPayloadInfo from '../../../../utils/inject/injectUtils';
 import { FIVE_SECONDS } from '../../../../utils/Time';
 import { TeamContext } from '../../common/Context';
 import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
 import AtomicTestingHeader from './AtomicTestingHeader';
+import AtomicTestingPayloadInfo from './AtomicTestingPayloadInfo';
 import teamContextForAtomicTesting from './context/TeamContextForAtomicTesting';
 
 const interval$ = interval(FIVE_SECONDS);
@@ -106,12 +108,24 @@ const Index = () => {
                 label={t('Execution details')}
                 className={classes.item}
               />
+              {
+                isInjectWithPayloadInfo(injectResultOverviewOutput) && (
+                  <Tab
+                    component={Link}
+                    to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
+                    value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
+                    label={t('Payload info')}
+                    className={classes.item}
+                  />
+                )
+              }
             </Tabs>
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(AtomicTesting)()} />
               <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
+              <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>
