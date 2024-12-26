@@ -1,20 +1,9 @@
 import { ControlPointOutlined, GroupsOutlined } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItemButton, ListItemIcon, ListItemText, } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 
-import { fetchTeams, findTeams } from '../../../../actions/teams/team-actions';
-import { TeamsHelper } from '../../../../actions/teams/team-helper';
+import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
@@ -23,10 +12,7 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Theme } from '../../../../components/Theme';
-import { useHelper } from '../../../../store';
 import type { TeamOutput } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import CreateTeam from '../../components/teams/CreateTeam';
 import { PermissionsContext, TeamContext } from '../Context';
 
@@ -45,16 +31,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   handleModifyTeams: (teamIds: string[]) => void;
   injectTeamsIds: string[];
-  availableTeamIds: string[];
 }
 
 const InjectAddTeams: FunctionComponent<Props> = ({
   handleModifyTeams,
   injectTeamsIds,
-  availableTeamIds,
 }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const classes = useStyles();
   const { permissions } = useContext(PermissionsContext);
@@ -62,12 +45,6 @@ const InjectAddTeams: FunctionComponent<Props> = ({
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
   const [selectedTeamValues, setSelectedTeamValues] = useState<TeamOutput[]>([]);
-
-  const allTeams = useHelper((helper: TeamsHelper) => helper.getTeams().filter(t => availableTeamIds.length > 0 ? availableTeamIds.includes(t.team_id) : true));
-  useDataLoader(() => {
-    dispatch(fetchTeams()).finally(() => {
-    });
-  });
 
   // Dialog
   const [open, setOpen] = useState(false);
@@ -85,7 +62,6 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   useEffect(() => {
     if (open) {
       findTeams(injectTeamsIds).then(result => setSelectedTeamValues(result.data));
-      setTeamValues(allTeams);
     }
   }, [open, injectTeamsIds]);
 

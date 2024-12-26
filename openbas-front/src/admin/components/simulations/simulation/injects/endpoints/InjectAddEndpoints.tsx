@@ -69,7 +69,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
         payloadArch={payloadArch}
         onClose={handleClose}
         onSubmit={onSubmit}
-        title={t('Add assets in this inject')}
+        title={t('Modify assets in this inject')}
       />
     </>
   );

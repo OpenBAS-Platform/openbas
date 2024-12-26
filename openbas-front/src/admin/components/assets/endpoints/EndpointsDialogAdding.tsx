@@ -172,7 +172,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>
         <Button color="secondary" onClick={handleSubmit}>
-          {t('Add')}
+          {t('Update')}
         </Button>
       </DialogActions>
     </Dialog>

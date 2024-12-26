@@ -235,7 +235,6 @@ class QuickInject extends Component {
     this.state = {
       allTeams: false,
       teamsIds: [],
-      availableTeamIds: this.props.exercise?.exercise_teams || [],
       documents: [],
       expectations: [],
       teamsSortBy: 'team_name',
@@ -810,7 +809,6 @@ class QuickInject extends Component {
     const {
       allTeams,
       teamsIds,
-      availableTeamIds,
       documents,
       expectations,
       teamsSortBy,
@@ -1148,7 +1146,6 @@ class QuickInject extends Component {
                           ))}
                           <InjectAddTeams
                             injectTeamsIds={teamsIds}
-                            availableTeamIds={availableTeamIds}
                             handleModifyTeams={this.handleModifyTeams.bind(
                               this,
                             )}

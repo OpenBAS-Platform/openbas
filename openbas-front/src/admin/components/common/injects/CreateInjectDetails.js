@@ -83,7 +83,6 @@ const CreateInjectDetails = ({
   const [defaultValues, setDefaultValues] = useState({});
   const [injectDetailsState, setInjectDetailsState] = useState({});
 
-  const availableTeamIds = props.teamsFromExerciseOrScenario ? props.teamsFromExerciseOrScenario.map(t => t.team_id) : [];
   const { tagsMap } = useHelper(helper => ({
     tagsMap: helper.getTagsMap(),
   }));
@@ -359,7 +358,6 @@ const CreateInjectDetails = ({
                   inject_asset_groups: [],
                   inject_documents: [],
                 }}
-                availableTeamIds={availableTeamIds}
                 injectorContract={{ ...contractContent }}
                 handleClose={handleClose}
                 tagsMap={tagsMap}
