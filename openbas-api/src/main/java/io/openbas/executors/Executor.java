@@ -1,6 +1,7 @@
 package io.openbas.executors;
 
 import static io.openbas.database.model.InjectStatusExecution.traceInfo;
+import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.QueueService;
@@ -155,11 +156,4 @@ public class Executor {
                         + injectorContract.getInjector().getType()));
   }
 
-  // region utils
-  private boolean isInInjectableRange(Injection injection) {
-    Instant now = Instant.now();
-    Instant start = now.minus(Duration.parse("PT1H"));
-    Instant injectWhen = injection.getDate().orElseThrow();
-    return injectWhen.isAfter(start) && injectWhen.isBefore(now);
-  }
 }
