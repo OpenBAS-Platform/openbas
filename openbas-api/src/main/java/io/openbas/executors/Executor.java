@@ -13,7 +13,6 @@ import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import jakarta.annotation.Resource;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,5 +154,4 @@ public class Executor {
                     "External injector not found for type: "
                         + injectorContract.getInjector().getType()));
   }
-
 }

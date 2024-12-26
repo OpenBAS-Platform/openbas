@@ -359,7 +359,7 @@ const CreateInjectDetails = ({
                   inject_asset_groups: [],
                   inject_documents: [],
                 }}
-                      availableTeamIds={availableTeamIds}
+                availableTeamIds={availableTeamIds}
                 injectorContract={{ ...contractContent }}
                 handleClose={handleClose}
                 tagsMap={tagsMap}

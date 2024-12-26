@@ -1,7 +1,6 @@
 package io.openbas.utils;
 
 import io.openbas.database.model.Injection;
-
 import java.time.Duration;
 import java.time.Instant;
 
@@ -15,5 +14,4 @@ public class InjectionUtils {
     Instant injectWhen = injection.getDate().orElseThrow();
     return injectWhen.isAfter(start) && injectWhen.isBefore(now);
   }
-
 }

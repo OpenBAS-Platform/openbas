@@ -911,8 +911,8 @@ class InjectDefinition extends Component {
                   />
                   <InjectAddTeams
                     injectTeamsIds={teamsIds}
-                      availableTeamIds={availableTeamIds}
-                      handleModifyTeams={this.handleModifyTeams.bind(this)}
+                    availableTeamIds={availableTeamIds}
+                    handleModifyTeams={this.handleModifyTeams.bind(this)}
                   />
                 </>
               )}
