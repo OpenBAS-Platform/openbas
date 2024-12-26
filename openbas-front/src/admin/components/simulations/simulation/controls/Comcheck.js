@@ -271,10 +271,10 @@ const Comcheck = () => {
                   comcheck?.comcheck_state === 'FINISHED'
                     ? 100
                     : progression(
-                        currentDate,
-                        Date.parse(comcheck?.comcheck_start_date),
-                        Date.parse(comcheck?.comcheck_end_date),
-                      )
+                      currentDate,
+                      Date.parse(comcheck?.comcheck_start_date),
+                      Date.parse(comcheck?.comcheck_end_date),
+                    )
                 }
                 variant="determinate"
               />

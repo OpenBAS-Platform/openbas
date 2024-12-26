@@ -169,17 +169,17 @@ const AtomicTesting = () => {
               {
                 injectResultOverviewOutput.injects_documents !== undefined && injectResultOverviewOutput.injects_documents.length > 0
                   ? injectResultOverviewOutput.injects_documents.map((documentId) => {
-                      const document = documentMap[documentId];
-                      return (
-                        <Typography key={documentId} variant="body1">
-                          {document?.document_name ?? '-'}
-                        </Typography>
-                      );
-                    }) : (
-                      <Typography variant="body1" gutterBottom>
-                        -
+                    const document = documentMap[documentId];
+                    return (
+                      <Typography key={documentId} variant="body1">
+                        {document?.document_name ?? '-'}
                       </Typography>
-                    )
+                    );
+                  }) : (
+                    <Typography variant="body1" gutterBottom>
+                      -
+                    </Typography>
+                  )
               }
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>

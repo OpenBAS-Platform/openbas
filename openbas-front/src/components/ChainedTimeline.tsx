@@ -136,7 +136,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     if (startDate !== undefined) {
       startDate = parsedCron !== null
         ? moment(startDate).utc().hour(parsedCron.h).minute(parsedCron.m)
-            .format()
+          .format()
         : moment(startDate).utc().format();
     }
   } else if (exercise !== undefined) {

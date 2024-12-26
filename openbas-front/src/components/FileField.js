@@ -37,14 +37,14 @@ const FileFieldInput = ({ input, dropZoneProps, filters, ...props }) => {
         </FormHelperText>,
       ]
     : acceptedFiles.map(file => (
-        <FormHelperText key={file.path} focused={true}>
-          {file.path}
-          {' '}
-          -
-          {bytesFormat(file.size).number}
-          {bytesFormat(file.size).symbol}
-        </FormHelperText>
-      ));
+      <FormHelperText key={file.path} focused={true}>
+        {file.path}
+        {' '}
+        -
+        {bytesFormat(file.size).number}
+        {bytesFormat(file.size).symbol}
+      </FormHelperText>
+    ));
   return (
     <div {...getRootProps()} style={{ marginTop: 20 }}>
       <input {...getInputProps()} />

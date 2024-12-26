@@ -384,8 +384,8 @@ const Injects: FunctionComponent<Props> = ({
   const injectsToProcess = selectAll
     ? injects.filter((inject: InjectOutputType) => !R.keys(deSelectedElements).includes(inject.inject_id))
     : injects.filter(
-        (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
-      );
+      (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
+    );
 
   const massUpdateInjects = async (actions: {
     field: string;

@@ -67,16 +67,16 @@ const useSearchAnFilter = (
     );
     return defaultSortKey
       ? R.pipe(
-          R.filter(
-            n => tags.length === 0
-              || R.any(
-                filter => R.includes(filter, n[`${schema}_tags`] || []),
-                R.pluck('id', tags),
-              ),
-          ),
-          R.filter(filterByKeyword),
-          sort,
-        )(elements)
+        R.filter(
+          n => tags.length === 0
+            || R.any(
+              filter => R.includes(filter, n[`${schema}_tags`] || []),
+              R.pluck('id', tags),
+            ),
+        ),
+        R.filter(filterByKeyword),
+        sort,
+      )(elements)
       : R.pipe(R.filter(filterByKeyword))(elements);
   };
   return {

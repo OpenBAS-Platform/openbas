@@ -107,9 +107,9 @@ const Dashboard = () => {
       name: t('Number of simulations'),
       data: exercisesCountByWeekHasValues
         ? Object.entries<number>(statistics.exercises_count_by_week!).map(([date, value]) => ({
-            x: date,
-            y: value,
-          }))
+          x: date,
+          y: value,
+        }))
         : exercisesTimeSeriesFakeData,
     },
   ], [exercisesCountByWeekHasValues, statistics?.exercises_count_by_week]);
@@ -140,11 +140,11 @@ const Dashboard = () => {
       name: t('Number of injects'),
       data: injectsCountByAttackPatternHasValues && Object.keys(attackPatternsMap).length
         ? Object.entries<number>(statistics.injects_count_by_attack_pattern!).map(([attackPatternId, value]) => {
-            return ({
-              x: [`[${attackPatternsMap[attackPatternId].attack_pattern_external_id}]`, attackPatternsMap[attackPatternId].attack_pattern_name],
-              y: value,
-            });
-          })
+          return ({
+            x: [`[${attackPatternsMap[attackPatternId].attack_pattern_external_id}]`, attackPatternsMap[attackPatternId].attack_pattern_name],
+            y: value,
+          });
+        })
         : attackPatternsFakeData,
     }],
     [statistics?.injects_count_by_attack_pattern, injectsCountByAttackPatternHasValues, attackPatternsMap],

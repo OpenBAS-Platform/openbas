@@ -239,47 +239,47 @@ const Scenarios = () => {
           loading
             ? <PaginatedListLoader Icon={MovieFilterOutlined} headers={headers} headerStyles={inlineStyles} />
             : scenarios.map((scenario: ScenarioStore, index) => {
-                return (
-                  <ListItem
-                    key={scenario.scenario_id}
-                    divider={scenarios.length !== index + 1}
-                    secondaryAction={(
-                      <ScenarioPopover
-                        scenario={scenario}
-                        actions={['Duplicate', 'Export', 'Delete']}
-                        onDelete={result => setScenarios(scenarios.filter(e => (e.scenario_id !== result)))}
-                        inList
-                      />
-                    )}
-                    disablePadding
+              return (
+                <ListItem
+                  key={scenario.scenario_id}
+                  divider={scenarios.length !== index + 1}
+                  secondaryAction={(
+                    <ScenarioPopover
+                      scenario={scenario}
+                      actions={['Duplicate', 'Export', 'Delete']}
+                      onDelete={result => setScenarios(scenarios.filter(e => (e.scenario_id !== result)))}
+                      inList
+                    />
+                  )}
+                  disablePadding
+                >
+                  <ListItemButton
+                    component={Link}
+                    to={`/admin/scenarios/${scenario.scenario_id}`}
+                    classes={{ root: classes.item }}
                   >
-                    <ListItemButton
-                      component={Link}
-                      to={`/admin/scenarios/${scenario.scenario_id}`}
-                      classes={{ root: classes.item }}
-                    >
-                      <ListItemIcon>
-                        <MovieFilterOutlined color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={(
-                          <div className={classes.bodyItems}>
-                            {headers.map(header => (
-                              <div
-                                key={header.field}
-                                className={classes.bodyItem}
-                                style={inlineStyles[header.field]}
-                              >
-                                {header.value(scenario)}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })
+                    <ListItemIcon>
+                      <MovieFilterOutlined color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={(
+                        <div className={classes.bodyItems}>
+                          {headers.map(header => (
+                            <div
+                              key={header.field}
+                              className={classes.bodyItem}
+                              style={inlineStyles[header.field]}
+                            >
+                              {header.value(scenario)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })
         }
       </List>
       {userAdmin && (
