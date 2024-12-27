@@ -23,6 +23,7 @@ public class V3_54__TagRule extends BaseJavaMigration {
                            references tags,
                    primary key (tag_rule_id)
                );
+           CREATE INDEX idx_tag_id ON tag_rules (tag_id);
             """);
 
     select.execute(

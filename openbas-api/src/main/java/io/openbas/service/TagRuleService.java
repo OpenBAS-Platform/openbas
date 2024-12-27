@@ -120,6 +120,7 @@ public class TagRuleService {
   protected Tag createtag(final String tagName) {
     Tag tag = new Tag();
     tag.setName(tagName);
+    tag.setColor("#001bda");
     return tag;
   }
 
