@@ -114,7 +114,8 @@ public class TaniumExecutorService implements Runnable {
                   .toList();
           if (existingEndpoints.isEmpty()) {
             Optional<Endpoint> endpointByExternalReference =
-                endpointService.findByExternalReference(endpoint.getAgents().getFirst().getExternalReference());
+                endpointService.findByExternalReference(
+                    endpoint.getAgents().getFirst().getExternalReference());
             if (endpointByExternalReference.isPresent()) {
               this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
             } else {
@@ -131,7 +132,8 @@ public class TaniumExecutorService implements Runnable {
     inactiveEndpoints.forEach(
         endpoint -> {
           Optional<Endpoint> optionalExistingEndpoint =
-              this.endpointService.findByExternalReference(endpoint.getAgents().getFirst().getExternalReference());
+              this.endpointService.findByExternalReference(
+                  endpoint.getAgents().getFirst().getExternalReference());
           if (optionalExistingEndpoint.isPresent()) {
             Endpoint existingEndpoint = optionalExistingEndpoint.get();
             if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli())
@@ -152,7 +154,7 @@ public class TaniumExecutorService implements Runnable {
               TaniumEndpoint taniumEndpoint = nodeEndpoint.getNode();
               Endpoint endpoint = new Endpoint();
               Agent agent = new Agent();
-              endpoint.setExecutor(this.executor);
+              agent.setExecutor(this.executor);
               agent.setExternalReference(taniumEndpoint.getId());
               agent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
               agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
@@ -180,10 +182,13 @@ public class TaniumExecutorService implements Runnable {
     matchingExistingEndpoint.setName(external.getName());
     matchingExistingEndpoint.setIps(external.getIps());
     matchingExistingEndpoint.setHostname(external.getHostname());
-    matchingExistingEndpoint.getAgents().getFirst().setExternalReference(external.getAgents().getFirst().getExternalReference());
+    matchingExistingEndpoint
+        .getAgents()
+        .getFirst()
+        .setExternalReference(external.getAgents().getFirst().getExternalReference());
     matchingExistingEndpoint.setPlatform(external.getPlatform());
     matchingExistingEndpoint.setArch(external.getArch());
-    matchingExistingEndpoint.setExecutor(this.executor);
+    matchingExistingEndpoint.getAgents().getFirst().setExecutor(this.executor);
     if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli())
         > CLEAR_TTL) {
       try {

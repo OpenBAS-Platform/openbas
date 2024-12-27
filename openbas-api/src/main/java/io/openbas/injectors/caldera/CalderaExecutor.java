@@ -139,7 +139,8 @@ public class CalderaExecutor extends Injector {
                           if (result.contains("complete")) {
                             ExploitResult exploitResult =
                                 this.calderaService.exploitResult(
-                                    executionEndpoint.getAgents().getFirst().getExternalReference(), contract);
+                                    executionEndpoint.getAgents().getFirst().getExternalReference(),
+                                    contract);
                             asyncIds.add(exploitResult.getLinkId());
                             execution.addTrace(
                                 traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
@@ -214,7 +215,10 @@ public class CalderaExecutor extends Injector {
                                         + " using "
                                         + executionEndpoint.getProcessName()
                                         + " (paw: "
-                                        + executionEndpoint.getAgents().getFirst().getExternalReference()
+                                        + executionEndpoint
+                                            .getAgents()
+                                            .getFirst()
+                                            .getExternalReference()
                                         + ", linkID: "
                                         + exploitResult.getLinkId()
                                         + ")"));
@@ -378,8 +382,8 @@ public class CalderaExecutor extends Injector {
             newEndpoint.setHostname(assetEndpoint.getHostname());
             newEndpoint.setPlatform(assetEndpoint.getPlatform());
             newEndpoint.setArch(assetEndpoint.getArch());
-            newEndpoint.setExecutor(assetEndpoint.getExecutor());
             newEndpoint.setProcessName(agent.getExe_name());
+            newAgent.setExecutor(assetEndpoint.getAgents().getFirst().getExecutor());
             newAgent.setExternalReference(agent.getPaw());
             newAgent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
             newAgent.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);

@@ -22,12 +22,12 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
                             agent_privilege VARCHAR(255) NOT NULL,
                             agent_deployment_mode VARCHAR(255) NOT NULL,
                             agent_executed_by_user VARCHAR(255) NOT NULL,
-                            agent_executor VARCHAR(255) NOT NULL CONSTRAINT agent_executor_id_fk REFERENCES executors ON DELETE CASCADE,
+                            agent_executor VARCHAR(255) CONSTRAINT agent_executor_id_fk REFERENCES executors ON DELETE CASCADE,
                             agent_version VARCHAR(255),
                             agent_parent VARCHAR(255),
                             agent_inject VARCHAR(255) CONSTRAINT agent_inject_id_fk REFERENCES injects ON DELETE CASCADE,
                             agent_process_name VARCHAR(255),
-                            agent_external_reference VARCHAR(255) NOT NULL,
+                            agent_external_reference VARCHAR(255),
                             agent_last_seen TIMESTAMP,
                             agent_created_at TIMESTAMP DEFAULT now(),
                             agent_updated_at TIMESTAMP DEFAULT now()
@@ -85,7 +85,7 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
         ALTER TABLE assets DROP COLUMN endpoint_agent_version;
         ALTER TABLE assets DROP COLUMN asset_last_seen;
         ALTER TABLE assets DROP COLUMN asset_external_reference;
-        --ALTER TABLE assets DROP COLUMN asset_executor;
+        ALTER TABLE assets DROP COLUMN asset_executor;
         --ALTER TABLE assets DROP COLUMN asset_parent;
         --ALTER TABLE assets DROP COLUMN asset_inject;
         --ALTER TABLE assets DROP COLUMN asset_process_name;

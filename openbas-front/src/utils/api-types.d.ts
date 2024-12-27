@@ -14,16 +14,16 @@ export interface Agent {
   agent_asset: string;
   /** @format date-time */
   agent_created_at: string;
-  agent_deployment_mode: string;
+  agent_deployment_mode: "service" | "session";
   agent_executed_by_user: string;
-  agent_executor: string;
-  agent_external_reference: string;
+  agent_executor?: string;
+  agent_external_reference?: string;
   agent_id: string;
   agent_inject?: string;
   /** @format date-time */
   agent_last_seen?: string;
   agent_parent?: string;
-  agent_privilege: string;
+  agent_privilege: "admin" | "standard";
   agent_process_name?: string;
   /** @format date-time */
   agent_updated_at: string;
@@ -677,7 +677,6 @@ export interface Endpoint {
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: string;
   asset_id: string;
   asset_inject?: string;
   /** @format date-time */
@@ -3142,7 +3141,6 @@ export interface SecurityPlatform {
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: string;
   asset_external_reference?: string;
   asset_id: string;
   asset_inject?: string;

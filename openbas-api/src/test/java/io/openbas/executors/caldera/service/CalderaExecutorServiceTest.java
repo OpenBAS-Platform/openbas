@@ -74,7 +74,11 @@ public class CalderaExecutorServiceTest {
     calderaExecutorService.setExecutor(calderaExecutor);
 
     calderaAgent =
-        createAgent(CALDERA_AGENT_HOSTNAME, CALDERA_AGENT_IP, CALDERA_AGENT_EXTERNAL_REF, CALDERA_AGENT_USERNAME);
+        createAgent(
+            CALDERA_AGENT_HOSTNAME,
+            CALDERA_AGENT_IP,
+            CALDERA_AGENT_EXTERNAL_REF,
+            CALDERA_AGENT_USERNAME);
     randomAgent = createAgent("hostname", "1.1.1.1", "ref", CALDERA_AGENT_USERNAME);
     calderaEndpoint = createEndpoint(calderaAgent, calderaExecutor);
     randomEndpoint = createEndpoint(randomAgent, randomExecutor);
@@ -86,7 +90,6 @@ public class CalderaExecutorServiceTest {
   private Endpoint createEndpoint(Agent agent, Executor executor) {
     Endpoint endpoint = new Endpoint();
     io.openbas.database.model.Agent agentEndpoint = new io.openbas.database.model.Agent();
-    endpoint.setExecutor(executor);
     endpoint.setName(agent.getHost());
     endpoint.setDescription("Asset collected by Caldera executor context.");
     endpoint.setIps(agent.getHost_ip_addrs());
@@ -94,6 +97,7 @@ public class CalderaExecutorServiceTest {
     endpoint.setPlatform(CalderaExecutorService.toPlatform("windows"));
     endpoint.setArch(CalderaExecutorService.toArch("amd64"));
     endpoint.setProcessName(agent.getExe_name());
+    agentEndpoint.setExecutor(executor);
     agentEndpoint.setExternalReference(agent.getPaw());
     agentEndpoint.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
     agentEndpoint.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
@@ -148,7 +152,7 @@ public class CalderaExecutorServiceTest {
 
   @Test
   void test_findExistingEndpointForAnAgent_WITH_1_enpdoint_with_null_executor() throws Exception {
-    randomEndpoint.setExecutor(null);
+    randomEndpoint.getAgents().getFirst().setExecutor(null);
     randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);
     randomEndpoint.setIps(new String[] {CALDERA_AGENT_IP});
     Optional<Endpoint> result = calderaExecutorService.findExistingEndpointForAnAgent(calderaAgent);

@@ -87,7 +87,10 @@ public class EndpointApi {
       endpoint.getAgents().getFirst().setVersion(input.getAgentVersion());
       endpoint.setDescription(input.getDescription());
       endpoint.getAgents().getFirst().setLastSeen(Instant.now());
-      endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      endpoint
+          .getAgents()
+          .getFirst()
+          .setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
     } else {
       endpoint = new Endpoint();
       Agent agent = new Agent();
@@ -99,7 +102,7 @@ public class EndpointApi {
       agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
       agent.setExecutedByUser("nt authority\\system");
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-      endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      agent.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
       endpoint.setAgents(List.of(agent));
     }
     Endpoint updatedEndpoint = this.endpointService.updateEndpoint(endpoint);

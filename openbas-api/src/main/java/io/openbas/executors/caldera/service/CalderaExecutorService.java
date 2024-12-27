@@ -137,7 +137,8 @@ public class CalderaExecutorService implements Runnable {
       inactiveEndpoints.forEach(
           endpoint -> {
             Optional<Endpoint> optionalExistingEndpoint =
-                this.endpointService.findByExternalReference(endpoint.getAgents().getFirst().getExternalReference());
+                this.endpointService.findByExternalReference(
+                    endpoint.getAgents().getFirst().getExternalReference());
             if (optionalExistingEndpoint.isPresent()) {
               Endpoint existingEndpoint = optionalExistingEndpoint.get();
               if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli())
@@ -163,14 +164,14 @@ public class CalderaExecutorService implements Runnable {
             endpoint ->
                 Arrays.stream(endpoint.getIps())
                         .anyMatch(Arrays.asList(agent.getHost_ip_addrs())::contains)
-                    && endpoint.getExecutor() != null
-                    && CALDERA_EXECUTOR_TYPE.equals(endpoint.getExecutor().getType()))
+                    && endpoint.getAgents().getFirst().getExecutor() != null
+                    && CALDERA_EXECUTOR_TYPE.equals(
+                        endpoint.getAgents().getFirst().getExecutor().getType()))
         .findFirst();
   }
 
   private Endpoint toEndpoint(@NotNull final Agent agent) {
     Endpoint endpoint = new Endpoint();
-    endpoint.setExecutor(this.executor);
     endpoint.setName(agent.getHost());
     endpoint.setDescription("Asset collected by Caldera executor context.");
     endpoint.setIps(agent.getHost_ip_addrs());
@@ -179,6 +180,7 @@ public class CalderaExecutorService implements Runnable {
     endpoint.setArch(toArch(agent.getArchitecture()));
     endpoint.setProcessName(agent.getExe_name());
     io.openbas.database.model.Agent agentEndpoint = new io.openbas.database.model.Agent();
+    agentEndpoint.setExecutor(this.executor);
     agentEndpoint.setExternalReference(agent.getPaw());
     agentEndpoint.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
     agentEndpoint.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
@@ -197,13 +199,13 @@ public class CalderaExecutorService implements Runnable {
     existingEndpoint.getAgents().getFirst().setLastSeen(toInstant(agent.getLast_seen()));
     existingEndpoint.getAgents().getFirst().setExternalReference(agent.getPaw());
     existingEndpoint.getAgents().getFirst().setExecutedByUser(agent.getUsername());
+    existingEndpoint.getAgents().getFirst().setExecutor(this.executor);
     existingEndpoint.setName(agent.getHost());
     existingEndpoint.setIps(agent.getHost_ip_addrs());
     existingEndpoint.setHostname(agent.getHost());
     existingEndpoint.setProcessName(agent.getExe_name());
     existingEndpoint.setPlatform(toPlatform(agent.getPlatform()));
     existingEndpoint.setArch(toArch(agent.getArchitecture()));
-    existingEndpoint.setExecutor(this.executor);
     if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
       try {
         log.info("Clearing endpoint " + existingEndpoint.getHostname());

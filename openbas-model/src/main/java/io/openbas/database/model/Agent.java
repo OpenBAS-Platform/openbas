@@ -83,7 +83,6 @@ public class Agent implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("agent_executor")
   @Schema(type = "string")
-  @NotNull
   private Executor executor;
 
   @Queryable(filterable = true, sortable = true)
@@ -117,7 +116,6 @@ public class Agent implements Base {
 
   @Column(name = "agent_external_reference")
   @JsonProperty("agent_external_reference")
-  @NotBlank
   private String externalReference;
 
   @Column(name = "agent_last_seen")

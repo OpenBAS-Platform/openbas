@@ -54,7 +54,10 @@ public class CalderaExecutorClient {
   public void deleteAgent(Endpoint endpoint) {
     try {
       this.delete(
-          this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getAgents().getFirst().getExternalReference());
+          this.config.getRestApiV2Url()
+              + AGENT_URI
+              + "/"
+              + endpoint.getAgents().getFirst().getExternalReference());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
