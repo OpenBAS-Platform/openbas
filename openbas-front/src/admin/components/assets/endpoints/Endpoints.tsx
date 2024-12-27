@@ -118,7 +118,7 @@ const Endpoints = () => {
     exportKeys: [
       'asset_name',
       'asset_description',
-      'asset_last_seen', // TODO DGO OK here if we keep this attribute in asset java object (do like getActive), OK to do that ? Are there imports here ?
+      'asset_last_seen',
       'endpoint_ips',
       'endpoint_hostname',
       'endpoint_platform',

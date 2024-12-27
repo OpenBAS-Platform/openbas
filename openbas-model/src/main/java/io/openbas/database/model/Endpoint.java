@@ -10,7 +10,6 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +86,11 @@ public class Endpoint extends Asset {
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
 
-  @OneToMany(mappedBy = "asset")
+  @OneToMany(
+      mappedBy = "asset",
+      fetch =
+          FetchType.EAGER) // TODO lazy with transactions with agent repository for the "getAgents"
+  // method
   @JsonProperty("asset_agents")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();

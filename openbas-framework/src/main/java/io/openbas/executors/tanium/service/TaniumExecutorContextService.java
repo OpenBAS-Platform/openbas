@@ -11,7 +11,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Base64;
 import java.util.Objects;
 import lombok.extern.java.Log;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,8 @@ public class TaniumExecutorContextService {
     this.taniumExecutorClient = taniumExecutorClient;
   }
 
-  public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
+  public void launchExecutorSubprocess(
+      @NotNull final Inject inject, @NotNull final Endpoint assetEndpoint) {
     Injector injector =
         inject
             .getInjectorContract()
@@ -41,13 +41,9 @@ public class TaniumExecutorContextService {
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
     Endpoint.PLATFORM_TYPE platform =
-        Objects.equals(asset.getType(), "Endpoint")
-            ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
-            : null;
+        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getPlatform() : null;
     Endpoint.PLATFORM_ARCH arch =
-        Objects.equals(asset.getType(), "Endpoint")
-            ? ((Endpoint) Hibernate.unproxy(asset)).getArch()
-            : null;
+        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getArch() : null;
     if (platform == null || arch == null) {
       throw new RuntimeException("Unsupported platform: " + platform + " (arch:" + arch + ")");
     }
@@ -60,7 +56,7 @@ public class TaniumExecutorContextService {
                 .replace("\"#{location}\"", "$PWD.Path")
                 .replace("#{inject}", inject.getId());
         this.taniumExecutorClient.executeAction(
-            asset.getExternalReference(),
+            assetEndpoint.getExternalReference(),
             this.taniumExecutorConfig.getWindowsPackageId(),
             Base64.getEncoder().encodeToString(command.getBytes()));
       }
@@ -72,7 +68,7 @@ public class TaniumExecutorContextService {
                 .replace("\"#{location}\"", "$(pwd)")
                 .replace("#{inject}", inject.getId());
         this.taniumExecutorClient.executeAction(
-            asset.getExternalReference(),
+            assetEndpoint.getExternalReference(),
             this.taniumExecutorConfig.getUnixPackageId(),
             Base64.getEncoder().encodeToString(command.getBytes()));
       }
@@ -84,7 +80,7 @@ public class TaniumExecutorContextService {
                 .replace("\"#{location}\"", "$(pwd)")
                 .replace("#{inject}", inject.getId());
         this.taniumExecutorClient.executeAction(
-            asset.getExternalReference(),
+            assetEndpoint.getExternalReference(),
             this.taniumExecutorConfig.getUnixPackageId(),
             Base64.getEncoder().encodeToString(command.getBytes()));
       }

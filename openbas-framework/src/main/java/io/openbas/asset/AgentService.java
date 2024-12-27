@@ -9,5 +9,4 @@ import org.springframework.stereotype.Service;
 public class AgentService {
 
   private final AgentRepository agentRepository;
-
 }

@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -72,27 +73,28 @@ public class ExecutionExecutorService {
   }
 
   private void launchExecutorContextForAsset(Inject inject, Asset asset) {
-    Executor executor = asset.getExecutor();
+    Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(asset);
+    Executor executor = assetEndpoint.getExecutor();
     if (executor == null) {
-      log.log(Level.SEVERE, "Cannot find the executor for the asset " + asset.getName());
-    } else if (asset instanceof Endpoint && !((Endpoint)asset).getAgents().getFirst().getActive()) { // TODO DGO fix
-      throw new RuntimeException("Asset error: " + asset.getName() + " is inactive");
+      log.log(Level.SEVERE, "Cannot find the executor for the asset " + assetEndpoint.getName());
+    } else if (!assetEndpoint.getAgents().getFirst().getActive()) {
+      throw new RuntimeException("Asset error: " + assetEndpoint.getName() + " is inactive");
     } else {
       switch (executor.getType()) {
         case "openbas_caldera" -> {
           if (!this.calderaExecutorConfig.isEnable()) {
             throw new RuntimeException("Fatal error: Caldera executor is not enabled");
           }
-          this.calderaExecutorContextService.launchExecutorSubprocess(inject, asset);
+          this.calderaExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         }
         case "openbas_tanium" -> {
           if (!this.taniumExecutorConfig.isEnable()) {
             throw new RuntimeException("Fatal error: Tanium executor is not enabled");
           }
-          this.taniumExecutorContextService.launchExecutorSubprocess(inject, asset);
+          this.taniumExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         }
         case "openbas_agent" ->
-            this.openBASExecutorContextService.launchExecutorSubprocess(inject, asset);
+            this.openBASExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         default ->
             throw new RuntimeException("Fatal error: Unsupported executor " + executor.getType());
       }

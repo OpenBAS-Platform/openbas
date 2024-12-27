@@ -98,7 +98,10 @@ public class TaniumExecutorService implements Runnable {
     log.info("Running Tanium executor endpoints gathering...");
     List<NodeEndpoint> nodeEndpoints =
         this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
-    List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(endpoint -> endpoint.getAgents().getFirst().getActive()).toList();
+    List<Endpoint> endpoints =
+        toEndpoint(nodeEndpoints).stream()
+            .filter(endpoint -> endpoint.getAgents().getFirst().getActive())
+            .toList();
     log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
     endpoints.forEach(
         endpoint -> {
@@ -122,7 +125,9 @@ public class TaniumExecutorService implements Runnable {
           }
         });
     List<Endpoint> inactiveEndpoints =
-        toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getAgents().getFirst().getActive()).toList();
+        toEndpoint(nodeEndpoints).stream()
+            .filter(endpoint -> !endpoint.getAgents().getFirst().getActive())
+            .toList();
     inactiveEndpoints.forEach(
         endpoint -> {
           Optional<Endpoint> optionalExistingEndpoint =
@@ -165,7 +170,10 @@ public class TaniumExecutorService implements Runnable {
   private void updateEndpoint(
       @NotNull final Endpoint external, @NotNull final List<Endpoint> existingList) {
     Endpoint matchingExistingEndpoint = existingList.getFirst();
-    matchingExistingEndpoint.getAgents().getFirst().setLastSeen(external.getAgents().getFirst().getLastSeen());
+    matchingExistingEndpoint
+        .getAgents()
+        .getFirst()
+        .setLastSeen(external.getAgents().getFirst().getLastSeen());
     matchingExistingEndpoint.setName(external.getName());
     matchingExistingEndpoint.setIps(external.getIps());
     matchingExistingEndpoint.setHostname(external.getHostname());
