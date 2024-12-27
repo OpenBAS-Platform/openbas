@@ -306,7 +306,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         <img
           src={`/api/images/security_platforms/id/${expectationResult.sourceId}/${theme.palette.mode}`}
           alt={expectationResult.sourceId}
-          style={{ width: 0, height: 25, borderRadius: 4 }}
+          style={{ width: 25, height: 25, borderRadius: 4 }}
         />
       );
     }
