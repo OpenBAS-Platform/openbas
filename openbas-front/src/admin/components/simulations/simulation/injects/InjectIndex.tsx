@@ -6,7 +6,7 @@ import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 're
 import { fetchInjectResultOverviewOutput } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import Breadcrumbs, { BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
+import Breadcrumbs, { BACK_LABEL, BACK_URI, BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../../components/Error';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
@@ -71,6 +71,13 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
   breadcrumbs.push({ label: t('Injects') });
   breadcrumbs.push({ label: injectResultOverviewOutput.inject_title, current: true });
 
+  const computePath = (path: string) => {
+    if (backlabel && backuri) {
+      return path + `?${BACK_LABEL}=${backlabel}&${BACK_URI}=${backuri}`;
+    }
+    return path;
+  };
+
   return (
     <InjectResultOverviewOutputContext.Provider value={{ injectResultOverviewOutput, updateInjectResultOverviewOutput }}>
       <PermissionsContext.Provider value={permissionsContext}>
@@ -86,14 +93,14 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
           <Tabs value={tabValue}>
             <Tab
               component={Link}
-              to={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}`}
+              to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}`)}
               value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}`}
               label={t('Overview')}
               className={classes.item}
             />
             <Tab
               component={Link}
-              to={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`}
+              to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`)}
               value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`}
               label={t('Execution details')}
               className={classes.item}
@@ -102,7 +109,7 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
               isInjectWithPayloadInfo(injectResultOverviewOutput) && (
                 <Tab
                   component={Link}
-                  to={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`}
+                  to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`)}
                   value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`}
                   label={t('Payload info')}
                   className={classes.item}
