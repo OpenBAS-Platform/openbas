@@ -58,7 +58,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add assets')}
+          primary={t('Modify target assets')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>

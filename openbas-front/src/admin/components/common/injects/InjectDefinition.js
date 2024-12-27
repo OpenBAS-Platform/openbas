@@ -758,9 +758,6 @@ class InjectDefinition extends Component {
     const hasAssets = injectorContract.fields
       .map(f => f.key)
       .includes('assets');
-    const assets = assetIds
-      .map(a => ({ asset_id: a, ...endpointsMap[a], type: 'static' }))
-      .filter(a => a !== undefined);
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
       .map(f => f.key)
@@ -922,7 +919,7 @@ class InjectDefinition extends Component {
               {t('Targeted assets')}
             </Typography>
             <EndpointsList
-              endpoints={assets}
+              endpointIds={assetIds}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore: Endpoint property handle by EndpointsList
               actions={
