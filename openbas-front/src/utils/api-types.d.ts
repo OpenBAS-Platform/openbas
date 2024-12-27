@@ -2560,8 +2560,8 @@ export interface PageTeamOutput {
   totalPages?: number;
 }
 
-export interface PageUser {
-  content?: User[];
+export interface PageUserOutput {
+  content?: UserOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3446,6 +3446,17 @@ export interface User {
   user_theme?: string;
   /** @format date-time */
   user_updated_at: string;
+}
+
+export interface UserOutput {
+  user_admin?: boolean;
+  user_email: string;
+  user_firstname?: string;
+  user_id: string;
+  user_lastname?: string;
+  user_organization_name?: string;
+  /** @uniqueItems true */
+  user_tags?: string[];
 }
 
 export interface ValidationContent {
