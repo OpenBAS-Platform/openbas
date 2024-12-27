@@ -133,13 +133,13 @@ public class CalderaExecutor extends Injector {
                           String result =
                               this.calderaService.exploit(
                                   obfuscator,
-                                  executionEndpoint.getExternalReference(),
+                                  executionEndpoint.getAgents().getFirst().getExternalReference(),
                                   contract,
                                   additionalFields);
                           if (result.contains("complete")) {
                             ExploitResult exploitResult =
                                 this.calderaService.exploitResult(
-                                    executionEndpoint.getExternalReference(), contract);
+                                    executionEndpoint.getAgents().getFirst().getExternalReference(), contract);
                             asyncIds.add(exploitResult.getLinkId());
                             execution.addTrace(
                                 traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
@@ -214,7 +214,7 @@ public class CalderaExecutor extends Injector {
                                         + " using "
                                         + executionEndpoint.getProcessName()
                                         + " (paw: "
-                                        + executionEndpoint.getExternalReference()
+                                        + executionEndpoint.getAgents().getFirst().getExternalReference()
                                         + ", linkID: "
                                         + exploitResult.getLinkId()
                                         + ")"));
@@ -370,6 +370,7 @@ public class CalderaExecutor extends Injector {
           if (resolvedExistingEndpoint.isEmpty()) {
             log.log(Level.INFO, "Agent found and not present in the database, creating it...");
             Endpoint newEndpoint = new Endpoint();
+            io.openbas.database.model.Agent newAgent = new io.openbas.database.model.Agent();
             newEndpoint.setInject(inject);
             newEndpoint.setParent(asset);
             newEndpoint.setName(assetEndpoint.getName());
@@ -377,9 +378,13 @@ public class CalderaExecutor extends Injector {
             newEndpoint.setHostname(assetEndpoint.getHostname());
             newEndpoint.setPlatform(assetEndpoint.getPlatform());
             newEndpoint.setArch(assetEndpoint.getArch());
-            newEndpoint.setExternalReference(agent.getPaw());
             newEndpoint.setExecutor(assetEndpoint.getExecutor());
             newEndpoint.setProcessName(agent.getExe_name());
+            newAgent.setExternalReference(agent.getPaw());
+            newAgent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
+            newAgent.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
+            newAgent.setExecutedByUser(agent.getUsername());
+            newEndpoint.setAgents(List.of(newAgent));
             endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
             break;
           }

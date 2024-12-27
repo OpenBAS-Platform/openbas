@@ -678,7 +678,6 @@ export interface Endpoint {
   asset_created_at: string;
   asset_description?: string;
   asset_executor?: string;
-  asset_external_reference?: string;
   asset_id: string;
   asset_inject?: string;
   /** @format date-time */

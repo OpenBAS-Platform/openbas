@@ -114,7 +114,7 @@ public class TaniumExecutorService implements Runnable {
                   .toList();
           if (existingEndpoints.isEmpty()) {
             Optional<Endpoint> endpointByExternalReference =
-                endpointService.findByExternalReference(endpoint.getExternalReference());
+                endpointService.findByExternalReference(endpoint.getAgents().getFirst().getExternalReference());
             if (endpointByExternalReference.isPresent()) {
               this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
             } else {
@@ -131,7 +131,7 @@ public class TaniumExecutorService implements Runnable {
     inactiveEndpoints.forEach(
         endpoint -> {
           Optional<Endpoint> optionalExistingEndpoint =
-              this.endpointService.findByExternalReference(endpoint.getExternalReference());
+              this.endpointService.findByExternalReference(endpoint.getAgents().getFirst().getExternalReference());
           if (optionalExistingEndpoint.isPresent()) {
             Endpoint existingEndpoint = optionalExistingEndpoint.get();
             if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli())
@@ -153,7 +153,10 @@ public class TaniumExecutorService implements Runnable {
               Endpoint endpoint = new Endpoint();
               Agent agent = new Agent();
               endpoint.setExecutor(this.executor);
-              endpoint.setExternalReference(taniumEndpoint.getId());
+              agent.setExternalReference(taniumEndpoint.getId());
+              agent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
+              agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
+              agent.setExecutedByUser("nt authority\\system");
               endpoint.setName(taniumEndpoint.getName());
               endpoint.setDescription("Asset collected by Tanium executor context.");
               endpoint.setIps(taniumEndpoint.getIpAddresses());
@@ -177,7 +180,7 @@ public class TaniumExecutorService implements Runnable {
     matchingExistingEndpoint.setName(external.getName());
     matchingExistingEndpoint.setIps(external.getIps());
     matchingExistingEndpoint.setHostname(external.getHostname());
-    matchingExistingEndpoint.setExternalReference(external.getExternalReference());
+    matchingExistingEndpoint.getAgents().getFirst().setExternalReference(external.getAgents().getFirst().getExternalReference());
     matchingExistingEndpoint.setPlatform(external.getPlatform());
     matchingExistingEndpoint.setArch(external.getArch());
     matchingExistingEndpoint.setExecutor(this.executor);

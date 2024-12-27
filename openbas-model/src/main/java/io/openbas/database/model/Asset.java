@@ -55,10 +55,6 @@ public class Asset implements Base {
   @JsonProperty("asset_description")
   private String description;
 
-  @Column(name = "asset_external_reference")
-  @JsonProperty("asset_external_reference")
-  private String externalReference;
-
   @Column(name = "asset_process_name")
   @JsonProperty("asset_process_name")
   private String processName;

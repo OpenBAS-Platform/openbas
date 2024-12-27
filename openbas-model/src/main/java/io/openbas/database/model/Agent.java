@@ -26,6 +26,20 @@ public class Agent implements Base {
 
   public static final int ACTIVE_THRESHOLD = 1800000; // 3 minutes
 
+  public enum PRIVILEGE {
+    @JsonProperty("admin")
+    admin,
+    @JsonProperty("standard")
+    standard,
+  }
+
+  public enum DEPLOYMENT_MODE {
+    @JsonProperty("service")
+    service,
+    @JsonProperty("session")
+    session,
+  }
+
   @Id
   @Column(name = "agent_id")
   @GeneratedValue(generator = "UUID")
@@ -46,14 +60,16 @@ public class Agent implements Base {
   @Queryable(sortable = true)
   @Column(name = "agent_privilege")
   @JsonProperty("agent_privilege")
+  @Enumerated(EnumType.STRING)
   @NotBlank
-  private String privilege;
+  private PRIVILEGE privilege;
 
   @Queryable(sortable = true)
   @Column(name = "agent_deployment_mode")
   @JsonProperty("agent_deployment_mode")
+  @Enumerated(EnumType.STRING)
   @NotBlank
-  private String deploymentMode;
+  private DEPLOYMENT_MODE deploymentMode;
 
   @Queryable(sortable = true)
   @Column(name = "agent_executed_by_user")

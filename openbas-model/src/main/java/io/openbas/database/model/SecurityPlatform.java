@@ -35,6 +35,10 @@ public class SecurityPlatform extends Asset {
     ISPM,
   }
 
+  @Column(name = "asset_external_reference")
+  @JsonProperty("asset_external_reference")
+  private String externalReference;
+
   @Queryable(filterable = true, sortable = true)
   @Column(name = "security_platform_type")
   @JsonProperty("security_platform_type")

@@ -84,8 +84,8 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
         """
         ALTER TABLE assets DROP COLUMN endpoint_agent_version;
         ALTER TABLE assets DROP COLUMN asset_last_seen;
+        ALTER TABLE assets DROP COLUMN asset_external_reference;
         --ALTER TABLE assets DROP COLUMN asset_executor;
-        --ALTER TABLE assets DROP COLUMN asset_external_reference;
         --ALTER TABLE assets DROP COLUMN asset_parent;
         --ALTER TABLE assets DROP COLUMN asset_inject;
         --ALTER TABLE assets DROP COLUMN asset_process_name;

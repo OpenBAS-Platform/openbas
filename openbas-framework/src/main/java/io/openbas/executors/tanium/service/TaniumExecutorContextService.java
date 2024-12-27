@@ -56,7 +56,7 @@ public class TaniumExecutorContextService {
                 .replace("\"#{location}\"", "$PWD.Path")
                 .replace("#{inject}", inject.getId());
         this.taniumExecutorClient.executeAction(
-            assetEndpoint.getExternalReference(),
+            assetEndpoint.getAgents().getFirst().getExternalReference(),
             this.taniumExecutorConfig.getWindowsPackageId(),
             Base64.getEncoder().encodeToString(command.getBytes()));
       }
@@ -68,7 +68,7 @@ public class TaniumExecutorContextService {
                 .replace("\"#{location}\"", "$(pwd)")
                 .replace("#{inject}", inject.getId());
         this.taniumExecutorClient.executeAction(
-            assetEndpoint.getExternalReference(),
+            assetEndpoint.getAgents().getFirst().getExternalReference(),
             this.taniumExecutorConfig.getUnixPackageId(),
             Base64.getEncoder().encodeToString(command.getBytes()));
       }
@@ -80,7 +80,7 @@ public class TaniumExecutorContextService {
                 .replace("\"#{location}\"", "$(pwd)")
                 .replace("#{inject}", inject.getId());
         this.taniumExecutorClient.executeAction(
-            assetEndpoint.getExternalReference(),
+            assetEndpoint.getAgents().getFirst().getExternalReference(),
             this.taniumExecutorConfig.getUnixPackageId(),
             Base64.getEncoder().encodeToString(command.getBytes()));
       }

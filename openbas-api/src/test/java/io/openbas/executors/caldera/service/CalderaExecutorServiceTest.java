@@ -28,6 +28,7 @@ public class CalderaExecutorServiceTest {
   private static final String CALDERA_AGENT_HOSTNAME = "calderaHostname";
   private static final String CALDERA_AGENT_EXTERNAL_REF = "calderaExt";
   private static final String CALDERA_AGENT_IP = "10.10.10.10";
+  private static final String CALDERA_AGENT_USERNAME = "openbas_user";
 
   private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
   private static final String CALDERA_EXECUTOR_NAME = "Caldera";
@@ -73,8 +74,8 @@ public class CalderaExecutorServiceTest {
     calderaExecutorService.setExecutor(calderaExecutor);
 
     calderaAgent =
-        createAgent(CALDERA_AGENT_HOSTNAME, CALDERA_AGENT_IP, CALDERA_AGENT_EXTERNAL_REF);
-    randomAgent = createAgent("hostname", "1.1.1.1", "ref");
+        createAgent(CALDERA_AGENT_HOSTNAME, CALDERA_AGENT_IP, CALDERA_AGENT_EXTERNAL_REF, CALDERA_AGENT_USERNAME);
+    randomAgent = createAgent("hostname", "1.1.1.1", "ref", CALDERA_AGENT_USERNAME);
     calderaEndpoint = createEndpoint(calderaAgent, calderaExecutor);
     randomEndpoint = createEndpoint(randomAgent, randomExecutor);
 
@@ -86,7 +87,6 @@ public class CalderaExecutorServiceTest {
     Endpoint endpoint = new Endpoint();
     io.openbas.database.model.Agent agentEndpoint = new io.openbas.database.model.Agent();
     endpoint.setExecutor(executor);
-    endpoint.setExternalReference(agent.getPaw());
     endpoint.setName(agent.getHost());
     endpoint.setDescription("Asset collected by Caldera executor context.");
     endpoint.setIps(agent.getHost_ip_addrs());
@@ -94,12 +94,16 @@ public class CalderaExecutorServiceTest {
     endpoint.setPlatform(CalderaExecutorService.toPlatform("windows"));
     endpoint.setArch(CalderaExecutorService.toArch("amd64"));
     endpoint.setProcessName(agent.getExe_name());
+    agentEndpoint.setExternalReference(agent.getPaw());
+    agentEndpoint.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
+    agentEndpoint.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
+    agentEndpoint.setExecutedByUser(agent.getUsername());
     agentEndpoint.setLastSeen(calderaExecutorService.toInstant(DATE));
     endpoint.setAgents(List.of(agentEndpoint));
     return endpoint;
   }
 
-  private Agent createAgent(String hostname, String ip, String externalRef) {
+  private Agent createAgent(String hostname, String ip, String externalRef, String username) {
     Agent agent = new Agent();
     agent.setArchitecture("amd64");
     agent.setPaw(externalRef);
@@ -108,6 +112,7 @@ public class CalderaExecutorServiceTest {
     agent.setLast_seen(DATE);
     agent.setHost_ip_addrs(new String[] {ip});
     agent.setHost(hostname);
+    agent.setUsername(username);
     return agent;
   }
 

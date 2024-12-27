@@ -81,18 +81,18 @@ public class CalderaExecutorContextService {
                     List.of(Map.of("trait", "inject", "value", inject.getId()));
                 calderaExecutorClient.exploit(
                     "base64",
-                    assetEndpoint.getExternalReference(),
+                    assetEndpoint.getAgents().getFirst().getExternalReference(),
                     this.injectorExecutorAbilities.get(injector.getId()).getAbility_id(),
                     additionalFields);
               }
             });
   }
 
-  public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
+  public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Endpoint assetEndpoint) {
     if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
       calderaExecutorClient.exploit(
           "base64",
-          asset.getExternalReference(),
+          assetEndpoint.getAgents().getFirst().getExternalReference(),
           this.injectorExecutorClearAbilities.get(injector.getId()).getAbility_id(),
           List.of());
     }

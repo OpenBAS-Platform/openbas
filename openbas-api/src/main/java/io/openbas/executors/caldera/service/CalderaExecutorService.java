@@ -137,7 +137,7 @@ public class CalderaExecutorService implements Runnable {
       inactiveEndpoints.forEach(
           endpoint -> {
             Optional<Endpoint> optionalExistingEndpoint =
-                this.endpointService.findByExternalReference(endpoint.getExternalReference());
+                this.endpointService.findByExternalReference(endpoint.getAgents().getFirst().getExternalReference());
             if (optionalExistingEndpoint.isPresent()) {
               Endpoint existingEndpoint = optionalExistingEndpoint.get();
               if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli())
@@ -171,7 +171,6 @@ public class CalderaExecutorService implements Runnable {
   private Endpoint toEndpoint(@NotNull final Agent agent) {
     Endpoint endpoint = new Endpoint();
     endpoint.setExecutor(this.executor);
-    endpoint.setExternalReference(agent.getPaw());
     endpoint.setName(agent.getHost());
     endpoint.setDescription("Asset collected by Caldera executor context.");
     endpoint.setIps(agent.getHost_ip_addrs());
@@ -180,7 +179,12 @@ public class CalderaExecutorService implements Runnable {
     endpoint.setArch(toArch(agent.getArchitecture()));
     endpoint.setProcessName(agent.getExe_name());
     io.openbas.database.model.Agent agentEndpoint = new io.openbas.database.model.Agent();
+    agentEndpoint.setExternalReference(agent.getPaw());
+    agentEndpoint.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
+    agentEndpoint.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
+    agentEndpoint.setExecutedByUser(agent.getUsername());
     agentEndpoint.setLastSeen(toInstant(agent.getLast_seen()));
+    endpoint.setAgents(List.of(agentEndpoint));
     return endpoint;
   }
 
@@ -191,7 +195,8 @@ public class CalderaExecutorService implements Runnable {
   private void updateEndpoint(
       @NotNull final Agent agent, @NotNull final Endpoint existingEndpoint) {
     existingEndpoint.getAgents().getFirst().setLastSeen(toInstant(agent.getLast_seen()));
-    existingEndpoint.setExternalReference(agent.getPaw());
+    existingEndpoint.getAgents().getFirst().setExternalReference(agent.getPaw());
+    existingEndpoint.getAgents().getFirst().setExecutedByUser(agent.getUsername());
     existingEndpoint.setName(agent.getHost());
     existingEndpoint.setIps(agent.getHost_ip_addrs());
     existingEndpoint.setHostname(agent.getHost());

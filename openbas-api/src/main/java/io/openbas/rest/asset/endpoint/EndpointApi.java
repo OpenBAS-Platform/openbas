@@ -52,6 +52,7 @@ public class EndpointApi {
   private final TagRepository tagRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
 
+  // TODO DGO to delete because useless ?
   @PostMapping(ENDPOINT_URI)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
@@ -94,6 +95,9 @@ public class EndpointApi {
       agent.setExternalReference(input.getExternalReference());
       endpoint.setUpdateAttributes(input);
       agent.setLastSeen(Instant.now());
+      agent.setPrivilege(Agent.PRIVILEGE.admin);
+      agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
+      agent.setExecutedByUser("nt authority\\system");
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
       endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
       endpoint.setAgents(List.of(agent));

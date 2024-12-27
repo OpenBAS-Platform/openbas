@@ -112,7 +112,7 @@ public class CalderaInjectorClient {
       body.put("sleep_min", 3);
       body.put("sleep_max", 3);
       this.patch(
-          this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference(), body);
+          this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getAgents().getFirst().getExternalReference(), body);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -133,7 +133,7 @@ public class CalderaInjectorClient {
   public void deleteAgent(Endpoint endpoint) {
     try {
       this.delete(
-          this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getExternalReference());
+          this.config.getRestApiV2Url() + AGENT_URI + "/" + endpoint.getAgents().getFirst().getExternalReference());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
