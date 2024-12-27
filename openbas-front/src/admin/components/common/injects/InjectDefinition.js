@@ -720,7 +720,6 @@ class InjectDefinition extends Component {
       submitting,
       inject,
       injectorContract,
-      endpointsMap,
       documentsMap,
       articlesMap,
       channelsMap,
@@ -1302,13 +1301,11 @@ InjectDefinition.propTypes = {
 const select = (state) => {
   const helper = storeHelper(state);
   const documentsMap = helper.getDocumentsMap();
-  const endpointsMap = helper.getEndpointsMap();
   const channelsMap = helper.getChannelsMap();
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
   return {
     documentsMap,
-    endpointsMap,
     articlesMap,
     channelsMap,
     challengesMap,
