@@ -233,7 +233,7 @@ interface BasePayload {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -461,7 +461,7 @@ export interface Command {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -537,7 +537,7 @@ export interface DnsResolution {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -747,7 +747,7 @@ export interface Executable {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -1015,7 +1015,7 @@ export interface FileDrop {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -2081,7 +2081,7 @@ export interface NetworkTraffic {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -2543,8 +2543,8 @@ export interface PageTeamOutput {
   totalPages?: number;
 }
 
-export interface PageUser {
-  content?: User[];
+export interface PageUserOutput {
+  content?: UserOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3225,7 +3225,7 @@ export interface StatusPayload {
 
 export interface StatusPayloadOutput {
   dns_resolution_hostname?: string;
-  executable_arch?: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   executable_file?: Document;
   file_drop_file?: Document;
   network_traffic_ip_dst: string;
@@ -3440,6 +3440,17 @@ export interface User {
   user_theme?: string;
   /** @format date-time */
   user_updated_at: string;
+}
+
+export interface UserOutput {
+  user_admin?: boolean;
+  user_email: string;
+  user_firstname?: string;
+  user_id: string;
+  user_lastname?: string;
+  user_organization_name?: string;
+  /** @uniqueItems true */
+  user_tags?: string[];
 }
 
 export interface ValidationContent {

@@ -98,18 +98,14 @@ const InjectAddTeams: FunctionComponent<Props> = ({
     ],
   }), []);
 
-  const availableFilterNames = [
-    'team_tags',
-  ];
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
-
   const paginationComponent = (
     <PaginationComponentV2
       fetch={input => searchTeams(input, true)}
       searchPaginationInput={searchPaginationInput}
       setContent={setTeamValues}
       entityPrefix="team"
-      availableFilterNames={availableFilterNames}
+      availableFilterNames={['team_tags']}
       queryableHelpers={queryableHelpers}
     />
   );

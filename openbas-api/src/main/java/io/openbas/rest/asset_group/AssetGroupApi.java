@@ -11,6 +11,7 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
+import io.openbas.rest.helper.RestBehavior;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Secured(ROLE_USER)
-public class AssetGroupApi {
+public class AssetGroupApi extends RestBehavior {
 
   public static final String ASSET_GROUP_URI = "/api/asset_groups";
 
