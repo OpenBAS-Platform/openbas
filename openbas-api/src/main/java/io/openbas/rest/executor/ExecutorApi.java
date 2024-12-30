@@ -2,6 +2,8 @@ package io.openbas.rest.executor;
 
 import static io.openbas.asset.EndpointService.JFROG_BASE;
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
+import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.EndpointService;
@@ -143,6 +145,13 @@ public class ExecutorApi extends RestBehavior {
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
+    if (!AVAILABLE_PLATFORMS.contains(platform)) {
+      throw new IllegalArgumentException("Platform invalid : " + platform);
+    }
+    if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
+      throw new IllegalArgumentException("Architecture invalid : " + architecture);
+    }
+
     InputStream in = null;
     String resourcePath = "/openbas-agent/" + platform + "/" + architecture + "/";
     String filename = "";
