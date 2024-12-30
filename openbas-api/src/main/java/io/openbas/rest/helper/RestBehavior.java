@@ -206,4 +206,12 @@ public class RestBehavior {
       }
     }
   }
+
+  protected void validateUUID(final String id) {
+    try {
+      UUID.fromString(id);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("ID invalid : " + id, e);
+    }
+  }
 }

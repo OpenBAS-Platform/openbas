@@ -134,6 +134,7 @@ public class ChallengeApi extends RestBehavior {
   @PostMapping("/api/challenges/{challengeId}/try")
   public ChallengeResult tryChallenge(
       @PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input) {
+    validateUUID(challengeId);
     return challengeService.tryChallenge(challengeId, input);
   }
 
@@ -144,6 +145,9 @@ public class ChallengeApi extends RestBehavior {
       @PathVariable String challengeId,
       @Valid @RequestBody ChallengeTryInput input,
       @RequestParam Optional<String> userId) {
+    validateUUID(exerciseId);
+    validateUUID(challengeId);
+
     final User user = impersonateUser(userRepository, userId);
     if (user.getId().equals(ANONYMOUS)) {
       throw new UnsupportedOperationException("User must be logged or dynamic player is required");
