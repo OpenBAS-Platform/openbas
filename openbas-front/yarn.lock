@@ -2430,14 +2430,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.49.0":
-  version: 1.49.0
-  resolution: "@playwright/test@npm:1.49.0"
+"@playwright/test@npm:1.49.1":
+  version: 1.49.1
+  resolution: "@playwright/test@npm:1.49.1"
   dependencies:
-    playwright: "npm:1.49.0"
+    playwright: "npm:1.49.1"
   bin:
     playwright: cli.js
-  checksum: 10c0/2890d52ee45bd83b5501f17a77c77f12ba934d257fda4b288405c6d91f94b83c4fcbdff3c0be89c2aaeea3d13576b72ec9a70be667ff844b342044afd72a246e
+  checksum: 10c0/2fca0bb7b334f7a23c7c5dfa5dbe37b47794c56f39b747c8d74a2f95c339e7902a296f2f1dd32c47bdd723cfa92cee05219f1a5876725dc89a1871b9137a286d
   languageName: node
   linkType: hard
 
@@ -3434,9 +3434,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@uiw/react-md-editor@npm:4.0.4":
-  version: 4.0.4
-  resolution: "@uiw/react-md-editor@npm:4.0.4"
+"@uiw/react-md-editor@npm:4.0.5":
+  version: 4.0.5
+  resolution: "@uiw/react-md-editor@npm:4.0.5"
   dependencies:
     "@babel/runtime": "npm:^7.14.6"
     "@uiw/react-markdown-preview": "npm:^5.0.6"
@@ -3445,7 +3445,7 @@ __metadata:
   peerDependencies:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
-  checksum: 10c0/2c52458f2efa1ff64f5c399cce10ac21f07600f7f93ff2b80173b7156c9e95a091a4b025b4beaf099489421656d9930adce2922d6753d37528fc8b0c3e2198d5
+  checksum: 10c0/33ba0eed9de77bb276977773a1ec0aa1dfdef3d93f3ac9bc6f1bffd61599d08ecd9ed912b4a923dc831bf8769aff51e518ca7cd385fccea9f506a9b22639df48
   languageName: node
   linkType: hard
 
@@ -3918,14 +3918,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.7.8":
-  version: 1.7.8
-  resolution: "axios@npm:1.7.8"
+"axios@npm:1.7.9":
+  version: 1.7.9
+  resolution: "axios@npm:1.7.9"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/23ae2d0105aea9170c34ac9b6f30d9b2ab2fa8b1370205d2f7ce98b9f9510ab420148c13359ee837ea5a4bf2fb028ff225bd2fc92052fb0c478c6b4a836e2d5f
+  checksum: 10c0/b7a41e24b59fee5f0f26c1fc844b45b17442832eb3a0fb42dd4f1430eb4abc571fe168e67913e8a1d91c993232bd1d1ab03e20e4d1fee8c6147649b576fc1b0b
   languageName: node
   linkType: hard
 
@@ -4235,12 +4235,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:4.0.1":
-  version: 4.0.1
-  resolution: "chokidar@npm:4.0.1"
+"chokidar@npm:4.0.3":
+  version: 4.0.3
+  resolution: "chokidar@npm:4.0.3"
   dependencies:
     readdirp: "npm:^4.0.1"
-  checksum: 10c0/4bb7a3adc304059810bb6c420c43261a15bb44f610d77c35547addc84faa0374265c3adc67f25d06f363d9a4571962b02679268c40de07676d260de1986efea9
+  checksum: 10c0/a58b9df05bb452f7d105d9e7229ac82fa873741c0c40ddcc7bb82f8a909fbe3f7814c9ebe9bc9a2bef9b737c0ec6e2d699d179048ef06ad3ec46315df0ebe6ad
   languageName: node
   linkType: hard
 
@@ -5477,9 +5477,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-import-resolver-oxc@npm:0.6.0":
-  version: 0.6.0
-  resolution: "eslint-import-resolver-oxc@npm:0.6.0"
+"eslint-import-resolver-oxc@npm:0.7.0":
+  version: 0.7.0
+  resolution: "eslint-import-resolver-oxc@npm:0.7.0"
   dependencies:
     oxc-resolver: "npm:^2.1.1"
   peerDependencies:
@@ -5491,7 +5491,7 @@ __metadata:
       optional: true
     eslint-plugin-import-x:
       optional: true
-  checksum: 10c0/9bb309fd531f28f1c0849a25ac3a489ca138bb0fa8c2efedee583a4aaf9fa8b0993aafab2304027cde6dcc473f7fbd350df1c222b12da4d089f15f6db5d80fce
+  checksum: 10c0/012df105c7603ce3577903f8dbbf199d26b0181eb1ee63c03f16b0fe9b0cb779ca70d88dc2a79e3e385fdf674fd54f3fe7a97779e0cf9b31f0d83353cc0c30f9
   languageName: node
   linkType: hard
 
@@ -8942,7 +8942,7 @@ __metadata:
     "@mui/system": "npm:6.2.0"
     "@mui/utils": "npm:6.2.0"
     "@mui/x-date-pickers": "npm:7.23.1"
-    "@playwright/test": "npm:1.49.0"
+    "@playwright/test": "npm:1.49.1"
     "@redux-devtools/extension": "npm:3.3.0"
     "@stylistic/eslint-plugin": "npm:2.12.1"
     "@testing-library/dom": "npm:10.4.0"
@@ -8959,12 +8959,12 @@ __metadata:
     "@types/seamless-immutable": "npm:7.1.19"
     "@types/uuid": "npm:10.0.0"
     "@typescript-eslint/parser": "npm:8.18.1"
-    "@uiw/react-md-editor": "npm:4.0.4"
+    "@uiw/react-md-editor": "npm:4.0.5"
     "@vitejs/plugin-react": "npm:4.3.4"
     "@xyflow/react": "npm:12.3.6"
     apexcharts: "npm:4.0.0"
-    axios: "npm:1.7.8"
-    chokidar: "npm:4.0.1"
+    axios: "npm:1.7.9"
+    chokidar: "npm:4.0.3"
     ckeditor5: "npm:43.3.0"
     classcat: "npm:5.0.5"
     classnames: "npm:2.5.1"
@@ -8976,7 +8976,7 @@ __metadata:
     elkjs: "npm:0.9.3"
     esbuild: "npm:0.24.0"
     eslint: "npm:9.15.0"
-    eslint-import-resolver-oxc: "npm:0.6.0"
+    eslint-import-resolver-oxc: "npm:0.7.0"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
     eslint-plugin-i18next: "npm:6.1.1"
     eslint-plugin-import: "npm:2.31.0"
@@ -9304,27 +9304,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.49.0":
-  version: 1.49.0
-  resolution: "playwright-core@npm:1.49.0"
+"playwright-core@npm:1.49.1":
+  version: 1.49.1
+  resolution: "playwright-core@npm:1.49.1"
   bin:
     playwright-core: cli.js
-  checksum: 10c0/22c1a72fabdcc87bd1cd4d40a032d2c5b94cf94ba7484dc182048c3fa1c8ec26180b559d8cac4ca9870e8fd6bdf5ef9d9f54e7a31fd60d67d098fcffc5e4253b
+  checksum: 10c0/990b619c75715cd98b2c10c1180a126e3a454b247063b8352bc67792fe01183ec07f31d30c8714c3768cefed12886d1d64ac06da701f2baafc2cad9b439e3919
   languageName: node
   linkType: hard
 
-"playwright@npm:1.49.0":
-  version: 1.49.0
-  resolution: "playwright@npm:1.49.0"
+"playwright@npm:1.49.1":
+  version: 1.49.1
+  resolution: "playwright@npm:1.49.1"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.49.0"
+    playwright-core: "npm:1.49.1"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 10c0/e94d662747cd147d0573570fec90dadc013c1097595714036fc8934a075c5a82ab04a49111b03b1f762ea86429bdb7c94460901896901e20970b30ce817cc93f
+  checksum: 10c0/2368762c898920d4a0a5788b153dead45f9c36c3f5cf4d2af5228d0b8ea65823e3bbe998877950a2b9bb23a211e4633996f854c6188769dc81a25543ac818ab5
   languageName: node
   linkType: hard
 
