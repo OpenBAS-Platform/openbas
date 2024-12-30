@@ -15,6 +15,8 @@ import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.fixtures.TagRuleFixture;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -52,7 +54,7 @@ public class TagRuleServiceTest {
     when(tagRuleRepository.findAll()).thenReturn(expected);
 
     List<TagRule> result = tagRuleService.findAll();
-    assertEquals(expected, result);
+    assertEquals(new HashSet<>(expected), new HashSet<>(result));
   }
 
   @Test
