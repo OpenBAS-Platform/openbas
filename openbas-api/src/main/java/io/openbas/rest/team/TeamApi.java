@@ -69,7 +69,9 @@ public class TeamApi extends RestBehavior {
     } else {
       // We get the teams that are linked to the organizations we are part of
       User local =
-          userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
+          userRepository
+              .findById(currentUser.getId())
+              .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
       List<String> organizationIds =
           local.getGroups().stream()
               .flatMap(group -> group.getOrganizations().stream())

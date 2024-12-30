@@ -710,7 +710,10 @@ public class InjectImportService {
                           mapPatternByAllTeams));
             });
     // The user is the one doing the import
-    inject.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    inject.setUser(
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     // No exercise yet
     inject.setExercise(null);
     // No dependencies
