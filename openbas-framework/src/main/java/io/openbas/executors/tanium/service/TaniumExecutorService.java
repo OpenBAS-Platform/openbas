@@ -166,6 +166,7 @@ public class TaniumExecutorService implements Runnable {
               endpoint.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
               endpoint.setArch(toArch(taniumEndpoint.getProcessor().getArchitecture()));
               agent.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
+              agent.setAsset(endpoint);
               endpoint.setAgents(List.of(agent));
               return endpoint;
             })

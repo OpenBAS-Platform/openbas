@@ -186,6 +186,7 @@ public class CalderaExecutorService implements Runnable {
     agentEndpoint.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
     agentEndpoint.setExecutedByUser(agent.getUsername());
     agentEndpoint.setLastSeen(toInstant(agent.getLast_seen()));
+    agentEndpoint.setAsset(endpoint);
     endpoint.setAgents(List.of(agentEndpoint));
     return endpoint;
   }

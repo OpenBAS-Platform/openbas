@@ -61,14 +61,14 @@ public class Agent implements Base {
   @Column(name = "agent_privilege")
   @JsonProperty("agent_privilege")
   @Enumerated(EnumType.STRING)
-  @NotBlank
+  @NotNull
   private PRIVILEGE privilege;
 
   @Queryable(sortable = true)
   @Column(name = "agent_deployment_mode")
   @JsonProperty("agent_deployment_mode")
   @Enumerated(EnumType.STRING)
-  @NotBlank
+  @NotNull
   private DEPLOYMENT_MODE deploymentMode;
 
   @Queryable(sortable = true)

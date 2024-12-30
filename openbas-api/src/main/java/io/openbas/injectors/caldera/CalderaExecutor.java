@@ -388,6 +388,7 @@ public class CalderaExecutor extends Injector {
             newAgent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
             newAgent.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
             newAgent.setExecutedByUser(agent.getUsername());
+            newAgent.setAsset(newEndpoint);
             newEndpoint.setAgents(List.of(newAgent));
             endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
             break;

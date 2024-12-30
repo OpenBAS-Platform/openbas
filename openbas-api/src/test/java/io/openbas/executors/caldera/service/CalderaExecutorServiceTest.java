@@ -103,6 +103,7 @@ public class CalderaExecutorServiceTest {
     agentEndpoint.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
     agentEndpoint.setExecutedByUser(agent.getUsername());
     agentEndpoint.setLastSeen(calderaExecutorService.toInstant(DATE));
+    agentEndpoint.setAsset(endpoint);
     endpoint.setAgents(List.of(agentEndpoint));
     return endpoint;
   }

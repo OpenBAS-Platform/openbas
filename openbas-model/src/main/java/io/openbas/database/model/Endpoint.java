@@ -88,8 +88,9 @@ public class Endpoint extends Asset {
 
   @OneToMany(
       mappedBy = "asset",
-      fetch =
-          FetchType.EAGER) // TODO lazy with transactions with agent repository for the "getAgents"
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true) // TODO lazy with transactions with agent repository for the "getAgents"
   // method
   @JsonProperty("asset_agents")
   @JsonSerialize(using = MultiModelDeserializer.class)
