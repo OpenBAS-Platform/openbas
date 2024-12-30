@@ -102,8 +102,8 @@ const useStyles = makeStyles<Theme>(theme => ({
     border: '1px solid #00b1ff',
   },
   cardHeaderContent: {
-    overflow: "hidden"
-  }
+    overflow: 'hidden',
+  },
 }));
 
 interface Props {
@@ -552,7 +552,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         <Card key={injectExpectation.inject_expectation_id}>
                           <CardHeader
                             classes={{
-                              content: classes.cardHeaderContent
+                              content: classes.cardHeaderContent,
                             }}
                             avatar={getAvatar(injectExpectation, expectationResult)}
                             action={(
