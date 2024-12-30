@@ -1,8 +1,9 @@
 package io.openbas.schema;
 
+import static io.openbas.utils.schema.SchemaUtils.isClassInPackage;
+
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.schema.model.PropertySchemaDTO;
-import io.openbas.utils.schema.PropertySchema;
 import io.openbas.utils.schema.SchemaUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -21,15 +22,19 @@ public class SchemaApi extends RestBehavior {
       @RequestParam final boolean filterableOnly,
       @RequestBody @Valid @NotNull List<String> filterNames)
       throws ClassNotFoundException {
-    String completeClassName = "io.openbas.database.model." + className;
-    if (filterableOnly) {
-      return SchemaUtils.schemaWithSubtypes(Class.forName(completeClassName)).stream()
-          .filter(PropertySchema::isFilterable)
-          .filter(p -> filterNames.isEmpty() || filterNames.contains(p.getJsonName()))
-          .map(PropertySchemaDTO::new)
-          .toList();
+
+    final String basePackage = "io.openbas.database.model";
+
+    String completeClassName = basePackage + "." + className;
+
+    if (!isClassInPackage(basePackage, completeClassName)) {
+      throw new IllegalArgumentException("Class not found: " + completeClassName);
     }
-    return SchemaUtils.schemaWithSubtypes(Class.forName(completeClassName)).stream()
+
+    Class<?> clazz = Class.forName(completeClassName);
+
+    return SchemaUtils.schemaWithSubtypes(clazz).stream()
+        .filter(p -> !filterableOnly || p.isFilterable())
         .filter(p -> filterNames.isEmpty() || filterNames.contains(p.getJsonName()))
         .map(PropertySchemaDTO::new)
         .toList();

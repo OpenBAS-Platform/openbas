@@ -213,4 +213,13 @@ public class SchemaUtils {
   public static List<PropertySchema> getSortableProperties(List<PropertySchema> propertySchemas) {
     return propertySchemas.stream().filter(PropertySchema::isSortable).collect(Collectors.toList());
   }
+
+  public static boolean isClassInPackage(String basePackage, String className) {
+    try {
+      Class<?> clazz = Class.forName(className);
+      return clazz.getPackageName().equals(basePackage);
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+  }
 }
