@@ -35,6 +35,9 @@ public class SecurityPlatform extends Asset {
     ISPM,
   }
 
+  /**
+   * Used by collectors to set collector_id
+   */
   @Column(name = "asset_external_reference")
   @JsonProperty("asset_external_reference")
   private String externalReference;

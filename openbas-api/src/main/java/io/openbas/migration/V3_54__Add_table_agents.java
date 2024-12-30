@@ -59,9 +59,9 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
     while (results.next()) {
       statement.setObject(1, UUID.randomUUID().toString());
       statement.setString(2, results.getString("asset_id"));
-      statement.setString(3, "ADMIN");
+      statement.setString(3, "admin");
       statement.setString(
-          4, executorCalderaId.equals(results.getString("asset_executor")) ? "SESSION" : "SERVICE");
+          4, executorCalderaId.equals(results.getString("asset_executor")) ? "session" : "service");
       statement.setString(
           5,
           "Windows".equals(results.getString("endpoint_platform"))
@@ -84,7 +84,6 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
         """
         ALTER TABLE assets DROP COLUMN endpoint_agent_version;
         ALTER TABLE assets DROP COLUMN asset_last_seen;
-        ALTER TABLE assets DROP COLUMN asset_external_reference;
         ALTER TABLE assets DROP COLUMN asset_executor;
         --ALTER TABLE assets DROP COLUMN asset_parent;
         --ALTER TABLE assets DROP COLUMN asset_inject;
