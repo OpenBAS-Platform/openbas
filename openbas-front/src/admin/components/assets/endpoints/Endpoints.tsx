@@ -158,7 +158,7 @@ const Endpoints = () => {
           <ListItemSecondaryAction />
         </ListItem>
         {endpoints.map((endpoint: Endpoint) => {
-          const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
+          const executor = executorsMap[endpoint.asset_agents && endpoint.asset_agents[0].agent_executor ? endpoint.asset_agents[0].agent_executor : 'Unknown'];
           return (
             <ListItem
               key={endpoint.asset_id}

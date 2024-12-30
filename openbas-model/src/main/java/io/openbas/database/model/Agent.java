@@ -78,7 +78,7 @@ public class Agent implements Base {
   private String executedByUser;
 
   @Queryable(sortable = true)
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "agent_executor")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("agent_executor")
