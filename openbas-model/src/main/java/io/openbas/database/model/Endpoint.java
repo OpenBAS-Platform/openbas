@@ -96,11 +96,13 @@ public class Endpoint extends Asset {
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
 
+  /** Used to show Front column */
   @JsonProperty("asset_last_seen")
   public Instant getLastSeen() {
     return this.agents.getFirst().getLastSeen();
   }
 
+  /** Used to show Front column */
   @JsonProperty("asset_active")
   public boolean getActive() {
     return this.agents.getFirst().getActive();
