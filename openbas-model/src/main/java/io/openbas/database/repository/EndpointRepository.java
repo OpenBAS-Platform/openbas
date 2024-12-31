@@ -24,13 +24,13 @@ public interface EndpointRepository
 
   @Query(
       value =
-          "select e.* from assets e where e.asset_parent is null and e.asset_inject is null and e.endpoint_hostname = :hostname",
+          "select e.* from assets e left join agents a on e.asset_id = a.agent_asset where a.agent_parent is null and a.agent_inject is null and e.endpoint_hostname = :hostname",
       nativeQuery = true)
   List<Endpoint> findForInjectionByHostname(@NotBlank final @Param("hostname") String hostname);
 
   @Query(
       value =
-          "select e.* from assets e where e.asset_parent is not null or e.asset_inject is not null and e.endpoint_hostname = :hostname",
+          "select e.* from assets e left join agents a on e.asset_id = a.agent_asset where a.agent_parent is not null or a.agent_inject is not null and e.endpoint_hostname = :hostname",
       nativeQuery = true)
   List<Endpoint> findForExecutionByHostname(@NotBlank final @Param("hostname") String hostname);
 

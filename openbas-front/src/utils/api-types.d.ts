@@ -678,12 +678,9 @@ export interface Endpoint {
   asset_created_at: string;
   asset_description?: string;
   asset_id: string;
-  asset_inject?: string;
   /** @format date-time */
   asset_last_seen?: string;
   asset_name: string;
-  asset_parent?: string;
-  asset_process_name?: string;
   asset_tags?: string[];
   asset_type?: string;
   /** @format date-time */
@@ -3143,10 +3140,7 @@ export interface SecurityPlatform {
   asset_description?: string;
   asset_external_reference?: string;
   asset_id: string;
-  asset_inject?: string;
   asset_name: string;
-  asset_parent?: string;
-  asset_process_name?: string;
   asset_tags?: string[];
   asset_type?: string;
   /** @format date-time */

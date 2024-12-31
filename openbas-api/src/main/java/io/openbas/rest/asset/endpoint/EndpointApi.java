@@ -65,7 +65,10 @@ public class EndpointApi {
     agent.setLastSeen(input.getLastSeen());
     agent.setPrivilege(Agent.PRIVILEGE.admin);
     agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-    agent.setExecutedByUser("nt authority\\system");
+    agent.setExecutedByUser(
+        Endpoint.PLATFORM_TYPE.Windows.equals(input.getPlatform())
+            ? Agent.ADMIN_SYSTEM_WINDOWS
+            : Agent.ADMIN_SYSTEM_UNIX);
     agent.setAsset(endpoint);
     endpoint.setAgents(List.of(agent));
     return this.endpointService.createEndpoint(endpoint);
@@ -103,7 +106,10 @@ public class EndpointApi {
       agent.setLastSeen(Instant.now());
       agent.setPrivilege(Agent.PRIVILEGE.admin);
       agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-      agent.setExecutedByUser("nt authority\\system");
+      agent.setExecutedByUser(
+          Endpoint.PLATFORM_TYPE.Windows.equals(input.getPlatform())
+              ? Agent.ADMIN_SYSTEM_WINDOWS
+              : Agent.ADMIN_SYSTEM_UNIX);
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
       agent.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
       agent.setAsset(endpoint);
@@ -112,7 +118,7 @@ public class EndpointApi {
     Endpoint updatedEndpoint = this.endpointService.updateEndpoint(endpoint);
     // If agent is not temporary and not the same version as the platform => Create an upgrade task
     // for the agent
-    if (updatedEndpoint.getParent() == null
+    if (updatedEndpoint.getAgents().getFirst().getParent() == null
         && !updatedEndpoint.getAgents().getFirst().getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(

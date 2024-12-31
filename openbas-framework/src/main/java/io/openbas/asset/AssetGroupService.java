@@ -120,8 +120,11 @@ public class AssetGroupService {
     Specification<Endpoint> specification = computeFilterGroupJpa(assetGroup.getDynamicFilter());
     List<Asset> assets =
         this.endpointService.endpoints(specification).stream()
+            .filter(
+                endpoint ->
+                    endpoint.getAgents().getFirst().getParent() == null
+                        && endpoint.getAgents().getFirst().getInject() == null)
             .map(endpoint -> (Asset) endpoint)
-            .filter(asset -> asset.getParent() == null && asset.getInject() == null)
             .distinct()
             .toList();
     assetGroup.setDynamicAssets(assets);
@@ -143,7 +146,9 @@ public class AssetGroupService {
                       computeFilterGroupJpa(assetGroup.getAssetGroupDynamicFilter());
                   return this.endpointService.endpoints(specification).stream()
                       .filter(
-                          endpoint -> endpoint.getParent() == null && endpoint.getInject() == null)
+                          endpoint ->
+                              endpoint.getAgents().getFirst().getParent() == null
+                                  && endpoint.getAgents().getFirst().getInject() == null)
                       .distinct()
                       .toList();
                 }));

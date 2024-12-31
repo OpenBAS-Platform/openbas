@@ -86,9 +86,9 @@ public class V3_54__Add_table_agents extends BaseJavaMigration {
         ALTER TABLE assets DROP COLUMN asset_last_seen;
         ALTER TABLE assets DROP COLUMN asset_executor;
         -- can't drop asset_external_reference because used for securityPlatform
-        --ALTER TABLE assets DROP COLUMN asset_parent;
-        --ALTER TABLE assets DROP COLUMN asset_inject;
-        --ALTER TABLE assets DROP COLUMN asset_process_name;
+        ALTER TABLE assets DROP COLUMN asset_parent;
+        ALTER TABLE assets DROP COLUMN asset_inject;
+        ALTER TABLE assets DROP COLUMN asset_process_name;
 """);
   }
 }

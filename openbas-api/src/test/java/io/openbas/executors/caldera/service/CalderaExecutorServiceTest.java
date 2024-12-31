@@ -96,7 +96,7 @@ public class CalderaExecutorServiceTest {
     endpoint.setHostname(agent.getHost());
     endpoint.setPlatform(CalderaExecutorService.toPlatform("windows"));
     endpoint.setArch(CalderaExecutorService.toArch("amd64"));
-    endpoint.setProcessName(agent.getExe_name());
+    agentEndpoint.setProcessName(agent.getExe_name());
     agentEndpoint.setExecutor(executor);
     agentEndpoint.setExternalReference(agent.getPaw());
     agentEndpoint.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);

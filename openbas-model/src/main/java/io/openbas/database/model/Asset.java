@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -55,10 +54,6 @@ public class Asset implements Base {
   @JsonProperty("asset_description")
   private String description;
 
-  @Column(name = "asset_process_name")
-  @JsonProperty("asset_process_name")
-  private String processName;
-
   @Column(name = "asset_cleared_at")
   @JsonProperty("asset_cleared_at")
   private Instant clearedAt = now();
@@ -75,20 +70,6 @@ public class Asset implements Base {
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("asset_tags")
   private Set<Tag> tags = new HashSet<>();
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "asset_parent")
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("asset_parent")
-  @Schema(type = "string")
-  private Asset parent;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "asset_inject")
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("asset_inject")
-  @Schema(type = "string")
-  private Inject inject;
 
   // -- AUDIT --
 

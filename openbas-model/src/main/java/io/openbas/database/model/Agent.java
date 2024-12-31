@@ -26,6 +26,9 @@ public class Agent implements Base {
 
   public static final int ACTIVE_THRESHOLD = 1800000; // 3 minutes
 
+  public static final String ADMIN_SYSTEM_WINDOWS = "nt authority\\system";
+  public static final String ADMIN_SYSTEM_UNIX = "root";
+
   public enum PRIVILEGE {
     @JsonProperty("admin")
     admin,
@@ -90,14 +93,16 @@ public class Agent implements Base {
   @JsonProperty("agent_version")
   private String version;
 
-  @ManyToOne
+  /** Used for Caldera only */
+  @ManyToOne(fetch = FetchType.EAGER)
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JoinColumn(name = "agent_parent")
   @JsonProperty("agent_parent")
   @Schema(type = "string")
   private Agent parent;
 
-  @OneToOne
+  /** Used for Caldera only */
+  @OneToOne(fetch = FetchType.EAGER)
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JoinColumn(name = "agent_inject")
   @JsonProperty("agent_inject")
@@ -110,6 +115,7 @@ public class Agent implements Base {
         && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
   }
 
+  /** Used for Caldera only */
   @Column(name = "agent_process_name")
   @JsonProperty("agent_process_name")
   private String processName;

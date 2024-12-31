@@ -178,7 +178,6 @@ public class CalderaExecutorService implements Runnable {
     endpoint.setHostname(agent.getHost());
     endpoint.setPlatform(toPlatform(agent.getPlatform()));
     endpoint.setArch(toArch(agent.getArchitecture()));
-    endpoint.setProcessName(agent.getExe_name());
     io.openbas.database.model.Agent agentEndpoint = new io.openbas.database.model.Agent();
     agentEndpoint.setExecutor(this.executor);
     agentEndpoint.setExternalReference(agent.getPaw());
@@ -186,6 +185,7 @@ public class CalderaExecutorService implements Runnable {
     agentEndpoint.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
     agentEndpoint.setExecutedByUser(agent.getUsername());
     agentEndpoint.setLastSeen(toInstant(agent.getLast_seen()));
+    agentEndpoint.setProcessName(agent.getExe_name());
     agentEndpoint.setAsset(endpoint);
     endpoint.setAgents(List.of(agentEndpoint));
     return endpoint;
@@ -204,7 +204,7 @@ public class CalderaExecutorService implements Runnable {
     existingEndpoint.setName(agent.getHost());
     existingEndpoint.setIps(agent.getHost_ip_addrs());
     existingEndpoint.setHostname(agent.getHost());
-    existingEndpoint.setProcessName(agent.getExe_name());
+    existingEndpoint.getAgents().getFirst().setProcessName(agent.getExe_name());
     existingEndpoint.setPlatform(toPlatform(agent.getPlatform()));
     existingEndpoint.setArch(toArch(agent.getArchitecture()));
     if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli()) > CLEAR_TTL) {

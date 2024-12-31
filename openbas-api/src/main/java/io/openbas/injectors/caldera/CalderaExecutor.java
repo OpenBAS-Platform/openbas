@@ -145,7 +145,13 @@ public class CalderaExecutor extends Injector {
                             execution.addTrace(
                                 traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
                             // Compute expectations
-                            boolean isInGroup = assets.get(executionEndpoint.getParent());
+                            boolean isInGroup =
+                                assets.get(
+                                    executionEndpoint
+                                        .getAgents()
+                                        .getFirst()
+                                        .getParent()
+                                        .getAsset());
                             List<InjectExpectationSignature> injectExpectationSignatures =
                                 new ArrayList<>();
                             if (injectorContract.getPayload() != null) {
@@ -154,7 +160,11 @@ public class CalderaExecutor extends Injector {
                                   injectExpectationSignatures.add(
                                       InjectExpectationSignature.builder()
                                           .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                                          .value(executionEndpoint.getProcessName())
+                                          .value(
+                                              executionEndpoint
+                                                  .getAgents()
+                                                  .getFirst()
+                                                  .getProcessName())
                                           .build());
                                   break;
                                 case PayloadType.EXECUTABLE:
@@ -199,13 +209,14 @@ public class CalderaExecutor extends Injector {
                               injectExpectationSignatures.add(
                                   InjectExpectationSignature.builder()
                                       .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                                      .value(executionEndpoint.getProcessName())
+                                      .value(
+                                          executionEndpoint.getAgents().getFirst().getProcessName())
                                       .build());
                             }
                             computeExpectationsForAsset(
                                 expectations,
                                 content,
-                                executionEndpoint.getParent(),
+                                executionEndpoint.getAgents().getFirst().getParent().getAsset(),
                                 isInGroup,
                                 injectExpectationSignatures);
                             execution.addTrace(
@@ -213,7 +224,7 @@ public class CalderaExecutor extends Injector {
                                     "Caldera executed the ability on asset "
                                         + asset.getName()
                                         + " using "
-                                        + executionEndpoint.getProcessName()
+                                        + executionEndpoint.getAgents().getFirst().getProcessName()
                                         + " (paw: "
                                         + executionEndpoint
                                             .getAgents()
@@ -375,14 +386,14 @@ public class CalderaExecutor extends Injector {
             log.log(Level.INFO, "Agent found and not present in the database, creating it...");
             Endpoint newEndpoint = new Endpoint();
             io.openbas.database.model.Agent newAgent = new io.openbas.database.model.Agent();
-            newEndpoint.setInject(inject);
-            newEndpoint.setParent(asset);
+            newAgent.setInject(inject);
+            newAgent.setParent(assetEndpoint.getAgents().getFirst());
             newEndpoint.setName(assetEndpoint.getName());
             newEndpoint.setIps(assetEndpoint.getIps());
             newEndpoint.setHostname(assetEndpoint.getHostname());
             newEndpoint.setPlatform(assetEndpoint.getPlatform());
             newEndpoint.setArch(assetEndpoint.getArch());
-            newEndpoint.setProcessName(agent.getExe_name());
+            newAgent.setProcessName(agent.getExe_name());
             newAgent.setExecutor(assetEndpoint.getAgents().getFirst().getExecutor());
             newAgent.setExternalReference(agent.getPaw());
             newAgent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
