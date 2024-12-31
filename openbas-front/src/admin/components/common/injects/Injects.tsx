@@ -139,8 +139,7 @@ const Injects: FunctionComponent<Props> = ({
               />
             )
           : <InjectorContract variant="list" label={t('Deleted')} deleted />;
-      }
-      ,
+      },
     },
     {
       field: 'inject_title',

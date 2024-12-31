@@ -1,15 +1,5 @@
 import { ControlPointOutlined, GroupsOutlined } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -39,12 +29,12 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  handleAddTeams: (teamIds: string[]) => void;
+  handleModifyTeams: (teamIds: string[]) => void;
   injectTeamsIds: string[];
 }
 
 const InjectAddTeams: FunctionComponent<Props> = ({
-  handleAddTeams,
+  handleModifyTeams,
   injectTeamsIds,
 }) => {
   // Standard hooks
@@ -65,7 +55,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
   };
 
   const submitAddTeams = () => {
-    handleAddTeams(selectedTeamValues.map(v => v.team_id).filter(id => !injectTeamsIds.includes(id)));
+    handleModifyTeams(selectedTeamValues.map(v => v.team_id));
     handleClose();
   };
 
@@ -127,7 +117,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add target teams')}
+          primary={t('Modify target teams')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
@@ -145,7 +135,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
           },
         }}
       >
-        <DialogTitle>{t('Add target teams in this inject')}</DialogTitle>
+        <DialogTitle>{t('Modify target teams in this inject')}</DialogTitle>
         <DialogContent>
           <Box sx={{ marginTop: 2 }}>
             <SelectList
@@ -171,7 +161,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
         <DialogActions>
           <Button onClick={handleClose}>{t('Cancel')}</Button>
           <Button color="secondary" onClick={submitAddTeams}>
-            {t('Add')}
+            {t('Update')}
           </Button>
         </DialogActions>
       </Dialog>

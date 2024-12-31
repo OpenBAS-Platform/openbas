@@ -31,11 +31,13 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../../utils/utils';
+import { TeamContext } from '../../../common/Context';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import InjectPopover from '../../../common/injects/InjectPopover';
 import UpdateInject from '../../../common/injects/UpdateInject';
 import AnimationMenu from '../AnimationMenu';
+import teamContextForExercise from '../teams/teamContextForExercise';
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 
@@ -122,6 +124,8 @@ const TimelineOverview = () => {
       await dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
     }
   };
+
+  const teamContext = teamContextForExercise(exerciseId, []);
 
   return (
     <div className={classes.root}>
@@ -326,14 +330,16 @@ const TimelineOverview = () => {
         </Grid>
       </Grid>
       {selectedInjectId && (
-        <UpdateInject
-          open={selectedInjectId !== null}
-          handleClose={() => setSelectedInjectId(null)}
-          onUpdateInject={onUpdateInject}
-          injectId={selectedInjectId}
-          isAtomic={false}
-          injects={injects}
-        />
+        <TeamContext.Provider value={teamContext}>
+          <UpdateInject
+            open={selectedInjectId !== null}
+            handleClose={() => setSelectedInjectId(null)}
+            onUpdateInject={onUpdateInject}
+            injectId={selectedInjectId}
+            isAtomic={false}
+            injects={injects}
+          />
+        </TeamContext.Provider>
       )}
     </div>
   );

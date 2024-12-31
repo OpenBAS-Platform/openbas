@@ -29,6 +29,12 @@ export const fetchEndpoints = () => (dispatch: Dispatch) => {
 
 export const searchEndpoints = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
-  const uri = '/api/endpoints/search';
+  const uri = `${ENDPOINT_URI}/search`;
+  return simplePostCall(uri, data);
+};
+
+export const findEndpoints = (endpointIds: string[]) => {
+  const data = endpointIds;
+  const uri = `${ENDPOINT_URI}/find`;
   return simplePostCall(uri, data);
 };
