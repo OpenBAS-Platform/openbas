@@ -412,9 +412,9 @@ class InjectDefinition extends Component {
   }
 
   // Teams
-  handleAddTeams(teamsIds) {
+  handleModifyTeams(teamsIds) {
     this.setState({
-      teamsIds: [...this.state.teamsIds, ...teamsIds],
+      teamsIds: [...teamsIds],
     }, () => this.props.setInjectDetailsState(this.state));
   }
 
@@ -973,7 +973,6 @@ class InjectDefinition extends Component {
       submitting,
       inject,
       injectorContract,
-      endpointsMap,
       documentsMap,
       articlesMap,
       channelsMap,
@@ -1011,9 +1010,6 @@ class InjectDefinition extends Component {
     const hasAssets = injectorContract.fields
       .map(f => f.key)
       .includes('assets');
-    const assets = assetIds
-      .map(a => ({ asset_id: a, ...endpointsMap[a], type: 'static' }))
-      .filter(a => a !== undefined);
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
       .map(f => f.key)
@@ -1163,7 +1159,7 @@ class InjectDefinition extends Component {
                     />
                     <InjectAddTeams
                       injectTeamsIds={teamsIds}
-                      handleAddTeams={this.handleAddTeams.bind(this)}
+                      handleModifyTeams={this.handleModifyTeams.bind(this)}
                     />
                   </>
                 )}
@@ -1176,7 +1172,7 @@ class InjectDefinition extends Component {
                 {t('Targeted assets')}
               </Typography>
               <EndpointsList
-                endpoints={assets}
+                endpointIds={assetIds}
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore: Endpoint property handle by EndpointsList
                 actions={
@@ -1560,13 +1556,11 @@ InjectDefinition.propTypes = {
 const select = (state) => {
   const helper = storeHelper(state);
   const documentsMap = helper.getDocumentsMap();
-  const endpointsMap = helper.getEndpointsMap();
   const channelsMap = helper.getChannelsMap();
   const articlesMap = helper.getArticlesMap();
   const challengesMap = helper.getChallengesMap();
   return {
     documentsMap,
-    endpointsMap,
     articlesMap,
     channelsMap,
     challengesMap,

@@ -52,7 +52,7 @@ const InjectAddAssetGroups: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add asset groups')}
+          primary={t('Modify target asset groups')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>

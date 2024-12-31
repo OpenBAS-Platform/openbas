@@ -263,9 +263,9 @@ class QuickInject extends Component {
     this.setState({ openVariables: false });
   }
 
-  handleAddTeams(teamsIds) {
+  handleModifyTeams(teamsIds) {
     this.setState({
-      teamsIds: [...this.state.teamsIds, ...teamsIds],
+      teamsIds: [...teamsIds],
     });
   }
 
@@ -1146,7 +1146,7 @@ class QuickInject extends Component {
                           ))}
                           <InjectAddTeams
                             injectTeamsIds={teamsIds}
-                            handleAddTeams={this.handleAddTeams.bind(
+                            handleModifyTeams={this.handleModifyTeams.bind(
                               this,
                             )}
                           />
