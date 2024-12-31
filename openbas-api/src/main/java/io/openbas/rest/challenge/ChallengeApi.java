@@ -17,6 +17,7 @@ import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.InputValidationException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.ChallengeService;
 import jakarta.transaction.Transactional;
@@ -133,7 +134,8 @@ public class ChallengeApi extends RestBehavior {
 
   @PostMapping("/api/challenges/{challengeId}/try")
   public ChallengeResult tryChallenge(
-      @PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input) {
+      @PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input)
+      throws InputValidationException {
     validateUUID(challengeId);
     return challengeService.tryChallenge(challengeId, input);
   }
@@ -144,7 +146,8 @@ public class ChallengeApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String challengeId,
       @Valid @RequestBody ChallengeTryInput input,
-      @RequestParam Optional<String> userId) {
+      @RequestParam Optional<String> userId)
+      throws InputValidationException {
     validateUUID(exerciseId);
     validateUUID(challengeId);
 
