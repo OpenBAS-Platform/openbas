@@ -40,7 +40,7 @@ public class FullTextSearchApi extends RestBehavior {
     Class<?> clazzUnknown = Class.forName(clazz);
 
     if (!this.fullTextSearchService.getAllowedClass().contains(clazzUnknown)) {
-      throw new IllegalArgumentException("Classe non autorisée : " + clazz);
+      throw new IllegalArgumentException("Class not allowed : " + clazz);
     }
 
     return this.fullTextSearchService.fullTextSearch(clazzUnknown, searchPaginationInput);

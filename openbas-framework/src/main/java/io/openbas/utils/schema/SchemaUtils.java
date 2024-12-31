@@ -214,12 +214,15 @@ public class SchemaUtils {
     return propertySchemas.stream().filter(PropertySchema::isSortable).collect(Collectors.toList());
   }
 
-  public static boolean isClassInPackage(String basePackage, String className) {
+  public static Class<?> computeAndValidateClassPackage(String basePackage, String className) {
     try {
       Class<?> clazz = Class.forName(className);
-      return clazz.getPackageName().equals(basePackage);
+      if (!clazz.getPackageName().equals(basePackage)) {
+        throw new IllegalArgumentException("Class not allowed: " + className);
+      }
+      return clazz;
     } catch (ClassNotFoundException e) {
-      return false;
+      return null;
     }
   }
 }

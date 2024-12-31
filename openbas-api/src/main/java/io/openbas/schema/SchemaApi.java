@@ -1,6 +1,6 @@
 package io.openbas.schema;
 
-import static io.openbas.utils.schema.SchemaUtils.isClassInPackage;
+import static io.openbas.utils.schema.SchemaUtils.computeAndValidateClassPackage;
 
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.schema.model.PropertySchemaDTO;
@@ -27,11 +27,7 @@ public class SchemaApi extends RestBehavior {
 
     String completeClassName = basePackage + "." + className;
 
-    if (!isClassInPackage(basePackage, completeClassName)) {
-      throw new IllegalArgumentException("Class not found: " + completeClassName);
-    }
-
-    Class<?> clazz = Class.forName(completeClassName);
+    Class<?> clazz = computeAndValidateClassPackage(basePackage, completeClassName);
 
     return SchemaUtils.schemaWithSubtypes(clazz).stream()
         .filter(p -> !filterableOnly || p.isFilterable())
