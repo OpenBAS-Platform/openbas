@@ -16,6 +16,10 @@ import io.openbas.rest.executor.form.ExecutorCreateInput;
 import io.openbas.rest.executor.form.ExecutorUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.FileService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -140,11 +144,37 @@ public class ExecutorApi extends RestBehavior {
   }
 
   // Public API
+  @Operation(
+      summary = "Retrieve OpenBAS Agent Executable",
+      description =
+          "Downloads the OpenBAS agent executable for a specified platform and architecture.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved the executable."),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid platform or architecture specified."),
+      })
   @GetMapping(
       value = "/api/agent/executable/openbas/{platform}/{architecture}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentExecutable(
-      @PathVariable String platform, @PathVariable String architecture) throws IOException {
+      @Parameter(
+              description =
+                  "Target platform for the agent installation (e.g., windows, linux, mac). Case insensitive.",
+              required = true)
+          @PathVariable
+          String platform,
+      @Parameter(
+              description =
+                  "Target architecture for the agent installation (e.g., x86_64, arm64). Case insensitive.",
+              required = true)
+          @PathVariable
+          String architecture)
+      throws IOException {
+    platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
+    architecture = Optional.ofNullable(architecture).map(String::toLowerCase).orElse("");
+
     if (!AVAILABLE_PLATFORMS.contains(platform)) {
       throw new IllegalArgumentException("Platform invalid : " + platform);
     }
@@ -179,11 +209,46 @@ public class ExecutorApi extends RestBehavior {
   }
 
   // Public API
+  @Operation(
+      summary = "Retrieve OpenBAS Agent Package",
+      description =
+          "Downloads the OpenBAS agent package for the specified platform and architecture.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved the agent package."),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid platform or architecture specified."),
+      })
   @GetMapping(
-      value = "/api/agent/package/openbas/{platform}/{architecture}",
+      value = "/{platform}/{architecture}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(
-      @PathVariable String platform, @PathVariable String architecture) throws IOException {
+      @Parameter(
+              description =
+                  "Target platform for the agent package (e.g., windows, linux, mac). Case insensitive.",
+              required = true)
+          @PathVariable
+          String platform,
+      @Parameter(
+              description =
+                  "Target architecture for the agent package (e.g., x86, x64, arm). Case insensitive.",
+              required = true)
+          @PathVariable
+          String architecture)
+      throws IOException {
+    platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
+    architecture = Optional.ofNullable(architecture).map(String::toLowerCase).orElse("");
+
+    if (!AVAILABLE_PLATFORMS.contains(platform)) {
+      throw new IllegalArgumentException("Platform invalid : " + platform);
+    }
+    if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
+      throw new IllegalArgumentException("Architecture invalid : " + architecture);
+    }
+
     byte[] file = null;
     String filename = null;
 
@@ -217,9 +282,34 @@ public class ExecutorApi extends RestBehavior {
   }
 
   // Public API
+  @Operation(
+      summary = "Retrieve OpenBAS Agent Installer Command",
+      description =
+          "Generates the installation command for the OpenBAS agent for the specified platform and token.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully generated the install command."),
+        @ApiResponse(responseCode = "400", description = "Invalid platform specified."),
+        @ApiResponse(responseCode = "404", description = "Token not found."),
+      })
   @GetMapping(value = "/api/agent/installer/openbas/{platform}/{token}")
   public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(
-      @PathVariable String platform, @PathVariable String token) throws IOException {
+      @Parameter(
+              description =
+                  "Target platform for the agent installation (e.g., windows, linux, mac). Case insensitive.",
+              required = true)
+          @PathVariable
+          String platform,
+      @Parameter(
+              description = "Unique token associated with the agent installation.",
+              required = true)
+          @PathVariable
+          String token)
+      throws IOException {
+    platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
+
     if (!AVAILABLE_PLATFORMS.contains(platform)) {
       throw new IllegalArgumentException("Platform invalid : " + platform);
     }
