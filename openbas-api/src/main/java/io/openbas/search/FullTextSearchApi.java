@@ -37,13 +37,11 @@ public class FullTextSearchApi extends RestBehavior {
       @PathVariable @NotBlank final String clazz,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput)
       throws ClassNotFoundException {
-    Class<?> clazzUnknown = Class.forName(clazz);
-
-    if (!this.fullTextSearchService.getAllowedClass().contains(clazzUnknown)) {
+    if (!this.fullTextSearchService.getAllowedClass().contains(clazz)) {
       throw new IllegalArgumentException("Class not allowed : " + clazz);
     }
 
-    return this.fullTextSearchService.fullTextSearch(clazzUnknown, searchPaginationInput);
+    return this.fullTextSearchService.fullTextSearch(Class.forName(clazz), searchPaginationInput);
   }
 
   @Data

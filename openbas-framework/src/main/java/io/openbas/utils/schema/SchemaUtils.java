@@ -17,6 +17,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SchemaUtils {
@@ -214,15 +215,9 @@ public class SchemaUtils {
     return propertySchemas.stream().filter(PropertySchema::isSortable).collect(Collectors.toList());
   }
 
-  public static Class<?> computeAndValidateClassPackage(String basePackage, String className) {
-    try {
-      Class<?> clazz = Class.forName(className);
-      if (!clazz.getPackageName().equals(basePackage)) {
-        throw new IllegalArgumentException("Class not allowed: " + className);
-      }
-      return clazz;
-    } catch (ClassNotFoundException e) {
-      return null;
-    }
+  public static boolean isValidClassName(String className) {
+    String regex = "^[a-zA-Z_][a-zA-Z0-9_]*$";
+    Pattern pattern = Pattern.compile(regex);
+    return pattern.matcher(className).matches();
   }
 }

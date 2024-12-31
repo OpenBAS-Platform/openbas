@@ -1,6 +1,6 @@
 package io.openbas.schema;
 
-import static io.openbas.utils.schema.SchemaUtils.computeAndValidateClassPackage;
+import static io.openbas.utils.schema.SchemaUtils.isValidClassName;
 
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.schema.model.PropertySchemaDTO;
@@ -25,9 +25,12 @@ public class SchemaApi extends RestBehavior {
 
     final String basePackage = "io.openbas.database.model";
 
+    if (!isValidClassName(className)) {
+      throw new IllegalArgumentException("Class not allowed : " + className);
+    }
     String completeClassName = basePackage + "." + className;
 
-    Class<?> clazz = computeAndValidateClassPackage(basePackage, completeClassName);
+    Class<?> clazz = Class.forName(completeClassName);
 
     return SchemaUtils.schemaWithSubtypes(clazz).stream()
         .filter(p -> !filterableOnly || p.isFilterable())

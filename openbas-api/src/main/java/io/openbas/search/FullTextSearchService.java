@@ -210,8 +210,8 @@ public class FullTextSearchService<T extends Base> {
         .collect(Collectors.joining(" & "));
   }
 
-  public Set<Class<T>> getAllowedClass() {
-    return this.repositoryMap.keySet();
+  public List<String> getAllowedClass() {
+    return this.repositoryMap.keySet().stream().map(Class::getName).toList();
   }
 
   @AllArgsConstructor
