@@ -220,6 +220,9 @@ public class ExecutorApi extends RestBehavior {
   @GetMapping(value = "/api/agent/installer/openbas/{platform}/{token}")
   public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(
       @PathVariable String platform, @PathVariable String token) throws IOException {
+    if (!AVAILABLE_PLATFORMS.contains(platform)) {
+      throw new IllegalArgumentException("Platform invalid : " + platform);
+    }
     Optional<Token> resolvedToken = tokenRepository.findByValue(token);
     if (resolvedToken.isEmpty()) {
       throw new UnsupportedOperationException("Invalid token");
