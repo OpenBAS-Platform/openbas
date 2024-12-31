@@ -17,6 +17,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SchemaUtils {
@@ -212,5 +213,11 @@ public class SchemaUtils {
 
   public static List<PropertySchema> getSortableProperties(List<PropertySchema> propertySchemas) {
     return propertySchemas.stream().filter(PropertySchema::isSortable).collect(Collectors.toList());
+  }
+
+  public static boolean isValidClassName(String className) {
+    String regex = "^[a-zA-Z_][a-zA-Z0-9_]*$";
+    Pattern pattern = Pattern.compile(regex);
+    return pattern.matcher(className).matches();
   }
 }
