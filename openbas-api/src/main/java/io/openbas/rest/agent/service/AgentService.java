@@ -1,4 +1,4 @@
-package io.openbas.asset;
+package io.openbas.rest.agent.service;
 
 import io.openbas.database.repository.AgentRepository;
 import lombok.RequiredArgsConstructor;

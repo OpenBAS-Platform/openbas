@@ -11,6 +11,7 @@ import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
+import io.openbas.database.specification.EndpointSpecification;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -118,12 +119,9 @@ public class AssetGroupService {
       return assetGroup;
     }
     Specification<Endpoint> specification = computeFilterGroupJpa(assetGroup.getDynamicFilter());
+    Specification<Endpoint> specification2 = EndpointSpecification.findEndpointsForInjection();
     List<Asset> assets =
-        this.endpointService.endpoints(specification).stream()
-            .filter(
-                endpoint ->
-                    endpoint.getAgents().getFirst().getParent() == null
-                        && endpoint.getAgents().getFirst().getInject() == null)
+        this.endpointService.endpoints(specification.and(specification2)).stream()
             .map(endpoint -> (Asset) endpoint)
             .distinct()
             .toList();
@@ -144,11 +142,9 @@ public class AssetGroupService {
                 assetGroup -> {
                   Specification<Endpoint> specification =
                       computeFilterGroupJpa(assetGroup.getAssetGroupDynamicFilter());
-                  return this.endpointService.endpoints(specification).stream()
-                      .filter(
-                          endpoint ->
-                              endpoint.getAgents().getFirst().getParent() == null
-                                  && endpoint.getAgents().getFirst().getInject() == null)
+                  Specification<Endpoint> specification2 =
+                      EndpointSpecification.findEndpointsForInjection();
+                  return this.endpointService.endpoints(specification.and(specification2)).stream()
                       .distinct()
                       .toList();
                 }));

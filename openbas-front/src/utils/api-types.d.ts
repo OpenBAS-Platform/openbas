@@ -677,6 +677,7 @@ export interface Endpoint {
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
+  asset_executor?: string;
   asset_id: string;
   /** @format date-time */
   asset_last_seen?: string;

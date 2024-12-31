@@ -131,9 +131,7 @@ public class CalderaExecutorService implements Runnable {
             }
           });
       List<Endpoint> inactiveEndpoints =
-          toEndpoint(agents).stream()
-              .filter(endpoint -> !endpoint.getAgents().getFirst().getActive())
-              .toList();
+          toEndpoint(agents).stream().filter(endpoint -> !endpoint.getActive()).toList();
       inactiveEndpoints.forEach(
           endpoint -> {
             Optional<Endpoint> optionalExistingEndpoint =
@@ -164,9 +162,8 @@ public class CalderaExecutorService implements Runnable {
             endpoint ->
                 Arrays.stream(endpoint.getIps())
                         .anyMatch(Arrays.asList(agent.getHost_ip_addrs())::contains)
-                    && endpoint.getAgents().getFirst().getExecutor() != null
-                    && CALDERA_EXECUTOR_TYPE.equals(
-                        endpoint.getAgents().getFirst().getExecutor().getType()))
+                    && endpoint.getExecutor() != null
+                    && CALDERA_EXECUTOR_TYPE.equals(endpoint.getExecutor().getType()))
         .findFirst();
   }
 

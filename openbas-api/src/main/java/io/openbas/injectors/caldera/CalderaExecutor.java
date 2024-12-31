@@ -365,7 +365,7 @@ public class CalderaExecutor extends Injector {
                       agent.getExe_name().contains("implant")
                           && (now().toEpochMilli()
                                   - Time.toInstant(agent.getCreated()).toEpochMilli())
-                              < Asset.ACTIVE_THRESHOLD
+                              < io.openbas.database.model.Agent.ACTIVE_THRESHOLD
                           && (agent.getHost().equals(assetEndpoint.getHostname())
                               || agent
                                   .getHost()
@@ -394,7 +394,7 @@ public class CalderaExecutor extends Injector {
             newEndpoint.setPlatform(assetEndpoint.getPlatform());
             newEndpoint.setArch(assetEndpoint.getArch());
             newAgent.setProcessName(agent.getExe_name());
-            newAgent.setExecutor(assetEndpoint.getAgents().getFirst().getExecutor());
+            newAgent.setExecutor(assetEndpoint.getExecutor());
             newAgent.setExternalReference(agent.getPaw());
             newAgent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
             newAgent.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);

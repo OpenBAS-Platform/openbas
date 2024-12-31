@@ -99,9 +99,7 @@ public class TaniumExecutorService implements Runnable {
     List<NodeEndpoint> nodeEndpoints =
         this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
     List<Endpoint> endpoints =
-        toEndpoint(nodeEndpoints).stream()
-            .filter(endpoint -> endpoint.getAgents().getFirst().getActive())
-            .toList();
+        toEndpoint(nodeEndpoints).stream().filter(endpoint -> endpoint.getActive()).toList();
     log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
     endpoints.forEach(
         endpoint -> {
@@ -126,9 +124,7 @@ public class TaniumExecutorService implements Runnable {
           }
         });
     List<Endpoint> inactiveEndpoints =
-        toEndpoint(nodeEndpoints).stream()
-            .filter(endpoint -> !endpoint.getAgents().getFirst().getActive())
-            .toList();
+        toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
     inactiveEndpoints.forEach(
         endpoint -> {
           Optional<Endpoint> optionalExistingEndpoint =

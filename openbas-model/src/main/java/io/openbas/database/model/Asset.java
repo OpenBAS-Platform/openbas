@@ -28,8 +28,6 @@ import org.hibernate.annotations.UuidGenerator;
 @EntityListeners(ModelBaseListener.class)
 public class Asset implements Base {
 
-  public static final int ACTIVE_THRESHOLD = 1800000; // 3 minutes
-
   @Id
   @Column(name = "asset_id")
   @GeneratedValue(generator = "UUID")

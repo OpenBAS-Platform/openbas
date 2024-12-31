@@ -74,10 +74,10 @@ public class ExecutionExecutorService {
 
   private void launchExecutorContextForAsset(Inject inject, Asset asset) {
     Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(asset);
-    Executor executor = assetEndpoint.getAgents().getFirst().getExecutor();
+    Executor executor = assetEndpoint.getExecutor();
     if (executor == null) {
       log.log(Level.SEVERE, "Cannot find the executor for the asset " + assetEndpoint.getName());
-    } else if (!assetEndpoint.getAgents().getFirst().getActive()) {
+    } else if (!assetEndpoint.getActive()) {
       throw new RuntimeException("Asset error: " + assetEndpoint.getName() + " is inactive");
     } else {
       switch (executor.getType()) {

@@ -6,7 +6,9 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Ipv4OrIpv6Constraint;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -95,6 +97,14 @@ public class Endpoint extends Asset {
   @JsonProperty("asset_agents")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
+
+  /** Used to show Front column */
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("asset_executor")
+  @Schema(type = "string")
+  public Executor getExecutor() {
+    return this.agents.getFirst().getExecutor();
+  }
 
   /** Used to show Front column */
   @JsonProperty("asset_last_seen")
