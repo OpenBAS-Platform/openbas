@@ -157,7 +157,7 @@ class UserApiTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("Reset Password from I forget my pswd option")
+  @DisplayName("Reset Password from I forget my pwd option")
   class ResetPassword {
     @DisplayName("With a known email")
     @Test
