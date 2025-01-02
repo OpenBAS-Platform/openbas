@@ -143,7 +143,7 @@ public class TagRuleServiceTest {
     TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
     Tag tag = TagFixture.getTag();
     when(tagRuleRepository.save(any())).thenReturn(expected);
-    when(tagRepository.findByName(expected.getTag().getName())).thenReturn(null);
+    when(tagRepository.findByName(expected.getTag().getName())).thenReturn(Optional.empty());
     when(tagRepository.save(any())).thenReturn(tag);
     when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.of(expected));
     expected
@@ -155,7 +155,7 @@ public class TagRuleServiceTest {
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
-              expected.getTag().getName(),
+                  expected.getTag().getName(),
               expected.getAssets().stream().map(Asset::getId).toList());
         });
   }
