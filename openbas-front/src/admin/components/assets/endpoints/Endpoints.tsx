@@ -1,8 +1,8 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
@@ -166,6 +166,10 @@ const Endpoints = () => {
               classes={{ root: classes.item }}
               divider
             >
+              <ListItemButton
+                component={Link}
+                to={`/admin/assets/endpoints/${endpoint.asset_id}`}
+              >
               <ListItemIcon>
                 <DevicesOtherOutlined color="primary" />
               </ListItemIcon>
@@ -210,6 +214,7 @@ const Endpoints = () => {
                   openEditOnInit={endpoint.asset_id === searchId}
                 />
               </ListItemSecondaryAction>
+              </ListItemButton>
             </ListItem>
           );
         })}
