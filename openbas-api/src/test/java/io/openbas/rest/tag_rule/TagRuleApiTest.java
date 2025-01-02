@@ -13,7 +13,6 @@ import io.openbas.service.TagRuleService;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.fixtures.TagRuleFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -111,6 +110,5 @@ public class TagRuleApiTest {
     List<TagRuleOutput> result = tagRuleApi.tags();
     List<TagRuleOutput> expected = tagRules.stream().map(TagRuleMapper::toTagRuleOutput).toList();
     assertEquals(new HashSet<>(expected), new HashSet<>(result));
-
   }
 }

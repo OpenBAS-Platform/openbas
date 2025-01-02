@@ -64,18 +64,14 @@ public class TagRuleService {
   }
 
   public Page<TagRule> searchTagRule(SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-            tagRuleRepository::findAll,
-        searchPaginationInput,
-        TagRule.class);
+    return buildPaginationJPA(tagRuleRepository::findAll, searchPaginationInput, TagRule.class);
   }
 
   public void deleteTagRule(@NotBlank final String tagRuleId) {
-    //verify that the TagRule exists
+    // verify that the TagRule exists
     tagRuleRepository
-            .findById(tagRuleId)
-            .orElseThrow(
-                    () -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
+        .findById(tagRuleId)
+        .orElseThrow(() -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
     tagRuleRepository.deleteById(tagRuleId);
   }
 
@@ -83,9 +79,8 @@ public class TagRuleService {
   protected Tag getTag(@NotBlank final String tagName) {
     // TODO: tag name normalization needs to be implemented in a reusable method
     return tagRepository
-            .findByName(tagName.toLowerCase())
-            .orElseThrow(
-                    () -> new ElementNotFoundException("Tag not found with name: " + tagName));
+        .findByName(tagName.toLowerCase())
+        .orElseThrow(() -> new ElementNotFoundException("Tag not found with name: " + tagName));
   }
 
   @VisibleForTesting

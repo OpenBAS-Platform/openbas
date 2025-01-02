@@ -15,7 +15,6 @@ import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.fixtures.TagRuleFixture;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -92,11 +91,11 @@ public class TagRuleServiceTest {
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
     assertThrows(
-            ElementNotFoundException.class,
-            () -> {
-              tagRuleService.createTagRule(
-                      expected.getId(), expected.getAssets().stream().map(Asset::getId).toList());
-            });
+        ElementNotFoundException.class,
+        () -> {
+          tagRuleService.createTagRule(
+              expected.getId(), expected.getAssets().stream().map(Asset::getId).toList());
+        });
   }
 
   @Test
@@ -151,13 +150,13 @@ public class TagRuleServiceTest {
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
     assertThrows(
-            ElementNotFoundException.class,
-            () -> {
-              tagRuleService.updateTagRule(
-                      expected.getId(),
-                      expected.getId(),
-                      expected.getAssets().stream().map(Asset::getId).toList());
-            });
+        ElementNotFoundException.class,
+        () -> {
+          tagRuleService.updateTagRule(
+              expected.getId(),
+              expected.getId(),
+              expected.getAssets().stream().map(Asset::getId).toList());
+        });
   }
 
   @Test
