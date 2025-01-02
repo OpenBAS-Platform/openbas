@@ -76,6 +76,32 @@ public class ExecutableInjectService {
     return result.toString();
   }
 
+  private static String formatMultilineCommand(String command) {
+    String[] lines = command.split("\n");
+    StringBuilder formattedCommand = new StringBuilder();
+
+    for (int i = 0; i < lines.length; i++) {
+      String line = lines[i];
+      String trimmedLine = line.trim();
+      if (trimmedLine.isEmpty()) {
+        continue;
+      }
+      formattedCommand.append(trimmedLine);
+
+      boolean isLastLine = (i == lines.length - 1);
+      boolean isAfterParentheses = trimmedLine.endsWith("(");
+      boolean isBeforeParentheses = !isLastLine && lines[i + 1].trim().startsWith(")");
+
+      if (!isAfterParentheses && !isBeforeParentheses && !isLastLine) {
+        formattedCommand.append(" & ");
+      } else {
+        formattedCommand.append(" ");
+      }
+    }
+
+    return formattedCommand.toString();
+  }
+
   private String processAndEncodeCommand(
       String command,
       String executor,
@@ -87,7 +113,7 @@ public class ExecutableInjectService {
 
     if (executor.equals("cmd")) {
       computedCommand = replaceCmdVariables(computedCommand);
-      computedCommand = computedCommand.trim().replace("\n", " & ");
+      computedCommand = formatMultilineCommand(computedCommand);
     }
 
     computedCommand = obfuscationMap.executeObfuscation(obfuscator, computedCommand, executor);
