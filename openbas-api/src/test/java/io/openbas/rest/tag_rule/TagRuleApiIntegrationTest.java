@@ -200,7 +200,6 @@ public class TagRuleApiIntegrationTest extends IntegrationTest {
   private Asset createAsset(String assetName) {
     Asset asset = new Asset();
     asset.setName(assetName);
-    asset.setExternalReference(assetName + System.currentTimeMillis());
     return assetRepository.save(asset);
   }
 }
