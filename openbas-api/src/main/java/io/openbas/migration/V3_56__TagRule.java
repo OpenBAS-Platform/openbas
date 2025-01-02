@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_54__TagRule extends BaseJavaMigration {
+public class V3_56__TagRule extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
