@@ -8,12 +8,11 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { SecurityPlatformInput } from '../../../../utils/api-types';
+import type { SecurityPlatform, SecurityPlatformInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { SecurityPlatformStore } from './SecurityPlatform';
 import SecurityPlatformForm from './SecurityPlatformForm';
 
-export type SecurityPlatformStoreWithType = SecurityPlatformStore & { type: string };
+export type SecurityPlatformStoreWithType = SecurityPlatform & { type: string };
 
 interface Props {
   inline?: boolean;
@@ -23,7 +22,7 @@ interface Props {
   onRemoveSecurityPlatformFromInject?: (assetId: string) => void;
   onRemoveSecurityPlatformFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
-  onUpdate?: (result: SecurityPlatformStore) => void;
+  onUpdate?: (result: SecurityPlatform) => void;
   onDelete?: (result: string) => void;
   disabled?: boolean;
 }
@@ -48,7 +47,6 @@ const SecurityPlatformPopover: React.FC<Props> = ({
     asset_description,
     security_platform_logo_light,
     security_platform_logo_dark,
-    asset_last_seen,
     asset_tags,
   }) => ({
     asset_name,
@@ -56,7 +54,6 @@ const SecurityPlatformPopover: React.FC<Props> = ({
     security_platform_type,
     security_platform_logo_light,
     security_platform_logo_dark,
-    asset_last_seen: asset_last_seen ?? undefined,
     asset_tags,
   }))(securityPlatform);
 
@@ -69,7 +66,7 @@ const SecurityPlatformPopover: React.FC<Props> = ({
   };
   const submitEdit = (data: SecurityPlatformInput) => {
     dispatch(updateSecurityPlatform(securityPlatform.asset_id, data)).then(
-      (result: { result: string; entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
+      (result: { result: string; entities: { securityplatforms: Record<string, SecurityPlatform> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const securityPlatformUpdated = result.entities.securityplatforms[result.result];

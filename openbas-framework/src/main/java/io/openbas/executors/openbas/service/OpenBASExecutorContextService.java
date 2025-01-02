@@ -5,7 +5,6 @@ import io.openbas.database.repository.AssetAgentJobRepository;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import lombok.extern.java.Log;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,21 +51,18 @@ public class OpenBASExecutorContextService {
     }
   }
 
-  public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
+  public void launchExecutorSubprocess(
+      @NotNull final Inject inject, @NotNull final Endpoint assetEndpoint) {
     Endpoint.PLATFORM_TYPE platform =
-        Objects.equals(asset.getType(), "Endpoint")
-            ? ((Endpoint) Hibernate.unproxy(asset)).getPlatform()
-            : null;
+        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getPlatform() : null;
     Endpoint.PLATFORM_ARCH arch =
-        Objects.equals(asset.getType(), "Endpoint")
-            ? ((Endpoint) Hibernate.unproxy(asset)).getArch()
-            : null;
+        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getArch() : null;
     if (platform == null) {
       throw new RuntimeException("Unsupported null platform");
     }
     AssetAgentJob assetAgentJob = new AssetAgentJob();
     assetAgentJob.setCommand(computeCommand(inject, platform, arch));
-    assetAgentJob.setAsset(asset);
+    assetAgentJob.setAsset(assetEndpoint);
     assetAgentJob.setInject(inject);
     assetAgentJobRepository.save(assetAgentJob);
   }

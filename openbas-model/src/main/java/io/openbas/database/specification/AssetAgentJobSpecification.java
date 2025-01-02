@@ -8,8 +8,7 @@ public class AssetAgentJobSpecification {
   public static Specification<AssetAgentJob> forEndpoint(String externalReference) {
     // TODO Add time limitation
     // TODO add cleanup
-    return (root, query, cb) -> {
-      return cb.equal(root.get("asset").get("externalReference"), externalReference);
-    };
+    return (root, query, cb) ->
+        cb.equal(root.get("asset").get("agents").get("externalReference"), externalReference);
   }
 }

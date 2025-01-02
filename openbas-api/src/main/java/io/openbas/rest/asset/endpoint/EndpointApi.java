@@ -9,12 +9,10 @@ import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.asset.EndpointService;
+import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.repository.AssetAgentJobRepository;
-import io.openbas.database.repository.EndpointRepository;
-import io.openbas.database.repository.ExecutorRepository;
-import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.*;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
@@ -59,10 +57,20 @@ public class EndpointApi {
   @Transactional(rollbackFor = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
+    Agent agent = new Agent();
     endpoint.setUpdateAttributes(input);
     endpoint.setPlatform(input.getPlatform());
     endpoint.setArch(input.getArch());
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    agent.setLastSeen(input.getLastSeen());
+    agent.setPrivilege(Agent.PRIVILEGE.admin);
+    agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
+    agent.setExecutedByUser(
+        Endpoint.PLATFORM_TYPE.Windows.equals(input.getPlatform())
+            ? Agent.ADMIN_SYSTEM_WINDOWS
+            : Agent.ADMIN_SYSTEM_UNIX);
+    agent.setAsset(endpoint);
+    endpoint.setAgents(List.of(agent));
     return this.endpointService.createEndpoint(endpoint);
   }
 
@@ -82,21 +90,36 @@ public class EndpointApi {
       endpoint.setPlatform(input.getPlatform());
       endpoint.setArch(input.getArch());
       endpoint.setName(input.getName());
-      endpoint.setAgentVersion(input.getAgentVersion());
+      endpoint.getAgents().getFirst().setVersion(input.getAgentVersion());
       endpoint.setDescription(input.getDescription());
-      endpoint.setLastSeen(Instant.now());
-      endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      endpoint.getAgents().getFirst().setLastSeen(Instant.now());
+      endpoint
+          .getAgents()
+          .getFirst()
+          .setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
     } else {
       endpoint = new Endpoint();
+      Agent agent = new Agent();
+      agent.setVersion(input.getAgentVersion());
+      agent.setExternalReference(input.getExternalReference());
       endpoint.setUpdateAttributes(input);
-      endpoint.setLastSeen(Instant.now());
+      agent.setLastSeen(Instant.now());
+      agent.setPrivilege(Agent.PRIVILEGE.admin);
+      agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
+      agent.setExecutedByUser(
+          Endpoint.PLATFORM_TYPE.Windows.equals(input.getPlatform())
+              ? Agent.ADMIN_SYSTEM_WINDOWS
+              : Agent.ADMIN_SYSTEM_UNIX);
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-      endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      agent.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      agent.setAsset(endpoint);
+      endpoint.setAgents(List.of(agent));
     }
     Endpoint updatedEndpoint = this.endpointService.updateEndpoint(endpoint);
     // If agent is not temporary and not the same version as the platform => Create an upgrade task
     // for the agent
-    if (updatedEndpoint.getParent() == null && !updatedEndpoint.getAgentVersion().equals(version)) {
+    if (updatedEndpoint.getAgents().getFirst().getParent() == null
+        && !updatedEndpoint.getAgents().getFirst().getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(
           this.endpointService.generateUpgradeCommand(updatedEndpoint.getPlatform().name()));
@@ -162,6 +185,7 @@ public class EndpointApi {
     endpoint.setPlatform(input.getPlatform());
     endpoint.setArch(input.getArch());
     endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    endpoint.getAgents().getFirst().setLastSeen(input.getLastSeen());
     return this.endpointService.updateEndpoint(endpoint);
   }
 

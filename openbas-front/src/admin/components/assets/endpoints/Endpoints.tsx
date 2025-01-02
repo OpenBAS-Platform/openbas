@@ -65,6 +65,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '15%',
     display: 'flex',
     alignItems: 'center',
+    cursor: 'default',
   },
   asset_tags: {
     width: '20%',
@@ -101,7 +102,7 @@ const Endpoints = () => {
     { field: 'asset_name', label: 'Name', isSortable: true },
     { field: 'endpoint_platform', label: 'Platform', isSortable: true },
     { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
-    { field: 'asset_executor', label: 'Executor', isSortable: true },
+    { field: 'asset_executor', label: 'Executor', isSortable: false },
     { field: 'asset_tags', label: 'Tags', isSortable: true },
     { field: 'asset_status', label: 'Status', isSortable: false },
   ];
