@@ -4,7 +4,6 @@ import { makeStyles } from '@mui/styles';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
-import SearchFilter from '../../../../../components/SearchFilter';
 import { useAppDispatch } from '../../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
@@ -33,13 +32,13 @@ const Endpoint = () => {
       spacing={3}
       classes={{ container: classes.gridContainer }}
     >
-      <Grid item style={{ paddingTop: 10 }}>
+      <Grid item xs={12} style={{ paddingTop: 10 }}>
         <Typography variant="h4" gutterBottom>
           {t('Endpoint Information')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
           <Grid container spacing={3}>
-            <Grid item xs={5} style={{ paddingTop: 10 }}>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -64,7 +63,7 @@ const Endpoint = () => {
                 host name
               </div>
             </Grid>
-            <Grid item xs={2} style={{ paddingTop: 10 }}>
+            <Grid item xs={3} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -88,18 +87,61 @@ const Endpoint = () => {
                 architecture
               </div>
             </Grid>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Architecture')}
+              </Typography>
+              <div style={{ display: 'flex' }}>
+                architecture
+              </div>
+            </Grid>
+            <Grid item xs={3} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Architecture')}
+              </Typography>
+              <div style={{ display: 'flex' }}>
+                architecture
+              </div>
+            </Grid>
+            <Grid item xs={3} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Architecture')}
+              </Typography>
+              <div style={{ display: 'flex' }}>
+                architecture
+              </div>
+            </Grid>
+            <Grid item xs={2} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Architecture')}
+              </Typography>
+              <div style={{ display: 'flex' }}>
+                architecture
+              </div>
+            </Grid>
           </Grid>
         </Paper>
       </Grid>
-      <Grid item style={{ marginTop: 30 }}>
+      <Grid item xs={12} style={{ marginTop: 50 }}>
         <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
           {t('Agents')}
         </Typography>
-        <div style={{ float: 'right', marginTop: -15 }}>
-          <SearchFilter
-            placeholder={t('Search')}
-          />
-        </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
           {true ? (
