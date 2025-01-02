@@ -50,6 +50,8 @@ const notifyError = (error: AxiosError) => {
     // Do not notify the user, as a 401 error will already trigger a disconnection, as 404 already handle inside the app
   } else if (error.status === 409) {
     MESSAGING$.notifyError(intl.formatMessage({ id: 'The element already exists' }));
+  } else if (error.status === 400) {
+    MESSAGING$.notifyError(intl.formatMessage({ id: 'Bad request' }));
   } else if (error.status === 500) {
     MESSAGING$.notifyError(intl.formatMessage({ id: 'Internal error' }));
   } else if (error.message) {
@@ -166,6 +168,7 @@ export const postReferential = (schema: Schema | null, uri: string, data: unknow
     .post(buildUri(uri), data)
     .then((response) => {
       dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
+      notifySuccess('The element has been successfully updated');
       return response.data;
     })
     .catch((error) => {
