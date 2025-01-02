@@ -42,6 +42,7 @@ import jakarta.servlet.ServletException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
@@ -74,6 +75,7 @@ class InjectApiTest extends IntegrationTest {
   static Team TEAM;
   static String SCENARIO_INJECT_ID;
   static InjectorContract PAYLOAD_INJECTOR_CONTRACT;
+  static InjectorContract PAYLOAD_INJECTOR_CONTRACT_2;
   @Resource protected ObjectMapper mapper;
   @Autowired private MockMvc mvc;
   @Autowired private ScenarioService scenarioService;
@@ -130,7 +132,8 @@ class InjectApiTest extends IntegrationTest {
     this.exerciseRepository.delete(EXERCISE);
     this.documentRepository.deleteAll(List.of(DOCUMENT1, DOCUMENT2));
     this.teamRepository.delete(TEAM);
-    this.injectorContractRepository.delete(PAYLOAD_INJECTOR_CONTRACT);
+    this.injectorContractRepository.deleteAll(
+        List.of(PAYLOAD_INJECTOR_CONTRACT, PAYLOAD_INJECTOR_CONTRACT_2));
   }
 
   // -- SCENARIOS --
@@ -680,6 +683,49 @@ class InjectApiTest extends IntegrationTest {
 
       // Verify command
       String cmdToExecute = payloadCommand.getContent().replace("#{arg_value}", "Hello world");
+      String expectedCmdEncoded = Base64.getEncoder().encodeToString(cmdToExecute.getBytes());
+      assertEquals(expectedCmdEncoded, JsonPath.read(response, "$.command_content"));
+    }
+
+    @DisplayName("Get obfuscate command")
+    @Test
+    void getExecutableObfuscatePayloadInject() throws Exception {
+      // -- PREPARE --
+      Command payloadCommand =
+          PayloadFixture.createCommand("psh", "echo Hello World", List.of(), "echo cleanup cmd");
+      Payload payloadSaved = payloadRepository.save(payloadCommand);
+
+      Injector injector = injectorRepository.findByType("openbas_implant").orElseThrow();
+      InjectorContract injectorContract =
+          InjectorContractFixture.createPayloadInjectorContractWithObfuscator(
+              injector, payloadSaved);
+      PAYLOAD_INJECTOR_CONTRACT_2 = injectorContractRepository.save(injectorContract);
+
+      Map<String, String> payloadArguments = new HashMap<>();
+      payloadArguments.put("obfuscator", "base64");
+      Inject inject =
+          InjectFixture.createInjectCommandPayload(PAYLOAD_INJECTOR_CONTRACT_2, payloadArguments);
+
+      Inject injectSaved = injectRepository.save(inject);
+
+      // -- EXECUTE --
+      String response =
+          mvc.perform(
+                  get(INJECT_URI + "/" + injectSaved.getId() + "/executable-payload")
+                      .accept(MediaType.APPLICATION_JSON))
+              .andExpect(status().is2xxSuccessful())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      // -- ASSERT --
+      assertNotNull(response);
+
+      // Verify command
+      byte[] utf16Bytes = payloadCommand.getContent().getBytes(StandardCharsets.UTF_16LE);
+      String base64 = Base64.getEncoder().encodeToString(utf16Bytes);
+      String cmdToExecute = String.format("powershell -Enc %s", base64);
+
       String expectedCmdEncoded = Base64.getEncoder().encodeToString(cmdToExecute.getBytes());
       assertEquals(expectedCmdEncoded, JsonPath.read(response, "$.command_content"));
     }

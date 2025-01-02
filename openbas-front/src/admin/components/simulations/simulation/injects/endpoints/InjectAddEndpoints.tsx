@@ -58,7 +58,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
           <ControlPointOutlined color="primary" />
         </ListItemIcon>
         <ListItemText
-          primary={t('Add assets')}
+          primary={t('Modify target assets')}
           classes={{ primary: classes.text }}
         />
       </ListItemButton>
@@ -69,7 +69,7 @@ const InjectAddEndpoints: FunctionComponent<Props> = ({
         payloadArch={payloadArch}
         onClose={handleClose}
         onSubmit={onSubmit}
-        title={t('Add assets in this inject')}
+        title={t('Modify assets in this inject')}
       />
     </>
   );

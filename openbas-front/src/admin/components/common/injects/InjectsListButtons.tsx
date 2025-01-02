@@ -23,17 +23,19 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  injects: InjectOutputType[];
+  selectedInjects: InjectOutputType[];
   setViewMode?: (mode: string) => void;
   availableButtons: string[];
   onImportedInjects?: () => void;
+  isAtLeastOneValidInject: boolean;
 }
 
 const InjectsListButtons: FunctionComponent<Props> = ({
-  injects,
+  selectedInjects,
   setViewMode,
   availableButtons,
   onImportedInjects,
+  isAtLeastOneValidInject,
 }) => {
   // Standard hooks
   const classes = useStyles();
@@ -47,8 +49,6 @@ const InjectsListButtons: FunctionComponent<Props> = ({
     tagsMap: helper.getTagsMap(),
   }));
 
-  const isAtLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
-
   const exportInjects = exportData(
     'inject',
     [
@@ -60,7 +60,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
       'inject_tags',
       'inject_content',
     ],
-    injects,
+    selectedInjects,
     tagsMap,
   );
   const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });

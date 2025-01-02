@@ -28,6 +28,7 @@ By doing this, you are actively helping us to improve the quality of the entire 
 - [ ] I wrote test cases for the relevant uses case
 - [ ] I added/update the relevant documentation (either on github or on notion)
 - [ ] Where necessary I refactored code to improve the overall quality
+- [ ] For bug fix -> I implemented a test that covers the bug
 
 <!-- _NOTE: these things are not required to open a PR and can be done afterwards / while the PR draft is open._ -->
 <!-- For completed items, change [ ] to [x]. -->

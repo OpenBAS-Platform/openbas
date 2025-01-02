@@ -4,10 +4,7 @@ import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 
 import io.openbas.asset.EndpointService;
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Executor;
-import io.openbas.database.model.Injector;
+import io.openbas.database.model.*;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.model.NodeEndpoint;
@@ -101,7 +98,8 @@ public class TaniumExecutorService implements Runnable {
     log.info("Running Tanium executor endpoints gathering...");
     List<NodeEndpoint> nodeEndpoints =
         this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
-    List<Endpoint> endpoints = toEndpoint(nodeEndpoints).stream().filter(Asset::getActive).toList();
+    List<Endpoint> endpoints =
+        toEndpoint(nodeEndpoints).stream().filter(endpoint -> endpoint.getActive()).toList();
     log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
     endpoints.forEach(
         endpoint -> {
@@ -114,7 +112,8 @@ public class TaniumExecutorService implements Runnable {
                   .toList();
           if (existingEndpoints.isEmpty()) {
             Optional<Endpoint> endpointByExternalReference =
-                endpointService.findByExternalReference(endpoint.getExternalReference());
+                endpointService.findByExternalReference(
+                    endpoint.getAgents().getFirst().getExternalReference());
             if (endpointByExternalReference.isPresent()) {
               this.updateEndpoint(endpoint, List.of(endpointByExternalReference.get()));
             } else {
@@ -129,7 +128,8 @@ public class TaniumExecutorService implements Runnable {
     inactiveEndpoints.forEach(
         endpoint -> {
           Optional<Endpoint> optionalExistingEndpoint =
-              this.endpointService.findByExternalReference(endpoint.getExternalReference());
+              this.endpointService.findByExternalReference(
+                  endpoint.getAgents().getFirst().getExternalReference());
           if (optionalExistingEndpoint.isPresent()) {
             Endpoint existingEndpoint = optionalExistingEndpoint.get();
             if ((now().toEpochMilli() - existingEndpoint.getClearedAt().toEpochMilli())
@@ -149,15 +149,24 @@ public class TaniumExecutorService implements Runnable {
             (nodeEndpoint) -> {
               TaniumEndpoint taniumEndpoint = nodeEndpoint.getNode();
               Endpoint endpoint = new Endpoint();
-              endpoint.setExecutor(this.executor);
-              endpoint.setExternalReference(taniumEndpoint.getId());
+              Agent agent = new Agent();
+              agent.setExecutor(this.executor);
+              agent.setExternalReference(taniumEndpoint.getId());
+              agent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
+              agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
               endpoint.setName(taniumEndpoint.getName());
               endpoint.setDescription("Asset collected by Tanium executor context.");
               endpoint.setIps(taniumEndpoint.getIpAddresses());
               endpoint.setHostname(taniumEndpoint.getName());
               endpoint.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
+              agent.setExecutedByUser(
+                  Endpoint.PLATFORM_TYPE.Windows.equals(endpoint.getPlatform())
+                      ? Agent.ADMIN_SYSTEM_WINDOWS
+                      : Agent.ADMIN_SYSTEM_UNIX);
               endpoint.setArch(toArch(taniumEndpoint.getProcessor().getArchitecture()));
-              endpoint.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
+              agent.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
+              agent.setAsset(endpoint);
+              endpoint.setAgents(List.of(agent));
               return endpoint;
             })
         .toList();
@@ -166,14 +175,20 @@ public class TaniumExecutorService implements Runnable {
   private void updateEndpoint(
       @NotNull final Endpoint external, @NotNull final List<Endpoint> existingList) {
     Endpoint matchingExistingEndpoint = existingList.getFirst();
-    matchingExistingEndpoint.setLastSeen(external.getLastSeen());
+    matchingExistingEndpoint
+        .getAgents()
+        .getFirst()
+        .setLastSeen(external.getAgents().getFirst().getLastSeen());
     matchingExistingEndpoint.setName(external.getName());
     matchingExistingEndpoint.setIps(external.getIps());
     matchingExistingEndpoint.setHostname(external.getHostname());
-    matchingExistingEndpoint.setExternalReference(external.getExternalReference());
+    matchingExistingEndpoint
+        .getAgents()
+        .getFirst()
+        .setExternalReference(external.getAgents().getFirst().getExternalReference());
     matchingExistingEndpoint.setPlatform(external.getPlatform());
     matchingExistingEndpoint.setArch(external.getArch());
-    matchingExistingEndpoint.setExecutor(this.executor);
+    matchingExistingEndpoint.getAgents().getFirst().setExecutor(this.executor);
     if ((now().toEpochMilli() - matchingExistingEndpoint.getClearedAt().toEpochMilli())
         > CLEAR_TTL) {
       try {

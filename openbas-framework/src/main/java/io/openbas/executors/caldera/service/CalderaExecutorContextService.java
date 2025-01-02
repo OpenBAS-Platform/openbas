@@ -1,9 +1,6 @@
 package io.openbas.executors.caldera.service;
 
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.Injector;
-import io.openbas.database.model.InjectorContract;
+import io.openbas.database.model.*;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
 import io.openbas.integrations.InjectorService;
@@ -72,7 +69,8 @@ public class CalderaExecutorContextService {
         });
   }
 
-  public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Asset asset) {
+  public void launchExecutorSubprocess(
+      @NotNull final Inject inject, @NotNull final Endpoint assetEndpoint) {
     inject
         .getInjectorContract()
         .map(InjectorContract::getInjector)
@@ -83,18 +81,19 @@ public class CalderaExecutorContextService {
                     List.of(Map.of("trait", "inject", "value", inject.getId()));
                 calderaExecutorClient.exploit(
                     "base64",
-                    asset.getExternalReference(),
+                    assetEndpoint.getAgents().getFirst().getExternalReference(),
                     this.injectorExecutorAbilities.get(injector.getId()).getAbility_id(),
                     additionalFields);
               }
             });
   }
 
-  public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
+  public void launchExecutorClear(
+      @NotNull final Injector injector, @NotNull final Endpoint assetEndpoint) {
     if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
       calderaExecutorClient.exploit(
           "base64",
-          asset.getExternalReference(),
+          assetEndpoint.getAgents().getFirst().getExternalReference(),
           this.injectorExecutorClearAbilities.get(injector.getId()).getAbility_id(),
           List.of());
     }

@@ -5,9 +5,11 @@ import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
 import io.openbas.rest.asset.form.AssetInput;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,4 +38,8 @@ public class EndpointInput extends AssetInput {
 
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
+
+  @Schema(nullable = true)
+  @JsonProperty("asset_last_seen")
+  private Instant lastSeen;
 }

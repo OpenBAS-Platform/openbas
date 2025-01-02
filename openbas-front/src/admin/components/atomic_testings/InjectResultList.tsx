@@ -130,7 +130,7 @@ const InjectResultList: FunctionComponent<Props> = ({
     },
     {
       field: 'inject_status',
-      label: 'Status',
+      label: 'Execution status',
       isSortable: false,
       value: (injectResultOutput: InjectResultOutput) => {
         return (<ItemStatus isInject status={injectResultOutput.inject_status?.status_name} label={t(injectResultOutput.inject_status?.status_name)} variant="inList" />);
@@ -201,56 +201,56 @@ const InjectResultList: FunctionComponent<Props> = ({
           loading
             ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
             : injects.map((injectResultOutput, index) => {
-              return (
-                <ListItem
-                  key={injectResultOutput.inject_id}
-                  classes={{ root: classes.item }}
-                  divider={injects.length !== index + 1}
-                  secondaryAction={showActions ? (
-                    <AtomicTestingPopover
-                      atomic={injectResultOutput}
-                      actions={['Duplicate', 'Delete']}
-                      onDelete={result => setInjects(injects.filter(e => e.inject_id !== result))}
-                      inList
-                    />
-                  ) : null}
-                  disablePadding
-                >
-                  <ListItemButton
-                    component={Link}
-                    to={goTo(injectResultOutput.inject_id)}
-                  >
-                    <ListItemIcon>
-                      <InjectIcon
-                        isPayload={isNotEmptyField(injectResultOutput.inject_injector_contract?.injector_contract_payload?.payload_id)}
-                        type={
-                          injectResultOutput.inject_injector_contract?.injector_contract_payload?.payload_id
-                            ? injectResultOutput.inject_injector_contract.injector_contract_payload?.payload_collector_type
-                            || injectResultOutput.inject_injector_contract.injector_contract_payload?.payload_type
-                            : injectResultOutput.inject_type
-                        }
-                        variant="list"
+                return (
+                  <ListItem
+                    key={injectResultOutput.inject_id}
+                    classes={{ root: classes.item }}
+                    divider={injects.length !== index + 1}
+                    secondaryAction={showActions ? (
+                      <AtomicTestingPopover
+                        atomic={injectResultOutput}
+                        actions={['Duplicate', 'Delete']}
+                        onDelete={result => setInjects(injects.filter(e => e.inject_id !== result))}
+                        inList
                       />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={(
-                        <div className={classes.bodyItems}>
-                          {headers.map(header => (
-                            <div
-                              key={header.field}
-                              className={classes.bodyItem}
-                              style={inlineStyles[header.field]}
-                            >
-                              {header.value?.(injectResultOutput)}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })
+                    ) : null}
+                    disablePadding
+                  >
+                    <ListItemButton
+                      component={Link}
+                      to={goTo(injectResultOutput.inject_id)}
+                    >
+                      <ListItemIcon>
+                        <InjectIcon
+                          isPayload={isNotEmptyField(injectResultOutput.inject_injector_contract?.injector_contract_payload?.payload_id)}
+                          type={
+                            injectResultOutput.inject_injector_contract?.injector_contract_payload?.payload_id
+                              ? injectResultOutput.inject_injector_contract.injector_contract_payload?.payload_collector_type
+                              || injectResultOutput.inject_injector_contract.injector_contract_payload?.payload_type
+                              : injectResultOutput.inject_type
+                          }
+                          variant="list"
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={(
+                          <div className={classes.bodyItems}>
+                            {headers.map(header => (
+                              <div
+                                key={header.field}
+                                className={classes.bodyItem}
+                                style={inlineStyles[header.field]}
+                              >
+                                {header.value?.(injectResultOutput)}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })
         }
         {!injects ? (<Empty message={t('No data available')} />) : null}
       </List>

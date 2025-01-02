@@ -18,6 +18,7 @@ import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-
 import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
 import type { InjectStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { BACK_LABEL, BACK_URI } from '../../../../../components/Breadcrumbs';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemStatus from '../../../../../components/ItemStatus';
@@ -30,11 +31,13 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../../utils/utils';
+import { TeamContext } from '../../../common/Context';
 import TagsFilter from '../../../common/filters/TagsFilter';
 import InjectIcon from '../../../common/injects/InjectIcon';
 import InjectPopover from '../../../common/injects/InjectPopover';
 import UpdateInject from '../../../common/injects/UpdateInject';
 import AnimationMenu from '../AnimationMenu';
+import teamContextForExercise from '../teams/teamContextForExercise';
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 
@@ -121,6 +124,8 @@ const TimelineOverview = () => {
       await dispatch(updateInjectForExercise(exerciseId, selectedInjectId, inject));
     }
   };
+
+  const teamContext = teamContextForExercise(exerciseId, []);
 
   return (
     <div className={classes.root}>
@@ -243,7 +248,7 @@ const TimelineOverview = () => {
                         classes={{ root: classes.item }}
                         divider
                         component={Link}
-                        to={`/admin/simulations/${exerciseId}/injects/${inject.inject_id}?backlabel=Animation&backuri=/admin/simulations/${exerciseId}/animation/timeline`}
+                        to={`/admin/simulations/${exerciseId}/injects/${inject.inject_id}?${BACK_LABEL}=Animation&${BACK_URI}=/admin/simulations/${exerciseId}/animation/timeline`}
                       >
                         <ListItemIcon>
                           <InjectIcon
@@ -325,14 +330,16 @@ const TimelineOverview = () => {
         </Grid>
       </Grid>
       {selectedInjectId && (
-        <UpdateInject
-          open={selectedInjectId !== null}
-          handleClose={() => setSelectedInjectId(null)}
-          onUpdateInject={onUpdateInject}
-          injectId={selectedInjectId}
-          isAtomic={false}
-          injects={injects}
-        />
+        <TeamContext.Provider value={teamContext}>
+          <UpdateInject
+            open={selectedInjectId !== null}
+            handleClose={() => setSelectedInjectId(null)}
+            onUpdateInject={onUpdateInject}
+            injectId={selectedInjectId}
+            isAtomic={false}
+            injects={injects}
+          />
+        </TeamContext.Provider>
       )}
     </div>
   );

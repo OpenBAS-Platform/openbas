@@ -2,8 +2,7 @@ import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { FunctionComponent, useEffect, useMemo, useState } from 'react';
 
-import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
-import { fetchEndpoints, searchEndpoints } from '../../../../actions/assets/endpoint-actions';
+import { findEndpoints, searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -13,10 +12,7 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { useHelper } from '../../../../store';
 import type { Endpoint, FilterGroup } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
-import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 interface Props {
   initialState: string[];
@@ -39,24 +35,15 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
   payloadArch,
 }) => {
   // Standard hooks
-  const dispatch = useAppDispatch();
   const { t } = useFormatter();
 
-  // Fetching data
-  const { endpointsMap } = useHelper((helper: EndpointHelper) => ({
-    endpointsMap: helper.getEndpointsMap(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchEndpoints());
-  });
-
-  const [endpointValues, setEndpointValues] = useState<Endpoint[]>(initialState.map(id => endpointsMap[id]));
+  const [endpointValues, setEndpointValues] = useState<Endpoint[]>([]);
   useEffect(() => {
-    setEndpointValues(initialState.map(id => endpointsMap[id]));
+    findEndpoints(initialState).then(result => setEndpointValues(result.data));
   }, [open, initialState]);
 
-  const addEndpoint = (endpointId: string) => {
-    setEndpointValues([...endpointValues, endpointsMap[endpointId]]);
+  const addEndpoint = (_endpointId: string, endpoint: Endpoint) => {
+    setEndpointValues([...endpointValues, endpoint]);
   };
   const removeEndpoint = (endpointId: string) => {
     setEndpointValues(endpointValues.filter(v => v.asset_id !== endpointId));
@@ -172,7 +159,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>
         <Button color="secondary" onClick={handleSubmit}>
-          {t('Add')}
+          {t('Update')}
         </Button>
       </DialogActions>
     </Dialog>

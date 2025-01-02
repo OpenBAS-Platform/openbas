@@ -13,15 +13,10 @@ import lombok.Setter;
 public class ContractSelect extends ContractCardinalityElement {
 
   private Map<String, String> choices = new HashMap<>();
+  private Map<String, String> choiceInformations = new HashMap<>();
 
   public ContractSelect(String key, String label, ContractCardinality cardinality) {
     super(key, label, cardinality);
-  }
-
-  public static ContractSelect selectField(String key, String label, Map<String, String> choices) {
-    ContractSelect contractSelect = new ContractSelect(key, label, ContractCardinality.One);
-    contractSelect.setChoices(choices);
-    return contractSelect;
   }
 
   public static ContractSelect selectFieldWithDefault(
@@ -29,13 +24,6 @@ public class ContractSelect extends ContractCardinalityElement {
     ContractSelect contractSelect = new ContractSelect(key, label, ContractCardinality.One);
     contractSelect.setChoices(choices);
     contractSelect.setDefaultValue(List.of(def));
-    return contractSelect;
-  }
-
-  public static ContractSelect multiSelectField(
-      String key, String label, Map<String, String> choices) {
-    ContractSelect contractSelect = new ContractSelect(key, label, ContractCardinality.Multiple);
-    contractSelect.setChoices(choices);
     return contractSelect;
   }
 

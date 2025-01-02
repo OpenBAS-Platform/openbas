@@ -14,8 +14,8 @@ import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import { isEmptyField } from '../../../../utils/utils';
 import { PermissionsContext } from '../Context';
-import InjectDefinition from './InjectDefinition';
-import InjectForm from './InjectForm';
+import InjectDefinition from './form/InjectDefinition';
+import InjectForm from './form/InjectForm';
 
 const useStyles = makeStyles(theme => ({
   details: {
@@ -186,19 +186,17 @@ const UpdateInjectDetails = ({
     'attachments',
     'expectations',
   ];
-  if (isEmptyField(inject?.inject_content)) {
-    contractContent?.fields
-      .filter(f => !builtInFields.includes(f.key))
-      .forEach((field) => {
-        if (!initialValues[field.key]) {
-          if (field.cardinality && field.cardinality === '1') {
-            initialValues[field.key] = R.head(field.defaultValue);
-          } else {
-            initialValues[field.key] = field.defaultValue;
-          }
+  contractContent?.fields
+    .filter(f => !builtInFields.includes(f.key))
+    .forEach((field) => {
+      if (!initialValues[field.key]) {
+        if (field.cardinality && field.cardinality === '1') {
+          initialValues[field.key] = R.head(field.defaultValue);
+        } else {
+          initialValues[field.key] = field.defaultValue;
         }
-      });
-  }
+      }
+    });
   // Specific processing for some fields
   contractContent?.fields
     .filter(f => !builtInFields.includes(f.key))
@@ -315,6 +313,7 @@ const UpdateInjectDetails = ({
                 register={register}
                 values={getValues()}
                 setValue={setValue}
+                getValues={key => getValues(key)}
                 submitting={isSubmitting}
                 inject={initialValues}
                 injectorContract={contractContent}

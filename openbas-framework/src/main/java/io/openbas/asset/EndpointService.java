@@ -6,6 +6,7 @@ import static java.time.Instant.now;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.specification.EndpointSpecification;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -64,12 +65,12 @@ public class EndpointService {
 
   @Transactional(readOnly = true)
   public List<Endpoint> findAssetsForInjectionByHostname(@NotBlank final String hostname) {
-    return this.endpointRepository.findForInjectionByHostname(hostname);
+    return endpoints(EndpointSpecification.findEndpointsForInjectionByHostname(hostname));
   }
 
   @Transactional(readOnly = true)
   public List<Endpoint> findAssetsForExecutionByHostname(@NotBlank final String hostname) {
-    return this.endpointRepository.findForExecutionByHostname(hostname);
+    return endpoints(EndpointSpecification.findEndpointsForExecutionByHostname(hostname));
   }
 
   @Transactional(readOnly = true)
