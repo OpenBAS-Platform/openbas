@@ -76,7 +76,6 @@ public class ExecutableInjectService {
   private static String formatMultilineCommand(String command) {
     String[] lines = command.split("\n");
     StringBuilder formattedCommand = new StringBuilder();
-    boolean insideBlock = false;
 
     for (int i = 0; i < lines.length; i++) {
       String line = lines[i];
@@ -86,16 +85,11 @@ public class ExecutableInjectService {
       }
       formattedCommand.append(trimmedLine);
 
-      if (trimmedLine.endsWith("(")) {
-        insideBlock = true;
-      }
-
-      if (trimmedLine.endsWith(")")) {
-        insideBlock = false;
-      }
-
       boolean isLastLine = (i == lines.length - 1);
-      if (!insideBlock && !isLastLine) {
+      boolean isAfterParentheses = trimmedLine.endsWith("(");
+      boolean isBeforeParentheses = !isLastLine && lines[i + 1].trim().startsWith(")");
+
+      if (!isAfterParentheses && !isBeforeParentheses && !isLastLine) {
         formattedCommand.append(" & ");
       } else {
         formattedCommand.append(" ");
@@ -116,6 +110,7 @@ public class ExecutableInjectService {
     if (executor.equals("cmd")) {
       computedCommand = replaceCmdVariables(computedCommand);
       computedCommand = formatMultilineCommand(computedCommand);
+      System.out.println("computed command : " + computedCommand);
     }
 
     if (obfuscator.equals("base64")) {
