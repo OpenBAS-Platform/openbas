@@ -893,7 +893,11 @@ public class ExerciseApi extends RestBehavior {
           inject
               .getInjectorContract()
               .ifPresent(
-                  injectorContract -> exerciseTags.addAll(injectorContract.getPayload().getTags()));
+                  injectorContract -> {
+                    if (injectorContract.getPayload() != null) {
+                      exerciseTags.addAll(injectorContract.getPayload().getTags());
+                    }
+                  });
           exerciseTags.addAll(inject.getTags());
         });
     exerciseTags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
