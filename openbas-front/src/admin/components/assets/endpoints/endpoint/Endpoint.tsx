@@ -93,7 +93,7 @@ const Endpoint = () => {
                 gutterBottom
                 style={{ marginTop: 20 }}
               >
-                {t('Architecture')}
+                {t('IP Addresses')}
               </Typography>
               <div style={{ display: 'flex' }}>
                 architecture
@@ -105,7 +105,7 @@ const Endpoint = () => {
                 gutterBottom
                 style={{ marginTop: 20 }}
               >
-                {t('Architecture')}
+                {t('MAC Addresses')}
               </Typography>
               <div style={{ display: 'flex' }}>
                 architecture
@@ -117,7 +117,7 @@ const Endpoint = () => {
                 gutterBottom
                 style={{ marginTop: 20 }}
               >
-                {t('Architecture')}
+                {t('Last Seen')}
               </Typography>
               <div style={{ display: 'flex' }}>
                 architecture
@@ -129,7 +129,7 @@ const Endpoint = () => {
                 gutterBottom
                 style={{ marginTop: 20 }}
               >
-                {t('Architecture')}
+                {t('Tags')}
               </Typography>
               <div style={{ display: 'flex' }}>
                 architecture
