@@ -6,6 +6,8 @@ import io.openbas.database.model.Executor;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;
+import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
+import io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorContextService;
 import io.openbas.executors.openbas.service.OpenBASExecutorContextService;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.service.TaniumExecutorContextService;
@@ -27,6 +29,8 @@ public class ExecutionExecutorService {
   private final CalderaExecutorContextService calderaExecutorContextService;
   private final TaniumExecutorConfig taniumExecutorConfig;
   private final TaniumExecutorContextService taniumExecutorContextService;
+  private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
+  private final CrowdStrikeExecutorContextService crowdStrikeExecutorContextService;
   private final OpenBASExecutorContextService openBASExecutorContextService;
   private final InjectStatusRepository injectStatusRepository;
 
@@ -92,6 +96,12 @@ public class ExecutionExecutorService {
             throw new RuntimeException("Fatal error: Tanium executor is not enabled");
           }
           this.taniumExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
+        }
+        case "openbas_crowdstrike" -> {
+          if (!this.crowdStrikeExecutorConfig.isEnable()) {
+            throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
+          }
+          this.crowdStrikeExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         }
         case "openbas_agent" ->
             this.openBASExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
