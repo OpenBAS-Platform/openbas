@@ -13,7 +13,6 @@ public class V3_54__TagRule extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    // Create relations between contracts and attack_patterns
     select.execute(
         """
                CREATE TABLE tag_rules (

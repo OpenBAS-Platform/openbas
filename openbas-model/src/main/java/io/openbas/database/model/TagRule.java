@@ -8,13 +8,12 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
+@Data
 @Entity
-@Setter
-@Getter
 @Table(name = "tag_rules")
 @EntityListeners(ModelBaseListener.class)
 public class TagRule implements Base {

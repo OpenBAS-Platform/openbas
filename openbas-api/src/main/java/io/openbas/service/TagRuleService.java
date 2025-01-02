@@ -18,62 +18,33 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class TagRuleService {
-  private TagRuleRepository tagRuleRepository;
-  private TagRepository tagRepository;
-  private AssetRepository assetRepository;
+  private final TagRuleRepository tagRuleRepository;
+  private final TagRepository tagRepository;
+  private final AssetRepository assetRepository;
 
-  /**
-   * Find the TagRule by id
-   *
-   * @param id
-   * @return
-   */
   public Optional<TagRule> findById(String id) {
     return tagRuleRepository.findById(id);
   }
 
-  /**
-   * Find all the TagRules
-   *
-   * @return
-   */
   public List<TagRule> findAll() {
     return StreamSupport.stream(tagRuleRepository.findAll().spliterator(), false)
         .collect(Collectors.toList());
   }
 
-  /**
-   * Create a TagRule
-   *
-   * @param tagName if the tag doesn't exist it will be created
-   * @param assetIds list of existing assets id
-   * @return
-   */
   public TagRule createTagRule(@NotBlank final String tagName, final List<String> assetIds) {
-    // if the tag doesn't exist we create it
-    // if one of the asset doesn't exist throw a ResourceNotFoundException
+    // if the tag  or one of the asset doesn't exist we exist throw a ElementNotFoundException
     TagRule tagRule = new TagRule();
-    tagRule.setTag(getOrCreateTag(tagName));
+    tagRule.setTag(getTag(tagName));
     tagRule.setAssets(getAssets(assetIds));
     return tagRuleRepository.save(tagRule);
   }
 
-  /**
-   * Update tagRule
-   *
-   * @param tagName
-   * @param assetIds
-   * @return
-   */
   public TagRule updateTagRule(
       @NotBlank final String tagRuleId, final String tagName, final List<String> assetIds) {
 
@@ -84,8 +55,7 @@ public class TagRuleService {
             .orElseThrow(
                 () -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
 
-    // if the tag doesn't exist we create it
-    tagRule.setTag(getOrCreateTag(tagName));
+    tagRule.setTag(getTag(tagName));
 
     // if one of the asset doesn't exist throw a ResourceNotFoundException
     tagRule.setAssets(getAssets(assetIds));
@@ -93,57 +63,31 @@ public class TagRuleService {
     return tagRuleRepository.save(tagRule);
   }
 
-  /**
-   * Search TagRule
-   *
-   * @param searchPaginationInput
-   * @return
-   */
   public Page<TagRule> searchTagRule(SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<TagRule> specification, Pageable pageable) ->
-            this.tagRuleRepository.findAll(specification, pageable),
+            tagRuleRepository::findAll,
         searchPaginationInput,
         TagRule.class);
   }
 
-  /**
-   * Delete a TagRule
-   *
-   * @param tagRuleId
-   */
   public void deleteTagRule(@NotBlank final String tagRuleId) {
-    this.tagRuleRepository.deleteById(tagRuleId);
+    //verify that the TagRule exists
+    tagRuleRepository
+            .findById(tagRuleId)
+            .orElseThrow(
+                    () -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
+    tagRuleRepository.deleteById(tagRuleId);
   }
 
   @VisibleForTesting
-  protected Tag createtag(final String tagName) {
-    Tag tag = new Tag();
-    tag.setName(tagName);
-    tag.setColor("#001bda");
-    return tag;
-  }
-
-  /**
-   * Check if the tag exists, if no it creates it
-   *
-   * @param tagName
-   * @return
-   */
-  @VisibleForTesting
-  protected Tag getOrCreateTag(@NotBlank final String tagName) {
+  protected Tag getTag(@NotBlank final String tagName) {
     // TODO: tag name normalization needs to be implemented in a reusable method
     return tagRepository
-        .findByName(tagName.toLowerCase())
-        .orElseGet(() -> tagRepository.save(createtag(tagName)));
+            .findByName(tagName.toLowerCase())
+            .orElseThrow(
+                    () -> new ElementNotFoundException("Tag not found with name: " + tagName));
   }
 
-  /**
-   * Get the assets from the DB, and throwns an exception if an asset doesn't exist
-   *
-   * @param assetIds
-   * @return
-   */
   @VisibleForTesting
   protected List<Asset> getAssets(final List<String> assetIds) {
     return assetIds == null
@@ -155,21 +99,6 @@ public class TagRuleService {
                         .findById(id)
                         .orElseThrow(
                             () -> new ElementNotFoundException("Asset not found with id: " + id)))
-            .toList();
-  }
-
-  @Autowired
-  public void setTagRuleRepository(TagRuleRepository tagRuleRepository) {
-    this.tagRuleRepository = tagRuleRepository;
-  }
-
-  @Autowired
-  public void setTagRepository(TagRepository tagRepository) {
-    this.tagRepository = tagRepository;
-  }
-
-  @Autowired
-  public void setAssetRepository(AssetRepository assetRepository) {
-    this.assetRepository = assetRepository;
+            .collect(Collectors.toList());
   }
 }

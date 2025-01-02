@@ -13,4 +13,8 @@ public class TagRuleMapper {
             tagRule.getAssets().stream().collect(Collectors.toMap(Asset::getId, Asset::getName)))
         .build();
   }
+
+  private TagRuleMapper() {
+    throw new UnsupportedOperationException("Cannot instantiate TagRuleMapper");
+  }
 }

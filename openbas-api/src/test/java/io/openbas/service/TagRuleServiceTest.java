@@ -91,12 +91,12 @@ public class TagRuleServiceTest {
         .getAssets()
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
-
-    TagRule result =
-        tagRuleService.createTagRule(
-            expected.getId(), expected.getAssets().stream().map(Asset::getId).toList());
-    verify(tagRepository).save(any());
-    assertEquals(expected, result);
+    assertThrows(
+            ElementNotFoundException.class,
+            () -> {
+              tagRuleService.createTagRule(
+                      expected.getId(), expected.getAssets().stream().map(Asset::getId).toList());
+            });
   }
 
   @Test
@@ -150,14 +150,14 @@ public class TagRuleServiceTest {
         .getAssets()
         .forEach(
             asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
-
-    TagRule result =
-        tagRuleService.updateTagRule(
-            expected.getId(),
-            expected.getId(),
-            expected.getAssets().stream().map(Asset::getId).toList());
-    verify(tagRepository).save(any());
-    assertEquals(expected, result);
+    assertThrows(
+            ElementNotFoundException.class,
+            () -> {
+              tagRuleService.updateTagRule(
+                      expected.getId(),
+                      expected.getId(),
+                      expected.getAssets().stream().map(Asset::getId).toList());
+            });
   }
 
   @Test
