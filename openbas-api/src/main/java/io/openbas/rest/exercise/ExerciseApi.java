@@ -781,7 +781,9 @@ public class ExerciseApi extends RestBehavior {
     // Start exporting exercise
     Exercise exercise =
             exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    ExerciseFileExport importExport = ExerciseFileExport.fromExercise(exercise, objectMapper, this.variableService, this.challengeService).withOptions(ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues));
+    ExerciseFileExport importExport = ExerciseFileExport
+            .fromExercise(exercise, objectMapper, this.variableService, this.challengeService)
+            .withOptions(ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues));
 
     // Build the response
     String infos =
@@ -800,7 +802,7 @@ public class ExerciseApi extends RestBehavior {
     ZipEntry zipEntry = new ZipEntry(exercise.getName() + ".json");
     zipEntry.setComment(EXPORT_ENTRY_EXERCISE);
     zipExport.putNextEntry(zipEntry);
-    zipExport.write(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(importExport));
+    zipExport.write(importExport.getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsBytes(importExport));
     zipExport.closeEntry();
     // Add the documents
     importExport.getAllDocumentIds().stream()

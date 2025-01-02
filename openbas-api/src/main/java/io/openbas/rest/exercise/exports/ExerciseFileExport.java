@@ -26,10 +26,11 @@ import org.springframework.stereotype.Component;
 @JsonInclude(NON_NULL)
 public class ExerciseFileExport {
 
+  @JsonIgnore
   private ChallengeService challengeService;
-
+  @JsonIgnore
   private VariableService variableService;
-
+  @JsonIgnore
   private ObjectMapper objectMapper;
 
   @JsonProperty("export_version")
@@ -43,7 +44,9 @@ public class ExerciseFileExport {
 
   public List<Team> getTeams() {
     if(teams == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getTeams();
+      return this.exercise != null && ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)
+        ? this.exercise.getTeams()
+        : new ArrayList<>();
     }
     return teams;
   }
@@ -64,7 +67,10 @@ public class ExerciseFileExport {
   public List<User> getUsers() {
     if(users == null) {
       return this.exercise != null && ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)
-              ? this.exercise.getUsers()
+              ? this.exercise.getTeams().stream()
+              .flatMap(team -> team.getUsers().stream())
+              .distinct()
+              .toList()
               : new ArrayList<>();
     }
     return users;
@@ -200,6 +206,7 @@ public class ExerciseFileExport {
     return variables;
   }
 
+  @JsonIgnore
   public List<String> getAllDocumentIds() {
     List<String> documentIds = new ArrayList<>();
     documentIds.addAll(this.getDocuments().stream().map(Document::getId).toList());
@@ -216,6 +223,7 @@ public class ExerciseFileExport {
     return documentIds;
   }
 
+  @JsonIgnore
   private int exportOptionsMask = 0;
 
   public ExerciseFileExport(ObjectMapper objectMapper, VariableService variableService, ChallengeService challengeService) {
@@ -238,9 +246,9 @@ public class ExerciseFileExport {
 
     // default options
     // variables with no value
-    this.objectMapper.addMixIn(Variable.class, VariableMixin.class);
+    //this.objectMapper.addMixIn(Variable.class, VariableMixin.class);
     //empty teams
-    this.objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
+    //this.objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
   }
 
   public static final ExerciseFileExport fromExercise(Exercise exercise, ObjectMapper objectMapper, VariableService variableService, ChallengeService challengeService) {
