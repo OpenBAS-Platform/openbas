@@ -40,7 +40,6 @@ public class TagRuleServiceTest {
   void testFindById() {
     TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
     when(tagRuleRepository.findById(TAG_RULE_ID)).thenReturn(Optional.of(expected));
-
     Optional<TagRule> result = tagRuleService.findById(TAG_RULE_ID);
     assertEquals(expected, result.get());
   }
@@ -58,6 +57,8 @@ public class TagRuleServiceTest {
 
   @Test
   void testDeleteTagRule() {
+    TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    when(tagRuleRepository.findById(TAG_RULE_ID)).thenReturn(Optional.of(expected));
     tagRuleService.deleteTagRule(TAG_RULE_ID);
     verify(tagRuleRepository).deleteById(TAG_RULE_ID);
   }
@@ -75,7 +76,7 @@ public class TagRuleServiceTest {
 
     TagRule result =
         tagRuleService.createTagRule(
-            expected.getId(), expected.getAssets().stream().map(Asset::getId).toList());
+            expected.getTag().getName(), expected.getAssets().stream().map(Asset::getId).toList());
     assertEquals(expected, result);
   }
 
@@ -132,7 +133,7 @@ public class TagRuleServiceTest {
     TagRule result =
         tagRuleService.updateTagRule(
             expected.getId(),
-            expected.getId(),
+            expected.getTag().getName(),
             expected.getAssets().stream().map(Asset::getId).toList());
     assertEquals(expected, result);
   }
@@ -154,7 +155,7 @@ public class TagRuleServiceTest {
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
-              expected.getId(),
+              expected.getTag().getName(),
               expected.getAssets().stream().map(Asset::getId).toList());
         });
   }
@@ -175,7 +176,7 @@ public class TagRuleServiceTest {
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
-              expected.getId(),
+              expected.getTag().getName(),
               expected.getAssets().stream().map(Asset::getId).toList());
         });
   }
@@ -189,7 +190,7 @@ public class TagRuleServiceTest {
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
-              expected.getId(),
+              expected.getTag().getName(),
               expected.getAssets().stream().map(Asset::getId).toList());
         });
   }
