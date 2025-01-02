@@ -15,6 +15,8 @@ public enum ContractType {
   Textarea,
   @JsonProperty("select")
   Select,
+  @JsonProperty("choice")
+  Choice,
   @JsonProperty("article")
   Article,
   @JsonProperty("challenge")

@@ -5,9 +5,9 @@ import static org.springframework.util.StringUtils.hasText;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.rest.exception.ElementNotFoundException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -76,29 +76,13 @@ public class ExecutableInjectService {
     return result.toString();
   }
 
-  private String obfuscateCommandBase64(String command, String executor) {
-    String obfuscatedCommand = command;
-
-    if (executor.equals("psh") || executor.equals("cmd")) {
-      byte[] utf16Bytes = command.getBytes(StandardCharsets.UTF_16LE);
-      String base64 = Base64.getEncoder().encodeToString(utf16Bytes);
-      obfuscatedCommand = String.format("powershell -Enc %s", base64);
-
-    } else if (executor.equals("bash") || executor.equals("sh")) {
-      obfuscatedCommand =
-          String.format(
-              "eval \"$(echo %s | base64 --decode)\"",
-              Base64.getEncoder().encodeToString(command.getBytes()));
-    }
-    return obfuscatedCommand;
-  }
-
   private String processAndEncodeCommand(
       String command,
       String executor,
       List<PayloadArgument> defaultArguments,
       ObjectNode injectContent,
       String obfuscator) {
+    OpenBASObfuscationMap obfuscationMap = new OpenBASObfuscationMap();
     String computedCommand = replaceArgumentsByValue(command, defaultArguments, injectContent);
 
     if (executor.equals("cmd")) {
@@ -106,9 +90,7 @@ public class ExecutableInjectService {
       computedCommand = computedCommand.trim().replace("\n", " & ");
     }
 
-    if (obfuscator.equals("base64")) {
-      computedCommand = obfuscateCommandBase64(computedCommand, executor);
-    }
+    computedCommand = obfuscationMap.executeObfuscation(obfuscator, computedCommand, executor);
 
     return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }

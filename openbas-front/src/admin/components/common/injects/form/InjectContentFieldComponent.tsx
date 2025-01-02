@@ -11,17 +11,21 @@ import TextField from '../../../../../components/fields/TextField';
 import { useFormatter } from '../../../../../components/i18n';
 import { Document } from '../../../../../utils/api-types';
 
+type choiceItem = {
+  label: string;
+  value: string;
+  information: string;
+};
 type InjectField = {
   key: string;
   richText: boolean;
   cardinality?: string;
   mandatory: boolean;
-  choiceInformations: Record<string, string>;
   defaultValue: string | string[];
-  choices: Record<string, Record<string, string>> | Record<string, string> ;
+  choices: Record<string, string> | choiceItem[];
   label: string;
   contractAttachment: { key: string; label: string }[];
-  type: 'textarea' | 'text' | 'select' | 'number' | 'tuple' | 'checkbox' | 'dependency-select';
+  type: 'textarea' | 'text' | 'select' | 'number' | 'tuple' | 'checkbox' | 'dependency-select' | 'choice';
   dependencyField: string;
 };
 
@@ -53,11 +57,12 @@ const InjectContentFieldComponent = ({
   }
 
   useEffect(() => {
-    if (!selectedValue && field.choiceInformations) {
-      setInformationToDisplay(field.choiceInformations[values[field.key]] ?? field.choiceInformations[field.defaultValue[0]]);
+    const findInformation = (value: string) => (field.choices as choiceItem[]).find(c => c.value === value)?.information || '';
+    if (!selectedValue && field.type === 'choice') {
+      setInformationToDisplay(findInformation(values[field.key]) ?? findInformation(field.defaultValue[0]));
     }
-    if (selectedValue && field.choiceInformations) {
-      setInformationToDisplay(field.choiceInformations[selectedValue]);
+    if (selectedValue && field.type === 'choice') {
+      setInformationToDisplay(findInformation(selectedValue));
     }
     if (fieldType === 'checkbox' || fieldType === 'select') {
       onSelectOrCheckboxFieldChange();
@@ -234,43 +239,69 @@ const InjectContentFieldComponent = ({
         );
       }
       case 'select': {
-        const renderMultipleValuesFct = (v: string[]) => v.map(a => field.choices[a]).join(', ');
-        const renderSingleValueFct = (v: string) => (t(field.choices[v] || 'Unknown'));
+        const choices = field.choices as Record<string, string>;
+        const renderMultipleValuesFct = (v: string[]) => v.map(a => (choices[a])).join(', ');
+        const renderSingleValueFct = (v: string) => (t(choices[v] || 'Unknown'));
         const renderValueFct = (v: string | string[]) =>
           Array.isArray(v) ? renderMultipleValuesFct(v) : renderSingleValueFct(v);
 
         return (
-          <>
-            <SelectField
-              variant="standard"
-              label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-              key={field.key}
-              multiple={field.cardinality === 'n'}
-              renderValue={(v: string | string[]) => renderValueFct(v)}
-              name={field.key}
-              fullWidth={true}
-              style={{ marginTop: 20 }}
-              control={control}
-              disabled={readOnly}
-              defaultValue={field.defaultValue}
-            >
-              {Object.entries(field.choices)
-                .sort((a, b) => a[1].localeCompare(b[1]))
-                .map(([k, v]) => (
-                  <MenuItem key={k} value={k}>
-                    <ListItemText>
-                      {t(v || 'Unknown')}
-                    </ListItemText>
-                  </MenuItem>
-                ))}
-            </SelectField>
-          </>
+          <SelectField
+            variant="standard"
+            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            key={field.key}
+            multiple={field.cardinality === 'n'}
+            renderValue={(v: string | string[]) => renderValueFct(v)}
+            name={field.key}
+            fullWidth={true}
+            style={{ marginTop: 20 }}
+            control={control}
+            disabled={readOnly}
+            defaultValue={field.defaultValue}
+          >
+            {Object.entries(choices)
+              .sort((a, b) => a[1].localeCompare(b[1]))
+              .map(([k, v]) => (
+                <MenuItem key={k} value={k}>
+                  <ListItemText>
+                    {t(v || 'Unknown')}
+                  </ListItemText>
+                </MenuItem>
+              ))}
+          </SelectField>
+        );
+      }
+      case 'choice': {
+        const choices = field.choices as choiceItem[];
+        const renderMultipleValuesFct = (v: string[]) => choices.filter(c => v.includes(c.value)).map(c => c.label).join(', ');
+        const renderSingleValueFct = (v: string) => (t(choices.find(c => c.value === v)?.label || 'Unknown'));
+        const renderValueFct = (v: string | string[]) =>
+          Array.isArray(v) ? renderMultipleValuesFct(v) : renderSingleValueFct(v);
 
+        return (
+          <SelectField
+            variant="standard"
+            label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+            key={field.key}
+            multiple={field.cardinality === 'n'}
+            renderValue={(v: string | string[]) => renderValueFct(v)}
+            name={field.key}
+            fullWidth={true}
+            style={{ marginTop: 20 }}
+            control={control}
+            disabled={readOnly}
+            defaultValue={field.defaultValue}
+          >
+            {choices.map(choice => (
+              <MenuItem key={choice.value} value={choice.value}>{choice.label}</MenuItem>
+            ))}
+
+          </SelectField>
         );
       }
       case 'dependency-select': {
         const depValue = values[field.dependencyField];
-        const choices = field.choices[depValue] as Record<string, string> ?? {};
+        const choices = ((field.choices as Record<string, string>)[depValue]) as unknown as Record<string, string> ?? {};
         const renderMultipleValuesFct = (v: string[]) => v.map(a => choices[a]).join(', ');
         const renderSingleValueFct = (v: string) => (t(choices[v] || 'Unknown'));
         const renderValueFct = (v: string | string[]) =>

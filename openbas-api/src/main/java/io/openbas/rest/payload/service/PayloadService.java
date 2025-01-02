@@ -23,11 +23,8 @@ import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
-import io.openbas.injector_contract.fields.ContractAsset;
-import io.openbas.injector_contract.fields.ContractAssetGroup;
-import io.openbas.injector_contract.fields.ContractExpectations;
-import io.openbas.injector_contract.fields.ContractSelect;
-import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
+import io.openbas.injector_contract.fields.*;
+import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.utils.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -110,14 +107,11 @@ public class PayloadService {
     }
   }
 
-  private ContractSelect obfuscatorField() {
-    Map<String, String> obfuscatorState = OpenBASImplantInjectContent.getObfuscatorState();
-
-    return ContractSelect.selectFieldWithChoiceInformations(
-        "obfuscator",
-        "Obfuscators",
-        obfuscatorState,
-        OpenBASImplantInjectContent.getDefaultObfuscator());
+  private ContractChoiceInformation obfuscatorField() {
+    OpenBASObfuscationMap obfuscationMap = new OpenBASObfuscationMap();
+    Map<String, String> obfuscationInfo = obfuscationMap.getAllObfuscationInfo();
+    return ContractChoiceInformation.choiceInformationField(
+        "obfuscator", "Obfuscators", obfuscationInfo, obfuscationMap.getDefaultObfuscator());
   }
 
   private Contract buildContract(
@@ -139,8 +133,8 @@ public class PayloadService {
     ContractDef builder = contractBuilder();
     builder.mandatoryGroup(assetField, assetGroupField);
 
-    if (injector.getType().equals("openbas_implant") && payload.getType().equals("Command")) {
-      ContractSelect obfuscatorField = obfuscatorField();
+    if (payload.getType().equals("Command")) {
+      ContractChoiceInformation obfuscatorField = obfuscatorField();
       builder.optional(obfuscatorField);
     }
 

@@ -5,7 +5,6 @@ import io.openbas.injector_contract.ContractType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,19 +24,6 @@ public class ContractSelect extends ContractCardinalityElement {
     ContractSelect contractSelect = new ContractSelect(key, label, ContractCardinality.One);
     contractSelect.setChoices(choices);
     contractSelect.setDefaultValue(List.of(def));
-    return contractSelect;
-  }
-
-  public static ContractSelect selectFieldWithChoiceInformations(
-      String key, String label, Map<String, String> choiceInformations, String def) {
-    ContractSelect contractSelect = new ContractSelect(key, label, ContractCardinality.One);
-
-    Map<String, String> choices =
-        choiceInformations.keySet().stream().collect(Collectors.toMap(k -> k, k -> k));
-
-    contractSelect.setChoices(choices);
-    contractSelect.setDefaultValue(List.of(def));
-    contractSelect.setChoiceInformations(choiceInformations);
     return contractSelect;
   }
 
