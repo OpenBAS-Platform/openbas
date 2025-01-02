@@ -26,41 +26,36 @@ public class TagRuleApi extends RestBehavior {
   public static final String TAG_RULE_URI = "/api/tag-rules";
 
   private final TagRuleService tagRuleService;
-  private final TagRuleMapper tagRuleMapper;
 
-  public TagRuleApi(TagRuleService tagRuleService,
-                    TagRuleMapper tagRuleMapper) {
+  public TagRuleApi(TagRuleService tagRuleService) {
     super();
     this.tagRuleService = tagRuleService;
-    this.tagRuleMapper = tagRuleMapper;
   }
 
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
-  @Operation(
-          summary = "Get TagRule by Id")
+  @Operation(summary = "Get TagRule by Id")
   public TagRuleOutput findTagRule(@PathVariable @NotBlank final String tagRuleId) {
-    return tagRuleService.findById(tagRuleId).map(tagRuleMapper::toTagRuleOutput).orElse(null);
+    return tagRuleService.findById(tagRuleId).map(TagRuleMapper::toTagRuleOutput).orElse(null);
   }
 
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI)
   @Operation(summary = "Get All TagRules")
   public List<TagRuleOutput> tags() {
-    return tagRuleService.findAll().stream().map(tagRuleMapper::toTagRuleOutput).toList();
+    return tagRuleService.findAll().stream().map(TagRuleMapper::toTagRuleOutput).toList();
   }
 
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @DeleteMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
   @Transactional(rollbackFor = Exception.class)
-  @Operation(summary = "Delete TagRule",
-          description = "TagRule needs to exists")
+  @Operation(summary = "Delete TagRule", description = "TagRule needs to exists")
   @ApiResponses(
-          value = {
-                  @ApiResponse(responseCode = "200", description = "TagRule deleted"),
-                  @ApiResponse(responseCode = "404", description = "TagRule not found")
-          })
+      value = {
+        @ApiResponse(responseCode = "200", description = "TagRule deleted"),
+        @ApiResponse(responseCode = "404", description = "TagRule not found")
+      })
   public void deleteTagRule(@PathVariable @NotBlank final String tagRuleId) {
     this.tagRuleService.deleteTagRule(tagRuleId);
   }
@@ -69,16 +64,14 @@ public class TagRuleApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI)
   @Transactional(rollbackFor = Exception.class)
-  @Operation(
-      summary = "Create TagRule",
-      description = "Tag and assets needs to exists")
+  @Operation(summary = "Create TagRule", description = "Tag and assets needs to exists")
   @ApiResponses(
-          value = {
-                  @ApiResponse(responseCode = "200", description = "TagRule created"),
-                  @ApiResponse(responseCode = "404", description = "Tag or Asset not found")
-          })
+      value = {
+        @ApiResponse(responseCode = "200", description = "TagRule created"),
+        @ApiResponse(responseCode = "404", description = "Tag or Asset not found")
+      })
   public TagRuleOutput createTagRule(@Valid @RequestBody final TagRuleInput input) {
-    return tagRuleMapper.toTagRuleOutput(
+    return TagRuleMapper.toTagRuleOutput(
         this.tagRuleService.createTagRule(input.getTagName(), input.getAssets()));
   }
 
@@ -86,29 +79,26 @@ public class TagRuleApi extends RestBehavior {
   @LogExecutionTime
   @PutMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
   @Transactional(rollbackFor = Exception.class)
-  @Operation(
-      summary = "Update TagRule",
-          description = "Tag and assets needs to exists")
+  @Operation(summary = "Update TagRule", description = "Tag and assets needs to exists")
   @ApiResponses(
-          value = {
-                  @ApiResponse(responseCode = "200", description = "TagRule updated"),
-                  @ApiResponse(responseCode = "404", description = "TagRule, Tag  or Asset not found")
-          })
+      value = {
+        @ApiResponse(responseCode = "200", description = "TagRule updated"),
+        @ApiResponse(responseCode = "404", description = "TagRule, Tag  or Asset not found")
+      })
   public TagRuleOutput updateTagRule(
       @PathVariable @NotBlank final String tagRuleId,
       @Valid @RequestBody final TagRuleInput input) {
-    return tagRuleMapper.toTagRuleOutput(
+    return TagRuleMapper.toTagRuleOutput(
         this.tagRuleService.updateTagRule(tagRuleId, input.getTagName(), input.getAssets()));
   }
 
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI + "/search")
-  @Operation(
-      summary = "Search TagRule")
+  @Operation(summary = "Search TagRule")
   public Page<TagRuleOutput> searchTagRules(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.tagRuleService
         .searchTagRule(searchPaginationInput)
-        .map(tagRuleMapper::toTagRuleOutput);
+        .map(TagRuleMapper::toTagRuleOutput);
   }
 }
