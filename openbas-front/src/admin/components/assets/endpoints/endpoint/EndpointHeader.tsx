@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useFormatter } from '../../../../../components/i18n';
-import EndpointPopover from '../EndpointPopover';
+import { truncate } from '../../../../../utils/String';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -34,19 +34,17 @@ const EndpointHeader = () => {
 
   return (
     <>
-      <Tooltip title={endpoint.asset_name}>
+      <Tooltip title={'endpoint.asset_name'}>
         <Typography
           variant="h1"
           gutterBottom={true}
           classes={{ root: classes.title }}
         >
-          {truncate(endpoint.asset_name, 80)}
+          {truncate('endpoint.asset_name', 80)}
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        <EndpointPopover
-          onDelete={() => navigate('/admin/assets/endpoints')}
-        />
+
       </div>
       <div className="clearfix" />
     </>
