@@ -190,7 +190,7 @@ class UserApiTest extends IntegrationTest {
               post("/api/reset")
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(input)))
-          .andExpect(status().isOk());
+          .andExpect(status().isBadRequest());
 
       // -- ASSERT --
       verify(mailingService, never()).sendEmail(anyString(), anyString(), any(List.class));
