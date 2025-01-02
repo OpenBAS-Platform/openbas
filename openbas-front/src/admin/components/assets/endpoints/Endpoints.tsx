@@ -100,11 +100,11 @@ const Endpoints = () => {
   // Headers
   const headers = [
     { field: 'asset_name', label: 'Name', isSortable: true },
+    { field: 'asset_status', label: 'Status', isSortable: false },
     { field: 'endpoint_platform', label: 'Platform', isSortable: true },
     { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
     { field: 'asset_executor', label: 'Executor', isSortable: false },
     { field: 'asset_tags', label: 'Tags', isSortable: true },
-    { field: 'asset_status', label: 'Status', isSortable: false },
   ];
 
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
@@ -175,6 +175,9 @@ const Endpoints = () => {
                     <div className={classes.bodyItem} style={inlineStyles.asset_name}>
                       {endpoint.asset_name}
                     </div>
+                    <div className={classes.bodyItem} style={inlineStyles.asset_status}>
+                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
+                    </div>
                     <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
                       <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
                       {' '}
@@ -195,9 +198,6 @@ const Endpoints = () => {
                     </div>
                     <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
                       <ItemTags variant="list" tags={endpoint.asset_tags} />
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
                     </div>
                   </div>
                 )}
