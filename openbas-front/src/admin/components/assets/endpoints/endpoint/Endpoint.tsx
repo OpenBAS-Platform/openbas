@@ -1,5 +1,6 @@
 import { Grid, List, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
@@ -7,14 +8,6 @@ import SearchFilter from '../../../../../components/SearchFilter';
 import { useAppDispatch } from '../../../../../utils/hooks';
 
 const useStyles = makeStyles(() => ({
-  chip: {
-    fontSize: 12,
-    height: 25,
-    margin: '0 7px 7px 0',
-    textTransform: 'uppercase',
-    borderRadius: 4,
-    width: 180,
-  },
   gridContainer: {
     marginBottom: 20,
   },
@@ -55,7 +48,7 @@ const Endpoint = () => {
                 {t('Description')}
               </Typography>
               <ExpandableMarkdown
-                source={'fefe'}
+                source="fefe"
                 limit={300}
               />
             </Grid>
@@ -68,7 +61,7 @@ const Endpoint = () => {
                 {t('Host name')}
               </Typography>
               <div style={{ display: 'flex' }}>
-                {'host name'}
+                host name
               </div>
             </Grid>
             <Grid item xs={2} style={{ paddingTop: 10 }}>
@@ -80,7 +73,7 @@ const Endpoint = () => {
                 {t('Platform')}
               </Typography>
               <div style={{ display: 'flex' }}>
-                {'platform'}
+                platform
               </div>
             </Grid>
             <Grid item xs={2} style={{ paddingTop: 10 }}>
@@ -92,7 +85,7 @@ const Endpoint = () => {
                 {t('Architecture')}
               </Typography>
               <div style={{ display: 'flex' }}>
-                {'architecture'}
+                architecture
               </div>
             </Grid>
           </Grid>
