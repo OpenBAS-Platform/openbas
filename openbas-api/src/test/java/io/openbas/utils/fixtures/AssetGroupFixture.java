@@ -1,7 +1,10 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.AssetGroup;
+import io.openbas.rest.asset_group.form.AssetGroupInput;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class AssetGroupFixture {
 
@@ -10,5 +13,12 @@ public class AssetGroupFixture {
     assetGroup.setName(name);
     assetGroup.setDescription("An asset group");
     return assetGroup;
+  }
+
+  public static AssetGroupInput createAssetGroupWithTags(@NotNull final String name, @NotNull final List<String> tags) {
+    AssetGroupInput assetGroupInput = new AssetGroupInput();
+    assetGroupInput.setName(name);
+    assetGroupInput.setDescription("An asset group");
+    return assetGroupInput;
   }
 }
