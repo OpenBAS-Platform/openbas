@@ -4,12 +4,11 @@ import io.openbas.database.model.*;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import jakarta.validation.constraints.NotNull;
+import java.util.Base64;
+import java.util.Objects;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Base64;
-import java.util.Objects;
 
 @Log
 @Service

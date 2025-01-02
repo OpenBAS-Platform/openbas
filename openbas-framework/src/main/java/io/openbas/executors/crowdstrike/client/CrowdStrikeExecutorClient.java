@@ -10,6 +10,13 @@ import io.openbas.executors.crowdstrike.model.ResourcesHosts;
 import io.openbas.executors.crowdstrike.model.ResourcesSession;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
@@ -24,14 +31,6 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-
 @RequiredArgsConstructor
 @Service
 @Log
@@ -41,7 +40,8 @@ public class CrowdStrikeExecutorClient {
   private static final String OAUTH_URI = "/oauth2/token";
   private static final String ENDPOINTS_URI = "/devices/combined/host-group-members/v1";
   private static final String SESSION_URI = "/real-time-response/entities/sessions/v1";
-  private static final String REAL_TIME_RESPONSE_URI = "/real-time-response/entities/active-responder-command/v1";
+  private static final String REAL_TIME_RESPONSE_URI =
+      "/real-time-response/entities/active-responder-command/v1";
 
   private final CrowdStrikeExecutorConfig config;
   private final ObjectMapper objectMapper = new ObjectMapper();
@@ -74,9 +74,10 @@ public class CrowdStrikeExecutorClient {
       bodySession.put("device_id", deviceId);
       bodySession.put("queue_offline", false);
       String jsonSessionResponse = this.post(SESSION_URI, bodySession);
-      ResourcesSession sessions = this.objectMapper.readValue(jsonSessionResponse, new TypeReference<>() {});
+      ResourcesSession sessions =
+          this.objectMapper.readValue(jsonSessionResponse, new TypeReference<>() {});
       CrowdStrikeSession session = sessions.getResources().getFirst();
-      if( session == null ) {
+      if (session == null) {
         log.log(Level.SEVERE, "Cannot get the session on the selected device");
         throw new RuntimeException("Cannot get the session on the selected device");
       }
@@ -84,7 +85,13 @@ public class CrowdStrikeExecutorClient {
       Map<String, Object> bodyCommand = new HashMap<>();
       bodyCommand.put("session_id", session.getSession_id());
       bodyCommand.put("base_command", "runscript");
-      bodyCommand.put("command_string", "runscript -CloudFile=\"" + scriptName + "\"  -CommandLine=```'{\"command\":\"" + command + "\"}'```");
+      bodyCommand.put(
+          "command_string",
+          "runscript -CloudFile=\""
+              + scriptName
+              + "\"  -CommandLine=```'{\"command\":\""
+              + command
+              + "\"}'```");
       this.post(REAL_TIME_RESPONSE_URI, bodyCommand);
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -94,7 +101,7 @@ public class CrowdStrikeExecutorClient {
   // -- PRIVATE --
 
   private String get(@NotBlank final String uri) throws IOException {
-    if( this.lastAuthentication.isBefore(Instant.now().minusSeconds(AUTH_TIMEOUT))) {
+    if (this.lastAuthentication.isBefore(Instant.now().minusSeconds(AUTH_TIMEOUT))) {
       this.authenticate();
     }
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -107,8 +114,9 @@ public class CrowdStrikeExecutorClient {
     }
   }
 
-  private String post(@NotBlank final String uri, @NotNull final Map<String, Object> body) throws IOException {
-    if( this.lastAuthentication.isBefore(Instant.now().minusSeconds(AUTH_TIMEOUT))) {
+  private String post(@NotBlank final String uri, @NotNull final Map<String, Object> body)
+      throws IOException {
+    if (this.lastAuthentication.isBefore(Instant.now().minusSeconds(AUTH_TIMEOUT))) {
       this.authenticate();
     }
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
@@ -136,7 +144,8 @@ public class CrowdStrikeExecutorClient {
       params.add(new BasicNameValuePair("client_secret", this.config.getClientSecret()));
       params.add(new BasicNameValuePair("grant_type", "client_credentials"));
       httpPost.setEntity(new UrlEncodedFormEntity(params));
-      String jsonResponse = httpClient.execute(httpPost, response -> EntityUtils.toString(response.getEntity()));
+      String jsonResponse =
+          httpClient.execute(httpPost, response -> EntityUtils.toString(response.getEntity()));
       Authentication auth = this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
       this.token = auth.getAccess_token();
       this.lastAuthentication = Instant.now();

@@ -1,5 +1,8 @@
 package io.openbas.executors.crowdstrike.service;
 
+import static java.time.Instant.now;
+import static java.time.ZoneOffset.UTC;
+
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
@@ -12,11 +15,6 @@ import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -26,9 +24,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
-
-import static java.time.Instant.now;
-import static java.time.ZoneOffset.UTC;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 @ConditionalOnProperty(prefix = "executor.crowdstrike", name = "enable")
 @Log
@@ -103,7 +102,8 @@ public class CrowdStrikeExecutorService implements Runnable {
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
     List<CrowdStrikeDevice> devices = this.client.devices().getResources().stream().toList();
-    List<Endpoint> endpoints = toEndpoint(devices).stream().filter(endpoint -> endpoint.getActive()).toList();
+    List<Endpoint> endpoints =
+        toEndpoint(devices).stream().filter(endpoint -> endpoint.getActive()).toList();
     log.info("CrowdStrike executor provisioning based on " + endpoints.size() + " assets");
     endpoints.forEach(
         endpoint -> {
@@ -160,7 +160,7 @@ public class CrowdStrikeExecutorService implements Runnable {
               endpoint.setName(crowdStrikeDevice.getHostname());
               endpoint.setDescription("Asset collected by CrowdStrike executor context.");
               endpoint.setIps(new String[] {crowdStrikeDevice.getConnection_ip()});
-              endpoint.setMacAddresses(new String[] { crowdStrikeDevice.getMac_address()});
+              endpoint.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
               endpoint.setHostname(crowdStrikeDevice.getHostname());
               endpoint.setPlatform(toPlatform(crowdStrikeDevice.getPlatform_name()));
               agent.setExecutedByUser(
