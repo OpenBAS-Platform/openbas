@@ -3,9 +3,9 @@ import { lazy } from 'react';
 
 import Breadcrumbs from '../../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../../components/i18n';
+import EndpointHeader from './EndpointHeader';
 
-const useStyles = makeStyles(() => ({
-}));
+const useStyles = makeStyles(() => ({}));
 
 const Endpoint = lazy(() => import('./Endpoint'));
 
@@ -16,13 +16,16 @@ const Index = () => {
   // Fetching data
 
   return (
-    <Breadcrumbs
-      variant="object"
-      elements={[
-        { label: t('Assets'), link: '/admin/assets' },
-        { label: t('Endpoints'), link: '/admin/assets/endpoints' },
-      ]}
-    />
+    <>
+      <Breadcrumbs
+        variant="object"
+        elements={[
+          { label: t('Assets'), link: '/admin/assets/endpoints' },
+          { label: t('Endpoints'), link: '/admin/assets/endpoints' },
+        ]}
+      />
+      <EndpointHeader />
+    </>
   );
 };
 
