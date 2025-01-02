@@ -170,50 +170,50 @@ const Endpoints = () => {
                 component={Link}
                 to={`/admin/assets/endpoints/${endpoint.asset_id}`}
               >
-              <ListItemIcon>
-                <DevicesOtherOutlined color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <div className={classes.bodyItems}>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_name}>
-                      {endpoint.asset_name}
+                <ListItemIcon>
+                  <DevicesOtherOutlined color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={(
+                    <div className={classes.bodyItems}>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_name}>
+                        {endpoint.asset_name}
+                      </div>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_status}>
+                        <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
+                      </div>
+                      <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
+                        <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                        {' '}
+                        {endpoint.endpoint_platform}
+                      </div>
+                      <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
+                        {endpoint.endpoint_arch}
+                      </div>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_executor}>
+                        {executor && (
+                          <img
+                            src={`/api/images/executors/${executor.executor_type}`}
+                            alt={executor.executor_type}
+                            style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                          />
+                        )}
+                        {executor?.executor_name ?? t('Unknown')}
+                      </div>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
+                        <ItemTags variant="list" tags={endpoint.asset_tags} />
+                      </div>
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_status}>
-                      <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                      <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
-                      {' '}
-                      {endpoint.endpoint_platform}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
-                      {endpoint.endpoint_arch}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_executor}>
-                      {executor && (
-                        <img
-                          src={`/api/images/executors/${executor.executor_type}`}
-                          alt={executor.executor_type}
-                          style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                        />
-                      )}
-                      {executor?.executor_name ?? t('Unknown')}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
-                      <ItemTags variant="list" tags={endpoint.asset_tags} />
-                    </div>
-                  </div>
-                )}
-              />
-              <ListItemSecondaryAction>
-                <EndpointPopover
-                  endpoint={{ ...endpoint, type: 'static' }}
-                  onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result)))}
-                  onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
-                  openEditOnInit={endpoint.asset_id === searchId}
+                  )}
                 />
-              </ListItemSecondaryAction>
+                <ListItemSecondaryAction>
+                  <EndpointPopover
+                    endpoint={{ ...endpoint, type: 'static' }}
+                    onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result)))}
+                    onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
+                    openEditOnInit={endpoint.asset_id === searchId}
+                  />
+                </ListItemSecondaryAction>
               </ListItemButton>
             </ListItem>
           );
