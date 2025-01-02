@@ -781,118 +781,13 @@ public class ExerciseApi extends RestBehavior {
       HttpServletResponse response)
       throws IOException {
     // Setup the mapper for export
-    List<String> documentIds = new ArrayList<>();
     ObjectMapper objectMapper = mapper.copy();
-    if (!isWithPlayers) {
-      objectMapper.addMixIn(
-          ExerciseFileExport.class, ExerciseExportMixins.ExerciseFileExport.class);
-    }
+
     // Start exporting exercise
-    ExerciseFileExport importExport = new ExerciseFileExport();
-    importExport.setVersion(1);
     Exercise exercise =
-        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
-    // Build the export
-    importExport.setExercise(exercise);
-    importExport.setDocuments(exercise.getDocuments());
-    documentIds.addAll(exercise.getDocuments().stream().map(Document::getId).toList());
-    objectMapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
-    List<Tag> exerciseTags = new ArrayList<>(exercise.getTags());
-    // Objectives
-    List<Objective> objectives = exercise.getObjectives();
-    importExport.setObjectives(objectives);
-    objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
-    // Lessons categories
-    List<LessonsCategory> lessonsCategories = exercise.getLessonsCategories();
-    importExport.setLessonsCategories(lessonsCategories);
-    objectMapper.addMixIn(LessonsCategory.class, ExerciseExportMixins.LessonsCategory.class);
-    // Lessons questions
-    List<LessonsQuestion> lessonsQuestions =
-        lessonsCategories.stream().flatMap(category -> category.getQuestions().stream()).toList();
-    importExport.setLessonsQuestions(lessonsQuestions);
-    objectMapper.addMixIn(LessonsQuestion.class, ExerciseExportMixins.LessonsQuestion.class);
-    if (isWithTeams) {
-      // Teams
-      List<Team> teams = exercise.getTeams();
-      importExport.setTeams(teams);
-      objectMapper.addMixIn(
-          Team.class,
-          isWithPlayers ? ExerciseExportMixins.Team.class : ExerciseExportMixins.EmptyTeam.class);
-      exerciseTags.addAll(teams.stream().flatMap(team -> team.getTags().stream()).toList());
-    }
-    if (isWithPlayers) {
-      // players
-      List<User> players =
-          exercise.getTeams().stream()
-              .flatMap(team -> team.getUsers().stream())
-              .distinct()
-              .toList();
-      exerciseTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
-      importExport.setUsers(players);
-      objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
-      // organizations
-      List<Organization> organizations =
-          players.stream().map(User::getOrganization).filter(Objects::nonNull).distinct().toList();
-      exerciseTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());
-      importExport.setOrganizations(organizations);
-      objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
-    }
-    // Injects
-    List<Inject> injects = exercise.getInjects();
-    injects.forEach(
-        inject -> {
-          exerciseTags.addAll(inject.getTags());
-          inject
-              .getInjectorContract()
-              .ifPresent(
-                  injectorContract -> {
-                    if (injectorContract.getPayload() != null) {
-                      exerciseTags.addAll(injectorContract.getPayload().getTags());
-                    }
-                  });
-          exerciseTags.addAll(inject.getTags());
-        });
-    exerciseTags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
-    importExport.setInjects(injects);
-    objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
-    // Documents
-    exerciseTags.addAll(
-        exercise.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
-    // Articles / Channels
-    List<Article> articles = exercise.getArticles();
-    importExport.setArticles(articles);
-    objectMapper.addMixIn(Article.class, ExerciseExportMixins.Article.class);
-    List<Channel> channels = articles.stream().map(Article::getChannel).distinct().toList();
-    documentIds.addAll(
-        channels.stream()
-            .flatMap(channel -> channel.getLogos().stream())
-            .map(Document::getId)
-            .toList());
-    importExport.setChannels(channels);
-    objectMapper.addMixIn(Channel.class, ExerciseExportMixins.Channel.class);
-    // Challenges
-    List<Challenge> challenges = fromIterable(challengeService.getExerciseChallenges(exerciseId));
-    importExport.setChallenges(challenges);
-    documentIds.addAll(
-        challenges.stream()
-            .flatMap(challenge -> challenge.getDocuments().stream())
-            .map(Document::getId)
-            .toList());
-    objectMapper.addMixIn(Challenge.class, ExerciseExportMixins.Challenge.class);
-    exerciseTags.addAll(
-        challenges.stream().flatMap(challenge -> challenge.getTags().stream()).toList());
-    // Tags
-    importExport.setTags(exerciseTags.stream().distinct().toList());
-    objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
-    // -- Variables --
-    List<Variable> variables = this.variableService.variablesFromExercise(exerciseId);
-    importExport.setVariables(variables);
-    if (isWithVariableValues) {
-      objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
-    } else {
-      objectMapper.addMixIn(Variable.class, VariableMixin.class);
-    }
+            exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    ExerciseFileExport importExport = ExerciseFileExport.fromExercise(exercise);
+
     // Build the response
     String infos =
         "("
@@ -913,7 +808,7 @@ public class ExerciseApi extends RestBehavior {
     zipExport.write(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(importExport));
     zipExport.closeEntry();
     // Add the documents
-    documentIds.stream()
+    importExport.getAllDocumentIds().stream()
         .distinct()
         .forEach(
             docId -> {
