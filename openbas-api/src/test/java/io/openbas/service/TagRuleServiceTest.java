@@ -155,7 +155,7 @@ public class TagRuleServiceTest {
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
-                  expected.getTag().getName(),
+              expected.getTag().getName(),
               expected.getAssets().stream().map(Asset::getId).toList());
         });
   }
