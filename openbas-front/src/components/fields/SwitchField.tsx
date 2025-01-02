@@ -7,9 +7,10 @@ interface Props {
   control: Control;
   name: string;
   style?: CSSProperties;
+  disabled?: boolean;
 }
 
-const SwitchField = ({ control, label, name, style = {}, ...extraProps }: Props) => {
+const SwitchField = ({ control, label, name, style = {}, disabled = false, ...extraProps }: Props) => {
   return (
     <div style={style}>
       <Controller
@@ -17,7 +18,7 @@ const SwitchField = ({ control, label, name, style = {}, ...extraProps }: Props)
         name={name}
         render={({ field }) => (
           <FormControlLabel
-            control={<Switch {...field} checked={!!field?.value} {...extraProps} />}
+            control={<Switch {...field} checked={!!field?.value} disabled={disabled} {...extraProps} />}
             label={label}
           />
         )}

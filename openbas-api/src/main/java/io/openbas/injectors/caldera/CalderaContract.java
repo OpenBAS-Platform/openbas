@@ -18,6 +18,7 @@ import io.openbas.injector_contract.*;
 import io.openbas.injector_contract.fields.*;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
+import io.openbas.injectors.caldera.model.CalderaInjectContent;
 import io.openbas.injectors.caldera.model.Obfuscator;
 import io.openbas.injectors.caldera.service.CalderaInjectorService;
 import jakarta.validation.constraints.NotNull;
@@ -74,7 +75,11 @@ public class CalderaContract extends Contractor {
     List<Obfuscator> obfuscators = this.injectorCalderaService.obfuscators();
     Map<String, String> obfuscatorChoices =
         obfuscators.stream().collect(Collectors.toMap(Obfuscator::getName, Obfuscator::getName));
-    return selectFieldWithDefault("obfuscator", "Obfuscators", obfuscatorChoices, "base64");
+    return selectFieldWithDefault(
+        "obfuscator",
+        "Obfuscators",
+        obfuscatorChoices,
+        CalderaInjectContent.getDefaultObfuscator());
   }
 
   private ContractExpectations expectations() {

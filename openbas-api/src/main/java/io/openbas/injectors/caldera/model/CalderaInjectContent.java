@@ -1,5 +1,6 @@
 package io.openbas.injectors.caldera.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.model.inject.form.Expectation;
 import java.util.ArrayList;
@@ -16,4 +17,9 @@ public class CalderaInjectContent {
 
   @JsonProperty("expectations")
   private List<Expectation> expectations = new ArrayList<>();
+
+  @JsonIgnore
+  public static String getDefaultObfuscator() {
+    return "plain-text";
+  }
 }
