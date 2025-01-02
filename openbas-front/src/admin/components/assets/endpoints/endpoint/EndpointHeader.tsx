@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 
 import { useFormatter } from '../../../../../components/i18n';
 import { truncate } from '../../../../../utils/String';
+import Loader from '../../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -31,6 +32,7 @@ const EndpointHeader = () => {
   const [edition, setEdition] = useState(false);
   const handleOpenEdit = () => setEdition(true);
   const handleCloseEdit = () => setEdition(false);
+
 
   return (
     <>
