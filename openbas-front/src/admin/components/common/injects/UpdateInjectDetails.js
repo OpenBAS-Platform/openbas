@@ -186,19 +186,17 @@ const UpdateInjectDetails = ({
     'attachments',
     'expectations',
   ];
-  if (isEmptyField(inject?.inject_content)) {
-    contractContent?.fields
-      .filter(f => !builtInFields.includes(f.key))
-      .forEach((field) => {
-        if (!initialValues[field.key]) {
-          if (field.cardinality && field.cardinality === '1') {
-            initialValues[field.key] = R.head(field.defaultValue);
-          } else {
-            initialValues[field.key] = field.defaultValue;
-          }
+  contractContent?.fields
+    .filter(f => !builtInFields.includes(f.key))
+    .forEach((field) => {
+      if (!initialValues[field.key]) {
+        if (field.cardinality && field.cardinality === '1') {
+          initialValues[field.key] = R.head(field.defaultValue);
+        } else {
+          initialValues[field.key] = field.defaultValue;
         }
-      });
-  }
+      }
+    });
   // Specific processing for some fields
   contractContent?.fields
     .filter(f => !builtInFields.includes(f.key))
