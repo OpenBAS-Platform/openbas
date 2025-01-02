@@ -1,4 +1,4 @@
-package io.openbas.integrations;
+package io.openbas.rest.payload.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.SupportedLanguage.en;
@@ -23,9 +23,8 @@ import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
-import io.openbas.injector_contract.fields.ContractAsset;
-import io.openbas.injector_contract.fields.ContractAssetGroup;
-import io.openbas.injector_contract.fields.ContractExpectations;
+import io.openbas.injector_contract.fields.*;
+import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.utils.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -108,6 +107,13 @@ public class PayloadService {
     }
   }
 
+  private ContractChoiceInformation obfuscatorField() {
+    OpenBASObfuscationMap obfuscationMap = new OpenBASObfuscationMap();
+    Map<String, String> obfuscationInfo = obfuscationMap.getAllObfuscationInfo();
+    return ContractChoiceInformation.choiceInformationField(
+        "obfuscator", "Obfuscators", obfuscationInfo, obfuscationMap.getDefaultObfuscator());
+  }
+
   private Contract buildContract(
       @NotNull final String contractId,
       @NotNull final Injector injector,
@@ -126,6 +132,12 @@ public class PayloadService {
     ContractExpectations expectationsField = expectations();
     ContractDef builder = contractBuilder();
     builder.mandatoryGroup(assetField, assetGroupField);
+
+    if (payload.getType().equals("Command")) {
+      ContractChoiceInformation obfuscatorField = obfuscatorField();
+      builder.optional(obfuscatorField);
+    }
+
     builder.optional(expectationsField);
     if (payload.getArguments() != null) {
       payload

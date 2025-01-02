@@ -3248,6 +3248,7 @@ export interface StatusPayloadOutput {
   payload_description?: string;
   payload_external_id?: string;
   payload_name?: string;
+  payload_obfuscator?: string;
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */

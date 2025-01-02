@@ -62,7 +62,10 @@ public class CalderaExecutor extends Injector {
       @NotNull final Execution execution, @NotNull final ExecutableInject injection)
       throws Exception {
     CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
-    String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "base64";
+    String obfuscator =
+        content.getObfuscator() != null
+            ? content.getObfuscator()
+            : CalderaInjectContent.getDefaultObfuscator();
     Inject inject =
         this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
 

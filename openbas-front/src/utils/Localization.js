@@ -261,6 +261,9 @@ const i18n = {
         'Souhaitez-vous supprimer ce document ?',
       'Update the document': 'Modifier le document',
       'Inject data': 'Données du stimuli',
+      'Obfuscator': 'Obfuscateur',
+      'Obfuscators': 'Obfuscateurs',
+      'CMD does not support base64 obfuscation': 'CMD ne prend pas en charge l\'obfuscation en base64',
       'Update teams': 'Modifier les équipes',
       'Add target teams in this inject':
         'Ajouter des équipes cibles dans ce stimuli',
@@ -1698,6 +1701,9 @@ const i18n = {
         '你想要删除这个文档么?',
       'Update the document': '更新文档',
       'Inject data': '注入数据',
+      'Obfuscator': '混淆器',
+      'Obfuscators': '混淆器',
+      'CMD does not support base64 obfuscation': 'CMD不支持base64混淆',
       'Update teams': '编辑团队',
       'Add target teams in this inject':
         '在这个注入里添加目标团队',

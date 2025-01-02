@@ -5,6 +5,8 @@ import static org.springframework.util.StringUtils.hasText;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
+import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
+import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.exception.ElementNotFoundException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class ExecutableInjectService {
 
   private final InjectRepository injectRepository;
+  private final InjectService injectService;
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
   private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
 
@@ -79,6 +82,7 @@ public class ExecutableInjectService {
       List<PayloadArgument> defaultArguments,
       ObjectNode injectContent,
       String obfuscator) {
+    OpenBASObfuscationMap obfuscationMap = new OpenBASObfuscationMap();
     String computedCommand = replaceArgumentsByValue(command, defaultArguments, injectContent);
 
     if (executor.equals("cmd")) {
@@ -86,18 +90,19 @@ public class ExecutableInjectService {
       computedCommand = computedCommand.trim().replace("\n", " & ");
     }
 
-    if (obfuscator.equals("base64")) {
-      return Base64.getEncoder().encodeToString(computedCommand.getBytes());
-    }
+    computedCommand = obfuscationMap.executeObfuscation(obfuscator, computedCommand, executor);
 
-    return computedCommand;
+    return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }
 
-  public Payload getExecutablePayloadInject(String injectId) {
+  public Payload getExecutablePayloadInject(String injectId) throws Exception {
     Inject inject =
         this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     InjectorContract contract =
         inject.getInjectorContract().orElseThrow(ElementNotFoundException::new);
+    OpenBASImplantInjectContent content =
+        injectService.convertInjectContent(inject, OpenBASImplantInjectContent.class);
+    String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "plain-text";
 
     // prerequisite
     contract
@@ -112,7 +117,7 @@ public class ExecutableInjectService {
                         prerequisite.getExecutor(),
                         contract.getPayload().getArguments(),
                         inject.getContent(),
-                        "base64"));
+                        obfuscator));
               }
               if (hasText(prerequisite.getGetCommand())) {
                 prerequisite.setGetCommand(
@@ -121,7 +126,7 @@ public class ExecutableInjectService {
                         prerequisite.getExecutor(),
                         contract.getPayload().getArguments(),
                         inject.getContent(),
-                        "base64"));
+                        obfuscator));
               }
             });
 
@@ -135,7 +140,7 @@ public class ExecutableInjectService {
                   contract.getPayload().getCleanupExecutor(),
                   contract.getPayload().getArguments(),
                   inject.getContent(),
-                  "base64"));
+                  obfuscator));
     }
 
     // Command
@@ -147,7 +152,7 @@ public class ExecutableInjectService {
               payloadCommand.getExecutor(),
               contract.getPayload().getArguments(),
               inject.getContent(),
-              "base64"));
+              obfuscator));
       return payloadCommand;
     }
 
