@@ -1,5 +1,13 @@
 package io.openbas.rest.asset_group;
 
+import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Tag;
@@ -9,24 +17,13 @@ import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import java.util.List;
-
-import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
-
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,14 +33,11 @@ public class AssetGroupTest {
   static AssetGroupInput ASSET_GROUP_INPUT;
   static String TAG_ID;
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private AssetGroupRepository assetGroupRepository;
+  @Autowired private AssetGroupRepository assetGroupRepository;
 
-  @Autowired
-  private TagRepository tagRepository;
+  @Autowired private TagRepository tagRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -86,7 +80,8 @@ public class AssetGroupTest {
   @WithMockAdminUser
   void updateAssetGroupTest() throws Exception {
     // --PREPARE--
-    AssetGroup assetGroup = assetGroupRepository.save(AssetGroupFixture.createDefaultAssetGroup("Asset group"));
+    AssetGroup assetGroup =
+        assetGroupRepository.save(AssetGroupFixture.createDefaultAssetGroup("Asset group"));
     String newName = "Asset group updated";
     ASSET_GROUP_INPUT.setName(newName);
 
