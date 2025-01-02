@@ -384,8 +384,8 @@ const Injects: FunctionComponent<Props> = ({
   const injectsToProcess = selectAll
     ? injects.filter((inject: InjectOutputType) => !R.keys(deSelectedElements).includes(inject.inject_id))
     : injects.filter(
-      (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
-    );
+        (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
+      );
 
   const massUpdateInjects = async (actions: {
     field: string;
@@ -482,6 +482,13 @@ const Injects: FunctionComponent<Props> = ({
     });
   };
 
+  const selectedInjects = () => {
+    const selectedInjectIds = Object.keys(selectedElements);
+    return injects.filter(inject => selectedInjectIds.includes(inject.inject_id));
+  };
+
+  const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
+
   return (
     <>
       <PaginationComponentV2
@@ -494,10 +501,11 @@ const Injects: FunctionComponent<Props> = ({
         reloadContentCount={reloadInjectCount}
         topBarButtons={(
           <InjectsListButtons
-            injects={injects}
+            selectedInjects={selectedInjects()}
             availableButtons={availableButtons}
             setViewMode={setViewMode}
             onImportedInjects={() => setReloadInjectCount(prev => prev + 1)}
+            isAtLeastOneValidInject={atLeastOneValidInject}
           />
         )}
       />

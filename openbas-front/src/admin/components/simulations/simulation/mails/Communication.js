@@ -2,7 +2,7 @@ import { AttachFileRounded, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, IconButton } from '@mui/material';
 import { lightBlue } from '@mui/material/colors';
 import { makeStyles, useTheme } from '@mui/styles';
-import DOMPurify from 'dompurify';
+import purify from 'dompurify';
 import parse from 'html-react-parser';
 import { useState } from 'react';
 
@@ -134,8 +134,8 @@ const Communication = (props) => {
         {isHtml ? (
           <div style={{ marginTop: -5 }}>
             {expand
-              ? parse(DOMPurify.sanitize(content))
-              : parse(DOMPurify.sanitize(truncate(content, limit)))}
+              ? parse(purify.sanitize(content))
+              : parse(purify.sanitize(truncate(content, limit)))}
           </div>
         ) : (
           <div style={{ marginTop: -5, whiteSpace: 'pre-line' }}>

@@ -73,8 +73,7 @@ public class FullTextSearchService<T extends Base> {
   }
 
   public Page<FullTextSearchResult> fullTextSearch(
-      @NotBlank final String clazz, @NotNull final SearchPaginationInput searchPaginationInput)
-      throws ClassNotFoundException {
+      @NotBlank final Class<?> clazz, @NotNull final SearchPaginationInput searchPaginationInput) {
     if (!hasText(searchPaginationInput.getTextSearch())) {
       Pageable pageable =
           PageRequest.of(
@@ -84,10 +83,9 @@ public class FullTextSearchService<T extends Base> {
       return new PageImpl<>(Collections.emptyList(), pageable, 0);
     }
 
-    Class<?> clazzUnknown = Class.forName(clazz);
     Class<T> clazzT =
         this.repositoryMap.keySet().stream()
-            .filter((k) -> k.isAssignableFrom(clazzUnknown))
+            .filter(k -> k.isAssignableFrom(clazz))
             .findFirst()
             .orElseThrow(
                 () -> new IllegalArgumentException(clazz + " is not handle by full text search"));
@@ -208,8 +206,12 @@ public class FullTextSearchService<T extends Base> {
 
   private static String getFinalSearchTerm(String searchTerm) {
     return Arrays.stream(searchTerm.split(" "))
-        .map((s) -> "(" + s + ":*)")
+        .map(s -> "(" + s + ":*)")
         .collect(Collectors.joining(" & "));
+  }
+
+  public List<String> getAllowedClass() {
+    return this.repositoryMap.keySet().stream().map(Class::getName).toList();
   }
 
   @AllArgsConstructor
