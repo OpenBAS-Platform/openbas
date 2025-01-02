@@ -9,6 +9,6 @@ public class AssetAgentJobSpecification {
     // TODO Add time limitation
     // TODO add cleanup
     return (root, query, cb) ->
-        cb.equal(root.get("asset").get("agents").get("externalReference"), externalReference);
+        cb.equal(root.get("agent").get("externalReference"), externalReference);
   }
 }

@@ -62,7 +62,7 @@ public class OpenBASExecutorContextService {
     }
     AssetAgentJob assetAgentJob = new AssetAgentJob();
     assetAgentJob.setCommand(computeCommand(inject, platform, arch));
-    assetAgentJob.setAsset(assetEndpoint);
+    assetAgentJob.setAgent(assetEndpoint.getAgents().getFirst());
     assetAgentJob.setInject(inject);
     assetAgentJobRepository.save(assetAgentJob);
   }

@@ -108,7 +108,7 @@ public class EndpointApi extends RestBehavior {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(
           this.endpointService.generateUpgradeCommand(updatedEndpoint.getPlatform().name()));
-      assetAgentJob.setAsset(updatedEndpoint);
+      assetAgentJob.setAgent(updatedEndpoint.getAgents().getFirst());
       assetAgentJobRepository.save(assetAgentJob);
     }
     return updatedEndpoint;
@@ -120,6 +120,7 @@ public class EndpointApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   public List<AssetAgentJob> getEndpointJobs(
       @PathVariable @NotBlank final String endpointExternalReference) {
+    // TODO get agent job with agent id (OpenBAS executor, deployment mode, user, privilege, externalReference)
     return this.assetAgentJobRepository.findAll(
         AssetAgentJobSpecification.forEndpoint(endpointExternalReference));
   }
