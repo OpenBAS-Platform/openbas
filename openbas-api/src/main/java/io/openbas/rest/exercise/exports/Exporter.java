@@ -9,6 +9,7 @@ public class Exporter {
     @Resource private ObjectMapper objectMapper;
     public ExerciseFileExport export(Exercise exercise, boolean withPlayers, boolean withTeams, boolean withVariableValues) {
         int exportOptions = ExportOptions.mask(withPlayers, withTeams, withVariableValues);
-        return ExerciseFileExport.fromExercise(exercise).withOptions(exportOptions);
+        //return ExerciseFileExport.fromExercise(exercise).withOptions(exportOptions);
+        return null;
     }
 }

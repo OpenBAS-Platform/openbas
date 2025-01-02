@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
-@Component
 public class ExerciseFileExport {
 
   private ChallengeService challengeService;
@@ -259,10 +258,12 @@ public class ExerciseFileExport {
               ExerciseFileExport.class, ExerciseExportMixins.ExerciseFileExport.class);
     }
 
-    if (ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)) {
+    if (ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)) {
       this.objectMapper.addMixIn(
               Team.class,
-              ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask) ? ExerciseExportMixins.Team.class : ExerciseExportMixins.EmptyTeam.class);
+              ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)
+                      ? ExerciseExportMixins.Team.class
+                      : ExerciseExportMixins.EmptyTeam.class);
     }
     if (ExportOptions.has(ExportOptions.WITH_VARIABLE_VALUES, this.exportOptionsMask)) {
       this.objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);

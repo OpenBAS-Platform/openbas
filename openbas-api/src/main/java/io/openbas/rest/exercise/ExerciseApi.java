@@ -21,10 +21,7 @@ import io.openbas.database.repository.*;
 import io.openbas.database.specification.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exception.InputValidationException;
-import io.openbas.rest.exercise.exports.ExerciseExportMixins;
-import io.openbas.rest.exercise.exports.ExerciseFileExport;
-import io.openbas.rest.exercise.exports.VariableMixin;
-import io.openbas.rest.exercise.exports.VariableWithValueMixin;
+import io.openbas.rest.exercise.exports.*;
 import io.openbas.rest.exercise.form.*;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
@@ -105,7 +102,6 @@ public class ExerciseApi extends RestBehavior {
   private final ChallengeService challengeService;
   private final VariableService variableService;
   private final ExerciseService exerciseService;
-
   // endregion
 
   // region logs
@@ -780,13 +776,12 @@ public class ExerciseApi extends RestBehavior {
       @RequestParam(required = false) final boolean isWithVariableValues,
       HttpServletResponse response)
       throws IOException {
-    // Setup the mapper for export
     ObjectMapper objectMapper = mapper.copy();
 
     // Start exporting exercise
     Exercise exercise =
             exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    ExerciseFileExport importExport = ExerciseFileExport.fromExercise(exercise);
+    ExerciseFileExport importExport = ExerciseFileExport.fromExercise(exercise, objectMapper, this.variableService, this.challengeService).withOptions(ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues));
 
     // Build the response
     String infos =
