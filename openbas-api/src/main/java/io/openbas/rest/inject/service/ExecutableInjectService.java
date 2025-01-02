@@ -110,7 +110,6 @@ public class ExecutableInjectService {
     if (executor.equals("cmd")) {
       computedCommand = replaceCmdVariables(computedCommand);
       computedCommand = formatMultilineCommand(computedCommand);
-      System.out.println("computed command : " + computedCommand);
     }
 
     if (obfuscator.equals("base64")) {
