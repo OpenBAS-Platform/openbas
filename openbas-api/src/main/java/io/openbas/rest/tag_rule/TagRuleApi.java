@@ -26,24 +26,26 @@ public class TagRuleApi extends RestBehavior {
   public static final String TAG_RULE_URI = "/api/tag-rules";
 
   private final TagRuleService tagRuleService;
+  private final TagRuleMapper tagRuleMapper;
 
-  public TagRuleApi(TagRuleService tagRuleService) {
+  public TagRuleApi(TagRuleService tagRuleService, TagRuleMapper tagRuleMapper) {
     super();
     this.tagRuleService = tagRuleService;
+    this.tagRuleMapper = tagRuleMapper;
   }
 
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
   @Operation(summary = "Get TagRule by Id")
   public TagRuleOutput findTagRule(@PathVariable @NotBlank final String tagRuleId) {
-    return tagRuleService.findById(tagRuleId).map(TagRuleMapper::toTagRuleOutput).orElse(null);
+    return tagRuleService.findById(tagRuleId).map(tagRuleMapper::toTagRuleOutput).orElse(null);
   }
 
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI)
   @Operation(summary = "Get All TagRules")
   public List<TagRuleOutput> tags() {
-    return tagRuleService.findAll().stream().map(TagRuleMapper::toTagRuleOutput).toList();
+    return tagRuleService.findAll().stream().map(tagRuleMapper::toTagRuleOutput).toList();
   }
 
   @Secured(ROLE_ADMIN)
@@ -57,7 +59,7 @@ public class TagRuleApi extends RestBehavior {
         @ApiResponse(responseCode = "404", description = "TagRule not found")
       })
   public void deleteTagRule(@PathVariable @NotBlank final String tagRuleId) {
-    this.tagRuleService.deleteTagRule(tagRuleId);
+    tagRuleService.deleteTagRule(tagRuleId);
   }
 
   @Secured(ROLE_ADMIN)
@@ -71,8 +73,8 @@ public class TagRuleApi extends RestBehavior {
         @ApiResponse(responseCode = "404", description = "Tag or Asset not found")
       })
   public TagRuleOutput createTagRule(@Valid @RequestBody final TagRuleInput input) {
-    return TagRuleMapper.toTagRuleOutput(
-        this.tagRuleService.createTagRule(input.getTagName(), input.getAssets()));
+    return tagRuleMapper.toTagRuleOutput(
+        tagRuleService.createTagRule(input.getTagName(), input.getAssets()));
   }
 
   @Secured(ROLE_ADMIN)
@@ -88,8 +90,8 @@ public class TagRuleApi extends RestBehavior {
   public TagRuleOutput updateTagRule(
       @PathVariable @NotBlank final String tagRuleId,
       @Valid @RequestBody final TagRuleInput input) {
-    return TagRuleMapper.toTagRuleOutput(
-        this.tagRuleService.updateTagRule(tagRuleId, input.getTagName(), input.getAssets()));
+    return tagRuleMapper.toTagRuleOutput(
+        tagRuleService.updateTagRule(tagRuleId, input.getTagName(), input.getAssets()));
   }
 
   @LogExecutionTime
@@ -97,8 +99,6 @@ public class TagRuleApi extends RestBehavior {
   @Operation(summary = "Search TagRule")
   public Page<TagRuleOutput> searchTagRules(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return this.tagRuleService
-        .searchTagRule(searchPaginationInput)
-        .map(TagRuleMapper::toTagRuleOutput);
+    return tagRuleService.searchTagRule(searchPaginationInput).map(tagRuleMapper::toTagRuleOutput);
   }
 }
