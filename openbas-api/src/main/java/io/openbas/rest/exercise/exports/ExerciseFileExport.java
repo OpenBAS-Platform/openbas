@@ -8,30 +8,22 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
+import io.openbas.service.ChallengeService;
+import io.openbas.service.VariableService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import io.openbas.service.ChallengeService;
-import io.openbas.service.VariableService;
-import jakarta.annotation.Resource;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
 public class ExerciseFileExport {
 
-  @JsonIgnore
-  private ChallengeService challengeService;
-  @JsonIgnore
-  private VariableService variableService;
-  @JsonIgnore
-  private ObjectMapper objectMapper;
+  @JsonIgnore private ChallengeService challengeService;
+  @JsonIgnore private VariableService variableService;
+  @JsonIgnore private ObjectMapper objectMapper;
 
   @JsonProperty("export_version")
   private int version = 1;
@@ -43,10 +35,11 @@ public class ExerciseFileExport {
   private List<Team> teams;
 
   public List<Team> getTeams() {
-    if(teams == null) {
-      return this.exercise != null && ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)
-        ? this.exercise.getTeams().stream().toList()
-        : new ArrayList<>();
+    if (teams == null) {
+      return this.exercise != null
+              && ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)
+          ? this.exercise.getTeams().stream().toList()
+          : new ArrayList<>();
     }
     return teams;
   }
@@ -55,8 +48,10 @@ public class ExerciseFileExport {
   private List<Objective> objectives;
 
   public List<Objective> getObjectives() {
-    if(objectives == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getObjectives().stream().toList();
+    if (objectives == null) {
+      return this.exercise == null
+          ? new ArrayList<>()
+          : this.exercise.getObjectives().stream().toList();
     }
     return objectives;
   }
@@ -65,13 +60,14 @@ public class ExerciseFileExport {
   private List<User> users;
 
   public List<User> getUsers() {
-    if(users == null) {
-      return this.exercise != null && ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)
-              ? this.exercise.getTeams().stream()
+    if (users == null) {
+      return this.exercise != null
+              && ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)
+          ? this.exercise.getTeams().stream()
               .flatMap(team -> team.getUsers().stream())
               .distinct()
               .toList()
-              : new ArrayList<>();
+          : new ArrayList<>();
     }
     return users;
   }
@@ -80,10 +76,14 @@ public class ExerciseFileExport {
   private List<Organization> organizations;
 
   public List<Organization> getOrganizations() {
-    if(organizations == null) {
+    if (organizations == null) {
       return this.exercise == null
-              ? new ArrayList<>()
-              : this.exercise.getUsers().stream().map(User::getOrganization).filter(Objects::nonNull).distinct().toList();
+          ? new ArrayList<>()
+          : this.exercise.getUsers().stream()
+              .map(User::getOrganization)
+              .filter(Objects::nonNull)
+              .distinct()
+              .toList();
     }
     return organizations;
   }
@@ -92,7 +92,7 @@ public class ExerciseFileExport {
   private List<Inject> injects;
 
   public List<Inject> getInjects() {
-    if(injects == null) {
+    if (injects == null) {
       return this.exercise == null ? new ArrayList<>() : this.exercise.getInjects();
     }
     return injects;
@@ -102,29 +102,36 @@ public class ExerciseFileExport {
   private List<Tag> tags;
 
   public List<Tag> getTags() {
-    if(tags == null) {
-      if (this.exercise == null)
-      {
+    if (tags == null) {
+      if (this.exercise == null) {
         return new ArrayList<>();
       } else {
         List<Tag> allTags = new ArrayList<>();
         allTags.addAll(this.exercise.getTags().stream().toList());
         allTags.addAll(this.getTeams().stream().flatMap(team -> team.getTags().stream()).toList());
         allTags.addAll(this.getUsers().stream().flatMap(user -> user.getTags().stream()).toList());
-        allTags.addAll(this.getOrganizations().stream().flatMap(organization -> organization.getTags().stream()).toList());
-        allTags.addAll(this.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
-        allTags.addAll(this.getChallenges().stream().flatMap(challenge -> challenge.getTags().stream()).toList());
-        this.getInjects().forEach(
+        allTags.addAll(
+            this.getOrganizations().stream()
+                .flatMap(organization -> organization.getTags().stream())
+                .toList());
+        allTags.addAll(
+            this.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
+        allTags.addAll(
+            this.getChallenges().stream()
+                .flatMap(challenge -> challenge.getTags().stream())
+                .toList());
+        this.getInjects()
+            .forEach(
                 inject -> {
                   allTags.addAll(inject.getTags());
                   inject
-                          .getInjectorContract()
-                          .ifPresent(
-                                  injectorContract -> {
-                                    if (injectorContract.getPayload() != null) {
-                                      allTags.addAll(injectorContract.getPayload().getTags());
-                                    }
-                                  });
+                      .getInjectorContract()
+                      .ifPresent(
+                          injectorContract -> {
+                            if (injectorContract.getPayload() != null) {
+                              allTags.addAll(injectorContract.getPayload().getTags());
+                            }
+                          });
                   allTags.addAll(inject.getTags());
                 });
 
@@ -138,7 +145,7 @@ public class ExerciseFileExport {
   private List<Document> documents;
 
   public List<Document> getDocuments() {
-    if(documents == null) {
+    if (documents == null) {
       return this.exercise == null ? new ArrayList<>() : this.exercise.getDocuments();
     }
     return documents;
@@ -148,8 +155,10 @@ public class ExerciseFileExport {
   private List<Channel> channels;
 
   public List<Channel> getChannels() {
-    if(channels == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getArticles().stream().map(Article::getChannel).distinct().toList();
+    if (channels == null) {
+      return this.exercise == null
+          ? new ArrayList<>()
+          : this.exercise.getArticles().stream().map(Article::getChannel).distinct().toList();
     }
     return channels;
   }
@@ -158,7 +167,7 @@ public class ExerciseFileExport {
   private List<Article> articles;
 
   public List<Article> getArticles() {
-    if(articles == null) {
+    if (articles == null) {
       return this.exercise == null ? new ArrayList<>() : this.exercise.getArticles();
     }
     return articles;
@@ -168,8 +177,10 @@ public class ExerciseFileExport {
   private List<Challenge> challenges;
 
   public List<Challenge> getChallenges() {
-    if(challenges == null) {
-      return this.exercise == null ? new ArrayList<>() : fromIterable(challengeService.getExerciseChallenges(this.exercise.getId()));
+    if (challenges == null) {
+      return this.exercise == null
+          ? new ArrayList<>()
+          : fromIterable(challengeService.getExerciseChallenges(this.exercise.getId()));
     }
     return challenges;
   }
@@ -178,7 +189,7 @@ public class ExerciseFileExport {
   private List<LessonsCategory> lessonsCategories;
 
   public List<LessonsCategory> getLessonsCategories() {
-    if(lessonsCategories == null) {
+    if (lessonsCategories == null) {
       return this.exercise == null ? new ArrayList<>() : this.exercise.getLessonsCategories();
     }
     return lessonsCategories;
@@ -188,8 +199,12 @@ public class ExerciseFileExport {
   private List<LessonsQuestion> lessonsQuestions;
 
   public List<LessonsQuestion> getLessonsQuestions() {
-    if(lessonsQuestions == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getLessonsCategories().stream().flatMap(category -> category.getQuestions().stream()).toList();
+    if (lessonsQuestions == null) {
+      return this.exercise == null
+          ? new ArrayList<>()
+          : this.exercise.getLessonsCategories().stream()
+              .flatMap(category -> category.getQuestions().stream())
+              .toList();
     }
     return lessonsQuestions;
   }
@@ -200,8 +215,10 @@ public class ExerciseFileExport {
   private List<Variable> variables;
 
   public List<Variable> getVariables() {
-    if(variables == null) {
-      return this.exercise == null ? new ArrayList<>() : this.variableService.variablesFromExercise(this.exercise.getId());
+    if (variables == null) {
+      return this.exercise == null
+          ? new ArrayList<>()
+          : this.variableService.variablesFromExercise(this.exercise.getId());
     }
     return variables;
   }
@@ -211,22 +228,24 @@ public class ExerciseFileExport {
     List<String> documentIds = new ArrayList<>();
     documentIds.addAll(this.getDocuments().stream().map(Document::getId).toList());
     documentIds.addAll(
-            this.getChannels().stream()
-                    .flatMap(channel -> channel.getLogos().stream())
-                    .map(Document::getId)
-                    .toList());
+        this.getChannels().stream()
+            .flatMap(channel -> channel.getLogos().stream())
+            .map(Document::getId)
+            .toList());
     documentIds.addAll(
-            this.getChallenges().stream()
-                    .flatMap(challenge -> challenge.getDocuments().stream())
-                    .map(Document::getId)
-                    .toList());
+        this.getChallenges().stream()
+            .flatMap(challenge -> challenge.getDocuments().stream())
+            .map(Document::getId)
+            .toList());
     return documentIds;
   }
 
-  @JsonIgnore
-  private int exportOptionsMask = 0;
+  @JsonIgnore private int exportOptionsMask = 0;
 
-  public ExerciseFileExport(ObjectMapper objectMapper, VariableService variableService, ChallengeService challengeService) {
+  public ExerciseFileExport(
+      ObjectMapper objectMapper,
+      VariableService variableService,
+      ChallengeService challengeService) {
     this.objectMapper = objectMapper;
     this.variableService = variableService;
     this.challengeService = challengeService;
@@ -247,12 +266,17 @@ public class ExerciseFileExport {
     // default options
     // variables with no value
     this.objectMapper.addMixIn(Variable.class, VariableMixin.class);
-    //empty teams
+    // empty teams
     this.objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
   }
 
-  public static final ExerciseFileExport fromExercise(Exercise exercise, ObjectMapper objectMapper, VariableService variableService, ChallengeService challengeService) {
-    ExerciseFileExport efe = new ExerciseFileExport(objectMapper, variableService, challengeService);
+  public static final ExerciseFileExport fromExercise(
+      Exercise exercise,
+      ObjectMapper objectMapper,
+      VariableService variableService,
+      ChallengeService challengeService) {
+    ExerciseFileExport efe =
+        new ExerciseFileExport(objectMapper, variableService, challengeService);
     efe.setExercise(exercise);
     return efe;
   }
@@ -263,15 +287,15 @@ public class ExerciseFileExport {
     // disable users if not requested; note negation
     if (!ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)) {
       this.objectMapper.addMixIn(
-              ExerciseFileExport.class, ExerciseExportMixins.ExerciseFileExport.class);
+          ExerciseFileExport.class, ExerciseExportMixins.ExerciseFileExport.class);
     }
 
     if (ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)) {
       this.objectMapper.addMixIn(
-              Team.class,
-              ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)
-                      ? ExerciseExportMixins.Team.class
-                      : ExerciseExportMixins.EmptyTeam.class);
+          Team.class,
+          ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)
+              ? ExerciseExportMixins.Team.class
+              : ExerciseExportMixins.EmptyTeam.class);
     }
     if (ExportOptions.has(ExportOptions.WITH_VARIABLE_VALUES, this.exportOptionsMask)) {
       this.objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
@@ -281,5 +305,4 @@ public class ExerciseFileExport {
 
     return this;
   }
-
 }
