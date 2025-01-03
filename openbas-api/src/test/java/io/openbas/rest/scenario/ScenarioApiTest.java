@@ -1,5 +1,6 @@
 package io.openbas.rest.scenario;
 
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,19 +12,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.database.model.Asset;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Tag;
-import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.scenario.form.ScenarioInformationInput;
 import io.openbas.rest.scenario.form.ScenarioInput;
 import io.openbas.rest.scenario.form.ScenarioUpdateTagsInput;
 import io.openbas.rest.scenario.form.UpdateScenarioInput;
 import io.openbas.service.ScenarioService;
+import io.openbas.utils.fixtures.InjectFixture;
+import io.openbas.utils.fixtures.InjectorContractFixture;
 import io.openbas.utils.fixtures.ScenarioFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.*;
@@ -39,16 +45,22 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ScenarioApiTest {
+  public static final String EMAIL_DEFAULT = "138ad8f8-32f8-4a22-8114-aaa12322bd09";
 
   @Autowired private MockMvc mvc;
 
   @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private TagRepository tagRepository;
+  @Autowired private AssetRepository assetRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
 
   @Mock TagRepository tagRepositoryMock;
   @Mock ScenarioService scenarioServiceMock;
   @InjectMocks private ScenarioApi scenarioApi;
 
   static String SCENARIO_ID;
+    @Autowired
+    private InjectRepository injectRepository;
 
   void cleanup() {
     this.scenarioRepository.deleteById(SCENARIO_ID);
@@ -216,119 +228,63 @@ public class ScenarioApiTest {
     cleanup();
   }
 
+
   @DisplayName("Update with apply rule")
   @Test
-  public void testUpdateScenario_WITH_apply_rule_true() {
-    io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
-    io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
-    io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
+  public void testUpdateScenario_WITH_apply_rule_true() throws Exception {
+    String tag1 = "tag1";
+    String tag2 = "tag2";
+    Tag tag3 = createTag("tag3");
+    Scenario scenario = createScenario("testScenario", List.of(tag1, tag2));
 
-    Scenario scenario = ScenarioFixture.getScenarioWithInjects();
-    scenario.setTags(Set.of(tag2, tag3, tag1));
-    scenario.setId("test");
-    UpdateScenarioInput input = new UpdateScenarioInput();
-    input.setDescription("test");
-    input.setApplyTagRule(true);
-    input.setTagIds(List.of(tag1.getId(), tag2.getId()));
+    UpdateScenarioInput updateScenarioInput = new UpdateScenarioInput();
+    updateScenarioInput.setApplyTagRule(false);
+    updateScenarioInput.setTagIds(List.of(tag3.getId()));
 
-    Scenario expected = ScenarioFixture.getScenarioWithInjects();
-    scenario.setId("test");
-    expected.setDescription("test");
-    expected.setTags(Set.of(tag1, tag2));
 
-    doReturn(List.of(tag1, tag2))
-        .when(tagRepositoryMock)
-        .findAllById(List.of(tag1.getId(), tag2.getId()));
-    doReturn(scenario).when(scenarioServiceMock).scenario(scenario.getId());
+    this.mvc
+            .perform(
+                    put(SCENARIO_URI + "/" + scenario.getId())
+                            .content(asJsonString(updateScenarioInput))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
-    scenarioApi.updateScenario(scenario.getId(), input);
 
-    verify(scenarioServiceMock).updateScenarioAndApplyRule(expected, Set.of(tag2, tag3, tag1));
+    Scenario updatedScenario = scenarioRepository.findById(scenario.getId()).orElseThrow();
+    assertEquals(updatedScenario.getTags().size(), 1);
+    assertEquals(new HashSet<>(updatedScenario.getInjects().getFirst().getAssets()),
+            new HashSet<>(scenario.getInjects().getFirst().getAssets()));
   }
 
-  @DisplayName("Update without apply rule")
-  @Test
-  public void testUpdateScenario_WITH_apply_rule_false() throws Exception {
-    io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
-    io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
-    io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
 
-    Scenario scenario = ScenarioFixture.getScenarioWithInjects();
-    scenario.setTags(Set.of(tag2, tag3, tag1));
-    scenario.setId("test");
-    UpdateScenarioInput input = new UpdateScenarioInput();
-    input.setDescription("test");
-    input.setApplyTagRule(true);
-    input.setTagIds(List.of(tag1.getId(), tag2.getId()));
-
-    Scenario expected = ScenarioFixture.getScenarioWithInjects();
-    expected.setId("test");
-    expected.setDescription("test");
-    expected.setTags(Set.of(tag1, tag2));
-
-    doReturn(List.of(tag1, tag2))
-        .when(tagRepositoryMock)
-        .findAllById(List.of(tag1.getId(), tag2.getId()));
-    doReturn(scenario).when(scenarioServiceMock).scenario(scenario.getId());
-
-    scenarioApi.updateScenario(scenario.getId(), input);
-
-    verify(scenarioServiceMock).updateScenario(expected);
+  private Scenario createScenario(String scenarioName, List<String> tagNames) {
+    Scenario scenario = new Scenario();
+    tagNames.forEach(tagName -> scenario.getTags().add(createTag(tagName)));
+    scenarioRepository.save(scenario);
+    createInject(scenario.getId());
+    return scenarioRepository.findById(scenario.getId()).orElseThrow();
   }
 
-  @DisplayName("Update tags without apply rule")
-  @Test
-  public void testUpdateScenarioTags_WITH_apply_rule_false() {
-    io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
-    io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
-    io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
-
-    Scenario scenario = ScenarioFixture.getScenarioWithInjects();
-    scenario.setTags(Set.of(tag2, tag3, tag1));
-    scenario.setId("test");
-
-    ScenarioUpdateTagsInput input = new ScenarioUpdateTagsInput();
-    input.setTagIds(List.of(tag1.getId(), tag2.getId()));
-
-    Scenario expected = ScenarioFixture.getScenarioWithInjects();
-    expected.setId("test");
-    expected.setTags(Set.of(tag1, tag2));
-
-    doReturn(List.of(tag1, tag2))
-        .when(tagRepositoryMock)
-        .findAllById(List.of(tag1.getId(), tag2.getId()));
-    doReturn(scenario).when(scenarioServiceMock).scenario(scenario.getId());
-
-    scenarioApi.updateScenarioTags(scenario.getId(), input);
-
-    verify(scenarioServiceMock).updateScenario(expected);
+  private Inject createInject(String scenarioId) {
+    Inject inject =  InjectFixture.getInjectForEmailContract(injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    inject.setScenario(scenarioRepository.findById(scenarioId).orElseThrow());
+    return injectRepository.save(inject);
   }
 
-  @DisplayName("Update tags with apply rule")
-  @Test
-  public void testUpdateScenarioTags_WITH_apply_rule_true() {
-    io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
-    io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
-    Tag tag3 = TagFixture.getTag("Tag3");
+  private Tag createTag(String tagName) {
+    Tag tag = new Tag();
+    tag.setName(tagName + System.currentTimeMillis());
+    tag.setColor("#0000");
+    return tagRepository.save(tag);
+  }
 
-    Scenario scenario = ScenarioFixture.getScenarioWithInjects();
-    scenario.setTags(Set.of(tag2, tag3, tag1));
-    scenario.setId("test");
-    ScenarioUpdateTagsInput input = new ScenarioUpdateTagsInput();
-    input.setTagIds(List.of(tag1.getId(), tag2.getId()));
-    input.setApplyTagRule(true);
-
-    Scenario expected = ScenarioFixture.getScenarioWithInjects();
-    expected.setId("test");
-    expected.setTags(Set.of(tag1, tag2));
-
-    doReturn(List.of(tag1, tag2))
-        .when(tagRepositoryMock)
-        .findAllById(List.of(tag1.getId(), tag2.getId()));
-    doReturn(scenario).when(scenarioServiceMock).scenario(scenario.getId());
-
-    scenarioApi.updateScenarioTags(scenario.getId(), input);
-
-    verify(scenarioServiceMock).updateScenarioAndApplyRule(expected, Set.of(tag2, tag3, tag1));
+  private Asset createAsset(String assetName) {
+    Asset asset = new Asset();
+    asset.setName(assetName);
+    return assetRepository.save(asset);
   }
 }

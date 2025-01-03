@@ -7,8 +7,7 @@ import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
@@ -205,7 +204,7 @@ class ScenarioServiceTest {
   }
 
   @Test
-  public void testUpdateScenarioAndApplyRule_WITH_AddedAndRemovedTags() {
+  public void testUpdateScenario_WITH_applyRule_true() {
     setUpWithMockRepository();
     Asset asset1 = AssetFixture.createDefaultAsset("asset1");
     Asset asset2 = AssetFixture.createDefaultAsset("asset2");
@@ -223,7 +222,7 @@ class ScenarioServiceTest {
     when(tagRuleService.getAssetsFromTagIds(List.of(tag3.getId()))).thenReturn(assetsToRemove);
     when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
 
-    scenarioService.updateScenarioAndApplyRule(scenario, currentTags);
+    scenarioService.updateScenario(scenario, currentTags, true);
 
     scenario
         .getInjects()
@@ -232,5 +231,33 @@ class ScenarioServiceTest {
                 verify(injectService)
                     .applyDefaultAssetsToInject(inject.getId(), assetsToAdd, assetsToRemove));
     verify(mockScenarioRepository).save(scenario);
+  }
+
+  @Test
+  public void testUpdateScenario_WITH_applyRule_false() {
+    setUpWithMockRepository();
+    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
+    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
+    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+    Tag tag1 = TagFixture.getTag("Tag1");
+    Tag tag2 = TagFixture.getTag("Tag2");
+    Tag tag3 = TagFixture.getTag("Tag3");
+    Scenario scenario = ScenarioFixture.getScenarioWithInjects();
+    scenario.setTags(Set.of(tag1, tag2));
+    Set<Tag> currentTags = Set.of(tag2, tag3);
+    List<Asset> assetsToAdd = List.of(asset1, asset2);
+    List<Asset> assetsToRemove = List.of(asset3);
+
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag1.getId()))).thenReturn(assetsToAdd);
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag3.getId()))).thenReturn(assetsToRemove);
+    when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
+
+    scenarioService.updateScenario(scenario, currentTags, false);
+
+    scenario
+            .getInjects()
+            .forEach(
+                    inject ->
+                            verify(injectService, never()).applyDefaultAssetsToInject(any(), any(), any()));
   }
 }

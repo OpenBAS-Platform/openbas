@@ -105,12 +105,7 @@ public class ScenarioApi extends RestBehavior {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Set<Tag> currentTagList = scenario.getTags();
     scenario.setUpdateAttributes(input);
-    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    if (input.isApplyTagRule()) {
-      return this.scenarioService.updateScenarioAndApplyRule(scenario, currentTagList);
-    } else {
-      return this.scenarioService.updateScenario(scenario);
-    }
+    return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
   }
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}/information")
@@ -139,12 +134,7 @@ public class ScenarioApi extends RestBehavior {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Set<Tag> currentTagList = scenario.getTags();
     scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-
-    if (input.isApplyTagRule()) {
-      return this.scenarioService.updateScenarioAndApplyRule(scenario, currentTagList);
-    } else {
-      return this.scenarioService.updateScenario(scenario);
-    }
+    return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
   }
 
   // -- EXPORT --
