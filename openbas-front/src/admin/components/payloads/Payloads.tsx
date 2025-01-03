@@ -7,7 +7,6 @@ import type { CollectorHelper } from '../../../actions/collectors/collector-help
 import { fetchDocuments } from '../../../actions/Document';
 import type { DocumentHelper } from '../../../actions/helper';
 import { searchPayloads } from '../../../actions/Payload';
-import type { PayloadStore } from '../../../actions/payloads/Payload';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
@@ -23,6 +22,7 @@ import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
+import { Payload as PayloadType } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePayload from './CreatePayload';
@@ -128,7 +128,7 @@ const Payloads = () => {
   const { t, nsdt } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const [selectedPayload, setSelectedPayload] = useState<PayloadStore | null>(null);
+  const [selectedPayload, setSelectedPayload] = useState<PayloadType | null>(null);
   const { documentsMap, collectorsMap } = useHelper((helper: DocumentHelper & CollectorHelper) => ({
     documentsMap: helper.getDocumentsMap(),
     collectorsMap: helper.getCollectorsMap(),
@@ -144,7 +144,7 @@ const Payloads = () => {
       field: 'payload_type',
       label: 'Type',
       isSortable: false,
-      value: (payload: PayloadStore) => (
+      value: (payload: PayloadType) => (
         <Chip
           variant="outlined"
           classes={{ root: classes.chipInList }}
@@ -157,13 +157,13 @@ const Payloads = () => {
       field: 'payload_name',
       label: 'Name',
       isSortable: true,
-      value: (payload: PayloadStore) => <>{payload.payload_name}</>,
+      value: (payload: PayloadType) => <>{payload.payload_name}</>,
     },
     {
       field: 'payload_platforms',
       label: 'Platforms',
       isSortable: false,
-      value: (payload: PayloadStore) => (
+      value: (payload: PayloadType) => (
         <>
           {payload.payload_platforms?.map(
             platform => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
@@ -175,13 +175,13 @@ const Payloads = () => {
       field: 'payload_description',
       label: 'Description',
       isSortable: true,
-      value: (payload: PayloadStore) => <>{payload.payload_description}</>,
+      value: (payload: PayloadType) => <>{payload.payload_description}</>,
     },
     {
       field: 'payload_tags',
       label: 'Tags',
       isSortable: false,
-      value: (payload: PayloadStore) => (
+      value: (payload: PayloadType) => (
         <ItemTags
           variant="reduced-view"
           tags={payload.payload_tags}
@@ -192,7 +192,7 @@ const Payloads = () => {
       field: 'payload_source',
       label: 'Source',
       isSortable: true,
-      value: (payload: PayloadStore) => (
+      value: (payload: PayloadType) => (
         <Chip
           variant="outlined"
           sx={chipSx}
@@ -205,7 +205,7 @@ const Payloads = () => {
       field: 'payload_status',
       label: 'Status',
       isSortable: false,
-      value: (payload: PayloadStore) => (
+      value: (payload: PayloadType) => (
         <Chip
           variant="outlined"
           classes={{ root: classes.chipInList2 }}
@@ -218,7 +218,7 @@ const Payloads = () => {
       field: 'payload_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (payload: PayloadStore) => <>{nsdt(payload.payload_updated_at)}</>,
+      value: (payload: PayloadType) => <>{nsdt(payload.payload_updated_at)}</>,
     },
   ], []);
 
@@ -233,7 +233,7 @@ const Payloads = () => {
     'payload_updated_at',
     'payload_execution_arch',
   ];
-  const [payloads, setPayloads] = useState<PayloadStore[]>([]);
+  const [payloads, setPayloads] = useState<PayloadType[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('payloads', buildSearchPagination({
     sorts: initSorting('payload_name'),
     filterGroup: {
@@ -293,7 +293,7 @@ const Payloads = () => {
             )}
           />
         </ListItem>
-        {payloads.map((payload: PayloadStore) => {
+        {payloads.map((payload: PayloadType) => {
           const collector = payload.payload_collector ? collectorsMap[payload.payload_collector] : null;
           return (
             (
@@ -304,8 +304,8 @@ const Payloads = () => {
                   <PayloadPopover
                     documentsMap={documentsMap}
                     payload={payload}
-                    onUpdate={(result: PayloadStore) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
-                    onDuplicate={(result: PayloadStore) => setPayloads([result, ...payloads])}
+                    onUpdate={(result: PayloadType) => setPayloads(payloads.map(a => (a.payload_id !== result.payload_id ? a : result)))}
+                    onDuplicate={(result: PayloadType) => setPayloads([result, ...payloads])}
                     onDelete={(result: string) => setPayloads(payloads.filter(a => (a.payload_id !== result)))}
                     disableUpdate={collector !== null}
                     disableDelete={collector !== null && payload.payload_status !== 'DEPRECATED'}
@@ -356,7 +356,7 @@ const Payloads = () => {
         })}
       </List>
       <CreatePayload
-        onCreate={(result: PayloadStore) => setPayloads([result, ...payloads])}
+        onCreate={(result: PayloadType) => setPayloads([result, ...payloads])}
       />
       <Drawer
         open={selectedPayload !== null}
