@@ -14,7 +14,7 @@ import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import Loader from '../../../components/Loader';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { Exercise, ExercisesGlobalScoresOutput, ExerciseSimple, ExpectationResultsByType } from '../../../utils/api-types';
+import type { ExercisesGlobalScoresOutput, ExerciseSimple, ExpectationResultsByType } from '../../../utils/api-types';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ExerciseStatus from './simulation/ExerciseStatus';
 

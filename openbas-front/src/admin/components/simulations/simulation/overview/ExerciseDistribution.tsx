@@ -12,6 +12,7 @@ import type { Theme } from '../../../../../components/Theme';
 import arrowDark from '../../../../../static/images/misc/arrow_dark.png';
 import arrowLight from '../../../../../static/images/misc/arrow_light.png';
 import { useHelper } from '../../../../../store';
+import { Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ExerciseDistributionByInjectorContract from './ExerciseDistributionByInjectorContract';
@@ -23,7 +24,6 @@ import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionS
 import ExerciseDistributionScoreOverTimeByInjectorContract from './ExerciseDistributionScoreOverTimeByInjectorContract';
 import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
-import { Exercise } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   paperChart: {

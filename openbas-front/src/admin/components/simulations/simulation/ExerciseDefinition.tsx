@@ -5,11 +5,11 @@ import { useParams } from 'react-router';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
+import { Exercise } from '../../../../utils/api-types';
 import ExerciseArticles from './articles/ExerciseArticles';
 import ExerciseChallenges from './challenges/ExerciseChallenges';
 import ExerciseTeams from './teams/ExerciseTeams';
 import ExerciseVariables from './variables/ExerciseVariables';
-import { Exercise } from '../../../../utils/api-types';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.

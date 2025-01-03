@@ -3,7 +3,6 @@ import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import Empty from '../../../../../components/Empty';
@@ -36,10 +35,10 @@ const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({
 
   let cumulation = 0;
   const teamsScores = R.pipe(
-    R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team && n?.inject_expectation_user === null),
+    R.filter((n: InjectExpectation) => !R.isEmpty(n.inject_expectation_results) && n?.inject_expectation_team && n?.inject_expectation_user === null),
     R.groupBy(R.prop('inject_expectation_team')),
     R.toPairs,
-    R.map((n: [string, InjectExpectationStore[]]) => {
+    R.map((n: [string, InjectExpectation[]]) => {
       cumulation = 0;
       return [
         n[0],
@@ -52,10 +51,10 @@ const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({
         )(n[1]),
       ];
     }),
-    R.map((n: [string, Array<InjectExpectationStore & { inject_expectation_cumulated_score: number }>]) => ({
+    R.map((n: [string, Array<InjectExpectation & { inject_expectation_cumulated_score: number }>]) => ({
       name: teamsMap[n[0]]?.team_name,
       color: teamsColors[n[0]],
-      data: n[1].map((i: InjectExpectationStore & { inject_expectation_cumulated_score: number }) => ({
+      data: n[1].map((i: InjectExpectation & { inject_expectation_cumulated_score: number }) => ({
         x: i.inject_expectation_updated_at,
         y: i.inject_expectation_cumulated_score,
       })),

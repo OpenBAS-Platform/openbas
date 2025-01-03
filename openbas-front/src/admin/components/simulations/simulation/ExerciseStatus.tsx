@@ -3,8 +3,8 @@ import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 
 import { useFormatter } from '../../../../components/i18n';
-import { inlineStylesColors } from '../../../../utils/Colors';
 import { Exercise } from '../../../../utils/api-types';
+import { inlineStylesColors } from '../../../../utils/Colors';
 
 const useStyles = makeStyles(() => ({
   chip: {

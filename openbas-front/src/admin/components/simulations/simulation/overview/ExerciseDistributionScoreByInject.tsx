@@ -3,13 +3,12 @@ import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { Exercise, Inject } from '../../../../../utils/api-types';
+import type { Exercise, Inject, InjectExpectation } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 
 interface Props {
@@ -30,18 +29,18 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
   }));
 
   const injectsTotalScores = R.pipe(
-    R.filter((n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results)),
+    R.filter((n: InjectExpectation) => !R.isEmpty(n.inject_expectation_results)),
     R.groupBy(R.prop('inject_expectation_inject')),
     R.toPairs,
-    R.map((n: [string, InjectExpectationStore[]]) => ({
+    R.map((n: [string, InjectExpectation[]]) => ({
       ...injectsMap[n[0]],
-      inject_total_score: R.sum(R.map((o: InjectExpectationStore) => o.inject_expectation_score, n[1])),
+      inject_total_score: R.sum(R.map((o: InjectExpectation) => o.inject_expectation_score, n[1])),
     })),
   )(injectExpectations);
 
   const sortedInjectsByTotalScore = R.pipe(
     R.sortWith([R.descend(R.prop('inject_total_score'))]),
-    R.filter((n: InjectExpectationStore) => n.inject_total_score > 0),
+    R.filter((n: InjectExpectation & { inject_total_score: number }) => n.inject_total_score > 0),
     R.take(10),
   )(injectsTotalScores);
 

@@ -4,7 +4,6 @@ import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
 import type { UserHelper } from '../../../../../actions/helper';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
@@ -38,9 +37,9 @@ const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({
     ),
     R.groupBy(R.prop('inject_expectation_user')),
     R.toPairs,
-    R.map((n: [string, InjectExpectationStore[]]) => ({
+    R.map((n: [string, InjectExpectation[]]) => ({
       ...usersMap[n[0]],
-      user_total_score: R.sum(R.map((o: InjectExpectationStore) => o.inject_expectation_score, n[1])),
+      user_total_score: R.sum(R.map((o: InjectExpectation) => o.inject_expectation_score, n[1])),
     })),
   )(injectExpectations);
 

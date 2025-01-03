@@ -13,7 +13,7 @@ import { buildSearchPagination } from '../../../components/common/queryable/Quer
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { Exercise, ExerciseSimple, FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
+import type { ExerciseSimple, FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
 import ExerciseList from './ExerciseList';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import ExerciseCreation from './simulation/ExerciseCreation';
