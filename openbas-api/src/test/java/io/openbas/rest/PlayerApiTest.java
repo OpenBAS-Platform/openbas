@@ -22,9 +22,7 @@ import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
-
 import java.util.List;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,19 +41,15 @@ public class PlayerApiTest {
   static Tag TAG;
   static Organization ORGANIZATION;
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
   @Value("${openbas.admin.email:#{null}}")
   private String adminEmail;
 
-  @Autowired
-  private OrganizationRepository organizationRepository;
+  @Autowired private OrganizationRepository organizationRepository;
 
-  @Autowired
-  private TagRepository tagRepository;
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private TagRepository tagRepository;
+  @Autowired private UserRepository userRepository;
 
   @BeforeAll
   void beforeAll() {
