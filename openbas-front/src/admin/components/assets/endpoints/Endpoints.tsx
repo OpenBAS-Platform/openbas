@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { DialogContent, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -9,6 +9,8 @@ import { fetchExecutors } from '../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import ButtonCreate from '../../../../components/common/ButtonCreate';
+import Dialog from '../../../../components/common/Dialog';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
@@ -19,10 +21,10 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
 import type { Endpoint, SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
 import EndpointPopover from './EndpointPopover';
-import ButtonCreate from '../../../../components/common/ButtonCreate';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -81,11 +83,15 @@ const Endpoints = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
+  const { settings } = useAuth();
+
+  // Dialog
+  const [open, setOpen] = useState(false);
+  const onClose = () => setOpen(false);
 
   // Query param
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
-  const [searchId] = searchParams.getAll('id');
 
   // Fetching data
   const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper & TagHelper) => ({
@@ -221,18 +227,23 @@ const Endpoints = () => {
           );
         })}
       </List>
-      {userAdmin && <ButtonCreate onClick={()=>setOpen(true)} />}
+      {userAdmin && <ButtonCreate onClick={() => setOpen(true)} />}
       <Dialog
-        PaperProps={{ elevation: 1 }}
         open={open}
-        onClose={onClose}
-        fullWidth={true}
-        maxWidth="md"
+        handleClose={onClose}
+        title={t('How Are Endpoints Added?')}
       >
-        <DialogTitle>
-          {t('Teset')}
-        </DialogTitle>
         <DialogContent>
+          <span>
+            {t('Your assets will be automatically created by the installation of your agent. ')}
+          </span>
+          <p>
+            {t('In order to do so, go to this page ')}
+            <a href={`${settings.platform_base_url}/admin/agents`} target="_blank" rel="noopener noreferrer">
+              {`${settings.platform_base_url}/admin/agents`}
+            </a>
+            {t(' to install the agent of your choice with its corresponding assets.')}
+          </p>
         </DialogContent>
       </Dialog>
     </>
