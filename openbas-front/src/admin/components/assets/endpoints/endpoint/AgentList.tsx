@@ -87,7 +87,6 @@ const AgentList: React.FC<Props> = ({ agents }) => {
     <List>
       <ListItem
         classes={{ root: classes.itemHead }}
-        divider={false}
         style={{ paddingTop: 0 }}
       >
         <ListItemIcon />
@@ -111,7 +110,6 @@ const AgentList: React.FC<Props> = ({ agents }) => {
       </ListItem>
       <ListItem
         classes={{ root: classes.itemHead }}
-        divider={false}
         style={{ paddingTop: 0 }}
       >
       </ListItem>
