@@ -231,7 +231,7 @@ public class ScenarioApiTest {
 
   @DisplayName("Update with apply rule")
   @Test
-  public void testUpdateScenario_WITH_apply_rule_true() throws Exception {
+  public void testUpdateScenario_WITH_apply_rule_false() throws Exception {
     String tag1 = "tag1";
     String tag2 = "tag2";
     Tag tag3 = createTag("tag3");
