@@ -43,8 +43,8 @@ public class InjectService {
 
   public Inject inject(@NotBlank final String injectId) {
     return this.injectRepository
-            .findById(injectId)
-            .orElseThrow(() -> new ElementNotFoundException("Inject not found"));
+        .findById(injectId)
+        .orElseThrow(() -> new ElementNotFoundException("Inject not found"));
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -71,23 +71,23 @@ public class InjectService {
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
     // Delete document from all exercise injects
     List<Inject> exerciseInjects =
-            injectRepository.findAllForExerciseAndDoc(exerciseId, documentId);
+        injectRepository.findAllForExerciseAndDoc(exerciseId, documentId);
     List<InjectDocument> updatedInjects =
-            exerciseInjects.stream()
-                    .flatMap(
-                            inject -> {
-                              @SuppressWarnings("UnnecessaryLocalVariable")
-                              Stream<InjectDocument> filterDocuments =
-                                      inject.getDocuments().stream()
-                                              .filter(document -> document.getDocument().getId().equals(documentId));
-                              return filterDocuments;
-                            })
-                    .toList();
+        exerciseInjects.stream()
+            .flatMap(
+                inject -> {
+                  @SuppressWarnings("UnnecessaryLocalVariable")
+                  Stream<InjectDocument> filterDocuments =
+                      inject.getDocuments().stream()
+                          .filter(document -> document.getDocument().getId().equals(documentId));
+                  return filterDocuments;
+                })
+            .toList();
     injectDocumentRepository.deleteAll(updatedInjects);
   }
 
   public <T> T convertInjectContent(@NotNull final Inject inject, @NotNull final Class<T> converter)
-          throws Exception {
+      throws Exception {
     ObjectNode content = inject.getContent();
     return this.mapper.treeToValue(content, converter);
   }
@@ -95,18 +95,18 @@ public class InjectService {
   public void cleanInjectsDocScenario(String scenarioId, String documentId) {
     // Delete document from all scenario injects
     List<Inject> scenarioInjects =
-            injectRepository.findAllForScenarioAndDoc(scenarioId, documentId);
+        injectRepository.findAllForScenarioAndDoc(scenarioId, documentId);
     List<InjectDocument> updatedInjects =
-            scenarioInjects.stream()
-                    .flatMap(
-                            inject -> {
-                              @SuppressWarnings("UnnecessaryLocalVariable")
-                              Stream<InjectDocument> filterDocuments =
-                                      inject.getDocuments().stream()
-                                              .filter(document -> document.getDocument().getId().equals(documentId));
-                              return filterDocuments;
-                            })
-                    .toList();
+        scenarioInjects.stream()
+            .flatMap(
+                inject -> {
+                  @SuppressWarnings("UnnecessaryLocalVariable")
+                  Stream<InjectDocument> filterDocuments =
+                      inject.getDocuments().stream()
+                          .filter(document -> document.getDocument().getId().equals(documentId));
+                  return filterDocuments;
+                })
+            .toList();
     injectDocumentRepository.deleteAll(updatedInjects);
   }
 
@@ -140,6 +140,7 @@ public class InjectService {
     injectDocumentRepository.deleteDocumentsFromInject(id);
     injectRepository.deleteById(id);
   }
+
   /**
    * Update an inject with default assets
    *
@@ -150,28 +151,28 @@ public class InjectService {
    */
   @Transactional
   public Inject applyDefaultAssetsToInject(
-          final String injectId,
-          final List<Asset> defaultAssetsToAdd,
-          final List<Asset> defaultAssetsToRemove) {
+      final String injectId,
+      final List<Asset> defaultAssetsToAdd,
+      final List<Asset> defaultAssetsToRemove) {
 
     // fetch the inject
     Inject inject =
-            this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     // remove/add default assets and remove duplicates
     List<Asset> currentAssets = inject.getAssets();
     // Get the Id of the assets to remove and filter the assets that are in both lists
     List<String> assetIdsToRemove =
-            defaultAssetsToRemove.stream()
-                    .filter(asset -> !defaultAssetsToAdd.contains(asset))
-                    .map(Asset::getId)
-                    .toList();
+        defaultAssetsToRemove.stream()
+            .filter(asset -> !defaultAssetsToAdd.contains(asset))
+            .map(Asset::getId)
+            .toList();
     Set<String> uniqueAssetsIds = new HashSet<>();
     List<Asset> newListOfAssets =
-            Stream.concat(currentAssets.stream(), defaultAssetsToAdd.stream())
-                    .filter(asset -> !assetIdsToRemove.contains(asset.getId()))
-                    .filter(asset -> uniqueAssetsIds.add(asset.getId()))
-                    .collect(Collectors.toList());
+        Stream.concat(currentAssets.stream(), defaultAssetsToAdd.stream())
+            .filter(asset -> !assetIdsToRemove.contains(asset.getId()))
+            .filter(asset -> uniqueAssetsIds.add(asset.getId()))
+            .collect(Collectors.toList());
 
     if (new HashSet<>(currentAssets).equals(new HashSet<>(newListOfAssets))) {
       return inject;
