@@ -49,12 +49,12 @@ public class ScenarioApiTest {
 
     // -- EXECUTE & ASSERT --
     this.mvc
-            .perform(
-                    post(SCENARIO_URI)
-                            .content(asJsonString(scenarioInput))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is4xxClientError());
+        .perform(
+            post(SCENARIO_URI)
+                .content(asJsonString(scenarioInput))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is4xxClientError());
 
     // -- PREPARE --
     String name = "My scenario";
@@ -64,17 +64,17 @@ public class ScenarioApiTest {
 
     // -- EXECUTE --
     String response =
-            this.mvc
-                    .perform(
-                            post(SCENARIO_URI)
-                                    .content(asJsonString(scenarioInput))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().is2xxSuccessful())
-                    .andExpect(jsonPath("$.scenario_name").value(name))
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        this.mvc
+            .perform(
+                post(SCENARIO_URI)
+                    .content(asJsonString(scenarioInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(jsonPath("$.scenario_name").value(name))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -88,12 +88,12 @@ public class ScenarioApiTest {
   void retrieveScenariosTest() throws Exception {
     // -- EXECUTE --
     String response =
-            this.mvc
-                    .perform(get(SCENARIO_URI).accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().is2xxSuccessful())
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        this.mvc
+            .perform(get(SCENARIO_URI).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -106,12 +106,12 @@ public class ScenarioApiTest {
   void retrieveScenarioTest() throws Exception {
     // -- EXECUTE --
     String response =
-            this.mvc
-                    .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().is2xxSuccessful())
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -124,12 +124,12 @@ public class ScenarioApiTest {
   void updateScenarioTest() throws Exception {
     // -- PREPARE --
     String response =
-            this.mvc
-                    .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().is2xxSuccessful())
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        this.mvc
+            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     ScenarioInput scenarioInput = new ScenarioInput();
     String subtitle = "A subtitle";
@@ -139,16 +139,16 @@ public class ScenarioApiTest {
 
     // -- EXECUTE --
     response =
-            this.mvc
-                    .perform(
-                            put(SCENARIO_URI + "/" + SCENARIO_ID)
-                                    .content(asJsonString(scenarioInput))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().is2xxSuccessful())
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID)
+                    .content(asJsonString(scenarioInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -168,16 +168,16 @@ public class ScenarioApiTest {
 
     // -- EXECUTE --
     String response =
-            this.mvc
-                    .perform(
-                            put(SCENARIO_URI + "/" + SCENARIO_ID + "/information")
-                                    .content(asJsonString(scenarioInformationInput))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .accept(MediaType.APPLICATION_JSON))
-                    .andExpect(status().is2xxSuccessful())
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsString();
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + SCENARIO_ID + "/information")
+                    .content(asJsonString(scenarioInformationInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
     assertNotNull(response);
@@ -191,7 +191,7 @@ public class ScenarioApiTest {
   void deleteScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --
     this.mvc
-            .perform(delete(SCENARIO_URI + "/" + SCENARIO_ID))
-            .andExpect(status().is2xxSuccessful());
+        .perform(delete(SCENARIO_URI + "/" + SCENARIO_ID))
+        .andExpect(status().is2xxSuccessful());
   }
 }
