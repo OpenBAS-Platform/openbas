@@ -22,7 +22,9 @@ import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
+
 import java.util.List;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,15 +43,19 @@ public class PlayerApiTest {
   static Tag TAG;
   static Organization ORGANIZATION;
 
-  @Autowired private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
   @Value("${openbas.admin.email:#{null}}")
   private String adminEmail;
 
-  @Autowired private OrganizationRepository organizationRepository;
+  @Autowired
+  private OrganizationRepository organizationRepository;
 
-  @Autowired private TagRepository tagRepository;
-  @Autowired private UserRepository userRepository;
+  @Autowired
+  private TagRepository tagRepository;
+  @Autowired
+  private UserRepository userRepository;
 
   @BeforeAll
   void beforeAll() {
@@ -109,6 +115,62 @@ public class PlayerApiTest {
 
     // --ASSERT--
     assertTrue(actualMessage.contains(expectedMessage));
+  }
+
+  @DisplayName("Upsert of a player")
+  @Test
+  @WithMockAdminUser
+  void upsertPlayerTest() throws Exception {
+    // --PREPARE--
+    User user = new User();
+    user.setUpdateAttributes(PLAYER_INPUT);
+    PLAYER = userRepository.save(user);
+    String newFirstname = "updatedFirstname";
+    PLAYER_INPUT.setFirstname(newFirstname);
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post(PLAYER_URI + "/upsert")
+                    .content(asJsonString(PLAYER_INPUT))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals("updatedFirstname", JsonPath.read(response, "$.user_firstname"));
+    // --THEN--
+    userRepository.deleteById(JsonPath.read(response, "$.user_id"));
+  }
+
+  @DisplayName("Upsert of a non existing player")
+  @Test
+  @WithMockAdminUser
+  void upsertNonExistingPlayerTest() throws Exception {
+    // --PREPARE--
+    User user = new User();
+    user.setEmail("admin@example.com");
+    PLAYER = userRepository.save(user);
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post(PLAYER_URI + "/upsert")
+                    .content(asJsonString(PLAYER_INPUT))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals("Firstname", JsonPath.read(response, "$.user_firstname"));
+    // --THEN--
+    userRepository.deleteById(JsonPath.read(response, "$.user_id"));
   }
 
   @DisplayName("Edition of a player")
