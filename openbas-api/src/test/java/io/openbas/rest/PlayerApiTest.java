@@ -51,8 +51,8 @@ public class PlayerApiTest {
   @Autowired private TagRepository tagRepository;
   @Autowired private UserRepository userRepository;
 
-  @BeforeAll
-  void beforeAll() {
+  @BeforeEach
+  void beforeEach() {
     ORGANIZATION = organizationRepository.save(OrganizationFixture.createOrganization());
     TAG = tagRepository.save(TagFixture.getTag());
     PLAYER_INPUT = PlayerFixture.createPlayer();
@@ -60,8 +60,8 @@ public class PlayerApiTest {
     PLAYER_INPUT.setTagIds(List.of(TAG.getId()));
   }
 
-  @AfterAll
-  void afterAll() {
+  @AfterEach
+  void afterEach() {
     organizationRepository.delete(ORGANIZATION);
     tagRepository.delete(TAG);
   }
