@@ -7,6 +7,7 @@ import Loader from '../../../components/Loader';
 import NotFound from '../../../components/NotFound';
 
 const Endpoints = lazy(() => import('./endpoints/Endpoints'));
+const IndexEndpoint = lazy(() => import('./endpoints/endpoint/Index'));
 const AssetGroups = lazy(() => import('./asset_groups/AssetGroups'));
 const SecurityPlatforms = lazy(() => import('./security_platforms/SecurityPlatforms'));
 
@@ -24,6 +25,7 @@ const Index = () => {
         <Routes>
           <Route path="" element={<Navigate to="endpoints" replace={true} />} />
           <Route path="endpoints" element={errorWrapper(Endpoints)()} />
+          <Route path="endpoints/:endpointId/*" element={errorWrapper(IndexEndpoint)()} />
           <Route path="asset_groups" element={errorWrapper(AssetGroups)()} />
           <Route path="security_platforms" element={errorWrapper(SecurityPlatforms)()} />
           {/* Not found */}
