@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { DialogContent, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { DialogContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -25,15 +25,13 @@ import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
 import EndpointPopover from './EndpointPopover';
+import * as React from 'react';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
-    cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItems: {
@@ -51,30 +49,29 @@ const useStyles = makeStyles(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
-    width: '30%',
+    width: '25%',
   },
-  endpoint_platform: {
+  asset_agents_status: {
     width: '15%',
-    display: 'flex',
-    alignItems: 'center',
   },
-  endpoint_arch: {
+  asset_agents_privilege: {
+    width: '10%',
+  },
+  asset_platform: {
     width: '10%',
     display: 'flex',
     alignItems: 'center',
   },
-  asset_executor: {
-    width: '15%',
+  asset_arch: {
+    width: '10%',
+  },
+  asset_agents_executor: {
+    width: '10%',
     display: 'flex',
     alignItems: 'center',
-    cursor: 'default',
   },
   asset_tags: {
-    width: '20%',
-  },
-  asset_status: {
     width: '15%',
-    cursor: 'default',
   },
 };
 
@@ -105,12 +102,13 @@ const Endpoints = () => {
 
   // Headers
   const headers = [
-    { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'asset_status', label: 'Status', isSortable: false },
-    { field: 'endpoint_platform', label: 'Platform', isSortable: true },
-    { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
-    { field: 'asset_executor', label: 'Executor', isSortable: false },
-    { field: 'asset_tags', label: 'Tags', isSortable: true },
+    { field: 'asset_name', label: 'Name', isSortable: false },
+    { field: 'asset_agents_status', label: 'Status', isSortable: false },
+    { field: 'asset_agents_privilege', label: 'Agents Privilege', isSortable: false },
+    { field: 'asset_platform', label: 'Platform', isSortable: false },
+    { field: 'asset_arch', label: 'Architecture', isSortable: false },
+    { field: 'asset_agents_executor', label: 'Executor', isSortable: false },
+    { field: 'asset_tags', label: 'Tags', isSortable: false },
   ];
 
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
@@ -148,21 +146,31 @@ const Endpoints = () => {
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
-          divider={false}
           style={{ paddingTop: 0 }}
         >
           <ListItemIcon />
           <ListItemText
             primary={(
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-              />
+              <div>
+                <div className={classes.bodyItems}>
+                  {headers.map(header => (
+                    <div
+                      key={header.field}
+                      className={classes.bodyItem}
+                      style={inlineStyles[header.field]}
+                    >
+                      {header.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           />
-          <ListItemSecondaryAction />
+        </ListItem>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          style={{ paddingTop: 0 }}
+        >
         </ListItem>
         {endpoints.map((endpoint: Endpoint) => {
           const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
@@ -195,18 +203,21 @@ const Endpoints = () => {
                       <div className={classes.bodyItem} style={inlineStyles.asset_name}>
                         {endpoint.asset_name}
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_status}>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_agents_status}>
                         <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_agents_privilege}>
+                        {'test'}
+                      </div>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_platform}>
                         <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
                         {' '}
                         {endpoint.endpoint_platform}
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_arch}>
                         {endpoint.endpoint_arch}
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_executor}>
+                      <div className={classes.bodyItem} style={inlineStyles.asset_agents_executor}>
                         {executor && (
                           <img
                             src={`/api/images/executors/${executor.executor_type}`}
