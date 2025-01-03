@@ -629,30 +629,30 @@ public class ExerciseService {
   @Transactional
   public Exercise updateExercice(
       @NotNull final Exercise exercise, @NotNull final Set<Tag> currentTags, boolean applyRule) {
-    if(applyRule) {
+    if (applyRule) {
       // Get assets from the TagRule of the added tags
       List<Asset> defaultAssetsToAdd =
-              tagRuleService.getAssetsFromTagIds(
-                      exercise.getTags().stream()
-                              .filter(tag -> !currentTags.contains(tag))
-                              .map(Tag::getId)
-                              .toList());
+          tagRuleService.getAssetsFromTagIds(
+              exercise.getTags().stream()
+                  .filter(tag -> !currentTags.contains(tag))
+                  .map(Tag::getId)
+                  .toList());
 
       // Get assets from the TagRule of the removed tags
       List<Asset> defaultAssetsToRemove =
-              tagRuleService.getAssetsFromTagIds(
-                      currentTags.stream()
-                              .filter(tag -> !exercise.getTags().contains(tag))
-                              .map(Tag::getId)
-                              .toList());
+          tagRuleService.getAssetsFromTagIds(
+              currentTags.stream()
+                  .filter(tag -> !exercise.getTags().contains(tag))
+                  .map(Tag::getId)
+                  .toList());
 
       // Add/remove the default assets to/from the injects
       exercise
-              .getInjects()
-              .forEach(
-                      inject ->
-                              injectService.applyDefaultAssetsToInject(
-                                      inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
+          .getInjects()
+          .forEach(
+              inject ->
+                  injectService.applyDefaultAssetsToInject(
+                      inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
     }
     exercise.setUpdatedAt(now());
     return exerciseRepository.save(exercise);
