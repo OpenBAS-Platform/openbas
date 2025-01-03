@@ -13,6 +13,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
@@ -35,6 +36,9 @@ class ExerciseServiceIntegrationTest {
   @Mock VariableService variableService;
 
   @Autowired private TeamService teamService;
+  @Autowired private TagRuleService tagRuleService;
+  @Autowired private InjectService injectService;
+
   @Autowired private ExerciseMapper exerciseMapper;
   @Autowired private InjectMapper injectMapper;
   @Autowired private ResultUtils resultUtils;
@@ -65,6 +69,8 @@ class ExerciseServiceIntegrationTest {
             injectDuplicateService,
             teamService,
             variableService,
+            tagRuleService,
+            injectService,
             exerciseMapper,
             injectMapper,
             resultUtils,

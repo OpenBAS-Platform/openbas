@@ -1,18 +1,16 @@
 package io.openbas.rest.exercise.form;
 
+import static io.openbas.config.AppConfig.*;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
-public class ExerciseUpdateTagsInput {
-
-  @JsonProperty("exercise_tags")
-  private List<String> tagIds = new ArrayList<>();
-
+@Setter
+@Data
+public class UpdateExerciseInput extends ExerciseInput {
   @JsonProperty("apply_tag_rule")
   private boolean applyTagRule = false;
 }

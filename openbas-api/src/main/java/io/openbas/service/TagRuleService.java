@@ -12,17 +12,17 @@ import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import jakarta.validation.constraints.NotNull;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class TagRuleService {
   private final TagRuleRepository tagRuleRepository;
   private final TagRepository tagRepository;
@@ -81,6 +81,36 @@ public class TagRuleService {
     return tagRepository
         .findByName(tagName.toLowerCase())
         .orElseThrow(() -> new ElementNotFoundException("Tag not found with name: " + tagName));
+  }
+
+  /**
+   * Return the set of assets to add from a tag id list
+   *
+   * @param tagIds
+   * @return set of assets to add by default
+   */
+  public List<Asset> getAssetsFromTagIds(@NotNull final List<String> tagIds) {
+    return this.tagRuleRepository.findByTags(tagIds).stream()
+        .flatMap(tagRule -> tagRule.getAssets().stream())
+        .toList();
+  }
+
+  /**
+   * Apply the rule to add the default assets to the input assets during Injects creation
+   *
+   * @param tagIds list of Assets of the Inject before applying the rules
+   * @param inputAssets list of Assets of the Inject before applying the rules
+   * @return return the new list of assets
+   */
+  public List<Asset> applyTagRuleToInjectCreation(List<String> tagIds, List<Asset> inputAssets) {
+
+    List<Asset> defaultAssets = this.getAssetsFromTagIds(tagIds);
+
+    // remove duplicate
+    Set<String> uniqueAssetsIds = new HashSet<>();
+    return Stream.concat(inputAssets.stream(), defaultAssets.stream())
+        .filter(asset -> uniqueAssetsIds.add(asset.getId()))
+        .toList();
   }
 
   @VisibleForTesting

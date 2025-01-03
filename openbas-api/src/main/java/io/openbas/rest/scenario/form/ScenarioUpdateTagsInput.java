@@ -12,4 +12,7 @@ public class ScenarioUpdateTagsInput {
 
   @JsonProperty("scenario_tags")
   private List<String> tagIds = new ArrayList<>();
+
+  @JsonProperty("apply_tag_rule")
+  private boolean applyTagRule = false;
 }

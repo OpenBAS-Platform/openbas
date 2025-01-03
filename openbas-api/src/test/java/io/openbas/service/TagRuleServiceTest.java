@@ -13,6 +13,7 @@ import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.fixtures.AssetFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.fixtures.TagRuleFixture;
 import java.util.HashSet;
@@ -193,5 +194,39 @@ public class TagRuleServiceTest {
               expected.getTag().getName(),
               expected.getAssets().stream().map(Asset::getId).toList());
         });
+  }
+
+  @Test
+  void testGetAssetsFromTagIds() {
+    List<String> tagIds = List.of("tag1");
+    TagRule tagRule = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    when(tagRuleRepository.findByTags(tagIds)).thenReturn(List.of(tagRule));
+    assertEquals(
+        new HashSet<>(tagRule.getAssets()),
+        new HashSet<>(tagRuleService.getAssetsFromTagIds(tagIds)));
+  }
+
+  @Test
+  void testApplyTagRuleToInjectCreation() throws Exception {
+    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
+    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
+    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+    Asset asset4 = AssetFixture.createDefaultAsset("asset4");
+
+    Tag tag1 = TagFixture.getTag("tag2");
+    Tag tag2 = TagFixture.getTag("tag3");
+
+    List<Asset> currentAssets = List.of(asset1, asset2);
+    List<Asset> defaultAssets = List.of(asset2, asset3, asset4);
+    TagRule tagRule = TagRuleFixture.createTagRule("tag_rule1", defaultAssets);
+
+    when(tagRuleRepository.findByTags(List.of(tag1.getId(), tag2.getId())))
+        .thenReturn(List.of(tagRule));
+
+    List<Asset> result =
+        tagRuleService.applyTagRuleToInjectCreation(
+            List.of(tag1.getId(), tag2.getId()), currentAssets);
+    List<Asset> expected = List.of(asset1, asset2, asset3, asset4);
+    assertEquals(new HashSet<>(expected), new HashSet<>(result));
   }
 }

@@ -33,6 +33,7 @@ import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.ScenarioService;
+import io.openbas.service.TagRuleService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -40,9 +41,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -84,6 +83,7 @@ public class InjectApi extends RestBehavior {
   private final ExecutableInjectService executableInjectService;
   private final InjectSearchService injectSearchService;
   private final InjectDuplicateService injectDuplicateService;
+  private final TagRuleService tagRuleService;
 
   // -- INJECTS --
 
@@ -348,7 +348,13 @@ public class InjectApi extends RestBehavior {
                   .toList());
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
+
+    // add default assets
+    inject.setAssets(
+        this.tagRuleService.applyTagRuleToInjectCreation(
+            exercise.getTags().stream().map(Tag::getId).toList(),
+            assetService.assets(input.getAssets())));
+
     inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =
@@ -582,7 +588,13 @@ public class InjectApi extends RestBehavior {
                   .toList());
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
+
+    // add default assets
+    inject.setAssets(
+        this.tagRuleService.applyTagRuleToInjectCreation(
+            scenario.getTags().stream().map(Tag::getId).toList(),
+            assetService.assets(input.getAssets())));
+
     inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =

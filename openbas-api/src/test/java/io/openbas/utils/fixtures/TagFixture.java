@@ -13,4 +13,12 @@ public class TagFixture {
     tag.setColor("#FFFFFF");
     return tag;
   }
+
+  public static Tag getTag(final String id) {
+    Tag tag = new Tag();
+    tag.setId(id);
+    tag.setName(TAG_NAME);
+    tag.setColor("#FFFFFF");
+    return tag;
+  }
 }

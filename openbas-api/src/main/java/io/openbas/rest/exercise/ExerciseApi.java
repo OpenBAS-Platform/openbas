@@ -401,12 +401,13 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Exercise updateExerciseInformation(
-      @PathVariable String exerciseId, @Valid @RequestBody ExerciseInput input) {
+      @PathVariable String exerciseId, @Valid @RequestBody UpdateExerciseInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Set<Tag> currentTagList = exercise.getTags();
     exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     exercise.setUpdateAttributes(input);
-    return exerciseRepository.save(exercise);
+    return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
@@ -432,8 +433,9 @@ public class ExerciseApi extends RestBehavior {
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTagsInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Set<Tag> currentTagList = exercise.getTags();
     exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    return exerciseRepository.save(exercise);
+    return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/logos")

@@ -37,6 +37,18 @@ public class TagRuleFixture {
     return rule;
   }
 
+  public static TagRule createTagRule(String tagRuleId, List<Asset> assets) {
+    Tag tag = new Tag();
+    tag.setName(TAG_NAME);
+
+    TagRule rule = new TagRule();
+    rule.setAssets(assets);
+    rule.setTag(tag);
+    rule.setId(tagRuleId);
+
+    return rule;
+  }
+
   public static TagRuleOutput createTagRuleOutput() {
     return TagRuleOutput.builder()
         .tagName(TAG_NAME)
