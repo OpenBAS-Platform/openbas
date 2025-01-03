@@ -1,11 +1,11 @@
 import { Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useParams } from 'react-router';
 
-import { useFormatter } from '../../../../../components/i18n';
+import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
+import { useHelper } from '../../../../../store';
+import type { Endpoint as EndpointType } from '../../../../../utils/api-types';
 import { truncate } from '../../../../../utils/String';
-import Loader from '../../../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -20,29 +20,23 @@ const useStyles = makeStyles(() => ({
 
 const EndpointHeader = () => {
   // Standard hooks
-  const { t } = useFormatter();
   const classes = useStyles();
-  const navigate = useNavigate();
+  const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const handleOpenDialog = () => setOpenDialog(true);
-  const handleCloseDialog = () => setOpenDialog(false);
-
-  // Edition
-  const [edition, setEdition] = useState(false);
-  const handleOpenEdit = () => setEdition(true);
-  const handleCloseEdit = () => setEdition(false);
-
+  // Fetching data
+  const { endpoint } = useHelper((helper: EndpointHelper) => ({
+    endpoint: helper.getEndpoint(endpointId),
+  }));
 
   return (
     <>
-      <Tooltip title={'endpoint.asset_name'}>
+      <Tooltip title={endpoint.asset_name}>
         <Typography
           variant="h1"
           gutterBottom={true}
           classes={{ root: classes.title }}
         >
-          {truncate('endpoint.asset_name', 80)}
+          {truncate(endpoint.asset_name, 80)}
         </Typography>
       </Tooltip>
       <div className={classes.actions}>

@@ -25,9 +25,9 @@ const Index = () => {
         <Routes>
           <Route path="" element={<Navigate to="endpoints" replace={true} />} />
           <Route path="endpoints" element={errorWrapper(Endpoints)()} />
+          <Route path="endpoints/:endpointId/*" element={errorWrapper(IndexEndpoint)()} />
           <Route path="asset_groups" element={errorWrapper(AssetGroups)()} />
           <Route path="security_platforms" element={errorWrapper(SecurityPlatforms)()} />
-          <Route path="endpoints/:assetId/*" element={errorWrapper(IndexEndpoint)()} />
           {/* Not found */}
           <Route path="*" element={<NotFound />} />
         </Routes>
