@@ -254,10 +254,6 @@ class ScenarioServiceTest {
 
     scenarioService.updateScenario(scenario, currentTags, false);
 
-    scenario
-            .getInjects()
-            .forEach(
-                    inject ->
-                            verify(injectService, never()).applyDefaultAssetsToInject(any(), any(), any()));
+    verify(injectService, never()).applyDefaultAssetsToInject(any(), any(), any());
   }
 }

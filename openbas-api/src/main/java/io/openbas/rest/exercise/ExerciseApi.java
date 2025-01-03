@@ -405,11 +405,7 @@ public class ExerciseApi extends RestBehavior {
     Set<Tag> currentTagList = exercise.getTags();
     exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     exercise.setUpdateAttributes(input);
-    if (input.isApplyTagRule()) {
-      return exerciseService.updateExerciceAndApplyRule(exercise, currentTagList);
-    } else {
-      return exerciseRepository.save(exercise);
-    }
+    return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
@@ -437,11 +433,7 @@ public class ExerciseApi extends RestBehavior {
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Set<Tag> currentTagList = exercise.getTags();
     exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    if (input.isApplyTagRule()) {
-      return exerciseService.updateExerciceAndApplyRule(exercise, currentTagList);
-    } else {
-      return exerciseRepository.save(exercise);
-    }
+    return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/logos")
