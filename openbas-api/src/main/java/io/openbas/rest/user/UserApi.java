@@ -1,5 +1,10 @@
 package io.openbas.rest.user;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.UserSpecification.fromIds;
+import static io.openbas.helper.DatabaseHelper.updateRelation;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawUser;
@@ -23,6 +28,8 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Optional;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,14 +40,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.specification.UserSpecification.fromIds;
-import static io.openbas.helper.DatabaseHelper.updateRelation;
-import static io.openbas.helper.StreamHelper.iterableToSet;
 
 @RestController
 public class UserApi extends RestBehavior {

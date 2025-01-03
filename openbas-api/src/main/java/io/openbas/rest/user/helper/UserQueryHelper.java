@@ -9,9 +9,8 @@ import io.openbas.rest.user.form.user.UserOutput;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 public class UserQueryHelper {
 
@@ -53,9 +52,7 @@ public class UserQueryHelper {
                     .email(tuple.get("user_email", String.class))
                     .admin(tuple.get("user_admin", boolean.class))
                     .organizationName(tuple.get("user_organization_name", String.class))
-                    .tags(
-                        Arrays.stream(tuple.get("user_tags", String[].class))
-                            .collect(Collectors.toSet()))
+                    .tags(Set.of((tuple.get("user_tags", String[].class))))
                     .build())
         .toList();
   }
