@@ -24,9 +24,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class TagRuleService {
-  private TagRuleRepository tagRuleRepository;
-  private TagRepository tagRepository;
-  private AssetRepository assetRepository;
+  private final TagRuleRepository tagRuleRepository;
+  private final TagRepository tagRepository;
+  private final AssetRepository assetRepository;
 
   public Optional<TagRule> findById(String id) {
     return tagRuleRepository.findById(id);
