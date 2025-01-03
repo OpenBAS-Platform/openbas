@@ -220,7 +220,7 @@ public class ExerciseFileExport {
     if (variables == null) {
       return this.exercise == null
           ? new ArrayList<>()
-          : this.variableService.variablesFromExercise(this.exercise.getId());
+          : this.variableService.variablesFromExercise(this.exercise.getId()).stream().toList();
     }
     return variables;
   }
