@@ -6,6 +6,7 @@ import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import { useHelper } from '../../../../../store';
 import type { Endpoint as EndpointType } from '../../../../../utils/api-types';
 import { truncate } from '../../../../../utils/String';
+import EndpointPopover from '../EndpointPopover';
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -40,7 +41,11 @@ const EndpointHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-
+        <EndpointPopover
+          endpoint={{ ...endpoint, type: 'static' }}
+          onUpdate={endpoint}
+          onDelete={endpoint}
+        />
       </div>
       <div className="clearfix" />
     </>
