@@ -165,6 +165,15 @@ const Endpoints = () => {
               key={endpoint.asset_id}
               classes={{ root: classes.item }}
               divider
+              secondaryAction={
+                <EndpointPopover
+                  endpoint={{ ...endpoint, type: 'static' }}
+                  onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result)))}
+                  onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
+                  openEditOnInit={endpoint.asset_id === searchId}
+                />
+              }
+              disablePadding
             >
               <ListItemButton
                 component={Link}
@@ -206,14 +215,6 @@ const Endpoints = () => {
                     </div>
                   )}
                 />
-                <ListItemSecondaryAction>
-                  <EndpointPopover
-                    endpoint={{ ...endpoint, type: 'static' }}
-                    onUpdate={result => setEndpoints(endpoints.map(e => (e.asset_id !== result.asset_id ? e : result)))}
-                    onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
-                    openEditOnInit={endpoint.asset_id === searchId}
-                  />
-                </ListItemSecondaryAction>
               </ListItemButton>
             </ListItem>
           );
