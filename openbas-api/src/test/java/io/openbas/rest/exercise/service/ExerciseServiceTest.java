@@ -140,25 +140,17 @@ class ExerciseServiceTest {
 
   @Test
   public void testUpdateExercise_WITH_apply_rule_false() {
-    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
-    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
-    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
     io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
     io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
     io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
     Exercise exercise = ExerciseFixture.getExerciseWithInjects();
     exercise.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
-    List<Asset> assetsToAdd = List.of(asset1, asset2);
-    List<Asset> assetsToRemove = List.of(asset3);
 
-    when(tagRuleService.getAssetsFromTagIds(List.of(tag1.getId()))).thenReturn(assetsToAdd);
-    when(tagRuleService.getAssetsFromTagIds(List.of(tag3.getId()))).thenReturn(assetsToRemove);
     when(exerciseRepository.save(exercise)).thenReturn(exercise);
 
     exerciseService.updateExercice(exercise, currentTags, false);
 
-    verify(injectService, never())
-            .applyDefaultAssetsToInject(any(), any(), any());
+    verify(injectService, never()).applyDefaultAssetsToInject(any(), any(), any());
   }
 }
