@@ -12,11 +12,10 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
-import java.io.FileOutputStream;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import java.io.ByteArrayInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -99,8 +98,16 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    FileOutputStream outputStream = new FileOutputStream("/home/antoinemzs/export.zip");
-    outputStream.write(response);
-    outputStream.close();
+    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(response))) {
+      ZipEntry entry;
+      while ((entry = zis.getNextEntry()) != null) {
+        if (entry.getName().equals("%s.json".formatted(EXERCISE.getName()))) {
+          // force exit of test since we have found the correct entry
+          return;
+        }
+      }
+      // no zip entry corresponding to expected json
+      Assertions.fail();
+    }
   }
 }
