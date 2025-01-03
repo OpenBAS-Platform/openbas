@@ -5,6 +5,7 @@ import * as React from 'react';
 
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import type { OrganizationHelper, TagHelper } from '../../../../actions/helper';
+import { TeamInputForm } from '../../../../actions/teams/Team';
 import { deleteTeam, updateTeam } from '../../../../actions/teams/team-actions';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import Dialog from '../../../../components/common/Dialog';
@@ -16,7 +17,6 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { Option, organizationOption, tagOptions } from '../../../../utils/Option';
 import { TeamContext } from '../../common/Context';
 import TeamForm from './TeamForm';
-import { TeamInputForm } from '../../../../actions/teams/Team';
 
 interface TeamPopoverProps {
   team: Team | TeamOutput;

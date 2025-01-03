@@ -3,6 +3,7 @@ import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useState } from 'react';
 
+import { TeamInputForm } from '../../../../actions/teams/Team';
 import { addTeam } from '../../../../actions/teams/team-actions';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
@@ -12,7 +13,6 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { Option } from '../../../../utils/Option';
 import { TeamContext } from '../../common/Context';
 import TeamForm from './TeamForm';
-import { TeamInputForm } from '../../../../actions/teams/Team';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {

@@ -1,16 +1,15 @@
 import { FunctionComponent } from 'react';
 
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { updateScenario } from '../../../../actions/scenarios/scenario-actions';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { ScenarioInput } from '../../../../utils/api-types';
+import type { Scenario, ScenarioInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import ScenarioForm from '../ScenarioForm';
 
 interface Props {
-  scenario: ScenarioStore;
+  scenario: Scenario;
   open: boolean;
   handleClose: () => void;
 }

@@ -5,14 +5,13 @@ import { useEffect } from 'react';
 import * as React from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import type { Exercise } from '../../../../utils/api-types';
+import type { Exercise, Scenario } from '../../../../utils/api-types';
 import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -78,10 +77,10 @@ const ScenarioHeader = ({
   const navigate = useNavigate();
   const classes = useStyles();
   const theme = useTheme<Theme>();
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   // Fetching data
-  const { scenario }: { scenario: ScenarioStore } = useHelper((helper: ScenariosHelper) => ({
+  const { scenario }: { scenario: Scenario } = useHelper((helper: ScenariosHelper) => ({
     scenario: helper.getScenario(scenarioId),
   }));
 

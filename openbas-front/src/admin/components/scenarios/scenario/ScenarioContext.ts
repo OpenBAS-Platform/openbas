@@ -9,13 +9,12 @@ import {
 } from '../../../../actions/Inject';
 import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { bulkTestInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { dryImportXlsForScenario, fetchScenario, fetchScenarioTeams, importXlsForScenario } from '../../../../actions/scenarios/scenario-actions';
 import { Page } from '../../../../components/common/queryable/Page';
-import type { ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, SearchPaginationInput } from '../../../../utils/api-types';
+import type { ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, Scenario, SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
-const injectContextForScenario = (scenario: ScenarioStore) => {
+const injectContextForScenario = (scenario: Scenario) => {
   const dispatch = useAppDispatch();
 
   return {

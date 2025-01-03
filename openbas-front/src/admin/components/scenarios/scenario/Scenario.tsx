@@ -8,7 +8,6 @@ import { Link, useParams } from 'react-router';
 
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import { initSorting } from '../../../../components/common/queryable/Page';
@@ -26,7 +25,7 @@ import type { Theme } from '../../../../components/Theme';
 import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
-import type { KillChainPhase, SearchPaginationInput } from '../../../../utils/api-types';
+import type { KillChainPhase, Scenario as ScenarioType, SearchPaginationInput } from '../../../../utils/api-types';
 import { isEmptyField } from '../../../../utils/utils';
 import ExerciseList from '../../simulations/ExerciseList';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
@@ -60,7 +59,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   const classes = useStyles();
   const theme = useTheme<Theme>();
   const { t } = useFormatter();
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: ScenarioType['scenario_id'] };
   // Fetching data
   const { scenario } = useHelper((helper: ScenariosHelper & ExercisesHelper) => ({
     scenario: helper.getScenario(scenarioId),
@@ -74,7 +73,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({
     sorts: initSorting('exercise_updated_at', 'DESC'),
   }));
-  const search = (scenarioId: ScenarioStore['scenario_id'], input: SearchPaginationInput) => {
+  const search = (scenarioId: ScenarioType['scenario_id'], input: SearchPaginationInput) => {
     setLoadingExercises(true);
     return searchScenarioExercises(scenarioId, input).finally(() => {
       setLoadingExercises(false);
