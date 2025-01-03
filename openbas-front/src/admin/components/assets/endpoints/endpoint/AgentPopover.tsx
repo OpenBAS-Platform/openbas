@@ -1,9 +1,10 @@
 import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Agent } from '../../../../../utils/api-types';
-import { useFormatter } from '../../../../../components/i18n';
+
 import ButtonPopover from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
+import { useFormatter } from '../../../../../components/i18n';
+import { Agent } from '../../../../../utils/api-types';
 
 type AgentActionType = 'Update' | 'Delete';
 
@@ -37,7 +38,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     /* deleteAgent(agent.agent_id).then(() => {
        handleCloseDelete();
        if (onDelete) onDeleteagent.agent_id;
-     });*/
+     }); */
   };
 
   // Button Popover
@@ -49,18 +50,18 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     <>
       <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
       {actions.includes(('Update'))
-        && (
-          <></>
-        )}
+      && (
+        <></>
+      )}
       {actions.includes('Delete')
-        && (
-          <DialogDelete
-            open={deletion}
-            handleClose={handleCloseDelete}
-            handleSubmit={submitDelete}
-            text={`${t('Do you want to delete this agent:')} ${agent.agent_id} ?`}
-          />
-        )}
+      && (
+        <DialogDelete
+          open={deletion}
+          handleClose={handleCloseDelete}
+          handleSubmit={submitDelete}
+          text={`${t('Do you want to delete this agent:')} ${agent.agent_id} ?`}
+        />
+      )}
     </>
   );
 };

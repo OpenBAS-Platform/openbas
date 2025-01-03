@@ -122,13 +122,13 @@ const AgentList: React.FC<Props> = ({ agents }) => {
             key={agent.agent_id}
             classes={{ root: classes.item }}
             divider
-            secondaryAction={
+            secondaryAction={(
               <AgentPopover
                 agent={agent}
                 actions={['Update']}
                 inList
               />
-            }
+            )}
             disablePadding
           >
             <ListItemIcon>
