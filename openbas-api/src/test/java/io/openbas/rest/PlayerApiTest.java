@@ -2,13 +2,14 @@ package io.openbas.rest;
 
 import static io.openbas.rest.user.PlayerApi.PLAYER_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.PlayerFixture.PLAYER_FIXTURE_FIRSTNAME;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Organization;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.User;
@@ -26,20 +27,15 @@ import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @TestInstance(PER_CLASS)
-public class PlayerApiTest {
+public class PlayerApiTest extends IntegrationTest {
 
-  static User PLAYER;
-  static PlayerInput PLAYER_INPUT;
   static Tag TAG;
   static Organization ORGANIZATION;
+  static User USER;
 
   @Autowired private MockMvc mvc;
 
@@ -47,7 +43,6 @@ public class PlayerApiTest {
   private String adminEmail;
 
   @Autowired private OrganizationRepository organizationRepository;
-
   @Autowired private TagRepository tagRepository;
   @Autowired private UserRepository userRepository;
 
@@ -55,26 +50,27 @@ public class PlayerApiTest {
   void beforeEach() {
     ORGANIZATION = organizationRepository.save(OrganizationFixture.createOrganization());
     TAG = tagRepository.save(TagFixture.getTag());
-    PLAYER_INPUT = PlayerFixture.createPlayer();
-    PLAYER_INPUT.setOrganizationId(ORGANIZATION.getId());
-    PLAYER_INPUT.setTagIds(List.of(TAG.getId()));
   }
 
   @AfterEach
   void afterEach() {
     organizationRepository.delete(ORGANIZATION);
     tagRepository.delete(TAG);
+    userRepository.delete(USER);
   }
 
-  @DisplayName("Creation of a player")
+  @DisplayName("Given valid player input, should create a player successfully")
   @Test
   @WithMockAdminUser
-  void createPlayerTest() throws Exception {
-    // --EXECUTE--
+  void given_validPlayerInput_should_createPlayerSuccessfully() throws Exception {
+    // -- PREPARE --
+    PlayerInput playerInput = buildPlayerInput();
+
+    // -- EXECUTE --
     String response =
         mvc.perform(
                 post(PLAYER_URI)
-                    .content(asJsonString(PLAYER_INPUT))
+                    .content(asJsonString(playerInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -82,17 +78,22 @@ public class PlayerApiTest {
             .getResponse()
             .getContentAsString();
 
-    // --ASSERT--
-    assertEquals("Firstname", JsonPath.read(response, "$.user_firstname"));
+    // -- ASSERT --
+    assertEquals(PLAYER_FIXTURE_FIRSTNAME, JsonPath.read(response, "$.user_firstname"));
+    assertEquals(TAG.getId(), JsonPath.read(response, "$.user_tags[0]"));
+    assertEquals(ORGANIZATION.getId(), JsonPath.read(response, "$.user_organization"));
 
-    // --THEN--
+    // -- CLEAN --
     userRepository.deleteById(JsonPath.read(response, "$.user_id"));
   }
 
-  @DisplayName("Creation of a player with a simple user")
+  @DisplayName("Given restricted user, should not allow creation of player")
   @Test
   @WithMockPlannerUser
-  void createPlayerWithRestrictedUserTest() throws Exception {
+  void given_restrictedUser_should_notAllowPlayerCreation() {
+    // -- PREPARE --
+    PlayerInput playerInput = buildPlayerInput();
+
     // --EXECUTE--
     Exception exception =
         assertThrows(
@@ -100,33 +101,82 @@ public class PlayerApiTest {
             () ->
                 mvc.perform(
                     post(PLAYER_URI)
-                        .content(asJsonString(PLAYER_INPUT))
+                        .content(asJsonString(playerInput))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)));
 
-    String expectedMessage = "User is restricted";
-    String actualMessage = exception.getMessage();
-
     // --ASSERT--
-    assertTrue(actualMessage.contains(expectedMessage));
+    assertTrue(exception.getMessage().contains("User is restricted"));
   }
 
-  @DisplayName("Upsert of a player")
+  @DisplayName("Given valid player input, should update player successfully")
   @Test
   @WithMockAdminUser
-  void upsertPlayerTest() throws Exception {
+  void given_validPlayerInput_should_updatePlayerSuccessfully() throws Exception {
     // --PREPARE--
+    PlayerInput playerInput = buildPlayerInput();
     User user = new User();
-    user.setUpdateAttributes(PLAYER_INPUT);
-    PLAYER = userRepository.save(user);
+    user.setUpdateAttributes(playerInput);
+    USER = userRepository.save(user);
     String newFirstname = "updatedFirstname";
-    PLAYER_INPUT.setFirstname(newFirstname);
+    playerInput.setFirstname(newFirstname);
+
+    // -- EXECUTE --
+    String response =
+        mvc.perform(
+                post(PLAYER_URI + "/upsert")
+                    .content(asJsonString(playerInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertEquals(newFirstname, JsonPath.read(response, "$.user_firstname"));
+  }
+
+  @DisplayName("Given non-existing player input, should upsert successfully")
+  @Test
+  @WithMockAdminUser
+  void given_nonExistingPlayerInput_should_upsertSuccessfully() throws Exception {
+    // --PREPARE--
+    PlayerInput playerInput = buildPlayerInput();
 
     // --EXECUTE--
     String response =
         mvc.perform(
                 post(PLAYER_URI + "/upsert")
-                    .content(asJsonString(PLAYER_INPUT))
+                    .content(asJsonString(playerInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals(PLAYER_FIXTURE_FIRSTNAME, JsonPath.read(response, "$.user_firstname"));
+  }
+
+  @DisplayName("Given valid player ID and input, should update player successfully")
+  @Test
+  @WithMockAdminUser
+  void given_validPlayerIdAndInput_should_updatePlayerSuccessfully() throws Exception {
+    // -- PREPARE --
+    PlayerInput playerInput = buildPlayerInput();
+    User user = new User();
+    user.setUpdateAttributes(playerInput);
+    USER = userRepository.save(user);
+    String newFirstname = "updatedFirstname";
+    playerInput.setFirstname(newFirstname);
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                put(PLAYER_URI + "/" + user.getId())
+                    .content(asJsonString(playerInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -136,87 +186,61 @@ public class PlayerApiTest {
 
     // --ASSERT--
     assertEquals("updatedFirstname", JsonPath.read(response, "$.user_firstname"));
-    // --THEN--
-    userRepository.deleteById(JsonPath.read(response, "$.user_id"));
   }
 
-  @DisplayName("Upsert of a non existing player")
-  @Test
-  @WithMockAdminUser
-  void upsertNonExistingPlayerTest() throws Exception {
-    // --PREPARE--
-    User user = new User();
-    user.setEmail("admin@example.com");
-    PLAYER = userRepository.save(user);
-
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                post(PLAYER_URI + "/upsert")
-                    .content(asJsonString(PLAYER_INPUT))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // --ASSERT--
-    assertEquals("Firstname", JsonPath.read(response, "$.user_firstname"));
-    // --THEN--
-    userRepository.deleteById(JsonPath.read(response, "$.user_id"));
-  }
-
-  @DisplayName("Edition of a player")
-  @Test
-  @WithMockAdminUser
-  void updatePlayerTest() throws Exception {
-    // --PREPARE--
-    User user = new User();
-    user.setUpdateAttributes(PLAYER_INPUT);
-    PLAYER = userRepository.save(user);
-    String newFirstname = "updatedFirstname";
-    PLAYER_INPUT.setFirstname(newFirstname);
-
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                put(PLAYER_URI + "/" + PLAYER.getId())
-                    .content(asJsonString(PLAYER_INPUT))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // --ASSERT--
-    assertEquals("updatedFirstname", JsonPath.read(response, "$.user_firstname"));
-    // --THEN--
-    userRepository.deleteById(JsonPath.read(response, "$.user_id"));
-  }
-
-  @DisplayName("Edition of a player with a simple user")
+  @DisplayName("Given restricted user, should not allow updating a player")
   @Test
   @WithMockPlannerUser
-  void updatePlayerWithRestrictedUserTest() throws Exception {
-
+  void given_restrictedUser_should_notAllowPlayerUpdate() {
+    // -- PREPARE --
+    PlayerInput playerInput = buildPlayerInput();
     User user = userRepository.findByEmailIgnoreCase(adminEmail).orElseThrow();
-    // --EXECUTE--
+
+    // -- EXECUTE --
     Exception exception =
         assertThrows(
             ServletException.class,
             () ->
                 mvc.perform(
                     put(PLAYER_URI + "/" + user.getId())
-                        .content(asJsonString(PLAYER_INPUT))
+                        .content(asJsonString(playerInput))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)));
 
-    String expectedMessage = "You dont have the right to update this user";
-    String actualMessage = exception.getMessage();
-
     // --ASSERT--
-    assertTrue(actualMessage.contains(expectedMessage));
+    assertTrue(exception.getMessage().contains("You dont have the right to update this user"));
+  }
+
+  @DisplayName("Given valid player ID, should delete player successfully")
+  @Test
+  @WithMockAdminUser
+  void given_validPlayerId_should_deletePlayerSuccessfully() throws Exception {
+    // -- PREPARE --
+    PlayerInput playerInput = buildPlayerInput();
+    User user = new User();
+    user.setUpdateAttributes(playerInput);
+    USER = userRepository.save(user);
+
+    // -- EXECUTE --
+    mvc.perform(
+            delete(PLAYER_URI + "/" + USER.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    // -- ASSERT --
+    assertTrue(this.userRepository.findById(USER.getId()).isEmpty());
+  }
+
+  // -- PRIVATE --
+
+  private PlayerInput buildPlayerInput() {
+    PlayerInput player = PlayerFixture.createPlayerInput();
+    player.setOrganizationId(ORGANIZATION.getId());
+    player.setTagIds(List.of(TAG.getId()));
+    return player;
   }
 }
