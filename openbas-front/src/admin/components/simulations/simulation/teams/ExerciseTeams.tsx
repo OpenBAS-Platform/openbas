@@ -1,14 +1,13 @@
 import { Paper, Typography } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Team } from '../../../../../utils/api-types';
+import type { Exercise, Team } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
@@ -17,7 +16,7 @@ import UpdateTeams from '../../../components/teams/UpdateTeams';
 import teamContextForExercise from './teamContextForExercise';
 
 interface Props {
-  exerciseTeamsUsers: ExerciseStore['exercise_teams_users'];
+  exerciseTeamsUsers: Exercise['exercise_teams_users'];
 }
 
 const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
@@ -27,7 +26,7 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   const { permissions } = useContext(PermissionsContext);
 
   // Fetching data
-  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { teamsStore }: { teamsStore: Team[] } = useHelper((helper: ExercisesHelper) => ({
     teamsStore: helper.getExerciseTeams(exerciseId),
   }));

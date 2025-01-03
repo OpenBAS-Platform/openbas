@@ -3,7 +3,6 @@ import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
@@ -11,12 +10,12 @@ import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { InjectExpectation } from '../../../../../utils/api-types';
+import type { Exercise, InjectExpectation } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
 import { computeTeamsColors } from './DistributionUtils';
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  exerciseId: Exercise['exercise_id'];
 }
 
 const ExerciseDistributionScoreOverTimeByTeam: FunctionComponent<Props> = ({

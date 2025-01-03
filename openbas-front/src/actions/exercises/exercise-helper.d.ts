@@ -1,10 +1,9 @@
-import type { Exercise, InjectExpectation, LessonsAnswer, LessonsCategory, LessonsQuestion, Objective, Team } from '../../utils/api-types';
-import type { ExerciseSimpleStore, ExerciseStore } from './Exercise';
+import type { Exercise, ExerciseSimple, InjectExpectation, LessonsAnswer, LessonsCategory, LessonsQuestion, Objective, Team } from '../../utils/api-types';
 
 export interface ExercisesHelper {
-  getExercise: (exerciseId: string) => ExerciseStore;
-  getExercises: () => ExerciseSimpleStore[];
-  getExercisesMap: () => Record<string, ExerciseStore>;
+  getExercise: (exerciseId: string) => Exercise;
+  getExercises: () => ExerciseSimple[];
+  getExercisesMap: () => Record<string, Exercise>;
   getExerciseTeams: (exerciseId: string) => Team[];
   getExerciseInjectExpectations: (exerciseId: Exercise['exercise_id']) => InjectExpectation[];
   getExerciseObjectives: (exerciseId: string) => Objective[];

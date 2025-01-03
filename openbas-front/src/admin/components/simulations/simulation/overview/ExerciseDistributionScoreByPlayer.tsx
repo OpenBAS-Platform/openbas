@@ -3,7 +3,6 @@ import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { UserHelper } from '../../../../../actions/helper';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
@@ -11,12 +10,12 @@ import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { InjectExpectation, User } from '../../../../../utils/api-types';
+import type { Exercise, InjectExpectation, User } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 import { resolveUserName } from '../../../../../utils/String';
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  exerciseId: Exercise['exercise_id'];
 }
 
 const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({

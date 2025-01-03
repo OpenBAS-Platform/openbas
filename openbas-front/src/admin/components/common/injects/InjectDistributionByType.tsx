@@ -3,7 +3,6 @@ import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { fetchExerciseInjects } from '../../../../actions/Inject';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
 import type { InjectExpectationStore, InjectStore } from '../../../../actions/injects/Inject';
@@ -12,12 +11,13 @@ import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
+import type { Exercise } from '../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  exerciseId: Exercise['exercise_id'];
 }
 
 const InjectDistributionByType: FunctionComponent<Props> = ({

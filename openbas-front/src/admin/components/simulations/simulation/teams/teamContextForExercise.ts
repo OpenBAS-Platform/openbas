@@ -1,14 +1,13 @@
 import { addExerciseTeamPlayers, disableExerciseTeamPlayers, enableExerciseTeamPlayers, removeExerciseTeamPlayers } from '../../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { addExerciseTeams, removeExerciseTeams, replaceExerciseTeams, searchExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { Page } from '../../../../../components/common/queryable/Page';
-import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
+import { Exercise, ExerciseTeamUser, SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import { TeamContextType } from '../../../common/Context';
 import type { UserStore } from '../../../teams/players/Player';
 
-const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'], exerciseTeamsUsers: ExerciseStore['exercise_teams_users']): TeamContextType => {
+const teamContextForExercise = (exerciseId: Exercise['exercise_id'], exerciseTeamsUsers: Exercise['exercise_teams_users']): TeamContextType => {
   const dispatch = useAppDispatch();
 
   return {
@@ -27,10 +26,10 @@ const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'], exerci
       return dispatch(addTeam({ ...team, team_exercises: [exerciseId] }));
     },
     checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
-      return exerciseTeamsUsers.filter((o: ExerciseStore['exercise_teams_users']) => o.exercise_id === exerciseId && o.team_id === teamId && userId === o.user_id).length > 0;
+      return (exerciseTeamsUsers ?? []).filter((o: ExerciseTeamUser) => o.exercise_id === exerciseId && o.team_id === teamId && userId === o.user_id).length > 0;
     },
     computeTeamUsersEnabled(teamId: Team['team_id']) {
-      return exerciseTeamsUsers.filter((o: ExerciseStore['exercise_teams_users']) => o.team_id === teamId).length;
+      return (exerciseTeamsUsers ?? []).filter((o: ExerciseTeamUser) => o.team_id === teamId).length;
     },
     onRemoveTeam(teamId: Team['team_id']): void {
       dispatch(removeExerciseTeams(exerciseId, { exercise_teams: [teamId] }));

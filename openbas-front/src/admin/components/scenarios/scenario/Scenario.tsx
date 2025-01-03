@@ -2,11 +2,10 @@ import { PlayArrowOutlined } from '@mui/icons-material';
 import { Avatar, Button, Chip, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
-import { useState } from 'react';
 import * as React from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 
-import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
@@ -25,7 +24,7 @@ import type { Theme } from '../../../../components/Theme';
 import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
-import type { KillChainPhase, Scenario as ScenarioType, SearchPaginationInput } from '../../../../utils/api-types';
+import type { ExerciseSimple, KillChainPhase, Scenario as ScenarioType, SearchPaginationInput } from '../../../../utils/api-types';
 import { isEmptyField } from '../../../../utils/utils';
 import ExerciseList from '../../simulations/ExerciseList';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
@@ -69,7 +68,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
 
   // Exercises
   const [loadingExercises, setLoadingExercises] = useState(true);
-  const [exercises, setExercises] = useState<ExerciseStore[]>([]);
+  const [exercises, setExercises] = useState<ExerciseSimple[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({
     sorts: initSorting('exercise_updated_at', 'DESC'),
   }));
@@ -79,8 +78,9 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
       setLoadingExercises(false);
     });
   };
-  const secondaryAction = (exercise: ExerciseStore) => (
+  const secondaryAction = (exercise: ExerciseSimple) => (
     <ExercisePopover
+      // @ts-expect-error: should pass Exercise model IF we have update as action
       exercise={exercise}
       actions={['Duplicate', 'Export', 'Delete']}
       onDelete={result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}

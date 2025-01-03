@@ -2,7 +2,6 @@ import { Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
 
-import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -10,6 +9,7 @@ import ExerciseArticles from './articles/ExerciseArticles';
 import ExerciseChallenges from './challenges/ExerciseChallenges';
 import ExerciseTeams from './teams/ExerciseTeams';
 import ExerciseVariables from './variables/ExerciseVariables';
+import { Exercise } from '../../../../utils/api-types';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -23,7 +23,7 @@ const ExerciseDefinition = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
-  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   // Fetching data
   const { exercise } = useHelper((helper: ExercisesHelper) => ({
     exercise: helper.getExercise(exerciseId),

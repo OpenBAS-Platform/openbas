@@ -3,7 +3,6 @@ import { makeStyles, useTheme } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
@@ -24,6 +23,7 @@ import ExerciseDistributionScoreByTeamInPercentage from './ExerciseDistributionS
 import ExerciseDistributionScoreOverTimeByInjectorContract from './ExerciseDistributionScoreOverTimeByInjectorContract';
 import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
+import { Exercise } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   paperChart: {
@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  exerciseId: Exercise['exercise_id'];
   isReport?: boolean;
 }
 
