@@ -20,15 +20,15 @@ public class ExerciseComposer {
     @Autowired private TagRepository tagRepository;
     @Autowired private DocumentRepository documentRepository;
 
-    public class Composer {
-        private Exercise exercise;
-        private List<Inject> injects = new ArrayList<>();
-        private List<LessonsCategory> categories = new ArrayList<>();
-        private List<Team> teams = new ArrayList<>();
-        private List<ArticleComposer.Composer> articleComposers = new ArrayList<>();
-        private List<Objective> objectives = new ArrayList<>();
-        private List<Tag> tags = new ArrayList<>();
-        private List<Document> documents = new ArrayList<>();
+    public class Composer extends InnerComposerBase<Exercise> {
+        private final Exercise exercise;
+        private final List<Inject> injects = new ArrayList<>();
+        private final List<LessonsCategoryComposer.Composer> categoryComposers = new ArrayList<>();
+        private final List<TeamComposer.Composer> teamComposers = new ArrayList<>();
+        private final List<ArticleComposer.Composer> articleComposers = new ArrayList<>();
+        private final List<Objective> objectives = new ArrayList<>();
+        private final List<Tag> tags = new ArrayList<>();
+        private final List<Document> documents = new ArrayList<>();
 
         public Composer(Exercise exercise) {
             this.exercise = exercise;
@@ -42,18 +42,18 @@ public class ExerciseComposer {
             return this;
         }
 
-        public Composer withLessonCategory(LessonsCategory category) {
-            this.categories.add(category);
+        public Composer withLessonCategory(LessonsCategoryComposer.Composer categoryComposer) {
+            this.categoryComposers.add(categoryComposer);
             List<LessonsCategory> tempCategories = this.exercise.getLessonsCategories();
-            tempCategories.add(category);
+            tempCategories.add(categoryComposer.get());
             this.exercise.setLessonsCategories(tempCategories);
             return this;
         }
 
-        public Composer withTeam(Team team) {
-            this.teams.add(team);
+        public Composer withTeam(TeamComposer.Composer teamComposer) {
+            this.teamComposers.add(teamComposer);
             List<Team> tempTeams = this.exercise.getTeams();
-            tempTeams.add(team);
+            tempTeams.add(teamComposer.get());
             this.exercise.setTeams(tempTeams);
             return this;
         }
@@ -89,11 +89,16 @@ public class ExerciseComposer {
             return this;
         }
 
+        @Override
         public Composer persist() {
             this.articleComposers.forEach(ArticleComposer.Composer::persist);
+            this.categoryComposers.forEach(LessonsCategoryComposer.Composer::persist);
+            this.teamComposers.forEach(TeamComposer.Composer::persist);
             exerciseRepository.save(exercise);
             return this;
         }
+
+        @Override
         public Exercise get() {
             return this.exercise;
         }
