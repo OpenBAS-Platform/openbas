@@ -22,6 +22,14 @@ public class InjectFixture {
     return inject;
   }
 
+  public static Inject getInjectWithoutContract() {
+    Inject inject = new Inject();
+    inject.setTitle(INJECT_EMAIL_NAME);
+    inject.setEnabled(true);
+    inject.setDependsDuration(0L);
+    return inject;
+  }
+
   public static Inject getInjectForEmailContract(InjectorContract injectorContract) {
     return createInject(injectorContract, INJECT_EMAIL_NAME);
   }
