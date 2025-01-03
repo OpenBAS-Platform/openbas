@@ -30,7 +30,8 @@ public class InjectComposer {
     // note this sets the inject's injector contract to Challenge Publish
     public Composer withChallenge(ChallengeComposer.Composer challengeComposer) {
       challengeComposers.add(challengeComposer);
-      InjectorContract injectorContract = injectorContractRepository.findById(ChallengeContract.CHALLENGE_PUBLISH).orElseThrow();
+      InjectorContract injectorContract =
+          injectorContractRepository.findById(ChallengeContract.CHALLENGE_PUBLISH).orElseThrow();
       this.inject.setInjectorContract(injectorContract);
       return this;
     }
