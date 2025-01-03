@@ -1,5 +1,4 @@
 import { FunctionComponent, useState } from 'react';
-import { useNavigate } from 'react-router';
 
 import ButtonPopover from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
@@ -23,36 +22,23 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const navigate = useNavigate();
-
-  // Edition
-  const [edition, setEdition] = useState(false);
-  const handleOpenEdit = () => setEdition(true);
-  const handleCloseEdit = () => setEdition(false);
 
   // Deletion
   const [deletion, setDeletion] = useState(false);
   const handleOpenDelete = () => setDeletion(true);
   const handleCloseDelete = () => setDeletion(false);
   const submitDelete = () => {
-    /* deleteAgent(agent.agent_id).then(() => {
-       handleCloseDelete();
-       if (onDelete) onDeleteagent.agent_id;
-     }); */
+    handleCloseDelete();
+    onDelete;
   };
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit() });
   if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
 
   return (
     <>
       <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
-      {actions.includes(('Update'))
-      && (
-        <></>
-      )}
       {actions.includes('Delete')
       && (
         <DialogDelete
