@@ -7,29 +7,28 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ChannelComposer {
-    @Autowired
-    private ChannelRepository channelRepository;
+  @Autowired private ChannelRepository channelRepository;
 
-    public class Composer extends InnerComposerBase<Channel> {
-        private final Channel channel;
+  public class Composer extends InnerComposerBase<Channel> {
+    private final Channel channel;
 
-        public Composer(Channel channel) {
-            this.channel = channel;
-        }
-
-        @Override
-        public Composer persist() {
-            channelRepository.save(channel);
-            return this;
-        }
-
-        @Override
-        public Channel get() {
-            return channel;
-        }
+    public Composer(Channel channel) {
+      this.channel = channel;
     }
 
-    public Composer withChannel(Channel channel) {
-        return new Composer(channel);
+    @Override
+    public Composer persist() {
+      channelRepository.save(channel);
+      return this;
     }
+
+    @Override
+    public Channel get() {
+      return channel;
+    }
+  }
+
+  public Composer forChannel(Channel channel) {
+    return new Composer(channel);
+  }
 }
