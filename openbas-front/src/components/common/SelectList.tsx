@@ -28,6 +28,7 @@ interface Props<T> {
   onDelete: (id: string) => void;
   paginationComponent: React.ReactElement;
   buttonComponent?: React.ReactElement;
+  getName?: (element: T) => string;
 }
 
 const SelectList = <T extends object>({
@@ -39,14 +40,15 @@ const SelectList = <T extends object>({
   onDelete,
   paginationComponent,
   buttonComponent,
+  getName,
 }: Props<T>) => {
   // @ts-expect-error: use a Record<string, unknown> is not working
-  const getId = (v: T) => v[`${prefix}_id`];
+  const getIdFn = (v: T) => v[`${prefix}_id`];
   // @ts-expect-error: use a Record<string, unknown> is not working
-  const getName = (v: T) => v[`${prefix}_name`];
+  const getNameFn = getName ? getName : (v: T) => v[`${prefix}_name`];
 
   const selectedIds = useMemo(
-    () => selectedValues.map(v => getId(v)),
+    () => selectedValues.map(v => getIdFn(v)),
     [selectedValues, prefix],
   );
 
@@ -57,7 +59,7 @@ const SelectList = <T extends object>({
         <Grid item xs={8}>
           <List>
             {values.map((value) => {
-              const id = getId(value);
+              const id = getIdFn(value);
               const disabled = selectedIds.includes(id);
               return (
                 <ListItemButton
@@ -106,8 +108,8 @@ const SelectList = <T extends object>({
             }}
           >
             {selectedValues.map((selectedValue) => {
-              const id = getId(selectedValue);
-              const name = getName(selectedValue);
+              const id = getIdFn(selectedValue);
+              const name = getNameFn(selectedValue);
               return (
                 <Chip
                   key={id}

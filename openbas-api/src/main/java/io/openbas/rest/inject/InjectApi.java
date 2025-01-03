@@ -319,7 +319,9 @@ public class InjectApi extends RestBehavior {
     // Get common attributes
     Inject inject = input.toInject(injectorContract);
     inject.setUser(
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     inject.setExercise(exercise);
     // Set dependencies
     if (input.getDependsOn() != null) {
@@ -495,7 +497,8 @@ public class InjectApi extends RestBehavior {
                     .isUserHasAccess(
                         userRepository
                             .findById(currentUser().getId())
-                            .orElseThrow(ElementNotFoundException::new)))
+                            .orElseThrow(
+                                () -> new ElementNotFoundException("Current user not found"))))
         // Order by near execution
         .sorted(Inject.executionComparator)
         // Keep only the expected size
@@ -558,7 +561,7 @@ public class InjectApi extends RestBehavior {
     inject.setUser(
         this.userRepository
             .findById(currentUser().getId())
-            .orElseThrow(ElementNotFoundException::new));
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     inject.setScenario(scenario);
     // Set dependencies
     if (input.getDependsOn() != null) {

@@ -9,8 +9,10 @@ export const api = (schema) => {
   // Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(
     (response) => {
-      if (schema) {
-        response.data = normalize(response.data, schema);
+      if (response.data && schema) {
+        if (typeof response.data === 'object') {
+          response.data = normalize(response.data, schema);
+        }
       }
       return response;
     },

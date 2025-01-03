@@ -103,7 +103,10 @@ public class AtomicTestingService {
     injectToSave.setAllTeams(input.isAllTeams());
     injectToSave.setDescription(input.getDescription());
     injectToSave.setDependsDuration(0L);
-    injectToSave.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    injectToSave.setUser(
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     injectToSave.setExercise(null);
 
     // Set dependencies
