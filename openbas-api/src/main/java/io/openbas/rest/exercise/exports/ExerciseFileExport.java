@@ -45,7 +45,7 @@ public class ExerciseFileExport {
   public List<Team> getTeams() {
     if(teams == null) {
       return this.exercise != null && ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)
-        ? this.exercise.getTeams()
+        ? this.exercise.getTeams().stream().toList()
         : new ArrayList<>();
     }
     return teams;
@@ -56,7 +56,7 @@ public class ExerciseFileExport {
 
   public List<Objective> getObjectives() {
     if(objectives == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getObjectives();
+      return this.exercise == null ? new ArrayList<>() : this.exercise.getObjectives().stream().toList();
     }
     return objectives;
   }
@@ -246,9 +246,9 @@ public class ExerciseFileExport {
 
     // default options
     // variables with no value
-    //this.objectMapper.addMixIn(Variable.class, VariableMixin.class);
+    this.objectMapper.addMixIn(Variable.class, VariableMixin.class);
     //empty teams
-    //this.objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
+    this.objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
   }
 
   public static final ExerciseFileExport fromExercise(Exercise exercise, ObjectMapper objectMapper, VariableService variableService, ChallengeService challengeService) {
