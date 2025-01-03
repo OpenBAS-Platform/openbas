@@ -805,7 +805,7 @@ public class V1_DataImporter implements Importer {
               ofNullable(injectNode.get("inject_enabled")).map(JsonNode::booleanValue).orElse(true);
           String injectorContractIdFromNode = null;
           JsonNode injectContractNode = injectNode.get("inject_injector_contract");
-          if (injectContractNode != null) {
+          if (injectContractNode != null && !injectContractNode.isNull()) {
             injectorContractIdFromNode = injectContractNode.get("injector_contract_id").textValue();
           }
 

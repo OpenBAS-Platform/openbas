@@ -60,7 +60,8 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
 
   useDataLoader(() => {
     setIsInjectLoading(true);
-    dispatch(fetchInject(injectId)).finally(() => setIsInjectLoading(false));
+    dispatch(fetchInject(injectId));
+    setIsInjectLoading(false);
   });
 
   // Selection

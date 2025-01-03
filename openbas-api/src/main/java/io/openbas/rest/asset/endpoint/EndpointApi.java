@@ -2,6 +2,7 @@ package io.openbas.rest.asset.endpoint;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.EndpointSpecification.fromIds;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
@@ -18,10 +19,11 @@ import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
@@ -33,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -53,7 +56,7 @@ public class EndpointApi {
 
   @PostMapping(ENDPOINT_URI)
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
@@ -65,7 +68,7 @@ public class EndpointApi {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input)
       throws IOException {
     Optional<Endpoint> optionalEndpoint =
@@ -105,7 +108,7 @@ public class EndpointApi {
 
   @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public List<AssetAgentJob> getEndpointJobs(
       @PathVariable @NotBlank final String endpointExternalReference) {
     return this.assetAgentJobRepository.findAll(
@@ -114,7 +117,7 @@ public class EndpointApi {
 
   @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
   }
@@ -141,9 +144,16 @@ public class EndpointApi {
         Endpoint.class);
   }
 
+  @PostMapping(ENDPOINT_URI + "/find")
+  @Transactional(readOnly = true)
+  @Tracing(name = "Find assets", layer = "api", operation = "POST")
+  public List<Endpoint> findEndpoints(@RequestBody @Valid @NotNull final List<String> endpointIds) {
+    return this.endpointRepository.findAll(fromIds(endpointIds));
+  }
+
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Endpoint updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointInput input) {
@@ -157,7 +167,7 @@ public class EndpointApi {
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);
   }

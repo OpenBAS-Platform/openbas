@@ -1,9 +1,11 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import * as React from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 
+import { findEndpoints } from '../../../../actions/assets/endpoint-actions';
+import ListLoader from '../../../../components/common/loader/ListLoader';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { Endpoint } from '../../../../utils/api-types';
@@ -48,12 +50,12 @@ const inlineStyles: Record<string, CSSProperties> = {
 export type EndpointStoreWithType = Endpoint & { type: string };
 
 interface Props {
-  endpoints: EndpointStoreWithType[];
+  endpointIds: string[];
   actions: React.ReactElement;
 }
 
 const EndpointsList: FunctionComponent<Props> = ({
-  endpoints = [],
+  endpointIds = [],
   actions,
 }) => {
   // Standard hooks
@@ -63,66 +65,81 @@ const EndpointsList: FunctionComponent<Props> = ({
     return React.cloneElement(actions as React.ReactElement, { endpoint });
   };
 
-  const [sortedEndpoints, setSortedEndpoints] = useState(endpoints);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [endpointValues, setEndpointValues] = useState<Endpoint[]>([]);
   useEffect(() => {
-    setSortedEndpoints(endpoints);
-  }, [endpoints]);
+    setLoading(true);
+    findEndpoints(endpointIds).then((result) => {
+      setEndpointValues(result.data);
+      setLoading(false);
+    });
+  }, [endpointIds]);
 
   return (
-    <List>
-      {sortedEndpoints?.map((endpoint) => {
-        return (
-          <ListItem
-            key={endpoint.asset_id}
-            classes={{ root: classes.item }}
-            divider={true}
-          >
-            <ListItemIcon>
-              <DevicesOtherOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_name}
-                  >
-                    {endpoint.asset_name}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_platform}
-                  >
-                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
-                    {' '}
-                    {endpoint.endpoint_platform}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_tags}
-                  >
-                    <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.asset_type}
-                  >
-                    <Chip
-                      variant="outlined"
-                      className={classes.typeChip}
-                      label={endpoint.asset_type}
-                    />
-                  </div>
-                </>
-              )}
-            />
-            <ListItemSecondaryAction>
-              {component(endpoint)}
-            </ListItemSecondaryAction>
-          </ListItem>
-        );
-      })}
-    </List>
+    <>
+      {
+        loading
+          ? <ListLoader Icon={DevicesOtherOutlined} headers={[]} headerStyles={inlineStyles} />
+          : (
+              <List>
+                {endpointValues?.map((endpoint) => {
+                  return (
+                    <ListItem
+                      key={endpoint.asset_id}
+                      classes={{ root: classes.item }}
+                      divider={true}
+                    >
+                      <ListItemIcon>
+                        <DevicesOtherOutlined color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={(
+                          <>
+                            <div
+                              className={classes.bodyItem}
+                              style={inlineStyles.asset_name}
+                            >
+                              {endpoint.asset_name}
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={inlineStyles.asset_platform}
+                            >
+                              <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                              {' '}
+                              {endpoint.endpoint_platform}
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={inlineStyles.asset_tags}
+                            >
+                              <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={inlineStyles.asset_type}
+                            >
+                              <Tooltip title={endpoint.asset_type}>
+                                <Chip
+                                  variant="outlined"
+                                  className={classes.typeChip}
+                                  label={endpoint.asset_type}
+                                />
+                              </Tooltip>
+                            </div>
+                          </>
+                        )}
+                      />
+                      <ListItemSecondaryAction>
+                        {component(endpoint)}
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            )
+      }
+    </>
   );
 };
 

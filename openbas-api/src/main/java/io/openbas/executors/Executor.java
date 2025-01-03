@@ -1,6 +1,7 @@
 package io.openbas.executors;
 
 import static io.openbas.database.model.InjectStatusExecution.traceInfo;
+import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.QueueService;
@@ -12,7 +13,6 @@ import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import jakarta.annotation.Resource;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,13 +153,5 @@ public class Executor {
                 new IllegalStateException(
                     "External injector not found for type: "
                         + injectorContract.getInjector().getType()));
-  }
-
-  // region utils
-  private boolean isInInjectableRange(Injection injection) {
-    Instant now = Instant.now();
-    Instant start = now.minus(Duration.parse("PT1H"));
-    Instant injectWhen = injection.getDate().orElseThrow();
-    return injectWhen.isAfter(start) && injectWhen.isBefore(now);
   }
 }
