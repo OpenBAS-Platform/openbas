@@ -105,6 +105,7 @@ public class ScenarioApi extends RestBehavior {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Set<Tag> currentTagList = scenario.getTags();
     scenario.setUpdateAttributes(input);
+    scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return this.scenarioService.updateScenario(scenario, currentTagList, true);
   }
 
