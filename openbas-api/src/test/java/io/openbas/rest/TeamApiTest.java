@@ -27,11 +27,9 @@ import io.openbas.utils.fixtures.TeamFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
-
+import jakarta.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -45,21 +43,14 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestInstance(PER_CLASS)
 public class TeamApiTest {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ScenarioService scenarioService;
-  @Autowired
-  private ScenarioRepository scenarioRepository;
-  @Autowired
-  private ExerciseService exerciseService;
-  @Autowired
-  private ExerciseRepository exerciseRepository;
-  @Autowired
-  private TeamRepository teamRepository;
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private ScenarioService scenarioService;
+  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private ExerciseService exerciseService;
+  @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private TeamRepository teamRepository;
+  @Autowired private UserRepository userRepository;
 
   static String SCENARIO_ID;
   static String TEAM_ID;
@@ -598,7 +589,8 @@ public class TeamApiTest {
     Team teamCreated = this.teamRepository.save(team);
     String teamId = teamCreated.getId();
 
-    TeamCreateInput teamInput = TeamFixture.createContextualExerciseTeam(List.of(exerciseId1, exerciseId2));
+    TeamCreateInput teamInput =
+        TeamFixture.createContextualExerciseTeam(List.of(exerciseId1, exerciseId2));
 
     // --EXECUTE--
     Exception exception =
