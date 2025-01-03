@@ -31,7 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @TestInstance(PER_CLASS)
-public class PlayerApiTest extends IntegrationTest {
+class PlayerApiTest extends IntegrationTest {
 
   static Tag TAG;
   static Organization ORGANIZATION;
@@ -158,6 +158,9 @@ public class PlayerApiTest extends IntegrationTest {
 
     // --ASSERT--
     assertEquals(PLAYER_FIXTURE_FIRSTNAME, JsonPath.read(response, "$.user_firstname"));
+
+    // -- CLEAN --
+    this.userRepository.deleteById(JsonPath.read(response, "$.user_id"));
   }
 
   @DisplayName("Given valid player ID and input, should update player successfully")

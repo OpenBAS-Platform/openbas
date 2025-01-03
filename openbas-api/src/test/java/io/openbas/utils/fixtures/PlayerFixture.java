@@ -5,10 +5,11 @@ import io.openbas.rest.user.form.player.PlayerInput;
 public class PlayerFixture {
 
   public static final String PLAYER_FIXTURE_FIRSTNAME = "Firstname";
+  public static final String PLAYER_FIXTURE_MAIL = "player@example.com";
 
   public static PlayerInput createPlayerInput() {
     PlayerInput player = new PlayerInput();
-    player.setEmail("player@example.com");
+    player.setEmail(PLAYER_FIXTURE_MAIL);
     player.setFirstname(PLAYER_FIXTURE_FIRSTNAME);
     player.setLastname("Lastname");
     player.setCountry("France");
