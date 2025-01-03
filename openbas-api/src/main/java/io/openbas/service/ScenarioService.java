@@ -307,30 +307,30 @@ public class ScenarioService {
   @Transactional
   public Scenario updateScenario(
       @NotNull final Scenario scenario, Set<Tag> currentTags, boolean applyRule) {
-    if(applyRule) {
+    if (applyRule) {
       // Get assets from the TagRule of the added tags
       List<Asset> defaultAssetsToAdd =
-              tagRuleService.getAssetsFromTagIds(
-                      scenario.getTags().stream()
-                              .filter(tag -> !currentTags.contains(tag))
-                              .map(Tag::getId)
-                              .toList());
+          tagRuleService.getAssetsFromTagIds(
+              scenario.getTags().stream()
+                  .filter(tag -> !currentTags.contains(tag))
+                  .map(Tag::getId)
+                  .toList());
 
       // Get assets from the TagRule of the removed tags
       List<Asset> defaultAssetsToRemove =
-              tagRuleService.getAssetsFromTagIds(
-                      currentTags.stream()
-                              .filter(tag -> !scenario.getTags().contains(tag))
-                              .map(Tag::getId)
-                              .toList());
+          tagRuleService.getAssetsFromTagIds(
+              currentTags.stream()
+                  .filter(tag -> !scenario.getTags().contains(tag))
+                  .map(Tag::getId)
+                  .toList());
 
       // Add/remove the default assets to/from the injects
       scenario
-              .getInjects()
-              .forEach(
-                      inject ->
-                              injectService.applyDefaultAssetsToInject(
-                                      inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
+          .getInjects()
+          .forEach(
+              inject ->
+                  injectService.applyDefaultAssetsToInject(
+                      inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
     }
     scenario.setUpdatedAt(now());
     return this.scenarioRepository.save(scenario);
