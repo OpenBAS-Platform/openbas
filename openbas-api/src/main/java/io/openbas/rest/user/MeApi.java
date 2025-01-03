@@ -71,14 +71,16 @@ public class MeApi extends RestBehavior {
   public User me() {
     return userRepository
         .findById(currentUser().getId())
-        .orElseThrow(ElementNotFoundException::new);
+        .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
   }
 
   @Secured(ROLE_USER)
   @PutMapping("/api/me/profile")
   public User updateProfile(@Valid @RequestBody UpdateProfileInput input) {
     User user =
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
     user.setUpdateAttributes(input);
     user.setOrganization(
         updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
@@ -91,7 +93,9 @@ public class MeApi extends RestBehavior {
   @PutMapping("/api/me/information")
   public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
     User user =
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
     user.setUpdateAttributes(input);
     User savedUser = userRepository.save(user);
     sessionManager.refreshUserSessions(savedUser);
@@ -103,7 +107,9 @@ public class MeApi extends RestBehavior {
   public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input)
       throws InputValidationException {
     User user =
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
     if (userService.isUserPasswordValid(user, input.getCurrentPassword())) {
       user.setPassword(userService.encodeUserPassword(input.getPassword()));
       return userRepository.save(user);
@@ -118,7 +124,9 @@ public class MeApi extends RestBehavior {
   public Token renewToken(@Valid @RequestBody RenewTokenInput input)
       throws InputValidationException {
     User user =
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new);
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
     Token token =
         tokenRepository.findById(input.getTokenId()).orElseThrow(ElementNotFoundException::new);
     if (!user.equals(token.getUser())) {

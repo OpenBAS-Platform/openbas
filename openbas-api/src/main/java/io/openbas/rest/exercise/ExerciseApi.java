@@ -127,7 +127,9 @@ public class ExerciseApi extends RestBehavior {
     log.setExercise(exercise);
     log.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     log.setUser(
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     return exerciseLogRepository.save(log);
   }
 
@@ -172,7 +174,7 @@ public class ExerciseApi extends RestBehavior {
             ? List.of(
                 userRepository
                     .findById(currentUser().getId())
-                    .orElseThrow(ElementNotFoundException::new))
+                    .orElseThrow(() -> new ElementNotFoundException("Current user not found")))
             : fromIterable(userRepository.findAllById(userIds));
     return dryrunService.provisionDryrun(exercise, users, input.getName());
   }

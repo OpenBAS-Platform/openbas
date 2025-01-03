@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.config.OpenBASAnonymous.ANONYMOUS;
 import static io.openbas.config.SessionHelper.currentUser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,7 +75,15 @@ public class MailingService {
         .ifPresent(
             injectorContract -> {
               inject.setContent(this.mapper.valueToTree(emailContent));
-              inject.setUser(this.userRepository.findById(currentUser().getId()).orElseThrow());
+
+              // When resetting the password, the user is not logged in (anonymous),
+              // so there's no need to add the user to the inject.
+              if (!ANONYMOUS.equals(currentUser().getId())) {
+                inject.setUser(
+                    this.userRepository
+                        .findById(currentUser().getId())
+                        .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
+              }
 
               exercise.ifPresent(inject::setExercise);
 

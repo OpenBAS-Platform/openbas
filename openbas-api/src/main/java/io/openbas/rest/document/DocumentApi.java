@@ -349,7 +349,8 @@ public class DocumentApi extends RestBehavior {
                     !exercise.isUserHasAccess(
                         userRepository
                             .findById(currentUser().getId())
-                            .orElseThrow(ElementNotFoundException::new)))
+                            .orElseThrow(
+                                () -> new ElementNotFoundException("Current user not found"))))
             .map(Exercise::getId);
     List<String> askExerciseIds =
         Stream.concat(askExerciseIdsStream, input.getExerciseIds().stream()).distinct().toList();
@@ -370,7 +371,8 @@ public class DocumentApi extends RestBehavior {
                     !scenario.isUserHasAccess(
                         userRepository
                             .findById(currentUser().getId())
-                            .orElseThrow(ElementNotFoundException::new)))
+                            .orElseThrow(
+                                () -> new ElementNotFoundException("Current user not found"))))
             .map(Scenario::getId);
     List<String> askScenarioIds =
         Stream.concat(askScenarioIdsStream, input.getScenarioIds().stream()).distinct().toList();

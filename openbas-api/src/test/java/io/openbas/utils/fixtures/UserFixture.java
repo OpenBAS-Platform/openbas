@@ -2,6 +2,7 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.User;
 import io.openbas.rest.user.form.login.LoginUserInput;
+import io.openbas.rest.user.form.login.ResetUserInput;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
 public class UserFixture {
@@ -44,5 +45,12 @@ public class UserFixture {
     User user = getUser();
     user.setId("saved-user-id");
     return user;
+  }
+
+  public static ResetUserInput getResetUserInput() {
+    ResetUserInput resetUserInput = new ResetUserInput();
+    resetUserInput.setLogin(EMAIL);
+
+    return resetUserInput;
   }
 }

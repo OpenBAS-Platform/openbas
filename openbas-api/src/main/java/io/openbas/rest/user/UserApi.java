@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -87,7 +88,7 @@ public class UserApi extends RestBehavior {
   }
 
   @PostMapping("/api/reset")
-  public void passwordReset(@Valid @RequestBody ResetUserInput input) {
+  public ResponseEntity<?> passwordReset(@Valid @RequestBody ResetUserInput input) {
     Optional<User> optionalUser = userRepository.findByEmailIgnoreCase(input.getLogin());
     if (optionalUser.isPresent()) {
       User user = optionalUser.get();
@@ -116,7 +117,9 @@ public class UserApi extends RestBehavior {
       }
       // Store in memory reset token
       resetTokenMap.put(resetToken, user.getId());
+      return ResponseEntity.ok().build();
     }
+    return ResponseEntity.badRequest().build();
   }
 
   @PostMapping("/api/reset/{token}")
