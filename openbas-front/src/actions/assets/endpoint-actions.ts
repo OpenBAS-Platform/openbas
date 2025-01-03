@@ -38,3 +38,8 @@ export const findEndpoints = (endpointIds: string[]) => {
   const uri = `${ENDPOINT_URI}/find`;
   return simplePostCall(uri, data);
 };
+
+export const fetchEndpoint = (endpointId: string) => (dispatch: Dispatch) => {
+  const uri = `/api/endpoints/${endpointId}`;
+  return getReferential(endpoint, uri)(dispatch);
+};

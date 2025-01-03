@@ -468,6 +468,7 @@ export const storeHelper = state => ({
     c => c.lessons_template_question_category === id,
   ),
   // assets
+  getEndpoint: id => entity(id, 'endpoints', state),
   getEndpoints: () => entities('endpoints', state),
   getEndpointsMap: () => maps('endpoints', state),
   // asset groups
