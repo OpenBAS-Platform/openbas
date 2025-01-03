@@ -2,6 +2,8 @@ package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Endpoint;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
+import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -16,6 +18,38 @@ public class EndpointFixture {
 
   public static EndpointInput createWindowsEndpointInput(List<String> tagIds) {
     EndpointInput input = new EndpointInput();
+    input.setName("Windows asset");
+    input.setDescription("Description of Windows asset");
+    input.setTagIds(tagIds);
+    input.setIps(IPS);
+    input.setHostname("Windows Hostname");
+    input.setAgentVersion("1.8.2");
+    input.setMacAddresses(MAC_ADDRESSES);
+    input.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
+    input.setArch(Endpoint.PLATFORM_ARCH.x86_64);
+    input.setLastSeen(REFERENCE_TIME);
+    return input;
+  }
+
+  public static EndpointRegisterInput createWindowsEndpointRegisterInput(List<String> tagIds,
+      String externalReference) {
+    EndpointRegisterInput input = new EndpointRegisterInput();
+    input.setName("Windows asset");
+    input.setDescription("Description of Windows asset");
+    input.setTagIds(tagIds);
+    input.setIps(IPS);
+    input.setHostname("Windows Hostname");
+    input.setAgentVersion("1.8.2");
+    input.setMacAddresses(MAC_ADDRESSES);
+    input.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
+    input.setArch(Endpoint.PLATFORM_ARCH.x86_64);
+    input.setLastSeen(REFERENCE_TIME);
+    input.setExternalReference(externalReference);
+    return input;
+  }
+
+  public static EndpointRegisterInput createWindowsEndpointRegisterInputWithoutReference(List<String> tagIds) {
+    EndpointRegisterInput input = new EndpointRegisterInput();
     input.setName("Windows asset");
     input.setDescription("Description of Windows asset");
     input.setTagIds(tagIds);
