@@ -27,8 +27,11 @@ import io.openbas.utils.fixtures.TeamFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -42,14 +45,21 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestInstance(PER_CLASS)
 public class TeamApiTest {
 
-  @Autowired private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-  @Autowired private ScenarioService scenarioService;
-  @Autowired private ScenarioRepository scenarioRepository;
-  @Autowired private ExerciseService exerciseService;
-  @Autowired private ExerciseRepository exerciseRepository;
-  @Autowired private TeamRepository teamRepository;
-  @Autowired private UserRepository userRepository;
+  @Autowired
+  private ScenarioService scenarioService;
+  @Autowired
+  private ScenarioRepository scenarioRepository;
+  @Autowired
+  private ExerciseService exerciseService;
+  @Autowired
+  private ExerciseRepository exerciseRepository;
+  @Autowired
+  private TeamRepository teamRepository;
+  @Autowired
+  private UserRepository userRepository;
 
   static String SCENARIO_ID;
   static String TEAM_ID;
@@ -504,5 +514,112 @@ public class TeamApiTest {
     assertEquals("updatedName", JsonPath.read(response, "$.team_name"));
     // --THEN--
     teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
+  }
+
+  @DisplayName("Upsert of a global team")
+  @Test
+  @WithMockAdminUser
+  void upsertGlobalTeamTest() throws Exception {
+    // --PREPARE--
+    TEAM_INPUT = TeamFixture.createTeam();
+
+    Team team = new Team();
+    team.setUpdateAttributes(TEAM_INPUT);
+    TEAM = teamRepository.save(team);
+    String newName = "updatedName";
+    TEAM_INPUT.setName(newName);
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post("/api/teams/upsert")
+                    .content(asJsonString(TEAM_INPUT))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals("updatedName", JsonPath.read(response, "$.team_name"));
+    // --THEN--
+    teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
+  }
+
+  @DisplayName("Upsert of a non existing global team")
+  @Test
+  @WithMockAdminUser
+  void upsertNonExistingGlobalTeamTest() throws Exception {
+    // --PREPARE--
+    TEAM_INPUT = TeamFixture.createTeam();
+
+    Team team = new Team();
+    team.setName("Name");
+    TEAM = teamRepository.save(team);
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post("/api/teams/upsert")
+                    .content(asJsonString(TEAM_INPUT))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals("Test team", JsonPath.read(response, "$.team_name"));
+    // --THEN--
+    teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
+  }
+
+  @DisplayName("Upsert of a contextual team with many exercices")
+  @Test
+  @WithMockAdminUser
+  void upsertContextualTeamTest() throws Exception {
+    // -- PREPARE --
+    Exercise exercise1 = new Exercise();
+    exercise1.setName("Exercise name1");
+    Exercise exerciseCreated1 = this.exerciseService.createExercise(exercise1);
+    String exerciseId1 = exerciseCreated1.getId();
+
+    Exercise exercise2 = new Exercise();
+    exercise2.setName("Exercise name2");
+    Exercise exerciseCreated2 = this.exerciseService.createExercise(exercise2);
+    String exerciseId2 = exerciseCreated2.getId();
+
+    Team team = new Team();
+    team.setName("Exercise team");
+    team.setContextual(true);
+    team.setExercises(List.of(exerciseCreated1, exerciseCreated2));
+    Team teamCreated = this.teamRepository.save(team);
+    String teamId = teamCreated.getId();
+
+    TeamCreateInput teamInput = TeamFixture.createContextualExerciseTeam(List.of(exerciseId1, exerciseId2));
+
+    // --EXECUTE--
+    Exception exception =
+        assertThrows(
+            ServletException.class,
+            () ->
+                mvc.perform(
+                    post("/api/teams/upsert")
+                        .content(asJsonString(teamInput))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)));
+
+    String expectedMessage = "Contextual team can only be associated to one exercise";
+    String actualMessage = exception.getMessage();
+
+    // --ASSERT--
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    // --THEN--
+    teamRepository.deleteById(teamId);
+    exerciseRepository.deleteById(exerciseId1);
+    exerciseRepository.deleteById(exerciseId2);
   }
 }
