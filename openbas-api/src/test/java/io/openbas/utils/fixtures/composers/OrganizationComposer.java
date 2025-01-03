@@ -7,29 +7,28 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OrganizationComposer {
-    @Autowired
-    OrganizationRepository organizationRepository;
+  @Autowired OrganizationRepository organizationRepository;
 
-    public class Composer extends InnerComposerBase<Organization> {
-        private final Organization organization;
+  public class Composer extends InnerComposerBase<Organization> {
+    private final Organization organization;
 
-        public Composer(Organization organization) {
-            this.organization = organization;
-        }
-
-        @Override
-        public Composer persist() {
-            organizationRepository.save(organization);
-            return this;
-        }
-
-        @Override
-        public Organization get() {
-            return this.organization;
-        }
+    public Composer(Organization organization) {
+      this.organization = organization;
     }
 
-    public Composer withOrganization(Organization organization) {
-        return new Composer(organization);
+    @Override
+    public Composer persist() {
+      organizationRepository.save(organization);
+      return this;
     }
+
+    @Override
+    public Organization get() {
+      return this.organization;
+    }
+  }
+
+  public Composer forOrganization(Organization organization) {
+    return new Composer(organization);
+  }
 }
