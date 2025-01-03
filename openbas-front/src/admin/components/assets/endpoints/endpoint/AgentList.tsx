@@ -12,6 +12,7 @@ import type { Agent } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../../AssetStatus';
+import AgentPopover from './AgentPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -121,6 +122,14 @@ const AgentList: React.FC<Props> = ({ agents }) => {
             key={agent.agent_id}
             classes={{ root: classes.item }}
             divider
+            secondaryAction={
+              <AgentPopover
+                agent={agent}
+                actions={['Update']}
+                inList
+              />
+            }
+            disablePadding
           >
             <ListItemIcon>
               <DevicesOtherOutlined color="primary" />
