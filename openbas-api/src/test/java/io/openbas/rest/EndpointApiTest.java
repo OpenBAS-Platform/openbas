@@ -20,14 +20,13 @@ import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.utils.fixtures.EndpointFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-
 import java.util.List;
-
 import org.junit.jupiter.api.*;
-import org.mockito.Spy;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -41,14 +40,10 @@ public class EndpointApiTest {
   static Endpoint ENDPOINT;
   static String TAG_ID;
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private TagRepository tagRepository;
-  @Autowired
-  private EndpointRepository endpointRepository;
-  @Spy
-  private EndpointService endpointService;
+  @Autowired private MockMvc mvc;
+  @Autowired private TagRepository tagRepository;
+  @Autowired private EndpointRepository endpointRepository;
+  @SpyBean private EndpointService endpointService;
 
   @BeforeEach
   void beforeEach() {
@@ -92,7 +87,8 @@ public class EndpointApiTest {
   @WithMockAdminUser
   void upsertEndpointTest() throws Exception {
     // --PREPARE--
-    ENDPOINT_REGISTER_INPUT = EndpointFixture.createWindowsEndpointRegisterInput(List.of(TAG_ID), "external01");
+    ENDPOINT_REGISTER_INPUT =
+        EndpointFixture.createWindowsEndpointRegisterInput(List.of(TAG_ID), "external01");
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(ENDPOINT_REGISTER_INPUT);
     Agent agent = new Agent();
@@ -107,6 +103,10 @@ public class EndpointApiTest {
     String newName = "New hostname";
     ENDPOINT_REGISTER_INPUT.setHostname(newName);
 
+    Mockito.doReturn("command")
+        .when(endpointService)
+        .generateUpgradeCommand(String.valueOf(Endpoint.PLATFORM_TYPE.Windows));
+
     // --EXECUTE--
     String response =
         mvc.perform(
@@ -119,10 +119,47 @@ public class EndpointApiTest {
             .getResponse()
             .getContentAsString();
 
-    endpointService.generateUpgradeCommand(String.valueOf(Endpoint.PLATFORM_TYPE.Windows));
-
     // --ASSERT--
     assertEquals("New hostname", JsonPath.read(response, "$.endpoint_hostname"));
+    // --THEN--
+    endpointRepository.deleteById(JsonPath.read(response, "$.asset_id"));
+  }
+
+  @DisplayName("Upsert of a non existing endpoint")
+  @Test
+  @WithMockAdminUser
+  void upsertNonExistingEndpointTest() throws Exception {
+    // --PREPARE--
+    ENDPOINT_REGISTER_INPUT =
+        EndpointFixture.createWindowsEndpointRegisterInput(List.of(TAG_ID), "external01");
+    Endpoint endpoint = new Endpoint();
+    endpoint.setUpdateAttributes(ENDPOINT_REGISTER_INPUT);
+    Agent agent = new Agent();
+    agent.setExecutedByUser(Agent.ADMIN_SYSTEM_WINDOWS);
+    agent.setPrivilege(Agent.PRIVILEGE.admin);
+    agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
+    agent.setAsset(endpoint);
+    agent.setExternalReference("external01");
+    endpoint.setAgents(List.of(agent));
+
+    Mockito.doReturn("command")
+        .when(endpointService)
+        .generateUpgradeCommand(String.valueOf(Endpoint.PLATFORM_TYPE.Windows));
+
+    // --EXECUTE--
+    String response =
+        mvc.perform(
+                post(ENDPOINT_URI + "/register")
+                    .content(asJsonString(ENDPOINT_REGISTER_INPUT))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // --ASSERT--
+    assertEquals("Windows Hostname", JsonPath.read(response, "$.endpoint_hostname"));
     // --THEN--
     endpointRepository.deleteById(JsonPath.read(response, "$.asset_id"));
   }
