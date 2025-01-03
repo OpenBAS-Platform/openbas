@@ -347,7 +347,7 @@ public class InjectApi extends RestBehavior {
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
 
-    // Get input assets
+    // add default assets
     inject.setAssets(
         this.tagRuleService.applyTagRuleToInjectCreation(
             exercise.getTags().stream().map(Tag::getId).toList(),
@@ -586,7 +586,7 @@ public class InjectApi extends RestBehavior {
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
 
-    // Get input assets
+    // add default assets
     inject.setAssets(
         this.tagRuleService.applyTagRuleToInjectCreation(
             scenario.getTags().stream().map(Tag::getId).toList(),
