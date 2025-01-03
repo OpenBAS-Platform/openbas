@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -221,7 +221,20 @@ const Endpoints = () => {
           );
         })}
       </List>
-      {userAdmin && <ButtonCreate />}
+      {userAdmin && <ButtonCreate onClick={()=>setOpen(true)} />}
+      <Dialog
+        PaperProps={{ elevation: 1 }}
+        open={open}
+        onClose={onClose}
+        fullWidth={true}
+        maxWidth="md"
+      >
+        <DialogTitle>
+          {t('Teset')}
+        </DialogTitle>
+        <DialogContent>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
