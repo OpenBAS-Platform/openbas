@@ -190,7 +190,9 @@ public class ExerciseFileExport {
 
   public List<LessonsCategory> getLessonsCategories() {
     if (lessonsCategories == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getLessonsCategories();
+      return this.exercise == null
+          ? new ArrayList<>()
+          : this.exercise.getLessonsCategories().stream().toList();
     }
     return lessonsCategories;
   }
