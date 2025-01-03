@@ -694,24 +694,6 @@ export interface Endpoint {
   listened?: boolean;
 }
 
-export interface EndpointInput {
-  asset_description?: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
-  asset_name: string;
-  asset_tags?: string[];
-  endpoint_agent_version?: string;
-  endpoint_arch: "x86_64" | "arm64" | "Unknown";
-  endpoint_hostname?: string;
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
-  endpoint_ips: string[];
-  endpoint_mac_addresses?: string[];
-  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-}
-
 export interface EndpointRegisterInput {
   asset_description?: string;
   asset_external_reference: string;
@@ -729,6 +711,12 @@ export interface EndpointRegisterInput {
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
+export interface EndpointUpdateInput {
+  asset_description?: string;
+  asset_name: string;
+  asset_tags?: string[];
 }
 
 export interface Evaluation {
@@ -1398,6 +1386,7 @@ export interface InjectInput {
   inject_depends_on?: InjectDependencyInput[];
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
+  inject_enabled?: boolean;
   inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
@@ -2541,6 +2530,25 @@ export interface PageTag {
   totalPages?: number;
 }
 
+export interface PageTagRuleOutput {
+  content?: TagRuleOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageTeamOutput {
   content?: TeamOutput[];
   empty?: boolean;
@@ -3266,6 +3274,17 @@ export interface Tag {
 export interface TagCreateInput {
   tag_color: string;
   tag_name: string;
+}
+
+export interface TagRuleInput {
+  tag_name: string;
+  tag_rule_assets?: string[];
+}
+
+export interface TagRuleOutput {
+  tag_name: string;
+  tag_rule_assets?: Record<string, string>;
+  tag_rule_id: string;
 }
 
 export interface TagUpdateInput {

@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
 
 import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
+import type { UserHelper } from '../../../../../actions/helper';
 import { useHelper } from '../../../../../store';
 import type { Endpoint as EndpointType } from '../../../../../utils/api-types';
 import { truncate } from '../../../../../utils/String';
@@ -25,7 +26,8 @@ const EndpointHeader = () => {
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
 
   // Fetching data
-  const { endpoint } = useHelper((helper: EndpointHelper) => ({
+  const { userAdmin, endpoint } = useHelper((helper: EndpointHelper & UserHelper) => ({
+    userAdmin: helper.getMe()?.user_admin ?? false,
     endpoint: helper.getEndpoint(endpointId),
   }));
 
@@ -41,11 +43,13 @@ const EndpointHeader = () => {
         </Typography>
       </Tooltip>
       <div className={classes.actions}>
-        <EndpointPopover
-          endpoint={{ ...endpoint, type: 'static' }}
-          onUpdate={endpoint}
-          onDelete={endpoint}
-        />
+        {userAdmin && (
+          <EndpointPopover
+            endpoint={{ ...endpoint, type: 'static' }}
+            onUpdate={endpoint}
+            onDelete={endpoint}
+          />
+        )}
       </div>
       <div className="clearfix" />
     </>

@@ -46,13 +46,7 @@ const EndpointPopover: React.FC<Props> = ({
   const initialValues = {
     asset_name: endpoint.asset_name,
     asset_description: endpoint.asset_description ?? '',
-    asset_last_seen: endpoint.asset_last_seen,
     asset_tags: endpoint.asset_tags,
-    endpoint_hostname: endpoint.endpoint_hostname,
-    endpoint_ips: endpoint.endpoint_ips,
-    endpoint_mac_addresses: endpoint.endpoint_mac_addresses ?? [],
-    endpoint_platform: endpoint.endpoint_platform,
-    endpoint_arch: endpoint.endpoint_arch,
   };
 
   // Edition
@@ -136,9 +130,13 @@ const EndpointPopover: React.FC<Props> = ({
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        <MenuItem onClick={handleEdit}>
-          {t('Update')}
-        </MenuItem>
+        {(onUpdate
+          && (
+            <MenuItem onClick={handleEdit}>
+              {t('Update')}
+            </MenuItem>
+          )
+        )}
         {(assetGroupId && endpoint.type !== 'dynamic') && (
           <MenuItem onClick={handleRemoveFromAssetGroup}>
             {t('Remove from the asset group')}
