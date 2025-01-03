@@ -7,16 +7,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
-import io.openbas.utils.fixtures.ArticleFixture;
-import io.openbas.utils.fixtures.ChannelFixture;
-import io.openbas.utils.fixtures.ExerciseFixture;
-import io.openbas.utils.fixtures.composers.ArticleComposer;
-import io.openbas.utils.fixtures.composers.ChannelComposer;
-import io.openbas.utils.fixtures.composers.ExerciseComposer;
+import io.openbas.database.model.Exercise;
+import io.openbas.utils.fixtures.*;
+import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
-
-import java.time.Instant;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,10 +29,14 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ArticleComposer articleComposer;
   @Autowired private ChannelComposer channelComposer;
+  @Autowired private LessonsQuestionsComposer lessonsQuestionsComposer;
+  @Autowired private LessonsCategoryComposer lessonsCategoryComposer;
+  @Autowired private TeamComposer teamComposer;
+  @Autowired private UserComposer userComposer;
+  @Autowired private OrganizationComposer organizationComposer;
   @Resource protected ObjectMapper mapper;
 
-  static io.openbas.database.model.Exercise EXERCISE;
-  static Instant REFERENCE_TIME;
+  static Exercise EXERCISE;
 
   @BeforeEach
   void beforeAll() {
@@ -46,6 +45,22 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .withArticle(
                     articleComposer.withArticle(ArticleFixture.getArticleNoChannel())
                     .withChannel(channelComposer.withChannel(ChannelFixture.getChannel()))
+            )
+            .withLessonCategory(
+                    lessonsCategoryComposer.withLessonsCategory(
+                            LessonsCategoryFixture.createLessonCategory()
+                            )
+                            .withLessonsQuestion(
+                                    lessonsQuestionsComposer.withLessonsQuestion(
+                                            LessonsQuestionFixture.createLessonsQuestion()
+                                    )
+                            )
+            )
+            .withTeam(
+                    teamComposer.withTeam(
+                            TeamFixture.getEmptyTeam()
+                    )
+                            .withUser(userComposer.withUser(UserFixture.getUser()).withOrganization(organizationComposer.withOrganization(OrganizationFixture.createOrganization())))
             )
             .persist()
             .get();

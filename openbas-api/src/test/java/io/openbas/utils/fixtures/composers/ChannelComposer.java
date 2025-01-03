@@ -10,18 +10,20 @@ public class ChannelComposer {
     @Autowired
     private ChannelRepository channelRepository;
 
-    public class Composer {
-        private Channel channel;
+    public class Composer extends InnerComposerBase<Channel> {
+        private final Channel channel;
 
         public Composer(Channel channel) {
             this.channel = channel;
         }
 
+        @Override
         public Composer persist() {
             channelRepository.save(channel);
             return this;
         }
 
+        @Override
         public Channel get() {
             return channel;
         }

@@ -1,7 +1,6 @@
 package io.openbas.utils.fixtures.composers;
 
 import io.openbas.database.model.Article;
-import io.openbas.database.model.Channel;
 import io.openbas.database.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,8 +9,8 @@ import org.springframework.stereotype.Component;
 public class ArticleComposer {
     @Autowired private ArticleRepository articleRepository;
 
-    public class Composer {
-        private Article article;
+    public class Composer extends InnerComposerBase<Article> {
+        private final Article article;
         private ChannelComposer.Composer channelComposer;
 
         public Composer(Article article) {
@@ -24,12 +23,14 @@ public class ArticleComposer {
             return this;
         }
 
+        @Override
         public Composer persist() {
             this.channelComposer.persist();
             articleRepository.save(article);
             return this;
         }
 
+        @Override
         public Article get() {
             return article;
         }
