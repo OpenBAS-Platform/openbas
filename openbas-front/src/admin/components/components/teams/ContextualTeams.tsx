@@ -4,8 +4,8 @@ import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router';
 
-import type { TeamStore } from '../../../../actions/teams/Team';
 import ItemTags from '../../../../components/ItemTags';
+import type { Team } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { PermissionsContext, TeamContext } from '../../common/Context';
 import TeamPlayers from './TeamPlayers';
@@ -119,10 +119,10 @@ const inlineStylesContextual: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  teams: TeamStore[];
+  teams: Team[];
 }
 
-interface TeamStoreExtended extends TeamStore {
+interface TeamStoreExtended extends Team {
   team_users_enabled_number: number;
 }
 

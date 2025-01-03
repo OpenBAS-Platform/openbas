@@ -2,24 +2,7 @@ import { useParams } from 'react-router';
 
 import { addExerciseEvaluation, fetchExerciseEvaluations, updateExerciseEvaluation } from '../../../../../actions/Evaluation';
 import { fetchExerciseTeams, updateExerciseLessons } from '../../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import {
-  addLessonsCategory,
-  addLessonsQuestion,
-  applyLessonsTemplate,
-  deleteLessonsCategory,
-  deleteLessonsQuestion,
-  emptyLessonsCategories,
-  fetchLessonsAnswers,
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-  fetchPlayersByExercise,
-  resetLessonsAnswers,
-  sendLessons,
-  updateLessonsCategory,
-  updateLessonsCategoryTeams,
-  updateLessonsQuestion,
-} from '../../../../../actions/exercises/exercise-action';
+import { addLessonsCategory, addLessonsQuestion, applyLessonsTemplate, deleteLessonsCategory, deleteLessonsQuestion, emptyLessonsCategories, fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions, fetchPlayersByExercise, resetLessonsAnswers, sendLessons, updateLessonsCategory, updateLessonsCategoryTeams, updateLessonsQuestion } from '../../../../../actions/exercises/exercise-action';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../../../actions/helper';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
@@ -30,17 +13,7 @@ import { addExerciseObjective, deleteExerciseObjective, fetchExerciseObjectives,
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import { useHelper } from '../../../../../store';
-import type {
-  EvaluationInput,
-  Exercise,
-  LessonsCategoryCreateInput,
-  LessonsCategoryTeamsInput,
-  LessonsCategoryUpdateInput,
-  LessonsQuestionCreateInput,
-  LessonsQuestionUpdateInput,
-  LessonsSendInput,
-  ObjectiveInput,
-} from '../../../../../utils/api-types';
+import type { EvaluationInput, Exercise, LessonsCategoryCreateInput, LessonsCategoryTeamsInput, LessonsCategoryUpdateInput, LessonsQuestionCreateInput, LessonsQuestionUpdateInput, LessonsSendInput, ObjectiveInput } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -52,7 +25,7 @@ const ExerciseLessons = () => {
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
-  const processToGenericSource = (exercise: ExerciseStore) => {
+  const processToGenericSource = (exercise: Exercise) => {
     return {
       id: exercise.exercise_id,
       type: 'simulation',

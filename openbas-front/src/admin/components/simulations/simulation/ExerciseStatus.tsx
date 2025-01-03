@@ -2,8 +2,8 @@ import { Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 
-import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../components/i18n';
+import { Exercise } from '../../../../utils/api-types';
 import { inlineStylesColors } from '../../../../utils/Colors';
 
 const useStyles = makeStyles(() => ({
@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exerciseStatus: ExerciseStore['exercise_status'];
+  exerciseStatus: Exercise['exercise_status'] | undefined;
   exerciseStartDate?: string;
   variant?: 'list';
 }

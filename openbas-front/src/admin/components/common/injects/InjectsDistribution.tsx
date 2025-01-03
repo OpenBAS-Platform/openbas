@@ -2,14 +2,14 @@ import { useTheme } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { TeamStore } from '../../../../actions/teams/Team';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
+import type { Team } from '../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 
 interface Props {
-  topTeams: TeamStore[];
+  topTeams: Team[];
   distributionChartData: ApexAxisChartSeries;
   maxInjectsNumber: number;
 }

@@ -7,7 +7,6 @@ import Chart from 'react-apexcharts';
 import { fetchStatistics } from '../../actions/Application';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
 import { searchExercises } from '../../actions/Exercise';
-import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../actions/exercises/Exercise';
 import type { StatisticsHelper } from '../../actions/statistics/statistics-helper';
 import { initSorting, type Page } from '../../components/common/queryable/Page';
 import Empty from '../../components/Empty';
@@ -15,7 +14,7 @@ import { useFormatter } from '../../components/i18n';
 import Loader from '../../components/Loader';
 import type { Theme } from '../../components/Theme';
 import { useHelper } from '../../store';
-import { AttackPattern, ExerciseSimple, PlatformStatistic } from '../../utils/api-types';
+import { AttackPattern, ExerciseSimple, type InjectExpectationResultsByAttackPattern, PlatformStatistic } from '../../utils/api-types';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
 import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
 import { useAppDispatch } from '../../utils/hooks';
@@ -69,7 +68,7 @@ const Dashboard = () => {
 
   // Exercises
   const [loadingExercises, setLoadingExercises] = useState(true);
-  const [exercises, setExercises] = useState<ExerciseStore[]>([]);
+  const [exercises, setExercises] = useState<ExerciseSimple[]>([]);
   const searchPaginationInput = {
     sorts: initSorting('exercise_updated_at', 'DESC'),
     page: 0,
@@ -291,7 +290,7 @@ const Dashboard = () => {
               ? <Loader variant="inElement" />
               : (
                   <MitreMatrix
-                    injectResults={(statistics?.inject_expectation_results as InjectExpectationResultsByAttackPatternStore[])}
+                    injectResults={(statistics?.inject_expectation_results as InjectExpectationResultsByAttackPattern[])}
                   />
                 )
           }

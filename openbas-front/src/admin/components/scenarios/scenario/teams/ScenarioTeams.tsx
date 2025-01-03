@@ -3,14 +3,13 @@ import { useContext, useEffect, useState } from 'react';
 import * as React from 'react';
 import { useParams } from 'react-router';
 
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import {
   fetchScenarioTeams,
 } from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
+import type { Scenario, Team } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
@@ -19,7 +18,7 @@ import UpdateTeams from '../../../components/teams/UpdateTeams';
 import teamContextForScenario from './teamContextForScenario';
 
 interface Props {
-  scenarioTeamsUsers: ScenarioStore['scenario_teams_users'];
+  scenarioTeamsUsers: Scenario['scenario_teams_users'];
 }
 
 const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
@@ -29,15 +28,15 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   const { permissions } = useContext(PermissionsContext);
 
   // Fetching data
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-  const { teamsStore }: { teamsStore: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
+  const { teamsStore }: { teamsStore: Team[] } = useHelper((helper: ScenariosHelper) => ({
     teamsStore: helper.getScenarioTeams(scenarioId),
   }));
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
 
-  const [teams, setTeams] = useState<TeamStore[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     setTeams(teamsStore);
   }, [teamsStore]);
@@ -50,8 +49,8 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
       {permissions.canWrite
       && (
         <UpdateTeams
-          addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
-          setTeams={(ts: TeamStore[]) => setTeams(ts)}
+          addedTeamIds={teams.map((team: Team) => team.team_id)}
+          setTeams={(ts: Team[]) => setTeams(ts)}
         />
       )}
       <div className="clearfix" />

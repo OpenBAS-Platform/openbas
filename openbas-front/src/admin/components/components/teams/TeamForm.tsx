@@ -4,7 +4,7 @@ import { FunctionComponent, useContext } from 'react';
 import { Form } from 'react-final-form';
 import { z } from 'zod';
 
-import type { TeamInputForm } from '../../../../actions/teams/Team';
+import { TeamInputForm } from '../../../../actions/teams/Team';
 import CheckboxField from '../../../../components/CheckboxField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';

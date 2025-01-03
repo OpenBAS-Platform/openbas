@@ -2,18 +2,17 @@ import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { LoggedHelper } from '../../../actions/helper';
-import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import { addScenario } from '../../../actions/scenarios/scenario-actions';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { PlatformSettings, ScenarioInput } from '../../../utils/api-types';
+import type { PlatformSettings, Scenario, ScenarioInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import ScenarioForm from './ScenarioForm';
 
 interface Props {
-  onCreate?: (result: ScenarioStore) => void;
+  onCreate?: (result: Scenario) => void;
 }
 
 const ScenarioCreation: FunctionComponent<Props> = ({
@@ -28,7 +27,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({
 
   const onSubmit = (data: ScenarioInput) => {
     dispatch(addScenario(data)).then(
-      (result: { result: string; entities: { scenarios: Record<string, ScenarioStore> } }) => {
+      (result: { result: string; entities: { scenarios: Record<string, Scenario> } }) => {
         if (result.entities) {
           if (onCreate) {
             const created = result.entities.scenarios[result.result];

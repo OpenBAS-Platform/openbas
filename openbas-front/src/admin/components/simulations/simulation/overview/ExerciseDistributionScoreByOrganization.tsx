@@ -3,20 +3,18 @@ import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { OrganizationHelper, UserHelper } from '../../../../../actions/helper';
-import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { Organization } from '../../../../../utils/api-types';
+import type { Exercise, InjectExpectation, Organization } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 import { computeOrganizationsColors } from './DistributionUtils';
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  exerciseId: Exercise['exercise_id'];
 }
 
 const ExerciseDistributionScoreByOrganization: FunctionComponent<Props> = ({
@@ -36,20 +34,20 @@ const ExerciseDistributionScoreByOrganization: FunctionComponent<Props> = ({
 
   const organizationsTotalScores = R.pipe(
     R.filter(
-      (n: InjectExpectationStore) => !R.isEmpty(n.inject_expectation_results)
+      (n: InjectExpectation) => !R.isEmpty(n.inject_expectation_results)
         && n.inject_expectation_user !== null,
     ),
-    R.map((n: InjectExpectationStore) => R.assoc(
+    R.map((n: InjectExpectation) => R.assoc(
       'inject_expectation_user',
       n.inject_expectation_user ? usersMap[n.inject_expectation_user] : {},
       n,
     )),
     R.groupBy(R.path(['inject_expectation_user', 'user_organization'])),
     R.toPairs,
-    R.map((n: [string, InjectExpectationStore[]]) => ({
+    R.map((n: [string, InjectExpectation[]]) => ({
       ...organizationsMap[n[0]],
       organization_total_score: R.sum(
-        R.map((o: InjectExpectationStore) => o.inject_expectation_score, n[1]),
+        R.map((o: InjectExpectation) => o.inject_expectation_score, n[1]),
       ),
     })),
   )(injectExpectations);

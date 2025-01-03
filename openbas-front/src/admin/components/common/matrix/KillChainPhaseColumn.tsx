@@ -1,9 +1,8 @@
 import { makeStyles, useTheme } from '@mui/styles';
 import { FunctionComponent } from 'react';
 
-import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import type { Theme } from '../../../../components/Theme';
-import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, InjectExpectationResultsByAttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import AttackPatternBox from './AttackPatternBox';
 
 const useStyles = makeStyles(() => ({
@@ -18,7 +17,7 @@ interface KillChainPhaseComponentProps {
   goToLink?: string;
   killChainPhase: KillChainPhase;
   attackPatterns: AttackPattern[];
-  injectResults: InjectExpectationResultsByAttackPatternStore[];
+  injectResults: InjectExpectationResultsByAttackPattern[];
   dummy?: boolean;
 }
 

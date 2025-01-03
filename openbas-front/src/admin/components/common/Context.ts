@@ -2,7 +2,6 @@ import { createContext, ReactElement } from 'react';
 
 import type { FullArticleStore } from '../../../actions/channels/Article';
 import type { InjectOutputType, InjectStore } from '../../../actions/injects/Inject';
-import type { TeamStore } from '../../../actions/teams/Team';
 import { Page } from '../../../components/common/queryable/Page';
 import type {
   Article,
@@ -78,7 +77,7 @@ export type TeamContextType = {
   onAddTeam?: (teamId: Team['team_id']) => Promise<void>;
   onCreateTeam?: (team: TeamCreateInput) => Promise<{ result: string }>;
   onRemoveTeam?: (teamId: Team['team_id']) => void;
-  onReplaceTeam?: (teamIds: Team['team_id'][]) => Promise<{ result: string[]; entities: { teams: Record<string, TeamStore> } }>;
+  onReplaceTeam?: (teamIds: Team['team_id'][]) => Promise<{ result: string[]; entities: { teams: Record<string, Team> } }>;
   onToggleUser?: (teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean) => void;
   checkUserEnabled?: (teamId: Team['team_id'], userId: UserStore['user_id']) => boolean;
   computeTeamUsersEnabled?: (teamId: Team['team_id']) => number;

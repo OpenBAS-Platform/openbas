@@ -3,10 +3,9 @@ import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { useHelper } from '../../../../store';
-import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, InjectExpectationResultsByAttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
 import MitreMatrixDummy from './MitreMatrixDummy';
 
@@ -23,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   goToLink?: string;
-  injectResults: InjectExpectationResultsByAttackPatternStore[];
+  injectResults: InjectExpectationResultsByAttackPattern[];
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({

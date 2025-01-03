@@ -3,11 +3,11 @@ import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../actions/Application';
 import type { UserHelper } from '../../../actions/helper';
-import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import { fetchLessonsCategories, fetchLessonsQuestions, fetchScenario } from '../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../actions/scenarios/scenario-helper';
 import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
 import { useHelper } from '../../../store';
+import { Scenario } from '../../../utils/api-types';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useScenarioPermissions from '../../../utils/Scenario';
@@ -17,10 +17,10 @@ const ScenarioViewLessons = () => {
   const dispatch = useAppDispatch();
   const [preview] = useQueryParameter(['preview']);
   const [userId] = useQueryParameter(['user']);
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const isPreview = preview === 'true';
 
-  const processToGenericSource = (scenario: ScenarioStore | undefined) => {
+  const processToGenericSource = (scenario: Scenario | undefined) => {
     if (!scenario) return undefined;
     return {
       id: scenarioId,

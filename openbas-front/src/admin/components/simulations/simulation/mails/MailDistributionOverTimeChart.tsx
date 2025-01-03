@@ -5,18 +5,17 @@ import Chart from 'react-apexcharts';
 
 import { fetchExerciseCommunications } from '../../../../../actions/Communication';
 import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { Communication } from '../../../../../utils/api-types';
+import type { Communication, Exercise } from '../../../../../utils/api-types';
 import { areaChartOptions } from '../../../../../utils/Charts';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  exerciseId: Exercise['exercise_id'];
 }
 
 const MailDistributionOverTimeChart: FunctionComponent<Props> = ({

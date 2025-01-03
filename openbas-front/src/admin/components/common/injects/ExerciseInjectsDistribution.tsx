@@ -1,13 +1,13 @@
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 
-import type { TeamStore } from '../../../../actions/teams/Team';
 import { useFormatter } from '../../../../components/i18n';
+import type { Team } from '../../../../utils/api-types';
 import InjectsDistribution from './InjectsDistribution';
 import { getTeamsColors } from './teams/utils';
 
 interface Props {
-  teams: TeamStore[];
+  teams: Team[];
 }
 
 const ExerciseInjectsDistribution: FunctionComponent<Props> = ({
@@ -24,7 +24,7 @@ const ExerciseInjectsDistribution: FunctionComponent<Props> = ({
   const distributionChartData = [
     {
       name: t('Number of injects'),
-      data: topTeams.map((a: TeamStore) => ({
+      data: topTeams.map((a: Team) => ({
         x: a.team_name,
         y: a.team_exercise_injects_number,
         fillColor: teamsColors[a.team_id],
@@ -32,7 +32,7 @@ const ExerciseInjectsDistribution: FunctionComponent<Props> = ({
     },
   ];
   const maxInjectsNumber = Math.max(
-    ...topTeams.map((a: TeamStore) => a.team_exercise_injects_number),
+    ...topTeams.map((a: Team) => a.team_exercise_injects_number),
   );
 
   return (

@@ -6,7 +6,6 @@ import { useSearchParams } from 'react-router';
 
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import type { TeamStore } from '../../../../actions/teams/Team';
 import { searchTeams } from '../../../../actions/teams/team-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
@@ -16,7 +15,7 @@ import { buildSearchPagination } from '../../../../components/common/queryable/Q
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
+import type { SearchPaginationInput, Team } from '../../../../utils/api-types';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
@@ -95,7 +94,7 @@ const Teams = () => {
     { field: 'team_updated_at', label: 'Updated', isSortable: true },
   ];
 
-  const [teams, setTeams] = useState<TeamStore[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('team_name'),
     textSearch: search,
@@ -143,7 +142,7 @@ const Teams = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {teams.map((team: TeamStore) => (
+        {teams.map((team: Team) => (
           <ListItem
             key={team.team_id}
             classes={{ root: classes.item }}

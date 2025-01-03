@@ -1,11 +1,11 @@
 import { Grid, Typography } from '@mui/material';
 import { FunctionComponent } from 'react';
 
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { useFormatter } from '../../../../../components/i18n';
+import type { Exercise } from '../../../../../utils/api-types';
 
 interface Props {
-  exercise: ExerciseStore;
+  exercise: Exercise;
 }
 
 const ExerciseInformation: FunctionComponent<Props> = ({

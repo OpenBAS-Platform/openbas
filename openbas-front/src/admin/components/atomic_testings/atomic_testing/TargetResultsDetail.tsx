@@ -28,12 +28,11 @@ import * as React from 'react';
 
 import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
-import type { InjectExpectationStore } from '../../../../actions/injects/Inject';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
 import type { Theme } from '../../../../components/Theme';
-import { InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectExpectation, InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
@@ -291,7 +290,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         return '';
     }
   };
-  const getAvatar = (injectExpectation: InjectExpectationStore, expectationResult: InjectExpectationResult) => {
+  const getAvatar = (injectExpectation: InjectExpectation, expectationResult: InjectExpectationResult) => {
     if (expectationResult.sourceType === 'collector') {
       return (
         <img
@@ -366,17 +365,17 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           return 1; // b comes before a
         }
         return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
-      }).map((expectation: InjectExpectationStore) => ({
+      }).map((expectation: InjectExpectation) => ({
         key: 'result',
         label: (
           <span>
-            {getStatusLabel(targetType, [expectation.inject_expectation_status])}
+            {getStatusLabel(targetType, [expectation.inject_expectation_status ?? 'UNKNOWN'])}
             <br />
             {truncate(expectation.inject_expectation_name, 20)}
           </span>
         ),
         type: targetType,
-        status: getStatus([expectation.inject_expectation_status]),
+        status: getStatus([expectation.inject_expectation_status ?? 'UNKNOWN']),
       })));
       const mergedSteps: Steptarget[] = [...computeInitialSteps(initialSteps), ...newSteps];
       // Custom sorting function

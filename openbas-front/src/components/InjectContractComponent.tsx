@@ -4,10 +4,9 @@ import { FunctionComponent, useEffect, useState } from 'react';
 import * as React from 'react';
 import { FieldError } from 'react-hook-form';
 
-import type { InjectorContractStore } from '../actions/injector_contracts/InjectorContract';
 import { searchInjectorContracts } from '../actions/InjectorContracts';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
-import type { FilterGroup } from '../utils/api-types';
+import type { FilterGroup, InjectorContract } from '../utils/api-types';
 import { isNotEmptyField } from '../utils/utils';
 import { initSorting, Page } from './common/queryable/Page';
 import { useFormatter } from './i18n';
@@ -42,7 +41,7 @@ const InjectContractComponent: FunctionComponent<Props> = ({
   const { t, tPick } = useFormatter();
 
   // Pagination
-  const [contracts, setContracts] = useState<InjectorContractStore[]>([]);
+  const [contracts, setContracts] = useState<InjectorContract[]>([]);
   const searchContract = (event: React.SyntheticEvent) => {
     const selectChangeEvent = event as SelectChangeEvent;
     const val = selectChangeEvent?.target.value ?? '';
@@ -75,7 +74,7 @@ const InjectContractComponent: FunctionComponent<Props> = ({
       size: 100,
     };
 
-    searchInjectorContracts(finalSearchPaginationInput).then((result: { data: Page<InjectorContractStore> }) => {
+    searchInjectorContracts(finalSearchPaginationInput).then((result: { data: Page<InjectorContract> }) => {
       const { data } = result;
       setContracts(data.content);
     });

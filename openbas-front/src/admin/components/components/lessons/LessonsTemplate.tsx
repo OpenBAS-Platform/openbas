@@ -6,10 +6,9 @@ import { useParams } from 'react-router';
 import type { UserHelper } from '../../../../actions/helper';
 import { fetchLessonsTemplateCategories, fetchLessonsTemplateQuestions } from '../../../../actions/Lessons';
 import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';
-import type { LessonsTemplateQuestionStore } from '../../../../actions/lessons/Lessons';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { LessonsTemplateCategory } from '../../../../utils/api-types';
+import type { LessonsTemplateCategory, LessonsTemplateQuestion } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import CreateLessonsTemplateCategory from './categories/CreateLessonsTemplateCategory';
@@ -39,7 +38,7 @@ const LessonsTemplate = () => {
   }: {
     userAdmin: boolean;
     categories: LessonsTemplateCategory[];
-    questions: LessonsTemplateQuestionStore[];
+    questions: LessonsTemplateQuestion[];
   } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => {
     return {
       categories: helper.getLessonsTemplateCategories(lessonsTemplateId),
@@ -55,7 +54,7 @@ const LessonsTemplate = () => {
   // Utils
   const categoriesSorted = categories
     .sort((c1, c2) => ((c1.lessons_template_category_order ?? 0) > (c2.lessons_template_category_order ?? 0) ? 1 : -1));
-  const sortQuestions = (qs: LessonsTemplateQuestionStore[]) => {
+  const sortQuestions = (qs: LessonsTemplateQuestion[]) => {
     return qs
       .sort((q1, q2) => ((q1.lessons_template_question_order ?? 0) > (q2.lessons_template_question_order ?? 0) ? 1 : -1));
   };

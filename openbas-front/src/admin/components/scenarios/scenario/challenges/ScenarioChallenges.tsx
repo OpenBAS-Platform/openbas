@@ -2,8 +2,8 @@ import { useParams } from 'react-router';
 
 import { fetchScenarioChallenges } from '../../../../../actions/Challenge';
 import type { ChallengeHelper } from '../../../../../actions/helper';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { useHelper } from '../../../../../store';
+import { Scenario } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ContextualChallenges from '../../../common/challenges/ContextualChallenges';
@@ -13,7 +13,7 @@ const ScenarioChallenges = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   // Fetching data
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const challenges = useHelper((helper: ChallengeHelper) => helper.getScenarioChallenges(scenarioId));
   useDataLoader(() => {
     dispatch(fetchScenarioChallenges(scenarioId));
