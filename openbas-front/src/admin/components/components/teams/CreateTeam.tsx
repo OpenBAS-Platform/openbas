@@ -3,16 +3,16 @@ import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useState } from 'react';
 
-import type { TeamInputForm, TeamStore } from '../../../../actions/teams/Team';
 import { addTeam } from '../../../../actions/teams/team-actions';
 import Dialog from '../../../../components/common/Dialog';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
-import type { TeamCreateInput } from '../../../../utils/api-types';
+import type { Team, TeamCreateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { Option } from '../../../../utils/Option';
 import { TeamContext } from '../../common/Context';
 import TeamForm from './TeamForm';
+import { TeamInputForm } from '../../../../actions/teams/Team';
 
 const useStyles = makeStyles((theme: Theme) => ({
   createButton: {
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface CreateTeamProps {
   inline?: boolean;
-  onCreate: (result: TeamStore) => void;
+  onCreate: (result: Team) => void;
 }
 
 const CreateTeam: FunctionComponent<CreateTeamProps> = ({

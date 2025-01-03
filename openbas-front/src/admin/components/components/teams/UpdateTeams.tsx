@@ -4,7 +4,6 @@ import { makeStyles } from '@mui/styles';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
 
-import type { TeamStore } from '../../../../actions/teams/Team';
 import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
@@ -26,7 +25,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   addedTeamIds: Team['team_id'][];
-  setTeams: (teams: TeamStore[]) => void;
+  setTeams: (teams: Team[]) => void;
 }
 
 const UpdateTeams: React.FC<Props> = ({

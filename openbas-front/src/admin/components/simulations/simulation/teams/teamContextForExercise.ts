@@ -1,7 +1,6 @@
 import { addExerciseTeamPlayers, disableExerciseTeamPlayers, enableExerciseTeamPlayers, removeExerciseTeamPlayers } from '../../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import { addExerciseTeams, removeExerciseTeams, replaceExerciseTeams, searchExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { Page } from '../../../../../components/common/queryable/Page';
 import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
@@ -36,7 +35,7 @@ const teamContextForExercise = (exerciseId: ExerciseStore['exercise_id'], exerci
     onRemoveTeam(teamId: Team['team_id']): void {
       dispatch(removeExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
     },
-    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[]; entities: { teams: Record<string, TeamStore> } }> {
+    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
       return dispatch(replaceExerciseTeams(exerciseId, { exercise_teams: teamIds }));
     },
     onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {

@@ -8,9 +8,9 @@ import {
   fetchScenarioTeams,
 } from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
+import type { Team } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
@@ -30,14 +30,14 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
 
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
-  const { teamsStore }: { teamsStore: TeamStore[] } = useHelper((helper: ScenariosHelper) => ({
+  const { teamsStore }: { teamsStore: Team[] } = useHelper((helper: ScenariosHelper) => ({
     teamsStore: helper.getScenarioTeams(scenarioId),
   }));
   useDataLoader(() => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
 
-  const [teams, setTeams] = useState<TeamStore[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     setTeams(teamsStore);
   }, [teamsStore]);
@@ -50,8 +50,8 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
       {permissions.canWrite
       && (
         <UpdateTeams
-          addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
-          setTeams={(ts: TeamStore[]) => setTeams(ts)}
+          addedTeamIds={teams.map((team: Team) => team.team_id)}
+          setTeams={(ts: Team[]) => setTeams(ts)}
         />
       )}
       <div className="clearfix" />

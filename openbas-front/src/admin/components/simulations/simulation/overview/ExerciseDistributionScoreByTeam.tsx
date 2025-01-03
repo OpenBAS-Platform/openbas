@@ -6,13 +6,12 @@ import Chart from 'react-apexcharts';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { InjectExpectationStore } from '../../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { InjectExpectation } from '../../../../../utils/api-types';
+import type { InjectExpectation, Team } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 import { computeTeamsColors } from './DistributionUtils';
 
@@ -55,7 +54,7 @@ const ExerciseDistributionScoreByTeam: FunctionComponent<Props> = ({
   const totalScoreByTeamData = [
     {
       name: t('Total score'),
-      data: sortedTeamsByTotalScore.map((a: TeamStore & { team_total_score: number }) => ({
+      data: sortedTeamsByTotalScore.map((a: Team & { team_total_score: number }) => ({
         x: a.team_name,
         y: a.team_total_score,
         fillColor: teamsColors[a.team_id],

@@ -6,9 +6,9 @@ import { useParams } from 'react-router';
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
+import type { Team } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { PermissionsContext, TeamContext } from '../../../common/Context';
@@ -28,14 +28,14 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
 
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
-  const { teamsStore }: { teamsStore: TeamStore[] } = useHelper((helper: ExercisesHelper) => ({
+  const { teamsStore }: { teamsStore: Team[] } = useHelper((helper: ExercisesHelper) => ({
     teamsStore: helper.getExerciseTeams(exerciseId),
   }));
   useDataLoader(() => {
     dispatch(fetchExerciseTeams(exerciseId));
   });
 
-  const [teams, setTeams] = useState<TeamStore[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   useEffect(() => {
     setTeams(teamsStore);
   }, [teamsStore]);
@@ -48,8 +48,8 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
       {permissions.canWrite
       && (
         <UpdateTeams
-          addedTeamIds={teams.map((team: TeamStore) => team.team_id)}
-          setTeams={(ts: TeamStore[]) => setTeams(ts)}
+          addedTeamIds={teams.map((team: Team) => team.team_id)}
+          setTeams={(ts: Team[]) => setTeams(ts)}
         />
       )}
       <div className="clearfix" />

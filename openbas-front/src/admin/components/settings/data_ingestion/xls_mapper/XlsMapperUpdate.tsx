@@ -1,13 +1,12 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 
-import { ImportMapperStore } from '../../../../../actions/mapper/mapper';
 import { fetchMapper, updateMapper } from '../../../../../actions/mapper/mapper-actions';
 import Loader from '../../../../../components/Loader';
-import type { ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
+import type { ImportMapper, ImportMapperUpdateInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import MapperForm from './MapperForm';
 
 interface XlsMapperUpdateComponentProps {
-  xlsMapper: ImportMapperStore;
+  xlsMapper: ImportMapper;
   onUpdate?: (result: RawPaginationImportMapper) => void;
   handleClose: () => void;
 }
@@ -62,10 +61,10 @@ const XlsMapperUpdate: FunctionComponent<XlsMapperUpdateProps> = ({
   onUpdate,
   handleClose,
 }) => {
-  const [xlsMapper, setXlsMapper] = useState<ImportMapperStore | null>();
+  const [xlsMapper, setXlsMapper] = useState<ImportMapper | null>();
 
   useEffect(() => {
-    fetchMapper(xlsMapperId).then((result: { data: ImportMapperStore }) => {
+    fetchMapper(xlsMapperId).then((result: { data: ImportMapper }) => {
       setXlsMapper(result.data);
     });
   }, []);

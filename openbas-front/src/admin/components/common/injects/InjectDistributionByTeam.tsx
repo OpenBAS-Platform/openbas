@@ -5,12 +5,12 @@ import Chart from 'react-apexcharts';
 
 import { fetchExerciseTeams } from '../../../../actions/Exercise';
 import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
-import type { TeamStore } from '../../../../actions/teams/Team';
 import type { TeamsHelper } from '../../../../actions/teams/team-helper';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
+import type { Team } from '../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -46,7 +46,7 @@ const InjectDistributionByTeam: FunctionComponent<Props> = ({
   const expectedScoreByTeamData = [
     {
       name: t('Total expected score'),
-      data: sortedTeamsByExpectedScore.map((a: TeamStore) => ({
+      data: sortedTeamsByExpectedScore.map((a: Team) => ({
         x: a.team_name,
         y: a.team_injects_expectations_total_expected_score,
         fillColor: teamsColors[a.team_id],

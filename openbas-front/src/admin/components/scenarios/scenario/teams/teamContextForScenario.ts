@@ -1,7 +1,6 @@
 import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { addScenarioTeamPlayers, disableScenarioTeamPlayers, enableScenarioTeamPlayers, removeScenarioTeamPlayers } from '../../../../../actions/scenarios/scenario-actions';
 import { addScenarioTeams, removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { Page } from '../../../../../components/common/queryable/Page';
 import type { SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
@@ -35,7 +34,7 @@ const teamContextForScenario = (scenarioId: ScenarioStore['scenario_id'], scenar
     onRemoveTeam(teamId: Team['team_id']): void {
       dispatch(removeScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
     },
-    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[]; entities: { teams: Record<string, TeamStore> } }> {
+    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
       return dispatch(replaceScenarioTeams(scenarioId, { scenario_teams: teamIds }));
     },
     onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {
