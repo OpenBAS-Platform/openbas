@@ -1,9 +1,9 @@
 package io.openbas.rest.user;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.specification.UserSpecification.fromIds;
 import static io.openbas.helper.DatabaseHelper.updateRelation;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.config.SessionManager;
 import io.openbas.database.model.User;
@@ -19,28 +19,33 @@ import io.openbas.rest.user.form.login.ResetUserInput;
 import io.openbas.rest.user.form.user.ChangePasswordInput;
 import io.openbas.rest.user.form.user.CreateUserInput;
 import io.openbas.rest.user.form.user.UpdateUserInput;
+import io.openbas.rest.user.form.user.UserOutput;
+import io.openbas.rest.user.service.UserCriteriaBuilderService;
 import io.openbas.service.MailingService;
 import io.openbas.service.UserService;
+import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserApi extends RestBehavior {
+
+  public static final String USER_URI = "/api/users";
+
   PassiveExpiringMap<String, String> resetTokenMap = new PassiveExpiringMap<>(1000 * 60 * 10);
   @Resource private SessionManager sessionManager;
   private OrganizationRepository organizationRepository;
@@ -48,6 +53,7 @@ public class UserApi extends RestBehavior {
   private TagRepository tagRepository;
   private UserService userService;
   private MailingService mailingService;
+  private UserCriteriaBuilderService userCriteriaBuilderService;
 
   @Autowired
   public void setMailingService(MailingService mailingService) {
@@ -72,6 +78,11 @@ public class UserApi extends RestBehavior {
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  @Autowired
+  public void setUserCriteriaBuilderService(UserCriteriaBuilderService userCriteriaBuilderService) {
+    this.userCriteriaBuilderService = userCriteriaBuilderService;
   }
 
   @PostMapping("/api/login")
@@ -154,18 +165,22 @@ public class UserApi extends RestBehavior {
     return userRepository.rawAll();
   }
 
-  @PostMapping("/api/users/search")
-  public Page<User> users(@RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-        (Specification<User> specification, Pageable pageable) ->
-            this.userRepository.findAll(specification, pageable),
-        searchPaginationInput,
-        User.class);
+  @PostMapping(USER_URI + "/search")
+  public Page<UserOutput> users(
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return this.userCriteriaBuilderService.userPagination(searchPaginationInput);
+  }
+
+  @PostMapping(USER_URI + "/find")
+  @Transactional(readOnly = true)
+  @Tracing(name = "Find users", layer = "api", operation = "POST")
+  public List<UserOutput> findUsers(@RequestBody @Valid @NotNull final List<String> userIds) {
+    return this.userCriteriaBuilderService.find(fromIds(userIds));
   }
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/users/{userId}/password")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public User changePassword(
       @PathVariable String userId, @Valid @RequestBody ChangePasswordInput input) {
     User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
@@ -175,14 +190,14 @@ public class UserApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/users")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public User createUser(@Valid @RequestBody CreateUserInput input) {
     return userService.createUser(input, 1);
   }
 
   @Secured(ROLE_ADMIN)
   @PutMapping("/api/users/{userId}")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public User updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserInput input) {
     User user = userRepository.findById(userId).orElseThrow(ElementNotFoundException::new);
     user.setUpdateAttributes(input);
@@ -196,7 +211,7 @@ public class UserApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/users/{userId}")
-  @Transactional(rollbackOn = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public void deleteUser(@PathVariable String userId) {
     sessionManager.invalidateUserSession(userId);
     userRepository.deleteById(userId);

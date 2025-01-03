@@ -20,6 +20,12 @@ export const searchUsers = (paginationInput) => {
   return simplePostCall(uri, data);
 };
 
+export const findUsers = (userIds) => {
+  const data = userIds;
+  const uri = '/api/users/find';
+  return simplePostCall(uri, data);
+};
+
 export const addUser = data => dispatch => postReferential(schema.user, '/api/users', data)(dispatch);
 
 export const updateUserPassword = (userId, data) => dispatch => putReferential(schema.user, `/api/users/${userId}/password`, data)(dispatch);
