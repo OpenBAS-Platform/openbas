@@ -11,20 +11,22 @@ import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
-import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { Endpoint, SearchPaginationInput } from '../../../../utils/api-types';
+import type { Endpoint } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
 import AgentPrivilege from './AgentPrivilege';
 import EndpointPopover from './EndpointPopover';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import ExportButton from '../../../../components/common/ExportButton';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -110,8 +112,14 @@ const Endpoints = () => {
     { field: 'asset_tags', label: 'Tags', isSortable: false },
   ];
 
+  const availableFilterNames = [
+    'asset_name',
+    'asset_description',
+    'asset_tags',
+  ];
+
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('asset', buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
   }));
@@ -136,16 +144,22 @@ const Endpoints = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
-      <PaginationComponent
+      <PaginationComponentV2
         fetch={searchEndpoints}
         searchPaginationInput={searchPaginationInput}
         setContent={setEndpoints}
-        exportProps={exportProps}
+        entityPrefix="asset"
+        availableFilterNames={availableFilterNames}
+        queryableHelpers={queryableHelpers}
+        topBarButtons={
+          <ExportButton totalElements={queryableHelpers.paginationHelpers.getTotalElements()} exportProps={exportProps} />
+        }
       />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
           style={{ paddingTop: 0 }}
+          secondaryAction={<>&nbsp;</>}
         >
           <ListItemIcon />
           <ListItemText
@@ -165,11 +179,6 @@ const Endpoints = () => {
               </div>
             )}
           />
-        </ListItem>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          style={{ paddingTop: 0 }}
-        >
         </ListItem>
         {endpoints.map((endpoint: Endpoint) => {
           const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];

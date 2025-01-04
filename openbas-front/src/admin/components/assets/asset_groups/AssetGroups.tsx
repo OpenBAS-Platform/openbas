@@ -215,7 +215,6 @@ const AssetGroups = () => {
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
-          divider={false}
           style={{ paddingTop: 0 }}
           secondaryAction={<>&nbsp;</>}
         >
