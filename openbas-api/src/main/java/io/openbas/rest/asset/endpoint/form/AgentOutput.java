@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
+@Builder
 public class AgentOutput {
 
   @Schema(description = "Agent id")
@@ -29,7 +31,7 @@ public class AgentOutput {
 
   @Schema(description = "Agent executor")
   @JsonProperty("agent_executor")
-  private String executor;
+  private ExecutorOutput executor;
 
   @Schema(
       description =

@@ -31,6 +31,22 @@ export interface Agent {
   listened?: boolean;
 }
 
+/** List of agents */
+export interface AgentOutput {
+  /** Indicates whether the endpoint is active. The endpoint is considered active if it was seen in the last 3 minutes. */
+  agent_active?: boolean;
+  /** Agent deployment mode */
+  agent_deployment_mode?: "service" | "session";
+  /** User */
+  agent_executed_by_user?: string;
+  /** Agent executor */
+  agent_executor?: ExecutorOutput;
+  /** Agent id */
+  agent_id?: string;
+  /** Agent privilege */
+  agent_privilege?: "admin" | "standard";
+}
+
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
@@ -694,6 +710,46 @@ export interface Endpoint {
   listened?: boolean;
 }
 
+export interface EndpointOutput {
+  /** Asset Id */
+  asset_id: string;
+  /** Asset name */
+  asset_name: string;
+  /** Tags */
+  asset_tags?: string[];
+  /** Indicates whether the endpoint is active. The endpoint is considered active if it was seen in the last 3 minutes. */
+  endpoint_active?: boolean;
+  /** List of agent executors */
+  endpoint_agents_executor?: string[];
+  /** List agent privilege */
+  endpoint_agents_privilege?: ("admin" | "standard")[];
+  /** Architecture */
+  endpoint_arch?: "x86_64" | "arm64" | "Unknown";
+  /** Platform */
+  endpoint_platform?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
+export interface EndpointOverviewOutput {
+  /** List of agents */
+  asset_agents?: AgentOutput[];
+  /** Endpoint description */
+  asset_description?: string;
+  /** Endpoint name */
+  asset_name: string;
+  /** Tags */
+  asset_tags?: string[];
+  /** Architecture */
+  endpoint_arch?: "x86_64" | "arm64" | "Unknown";
+  /** Hostname */
+  endpoint_hostname?: string;
+  /** List IPs */
+  endpoint_ips?: string[];
+  /** List of MAC addresses */
+  endpoint_mac_addresses?: string[];
+  /** Platform */
+  endpoint_platform?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
 export interface EndpointRegisterInput {
   asset_description?: string;
   asset_external_reference: string;
@@ -785,6 +841,14 @@ export interface ExecutorCreateInput {
   executor_name: string;
   executor_platforms?: string[];
   executor_type: string;
+}
+
+/** Agent executor */
+export interface ExecutorOutput {
+  /** Agent executor name */
+  executor_name?: string;
+  /** Agent executor type */
+  executor_type?: string;
 }
 
 export interface ExecutorUpdateInput {
@@ -2207,8 +2271,8 @@ export interface PageAttackPattern {
   totalPages?: number;
 }
 
-export interface PageEndpoint {
-  content?: Endpoint[];
+export interface PageEndpointOutput {
+  content?: EndpointOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

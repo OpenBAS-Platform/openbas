@@ -6,6 +6,7 @@ import static io.openbas.database.specification.EndpointSpecification.fromIds;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
@@ -16,6 +17,7 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
+import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.service.EndpointService;
@@ -107,6 +109,7 @@ public class EndpointApi {
     return updatedEndpoint;
   }
 
+  @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
@@ -123,24 +126,30 @@ public class EndpointApi {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
   }
 
+  @LogExecutionTime
   @GetMapping(ENDPOINT_URI)
   @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
     return this.endpointService.endpoints(EndpointSpecification.findEndpointsForInjection());
   }
 
+  @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
-  public Endpoint endpoint(@PathVariable @NotBlank final String endpointId) {
-    return this.endpointService.endpoint(endpointId);
+  @Tracing(name = "Endpoint overview", layer = "api", operation = "POST")
+  public EndpointOverviewOutput endpoint(@PathVariable @NotBlank final String endpointId) {
+    return this.endpointService.findById(endpointId);
   }
 
+  @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/search")
+  @Tracing(name = "Get a page of endpoints", layer = "api", operation = "POST")
   public Page<EndpointOutput> endpoints(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return endpointService.searchEndpoints(searchPaginationInput);
   }
 
+  @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/find")
   @Transactional(readOnly = true)
   @Tracing(name = "Find assets", layer = "api", operation = "POST")
@@ -151,13 +160,10 @@ public class EndpointApi {
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
-  public Endpoint updateEndpoint(
+  public EndpointOverviewOutput updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointUpdateInput input) {
-    Endpoint endpoint = this.endpointService.endpoint(endpointId);
-    endpoint.setUpdateAttributes(input);
-    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.endpointService.updateEndpoint(endpoint);
+    return this.endpointService.updateEndpoint(endpointId, input);
   }
 
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")

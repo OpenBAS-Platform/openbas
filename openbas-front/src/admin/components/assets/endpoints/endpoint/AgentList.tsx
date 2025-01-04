@@ -66,7 +66,6 @@ const AgentList: React.FC<Props> = ({ agents }) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
-
   // Fetching data
   const { executorsMap } = useHelper((helper: ExecutorHelper) => ({
     executorsMap: helper.getExecutorsMap(),
@@ -115,6 +114,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
       >
       </ListItem>
       {agents.map((agent: Agent) => {
+        console.log(executorsMap);
         const executor = executorsMap[agent.agent_executor ?? 'Unknown'];
         return (
           <ListItem

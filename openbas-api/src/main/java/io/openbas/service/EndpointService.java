@@ -1,13 +1,20 @@
 package io.openbas.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
+import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
+import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -23,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +56,9 @@ public class EndpointService {
   @Value("${executor.openbas.binaries.version:${info.app.version:unknown}}")
   private String executorOpenbasBinariesVersion;
 
+  private final EndpointMapper endpointMapper;
   private final EndpointRepository endpointRepository;
+  private final TagRepository tagRepository;
 
   // -- CRUD --
   public Endpoint createEndpoint(@NotNull final Endpoint endpoint) {
@@ -76,16 +87,6 @@ public class EndpointService {
     return fromIterable(this.endpointRepository.findAll(specification));
   }
 
-  public Page<EndpointOutput> searchEndpoints(SearchPaginationInput searchPaginationInput) {
-    /* return buildPaginationJPA(
-    (Specification<Endpoint> specification, Pageable pageable) ->
-        this.endpointRepository.findAll(
-            EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
-    handleEndpointFilter(searchPaginationInput),
-    Endpoint.class);*/
-    return null;
-  }
-
   public Endpoint updateEndpoint(@NotNull final Endpoint endpoint) {
     endpoint.setUpdatedAt(now());
     return this.endpointRepository.save(endpoint);
@@ -93,6 +94,37 @@ public class EndpointService {
 
   public void deleteEndpoint(@NotBlank final String endpointId) {
     this.endpointRepository.deleteById(endpointId);
+  }
+
+  // -- ENDPOINT DTOs --
+
+  public EndpointOverviewOutput findById(@NotBlank final String endpointId) {
+    return endpointMapper.toEndpointOverviewOutput(endpoint(endpointId));
+  }
+
+  public Page<EndpointOutput> searchEndpoints(SearchPaginationInput searchPaginationInput) {
+    Page<Endpoint> endpointPage =
+        buildPaginationJPA(
+            (Specification<Endpoint> specification, Pageable pageable) ->
+                this.endpointRepository.findAll(
+                    EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
+            handleEndpointFilter(searchPaginationInput),
+            Endpoint.class);
+
+    // Convert the Page of Endpoint to a Page of EndpointOutput
+    List<EndpointOutput> endpointOutputs =
+        endpointPage.getContent().stream().map(endpointMapper::toEndpointOutput).toList();
+
+    return new PageImpl<>(
+        endpointOutputs, endpointPage.getPageable(), endpointPage.getTotalElements());
+  }
+
+  public EndpointOverviewOutput updateEndpoint(
+      @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
+    Endpoint toUpdate = this.endpointRepository.findById(endpointId).orElseThrow();
+    toUpdate.setUpdateAttributes(input);
+    toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    return endpointMapper.toEndpointOverviewOutput(updateEndpoint(toUpdate));
   }
 
   // -- INSTALLATION AGENT --

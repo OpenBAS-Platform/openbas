@@ -34,7 +34,7 @@ public class AtomicTestingApi extends RestBehavior {
   @Tracing(name = "Get a page of atomic testings", layer = "api", operation = "POST")
   public Page<InjectResultOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
+    return atomicTestingService.searchAtomicTestings(searchPaginationInput);
   }
 
   @LogExecutionTime

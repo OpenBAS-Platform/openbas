@@ -218,7 +218,7 @@ public class AtomicTestingService {
 
   // -- PAGINATION --
 
-  public Page<InjectResultOutput> findAllAtomicTestings(
+  public Page<InjectResultOutput> searchAtomicTestings(
       @NotNull final SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();
 

@@ -115,7 +115,7 @@ public class Endpoint extends Asset {
   /** Used to show Front column */
   @JsonProperty("asset_active")
   public boolean getActive() {
-    return this.agents.getFirst().getActive();
+    return this.agents.getFirst().isActive();
   }
 
   public Endpoint() {}

@@ -110,7 +110,7 @@ public class Agent implements Base {
   private Inject inject;
 
   @JsonProperty("agent_active")
-  public boolean getActive() {
+  public boolean isActive() {
     return this.getLastSeen() != null
         && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < ACTIVE_THRESHOLD;
   }

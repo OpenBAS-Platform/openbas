@@ -33,7 +33,6 @@ const Endpoint = () => {
   const { endpoint } = useHelper((helper: EndpointHelper) => ({
     endpoint: helper.getEndpoint(endpointId),
   }));
-
   return (
     <div className={classes.root}>
       <Grid
@@ -138,7 +137,8 @@ const Endpoint = () => {
                   {t('Last Seen')}
                 </Typography>
                 <div style={{ display: 'flex' }}>
-                  {fldt(endpoint.asset_last_seen)}
+                  {/* {fldt(endpoint.asset_last_seen)} */}
+                  last seen
                 </div>
               </Grid>
               <Grid item xs={2} style={{ paddingTop: 10 }}>
