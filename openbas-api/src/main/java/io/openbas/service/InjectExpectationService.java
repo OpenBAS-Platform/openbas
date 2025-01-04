@@ -1,12 +1,11 @@
-package io.openbas.inject_expectation;
+package io.openbas.service;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.inject_expectation.InjectExpectationUtils.*;
+import static io.openbas.service.InjectExpectationUtils.*;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.asset.AssetGroupService;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectExpectationRepository;

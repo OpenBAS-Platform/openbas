@@ -5,7 +5,6 @@ import static io.openbas.database.specification.AssetGroupSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
-import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
@@ -13,6 +12,7 @@ import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.AssetGroupService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;

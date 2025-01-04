@@ -7,7 +7,7 @@ import { Link, useSearchParams } from 'react-router';
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import type { UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
@@ -27,6 +27,7 @@ import EndpointPopover from './EndpointPopover';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import ExportButton from '../../../../components/common/ExportButton';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { fetchTags } from '../../../../actions/Tag';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -52,21 +53,21 @@ const inlineStyles: Record<string, CSSProperties> = {
   asset_name: {
     width: '25%',
   },
-  asset_agents_status: {
+  endpoint_active: {
     width: '15%',
   },
-  asset_agents_privilege: {
+  endpoint_agents_privilege: {
     width: '10%',
   },
-  asset_platform: {
+  endpoint_platform: {
     width: '10%',
     display: 'flex',
     alignItems: 'center',
   },
-  asset_arch: {
+  endpoint_arch: {
     width: '10%',
   },
-  asset_agents_executor: {
+  endpoint_agents_executor: {
     width: '10%',
     display: 'flex',
     alignItems: 'center',
@@ -92,29 +93,29 @@ const Endpoints = () => {
   const [search] = searchParams.getAll('search');
 
   // Fetching data
-  const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper & TagHelper) => ({
+  const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,
     executorsMap: helper.getExecutorsMap(),
-    tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
+    dispatch(fetchTags());
   });
 
   // Headers
   const headers = [
     { field: 'asset_name', label: 'Name', isSortable: false },
-    { field: 'asset_agents_status', label: 'Status', isSortable: false },
-    { field: 'asset_agents_privilege', label: 'Agents Privilege', isSortable: false },
-    { field: 'asset_platform', label: 'Platform', isSortable: false },
-    { field: 'asset_arch', label: 'Architecture', isSortable: false },
-    { field: 'asset_agents_executor', label: 'Executor', isSortable: false },
+    { field: 'endpoint_active', label: 'Status', isSortable: false },
+    { field: 'endpoint_agents_privilege', label: 'Agents Privilege', isSortable: false },
+    { field: 'endpoint_platform', label: 'Platform', isSortable: false },
+    { field: 'endpoint_arch', label: 'Architecture', isSortable: false },
+    { field: 'endpoint_agents_executor', label: 'Executor', isSortable: false },
     { field: 'asset_tags', label: 'Tags', isSortable: false },
   ];
 
   const availableFilterNames = [
-    'asset_name',
-    'asset_description',
+    'endpoint_platform',
+    'endpoint_arch',
     'asset_tags',
   ];
 
@@ -211,21 +212,21 @@ const Endpoints = () => {
                       <div className={classes.bodyItem} style={inlineStyles.asset_name}>
                         {endpoint.asset_name}
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_agents_status}>
+                      <div className={classes.bodyItem} style={inlineStyles.endpoint_active}>
                         <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_agents_privilege}>
+                      <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
                         <AgentPrivilege variant="list" status={endpoint.asset_agents ? endpoint.asset_agents[0].agent_privilege : 'admin'} />
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_platform}>
+                      <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
                         <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
                         {' '}
                         {endpoint.endpoint_platform}
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_arch}>
+                      <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
                         {endpoint.endpoint_arch}
                       </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_agents_executor}>
+                      <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_executor}>
                         {executor && (
                           <img
                             src={`/api/images/executors/${executor.executor_type}`}

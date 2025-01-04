@@ -5,19 +5,20 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.EndpointSpecification.fromIds;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.AssetAgentJobRepository;
+import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.repository.ExecutorRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
-import io.openbas.rest.asset.endpoint.form.EndpointInput;
+import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.service.EndpointService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -30,8 +31,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,13 +136,9 @@ public class EndpointApi {
   }
 
   @PostMapping(ENDPOINT_URI + "/search")
-  public Page<Endpoint> endpoints(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-        (Specification<Endpoint> specification, Pageable pageable) ->
-            this.endpointRepository.findAll(
-                EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
-        handleEndpointFilter(searchPaginationInput),
-        Endpoint.class);
+  public Page<EndpointOutput> endpoints(
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    return endpointService.searchEndpoints(searchPaginationInput);
   }
 
   @PostMapping(ENDPOINT_URI + "/find")

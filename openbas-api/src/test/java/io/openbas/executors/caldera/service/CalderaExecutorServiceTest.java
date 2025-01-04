@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
@@ -13,6 +12,7 @@ import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
 import java.util.List;
 import java.util.Optional;

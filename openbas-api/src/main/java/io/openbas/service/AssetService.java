@@ -1,4 +1,4 @@
-package io.openbas.asset;
+package io.openbas.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 

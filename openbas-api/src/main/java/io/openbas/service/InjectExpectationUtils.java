@@ -1,4 +1,4 @@
-package io.openbas.inject_expectation;
+package io.openbas.service;
 
 import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
 import static java.util.Optional.ofNullable;

@@ -1,12 +1,12 @@
 package io.openbas.executors.tanium;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.service.TaniumExecutorContextService;
 import io.openbas.executors.tanium.service.TaniumExecutorService;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import io.openbas.service.EndpointService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

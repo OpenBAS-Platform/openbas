@@ -1,12 +1,12 @@
 package io.openbas.executors.caldera;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;
 import io.openbas.executors.caldera.service.CalderaExecutorService;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
