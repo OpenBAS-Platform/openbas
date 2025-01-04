@@ -7,6 +7,7 @@ import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
+import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
 import type { Endpoint as EndpointType } from '../../../../../utils/api-types';
 import AgentList from './AgentList';
@@ -79,6 +80,8 @@ const Endpoint = () => {
                   {t('Platform')}
                 </Typography>
                 <div style={{ display: 'flex' }}>
+                  <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                  {' '}
                   {endpoint.endpoint_platform}
                 </div>
               </Grid>

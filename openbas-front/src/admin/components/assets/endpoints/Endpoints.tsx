@@ -12,7 +12,6 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useFormatter } from '../../../../components/i18n';
@@ -24,8 +23,8 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../AssetStatus';
+import AgentPrivilege from './AgentPrivilege';
 import EndpointPopover from './EndpointPopover';
-import * as React from 'react';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -207,7 +206,7 @@ const Endpoints = () => {
                         <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.asset_agents_privilege}>
-                        {'test'}
+                        <AgentPrivilege variant="list" status={endpoint.asset_agents ? endpoint.asset_agents[0].agent_privilege : 'admin'} />
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.asset_platform}>
                         <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />

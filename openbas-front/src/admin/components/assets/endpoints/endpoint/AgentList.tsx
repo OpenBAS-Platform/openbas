@@ -12,6 +12,7 @@ import type { Agent } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../../AssetStatus';
+import AgentPrivilege from '../AgentPrivilege';
 import AgentPopover from './AgentPopover';
 
 const useStyles = makeStyles(() => ({
@@ -37,7 +38,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  agent_external_reference: {
+  agent_executed_by_user: {
     width: '30%',
   },
   agent_executor: {
@@ -76,7 +77,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
 
   // Headers
   const headers = [
-    { field: 'agent_external_reference', label: 'Agent Name' },
+    { field: 'agent_executed_by_user', label: 'Agent Name' },
     { field: 'agent_executor', label: 'Executor' },
     { field: 'agent_privilege', label: 'Privilege' },
     { field: 'agent_deployment_mode', label: 'Deployment' },
@@ -135,8 +136,8 @@ const AgentList: React.FC<Props> = ({ agents }) => {
             <ListItemText
               primary={(
                 <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_external_reference}>
-                    {agent.agent_external_reference}
+                  <div className={classes.bodyItem} style={inlineStyles.agent_executed_by_user}>
+                    {agent.agent_executed_by_user}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_executor}>
                     {executor && (
@@ -149,7 +150,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                     {executor?.executor_name ?? t('Unknown')}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_privilege}>
-                    {agent.agent_privilege}
+                    <AgentPrivilege variant="list" status={agent.agent_privilege} />
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_deployment_mode}>
                     {agent.agent_deployment_mode}
