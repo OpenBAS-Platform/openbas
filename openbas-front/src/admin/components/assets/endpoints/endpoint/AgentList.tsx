@@ -2,7 +2,7 @@ import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
-import { CSSProperties } from 'react';
+import { CSSProperties, useState } from 'react';
 
 import { fetchExecutors } from '../../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
@@ -83,6 +83,8 @@ const AgentList: React.FC<Props> = ({ agents }) => {
     { field: 'agent_active', label: 'Status' },
   ];
 
+  const [availableAgents, setAvailableAgents] = useState<AgentOutput[]>(agents);
+
   return (
     <List>
       <ListItem
@@ -113,7 +115,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
         style={{ paddingTop: 0 }}
       >
       </ListItem>
-      {agents.map((agent: AgentOutput) => {
+      {availableAgents.map((agent: AgentOutput) => {
         const executor = agent.agent_executor?.executor_id ? executorsMap[agent.agent_executor?.executor_id] : undefined;
         return (
           <ListItem
@@ -125,6 +127,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                 agent={agent}
                 actions={['Delete']}
                 inList
+                onDelete={result => setAvailableAgents(availableAgents.filter(agent => (agent.agent_id !== result)))}
               />
             )}
             disablePadding
