@@ -16,6 +16,7 @@ const useStyles = makeStyles(() => ({
     float: 'left',
     borderRadius: 4,
     width: 71,
+    marginLeft: 5,
   },
 }));
 

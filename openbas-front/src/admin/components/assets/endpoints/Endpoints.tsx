@@ -54,10 +54,10 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '25%',
   },
   endpoint_active: {
-    width: '15%',
+    width: '10%',
   },
   endpoint_agents_privilege: {
-    width: '10%',
+    width: '12%',
   },
   endpoint_platform: {
     width: '10%',
@@ -68,7 +68,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '10%',
   },
   endpoint_agents_executor: {
-    width: '10%',
+    width: '13%',
     display: 'flex',
     alignItems: 'center',
   },
@@ -247,12 +247,15 @@ const Endpoints = () => {
                         </Tooltip>
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
-                        <Tooltip title={`Admin: ${adminCount} | User: ${userCount}`} placement="top">
+                        <Tooltip title={`Admin: ${adminCount}`} placement="top">
                           <span>
                             {' '}
-                            {adminCount > 0 && (
-                              <AgentPrivilege variant="list" privilege="admin" />
-                            )}
+                            {adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
+                          </span>
+                        </Tooltip>
+                        <Tooltip title={`User: ${userCount}`} placement="top">
+                          <span>
+                            {' '}
                             {userCount > 0 && (
                               <AgentPrivilege variant="list" privilege="user" />
                             )}

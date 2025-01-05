@@ -123,7 +123,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
             secondaryAction={(
               <AgentPopover
                 agent={agent}
-                actions={['Update']}
+                actions={['Delete']}
                 inList
               />
             )}

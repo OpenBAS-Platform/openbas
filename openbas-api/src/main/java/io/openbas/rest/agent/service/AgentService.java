@@ -1,6 +1,7 @@
 package io.openbas.rest.agent.service;
 
 import io.openbas.database.repository.AgentRepository;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,4 +10,8 @@ import org.springframework.stereotype.Service;
 public class AgentService {
 
   private final AgentRepository agentRepository;
+
+  public void delete(@NotBlank String endpointId) {
+    agentRepository.deleteById(endpointId);
+  }
 }

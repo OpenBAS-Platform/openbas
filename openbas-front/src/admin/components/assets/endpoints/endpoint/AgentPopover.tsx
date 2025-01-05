@@ -14,7 +14,7 @@ interface Props {
   inList?: boolean;
 }
 
-const AtomicTestingPopover: FunctionComponent<Props> = ({
+const AgentPopover: FunctionComponent<Props> = ({
   agent,
   actions = [],
   onDelete,
@@ -29,7 +29,6 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const handleCloseDelete = () => setDeletion(false);
   const submitDelete = () => {
     handleCloseDelete();
-    onDelete;
   };
 
   // Button Popover
@@ -45,11 +44,11 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
           open={deletion}
           handleClose={handleCloseDelete}
           handleSubmit={submitDelete}
-          text={`${t('Do you want to delete this agent:')} ${agent.agent_id} ?`}
+          text={`${t('Do you want to delete this agent:')} ${agent.agent_executed_by_user} ?`}
         />
       )}
     </>
   );
 };
 
-export default AtomicTestingPopover;
+export default AgentPopover;

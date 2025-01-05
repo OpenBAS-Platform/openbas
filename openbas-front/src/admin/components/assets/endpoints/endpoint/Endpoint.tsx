@@ -27,7 +27,7 @@ const Endpoint = () => {
   // Standard hooks
   const classes = useStyles();
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
-  const { t, fldt } = useFormatter();
+  const { t } = useFormatter();
 
   // Fetching data
   const { endpoint } = useHelper((helper: EndpointHelper) => ({
@@ -126,19 +126,6 @@ const Endpoint = () => {
                       {mac}
                     </div>
                   ))}
-                </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Last Seen')}
-                </Typography>
-                <div style={{ display: 'flex' }}>
-                  {/* {fldt(endpoint.asset_last_seen)} */}
-                  last seen
                 </div>
               </Grid>
               <Grid item xs={2} style={{ paddingTop: 10 }}>
