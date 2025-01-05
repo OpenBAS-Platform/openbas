@@ -102,7 +102,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                     className={classes.bodyItem}
                     style={inlineStyles[header.field]}
                   >
-                    {header.label}
+                    {t(header.label)}
                   </div>
                 ))}
               </div>

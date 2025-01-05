@@ -824,6 +824,10 @@ const i18n = {
       'Question': 'Question',
       'By': 'Par',
       'Should not be empty': 'Ne doit pas être vide',
+      // Agents
+      'Agent Name': 'Nom de l\'agent',
+      'Privilege': 'Privilège',
+      'Deployment': 'Déploiement',
       // Assets
       'Endpoints': 'Endpoints',
       'asset': 'actif',
@@ -2242,6 +2246,10 @@ const i18n = {
       'Question': '问题',
       'By': '由',
       'Should not be empty': '不能为空',
+      // Agents
+      'Agent Name': '代理人姓名',
+      'Privilege': '特权',
+      'Deployment': '部署',
       // Assets
       'Endpoints': '终端',
       'Rules': '规则',

@@ -168,7 +168,7 @@ const Endpoints = () => {
                       className={classes.bodyItem}
                       style={inlineStyles[header.field]}
                     >
-                      {header.label}
+                      {t(header.label)}
                     </div>
                   ))}
                 </div>
@@ -178,7 +178,6 @@ const Endpoints = () => {
         </ListItem>
         {endpoints.map((endpoint: EndpointOutput) => {
           // Statuses : IsActive ?
-
           const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
           const inactiveCount = endpoint.asset_agents.length - activeCount;
           const isActive = activeCount > 0;
