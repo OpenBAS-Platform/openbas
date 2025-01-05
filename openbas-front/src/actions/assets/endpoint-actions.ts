@@ -1,13 +1,13 @@
 import { Dispatch } from 'redux';
 
 import { delReferential, getReferential, putReferential, simplePostCall } from '../../utils/Action';
-import type { Endpoint, EndpointUpdateInput, SearchPaginationInput } from '../../utils/api-types';
+import type { Endpoint, EndpointOutput, EndpointUpdateInput, SearchPaginationInput } from '../../utils/api-types';
 import { arrayOfEndpoints, endpoint } from './asset-schema';
 
 const ENDPOINT_URI = '/api/endpoints';
 
 export const updateEndpoint = (
-  assetId: Endpoint['asset_id'],
+  assetId: EndpointOutput['asset_id'],
   data: EndpointUpdateInput,
 ) => (dispatch: Dispatch) => {
   const uri = `${ENDPOINT_URI}/${assetId}`;

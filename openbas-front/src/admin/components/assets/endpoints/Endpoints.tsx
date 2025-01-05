@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { DialogContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -182,7 +182,7 @@ const Endpoints = () => {
           const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
           const inactiveCount = endpoint.asset_agents.length - activeCount;
           const isActive = activeCount > 0;
-          const activeMsgTooltip = 'Active : ' + activeCount + ' | Inactive : ' + inactiveCount;
+          const activeMsgTooltip = t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount;
 
           // Privileges
           const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
@@ -247,18 +247,16 @@ const Endpoints = () => {
                         </Tooltip>
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
-                        <Tooltip title={`Admin: ${adminCount}`} placement="top">
+                        <Tooltip title={t('Admin') + `: ${adminCount}`} placement="top">
                           <span>
                             {' '}
                             {adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
                           </span>
                         </Tooltip>
-                        <Tooltip title={`User: ${userCount}`} placement="top">
+                        <Tooltip title={t('User') + `: ${userCount}`} placement="top">
                           <span>
                             {' '}
-                            {userCount > 0 && (
-                              <AgentPrivilege variant="list" privilege="user" />
-                            )}
+                            {userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
                           </span>
                         </Tooltip>
                       </div>
@@ -307,7 +305,7 @@ const Endpoints = () => {
         handleClose={onClose}
         title={t('How Are Endpoints Added?')}
       >
-        <DialogContent>
+        <div>
           <span>
             {t('Your assets will be automatically created by the installation of your agent. ')}
           </span>
@@ -318,7 +316,7 @@ const Endpoints = () => {
             </a>
             {t(' to install the agent of your choice with its corresponding assets.')}
           </p>
-        </DialogContent>
+        </div>
       </Dialog>
     </>
   );

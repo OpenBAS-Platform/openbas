@@ -1,9 +1,11 @@
 import { FunctionComponent, useState } from 'react';
 
+import { deleteAgent } from '../../../../../actions/assets/agent-actions';
 import ButtonPopover from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../../components/i18n';
 import { AgentOutput } from '../../../../../utils/api-types';
+import { useAppDispatch } from '../../../../../utils/hooks';
 
 type AgentActionType = 'Update' | 'Delete';
 
@@ -22,12 +24,20 @@ const AgentPopover: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const dispatch = useAppDispatch();
 
   // Deletion
   const [deletion, setDeletion] = useState(false);
   const handleOpenDelete = () => setDeletion(true);
   const handleCloseDelete = () => setDeletion(false);
   const submitDelete = () => {
+    dispatch(deleteAgent(agent.agent_id)).then(
+      () => {
+        if (onDelete) {
+          onDelete(agent.agent_id);
+        }
+      },
+    );
     handleCloseDelete();
   };
 

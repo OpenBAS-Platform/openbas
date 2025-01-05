@@ -157,8 +157,8 @@ public class EndpointApi {
     return this.endpointRepository.findAll(fromIds(endpointIds));
   }
 
+  @Secured(ROLE_ADMIN)
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public EndpointOverviewOutput updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
@@ -166,8 +166,8 @@ public class EndpointApi {
     return this.endpointService.updateEndpoint(endpointId, input);
   }
 
+  @Secured(ROLE_ADMIN)
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);

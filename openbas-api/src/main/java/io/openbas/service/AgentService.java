@@ -1,4 +1,4 @@
-package io.openbas.rest.agent.service;
+package io.openbas.service;
 
 import io.openbas.database.repository.AgentRepository;
 import jakarta.validation.constraints.NotBlank;

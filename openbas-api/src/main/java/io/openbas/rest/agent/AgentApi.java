@@ -2,11 +2,10 @@ package io.openbas.rest.agent;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
-import io.openbas.rest.agent.service.AgentService;
+import io.openbas.service.AgentService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +21,8 @@ public class AgentApi {
   private final AgentService agentService;
 
   @DeleteMapping(AGENT_URI + "/{agentId}")
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
-  public void delete(@PathVariable @NotBlank final String endpointId) {
-    this.agentService.delete(endpointId);
+  public void delete(@PathVariable @NotBlank final String agentId) {
+    this.agentService.delete(agentId);
   }
 }
