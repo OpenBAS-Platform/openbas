@@ -205,6 +205,8 @@ const Endpoints = () => {
             if (type && executor) {
               acc[type] = acc[type] || [];
               acc[type].push(executor);
+            } else {
+              acc['Unknown'] = acc['Unknown'] || [];
             }
             return acc;
           }, {} as Record<string, ExecutorOutput[]>);
@@ -241,7 +243,6 @@ const Endpoints = () => {
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_active}>
                         <Tooltip title={activeMsgTooltip}>
                           <span>
-                            {' '}
                             <AssetStatus variant="list" status={isActive ? 'Active' : 'Inactive'} />
                           </span>
                         </Tooltip>
@@ -249,20 +250,17 @@ const Endpoints = () => {
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
                         <Tooltip title={t('Admin') + `: ${adminCount}`} placement="top">
                           <span>
-                            {' '}
                             {adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
                           </span>
                         </Tooltip>
                         <Tooltip title={t('User') + `: ${userCount}`} placement="top">
                           <span>
-                            {' '}
                             {userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
                           </span>
                         </Tooltip>
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
                         <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={10} />
-                        {' '}
                         {endpoint.endpoint_platform}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
@@ -272,19 +270,23 @@ const Endpoints = () => {
                         {Object.keys(groupedExecutors).map((executorType) => {
                           const executorsOfType = groupedExecutors[executorType];
                           const count = executorsOfType.length;
-                          const exampleExecutor = executorsOfType[0];
+                          const base = executorsOfType[0];
 
-                          return (
-                            <Tooltip key={executorType} title={`${exampleExecutor.executor_name} : ${count}`} arrow>
-                              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-                                <img
-                                  src={`/api/images/executors/${executorType}`}
-                                  alt={executorType}
-                                  style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                                />
-                              </div>
-                            </Tooltip>
-                          );
+                          if (count > 0) {
+                            return (
+                              <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
+                                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                                  <img
+                                    src={`/api/images/executors/${executorType}`}
+                                    alt={executorType}
+                                    style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                                  />
+                                </div>
+                              </Tooltip>
+                            );
+                          } else {
+                            return t('Unknown');
+                          }
                         })}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
