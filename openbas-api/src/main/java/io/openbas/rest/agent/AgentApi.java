@@ -2,6 +2,7 @@ package io.openbas.rest.agent;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 
+import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AgentService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @Secured(ROLE_ADMIN)
-public class AgentApi {
+public class AgentApi extends RestBehavior {
 
   public static final String AGENT_URI = "/api/agents";
 

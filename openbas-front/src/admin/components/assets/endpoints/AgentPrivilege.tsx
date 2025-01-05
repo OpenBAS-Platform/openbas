@@ -44,13 +44,13 @@ const AgentPrivilege: React.FC<Props> = ({ variant, privilege }) => {
   const style = variant === 'list' ? classes.chipInList : classes.chip;
 
   switch (privilege) {
-    case 'user':
+    case 'admin':
       return (
         <Chip
           variant="outlined"
           className={style}
           style={inlineStyles.green}
-          label={t('User')}
+          label={t('Admin')}
         />
       );
     default:
@@ -59,7 +59,7 @@ const AgentPrivilege: React.FC<Props> = ({ variant, privilege }) => {
           variant="outlined"
           className={style}
           style={inlineStyles.yellow}
-          label={t('Admin')}
+          label={t('User')}
         />
       );
   }
