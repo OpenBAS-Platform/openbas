@@ -16,6 +16,7 @@ import ExportButton from '../../../../components/common/ExportButton';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
@@ -160,19 +161,11 @@ const Endpoints = () => {
           <ListItemIcon />
           <ListItemText
             primary={(
-              <div>
-                <div className={classes.bodyItems}>
-                  {headers.map(header => (
-                    <div
-                      key={header.field}
-                      className={classes.bodyItem}
-                      style={inlineStyles[header.field]}
-                    >
-                      {t(header.label)}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <SortHeadersComponentV2
+                headers={headers}
+                inlineStylesHeaders={inlineStyles}
+                sortHelpers={queryableHelpers.sortHelpers}
+              />
             )}
           />
         </ListItem>
