@@ -1,18 +1,16 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Ipv4OrIpv6Constraint;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -98,23 +96,19 @@ public class Endpoint extends Asset {
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
 
-  /** Used to show Front column */
-  @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("asset_executor")
-  @Schema(type = "string")
+  @JsonIgnore
   public Executor getExecutor() {
+    if (this.agents.isEmpty()) {
+      return null;
+    }
     return this.agents.getFirst().getExecutor();
   }
 
-  /** Used to show Front column */
-  @JsonProperty("asset_last_seen")
-  public Instant getLastSeen() {
-    return this.agents.getFirst().getLastSeen();
-  }
-
-  /** Used to show Front column */
-  @JsonProperty("asset_active")
+  @JsonIgnore
   public boolean getActive() {
+    if (this.agents.isEmpty()) {
+      return false;
+    }
     return this.agents.getFirst().isActive();
   }
 

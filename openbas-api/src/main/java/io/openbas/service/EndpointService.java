@@ -14,6 +14,7 @@ import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -66,7 +67,9 @@ public class EndpointService {
   }
 
   public Endpoint endpoint(@NotBlank final String endpointId) {
-    return this.endpointRepository.findById(endpointId).orElseThrow();
+    return this.endpointRepository
+        .findById(endpointId)
+        .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
   }
 
   @Transactional(readOnly = true)
@@ -121,7 +124,10 @@ public class EndpointService {
 
   public EndpointOverviewOutput updateEndpoint(
       @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
-    Endpoint toUpdate = this.endpointRepository.findById(endpointId).orElseThrow();
+    Endpoint toUpdate =
+        this.endpointRepository
+            .findById(endpointId)
+            .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
     toUpdate.setUpdateAttributes(input);
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return endpointMapper.toEndpointOverviewOutput(updateEndpoint(toUpdate));
