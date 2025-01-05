@@ -15,8 +15,7 @@ public class EndpointSpecification {
       query.groupBy(root.get("id"));
       return criteriaBuilder.and(
           criteriaBuilder.isNull(root.get("agents").get("parent")),
-          criteriaBuilder.isNull(root.get("agents").get("inject"))
-      );
+          criteriaBuilder.isNull(root.get("agents").get("inject")));
     };
   }
 
@@ -25,8 +24,7 @@ public class EndpointSpecification {
       query.groupBy(root.get("id"));
       return criteriaBuilder.or(
           criteriaBuilder.isNotNull(root.get("agents").get("parent")),
-          criteriaBuilder.isNotNull(root.get("agents").get("inject"))
-      );
+          criteriaBuilder.isNotNull(root.get("agents").get("inject")));
     };
   }
 

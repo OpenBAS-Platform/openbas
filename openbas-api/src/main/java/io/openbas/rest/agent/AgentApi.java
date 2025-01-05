@@ -1,7 +1,6 @@
 package io.openbas.rest.agent;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.rest.agent.service.AgentService;
 import jakarta.validation.constraints.NotBlank;
