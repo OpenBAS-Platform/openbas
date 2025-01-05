@@ -8,7 +8,7 @@ import { fetchExecutors } from '../../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Agent } from '../../../../../utils/api-types';
+import type { AgentOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../../AssetStatus';
@@ -59,7 +59,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  agents: Agent[];
+  agents: AgentOutput[];
 }
 
 const AgentList: React.FC<Props> = ({ agents }) => {
@@ -113,9 +113,8 @@ const AgentList: React.FC<Props> = ({ agents }) => {
         style={{ paddingTop: 0 }}
       >
       </ListItem>
-      {agents.map((agent: Agent) => {
-        console.log(executorsMap);
-        const executor = executorsMap[agent.agent_executor ?? 'Unknown'];
+      {agents.map((agent: AgentOutput) => {
+        const executor = agent.agent_executor?.executor_id ? executorsMap[agent.agent_executor?.executor_id] : undefined;
         return (
           <ListItem
             key={agent.agent_id}
@@ -150,7 +149,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                     {executor?.executor_name ?? t('Unknown')}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_privilege}>
-                    <AgentPrivilege variant="list" status={agent.agent_privilege} />
+                    <AgentPrivilege variant="list" status={agent.agent_privilege ?? 'admin'} />
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_deployment_mode}>
                     {agent.agent_deployment_mode}

@@ -11,6 +11,10 @@ import lombok.Setter;
 @Builder
 public class ExecutorOutput {
 
+  @Schema(description = "Agent executor id")
+  @JsonProperty("executor_id")
+  private String id;
+
   @Schema(description = "Agent executor name")
   @JsonProperty("executor_name")
   private String name;

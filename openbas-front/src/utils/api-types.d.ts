@@ -42,7 +42,7 @@ export interface AgentOutput {
   /** Agent executor */
   agent_executor?: ExecutorOutput;
   /** Agent id */
-  agent_id?: string;
+  agent_id: string;
   /** Agent privilege */
   agent_privilege?: "admin" | "standard";
 }
@@ -711,29 +711,29 @@ export interface Endpoint {
 }
 
 export interface EndpointOutput {
+  /** List of agents */
+  asset_agents: AgentOutput[];
   /** Asset Id */
   asset_id: string;
   /** Asset name */
   asset_name: string;
   /** Tags */
   asset_tags?: string[];
-  /** Indicates whether the endpoint is active. The endpoint is considered active if it was seen in the last 3 minutes. */
-  endpoint_active?: boolean;
-  /** List of agent executors */
-  endpoint_agents_executor?: string[];
-  /** List agent privilege */
-  endpoint_agents_privilege?: ("admin" | "standard")[];
+  /** Asset type */
+  asset_type?: string;
   /** Architecture */
-  endpoint_arch?: "x86_64" | "arm64" | "Unknown";
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
   /** Platform */
-  endpoint_platform?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+  endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface EndpointOverviewOutput {
   /** List of agents */
-  asset_agents?: AgentOutput[];
+  asset_agents: AgentOutput[];
   /** Endpoint description */
   asset_description?: string;
+  /** Asset Id */
+  asset_id: string;
   /** Endpoint name */
   asset_name: string;
   /** Tags */
@@ -845,6 +845,8 @@ export interface ExecutorCreateInput {
 
 /** Agent executor */
 export interface ExecutorOutput {
+  /** Agent executor id */
+  executor_id?: string;
   /** Agent executor name */
   executor_name?: string;
   /** Agent executor type */

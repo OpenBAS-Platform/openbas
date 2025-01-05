@@ -1,7 +1,7 @@
 import { MoreVert } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem } from '@mui/material';
-import { useState } from 'react';
 import * as React from 'react';
+import { useState } from 'react';
 
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
@@ -9,7 +9,7 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { Endpoint, EndpointInput } from '../../../../utils/api-types';
+import type { Endpoint, EndpointOverviewOutput, EndpointUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointForm from './EndpointForm';
 import { EndpointStoreWithType } from './EndpointsList';
@@ -22,7 +22,7 @@ interface Props {
   onRemoveEndpointFromInject?: (assetId: string) => void;
   onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
-  onUpdate?: (result: Endpoint) => void;
+  onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
 }
 
@@ -56,9 +56,9 @@ const EndpointPopover: React.FC<Props> = ({
     setEdition(true);
     setAnchorEl(null);
   };
-  const submitEdit = (data: EndpointInput) => {
+  const submitEdit = (data: EndpointUpdateInput) => {
     dispatch(updateEndpoint(endpoint.asset_id, data)).then(
-      (result: { result: string; entities: { endpoints: Record<string, Endpoint> } }) => {
+      (result: { result: string; entities: { endpoints: Record<string, EndpointOverviewOutput> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const endpointUpdated = result.entities.endpoints[result.result];

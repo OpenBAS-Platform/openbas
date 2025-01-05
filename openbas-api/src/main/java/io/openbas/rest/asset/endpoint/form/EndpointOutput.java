@@ -1,10 +1,13 @@
 package io.openbas.rest.asset.endpoint.form;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +16,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
+@JsonInclude(NON_NULL)
 public class EndpointOutput {
 
   @Schema(description = "Asset Id")
@@ -25,28 +29,24 @@ public class EndpointOutput {
   @NotBlank
   private String name;
 
-  @Schema(
-      description =
-          "Indicates whether the endpoint is active. "
-              + "The endpoint is considered active if it was seen in the last 3 minutes.")
-  @JsonProperty("endpoint_active")
-  private boolean isActive;
+  @Schema(description = "Asset type")
+  @JsonProperty("asset_type")
+  private String type;
 
-  @Schema(description = "List agent privilege")
-  @JsonProperty("endpoint_agents_privilege")
-  private List<Agent.PRIVILEGE> privileges;
+  @Schema(description = "List of agents")
+  @JsonProperty("asset_agents")
+  @NotNull
+  private List<AgentOutput> agents;
 
   @Schema(description = "Platform")
   @JsonProperty("endpoint_platform")
+  @NotBlank
   private Endpoint.PLATFORM_TYPE platform;
 
   @Schema(description = "Architecture")
   @JsonProperty("endpoint_arch")
+  @NotBlank
   private Endpoint.PLATFORM_ARCH arch;
-
-  @Schema(description = "List of agent executors")
-  @JsonProperty("endpoint_agents_executor")
-  private List<ExecutorOutput> executors;
 
   @Schema(description = "Tags")
   @JsonProperty("asset_tags")

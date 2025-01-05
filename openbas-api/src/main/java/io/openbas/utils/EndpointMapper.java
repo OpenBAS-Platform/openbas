@@ -1,5 +1,7 @@
 package io.openbas.utils;
 
+import static java.util.Collections.emptyList;
+
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Tag;
@@ -9,6 +11,7 @@ import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.ExecutorOutput;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,27 +21,19 @@ public class EndpointMapper {
 
   public EndpointOutput toEndpointOutput(Endpoint endpoint) {
     return EndpointOutput.builder()
+        .id(endpoint.getId())
         .name(endpoint.getName())
-        .isActive(endpoint.getAgents().stream().anyMatch(agent -> agent.isActive()))
-        .privileges(endpoint.getAgents().stream().map(agent -> agent.getPrivilege()).toList())
+        .type(endpoint.getType())
+        .agents(toAgentOutputs(endpoint.getAgents()))
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
-        .executors(
-            endpoint.getAgents().stream()
-                .filter(agent -> agent.getExecutor() != null)
-                .map(
-                    agent ->
-                        ExecutorOutput.builder()
-                            .name(agent.getExecutor().getName())
-                            .type(agent.getExecutor().getType())
-                            .build())
-                .toList())
         .tags(endpoint.getTags().stream().map(Tag::getId).toList())
         .build();
   }
 
   public EndpointOverviewOutput toEndpointOverviewOutput(Endpoint endpoint) {
     return EndpointOverviewOutput.builder()
+        .id(endpoint.getId())
         .name(endpoint.getName())
         .description(endpoint.getDescription())
         .hostname(endpoint.getHostname())
@@ -46,27 +41,34 @@ public class EndpointMapper {
         .arch(endpoint.getArch())
         .ips(Arrays.asList(endpoint.getIps()))
         .macAddresses(Arrays.asList(endpoint.getMacAddresses()))
-        .agents(this.toAgentOutputs(endpoint.getAgents()))
+        .agents(toAgentOutputs(endpoint.getAgents()))
         .tags(endpoint.getTags().stream().map(Tag::getId).toList())
         .build();
   }
 
   private List<AgentOutput> toAgentOutputs(List<Agent> agents) {
-    return agents.stream().map(agent -> this.toAgentOutput(agent)).toList();
+    return Optional.ofNullable(agents).orElse(emptyList()).stream()
+        .map(agent -> toAgentOutput(agent))
+        .toList();
   }
 
   private AgentOutput toAgentOutput(Agent agent) {
-    return AgentOutput.builder()
-        .id(agent.getId())
-        .privilege(agent.getPrivilege())
-        .deploymentMode(agent.getDeploymentMode())
-        .executedByUser(agent.getExecutedByUser())
-        .executor(
-            ExecutorOutput.builder()
-                .name(agent.getExecutor().getName())
-                .type(agent.getExecutor().getType())
-                .build())
-        .isActive(agent.isActive())
-        .build();
+    AgentOutput.AgentOutputBuilder builder =
+        AgentOutput.builder()
+            .id(agent.getId())
+            .privilege(agent.getPrivilege())
+            .deploymentMode(agent.getDeploymentMode())
+            .executedByUser(agent.getExecutedByUser())
+            .isActive(agent.isActive());
+
+    if (agent.getExecutor() != null) {
+      builder.executor(
+          ExecutorOutput.builder()
+              .id(agent.getExecutor().getId())
+              .name(agent.getExecutor().getName())
+              .type(agent.getExecutor().getType())
+              .build());
+    }
+    return builder.build();
   }
 }

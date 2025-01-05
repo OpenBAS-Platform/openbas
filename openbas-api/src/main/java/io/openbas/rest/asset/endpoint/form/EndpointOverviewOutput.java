@@ -1,9 +1,13 @@
 package io.openbas.rest.asset.endpoint.form;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Endpoint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +16,13 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
+@JsonInclude(NON_NULL)
 public class EndpointOverviewOutput {
+
+  @Schema(description = "Asset Id")
+  @JsonProperty("asset_id")
+  @NotBlank
+  private String id;
 
   @Schema(description = "Endpoint name")
   @JsonProperty("asset_name")
@@ -45,6 +55,7 @@ public class EndpointOverviewOutput {
 
   @Schema(description = "List of agents")
   @JsonProperty("asset_agents")
+  @NotNull
   private List<AgentOutput> agents;
 
   @Schema(description = "Tags")

@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { DialogContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { DialogContent, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -21,7 +21,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { Endpoint } from '../../../../utils/api-types';
+import type { EndpointOutput, ExecutorOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -104,11 +104,11 @@ const Endpoints = () => {
 
   // Headers
   const headers = [
-    { field: 'asset_name', label: 'Name', isSortable: false },
+    { field: 'asset_name', label: 'Name', isSortable: true },
     { field: 'endpoint_active', label: 'Status', isSortable: false },
     { field: 'endpoint_agents_privilege', label: 'Agents Privilege', isSortable: false },
-    { field: 'endpoint_platform', label: 'Platform', isSortable: false },
-    { field: 'endpoint_arch', label: 'Architecture', isSortable: false },
+    { field: 'endpoint_platform', label: 'Platform', isSortable: true },
+    { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
     { field: 'endpoint_agents_executor', label: 'Executor', isSortable: false },
     { field: 'asset_tags', label: 'Tags', isSortable: false },
   ];
@@ -119,7 +119,7 @@ const Endpoints = () => {
     'asset_tags',
   ];
 
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('asset', buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
@@ -130,13 +130,8 @@ const Endpoints = () => {
     exportType: 'endpoint',
     exportKeys: [
       'asset_name',
-      'asset_description',
-      'asset_last_seen',
-      'endpoint_ips',
-      'endpoint_hostname',
       'endpoint_platform',
-      'endpoint_mac_addresses',
-      'asset_tags',
+      'endpoint_arch',
     ],
     exportData: endpoints,
     exportFileName: `${t('Endpoints')}.csv`,
@@ -181,8 +176,18 @@ const Endpoints = () => {
             )}
           />
         </ListItem>
-        {endpoints.map((endpoint: Endpoint) => {
-          const executor = executorsMap[endpoint.asset_executor ?? 'Unknown'];
+        {endpoints.map((endpoint: EndpointOutput) => {
+          const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
+          const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
+
+          const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
+          const inactiveCount = endpoint.asset_agents.length - activeCount;
+          const isActive = activeCount > 0;
+
+          const activeMsgTooltip = 'Active : ' + activeCount + ' / Inactive : ' + inactiveCount;
+          const privilegeMsgTooltip = 'Active : ' + activeCount + ' / Inactive : ' + inactiveCount;
+          const executorMsgTooltip = 'Active : ' + activeCount + ' / Inactive : ' + inactiveCount;
+
           return (
             <ListItem
               key={endpoint.asset_id}
@@ -213,13 +218,21 @@ const Endpoints = () => {
                         {endpoint.asset_name}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_active}>
-                        <AssetStatus variant="list" status={endpoint.asset_active ? 'Active' : 'Inactive'} />
+                        <Tooltip title={activeMsgTooltip}>
+                          <span>
+                            {' '}
+                            {/* Using <span> to wrap the element */}
+                            <AssetStatus variant="list" status={isActive ? 'Active' : 'Inactive'} />
+                          </span>
+                        </Tooltip>
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
-                        <AgentPrivilege variant="list" status={endpoint.asset_agents ? endpoint.asset_agents[0].agent_privilege : 'admin'} />
+                        {privileges?.map((privilege) => {
+                          return (<AgentPrivilege variant="list" status={privilege ?? 'admin'} />);
+                        })}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                        <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                        <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={10} />
                         {' '}
                         {endpoint.endpoint_platform}
                       </div>
@@ -227,14 +240,17 @@ const Endpoints = () => {
                         {endpoint.endpoint_arch}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_executor}>
-                        {executor && (
-                          <img
-                            src={`/api/images/executors/${executor.executor_type}`}
-                            alt={executor.executor_type}
-                            style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                          />
-                        )}
-                        {executor?.executor_name ?? t('Unknown')}
+                        {executors?.filter(executor => executor !== undefined).map((executor: ExecutorOutput) => {
+                          const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : 'Unknown';
+                          return (
+                            <img
+                              key={executor?.executor_id ?? 'unknown'}
+                              src={`/api/images/executors/${type}`}
+                              alt={type}
+                              style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                            />
+                          );
+                        })}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
                         <ItemTags variant="list" tags={endpoint.asset_tags} />
@@ -244,7 +260,8 @@ const Endpoints = () => {
                 />
               </ListItemButton>
             </ListItem>
-          );
+          )
+          ;
         })}
       </List>
       {userAdmin && <ButtonCreate onClick={() => setOpen(true)} />}

@@ -3,12 +3,12 @@ import { FunctionComponent, useState } from 'react';
 import ButtonPopover from '../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../../components/i18n';
-import { Agent } from '../../../../../utils/api-types';
+import { AgentOutput } from '../../../../../utils/api-types';
 
 type AgentActionType = 'Update' | 'Delete';
 
 interface Props {
-  agent: Agent;
+  agent: AgentOutput;
   actions: AgentActionType[];
   onDelete?: (result: string) => void;
   inList?: boolean;
