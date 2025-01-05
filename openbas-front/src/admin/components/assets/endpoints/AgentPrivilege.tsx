@@ -34,15 +34,15 @@ const inlineStyles = {
 
 interface Props {
   variant: string;
-  status: string;
+  privilege: string;
 }
 
-const AgentPrivilege: React.FC<Props> = ({ variant, status }) => {
+const AgentPrivilege: React.FC<Props> = ({ variant, privilege }) => {
   const { t } = useFormatter();
   const classes = useStyles();
   const style = variant === 'list' ? classes.chipInList : classes.chip;
 
-  switch (status) {
+  switch (privilege) {
     case 'user':
       return (
         <Chip

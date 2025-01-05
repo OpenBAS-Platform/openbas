@@ -177,16 +177,37 @@ const Endpoints = () => {
           />
         </ListItem>
         {endpoints.map((endpoint: EndpointOutput) => {
-          const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
-          const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
+          // Statuses : IsActive ?
 
           const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
           const inactiveCount = endpoint.asset_agents.length - activeCount;
           const isActive = activeCount > 0;
+          const activeMsgTooltip = 'Active : ' + activeCount + ' | Inactive : ' + inactiveCount;
 
-          const activeMsgTooltip = 'Active : ' + activeCount + ' / Inactive : ' + inactiveCount;
-          const privilegeMsgTooltip = 'Active : ' + activeCount + ' / Inactive : ' + inactiveCount;
-          const executorMsgTooltip = 'Active : ' + activeCount + ' / Inactive : ' + inactiveCount;
+          // Privileges
+          const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
+          const privilegeCount = privileges?.reduce((count, privilege) => {
+            if (privilege === 'admin') {
+              count.admin += 1;
+            } else {
+              count.user += 1;
+            }
+            return count;
+          }, { admin: 0, user: 0 });
+
+          const adminCount = privilegeCount?.admin;
+          const userCount = privilegeCount?.user;
+
+          // Executors
+          const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
+          const groupedExecutors = executors?.reduce((acc, executor) => {
+            const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : undefined;
+            if (type && executor) {
+              acc[type] = acc[type] || [];
+              acc[type].push(executor);
+            }
+            return acc;
+          }, {} as Record<string, ExecutorOutput[]>);
 
           return (
             <ListItem
@@ -221,15 +242,22 @@ const Endpoints = () => {
                         <Tooltip title={activeMsgTooltip}>
                           <span>
                             {' '}
-                            {/* Using <span> to wrap the element */}
                             <AssetStatus variant="list" status={isActive ? 'Active' : 'Inactive'} />
                           </span>
                         </Tooltip>
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
-                        {privileges?.map((privilege) => {
-                          return (<AgentPrivilege variant="list" status={privilege ?? 'admin'} />);
-                        })}
+                        <Tooltip title={`Admin: ${adminCount} | User: ${userCount}`} placement="top">
+                          <span>
+                            {' '}
+                            {adminCount > 0 && (
+                              <AgentPrivilege variant="list" privilege="admin" />
+                            )}
+                            {userCount > 0 && (
+                              <AgentPrivilege variant="list" privilege="user" />
+                            )}
+                          </span>
+                        </Tooltip>
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
                         <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={10} />
@@ -240,15 +268,21 @@ const Endpoints = () => {
                         {endpoint.endpoint_arch}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_executor}>
-                        {executors?.filter(executor => executor !== undefined).map((executor: ExecutorOutput) => {
-                          const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : 'Unknown';
+                        {Object.keys(groupedExecutors).map((executorType) => {
+                          const executorsOfType = groupedExecutors[executorType];
+                          const count = executorsOfType.length;
+                          const exampleExecutor = executorsOfType[0];
+
                           return (
-                            <img
-                              key={executor?.executor_id ?? 'unknown'}
-                              src={`/api/images/executors/${type}`}
-                              alt={type}
-                              style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                            />
+                            <Tooltip key={executorType} title={`${exampleExecutor.executor_name} : ${count}`} arrow>
+                              <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                                <img
+                                  src={`/api/images/executors/${executorType}`}
+                                  alt={executorType}
+                                  style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                                />
+                              </div>
+                            </Tooltip>
                           );
                         })}
                       </div>

@@ -149,7 +149,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                     {executor?.executor_name ?? t('Unknown')}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_privilege}>
-                    <AgentPrivilege variant="list" status={agent.agent_privilege ?? 'admin'} />
+                    <AgentPrivilege variant="list" privilege={agent.agent_privilege ?? 'admin'} />
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_deployment_mode}>
                     {agent.agent_deployment_mode}

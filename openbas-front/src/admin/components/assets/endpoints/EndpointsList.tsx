@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import { findEndpoints } from '../../../../actions/assets/endpoint-actions';
 import ListLoader from '../../../../components/common/loader/ListLoader';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { Endpoint, EndpointOutput, EndpointOverviewOutput } from '../../../../utils/api-types';
+import { EndpointOutput, EndpointOverviewOutput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   item: {
