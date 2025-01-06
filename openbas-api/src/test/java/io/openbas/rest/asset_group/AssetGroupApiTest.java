@@ -4,8 +4,7 @@ import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.AssetGroupFixture.createAssetGroupWithTags;
 import static io.openbas.utils.fixtures.AssetGroupFixture.createDefaultAssetGroup;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,6 +18,7 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import jakarta.servlet.ServletException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -101,12 +101,14 @@ class AssetGroupApiTest extends IntegrationTest {
     input.setName("Asset group updated");
 
     // --EXECUTE--
-    mvc.perform(
-            put(ASSET_GROUP_URI + "/" + nonexistentAssetGroupId)
-                .content(asJsonString(input))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is4xxClientError());
+    assertThrows(
+        ServletException.class,
+        () ->
+            mvc.perform(
+                put(ASSET_GROUP_URI + "/" + nonexistentAssetGroupId)
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)));
   }
 
   @DisplayName("Given existing assetGroup, should delete assetGroup successfully")
