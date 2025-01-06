@@ -1,5 +1,14 @@
 package io.openbas.rest.asset_group;
 
+import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.AssetGroupFixture.createAssetGroupWithTags;
+import static io.openbas.utils.fixtures.AssetGroupFixture.createDefaultAssetGroup;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.AssetGroup;
@@ -10,6 +19,7 @@ import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.servlet.ServletException;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -18,27 +28,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
-import static io.openbas.utils.JsonUtils.asJsonString;
-import static io.openbas.utils.fixtures.AssetGroupFixture.createAssetGroupWithTags;
-import static io.openbas.utils.fixtures.AssetGroupFixture.createDefaultAssetGroup;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @TestInstance(PER_CLASS)
 @Transactional
 class AssetGroupApiTest extends IntegrationTest {
 
-  @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private AssetGroupRepository assetGroupRepository;
-  @Autowired
-  private TagRepository tagRepository;
+  @Autowired private MockMvc mvc;
+  @Autowired private AssetGroupRepository assetGroupRepository;
+  @Autowired private TagRepository tagRepository;
 
   @DisplayName("Given valid AssetGroupInput, should create assetGroup successfully")
   @Test
