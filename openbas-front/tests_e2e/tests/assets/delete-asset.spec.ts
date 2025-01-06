@@ -16,10 +16,6 @@ test('Delete an asset', async ({ page }) => {
   const assetsPage = new AssetsPage(page);
   await assetsPage.getAddButton().click();
 
-  const assetFormPage = new AssetFormPage(page);
-  await fillLinuxAssetBase(page, 'My endpoint name to delete', '192.168.255.255');
-  await assetFormPage.getCreateButton().click();
-
   // -- EXECUTE --
   const deleteMenuItem = await assetsPage.getDeleteMenuItem('My endpoint name to delete');
   await deleteMenuItem.click();
