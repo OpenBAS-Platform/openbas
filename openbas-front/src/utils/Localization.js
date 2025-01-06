@@ -830,6 +830,8 @@ const i18n = {
       'Agent Name': 'Nom de l\'agent',
       'Privilege': 'Privilège',
       'Deployment': 'Déploiement',
+      'Session': 'Session',
+      'Service': 'Service',
       // Assets
       'Agents Privileges': 'Privilèges des agents',
       'Endpoints': 'Endpoints',
@@ -2256,6 +2258,8 @@ const i18n = {
       'Agent Name': '代理人姓名',
       'Privilege': '特权',
       'Deployment': '部署',
+      'Session': '会议',
+      'Service': '服务',
       // Assets
       'Agents Privileges': '代理权限',
       'Endpoints': '终端',

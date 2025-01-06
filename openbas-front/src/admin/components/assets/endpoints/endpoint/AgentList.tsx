@@ -12,6 +12,7 @@ import type { AgentOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../../AssetStatus';
+import AgentDeploymentMode from '../AgentDeploymentMode';
 import AgentPrivilege from '../AgentPrivilege';
 
 const useStyles = makeStyles(() => ({
@@ -147,7 +148,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                     <AgentPrivilege variant="list" privilege={agent.agent_privilege ?? 'admin'} />
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_deployment_mode}>
-                    {agent.agent_deployment_mode}
+                    <AgentDeploymentMode variant="list" mode={agent.agent_deployment_mode ?? 'session'} />
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_active}>
                     <AssetStatus variant="list" status={agent.agent_active ? 'Active' : 'Inactive'} />
