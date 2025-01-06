@@ -12,12 +12,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExerciseComposer {
   @Autowired private ExerciseRepository exerciseRepository;
-  @Autowired private InjectRepository injectRepository;
-  @Autowired private ArticleRepository articleRepository;
-  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
-  @Autowired private ObjectiveRepository objectiveRepository;
-  @Autowired private TagRepository tagRepository;
-  @Autowired private DocumentRepository documentRepository;
 
   public class Composer extends InnerComposerBase<Exercise> {
     private final Exercise exercise;

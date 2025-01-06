@@ -244,7 +244,7 @@ public class ExerciseFileExport {
 
   @JsonIgnore private int exportOptionsMask = 0;
 
-  public ExerciseFileExport(
+  private ExerciseFileExport(
       ObjectMapper objectMapper,
       VariableService variableService,
       ChallengeService challengeService) {

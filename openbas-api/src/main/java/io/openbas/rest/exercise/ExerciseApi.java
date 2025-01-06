@@ -779,7 +779,6 @@ public class ExerciseApi extends RestBehavior {
       throws IOException {
     ObjectMapper objectMapper = mapper.copy();
 
-    // Start exporting exercise
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     ExerciseFileExport importExport =

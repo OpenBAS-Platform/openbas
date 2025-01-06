@@ -78,14 +78,6 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .get();
   }
 
-  @AfterEach
-  void afterAll() {
-    // this.injectRepository.deleteAll();
-    // this.exerciseRepository.deleteAll();
-    // this.userRepository.deleteAll();
-    // this.teamRepository.deleteAll();
-  }
-
   @Test
   @WithMockAdminUser
   public void test_export() throws Exception {
