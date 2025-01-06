@@ -862,6 +862,9 @@ const i18n = {
       'Modify assets in this inject': 'Modifier des actifs dans ce stimuli',
       'Show all assets': 'Afficher tous les actifs',
       'By default, only assets compliant with the injector are displayed': 'Par défaut, seuls les actifs conformes à l\'injecteur sont affichés',
+      'To register new endpoints, you will need to install an agent. You can find detailed instructions on the ': 'Pour enregistrer de nouveaux points de terminaison, vous devrez installer un agent. Vous pouvez trouver des instructions détaillées sur le ',
+      ' and in our ': ' et dans notre ',
+      'agent installation page': 'page d\'installation de l\'agent',
       // Asset groups
       'Asset groups': 'Groupe d\'assets',
       'AssetGroup': 'Groupe-d-assets',
@@ -2288,6 +2291,10 @@ const i18n = {
       'Modify assets in this inject': '修改本次注入中的资产',
       'Show all assets': '显示所有资产',
       'By default, only assets compliant with the injector are displayed': '默认情况下,只显示符合注入器要求的资产',
+      'To register new endpoints, you will need to install an agent. You can find detailed instructions on the ':
+        '要注册新的端点，您需要安装一个代理。您可以在以下位置找到详细的安装说明：',
+      ' and in our ': ' 以及在我们的 ',
+      'agent installation page': '代理安装页面',
       // Asset groups
       'Asset groups': '资产组',
       'AssetGroup': '资产组',
