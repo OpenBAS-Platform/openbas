@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -10,8 +10,6 @@ import type { ExecutorHelper } from '../../../../actions/executors/executor-help
 import type { UserHelper } from '../../../../actions/helper';
 import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
-import ButtonCreate from '../../../../components/common/ButtonCreate';
-import Dialog from '../../../../components/common/Dialog';
 import ExportButton from '../../../../components/common/ExportButton';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -85,10 +83,6 @@ const Endpoints = () => {
   const { t } = useFormatter();
   const { settings } = useAuth();
 
-  // Dialog
-  const [open, setOpen] = useState(false);
-  const onClose = () => setOpen(false);
-
   // Query param
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
@@ -141,6 +135,20 @@ const Endpoints = () => {
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
+      <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
+        {t('To register new endpoints, you will need to install our agent. Detailed instructions can be found on our ')}
+
+        <a href={`${settings.platform_base_url}/admin/agents`} target="_blank" rel="noopener noreferrer">
+          {t('agent installation page')}
+        </a>
+
+        {t(' and in our ')}
+
+        <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">
+          {t('documentation')}
+        </a>
+        .
+      </Alert>
       <PaginationComponentV2
         fetch={searchEndpoints}
         searchPaginationInput={searchPaginationInput}
@@ -294,25 +302,6 @@ const Endpoints = () => {
           ;
         })}
       </List>
-      {userAdmin && <ButtonCreate onClick={() => setOpen(true)} />}
-      <Dialog
-        open={open}
-        handleClose={onClose}
-        title={t('How Are Endpoints Added?')}
-      >
-        <div>
-          <span>
-            {t('Your assets will be automatically created by the installation of your agent. ')}
-          </span>
-          <p>
-            {t('In order to do so, go to this page ')}
-            <a href={`${settings.platform_base_url}/admin/agents`} target="_blank" rel="noopener noreferrer">
-              {`${settings.platform_base_url}/admin/agents`}
-            </a>
-            {t(' to install the agent of your choice with its corresponding assets.')}
-          </p>
-        </div>
-      </Dialog>
     </>
   );
 };
