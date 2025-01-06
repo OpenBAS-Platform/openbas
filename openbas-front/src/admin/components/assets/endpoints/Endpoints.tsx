@@ -212,6 +212,7 @@ const Endpoints = () => {
                 (userAdmin
                   && (
                     <EndpointPopover
+                      inline
                       endpoint={{ ...endpoint, type: 'static' }}
                       onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
                     />

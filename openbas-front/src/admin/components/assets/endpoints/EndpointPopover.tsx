@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
@@ -111,47 +112,16 @@ const EndpointPopover: React.FC<Props> = ({
     setDeletion(false);
   };
 
+  // Button Popover
+  const entries = [];
+  if (onUpdate) entries.push({ label: 'Update', action: () => handleEdit() });
+  if (onRemoveEndpointFromInject) entries.push({ label: 'Remove from the inject', action: () => onRemoveEndpointFromInject(endpoint.asset_id) });
+  if ((assetGroupId && endpoint.type !== 'dynamic')) entries.push({ label: 'Remove from the asset group', action: () => handleRemoveFromAssetGroup() });
+  if (onDelete) entries.push({ label: 'Delete', action: () => handleDelete() });
+
   return (
     <>
-      <IconButton
-        color="primary"
-        onClick={(ev) => {
-          ev.stopPropagation();
-          setAnchorEl(ev.currentTarget);
-        }}
-        aria-label={`endpoint menu for ${endpoint.asset_name}`}
-        aria-haspopup="true"
-        size="large"
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
-        {(onUpdate
-          && (
-            <MenuItem onClick={handleEdit}>
-              {t('Update')}
-            </MenuItem>
-          )
-        )}
-        {(assetGroupId && endpoint.type !== 'dynamic') && (
-          <MenuItem onClick={handleRemoveFromAssetGroup}>
-            {t('Remove from the asset group')}
-          </MenuItem>
-        )}
-        {onRemoveEndpointFromInject && (
-          <MenuItem onClick={() => onRemoveEndpointFromInject(endpoint.asset_id)}>
-            {t('Remove from the inject')}
-          </MenuItem>
-        )}
-        <MenuItem onClick={handleDelete}>
-          {t('Delete')}
-        </MenuItem>
-      </Menu>
-
+      <ButtonPopover entries={entries} variant={inline ? 'icon' : 'toggle'} />
       {inline ? (
         <Dialog
           open={edition}
