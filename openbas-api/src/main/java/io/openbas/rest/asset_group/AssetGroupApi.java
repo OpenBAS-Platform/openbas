@@ -11,6 +11,7 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -102,6 +103,11 @@ public class AssetGroupApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void deleteAssetGroup(@PathVariable @NotBlank final String assetGroupId) {
+    try {
+      assetGroupService.assetGroup(assetGroupId);
+    } catch (IllegalArgumentException ex) {
+      throw new ElementNotFoundException(ex.getMessage());
+    }
     this.assetGroupService.deleteAssetGroup(assetGroupId);
   }
 }
