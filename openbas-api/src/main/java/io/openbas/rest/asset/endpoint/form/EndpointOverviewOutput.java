@@ -24,12 +24,12 @@ public class EndpointOverviewOutput {
   @NotBlank
   private String id;
 
-  @Schema(description = "Endpoint name")
+  @Schema(description = "Asset name")
   @JsonProperty("asset_name")
   @NotBlank
   private String name;
 
-  @Schema(description = "Endpoint description")
+  @Schema(description = "Asset description")
   @JsonProperty("asset_description")
   private String description;
 
