@@ -55,9 +55,9 @@ const Endpoint = () => {
                 </Typography>
                 <div style={{ display: 'flex', paddingTop: 5 }}>
                   <ExpandableMarkdown
-                  source={endpoint.asset_description}
-                  limit={300}
-                />
+                    source={endpoint.asset_description}
+                    limit={300}
+                  />
                 </div>
               </Grid>
               <Grid item xs={3} style={{ paddingTop: 20 }}>
@@ -122,7 +122,7 @@ const Endpoint = () => {
                 >
                   {t('MAC Addresses')}
                 </Typography>
-                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10, paddingTop: 5  }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10, paddingTop: 5 }}>
                   {endpoint.endpoint_mac_addresses?.map((mac: string, index: number) => (
                     <div key={index} style={{ marginRight: 10 }}>
                       {mac}
