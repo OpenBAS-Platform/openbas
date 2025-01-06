@@ -13,7 +13,6 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../../AssetStatus';
 import AgentPrivilege from '../AgentPrivilege';
-import AgentPopover from './AgentPopover';
 
 const useStyles = makeStyles(() => ({
   itemHead: {
@@ -87,8 +86,6 @@ const AgentList: React.FC<Props> = ({ agents }) => {
     { field: 'agent_last_seen', label: 'Last Seen' },
   ];
 
-  const [availableAgents, setAvailableAgents] = useState<AgentOutput[]>(agents);
-
   return (
     <List>
       <ListItem
@@ -119,7 +116,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
         style={{ paddingTop: 0 }}
       >
       </ListItem>
-      {availableAgents.map((agent: AgentOutput) => {
+      {agents.map((agent: AgentOutput) => {
         const executor = agent.agent_executor?.executor_id ? executorsMap[agent.agent_executor?.executor_id] : undefined;
         return (
           <ListItem
