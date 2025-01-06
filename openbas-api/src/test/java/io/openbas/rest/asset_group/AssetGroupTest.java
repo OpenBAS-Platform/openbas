@@ -1,66 +1,58 @@
 package io.openbas.rest.asset_group;
 
-import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
-import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
-import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import java.util.List;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+import java.util.List;
+
+import static io.openbas.rest.asset_group.AssetGroupApi.ASSET_GROUP_URI;
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.AssetGroupFixture.createAssetGroupWithTags;
+import static io.openbas.utils.fixtures.AssetGroupFixture.createDefaultAssetGroup;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @TestInstance(PER_CLASS)
-public class AssetGroupTest {
+@Transactional
+class AssetGroupTest extends IntegrationTest {
 
-  static AssetGroupInput ASSET_GROUP_INPUT;
-  static String TAG_ID;
+  @Autowired
+  private MockMvc mvc;
+  @Autowired
+  private AssetGroupRepository assetGroupRepository;
+  @Autowired
+  private TagRepository tagRepository;
 
-  @Autowired private MockMvc mvc;
-
-  @Autowired private AssetGroupRepository assetGroupRepository;
-
-  @Autowired private TagRepository tagRepository;
-
-  @BeforeEach
-  void beforeEach() {
-    Tag tag = tagRepository.save(TagFixture.getTag());
-    TAG_ID = tag.getId();
-
-    ASSET_GROUP_INPUT = AssetGroupFixture.createAssetGroupWithTags("Asset group", List.of(TAG_ID));
-  }
-
-  @AfterEach
-  void afterEach() {
-    tagRepository.deleteById(TAG_ID);
-  }
-
-  @DisplayName("Creation of an asset group")
+  @DisplayName("Given valid AssetGroupInput, should create assetGroup successfully")
   @Test
   @WithMockAdminUser
-  void createAssetGroupTest() throws Exception {
+  void given_validAssetGroupInput_should_createAssetGroupSuccessfully() throws Exception {
+    // -- PREPARE --
+    Tag tag = tagRepository.save(TagFixture.getTag());
+    AssetGroupInput assetGroupInput = createAssetGroupWithTags("Asset group", List.of(tag.getId()));
+
     // --EXECUTE--
     String response =
         mvc.perform(
                 post(ASSET_GROUP_URI)
-                    .content(asJsonString(ASSET_GROUP_INPUT))
+                    .content(asJsonString(assetGroupInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -69,27 +61,25 @@ public class AssetGroupTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("Asset group", JsonPath.read(response, "$.asset_group_name"));
-
-    // --THEN--
-    assetGroupRepository.deleteById(JsonPath.read(response, "$.asset_group_id"));
+    assertEquals(assetGroupInput.getName(), JsonPath.read(response, "$.asset_group_name"));
+    assertEquals(tag.getId(), JsonPath.read(response, "$.asset_group_tags[0]"));
   }
 
-  @DisplayName("Edition of an asset group")
+  @DisplayName("Given valid AssetGroupInput, should update assetGroup successfully")
   @Test
   @WithMockAdminUser
-  void updateAssetGroupTest() throws Exception {
+  void given_validAssetGroupInput_should_updateAssetGroupSuccessfully() throws Exception {
     // --PREPARE--
-    AssetGroup assetGroup =
-        assetGroupRepository.save(AssetGroupFixture.createDefaultAssetGroup("Asset group"));
+    AssetGroup input = createDefaultAssetGroup("Asset group");
+    AssetGroup assetGroup = assetGroupRepository.save(input);
     String newName = "Asset group updated";
-    ASSET_GROUP_INPUT.setName(newName);
+    input.setName(newName);
 
     // --EXECUTE--
     String response =
         mvc.perform(
                 put(ASSET_GROUP_URI + "/" + assetGroup.getId())
-                    .content(asJsonString(ASSET_GROUP_INPUT))
+                    .content(asJsonString(input))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -98,8 +88,24 @@ public class AssetGroupTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("Asset group updated", JsonPath.read(response, "$.asset_group_name"));
-    // --THEN--
-    assetGroupRepository.deleteById(JsonPath.read(response, "$.asset_group_id"));
+    assertEquals(newName, JsonPath.read(response, "$.asset_group_name"));
+  }
+
+  @DisplayName("Given existing assetGroup, should delete assetGroup successfully")
+  @Test
+  @WithMockAdminUser
+  void given_existingAssetGroup_should_deleteAssetGroupSuccessfully() throws Exception {
+    // --PREPARE--
+    AssetGroup assetGroup = assetGroupRepository.save(createDefaultAssetGroup("Asset group"));
+
+    // --EXECUTE--
+    mvc.perform(
+            delete(ASSET_GROUP_URI + "/" + assetGroup.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful());
+
+    // --ASSERT--
+    assertTrue(assetGroupRepository.findById(assetGroup.getId()).isEmpty());
   }
 }

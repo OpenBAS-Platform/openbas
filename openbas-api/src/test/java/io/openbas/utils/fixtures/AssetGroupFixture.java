@@ -15,10 +15,12 @@ public class AssetGroupFixture {
   }
 
   public static AssetGroupInput createAssetGroupWithTags(
-      @NotNull final String name, @NotNull final List<String> tags) {
+      @NotNull final String name,
+      @NotNull final List<String> tagIds) {
     AssetGroupInput assetGroupInput = new AssetGroupInput();
     assetGroupInput.setName(name);
     assetGroupInput.setDescription("An asset group");
+    assetGroupInput.setTagIds(tagIds);
     return assetGroupInput;
   }
 }
