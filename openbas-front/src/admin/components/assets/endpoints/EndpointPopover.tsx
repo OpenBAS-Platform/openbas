@@ -189,7 +189,7 @@ const EndpointPopover: React.FC<Props> = ({
         open={deletion}
         handleClose={() => setDeletion(false)}
         handleSubmit={submitDelete}
-        text={`${t('Do you want to delete the endpoint:')} ${endpoint.asset_id} ?`}
+        text={`${t('Do you want to delete the endpoint:')} ${endpoint.asset_name} ?`}
       />
     </>
   );
