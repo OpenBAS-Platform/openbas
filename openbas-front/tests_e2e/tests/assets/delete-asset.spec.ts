@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+
 import { test } from '../../fixtures/baseFixtures';
 import AssetsPage from '../../model/assets/assets.page';
 import appUrl from '../../utils/url';

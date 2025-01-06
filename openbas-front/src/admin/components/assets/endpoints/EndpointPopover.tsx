@@ -1,5 +1,3 @@
-import { MoreVert } from '@mui/icons-material';
-import { IconButton, Menu, MenuItem } from '@mui/material';
 import * as React from 'react';
 import { useState } from 'react';
 
@@ -42,8 +40,6 @@ const EndpointPopover: React.FC<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-
   const initialValues = {
     asset_name: endpoint.asset_name,
     asset_description: endpoint.asset_description ?? '',
@@ -55,7 +51,6 @@ const EndpointPopover: React.FC<Props> = ({
 
   const handleEdit = () => {
     setEdition(true);
-    setAnchorEl(null);
   };
   const submitEdit = (data: EndpointUpdateInput) => {
     dispatch(updateEndpoint(endpoint.asset_id, data)).then(
@@ -77,7 +72,6 @@ const EndpointPopover: React.FC<Props> = ({
 
   const handleRemoveFromAssetGroup = () => {
     setRemovalFromAssetGroup(true);
-    setAnchorEl(null);
   };
   const submitRemoveFromAssetGroup = () => {
     if (assetGroupId) {
@@ -99,7 +93,6 @@ const EndpointPopover: React.FC<Props> = ({
 
   const handleDelete = () => {
     setDeletion(true);
-    setAnchorEl(null);
   };
   const submitDelete = () => {
     dispatch(deleteEndpoint(endpoint.asset_id)).then(
