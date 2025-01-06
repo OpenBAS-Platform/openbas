@@ -1,5 +1,6 @@
 package io.openbas.rest;
 
+import static io.openbas.config.AppConfig.EMAIL_FORMAT;
 import static io.openbas.rest.user.PlayerApi.PLAYER_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.PlayerFixture.PLAYER_FIXTURE_FIRSTNAME;
@@ -24,18 +25,18 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
 import java.util.List;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @TestInstance(PER_CLASS)
+@Transactional
 class PlayerApiTest extends IntegrationTest {
-
-  static Tag TAG;
-  static Organization ORGANIZATION;
-  static User USER;
 
   @Autowired private MockMvc mvc;
 
@@ -45,19 +46,6 @@ class PlayerApiTest extends IntegrationTest {
   @Autowired private OrganizationRepository organizationRepository;
   @Autowired private TagRepository tagRepository;
   @Autowired private UserRepository userRepository;
-
-  @BeforeEach
-  void beforeEach() {
-    ORGANIZATION = organizationRepository.save(OrganizationFixture.createOrganization());
-    TAG = tagRepository.save(TagFixture.getTag());
-  }
-
-  @AfterEach
-  void afterEach() {
-    organizationRepository.delete(ORGANIZATION);
-    tagRepository.delete(TAG);
-    userRepository.delete(USER);
-  }
 
   @DisplayName("Given valid player input, should create a player successfully")
   @Test
@@ -80,11 +68,32 @@ class PlayerApiTest extends IntegrationTest {
 
     // -- ASSERT --
     assertEquals(PLAYER_FIXTURE_FIRSTNAME, JsonPath.read(response, "$.user_firstname"));
-    assertEquals(TAG.getId(), JsonPath.read(response, "$.user_tags[0]"));
-    assertEquals(ORGANIZATION.getId(), JsonPath.read(response, "$.user_organization"));
+    assertEquals(playerInput.getTagIds().getFirst(), JsonPath.read(response, "$.user_tags[0]"));
+    assertEquals(playerInput.getOrganizationId(), JsonPath.read(response, "$.user_organization"));
+  }
 
-    // -- CLEAN --
-    userRepository.deleteById(JsonPath.read(response, "$.user_id"));
+  @DisplayName("Given invalid email in player input, should throw exceptions")
+  @Test
+  @WithMockAdminUser
+  void given_invalidEmailInPlayerInput_should_throwExceptions() throws Exception {
+    // -- PREPARE --
+    PlayerInput playerInput = new PlayerInput();
+    playerInput.setEmail("email");
+
+    // -- EXECUTE --
+    String response =
+        mvc.perform(
+                post(PLAYER_URI)
+                    .content(asJsonString(playerInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is4xxClientError())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // -- ASSERT --
+    assertTrue(response.contains(EMAIL_FORMAT));
   }
 
   @DisplayName("Given restricted user, should not allow creation of player")
@@ -109,15 +118,15 @@ class PlayerApiTest extends IntegrationTest {
     assertTrue(exception.getMessage().contains("User is restricted"));
   }
 
-  @DisplayName("Given valid player input, should update player successfully")
+  @DisplayName("Given valid player input, should upsert player successfully")
   @Test
   @WithMockAdminUser
-  void given_validPlayerInput_should_updatePlayerSuccessfully() throws Exception {
+  void given_validPlayerInput_should_upsertPlayerSuccessfully() throws Exception {
     // --PREPARE--
     PlayerInput playerInput = buildPlayerInput();
     User user = new User();
     user.setUpdateAttributes(playerInput);
-    USER = userRepository.save(user);
+    userRepository.save(user);
     String newFirstname = "updatedFirstname";
     playerInput.setFirstname(newFirstname);
 
@@ -158,9 +167,6 @@ class PlayerApiTest extends IntegrationTest {
 
     // --ASSERT--
     assertEquals(PLAYER_FIXTURE_FIRSTNAME, JsonPath.read(response, "$.user_firstname"));
-
-    // -- CLEAN --
-    this.userRepository.deleteById(JsonPath.read(response, "$.user_id"));
   }
 
   @DisplayName("Given valid player ID and input, should update player successfully")
@@ -171,7 +177,7 @@ class PlayerApiTest extends IntegrationTest {
     PlayerInput playerInput = buildPlayerInput();
     User user = new User();
     user.setUpdateAttributes(playerInput);
-    USER = userRepository.save(user);
+    userRepository.save(user);
     String newFirstname = "updatedFirstname";
     playerInput.setFirstname(newFirstname);
 
@@ -222,11 +228,11 @@ class PlayerApiTest extends IntegrationTest {
     PlayerInput playerInput = buildPlayerInput();
     User user = new User();
     user.setUpdateAttributes(playerInput);
-    USER = userRepository.save(user);
+    user = userRepository.save(user);
 
     // -- EXECUTE --
     mvc.perform(
-            delete(PLAYER_URI + "/" + USER.getId())
+            delete(PLAYER_URI + "/" + user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
@@ -235,15 +241,35 @@ class PlayerApiTest extends IntegrationTest {
         .getContentAsString();
 
     // -- ASSERT --
-    assertTrue(this.userRepository.findById(USER.getId()).isEmpty());
+    assertTrue(this.userRepository.findById(user.getId()).isEmpty());
+  }
+
+  @DisplayName("Given no existing player ID, should throw an exception")
+  @Test
+  @WithMockAdminUser
+  void given_notExistingAssetGroup_should_throwAnException() {
+    // -- PREPARE --
+    String nonexistentAssetGroupId = "nonexistent-id";
+
+    // --EXECUTE--
+    assertThrows(
+        ServletException.class,
+        () ->
+            mvc.perform(
+                delete(PLAYER_URI + "/" + nonexistentAssetGroupId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)));
   }
 
   // -- PRIVATE --
 
   private PlayerInput buildPlayerInput() {
+    Organization organization =
+        organizationRepository.save(OrganizationFixture.createOrganization());
+    Tag tag = tagRepository.save(TagFixture.getTag());
     PlayerInput player = PlayerFixture.createPlayerInput();
-    player.setOrganizationId(ORGANIZATION.getId());
-    player.setTagIds(List.of(TAG.getId()));
+    player.setOrganizationId(organization.getId());
+    player.setTagIds(List.of(tag.getId()));
     return player;
   }
 }
