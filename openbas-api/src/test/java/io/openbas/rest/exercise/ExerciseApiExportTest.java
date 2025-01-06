@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.*;
-import org.opensaml.saml.saml1.core.Assertion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -98,12 +97,15 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String jsonExport = getZipEntryAsStringFromByteArrayByName(response, "%s.json".formatted(EXERCISE.getName()));
+    String jsonExport =
+        getZipEntryAsStringFromByteArrayByName(response, "%s.json".formatted(EXERCISE.getName()));
     ObjectMapper exportMapper = mapper.copy();
-    JsonNode expectedJson = exportMapper.readTree(
+    JsonNode expectedJson =
+        exportMapper.readTree(
             exportMapper.writeValueAsBytes(
-                    ExerciseFileExport.fromExercise(EXERCISE, exportMapper, variableService, challengeService)
-                            .withOptions(0)));
+                ExerciseFileExport.fromExercise(
+                        EXERCISE, exportMapper, variableService, challengeService)
+                    .withOptions(0)));
     JsonNode actualJson = exportMapper.readTree(jsonExport);
 
     Assertions.assertEquals(expectedJson, actualJson);
@@ -111,7 +113,8 @@ public class ExerciseApiExportTest extends IntegrationTest {
 
   // looks for a specific entry in a zip buffer by name, and returns a string representation of it
   // ensure you are using this for text files within zips, not binary files
-  private String getZipEntryAsStringFromByteArrayByName(byte[] byteArray, String entryName) throws IOException {
+  private String getZipEntryAsStringFromByteArrayByName(byte[] byteArray, String entryName)
+      throws IOException {
     try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(byteArray))) {
       ZipEntry entry;
       while ((entry = zis.getNextEntry()) != null) {
