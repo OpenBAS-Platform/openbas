@@ -94,7 +94,7 @@ class AssetGroupApiTest extends IntegrationTest {
       "Given valid AssetGroupInput for a nonexistent assetGroup, should return 404 Not Found")
   @Test
   @WithMockAdminUser
-  void given_validAssetGroupInputForNonexistentAssetGroup_should_returnNotFound() throws Exception {
+  void given_validAssetGroupInputForNonexistentAssetGroup_should_returnNotFound() {
     // --PREPARE--
     AssetGroup input = createDefaultAssetGroup("Asset group");
     String nonexistentAssetGroupId = "nonexistent-id";
