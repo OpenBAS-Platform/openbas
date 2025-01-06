@@ -12,6 +12,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Setter
 @Getter
 @Builder
@@ -45,4 +47,9 @@ public class AgentOutput {
               + "The endpoint is considered active if it was seen in the last 3 minutes.")
   @JsonProperty("agent_active")
   private boolean isActive;
+
+  @Schema(
+      description = "Instant when agent was last seen")
+  @JsonProperty("agent_last_seen")
+  private Instant lastSeen;
 }

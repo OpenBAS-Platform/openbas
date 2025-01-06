@@ -51,10 +51,13 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '15%',
   },
   agent_deployment_mode: {
-    width: '15%',
+    width: '10%',
   },
   agent_active: {
-    width: '20%',
+    width: '10%',
+  },
+  agent_last_seen: {
+    width: '10%',
   },
 };
 
@@ -65,7 +68,7 @@ interface Props {
 const AgentList: React.FC<Props> = ({ agents }) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const { t } = useFormatter();
+  const { t, fldt } = useFormatter();
   // Fetching data
   const { executorsMap } = useHelper((helper: ExecutorHelper) => ({
     executorsMap: helper.getExecutorsMap(),
@@ -81,6 +84,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
     { field: 'agent_privilege', label: 'Privilege' },
     { field: 'agent_deployment_mode', label: 'Deployment' },
     { field: 'agent_active', label: 'Status' },
+    { field: 'agent_last_seen', label: 'Last Seen' },
   ];
 
   const [availableAgents, setAvailableAgents] = useState<AgentOutput[]>(agents);
@@ -159,6 +163,9 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.agent_active}>
                     <AssetStatus variant="list" status={agent.agent_active ? 'Active' : 'Inactive'} />
+                  </div>
+                  <div className={classes.bodyItem} style={inlineStyles.agent_active}>
+                    {fldt(agent.agent_last_seen)}
                   </div>
                 </div>
               )}

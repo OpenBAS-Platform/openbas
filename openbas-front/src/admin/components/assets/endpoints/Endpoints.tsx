@@ -107,10 +107,10 @@ const Endpoints = () => {
   const headers = [
     { field: 'asset_name', label: 'Name', isSortable: true },
     { field: 'endpoint_active', label: 'Status', isSortable: false },
-    { field: 'endpoint_agents_privilege', label: 'Agents Privilege', isSortable: false },
+    { field: 'endpoint_agents_privilege', label: 'Agents Privileges', isSortable: false },
     { field: 'endpoint_platform', label: 'Platform', isSortable: true },
     { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
-    { field: 'endpoint_agents_executor', label: 'Executor', isSortable: false },
+    { field: 'endpoint_agents_executor', label: 'Executors', isSortable: false },
     { field: 'asset_tags', label: 'Tags', isSortable: false },
   ];
 

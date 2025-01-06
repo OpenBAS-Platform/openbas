@@ -794,6 +794,7 @@ const i18n = {
       'Questionnaire': 'Questionnaire',
       'User': 'Utilisateur',
       'Admin': 'Administrateur',
+      'Standard': 'Standard',
       'Modules': 'Modules',
       'General': 'Général',
       'Access reports': 'Accéder aux rapports',
@@ -830,6 +831,7 @@ const i18n = {
       'Privilege': 'Privilège',
       'Deployment': 'Déploiement',
       // Assets
+      'Agents Privileges': 'Privilèges des agents',
       'Endpoints': 'Endpoints',
       'Endpoint Information': 'Informations sur endpoint',
       'asset': 'actif',
@@ -2218,6 +2220,7 @@ const i18n = {
       'Questionnaire': '调查问卷',
       'User': '用户',
       'Admin': '管理员',
+      'Standard': '标准',
       'Modules': '模块',
       'Access reports': '访问报告',
       'General information': '通用信息',
@@ -2254,6 +2257,7 @@ const i18n = {
       'Privilege': '特权',
       'Deployment': '部署',
       // Assets
+      'Agents Privileges': '代理权限',
       'Endpoints': '终端',
       'Endpoint Information': '终端信息',
       'Rules': '规则',

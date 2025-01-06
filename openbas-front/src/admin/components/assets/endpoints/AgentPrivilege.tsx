@@ -8,14 +8,12 @@ const useStyles = makeStyles(() => ({
   chip: {
     fontSize: 20,
     borderRadius: 4,
-    width: 71,
   },
   chipInList: {
     fontSize: 12,
     height: 20,
     float: 'left',
     borderRadius: 4,
-    width: 71,
     marginLeft: 5,
   },
 }));
@@ -59,7 +57,7 @@ const AgentPrivilege: React.FC<Props> = ({ variant, privilege }) => {
           variant="outlined"
           className={style}
           style={inlineStyles.yellow}
-          label={t('User')}
+          label={t('Standard')}
         />
       );
   }

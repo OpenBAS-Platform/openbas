@@ -43,6 +43,11 @@ export interface AgentOutput {
   agent_executor?: ExecutorOutput;
   /** Agent id */
   agent_id: string;
+  /**
+   * Instant when agent was last seen
+   * @format date-time
+   */
+  agent_last_seen?: string;
   /** Agent privilege */
   agent_privilege?: "admin" | "standard";
 }
@@ -686,17 +691,13 @@ export interface DryrunCreateInput {
 }
 
 export interface Endpoint {
-  asset_active?: boolean;
   asset_agents?: Agent[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: string;
   asset_id: string;
-  /** @format date-time */
-  asset_last_seen?: string;
   asset_name: string;
   asset_tags?: string[];
   asset_type?: string;

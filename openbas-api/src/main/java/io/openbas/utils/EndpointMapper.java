@@ -39,8 +39,8 @@ public class EndpointMapper {
         .hostname(endpoint.getHostname())
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
-        .ips(Arrays.asList(endpoint.getIps()))
-        .macAddresses(Arrays.asList(endpoint.getMacAddresses()))
+        .ips(endpoint.getIps() != null ? Arrays.asList(endpoint.getIps()) : emptyList())
+        .macAddresses(endpoint.getMacAddresses() != null ? Arrays.asList(endpoint.getMacAddresses()) : emptyList())
         .agents(toAgentOutputs(endpoint.getAgents()))
         .tags(endpoint.getTags().stream().map(Tag::getId).toList())
         .build();
@@ -59,7 +59,8 @@ public class EndpointMapper {
             .privilege(agent.getPrivilege())
             .deploymentMode(agent.getDeploymentMode())
             .executedByUser(agent.getExecutedByUser())
-            .isActive(agent.isActive());
+            .isActive(agent.isActive())
+            .lastSeen(agent.getLastSeen());
 
     if (agent.getExecutor() != null) {
       builder.executor(
