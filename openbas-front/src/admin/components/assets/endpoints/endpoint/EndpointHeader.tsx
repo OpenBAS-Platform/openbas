@@ -1,6 +1,6 @@
 import { Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import type { UserHelper } from '../../../../../actions/helper';
@@ -23,6 +23,7 @@ const useStyles = makeStyles(() => ({
 const EndpointHeader = () => {
   // Standard hooks
   const classes = useStyles();
+  const navigate = useNavigate();
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
 
   // Fetching data
@@ -47,7 +48,7 @@ const EndpointHeader = () => {
           <EndpointPopover
             endpoint={{ ...endpoint, type: 'static' }}
             onUpdate={endpoint}
-            onDelete={endpoint}
+            onDelete={() => navigate('/admin/assets/endpoints')}
           />
         )}
       </div>
