@@ -1,8 +1,5 @@
 import { expect } from '@playwright/test';
-
-import fillLinuxAssetBase from '../../fixtures/assetFixtures';
 import { test } from '../../fixtures/baseFixtures';
-import AssetFormPage from '../../model/assets/asset-form.page';
 import AssetsPage from '../../model/assets/assets.page';
 import appUrl from '../../utils/url';
 
