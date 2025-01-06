@@ -1,9 +1,10 @@
 package io.openbas.rest.exercise.exports;
 
+// note all values and future values must be an incremental power of 2
 public enum ExportOptions {
-  WITH_PLAYERS(1),
-  WITH_TEAMS(2),
-  WITH_VARIABLE_VALUES(4);
+  WITH_PLAYERS((int) Math.pow(2, 0)),
+  WITH_TEAMS((int) Math.pow(2, 1)),
+  WITH_VARIABLE_VALUES((int) Math.pow(2, 2));
 
   private final int rank;
 
