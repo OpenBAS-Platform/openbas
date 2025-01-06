@@ -153,7 +153,7 @@ const AgentList: React.FC<Props> = ({ agents }) => {
                   <div className={classes.bodyItem} style={inlineStyles.agent_active}>
                     <AssetStatus variant="list" status={agent.agent_active ? 'Active' : 'Inactive'} />
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_active}>
+                  <div className={classes.bodyItem} style={inlineStyles.agent_last_seen}>
                     {fldt(agent.agent_last_seen)}
                   </div>
                 </div>
