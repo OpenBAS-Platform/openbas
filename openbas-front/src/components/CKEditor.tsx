@@ -70,6 +70,7 @@ import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
 
 const CKEDITOR_DEFAULT_CONFIG: EditorConfig = {
+  licenseKey: 'GPL',
   translations: [en, fr, zh],
   plugins: [
     Alignment,
