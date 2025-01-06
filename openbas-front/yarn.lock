@@ -3746,9 +3746,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:4.0.0":
-  version: 4.0.0
-  resolution: "apexcharts@npm:4.0.0"
+"apexcharts@npm:4.3.0":
+  version: 4.3.0
+  resolution: "apexcharts@npm:4.3.0"
   dependencies:
     "@svgdotjs/svg.draggable.js": "npm:^3.0.4"
     "@svgdotjs/svg.filter.js": "npm:^3.0.8"
@@ -3756,7 +3756,7 @@ __metadata:
     "@svgdotjs/svg.resize.js": "npm:^2.0.2"
     "@svgdotjs/svg.select.js": "npm:^4.0.1"
     "@yr/monotone-cubic-spline": "npm:^1.0.3"
-  checksum: 10c0/723a8b2ceb2b1166588c5821aefb27ea105ca1ee08aaf415234edcd5cc1c279e21f40241622d2e909934b6d6f6b9cda6fee15c16226739b7a3d8b9d7ecf04908
+  checksum: 10c0/1120485120ffc52438bfb22db5371cef2f74133bfe839f0464d8c34f09dc477b9bb233f08718db9eef6fcbf96bf3c2c70026ad79f5631ab1feb2b2e3d7e914d9
   languageName: node
   linkType: hard
 
@@ -8962,7 +8962,7 @@ __metadata:
     "@uiw/react-md-editor": "npm:4.0.5"
     "@vitejs/plugin-react": "npm:4.3.4"
     "@xyflow/react": "npm:12.3.6"
-    apexcharts: "npm:4.0.0"
+    apexcharts: "npm:4.3.0"
     axios: "npm:1.7.9"
     chokidar: "npm:4.0.3"
     ckeditor5: "npm:43.3.0"
@@ -9007,7 +9007,7 @@ __metadata:
     qs: "npm:6.13.0"
     ramda: "npm:0.30.1"
     react: "npm:18.3.1"
-    react-apexcharts: "patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch"
+    react-apexcharts: "patch:react-apexcharts@npm%3A1.7.0#~/.yarn/patches/react-apexcharts-npm-1.7.0-334ef0640d.patch"
     react-color: "npm:2.19.3"
     react-csv: "npm:2.2.2"
     react-dom: "npm:18.3.1"
@@ -9515,27 +9515,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-apexcharts@npm:1.5.0":
-  version: 1.5.0
-  resolution: "react-apexcharts@npm:1.5.0"
+"react-apexcharts@npm:1.7.0":
+  version: 1.7.0
+  resolution: "react-apexcharts@npm:1.7.0"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
-    apexcharts: ^3.41.0
+    apexcharts: ">=4.0.0"
     react: ">=0.13"
-  checksum: 10c0/91aef93cfd999053b0fad03b31b32b18dccfe5f08676b07e251cef214ffcc20e8e9cf92821c5ced090521ec5a02c0ca668f0139bf0f76a338cceeab0345889e9
+  checksum: 10c0/0533cd8b44df4d6a0b157c8a8adbcddb33a0575420b3fa1b5c90fa8553a39884bcc1122cce912252e452c8bffd1c4eaf2d9f9cfa4e515e81e7067fa36fcffe52
   languageName: node
   linkType: hard
 
-"react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch":
-  version: 1.5.0
-  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch::version=1.5.0&hash=85e843"
+"react-apexcharts@patch:react-apexcharts@npm%3A1.7.0#~/.yarn/patches/react-apexcharts-npm-1.7.0-334ef0640d.patch":
+  version: 1.7.0
+  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.7.0#~/.yarn/patches/react-apexcharts-npm-1.7.0-334ef0640d.patch::version=1.7.0&hash=fc1890"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
-    apexcharts: ^3.41.0
+    apexcharts: ">=4.0.0"
     react: ">=0.13"
-  checksum: 10c0/854d440acadd577735cdd11aafbf50eb1d2c77e14eff5157b191d89bdcf022fd041ae32189d43bd345ebb735e21fce81e1a04e6502430449d1b7cc488cc4c631
+  checksum: 10c0/439b84a7483d9102c19e463ab978a8963c4af747ee98df4aca5d4b4b1e7b5387a0e2d6d6e4373d7effb71648c2a07c87f5774a3b17e0a5f6ffc068a1decbcd44
   languageName: node
   linkType: hard
 
@@ -9773,7 +9773,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-transition-group@npm:4.4.5":
+"react-transition-group@npm:^4.4.5":
   version: 4.4.5
   resolution: "react-transition-group@npm:4.4.5"
   dependencies:
