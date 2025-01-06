@@ -114,7 +114,6 @@ export const lineChartOptions = (
     hover: {
       filter: {
         type: 'lighten',
-        value: 0.05,
       },
     },
   },
@@ -206,7 +205,6 @@ export const areaChartOptions = (
     hover: {
       filter: {
         type: 'lighten',
-        value: 0.05,
       },
     },
   },
@@ -343,7 +341,6 @@ export const verticalBarsChartOptions = (
     hover: {
       filter: {
         type: isFakeData ? 'none' : 'lighten',
-        value: 0.05,
       },
     },
     active: {
@@ -488,7 +485,6 @@ export const horizontalBarsChartOptions = (
     hover: {
       filter: {
         type: isFakeData ? 'none' : 'lighten',
-        value: 0.05,
       },
     },
   },
@@ -587,7 +583,6 @@ export const radarChartOptions = (theme: Theme, labels: string[], chartColors = 
     hover: {
       filter: {
         type: 'lighten',
-        value: 0.05,
       },
     },
   },
@@ -695,7 +690,6 @@ export const polarAreaChartOptions = (
       hover: {
         filter: {
           type: 'lighten',
-          value: 0.05,
         },
       },
     },
@@ -839,7 +833,6 @@ export const donutChartOptions = ({
       hover: {
         filter: {
           type: isFakeData ? 'none' : 'lighten',
-          value: 0.05,
         },
       },
     },

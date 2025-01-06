@@ -9007,7 +9007,7 @@ __metadata:
     qs: "npm:6.13.0"
     ramda: "npm:0.30.1"
     react: "npm:18.3.1"
-    react-apexcharts: "patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch"
+    react-apexcharts: "patch:react-apexcharts@npm%3A1.7.0#~/.yarn/patches/react-apexcharts-npm-1.7.0-334ef0640d.patch"
     react-color: "npm:2.19.3"
     react-csv: "npm:2.2.2"
     react-dom: "npm:18.3.1"
@@ -9515,27 +9515,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-apexcharts@npm:1.5.0":
-  version: 1.5.0
-  resolution: "react-apexcharts@npm:1.5.0"
+"react-apexcharts@npm:1.7.0":
+  version: 1.7.0
+  resolution: "react-apexcharts@npm:1.7.0"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
-    apexcharts: ^3.41.0
+    apexcharts: ">=4.0.0"
     react: ">=0.13"
-  checksum: 10c0/91aef93cfd999053b0fad03b31b32b18dccfe5f08676b07e251cef214ffcc20e8e9cf92821c5ced090521ec5a02c0ca668f0139bf0f76a338cceeab0345889e9
+  checksum: 10c0/0533cd8b44df4d6a0b157c8a8adbcddb33a0575420b3fa1b5c90fa8553a39884bcc1122cce912252e452c8bffd1c4eaf2d9f9cfa4e515e81e7067fa36fcffe52
   languageName: node
   linkType: hard
 
-"react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch":
-  version: 1.5.0
-  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch::version=1.5.0&hash=85e843"
+"react-apexcharts@patch:react-apexcharts@npm%3A1.7.0#~/.yarn/patches/react-apexcharts-npm-1.7.0-334ef0640d.patch":
+  version: 1.7.0
+  resolution: "react-apexcharts@patch:react-apexcharts@npm%3A1.7.0#~/.yarn/patches/react-apexcharts-npm-1.7.0-334ef0640d.patch::version=1.7.0&hash=fc1890"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
-    apexcharts: ^3.41.0
+    apexcharts: ">=4.0.0"
     react: ">=0.13"
-  checksum: 10c0/854d440acadd577735cdd11aafbf50eb1d2c77e14eff5157b191d89bdcf022fd041ae32189d43bd345ebb735e21fce81e1a04e6502430449d1b7cc488cc4c631
+  checksum: 10c0/439b84a7483d9102c19e463ab978a8963c4af747ee98df4aca5d4b4b1e7b5387a0e2d6d6e4373d7effb71648c2a07c87f5774a3b17e0a5f6ffc068a1decbcd44
   languageName: node
   linkType: hard
 
@@ -9773,7 +9773,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-transition-group@npm:4.4.5":
+"react-transition-group@npm:^4.4.5":
   version: 4.4.5
   resolution: "react-transition-group@npm:4.4.5"
   dependencies:

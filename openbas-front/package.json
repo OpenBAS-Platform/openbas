@@ -50,7 +50,7 @@
     "qs": "6.13.0",
     "ramda": "0.30.1",
     "react": "18.3.1",
-    "react-apexcharts": "patch:react-apexcharts@npm%3A1.5.0#~/.yarn/patches/react-apexcharts-npm-1.5.0-61b3dc052e.patch",
+    "react-apexcharts": "patch:react-apexcharts@npm%3A1.7.0#~/.yarn/patches/react-apexcharts-npm-1.7.0-334ef0640d.patch",
     "react-color": "2.19.3",
     "react-csv": "2.2.2",
     "react-dom": "18.3.1",
@@ -139,11 +139,6 @@
     "test:e2e:coverage": "E2E_COVERAGE=true yarn playwright test && yarn show-report-e2e",
     "generate-test-e2e": "yarn playwright codegen http://localhost:3001/",
     "show-report-e2e": "start \"\" test-results/report.html && start \"\" test-results/coverage/index.html"
-  },
-  "resolutions": {
-    "mini-css-extract-plugin": "2.9.2",
-    "react-transition-group": "4.4.5",
-    "react-apexcharts@1.4.1": "patch:react-apexcharts@npm%3A1.4.1#./.yarn/patches/react-apexcharts-npm-1.4.1-2dc909d883.patch"
   },
   "workspaces": [
     "packages/*"
