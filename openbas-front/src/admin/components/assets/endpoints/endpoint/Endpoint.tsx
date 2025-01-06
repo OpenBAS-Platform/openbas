@@ -64,7 +64,7 @@ const Endpoint = () => {
                   gutterBottom
                   style={{ marginTop: 20 }}
                 >
-                  {t('Host name')}
+                  {t('Hostname')}
                 </Typography>
                 <div style={{ display: 'flex' }}>
                   {endpoint.endpoint_hostname}

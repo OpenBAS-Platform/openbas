@@ -793,6 +793,7 @@ const i18n = {
       'Template': 'Modèle',
       'Questionnaire': 'Questionnaire',
       'User': 'Utilisateur',
+      'Admin': 'Administrateur',
       'Modules': 'Modules',
       'General': 'Général',
       'Access reports': 'Accéder aux rapports',
@@ -830,6 +831,7 @@ const i18n = {
       'Deployment': 'Déploiement',
       // Assets
       'Endpoints': 'Endpoints',
+      'Endpoint Information': 'Informations sur endpoint',
       'asset': 'actif',
       'Rules': 'Règles',
       'Rule': 'Règle',
@@ -2215,6 +2217,7 @@ const i18n = {
       'Template': '模板',
       'Questionnaire': '调查问卷',
       'User': '用户',
+      'Admin': '管理员',
       'Modules': '模块',
       'Access reports': '访问报告',
       'General information': '通用信息',
