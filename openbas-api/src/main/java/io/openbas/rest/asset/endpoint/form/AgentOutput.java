@@ -32,7 +32,7 @@ public class AgentOutput {
   @JsonProperty("agent_deployment_mode")
   private Agent.DEPLOYMENT_MODE deploymentMode;
 
-  @Schema(description = "User")
+  @Schema(description = "The user who executed the agent")
   @JsonProperty("agent_executed_by_user")
   private String executedByUser;
 
