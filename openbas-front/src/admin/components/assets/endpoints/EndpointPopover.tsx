@@ -13,6 +13,7 @@ import type { EndpointOverviewOutput, EndpointUpdateInput } from '../../../../ut
 import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointForm from './EndpointForm';
 import { EndpointStoreWithType } from './EndpointsList';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 
 interface Props {
   inline?: boolean;
