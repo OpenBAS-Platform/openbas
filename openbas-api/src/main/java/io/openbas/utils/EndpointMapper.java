@@ -40,7 +40,10 @@ public class EndpointMapper {
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
         .ips(endpoint.getIps() != null ? Arrays.asList(endpoint.getIps()) : emptyList())
-        .macAddresses(endpoint.getMacAddresses() != null ? Arrays.asList(endpoint.getMacAddresses()) : emptyList())
+        .macAddresses(
+            endpoint.getMacAddresses() != null
+                ? Arrays.asList(endpoint.getMacAddresses())
+                : emptyList())
         .agents(toAgentOutputs(endpoint.getAgents()))
         .tags(endpoint.getTags().stream().map(Tag::getId).toList())
         .build();

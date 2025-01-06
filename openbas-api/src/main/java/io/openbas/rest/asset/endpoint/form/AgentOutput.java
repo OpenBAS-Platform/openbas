@@ -8,11 +8,10 @@ import io.openbas.database.model.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Setter
 @Getter
@@ -48,8 +47,7 @@ public class AgentOutput {
   @JsonProperty("agent_active")
   private boolean isActive;
 
-  @Schema(
-      description = "Instant when agent was last seen")
+  @Schema(description = "Instant when agent was last seen")
   @JsonProperty("agent_last_seen")
   private Instant lastSeen;
 }
