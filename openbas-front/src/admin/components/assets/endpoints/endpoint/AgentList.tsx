@@ -126,15 +126,6 @@ const AgentList: React.FC<Props> = ({ agents }) => {
             key={agent.agent_id}
             classes={{ root: classes.item }}
             divider
-            secondaryAction={(
-              <AgentPopover
-                agent={agent}
-                actions={['Delete']}
-                inList
-                onDelete={result => setAvailableAgents(availableAgents.filter(agent => (agent.agent_id !== result)))}
-              />
-            )}
-            disablePadding
           >
             <ListItemIcon>
               <DevicesOtherOutlined color="primary" />
