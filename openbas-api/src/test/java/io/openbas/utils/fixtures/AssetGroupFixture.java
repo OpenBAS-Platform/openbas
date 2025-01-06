@@ -15,8 +15,7 @@ public class AssetGroupFixture {
   }
 
   public static AssetGroupInput createAssetGroupWithTags(
-      @NotNull final String name,
-      @NotNull final List<String> tagIds) {
+      @NotNull final String name, @NotNull final List<String> tagIds) {
     AssetGroupInput assetGroupInput = new AssetGroupInput();
     assetGroupInput.setName(name);
     assetGroupInput.setDescription("An asset group");
