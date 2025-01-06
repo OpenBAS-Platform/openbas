@@ -52,7 +52,10 @@ public class AssetGroupService {
   }
 
   public AssetGroup assetGroup(@NotBlank final String assetGroupId) {
-    AssetGroup assetGroup = this.assetGroupRepository.findById(assetGroupId).orElseThrow();
+    AssetGroup assetGroup =
+        this.assetGroupRepository
+            .findById(assetGroupId)
+            .orElseThrow(() -> new IllegalArgumentException("Asset group not found"));
     return computeDynamicAssets(assetGroup);
   }
 
