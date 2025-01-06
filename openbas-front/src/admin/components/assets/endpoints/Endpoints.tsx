@@ -136,14 +136,11 @@ const Endpoints = () => {
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
       <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
-        {t('To register new endpoints, you will need to install our agent. Detailed instructions can be found on our ')}
-
+        {t('To register new endpoints, you will need to install an agent. You can find detailed instructions on the ')}
         <a href={`${settings.platform_base_url}/admin/agents`} target="_blank" rel="noopener noreferrer">
           {t('agent installation page')}
         </a>
-
         {t(' and in our ')}
-
         <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">
           {t('documentation')}
         </a>
