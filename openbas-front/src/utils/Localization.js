@@ -2255,6 +2255,7 @@ const i18n = {
       'Deployment': '部署',
       // Assets
       'Endpoints': '终端',
+      'Endpoint Information': '终端信息',
       'Rules': '规则',
       'Rule': '规则',
       'Teams of players': '选手团队',
