@@ -45,7 +45,7 @@ const Endpoint = () => {
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
             <Grid container spacing={3}>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -53,12 +53,14 @@ const Endpoint = () => {
                 >
                   {t('Description')}
                 </Typography>
-                <ExpandableMarkdown
+                <div style={{ display: 'flex', paddingTop: 5 }}>
+                  <ExpandableMarkdown
                   source={endpoint.asset_description}
                   limit={300}
                 />
+                </div>
               </Grid>
-              <Grid item xs={3} style={{ paddingTop: 10 }}>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -66,11 +68,11 @@ const Endpoint = () => {
                 >
                   {t('Hostname')}
                 </Typography>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', paddingTop: 5 }}>
                   {endpoint.endpoint_hostname}
                 </div>
               </Grid>
-              <Grid item xs={3} style={{ paddingTop: 10 }}>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -78,13 +80,13 @@ const Endpoint = () => {
                 >
                   {t('Platform')}
                 </Typography>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', paddingTop: 5 }}>
                   <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
                   {' '}
                   {endpoint.endpoint_platform}
                 </div>
               </Grid>
-              <Grid item xs={2} style={{ paddingTop: 10 }}>
+              <Grid item xs={2} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -92,11 +94,11 @@ const Endpoint = () => {
                 >
                   {t('Architecture')}
                 </Typography>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', paddingTop: 5 }}>
                   {endpoint.endpoint_arch}
                 </div>
               </Grid>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Grid item xs={4} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -104,7 +106,7 @@ const Endpoint = () => {
                 >
                   {t('IP Addresses')}
                 </Typography>
-                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10, paddingTop: 5 }}>
                   {endpoint.endpoint_ips?.map((ip: string, index: number) => (
                     <div key={index} style={{ marginRight: 10 }}>
                       {ip}
@@ -112,7 +114,7 @@ const Endpoint = () => {
                   ))}
                 </div>
               </Grid>
-              <Grid item xs={3} style={{ paddingTop: 10 }}>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -120,7 +122,7 @@ const Endpoint = () => {
                 >
                   {t('MAC Addresses')}
                 </Typography>
-                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10, paddingTop: 5  }}>
                   {endpoint.endpoint_mac_addresses?.map((mac: string, index: number) => (
                     <div key={index} style={{ marginRight: 10 }}>
                       {mac}
@@ -128,7 +130,7 @@ const Endpoint = () => {
                   ))}
                 </div>
               </Grid>
-              <Grid item xs={2} style={{ paddingTop: 10 }}>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -136,7 +138,7 @@ const Endpoint = () => {
                 >
                   {t('Tags')}
                 </Typography>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', paddingTop: 5 }}>
                   <ItemTags variant="list" tags={endpoint.asset_tags} />
                 </div>
               </Grid>
