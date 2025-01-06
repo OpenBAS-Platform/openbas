@@ -2,7 +2,7 @@ import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties } from 'react';
 
 import { fetchExecutors } from '../../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
