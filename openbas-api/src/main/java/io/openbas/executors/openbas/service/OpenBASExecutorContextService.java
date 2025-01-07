@@ -20,7 +20,10 @@ public class OpenBASExecutorContextService {
   }
 
   private String computeCommand(
-      @NotNull final Inject inject, Endpoint.PLATFORM_TYPE platform, Endpoint.PLATFORM_ARCH arch) {
+      @NotNull final Inject inject,
+      String agentId,
+      Endpoint.PLATFORM_TYPE platform,
+      Endpoint.PLATFORM_ARCH arch) {
     Injector injector =
         inject
             .getInjectorContract()
@@ -33,19 +36,22 @@ public class OpenBASExecutorContextService {
         return injector
             .getExecutorCommands()
             .get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
-            .replace("#{inject}", inject.getId());
+            .replace("#{inject}", inject.getId())
+            .replace("#{agent}", agentId);
       }
       case Endpoint.PLATFORM_TYPE.Linux -> {
         return injector
             .getExecutorCommands()
             .get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name())
-            .replace("#{inject}", inject.getId());
+            .replace("#{inject}", inject.getId())
+            .replace("#{agent}", agentId);
       }
       case Endpoint.PLATFORM_TYPE.MacOS -> {
         return injector
             .getExecutorCommands()
             .get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name())
-            .replace("#{inject}", inject.getId());
+            .replace("#{inject}", inject.getId())
+            .replace("#{agent}", agentId);
       }
       default -> throw new RuntimeException("Unsupported platform: " + platform);
     }
@@ -61,7 +67,8 @@ public class OpenBASExecutorContextService {
       throw new RuntimeException("Unsupported null platform");
     }
     AssetAgentJob assetAgentJob = new AssetAgentJob();
-    assetAgentJob.setCommand(computeCommand(inject, platform, arch));
+    assetAgentJob.setCommand(
+        computeCommand(inject, assetEndpoint.getAgents().getFirst().getId(), platform, arch));
     assetAgentJob.setAgent(assetEndpoint.getAgents().getFirst());
     assetAgentJob.setInject(inject);
     assetAgentJobRepository.save(assetAgentJob);

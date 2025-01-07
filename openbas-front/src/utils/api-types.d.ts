@@ -140,7 +140,7 @@ export interface ArticleUpdateInput {
 }
 
 export interface AssetAgentJob {
-  asset_agent_asset?: string;
+  asset_agent_agent?: string;
   asset_agent_command: string;
   asset_agent_id: string;
   asset_agent_inject?: string;
@@ -752,6 +752,9 @@ export interface EndpointOverviewOutput {
 }
 
 export interface EndpointRegisterInput {
+  agent_executed_by_user?: string;
+  agent_is_elevated?: boolean;
+  agent_is_service?: boolean;
   asset_description?: string;
   asset_external_reference: string;
   /** @format date-time */

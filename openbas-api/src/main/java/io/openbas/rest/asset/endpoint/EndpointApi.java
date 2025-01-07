@@ -82,6 +82,16 @@ public class EndpointApi extends RestBehavior {
           .getAgents()
           .getFirst()
           .setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      endpoint
+          .getAgents()
+          .getFirst()
+          .setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
+      endpoint
+          .getAgents()
+          .getFirst()
+          .setDeploymentMode(
+              input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
+      endpoint.getAgents().getFirst().setExecutedByUser(input.getExecutedByUser());
     } else {
       endpoint = new Endpoint();
       Agent agent = new Agent();
@@ -89,12 +99,10 @@ public class EndpointApi extends RestBehavior {
       agent.setExternalReference(input.getExternalReference());
       endpoint.setUpdateAttributes(input);
       agent.setLastSeen(Instant.now());
-      agent.setPrivilege(Agent.PRIVILEGE.admin);
-      agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-      agent.setExecutedByUser(
-          Endpoint.PLATFORM_TYPE.Windows.equals(input.getPlatform())
-              ? Agent.ADMIN_SYSTEM_WINDOWS
-              : Agent.ADMIN_SYSTEM_UNIX);
+      agent.setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
+      agent.setDeploymentMode(
+          input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
+      agent.setExecutedByUser(input.getExecutedByUser());
       endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
       agent.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
       agent.setAsset(endpoint);
@@ -115,17 +123,21 @@ public class EndpointApi extends RestBehavior {
   }
 
   @LogExecutionTime
-  @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
+  @PostMapping(ENDPOINT_URI + "/jobs")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
-  public List<AssetAgentJob> getEndpointJobs(
-      @PathVariable @NotBlank final String endpointExternalReference) {
-    // TODO get agent job with agent id (OpenBAS executor, deployment mode, user, privilege, externalReference)
+  public List<AssetAgentJob> getEndpointJobs(@RequestBody final EndpointRegisterInput input) {
     return this.assetAgentJobRepository.findAll(
-        AssetAgentJobSpecification.forEndpoint(endpointExternalReference));
+        AssetAgentJobSpecification.forEndpoint(
+            input.getExternalReference(),
+            input.isService()
+                ? Agent.DEPLOYMENT_MODE.service.name()
+                : Agent.DEPLOYMENT_MODE.session.name(),
+            input.isElevated() ? Agent.PRIVILEGE.admin.name() : Agent.PRIVILEGE.standard.name(),
+            input.getExecutedByUser()));
   }
 
-  @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
+  @DeleteMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
