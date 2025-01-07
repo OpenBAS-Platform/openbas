@@ -14,10 +14,11 @@ public class EndpointFixture {
   public static final String[] MAC_ADDRESSES = {"00:1B:44:11:3A:B7"};
   public static final Instant REFERENCE_TIME =
       Instant.now(Clock.fixed(Instant.parse("2024-12-17T10:30:45Z"), ZoneId.of("UTC")));
+  public static final String WINDOWS_ASSET_NAME_INPUT = "Windows asset";
 
   public static EndpointInput createWindowsEndpointInput(List<String> tagIds) {
     EndpointInput input = new EndpointInput();
-    input.setName("Windows asset");
+    input.setName(WINDOWS_ASSET_NAME_INPUT);
     input.setDescription("Description of Windows asset");
     input.setTagIds(tagIds);
     input.setIps(IPS);
@@ -33,7 +34,7 @@ public class EndpointFixture {
   public static EndpointRegisterInput createWindowsEndpointRegisterInput(
       List<String> tagIds, String externalReference) {
     EndpointRegisterInput input = new EndpointRegisterInput();
-    input.setName("Windows asset");
+    input.setName(WINDOWS_ASSET_NAME_INPUT);
     input.setDescription("Description of Windows asset");
     input.setTagIds(tagIds);
     input.setIps(IPS);

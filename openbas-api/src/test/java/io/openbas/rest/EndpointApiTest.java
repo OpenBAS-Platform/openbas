@@ -2,6 +2,9 @@ package io.openbas.rest;
 
 import static io.openbas.rest.asset.endpoint.EndpointApi.ENDPOINT_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.AgentFixture.createAgent;
+import static io.openbas.utils.fixtures.EndpointFixture.*;
+import static io.openbas.utils.fixtures.TagFixture.getTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
@@ -17,57 +21,41 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.utils.fixtures.EndpointFixture;
-import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @TestInstance(PER_CLASS)
-public class EndpointApiTest {
-
-  static EndpointInput ENDPOINT_INPUT;
-  static EndpointRegisterInput ENDPOINT_REGISTER_INPUT;
-  static Endpoint ENDPOINT;
-  static String TAG_ID;
+@Transactional
+class EndpointApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
   @Autowired private TagRepository tagRepository;
   @Autowired private EndpointRepository endpointRepository;
   @SpyBean private EndpointService endpointService;
 
-  @BeforeEach
-  void beforeEach() {
-    Tag tag = tagRepository.save(TagFixture.getTag());
-    TAG_ID = tag.getId();
-  }
-
-  @AfterEach
-  void afterEach() {
-    tagRepository.deleteById(TAG_ID);
-  }
-
-  @DisplayName("Creation of a windows endpoint")
+  @DisplayName("Given valid Windows endpoint input, should create a Windows endpoint successfully")
   @Test
   @WithMockAdminUser
-  void createWindowsEndpointTest() throws Exception {
+  void given_validWindowsEndpointInput_should_createWindowsEndpointSuccessfully() throws Exception {
     // --PREPARE--
-    ENDPOINT_INPUT = EndpointFixture.createWindowsEndpointInput(List.of(TAG_ID));
+    Tag tag = tagRepository.save(getTag());
+    EndpointInput input = createWindowsEndpointInput(List.of(tag.getId()));
 
     // --EXECUTE--
     String response =
         mvc.perform(
                 post(ENDPOINT_URI)
-                    .content(asJsonString(ENDPOINT_INPUT))
+                    .content(asJsonString(input))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -76,32 +64,32 @@ public class EndpointApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("Windows Hostname", JsonPath.read(response, "$.endpoint_hostname"));
-
-    // --THEN--
-    endpointRepository.deleteById(JsonPath.read(response, "$.endpoint_hostname"));
+    assertEquals(WINDOWS_ASSET_NAME_INPUT, JsonPath.read(response, "$.asset_name"));
+    assertEquals(MAC_ADDRESSES[0], JsonPath.read(response, "$.endpoint_mac_addresses[0]"));
   }
 
-  @DisplayName("Upsert of an endpoint")
+  @DisplayName("Given valid endpoint input, should upsert an endpoint successfully")
   @Test
   @WithMockAdminUser
-  void upsertEndpointTest() throws Exception {
+  void given_validEndpointInput_should_upsertEndpointSuccessfully() throws Exception {
     // --PREPARE--
-    ENDPOINT_REGISTER_INPUT =
-        EndpointFixture.createWindowsEndpointRegisterInput(List.of(TAG_ID), "external01");
+    Tag tag = tagRepository.save(getTag());
+    String externalReference = "external01";
+    EndpointRegisterInput registerInput =
+        createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
-    endpoint.setUpdateAttributes(ENDPOINT_REGISTER_INPUT);
-    Agent agent = new Agent();
-    agent.setExecutedByUser(Agent.ADMIN_SYSTEM_WINDOWS);
-    agent.setPrivilege(Agent.PRIVILEGE.admin);
-    agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-    agent.setAsset(endpoint);
-    agent.setExternalReference("external01");
-    endpoint.setAgents(List.of(agent));
-    ENDPOINT = endpointRepository.save(endpoint);
+    endpoint.setUpdateAttributes(registerInput);
+    Agent agent = createAgent(endpoint, externalReference);
+    endpoint.setAgents(
+        new ArrayList<>() {
+          {
+            add(agent);
+          }
+        });
+    endpointRepository.save(endpoint);
 
     String newName = "New hostname";
-    ENDPOINT_REGISTER_INPUT.setHostname(newName);
+    registerInput.setHostname(newName);
 
     Mockito.doReturn("command")
         .when(endpointService)
@@ -111,7 +99,7 @@ public class EndpointApiTest {
     String response =
         mvc.perform(
                 post(ENDPOINT_URI + "/register")
-                    .content(asJsonString(ENDPOINT_REGISTER_INPUT))
+                    .content(asJsonString(registerInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -120,26 +108,23 @@ public class EndpointApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("New hostname", JsonPath.read(response, "$.endpoint_hostname"));
-    // --THEN--
-    endpointRepository.deleteById(JsonPath.read(response, "$.asset_id"));
+    assertEquals(newName, JsonPath.read(response, "$.endpoint_hostname"));
   }
 
-  @DisplayName("Upsert of a non existing endpoint")
+  @DisplayName(
+      "Given valid input for a non-existing endpoint, should create and upsert successfully")
   @Test
   @WithMockAdminUser
-  void upsertNonExistingEndpointTest() throws Exception {
+  void given_validInputForNonExistingEndpoint_should_createAndUpsertSuccessfully()
+      throws Exception {
     // --PREPARE--
-    ENDPOINT_REGISTER_INPUT =
-        EndpointFixture.createWindowsEndpointRegisterInput(List.of(TAG_ID), "external01");
+    Tag tag = tagRepository.save(getTag());
+    String externalReference = "external01";
+    EndpointRegisterInput registerInput =
+        createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
-    endpoint.setUpdateAttributes(ENDPOINT_REGISTER_INPUT);
-    Agent agent = new Agent();
-    agent.setExecutedByUser(Agent.ADMIN_SYSTEM_WINDOWS);
-    agent.setPrivilege(Agent.PRIVILEGE.admin);
-    agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-    agent.setAsset(endpoint);
-    agent.setExternalReference("external01");
+    endpoint.setUpdateAttributes(registerInput);
+    Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(List.of(agent));
 
     Mockito.doReturn("command")
@@ -150,7 +135,7 @@ public class EndpointApiTest {
     String response =
         mvc.perform(
                 post(ENDPOINT_URI + "/register")
-                    .content(asJsonString(ENDPOINT_REGISTER_INPUT))
+                    .content(asJsonString(registerInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -159,35 +144,36 @@ public class EndpointApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("Windows Hostname", JsonPath.read(response, "$.endpoint_hostname"));
-    // --THEN--
-    endpointRepository.deleteById(JsonPath.read(response, "$.asset_id"));
+    assertEquals(WINDOWS_ASSET_NAME_INPUT, JsonPath.read(response, "$.asset_name"));
   }
 
-  @DisplayName("Edition of an endpoint")
+  @DisplayName("Given valid input, should update an endpoint successfully")
   @Test
   @WithMockAdminUser
-  void updateEndpointTest() throws Exception {
+  void given_validInput_should_updateEndpointSuccessfully() throws Exception {
     // --PREPARE--
-    ENDPOINT_INPUT = EndpointFixture.createWindowsEndpointInput(List.of(TAG_ID));
+    Tag tag = tagRepository.save(getTag());
+    String externalReference = "external01";
+    EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
     Endpoint endpoint = new Endpoint();
-    endpoint.setUpdateAttributes(ENDPOINT_INPUT);
-    Agent agent = new Agent();
-    agent.setExecutedByUser(Agent.ADMIN_SYSTEM_WINDOWS);
-    agent.setPrivilege(Agent.PRIVILEGE.admin);
-    agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-    agent.setAsset(endpoint);
-    endpoint.setAgents(List.of(agent));
-    ENDPOINT = endpointRepository.save(endpoint);
+    endpoint.setUpdateAttributes(endpointInput);
+    Agent agent = createAgent(endpoint, externalReference);
+    endpoint.setAgents(
+        new ArrayList<>() {
+          {
+            add(agent);
+          }
+        });
+    Endpoint endpointCreated = endpointRepository.save(endpoint);
 
     String newName = "New hostname";
-    ENDPOINT_INPUT.setHostname(newName);
+    endpointInput.setHostname(newName);
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                put(ENDPOINT_URI + "/" + ENDPOINT.getId())
-                    .content(asJsonString(ENDPOINT_INPUT))
+                put(ENDPOINT_URI + "/" + endpointCreated.getId())
+                    .content(asJsonString(endpointInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -196,8 +182,6 @@ public class EndpointApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("New hostname", JsonPath.read(response, "$.endpoint_hostname"));
-    // --THEN--
-    endpointRepository.deleteById(JsonPath.read(response, "$.asset_id"));
+    assertEquals(newName, JsonPath.read(response, "$.endpoint_hostname"));
   }
 }
