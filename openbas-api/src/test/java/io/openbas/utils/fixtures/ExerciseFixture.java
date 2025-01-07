@@ -4,7 +4,6 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseStatus;
-import io.openbas.database.model.Inject;
 import io.openbas.database.model.Team;
 import java.time.Instant;
 import java.util.List;
@@ -23,16 +22,6 @@ public class ExerciseFixture {
     if (exerciseTeams != null) {
       exercise.setTeams(exerciseTeams);
     }
-    return exercise;
-  }
-
-  public static Exercise getExerciseWithInjects() {
-    Exercise exercise = getExercise(null);
-    Inject inject1 = new Inject();
-    inject1.setId("1");
-    Inject inject2 = new Inject();
-    inject1.setId("2");
-    exercise.setInjects(List.of(inject1, inject2));
     return exercise;
   }
 

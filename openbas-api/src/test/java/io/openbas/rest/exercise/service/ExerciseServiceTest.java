@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
@@ -114,10 +115,15 @@ class ExerciseServiceTest {
     Asset asset1 = AssetFixture.createDefaultAsset("asset1");
     Asset asset2 = AssetFixture.createDefaultAsset("asset2");
     Asset asset3 = AssetFixture.createDefaultAsset("asset3");
-    io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
-    io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
-    io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
-    Exercise exercise = ExerciseFixture.getExerciseWithInjects();
+    Tag tag1 = TagFixture.getTag("Tag1");
+    Tag tag2 = TagFixture.getTag("Tag2");
+    Tag tag3 = TagFixture.getTag("Tag3");
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Exercise exercise = ExerciseFixture.getExercise(null);
+    exercise.setInjects(List.of(inject1, inject2));
     exercise.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
     List<Asset> assetsToAdd = List.of(asset1, asset2);
@@ -143,7 +149,12 @@ class ExerciseServiceTest {
     io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
     io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
     io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
-    Exercise exercise = ExerciseFixture.getExerciseWithInjects();
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Exercise exercise = ExerciseFixture.getExercise(null);
+    exercise.setInjects(List.of(inject1, inject2));
     exercise.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
 

@@ -49,12 +49,4 @@ public class ScenarioFixture {
     scenario.setSeverity(critical);
     return scenario;
   }
-
-  public static Scenario getScenarioWithInjects() {
-    Inject inject1 = new Inject();
-    inject1.setId("1");
-    Inject inject2 = new Inject();
-    inject1.setId("2");
-    return getScenario(null, Set.of(inject1, inject2));
-  }
 }

@@ -212,7 +212,11 @@ class ScenarioServiceTest {
     Tag tag1 = TagFixture.getTag("Tag1");
     Tag tag2 = TagFixture.getTag("Tag2");
     Tag tag3 = TagFixture.getTag("Tag3");
-    Scenario scenario = ScenarioFixture.getScenarioWithInjects();
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Scenario scenario = ScenarioFixture.getScenario(null, Set.of(inject1, inject2));
     scenario.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
     List<Asset> assetsToAdd = List.of(asset1, asset2);
@@ -242,7 +246,11 @@ class ScenarioServiceTest {
     Tag tag1 = TagFixture.getTag("Tag1");
     Tag tag2 = TagFixture.getTag("Tag2");
     Tag tag3 = TagFixture.getTag("Tag3");
-    Scenario scenario = ScenarioFixture.getScenarioWithInjects();
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Scenario scenario = ScenarioFixture.getScenario(null, Set.of(inject1, inject2));
     scenario.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
     List<Asset> assetsToAdd = List.of(asset1, asset2);
