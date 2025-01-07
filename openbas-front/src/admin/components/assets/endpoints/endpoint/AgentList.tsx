@@ -1,8 +1,7 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import * as React from 'react';
-import { CSSProperties } from 'react';
+import { CSSProperties, FunctionComponent } from 'react';
 
 import { fetchExecutors } from '../../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
@@ -65,7 +64,7 @@ interface Props {
   agents: AgentOutput[];
 }
 
-const AgentList: React.FC<Props> = ({ agents }) => {
+const AgentList: FunctionComponent<Props> = ({ agents }) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
@@ -79,12 +78,62 @@ const AgentList: React.FC<Props> = ({ agents }) => {
 
   // Headers
   const headers = [
-    { field: 'agent_executed_by_user', label: 'Agent Name' },
-    { field: 'agent_executor', label: 'Executor' },
-    { field: 'agent_privilege', label: 'Privilege' },
-    { field: 'agent_deployment_mode', label: 'Deployment' },
-    { field: 'agent_active', label: 'Status' },
-    { field: 'agent_last_seen', label: 'Last Seen' },
+    {
+      field: 'agent_executed_by_user',
+      label: 'Agent Name',
+      isSortable: false,
+      value: (agent: AgentOutput) => agent.agent_executed_by_user,
+    },
+    {
+      field: 'agent_executor',
+      label: 'Executor',
+      isSortable: false,
+      value: (agent: AgentOutput) => {
+        const executor = agent.agent_executor?.executor_id ? executorsMap[agent.agent_executor?.executor_id] : undefined;
+        return (
+          <>
+            {executor && (
+              <img
+                src={`/api/images/executors/${executor.executor_type}`}
+                alt={executor.executor_type}
+                style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+              />
+            )}
+            {executor?.executor_name ?? t('Unknown')}
+          </>
+        );
+      },
+    },
+    {
+      field: 'agent_privilege',
+      label: 'Privilege',
+      isSortable: false,
+      value: (agent: AgentOutput) => {
+        return (<AgentPrivilege variant="list" privilege={agent.agent_privilege ?? 'admin'} />);
+      },
+    },
+    {
+      field: 'agent_deployment_mode',
+      label: 'Deployment',
+      isSortable: false,
+      value: (agent: AgentOutput) => {
+        return (<AgentDeploymentMode variant="list" mode={agent.agent_deployment_mode ?? 'session'} />);
+      },
+    },
+    {
+      field: 'agent_active',
+      label: 'Status',
+      isSortable: false,
+      value: (agent: AgentOutput) => {
+        return (<AssetStatus variant="list" status={agent.agent_active ? 'Active' : 'Inactive'} />);
+      },
+    },
+    {
+      field: 'agent_last_seen',
+      label: 'Last Seen',
+      isSortable: false,
+      value: (agent: AgentOutput) => fldt(agent.agent_last_seen),
+    },
   ];
 
   return (
@@ -118,7 +167,6 @@ const AgentList: React.FC<Props> = ({ agents }) => {
       >
       </ListItem>
       {agents.map((agent: AgentOutput) => {
-        const executor = agent.agent_executor?.executor_id ? executorsMap[agent.agent_executor?.executor_id] : undefined;
         return (
           <ListItem
             key={agent.agent_id}
@@ -131,31 +179,15 @@ const AgentList: React.FC<Props> = ({ agents }) => {
             <ListItemText
               primary={(
                 <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_executed_by_user}>
-                    {agent.agent_executed_by_user}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_executor}>
-                    {executor && (
-                      <img
-                        src={`/api/images/executors/${executor.executor_type}`}
-                        alt={executor.executor_type}
-                        style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                      />
-                    )}
-                    {executor?.executor_name ?? t('Unknown')}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_privilege}>
-                    <AgentPrivilege variant="list" privilege={agent.agent_privilege ?? 'admin'} />
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_deployment_mode}>
-                    <AgentDeploymentMode variant="list" mode={agent.agent_deployment_mode ?? 'session'} />
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_active}>
-                    <AssetStatus variant="list" status={agent.agent_active ? 'Active' : 'Inactive'} />
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.agent_last_seen}>
-                    {fldt(agent.agent_last_seen)}
-                  </div>
+                  {headers.map(header => (
+                    <div
+                      key={header.field}
+                      className={classes.bodyItem}
+                      style={inlineStyles[header.field]}
+                    >
+                      {header.value(agent)}
+                    </div>
+                  ))}
                 </div>
               )}
             />
