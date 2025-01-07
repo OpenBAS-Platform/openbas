@@ -9,17 +9,12 @@ import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
-import type { Endpoint as EndpointType } from '../../../../../utils/api-types';
+import type { EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
 import AgentList from './AgentList';
 
 const useStyles = makeStyles(() => ({
-  root: {
-    flexGrow: 1,
-    paddingBottom: 40,
-  },
   paper: {
     padding: 20,
-    marginBottom: 20,
   },
 }));
 
@@ -34,12 +29,12 @@ const Endpoint = () => {
     endpoint: helper.getEndpoint(endpointId),
   }));
   return (
-    <div className={classes.root}>
+    <div>
       <Grid
         container
         spacing={3}
       >
-        <Grid item xs={12} style={{ paddingTop: 10 }}>
+        <Grid item xs={12} style={{ paddingTop: 15 }}>
           <Typography variant="h4">
             {t('Endpoint Information')}
           </Typography>
@@ -49,7 +44,7 @@ const Endpoint = () => {
                 <Typography
                   variant="h3"
                   gutterBottom
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 5 }}
                 >
                   {t('Description')}
                 </Typography>
@@ -64,7 +59,7 @@ const Endpoint = () => {
                 <Typography
                   variant="h3"
                   gutterBottom
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 5 }}
                 >
                   {t('Hostname')}
                 </Typography>
@@ -76,7 +71,7 @@ const Endpoint = () => {
                 <Typography
                   variant="h3"
                   gutterBottom
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 5 }}
                 >
                   {t('Platform')}
                 </Typography>
@@ -90,7 +85,7 @@ const Endpoint = () => {
                 <Typography
                   variant="h3"
                   gutterBottom
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 5 }}
                 >
                   {t('Architecture')}
                 </Typography>
@@ -102,7 +97,7 @@ const Endpoint = () => {
                 <Typography
                   variant="h3"
                   gutterBottom
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 10 }}
                 >
                   {t('IP Addresses')}
                 </Typography>
@@ -118,7 +113,7 @@ const Endpoint = () => {
                 <Typography
                   variant="h3"
                   gutterBottom
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 10 }}
                 >
                   {t('MAC Addresses')}
                 </Typography>
@@ -134,7 +129,7 @@ const Endpoint = () => {
                 <Typography
                   variant="h3"
                   gutterBottom
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: 10 }}
                 >
                   {t('Tags')}
                 </Typography>

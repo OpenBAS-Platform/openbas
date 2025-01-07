@@ -1,5 +1,4 @@
 import { Alert, AlertTitle } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { lazy, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router';
 
@@ -11,7 +10,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import NotFound from '../../../../../components/NotFound';
 import { useHelper } from '../../../../../store';
-import type { Endpoint as EndpointType } from '../../../../../utils/api-types';
+import type { EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import EndpointHeader from './EndpointHeader';

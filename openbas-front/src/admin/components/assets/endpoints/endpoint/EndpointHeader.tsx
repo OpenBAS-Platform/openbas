@@ -5,14 +5,13 @@ import { useNavigate, useParams } from 'react-router';
 import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import type { UserHelper } from '../../../../../actions/helper';
 import { useHelper } from '../../../../../store';
-import type { Endpoint as EndpointType } from '../../../../../utils/api-types';
+import type { EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
 import { truncate } from '../../../../../utils/String';
 import EndpointPopover from '../EndpointPopover';
 
 const useStyles = makeStyles(() => ({
   title: {
     float: 'left',
-    marginRight: 10,
   },
   actions: {
     margin: '-6px 0 0 0',
@@ -37,7 +36,7 @@ const EndpointHeader = () => {
       <Tooltip title={endpoint.asset_name}>
         <Typography
           variant="h1"
-          gutterBottom={true}
+          gutterBottom
           classes={{ root: classes.title }}
         >
           {truncate(endpoint.asset_name, 80)}
