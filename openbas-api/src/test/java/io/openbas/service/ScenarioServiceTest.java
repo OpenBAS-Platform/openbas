@@ -7,12 +7,17 @@ import static io.openbas.utils.fixtures.TeamFixture.getTeam;
 import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.*;
 
 import io.openbas.database.model.*;
+import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.ExerciseMapper;
+import io.openbas.utils.fixtures.AssetFixture;
 import io.openbas.utils.fixtures.ScenarioFixture;
+import io.openbas.utils.fixtures.TagFixture;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +42,7 @@ class ScenarioServiceTest {
 
   @Autowired InjectRepository injectRepository;
 
+  @Mock ScenarioRepository mockScenarioRepository;
   @Mock GrantService grantService;
   @Mock VariableService variableService;
   @Mock ChallengeService challengeService;
@@ -46,7 +52,8 @@ class ScenarioServiceTest {
   @Autowired private ExerciseMapper exerciseMapper;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
-
+  @Mock private InjectService injectService;
+  @Mock private TagRuleService tagRuleService;
   @InjectMocks private ScenarioService scenarioService;
 
   private static String USER_ID;
@@ -70,6 +77,30 @@ class ScenarioServiceTest {
             teamService,
             fileService,
             injectDuplicateService,
+            tagRuleService,
+            injectService,
+            injectRepository,
+            lessonsCategoryRepository);
+  }
+
+  void setUpWithMockRepository() {
+    scenarioService =
+        new ScenarioService(
+            mockScenarioRepository,
+            teamRepository,
+            userRepository,
+            documentRepository,
+            scenarioTeamUserRepository,
+            articleRepository,
+            exerciseMapper,
+            grantService,
+            variableService,
+            challengeService,
+            teamService,
+            fileService,
+            injectDuplicateService,
+            tagRuleService,
+            injectService,
             injectRepository,
             lessonsCategoryRepository);
   }
@@ -170,5 +201,67 @@ class ScenarioServiceTest {
     assertEquals(0, teams.size());
     Inject injectAssert = this.injectRepository.findById(INJECT_ID).orElseThrow();
     assertEquals(0, injectAssert.getTeams().size());
+  }
+
+  @Test
+  public void testUpdateScenario_WITH_applyRule_true() {
+    setUpWithMockRepository();
+    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
+    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
+    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+    Tag tag1 = TagFixture.getTag("Tag1");
+    Tag tag2 = TagFixture.getTag("Tag2");
+    Tag tag3 = TagFixture.getTag("Tag3");
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Scenario scenario = ScenarioFixture.getScenario(null, Set.of(inject1, inject2));
+    scenario.setTags(Set.of(tag1, tag2));
+    Set<Tag> currentTags = Set.of(tag2, tag3);
+    List<Asset> assetsToAdd = List.of(asset1, asset2);
+    List<Asset> assetsToRemove = List.of(asset3);
+
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag1.getId()))).thenReturn(assetsToAdd);
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag3.getId()))).thenReturn(assetsToRemove);
+    when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
+
+    scenarioService.updateScenario(scenario, currentTags, true);
+
+    scenario
+        .getInjects()
+        .forEach(
+            inject ->
+                verify(injectService)
+                    .applyDefaultAssetsToInject(inject.getId(), assetsToAdd, assetsToRemove));
+    verify(mockScenarioRepository).save(scenario);
+  }
+
+  @Test
+  public void testUpdateScenario_WITH_applyRule_false() {
+    setUpWithMockRepository();
+    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
+    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
+    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+    Tag tag1 = TagFixture.getTag("Tag1");
+    Tag tag2 = TagFixture.getTag("Tag2");
+    Tag tag3 = TagFixture.getTag("Tag3");
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Scenario scenario = ScenarioFixture.getScenario(null, Set.of(inject1, inject2));
+    scenario.setTags(Set.of(tag1, tag2));
+    Set<Tag> currentTags = Set.of(tag2, tag3);
+    List<Asset> assetsToAdd = List.of(asset1, asset2);
+    List<Asset> assetsToRemove = List.of(asset3);
+
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag1.getId()))).thenReturn(assetsToAdd);
+    when(tagRuleService.getAssetsFromTagIds(List.of(tag3.getId()))).thenReturn(assetsToRemove);
+    when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
+
+    scenarioService.updateScenario(scenario, currentTags, false);
+
+    verify(injectService, never()).applyDefaultAssetsToInject(any(), any(), any());
   }
 }

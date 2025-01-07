@@ -33,6 +33,7 @@ import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.service.InjectDuplicateService;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.export.ScenarioExportMixins;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
@@ -102,6 +103,9 @@ public class ScenarioService {
   private final TeamService teamService;
   private final FileService fileService;
   private final InjectDuplicateService injectDuplicateService;
+  private final TagRuleService tagRuleService;
+  private final InjectService injectService;
+
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
 
@@ -290,6 +294,44 @@ public class ScenarioService {
   }
 
   public Scenario updateScenario(@NotNull final Scenario scenario) {
+    return this.updateScenario(scenario, null, false);
+  }
+
+  /**
+   * Update the scenario and each of the injects to add/remove default assets
+   *
+   * @param scenario
+   * @param currentTags list of the tags before the update
+   * @return
+   */
+  @Transactional
+  public Scenario updateScenario(
+      @NotNull final Scenario scenario, Set<Tag> currentTags, boolean applyRule) {
+    if (applyRule) {
+      // Get assets from the TagRule of the added tags
+      List<Asset> defaultAssetsToAdd =
+          tagRuleService.getAssetsFromTagIds(
+              scenario.getTags().stream()
+                  .filter(tag -> !currentTags.contains(tag))
+                  .map(Tag::getId)
+                  .toList());
+
+      // Get assets from the TagRule of the removed tags
+      List<Asset> defaultAssetsToRemove =
+          tagRuleService.getAssetsFromTagIds(
+              currentTags.stream()
+                  .filter(tag -> !scenario.getTags().contains(tag))
+                  .map(Tag::getId)
+                  .toList());
+
+      // Add/remove the default assets to/from the injects
+      scenario
+          .getInjects()
+          .forEach(
+              inject ->
+                  injectService.applyDefaultAssetsToInject(
+                      inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
+    }
     scenario.setUpdatedAt(now());
     return this.scenarioRepository.save(scenario);
   }

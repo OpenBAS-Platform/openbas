@@ -5,10 +5,7 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectDocument;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
@@ -22,7 +19,10 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -139,6 +139,47 @@ public class InjectService {
   public void delete(String id) {
     injectDocumentRepository.deleteDocumentsFromInject(id);
     injectRepository.deleteById(id);
+  }
+
+  /**
+   * Update an inject with default assets
+   *
+   * @param injectId
+   * @param defaultAssetsToAdd
+   * @param defaultAssetsToRemove
+   * @return
+   */
+  @Transactional
+  public Inject applyDefaultAssetsToInject(
+      final String injectId,
+      final List<Asset> defaultAssetsToAdd,
+      final List<Asset> defaultAssetsToRemove) {
+
+    // fetch the inject
+    Inject inject =
+        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+
+    // remove/add default assets and remove duplicates
+    List<Asset> currentAssets = inject.getAssets();
+    // Get the Id of the assets to remove and filter the assets that are in both lists
+    List<String> assetIdsToRemove =
+        defaultAssetsToRemove.stream()
+            .filter(asset -> !defaultAssetsToAdd.contains(asset))
+            .map(Asset::getId)
+            .toList();
+    Set<String> uniqueAssetsIds = new HashSet<>();
+    List<Asset> newListOfAssets =
+        Stream.concat(currentAssets.stream(), defaultAssetsToAdd.stream())
+            .filter(asset -> !assetIdsToRemove.contains(asset.getId()))
+            .filter(asset -> uniqueAssetsIds.add(asset.getId()))
+            .collect(Collectors.toList());
+
+    if (new HashSet<>(currentAssets).equals(new HashSet<>(newListOfAssets))) {
+      return inject;
+    } else {
+      inject.setAssets(newListOfAssets);
+      return this.injectRepository.save(inject);
+    }
   }
 
   private Inject findAndDuplicateInject(String id) {
