@@ -865,6 +865,7 @@ const i18n = {
       'To register new endpoints, you will need to install an agent. You can find detailed instructions on the ': 'Pour enregistrer de nouveaux points de terminaison, vous devrez installer un agent. Vous pouvez trouver des instructions détaillées sur le ',
       ' and in our ': ' et dans notre ',
       'agent installation page': 'page d\'installation de l\'agent',
+      'Endpoint is currently unavailable or you do not have sufficient permissions to access it.': 'L\'endpoint est actuellement indisponible ou vous n\'avez pas les autorisations nécessaires pour y accéder.',
       // Asset groups
       'Asset groups': 'Groupe d\'assets',
       'AssetGroup': 'Groupe-d-assets',
@@ -2295,6 +2296,7 @@ const i18n = {
         '要注册新的端点，您需要安装一个代理。您可以在以下位置找到详细的安装说明：',
       ' and in our ': ' 以及在我们的 ',
       'agent installation page': '代理安装页面',
+      'Endpoint is currently unavailable or you do not have sufficient permissions to access it.': '端點目前不可用或您沒有足夠的權限存取它。',
       // Asset groups
       'Asset groups': '资产组',
       'AssetGroup': '资产组',
