@@ -132,6 +132,41 @@ const Endpoints = () => {
     exportFileName: `${t('Endpoints')}.csv`,
   };
 
+  const getActiveMsgTooltip = (endpoint: EndpointOutput) => {
+    const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
+    const inactiveCount = endpoint.asset_agents.length - activeCount;
+    const isActive = activeCount > 0;
+    return { isActive: isActive, activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount };
+  };
+
+  const getPrivilegesCount = (endpoint: EndpointOutput) => {
+    const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
+    const privilegeCount = privileges?.reduce((count, privilege) => {
+      if (privilege === 'admin') {
+        count.admin += 1;
+      } else {
+        count.user += 1;
+      }
+      return count;
+    }, { admin: 0, user: 0 });
+
+    return { adminCount: privilegeCount?.admin, userCount: privilegeCount?.user };
+  };
+
+  const getExecutorsCount = (endpoint: EndpointOutput) => {
+    const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
+    return executors?.reduce((acc, executor) => {
+      const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : undefined;
+      if (type && executor) {
+        acc[type] = acc[type] || [];
+        acc[type].push(executor);
+      } else {
+        acc['Unknown'] = acc['Unknown'] || [];
+      }
+      return acc;
+    }, {} as Record<string, ExecutorOutput[]>);
+  };
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
@@ -175,38 +210,9 @@ const Endpoints = () => {
           />
         </ListItem>
         {endpoints.map((endpoint: EndpointOutput) => {
-          // Statuses : IsActive ?
-          const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
-          const inactiveCount = endpoint.asset_agents.length - activeCount;
-          const isActive = activeCount > 0;
-          const activeMsgTooltip = t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount;
-
-          // Privileges
-          const privileges = endpoint.asset_agents.map(agent => agent.agent_privilege);
-          const privilegeCount = privileges?.reduce((count, privilege) => {
-            if (privilege === 'admin') {
-              count.admin += 1;
-            } else {
-              count.user += 1;
-            }
-            return count;
-          }, { admin: 0, user: 0 });
-
-          const adminCount = privilegeCount?.admin;
-          const userCount = privilegeCount?.user;
-
-          // Executors
-          const executors = endpoint.asset_agents.map(agent => agent.agent_executor);
-          const groupedExecutors = executors?.reduce((acc, executor) => {
-            const type = executor?.executor_id ? executorsMap[executor.executor_id]?.executor_type : undefined;
-            if (type && executor) {
-              acc[type] = acc[type] || [];
-              acc[type].push(executor);
-            } else {
-              acc['Unknown'] = acc['Unknown'] || [];
-            }
-            return acc;
-          }, {} as Record<string, ExecutorOutput[]>);
+          const status = getActiveMsgTooltip(endpoint);
+          const privileges = getPrivilegesCount(endpoint);
+          const groupedExecutors = getExecutorsCount(endpoint);
 
           return (
             <ListItem
@@ -239,21 +245,21 @@ const Endpoints = () => {
                         {endpoint.asset_name}
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_active}>
-                        <Tooltip title={activeMsgTooltip}>
+                        <Tooltip title={status.activeMsgTooltip}>
                           <span>
-                            <AssetStatus variant="list" status={isActive ? 'Active' : 'Inactive'} />
+                            <AssetStatus variant="list" status={status.isActive ? 'Active' : 'Inactive'} />
                           </span>
                         </Tooltip>
                       </div>
                       <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
-                        <Tooltip title={t('Admin') + `: ${adminCount}`} placement="top">
+                        <Tooltip title={t('Admin') + `: ${privileges.adminCount}`} placement="top">
                           <span>
-                            {adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
+                            {privileges.adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
                           </span>
                         </Tooltip>
-                        <Tooltip title={t('User') + `: ${userCount}`} placement="top">
+                        <Tooltip title={t('User') + `: ${privileges.userCount}`} placement="top">
                           <span>
-                            {userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
+                            {privileges.userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
                           </span>
                         </Tooltip>
                       </div>
