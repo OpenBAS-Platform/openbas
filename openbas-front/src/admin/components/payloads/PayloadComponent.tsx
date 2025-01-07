@@ -26,7 +26,7 @@ interface Props {
   selectedPayload: PayloadType | null;
 }
 
-const Payload: FunctionComponent<Props> = ({
+const PayloadComponent: FunctionComponent<Props> = ({
   selectedPayload,
 }) => {
   // Standard hooks
@@ -281,4 +281,4 @@ const Payload: FunctionComponent<Props> = ({
   );
 };
 
-export default Payload;
+export default PayloadComponent;

@@ -14,7 +14,7 @@ import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import { Scenario as ScenarioType } from '../../../../utils/api-types';
+import { Scenario } from '../../../../utils/api-types';
 import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -23,7 +23,7 @@ import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext
 import injectContextForScenario from './ScenarioContext';
 import ScenarioHeader from './ScenarioHeader';
 
-const Scenario = lazy(() => import('./Scenario'));
+const ScenarioComponent = lazy(() => import('./Scenario'));
 const ScenarioDefinition = lazy(() => import('./ScenarioDefinition'));
 const Injects = lazy(() => import('./injects/ScenarioInjects'));
 const Tests = lazy(() => import('./tests/ScenarioTests'));
@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioType }> = ({
+const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({
   scenario,
 }) => {
   const { t, ft, locale, fld } = useFormatter();
@@ -179,7 +179,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioType }> = ({
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="" element={errorWrapper(Scenario)({ setOpenInstantiateSimulationAndStart })} />
+              <Route path="" element={errorWrapper(ScenarioComponent)({ setOpenInstantiateSimulationAndStart })} />
               <Route path="definition" element={errorWrapper(ScenarioDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
@@ -201,7 +201,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const { t } = useFormatter();
   // Fetching data
-  const { scenarioId } = useParams() as { scenarioId: ScenarioType['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(scenarioId));
   useDataLoader(() => {
     setLoading(true);

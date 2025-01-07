@@ -13,7 +13,7 @@ import { useQueryableWithLocalStorage } from '../../../../../components/common/q
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
-import type { Exercise as ExerciseType, ExpectationResultsByType, FilterGroup, InjectExpectationResultsByAttackPattern } from '../../../../../utils/api-types';
+import type { Exercise, ExpectationResultsByType, FilterGroup, InjectExpectationResultsByAttackPattern } from '../../../../../utils/api-types';
 import InjectResultList from '../../../atomic_testings/InjectResultList';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
@@ -35,12 +35,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Exercise = () => {
+const ExerciseComponent = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
   // Fetching data
-  const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({
     exercise: helper.getExercise(exerciseId),
   }));
@@ -128,4 +128,4 @@ const Exercise = () => {
   );
 };
 
-export default Exercise;
+export default ExerciseComponent;
