@@ -1,5 +1,6 @@
+import { Alert, AlertTitle } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { lazy } from 'react';
+import { lazy, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router';
 
 import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
@@ -26,6 +27,8 @@ const Endpoint = lazy(() => import('./Endpoint'));
 const Index = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
+  const [pristine, setPristine] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { t } = useFormatter();
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
 
@@ -34,31 +37,44 @@ const Index = () => {
     endpoint: helper.getEndpoint(endpointId),
   }));
   useDataLoader(() => {
-    dispatch(fetchEndpoint(endpointId));
+    setLoading(true);
+    dispatch(fetchEndpoint(endpointId)).finally(() => {
+      setPristine(false);
+      setLoading(false);
+    });
   });
 
-  if (endpoint) {
+  // avoid to show loader if something trigger useDataLoader
+  if (pristine && loading) {
+    return <Loader />;
+  }
+  if (!loading && !endpoint) {
     return (
-      <div className={classes.root}>
-        <Breadcrumbs
-          variant="object"
-          elements={[
-            { label: t('Assets') },
-            { label: t('Endpoints'), link: '/admin/assets/endpoints' },
-            { label: endpoint.asset_name, current: true },
-          ]}
-        />
-        <EndpointHeader />
-        <div className="clearfix" />
-        <Routes>
-          <Route path="" element={errorWrapper(Endpoint)()} />
-          {/* Not found */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {t('Endpoint is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
     );
   }
-  return <Loader />;
+  return (
+    <div className={classes.root}>
+      <Breadcrumbs
+        variant="object"
+        elements={[
+          { label: t('Assets') },
+          { label: t('Endpoints'), link: '/admin/assets/endpoints' },
+          { label: endpoint.asset_name, current: true },
+        ]}
+      />
+      <EndpointHeader />
+      <div className="clearfix" />
+      <Routes>
+        <Route path="" element={errorWrapper(Endpoint)()} />
+        {/* Not found */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </div>
+  );
 };
 
 export default Index;
