@@ -11,11 +11,8 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.EndpointSpecification;
-import io.openbas.rest.asset.endpoint.form.EndpointOutput;
-import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -31,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -57,7 +53,6 @@ public class EndpointService {
   @Value("${executor.openbas.binaries.version:${info.app.version:unknown}}")
   private String executorOpenbasBinariesVersion;
 
-  private final EndpointMapper endpointMapper;
   private final EndpointRepository endpointRepository;
   private final TagRepository tagRepository;
 
@@ -99,30 +94,20 @@ public class EndpointService {
     this.endpointRepository.deleteById(endpointId);
   }
 
-  // -- ENDPOINT DTOs --
-
-  public EndpointOverviewOutput findById(@NotBlank final String endpointId) {
-    return endpointMapper.toEndpointOverviewOutput(endpoint(endpointId));
+  public Endpoint findById(@NotBlank final String endpointId) {
+    return endpoint(endpointId);
   }
 
-  public Page<EndpointOutput> searchEndpoints(SearchPaginationInput searchPaginationInput) {
-    Page<Endpoint> endpointPage =
-        buildPaginationJPA(
-            (Specification<Endpoint> specification, Pageable pageable) ->
-                this.endpointRepository.findAll(
-                    EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
-            handleEndpointFilter(searchPaginationInput),
-            Endpoint.class);
-
-    // Convert the Page of Endpoint to a Page of EndpointOutput
-    List<EndpointOutput> endpointOutputs =
-        endpointPage.getContent().stream().map(endpointMapper::toEndpointOutput).toList();
-
-    return new PageImpl<>(
-        endpointOutputs, endpointPage.getPageable(), endpointPage.getTotalElements());
+  public Page<Endpoint> searchEndpoints(SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        (Specification<Endpoint> specification, Pageable pageable) ->
+            this.endpointRepository.findAll(
+                EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
+        handleEndpointFilter(searchPaginationInput),
+        Endpoint.class);
   }
 
-  public EndpointOverviewOutput updateEndpoint(
+  public Endpoint updateEndpoint(
       @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
     Endpoint toUpdate =
         this.endpointRepository
@@ -130,7 +115,7 @@ public class EndpointService {
             .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
     toUpdate.setUpdateAttributes(input);
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return endpointMapper.toEndpointOverviewOutput(updateEndpoint(toUpdate));
+    return updateEndpoint(toUpdate);
   }
 
   // -- INSTALLATION AGENT --

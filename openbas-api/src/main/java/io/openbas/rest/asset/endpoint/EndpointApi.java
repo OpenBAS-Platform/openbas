@@ -23,6 +23,7 @@ import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EndpointService;
 import io.openbas.telemetry.Tracing;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,8 @@ public class EndpointApi extends RestBehavior {
   private final ExecutorRepository executorRepository;
   private final TagRepository tagRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
+
+  private final EndpointMapper endpointMapper;
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
@@ -139,7 +143,7 @@ public class EndpointApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Tracing(name = "Endpoint overview", layer = "api", operation = "POST")
   public EndpointOverviewOutput endpoint(@PathVariable @NotBlank final String endpointId) {
-    return this.endpointService.findById(endpointId);
+    return endpointMapper.toEndpointOverviewOutput(this.endpointService.findById(endpointId));
   }
 
   @LogExecutionTime
@@ -147,7 +151,12 @@ public class EndpointApi extends RestBehavior {
   @Tracing(name = "Get a page of endpoints", layer = "api", operation = "POST")
   public Page<EndpointOutput> endpoints(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return endpointService.searchEndpoints(searchPaginationInput);
+    Page<Endpoint> endpointPage = endpointService.searchEndpoints(searchPaginationInput);
+    // Convert the Page of Endpoint to a Page of EndpointOutput
+    List<EndpointOutput> endpointOutputs =
+        endpointPage.getContent().stream().map(endpointMapper::toEndpointOutput).toList();
+    return new PageImpl<>(
+        endpointOutputs, endpointPage.getPageable(), endpointPage.getTotalElements());
   }
 
   @LogExecutionTime
@@ -164,7 +173,8 @@ public class EndpointApi extends RestBehavior {
   public EndpointOverviewOutput updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
       @Valid @RequestBody final EndpointUpdateInput input) {
-    return this.endpointService.updateEndpoint(endpointId, input);
+    return endpointMapper.toEndpointOverviewOutput(
+        this.endpointService.updateEndpoint(endpointId, input));
   }
 
   @Secured(ROLE_ADMIN)
