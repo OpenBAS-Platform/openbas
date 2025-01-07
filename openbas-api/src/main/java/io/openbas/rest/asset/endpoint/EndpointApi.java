@@ -143,7 +143,7 @@ public class EndpointApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Tracing(name = "Endpoint overview", layer = "api", operation = "POST")
   public EndpointOverviewOutput endpoint(@PathVariable @NotBlank final String endpointId) {
-    return endpointMapper.toEndpointOverviewOutput(this.endpointService.findById(endpointId));
+    return endpointMapper.toEndpointOverviewOutput(this.endpointService.getEndpoint(endpointId));
   }
 
   @LogExecutionTime

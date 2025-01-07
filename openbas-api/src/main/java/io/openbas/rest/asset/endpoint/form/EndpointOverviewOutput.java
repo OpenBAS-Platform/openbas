@@ -8,7 +8,7 @@ import io.openbas.database.model.Endpoint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,18 +47,18 @@ public class EndpointOverviewOutput {
 
   @Schema(description = "List IPs")
   @JsonProperty("endpoint_ips")
-  private List<String> ips;
+  private Set<String> ips;
 
   @Schema(description = "List of MAC addresses")
   @JsonProperty("endpoint_mac_addresses")
-  private List<String> macAddresses;
+  private Set<String> macAddresses;
 
   @Schema(description = "List of agents")
   @JsonProperty("asset_agents")
   @NotNull
-  private List<AgentOutput> agents;
+  private Set<AgentOutput> agents;
 
   @Schema(description = "Tags")
   @JsonProperty("asset_tags")
-  private List<String> tags;
+  private Set<String> tags;
 }

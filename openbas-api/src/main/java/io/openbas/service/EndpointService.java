@@ -94,7 +94,7 @@ public class EndpointService {
     this.endpointRepository.deleteById(endpointId);
   }
 
-  public Endpoint findById(@NotBlank final String endpointId) {
+  public Endpoint getEndpoint(@NotBlank final String endpointId) {
     return endpoint(endpointId);
   }
 
@@ -109,10 +109,7 @@ public class EndpointService {
 
   public Endpoint updateEndpoint(
       @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
-    Endpoint toUpdate =
-        this.endpointRepository
-            .findById(endpointId)
-            .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
+    Endpoint toUpdate = this.endpoint(endpointId);
     toUpdate.setUpdateAttributes(input);
     toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     return updateEndpoint(toUpdate);
