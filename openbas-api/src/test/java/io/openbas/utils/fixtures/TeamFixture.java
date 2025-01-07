@@ -9,17 +9,18 @@ import java.util.List;
 public class TeamFixture {
 
   public static final String TEAM_NAME = "My team";
+  public static final String CONTEXTUAL_TEAM_NAME = "My contextual team";
 
   public static TeamCreateInput createTeam() {
     TeamCreateInput teamCreateInput = new TeamCreateInput();
-    teamCreateInput.setName("Test team");
+    teamCreateInput.setName(TEAM_NAME);
     teamCreateInput.setDescription("Team description");
     return teamCreateInput;
   }
 
   public static TeamCreateInput createContextualExerciseTeam(List<String> exerciseIds) {
     TeamCreateInput teamCreateInput = new TeamCreateInput();
-    teamCreateInput.setName("Exercise team");
+    teamCreateInput.setName(CONTEXTUAL_TEAM_NAME);
     teamCreateInput.setDescription("Team description");
     teamCreateInput.setContextual(true);
     teamCreateInput.setExerciseIds(exerciseIds);

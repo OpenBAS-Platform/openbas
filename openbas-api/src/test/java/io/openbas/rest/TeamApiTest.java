@@ -1,320 +1,54 @@
 package io.openbas.rest;
 
-import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
+import static io.openbas.rest.team.TeamApi.TEAM_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.TeamFixture.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
-import io.openbas.database.model.User;
-import io.openbas.database.repository.ExerciseRepository;
-import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.TeamRepository;
-import io.openbas.database.repository.UserRepository;
-import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.exercise.service.ExerciseService;
-import io.openbas.rest.scenario.form.ScenarioUpdateTeamsInput;
 import io.openbas.rest.team.form.TeamCreateInput;
-import io.openbas.service.ScenarioService;
-import io.openbas.utils.fixtures.TeamFixture;
+import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import io.openbas.utils.mockUser.WithMockObserverUser;
-import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.servlet.ServletException;
-import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(PER_CLASS)
-public class TeamApiTest {
+@Transactional
+class TeamApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
 
-  @Autowired private ScenarioService scenarioService;
-  @Autowired private ScenarioRepository scenarioRepository;
   @Autowired private ExerciseService exerciseService;
-  @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamRepository teamRepository;
-  @Autowired private UserRepository userRepository;
 
-  static String SCENARIO_ID;
-  static String TEAM_ID;
-  static String USER_ID;
-  static TeamCreateInput TEAM_INPUT;
-  static Team TEAM;
-
-  // -- SCENARIOS --
-
-  @DisplayName("Add a team on a scenario")
-  @Test
-  @WithMockPlannerUser
-  void addTeamOnScenarioTest() throws Exception {
-    // -- PREPARE --
-    Scenario scenario = new Scenario();
-    scenario.setName("Scenario name");
-    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
-    SCENARIO_ID = scenarioCreated.getId();
-
-    Team team = new Team();
-    team.setName("My team");
-    team = this.teamRepository.save(team);
-    TEAM_ID = team.getId();
-
-    ScenarioUpdateTeamsInput input = new ScenarioUpdateTeamsInput();
-    input.setTeamIds(List.of(TEAM_ID));
-
-    // -- EXECUTE --
-    String response =
-        this.mvc
-            .perform(
-                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/add")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    response =
-        this.mvc
-            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertEquals(TEAM_ID, JsonPath.read(response, "$.scenario_teams[0]"));
-
-    // --THEN--
-    this.scenarioRepository.deleteById(SCENARIO_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-  }
-
-  @DisplayName("Retrieve teams on a scenario")
-  @Test
-  @WithMockObserverUser
-  void retrieveTeamsOnScenarioTest() throws Exception {
-    // -- PREPARE --
-    Team team = new Team();
-    team.setName("My team");
-    team = this.teamRepository.save(team);
-    TEAM_ID = team.getId();
-
-    Scenario scenario = new Scenario();
-    scenario.setName("Scenario name");
-    scenario.setTeams(List.of(team));
-    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
-    SCENARIO_ID = scenarioCreated.getId();
-
-    // -- EXECUTE --
-    String response =
-        this.mvc
-            .perform(
-                get(SCENARIO_URI + "/" + SCENARIO_ID + "/teams").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    assertEquals(TEAM_ID, JsonPath.read(response, "$[0].team_id"));
-
-    // --THEN--
-    this.scenarioRepository.deleteById(SCENARIO_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-  }
-
-  @DisplayName("Add a player to a team on a scenario")
-  @Test
-  @WithMockPlannerUser
-  void addPlayerOnTeamOnScenarioTest() throws Exception {
-    // -- PREPARE --
-    Team team = new Team();
-    team.setName("My team");
-    team = this.teamRepository.save(team);
-    TEAM_ID = team.getId();
-
-    Scenario scenario = new Scenario();
-    scenario.setName("Scenario name");
-    scenario.setTeams(List.of(team));
-    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
-    SCENARIO_ID = scenarioCreated.getId();
-
-    User user = new User();
-    user.setEmail("testfiligran@gmail.com");
-    user = this.userRepository.save(user);
-    USER_ID = user.getId();
-
-    ScenarioTeamPlayersEnableInput input = new ScenarioTeamPlayersEnableInput();
-    input.setPlayersIds(List.of(USER_ID));
-
-    // -- EXECUTE --
-    String response =
-        this.mvc
-            .perform(
-                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/" + TEAM_ID + "/players/add")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    response =
-        this.mvc
-            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertEquals(USER_ID, JsonPath.read(response, "$.scenario_teams_users[0].user_id"));
-
-    // --THEN--
-    this.scenarioRepository.deleteById(SCENARIO_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-    this.userRepository.deleteById(USER_ID);
-  }
-
-  @DisplayName("Remove a player to a team on a scenario")
-  @Test
-  @WithMockPlannerUser
-  void removePlayerOnTeamOnScenarioTest() throws Exception {
-    // -- PREPARE --
-    Team team = new Team();
-    team.setName("My team");
-    team = this.teamRepository.save(team);
-    TEAM_ID = team.getId();
-
-    Scenario scenario = new Scenario();
-    scenario.setName("Scenario name");
-    scenario.setTeams(List.of(team));
-    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
-    SCENARIO_ID = scenarioCreated.getId();
-
-    User user = new User();
-    user.setEmail("testfiligran@gmail.com");
-    user = this.userRepository.save(user);
-    USER_ID = user.getId();
-
-    ScenarioTeamPlayersEnableInput input = new ScenarioTeamPlayersEnableInput();
-    input.setPlayersIds(List.of(USER_ID));
-
-    // -- EXECUTE --
-    String response =
-        this.mvc
-            .perform(
-                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/" + TEAM_ID + "/players/remove")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    response =
-        this.mvc
-            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertEquals(new ArrayList<>(), JsonPath.read(response, "$.scenario_teams_users"));
-
-    // --THEN--
-    this.scenarioRepository.deleteById(SCENARIO_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-    this.userRepository.deleteById(USER_ID);
-  }
-
-  @DisplayName("Remove a team on a scenario")
-  @Test
-  @WithMockPlannerUser
-  void removeTeamOnScenarioTest() throws Exception {
-    // -- PREPARE --
-    Team team = new Team();
-    team.setName("My team");
-    team = this.teamRepository.save(team);
-    TEAM_ID = team.getId();
-
-    Scenario scenario = new Scenario();
-    scenario.setName("Scenario name");
-    scenario.setTeams(List.of(team));
-    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
-    SCENARIO_ID = scenarioCreated.getId();
-
-    ScenarioUpdateTeamsInput input = new ScenarioUpdateTeamsInput();
-    input.setTeamIds(
-        new ArrayList<>() {
-          {
-            add(TEAM_ID);
-          }
-        });
-
-    // -- EXECUTE --
-    String response =
-        this.mvc
-            .perform(
-                put(SCENARIO_URI + "/" + SCENARIO_ID + "/teams/remove")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    response =
-        this.mvc
-            .perform(get(SCENARIO_URI + "/" + SCENARIO_ID).accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertEquals(new ArrayList<>(), JsonPath.read(response, "$.scenario_teams"));
-
-    // --THEN--
-    this.scenarioRepository.deleteById(SCENARIO_ID);
-    this.teamRepository.deleteById(TEAM_ID);
-  }
-
-  @DisplayName("Creation of a team")
+  @DisplayName("Given valid team input, should create a team successfully")
   @Test
   @WithMockAdminUser
-  void createTeamTest() throws Exception {
+  void given_validTeamInput_should_createTeamSuccessfully() throws Exception {
     // --PREPARE--
-    TEAM_INPUT = TeamFixture.createTeam();
+    TeamCreateInput teamInput = createTeam();
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                post("/api/teams")
-                    .content(asJsonString(TEAM_INPUT))
+                post(TEAM_URI)
+                    .content(asJsonString(teamInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -323,29 +57,26 @@ public class TeamApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("Test team", JsonPath.read(response, "$.team_name"));
-
-    // --THEN--
-    teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
+    assertEquals(teamInput.getName(), JsonPath.read(response, "$.team_name"));
+    assertEquals(teamInput.getDescription(), JsonPath.read(response, "$.team_description"));
   }
 
-  @DisplayName("Creation of a global team with an existing name")
+  @DisplayName("Given existing team name input, should throw an exception")
   @Test
   @WithMockAdminUser
-  void createGlobalTeamTest() throws Exception {
+  void given_existingTeamNameInput_should_throwAnException() throws Exception {
     // --PREPARE--
-    TEAM_INPUT = TeamFixture.createTeam();
-
     Team team = new Team();
-    team.setName("Test team");
-    team = this.teamRepository.save(team);
-    String teamId = team.getId();
+    team.setName(TEAM_NAME);
+    this.teamRepository.save(team);
+
+    TeamCreateInput teamInput = createTeam();
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                post("/api/teams")
-                    .content(asJsonString(TEAM_INPUT))
+                post(TEAM_URI)
+                    .content(asJsonString(teamInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is4xxClientError())
@@ -357,27 +88,22 @@ public class TeamApiTest {
     assertEquals(
         "Global teams (non contextual) cannot have the same name (already exists)",
         JsonPath.read(response, "$.message"));
-
-    // --THEN--
-    teamRepository.deleteById(teamId);
   }
 
-  @DisplayName("Creation of a contextual team (exercise)")
+  @DisplayName("Given valid contextual team input, should create a contextual team successfully")
   @Test
   @WithMockAdminUser
-  void createContextualTeamTest() throws Exception {
+  void given_validContextualTeamInput_should_createContextualTeamSuccessfully() throws Exception {
     // -- PREPARE --
-    Exercise exercise = new Exercise();
-    exercise.setName("Exercise name");
-    Exercise exerciseCreated = this.exerciseService.createExercise(exercise);
-    String exerciseId = exerciseCreated.getId();
+    Exercise exercise = ExerciseFixture.getExercise();
+    exercise = this.exerciseService.createExercise(exercise);
 
-    TeamCreateInput teamInput = TeamFixture.createContextualExerciseTeam(List.of(exerciseId));
+    TeamCreateInput teamInput = createContextualExerciseTeam(List.of(exercise.getId()));
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                post("/api/teams")
+                post(TEAM_URI)
                     .content(asJsonString(teamInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
@@ -387,36 +113,28 @@ public class TeamApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("Exercise team", JsonPath.read(response, "$.team_name"));
-
-    // --THEN--
-    teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
-    exerciseRepository.deleteById(exerciseId);
+    assertEquals(CONTEXTUAL_TEAM_NAME, JsonPath.read(response, "$.team_name"));
   }
 
-  @DisplayName("Creation of a contextual team with an existing name (exercise)")
+  @DisplayName("Given existing contextual team name input, should throw an exception")
   @Test
   @WithMockAdminUser
-  void createExerciseTeamTest() throws Exception {
+  void given_existingContextualTeamNameInput_should_throwAnException() throws Exception {
     // -- PREPARE --
-    Exercise exercise = new Exercise();
-    exercise.setName("Exercise name");
-    Exercise exerciseCreated = this.exerciseService.createExercise(exercise);
-    String exerciseId = exerciseCreated.getId();
-
+    Exercise exercise = ExerciseFixture.getExercise();
+    exercise = this.exerciseService.createExercise(exercise);
     Team team = new Team();
-    team.setName("Exercise team");
+    team.setName(CONTEXTUAL_TEAM_NAME);
     team.setContextual(true);
-    team.setExercises(List.of(exerciseCreated));
-    Team teamCreated = this.teamRepository.save(team);
-    String teamId = teamCreated.getId();
+    team.setExercises(List.of(exercise));
+    this.teamRepository.save(team);
 
-    TeamCreateInput teamInput = TeamFixture.createContextualExerciseTeam(List.of(exerciseId));
+    TeamCreateInput teamInput = createContextualExerciseTeam(List.of(exercise.getId()));
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                post("/api/teams")
+                post(TEAM_URI)
                     .content(asJsonString(teamInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
@@ -429,71 +147,55 @@ public class TeamApiTest {
     assertEquals(
         "A contextual team with the same name already exists on this simulation",
         JsonPath.read(response, "$.message"));
-
-    // --THEN--
-    teamRepository.deleteById(teamId);
-    exerciseRepository.deleteById(exerciseId);
   }
 
-  @DisplayName("Creation of a contextual team with an existing name (scenario)")
+  @DisplayName("Given valid team ID and input, should update team successfully")
   @Test
   @WithMockAdminUser
-  void createScenarioGlobalTeamTest() throws Exception {
-    // -- PREPARE --
-    Scenario scenario = new Scenario();
-    scenario.setName("Scenario name");
-    Scenario scenarioCreated = this.scenarioService.createScenario(scenario);
-    String scenarioId = scenarioCreated.getId();
+  void given_validTeamIdAndInput_should_updateTeamSuccessfully() throws Exception {
+    // --PREPARE--
+    TeamCreateInput teamInput = createTeam();
 
     Team team = new Team();
-    team.setName("Scenario team");
-    team.setContextual(true);
-    team.setScenarios(List.of(scenarioCreated));
-    team = this.teamRepository.save(team);
-    String teamId = team.getId();
-
-    TeamCreateInput teamInput = TeamFixture.createContextualScenarioTeam(List.of(scenarioId));
+    team.setUpdateAttributes(teamInput);
+    team = teamRepository.save(team);
+    String newName = "updatedName";
+    teamInput.setName(newName);
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                post("/api/teams")
+                put(TEAM_URI + "/" + team.getId())
                     .content(asJsonString(teamInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is4xxClientError())
+            .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(
-        "A contextual team with the same name already exists on this scenario",
-        JsonPath.read(response, "$.message"));
-
-    // --THEN--
-    teamRepository.deleteById(teamId);
-    scenarioRepository.deleteById(scenarioId);
+    assertEquals(newName, JsonPath.read(response, "$.team_name"));
   }
 
-  @DisplayName("Edition of a team")
+  @DisplayName("Given valid team ID and input, should upsert team successfully")
   @Test
   @WithMockAdminUser
-  void updateTeamTest() throws Exception {
+  void given_validTeamIdAndInput_should_upsertTeamSuccessfully() throws Exception {
     // --PREPARE--
-    TEAM_INPUT = TeamFixture.createTeam();
+    TeamCreateInput teamInput = createTeam();
 
     Team team = new Team();
-    team.setUpdateAttributes(TEAM_INPUT);
-    TEAM = teamRepository.save(team);
+    team.setUpdateAttributes(teamInput);
+    teamRepository.save(team);
     String newName = "updatedName";
-    TEAM_INPUT.setName(newName);
+    teamInput.setName(newName);
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                put("/api/teams/" + TEAM.getId())
-                    .content(asJsonString(TEAM_INPUT))
+                post(TEAM_URI + "/upsert")
+                    .content(asJsonString(teamInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -502,29 +204,23 @@ public class TeamApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("updatedName", JsonPath.read(response, "$.team_name"));
+    assertEquals(newName, JsonPath.read(response, "$.team_name"));
     // --THEN--
     teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
   }
 
-  @DisplayName("Upsert of a global team")
+  @DisplayName("Given non existing and team input, should upsert team successfully")
   @Test
   @WithMockAdminUser
-  void upsertGlobalTeamTest() throws Exception {
+  void given_nonExistingTeamInput_should_upsertTeamSuccessfully() throws Exception {
     // --PREPARE--
-    TEAM_INPUT = TeamFixture.createTeam();
-
-    Team team = new Team();
-    team.setUpdateAttributes(TEAM_INPUT);
-    TEAM = teamRepository.save(team);
-    String newName = "updatedName";
-    TEAM_INPUT.setName(newName);
+    TeamCreateInput teamInput = createTeam();
 
     // --EXECUTE--
     String response =
         mvc.perform(
-                post("/api/teams/upsert")
-                    .content(asJsonString(TEAM_INPUT))
+                post(TEAM_URI + "/upsert")
+                    .content(asJsonString(teamInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -533,64 +229,23 @@ public class TeamApiTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals("updatedName", JsonPath.read(response, "$.team_name"));
-    // --THEN--
-    teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
+    assertEquals(TEAM_NAME, JsonPath.read(response, "$.team_name"));
   }
 
-  @DisplayName("Upsert of a non existing global team")
+  @DisplayName("Given contextual team input with multiple exercise, should throw an exception")
   @Test
   @WithMockAdminUser
-  void upsertNonExistingGlobalTeamTest() throws Exception {
-    // --PREPARE--
-    TEAM_INPUT = TeamFixture.createTeam();
-
-    Team team = new Team();
-    team.setName("Name");
-    TEAM = teamRepository.save(team);
-
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                post("/api/teams/upsert")
-                    .content(asJsonString(TEAM_INPUT))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // --ASSERT--
-    assertEquals("Test team", JsonPath.read(response, "$.team_name"));
-    // --THEN--
-    teamRepository.deleteById(JsonPath.read(response, "$.team_id"));
-  }
-
-  @DisplayName("Upsert of a contextual team with many exercices")
-  @Test
-  @WithMockAdminUser
-  void upsertContextualTeamTest() throws Exception {
+  void given_contextualTeamWithMultipleExercise_should_throwAnException() {
     // -- PREPARE --
-    Exercise exercise1 = new Exercise();
-    exercise1.setName("Exercise name1");
-    Exercise exerciseCreated1 = this.exerciseService.createExercise(exercise1);
-    String exerciseId1 = exerciseCreated1.getId();
-
-    Exercise exercise2 = new Exercise();
-    exercise2.setName("Exercise name2");
-    Exercise exerciseCreated2 = this.exerciseService.createExercise(exercise2);
-    String exerciseId2 = exerciseCreated2.getId();
-
-    Team team = new Team();
-    team.setName("Exercise team");
-    team.setContextual(true);
-    team.setExercises(List.of(exerciseCreated1, exerciseCreated2));
-    Team teamCreated = this.teamRepository.save(team);
-    String teamId = teamCreated.getId();
+    Exercise exercise1 = ExerciseFixture.getExercise();
+    exercise1.setName("exercise 1");
+    exercise1 = this.exerciseService.createExercise(exercise1);
+    Exercise exercise2 = ExerciseFixture.getExercise();
+    exercise2.setName("exercise 2");
+    exercise2 = this.exerciseService.createExercise(exercise2);
 
     TeamCreateInput teamInput =
-        TeamFixture.createContextualExerciseTeam(List.of(exerciseId1, exerciseId2));
+        createContextualExerciseTeam(List.of(exercise1.getId(), exercise2.getId()));
 
     // --EXECUTE--
     Exception exception =
@@ -598,7 +253,7 @@ public class TeamApiTest {
             ServletException.class,
             () ->
                 mvc.perform(
-                    post("/api/teams/upsert")
+                    post(TEAM_URI + "/upsert")
                         .content(asJsonString(teamInput))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)));
@@ -608,10 +263,5 @@ public class TeamApiTest {
 
     // --ASSERT--
     assertTrue(actualMessage.contains(expectedMessage));
-
-    // --THEN--
-    teamRepository.deleteById(teamId);
-    exerciseRepository.deleteById(exerciseId1);
-    exerciseRepository.deleteById(exerciseId2);
   }
 }
