@@ -56,7 +56,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '10%',
   },
   agent_last_seen: {
-    width: '10%',
+    width: '20%',
   },
 };
 

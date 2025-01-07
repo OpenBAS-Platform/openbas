@@ -16,16 +16,9 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import EndpointHeader from './EndpointHeader';
 
-const useStyles = makeStyles(() => ({
-  root: {
-    flexGrow: 1,
-  },
-}));
-
 const Endpoint = lazy(() => import('./Endpoint'));
 
 const Index = () => {
-  const classes = useStyles();
   const dispatch = useAppDispatch();
   const [pristine, setPristine] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -57,7 +50,7 @@ const Index = () => {
     );
   }
   return (
-    <div className={classes.root}>
+    <div>
       <Breadcrumbs
         variant="object"
         elements={[
