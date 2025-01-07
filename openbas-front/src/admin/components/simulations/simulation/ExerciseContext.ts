@@ -1,5 +1,4 @@
 import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import {
   addInjectForExercise,
@@ -15,10 +14,10 @@ import {
 import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { bulkTestInjects, searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
 import { Page } from '../../../../components/common/queryable/Page';
-import type { ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, SearchPaginationInput } from '../../../../utils/api-types';
+import type { Exercise, ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
-const injectContextForExercise = (exercise: ExerciseStore) => {
+const injectContextForExercise = (exercise: Exercise) => {
   const dispatch = useAppDispatch();
 
   return {

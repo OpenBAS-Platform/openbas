@@ -4,7 +4,6 @@ import * as R from 'ramda';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import type { ExerciseStore, InjectExpectationResultsByAttackPatternStore } from '../../../../../actions/exercises/Exercise';
 import { fetchExerciseExpectationResult, fetchExerciseInjectExpectationResults, searchExerciseInjects } from '../../../../../actions/exercises/exercise-action';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { buildEmptyFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
@@ -14,7 +13,7 @@ import { useQueryableWithLocalStorage } from '../../../../../components/common/q
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
-import type { ExpectationResultsByType, FilterGroup } from '../../../../../utils/api-types';
+import type { Exercise, ExpectationResultsByType, FilterGroup, InjectExpectationResultsByAttackPattern } from '../../../../../utils/api-types';
 import InjectResultList from '../../../atomic_testings/InjectResultList';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import MitreMatrix from '../../../common/matrix/MitreMatrix';
@@ -36,20 +35,20 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Exercise = () => {
+const ExerciseComponent = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
   // Fetching data
-  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => ({
     exercise: helper.getExercise(exerciseId),
   }));
   const [results, setResults] = useState<ExpectationResultsByType[] | null>(null);
-  const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPatternStore[] | null>(null);
+  const [injectResults, setInjectResults] = useState<InjectExpectationResultsByAttackPattern[] | null>(null);
   useEffect(() => {
     fetchExerciseExpectationResult(exerciseId).then((result: { data: ExpectationResultsByType[] }) => setResults(result.data));
-    fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: InjectExpectationResultsByAttackPatternStore[] }) => setInjectResults(result.data));
+    fetchExerciseInjectExpectationResults(exerciseId).then((result: { data: InjectExpectationResultsByAttackPattern[] }) => setInjectResults(result.data));
   }, [exerciseId]);
   const goToLink = `/admin/simulations/${exerciseId}/injects`;
   let resultAttackPatternIds = [];
@@ -129,4 +128,4 @@ const Exercise = () => {
   );
 };
 
-export default Exercise;
+export default ExerciseComponent;

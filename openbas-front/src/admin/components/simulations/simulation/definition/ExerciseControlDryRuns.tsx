@@ -6,12 +6,11 @@ import { Link } from 'react-router';
 
 import { deleteDryrun, fetchDryruns } from '../../../../../actions/Dryrun';
 import type { DryRunHelper } from '../../../../../actions/dryruns/dryrun-helper';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Dryrun } from '../../../../../utils/api-types';
+import type { Dryrun, Exercise } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -33,7 +32,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  exercise: ExerciseStore;
+  exercise: Exercise;
 }
 
 const ExerciseControlDryRuns: FunctionComponent<Props> = ({

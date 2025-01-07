@@ -1,22 +1,8 @@
-import {
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -25,7 +11,7 @@ import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { ExerciseInput } from '../../../../utils/api-types';
+import type { Exercise, ExerciseInput } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseForm from './ExerciseForm';
@@ -34,7 +20,7 @@ import ExerciseReports from './reports/ExerciseReports';
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
 
 interface ExercisePopoverProps {
-  exercise: ExerciseStore;
+  exercise: Exercise;
   actions: ExerciseActionPopover[];
   onDelete?: (result: string) => void;
   inList?: boolean;
@@ -92,7 +78,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseDuplicate = () => setOpenDuplicate(false);
 
   const submitDuplicate = () => {
-    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string; entities: { exercises: ExerciseStore } }) => {
+    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string; entities: { exercises: Exercise } }) => {
       handleCloseDuplicate();
       navigate(`/admin/simulations/${result.result}`);
     });
@@ -132,7 +118,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     exercise_severity: exercise.exercise_severity ?? 'high',
     exercise_tags: exercise.exercise_tags ?? [],
     exercise_mail_from: exercise.exercise_mail_from ?? '',
-    exercise_mails_reply_to: exercise.exercise_mails_reply_to ?? '',
+    exercise_mails_reply_to: exercise.exercise_mails_reply_to ?? [],
     exercise_message_header: exercise.exercise_message_header ?? '',
     exercise_message_footer: exercise.exercise_message_footer ?? '',
   };

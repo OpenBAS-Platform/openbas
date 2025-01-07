@@ -2,12 +2,11 @@ import { Paper, Typography } from '@mui/material';
 import { useContext } from 'react';
 import { useParams } from 'react-router';
 
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import { addVariableForScenario, deleteVariableForScenario, fetchVariablesForScenario, updateVariableForScenario } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Variable, VariableInput } from '../../../../../utils/api-types';
+import type { Scenario, Variable, VariableInput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { PermissionsContext, VariableContext, VariableContextType } from '../../../common/Context';
@@ -19,7 +18,7 @@ const ScenarioVariables = () => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   // Fetching data
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const { permissions } = useContext(PermissionsContext);
   const variables = useHelper((helper: VariablesHelper) => helper.getScenarioVariables(scenarioId));
   useDataLoader(() => {

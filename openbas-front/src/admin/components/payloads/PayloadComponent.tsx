@@ -3,13 +3,12 @@ import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 
 import { AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
-import { PayloadStore } from '../../../actions/payloads/Payload';
 import { useFormatter } from '../../../components/i18n';
 import ItemCopy from '../../../components/ItemCopy';
 import ItemTags from '../../../components/ItemTags';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { AttackPattern, PayloadArgument, PayloadPrerequisite } from '../../../utils/api-types';
+import { AttackPattern, Command, DnsResolution, Executable, FileDrop, Payload as PayloadType, PayloadArgument, PayloadPrerequisite } from '../../../utils/api-types';
 import { emptyFilled } from '../../../utils/String';
 
 const useStyles = makeStyles(() => ({
@@ -24,10 +23,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  selectedPayload: PayloadStore | null;
+  selectedPayload: PayloadType | null;
 }
 
-const Payload: FunctionComponent<Props> = ({
+const PayloadComponent: FunctionComponent<Props> = ({
   selectedPayload,
 }) => {
   // Standard hooks
@@ -37,6 +36,23 @@ const Payload: FunctionComponent<Props> = ({
   const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
     attackPatternsMap: helper.getAttackPatternsMap(),
   }));
+
+  const getAttackCommand = (payload: PayloadType | null): string => {
+    if (!payload) return '';
+
+    switch (payload.payload_type) {
+      case 'Command':
+        return (payload as Command).command_content || '';
+      case 'Dns':
+        return (payload as DnsResolution).dns_resolution_hostname || '';
+      case 'File':
+        return (payload as FileDrop).file_drop_file || '';
+      case 'Executable':
+        return (payload as Executable).executable_file || '';
+      default:
+        return '';
+    }
+  };
 
   return (
     <Grid container spacing={3}>
@@ -130,7 +146,9 @@ const Payload: FunctionComponent<Props> = ({
         >
           {t('Command executor')}
         </Typography>
-        {selectedPayload?.command_executor}
+        {selectedPayload?.payload_type === 'Command' && selectedPayload.command_executor && (
+          <>{selectedPayload.command_executor}</>
+        )}
         <Typography
           variant="h3"
           gutterBottom
@@ -139,10 +157,7 @@ const Payload: FunctionComponent<Props> = ({
           {t('Attack command')}
         </Typography>
         <pre>
-          <ItemCopy content={
-            selectedPayload?.command_content ?? selectedPayload?.dns_resolution_hostname ?? selectedPayload?.file_drop_file ?? selectedPayload?.executable_file ?? ''
-          }
-          />
+          <ItemCopy content={getAttackCommand(selectedPayload)} />
         </pre>
         <Typography
           variant="h3"
@@ -266,4 +281,4 @@ const Payload: FunctionComponent<Props> = ({
   );
 };
 
-export default Payload;
+export default PayloadComponent;

@@ -21,7 +21,7 @@ import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import ExerciseHeader from './ExerciseHeader';
 
-const Exercise = lazy(() => import('./overview/Exercise'));
+const Exercise = lazy(() => import('./overview/ExerciseComponent'));
 const Dryrun = lazy(() => import('./controls/Dryrun'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
 const Lessons = lazy(() => import('./lessons/ExerciseLessons'));

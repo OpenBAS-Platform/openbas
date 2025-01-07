@@ -4,21 +4,19 @@ import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import type { TeamStore } from '../../../../../actions/teams/Team';
 import type { TeamsHelper } from '../../../../../actions/teams/team-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
-import type { Communication } from '../../../../../utils/api-types';
+import type { Communication, Exercise, Team } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { getTeamsColors } from '../../../common/injects/teams/utils';
 
 interface Props {
-  exerciseId: ExerciseStore['exercise_id'];
+  exerciseId: Exercise['exercise_id'];
 }
 
 const MailDistributionOverTime: FunctionComponent<Props> = ({
@@ -40,7 +38,7 @@ const MailDistributionOverTime: FunctionComponent<Props> = ({
   let cumulation = 0;
   const teamsColors = getTeamsColors(teams);
   const teamsCommunications = R.pipe(
-    R.map((n: TeamStore) => {
+    R.map((n: Team) => {
       cumulation = 0;
       return R.assoc(
         'team_communications',
@@ -54,7 +52,7 @@ const MailDistributionOverTime: FunctionComponent<Props> = ({
         n,
       );
     }),
-    R.map((a: TeamStore & { team_communications: Array<Communication & { communication_cumulated_number: number }> }) => ({
+    R.map((a: Team & { team_communications: Array<Communication & { communication_cumulated_number: number }> }) => ({
       name: a.team_name,
       color: teamsColors[a.team_id],
       data: a.team_communications?.map((c: Communication & { communication_cumulated_number: number }) => ({

@@ -1,10 +1,9 @@
 import type { FullArticleStore } from '../../../../../actions/channels/Article';
 import { addExerciseArticle, deleteExerciseArticle, updateExerciseArticle } from '../../../../../actions/channels/article-action';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
-import { Article, ArticleCreateInput, ArticleUpdateInput } from '../../../../../utils/api-types';
+import { Article, ArticleCreateInput, ArticleUpdateInput, Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 
-const articleContextForExercise = (exerciseId: ExerciseStore['exercise_id']) => {
+const articleContextForExercise = (exerciseId: Exercise['exercise_id']) => {
   const dispatch = useAppDispatch();
   return {
     previewArticleUrl: (article: FullArticleStore) => `/channels/${exerciseId}/${article.article_fullchannel?.channel_id}?preview=true`,

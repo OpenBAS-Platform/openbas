@@ -4,10 +4,10 @@ import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
 
 import { fetchExercise, updateExercise } from '../../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
+import type { Exercise } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -32,7 +32,7 @@ const ExerciseSettings = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
 
-  const { exerciseId } = useParams() as { exerciseId: ExerciseStore['exercise_id'] };
+  const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const permissions = usePermissions(exerciseId);
 
   // Fetching data
@@ -41,7 +41,7 @@ const ExerciseSettings = () => {
     dispatch(fetchExercise(exerciseId));
   });
 
-  const settingsMapping = (settings: ExerciseStore) => {
+  const settingsMapping = (settings: Exercise) => {
     return {
       setting_mail_from: settings.exercise_mail_from,
       setting_mails_reply_to: settings.exercise_mails_reply_to,

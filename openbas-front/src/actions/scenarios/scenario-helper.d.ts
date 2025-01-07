@@ -1,11 +1,9 @@
-import type { LessonsCategory, LessonsQuestion, Objective } from '../../utils/api-types';
-import type { TeamStore } from '../teams/Team';
-import type { ScenarioStore } from './Scenario';
+import type { LessonsCategory, LessonsQuestion, Objective, Scenario, Team } from '../../utils/api-types';
 
 export interface ScenariosHelper {
-  getScenario: (scenarioId: string) => ScenarioStore;
-  getScenarios: () => ScenarioStore[];
-  getScenarioTeams: (scenarioId: string) => TeamStore[];
+  getScenario: (scenarioId: string) => Scenario;
+  getScenarios: () => Scenario[];
+  getScenarioTeams: (scenarioId: string) => Team[];
   getScenarioObjectives: (scenarioId: string) => Objective[];
   getScenarioLessonsCategories: (scenarioId: string) => LessonsCategory[];
   getScenarioLessonsQuestions: (scenarioId: string) => LessonsQuestion[];

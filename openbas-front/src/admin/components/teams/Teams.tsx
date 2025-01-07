@@ -1,5 +1,4 @@
 import type { UserHelper } from '../../../actions/helper';
-import type { TeamStore } from '../../../actions/teams/Team';
 import { updateTeamPlayers } from '../../../actions/teams/team-actions';
 import type { TeamsHelper } from '../../../actions/teams/team-helper';
 import { Page } from '../../../components/common/queryable/Page';
@@ -12,7 +11,7 @@ import type { UserStore } from './players/Player';
 
 const Teams = () => {
   const dispatch = useAppDispatch();
-  const { user, teams }: { user: User; teams: TeamStore[] } = useHelper((helper: UserHelper & TeamsHelper) => ({
+  const { user, teams }: { user: User; teams: Team[] } = useHelper((helper: UserHelper & TeamsHelper) => ({
     user: helper.getMe(),
     teams: helper.getTeams(),
   }));
@@ -31,7 +30,7 @@ const Teams = () => {
         team_users: [...(teams.find(t => t.team_id === teamId)?.team_users || []), ...userIds],
       }));
     },
-    onRemoveUsersTeam(teamId: TeamStore['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
+    onRemoveUsersTeam(teamId: Team['team_id'], userIds: UserStore['user_id'][]): Promise<void> {
       return dispatch(updateTeamPlayers(teamId, {
         team_users: [...(teams.find(t => t.team_id === teamId)?.team_users?.filter(u => !userIds.includes(u)) || [])],
       }));

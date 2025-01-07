@@ -8,7 +8,6 @@ import type { InjectHelper } from '../../../../../actions/injects/inject-helper'
 import { fetchLessonsTemplates } from '../../../../../actions/Lessons';
 import type { LessonsTemplatesHelper } from '../../../../../actions/lessons/lesson-helper';
 import { addScenarioObjective, deleteScenarioObjective, fetchScenarioObjectives, updateScenarioObjective } from '../../../../../actions/Objective';
-import type { ScenarioStore } from '../../../../../actions/scenarios/Scenario';
 import {
   addLessonsCategory,
   addLessonsQuestion,
@@ -36,7 +35,7 @@ import type {
   LessonsCategoryUpdateInput,
   LessonsQuestionCreateInput,
   LessonsQuestionUpdateInput,
-  ObjectiveInput,
+  ObjectiveInput, Scenario,
 } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
@@ -47,9 +46,9 @@ import Lessons from '../../../lessons/scenarios/Lessons';
 const ScenarioLessons = () => {
   const dispatch = useAppDispatch();
   // Fetching data
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
-  const processToGenericSource = (scenario: ScenarioStore) => {
+  const processToGenericSource = (scenario: Scenario) => {
     return {
       id: scenario.scenario_id,
       type: 'scenario',
