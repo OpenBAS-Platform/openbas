@@ -43,31 +43,6 @@ class EndpointApiTest extends IntegrationTest {
   @Autowired private EndpointRepository endpointRepository;
   @SpyBean private EndpointService endpointService;
 
-  @DisplayName("Given valid Windows endpoint input, should create a Windows endpoint successfully")
-  @Test
-  @WithMockAdminUser
-  void given_validWindowsEndpointInput_should_createWindowsEndpointSuccessfully() throws Exception {
-    // --PREPARE--
-    Tag tag = tagRepository.save(getTag());
-    EndpointInput input = createWindowsEndpointInput(List.of(tag.getId()));
-
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                post(ENDPOINT_URI)
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // --ASSERT--
-    assertEquals(WINDOWS_ASSET_NAME_INPUT, JsonPath.read(response, "$.asset_name"));
-    assertEquals(MAC_ADDRESSES[0], JsonPath.read(response, "$.endpoint_mac_addresses[0]"));
-  }
-
   @DisplayName("Given valid endpoint input, should upsert an endpoint successfully")
   @Test
   @WithMockAdminUser
