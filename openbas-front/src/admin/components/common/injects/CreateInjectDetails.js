@@ -323,7 +323,7 @@ const CreateInjectDetails = ({
                   || contract?.injector_contract_payload?.payload_type
                   : contract?.injector_contract_injector_type
               }
-              isPayload={isNotEmptyField(contract.injector_contract_payload)}
+              isPayload={isNotEmptyField(contract?.injector_contract_payload)}
             />
           ) : (
             <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>
@@ -349,6 +349,7 @@ const CreateInjectDetails = ({
                 register={register}
                 values={getValues()}
                 setValue={setValue}
+                getValues={key => getValues(key)}
                 submitting={isSubmitting}
                 inject={{
                   inject_injector_contract: { injector_contract_id: contractId, injector_contract_arch: contract.injector_contract_arch },
