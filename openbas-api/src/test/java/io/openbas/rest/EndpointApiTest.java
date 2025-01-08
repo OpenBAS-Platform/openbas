@@ -7,13 +7,12 @@ import static io.openbas.utils.fixtures.EndpointFixture.*;
 import static io.openbas.utils.fixtures.TagFixture.getTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Tag;
@@ -21,6 +20,8 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.service.EndpointService;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,31 +43,6 @@ class EndpointApiTest extends IntegrationTest {
   @Autowired private TagRepository tagRepository;
   @Autowired private EndpointRepository endpointRepository;
   @SpyBean private EndpointService endpointService;
-
-  @DisplayName("Given valid Windows endpoint input, should create a Windows endpoint successfully")
-  @Test
-  @WithMockAdminUser
-  void given_validWindowsEndpointInput_should_createWindowsEndpointSuccessfully() throws Exception {
-    // --PREPARE--
-    Tag tag = tagRepository.save(getTag());
-    EndpointInput input = createWindowsEndpointInput(List.of(tag.getId()));
-
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                post(ENDPOINT_URI)
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // --ASSERT--
-    assertEquals(WINDOWS_ASSET_NAME_INPUT, JsonPath.read(response, "$.asset_name"));
-    assertEquals(MAC_ADDRESSES[0], JsonPath.read(response, "$.endpoint_mac_addresses[0]"));
-  }
 
   @DisplayName("Given valid endpoint input, should upsert an endpoint successfully")
   @Test
@@ -166,14 +142,15 @@ class EndpointApiTest extends IntegrationTest {
         });
     Endpoint endpointCreated = endpointRepository.save(endpoint);
 
+    EndpointUpdateInput updateInput = new EndpointUpdateInput();
     String newName = "New hostname";
-    endpointInput.setHostname(newName);
+    updateInput.setName(newName);
 
     // --EXECUTE--
     String response =
         mvc.perform(
                 put(ENDPOINT_URI + "/" + endpointCreated.getId())
-                    .content(asJsonString(endpointInput))
+                    .content(asJsonString(updateInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -182,6 +159,36 @@ class EndpointApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(newName, JsonPath.read(response, "$.endpoint_hostname"));
+    assertEquals(newName, JsonPath.read(response, "$.asset_name"));
+  }
+
+  @DisplayName("Given valid input, should delete an endpoint successfully")
+  @Test
+  @WithMockAdminUser
+  void given_validInput_should_deleteEndpointSuccessfully() throws Exception {
+    // --PREPARE--
+    Tag tag = tagRepository.save(getTag());
+    String externalReference = "external01";
+    EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
+    Endpoint endpoint = new Endpoint();
+    endpoint.setUpdateAttributes(endpointInput);
+    Agent agent = createAgent(endpoint, externalReference);
+    endpoint.setAgents(
+        new ArrayList<>() {
+          {
+            add(agent);
+          }
+        });
+    Endpoint endpointCreated = endpointRepository.save(endpoint);
+
+    // -- EXECUTE --
+    mvc.perform(
+            delete(ENDPOINT_URI + "/" + endpointCreated.getId()).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful());
+
+    // -- ASSERT --
+    mvc.perform(
+            get(ENDPOINT_URI + "/" + endpointCreated.getId()).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is4xxClientError());
   }
 }

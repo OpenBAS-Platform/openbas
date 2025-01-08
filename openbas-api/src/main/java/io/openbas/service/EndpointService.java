@@ -1,12 +1,19 @@
-package io.openbas.asset;
+package io.openbas.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.EndpointSpecification;
+import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +27,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,32 +54,22 @@ public class EndpointService {
   private String executorOpenbasBinariesVersion;
 
   private final EndpointRepository endpointRepository;
+  private final TagRepository tagRepository;
 
+  // -- CRUD --
   public Endpoint createEndpoint(@NotNull final Endpoint endpoint) {
     return this.endpointRepository.save(endpoint);
   }
 
-  public Iterable<Endpoint> createEndpoints(@NotNull final List<Endpoint> endpoints) {
-    return this.endpointRepository.saveAll(endpoints);
-  }
-
   public Endpoint endpoint(@NotBlank final String endpointId) {
-    return this.endpointRepository.findById(endpointId).orElseThrow();
-  }
-
-  @Transactional(readOnly = true)
-  public List<Endpoint> findByHostname(@NotBlank final String hostname) {
-    return this.endpointRepository.findByHostname(hostname);
+    return this.endpointRepository
+        .findById(endpointId)
+        .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
   }
 
   @Transactional(readOnly = true)
   public List<Endpoint> findAssetsForInjectionByHostname(@NotBlank final String hostname) {
     return endpoints(EndpointSpecification.findEndpointsForInjectionByHostname(hostname));
-  }
-
-  @Transactional(readOnly = true)
-  public List<Endpoint> findAssetsForExecutionByHostname(@NotBlank final String hostname) {
-    return endpoints(EndpointSpecification.findEndpointsForExecutionByHostname(hostname));
   }
 
   @Transactional(readOnly = true)
@@ -91,14 +90,32 @@ public class EndpointService {
     return this.endpointRepository.save(endpoint);
   }
 
-  public Iterable<Endpoint> updateEndpoints(@NotNull final List<Endpoint> endpoints) {
-    endpoints.forEach((e) -> e.setUpdatedAt(now()));
-    return this.endpointRepository.saveAll(endpoints);
-  }
-
   public void deleteEndpoint(@NotBlank final String endpointId) {
     this.endpointRepository.deleteById(endpointId);
   }
+
+  public Endpoint getEndpoint(@NotBlank final String endpointId) {
+    return endpoint(endpointId);
+  }
+
+  public Page<Endpoint> searchEndpoints(SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        (Specification<Endpoint> specification, Pageable pageable) ->
+            this.endpointRepository.findAll(
+                EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
+        handleEndpointFilter(searchPaginationInput),
+        Endpoint.class);
+  }
+
+  public Endpoint updateEndpoint(
+      @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
+    Endpoint toUpdate = this.endpoint(endpointId);
+    toUpdate.setUpdateAttributes(input);
+    toUpdate.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+    return updateEndpoint(toUpdate);
+  }
+
+  // -- INSTALLATION AGENT --
 
   public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken)
       throws IOException {

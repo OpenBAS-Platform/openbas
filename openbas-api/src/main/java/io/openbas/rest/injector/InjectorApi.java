@@ -1,11 +1,11 @@
 package io.openbas.rest.injector;
 
-import static io.openbas.asset.EndpointService.JFROG_BASE;
 import static io.openbas.asset.QueueService.EXCHANGE_KEY;
 import static io.openbas.asset.QueueService.ROUTING_KEY;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.InjectorSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.service.EndpointService.JFROG_BASE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

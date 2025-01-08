@@ -6,7 +6,7 @@ import static io.openbas.collectors.expectations_expiration_manager.utils.Expect
 
 import io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig;
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.inject_expectation.InjectExpectationService;
+import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
