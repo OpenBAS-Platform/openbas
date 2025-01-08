@@ -10,9 +10,7 @@ import io.openbas.rest.asset.endpoint.form.AgentOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.ExecutorOutput;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -41,9 +39,14 @@ public class EndpointMapper {
         .hostname(endpoint.getHostname())
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
-        .ips(endpoint.getIps() != null ? Set.of(endpoint.getIps()) : emptySet())
+        .ips(
+            endpoint.getIps() != null
+                ? new HashSet<>(Arrays.asList(endpoint.getIps()))
+                : emptySet())
         .macAddresses(
-            endpoint.getMacAddresses() != null ? Set.of(endpoint.getMacAddresses()) : emptySet())
+            endpoint.getMacAddresses() != null
+                ? new HashSet<>(Arrays.asList(endpoint.getMacAddresses()))
+                : emptySet())
         .agents(toAgentOutputs(endpoint.getAgents()))
         .tags(endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .build();
