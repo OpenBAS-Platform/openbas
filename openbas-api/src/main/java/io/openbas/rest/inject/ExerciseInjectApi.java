@@ -9,7 +9,6 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.InjectOutput;
-import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -22,7 +21,6 @@ import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ExerciseInjectApi extends RestBehavior {
 
-  private final InjectService injectService;
   private final InjectSearchService injectSearchService;
   private final InjectTestStatusService injectTestStatusService;
 
@@ -79,13 +76,6 @@ public class ExerciseInjectApi extends RestBehavior {
         searchPaginationInput,
         Inject.class,
         joinMap);
-  }
-
-  @DeleteMapping(EXERCISE_URI + "/{exerciseId}/injects")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public void deleteListOfInjectsForExercise(
-      @PathVariable final String exerciseId, @RequestBody List<String> injectIds) {
-    injectService.deleteAllByIds(injectIds);
   }
 
   @PostMapping("/api/exercise/{exerciseId}/injects/test")

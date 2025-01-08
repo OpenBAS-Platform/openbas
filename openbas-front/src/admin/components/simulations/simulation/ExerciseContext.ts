@@ -2,8 +2,8 @@ import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise'
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import {
   addInjectForExercise,
-  bulkDeleteInjectsForExercise,
-  bulkUpdateInjectForExercise,
+  bulkDeleteInjects,
+  bulkUpdateInject,
   deleteInjectForExercise,
   fetchExerciseInjects,
   injectDone,
@@ -14,7 +14,16 @@ import {
 import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import { bulkTestInjects, searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
 import { Page } from '../../../../components/common/queryable/Page';
-import type { Exercise, ImportTestSummary, Inject, InjectsImportInput, InjectTestStatus, SearchPaginationInput } from '../../../../utils/api-types';
+import type {
+  Exercise,
+  ImportTestSummary,
+  Inject,
+  InjectBulkProcessingInput,
+  InjectBulkUpdateInputs,
+  InjectsImportInput,
+  InjectTestStatus,
+  SearchPaginationInput,
+} from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 const injectContextForExercise = (exercise: Exercise) => {
@@ -27,8 +36,12 @@ const injectContextForExercise = (exercise: Exercise) => {
     onAddInject(inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(addInjectForExercise(exercise.exercise_id, inject));
     },
-    onBulkUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
-      return dispatch(bulkUpdateInjectForExercise(exercise.exercise_id, injectId, inject));
+    onBulkUpdateInject(param: InjectBulkUpdateInputs): Promise<{
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }> {
+      // exercise.exercise_id
+      return dispatch(bulkUpdateInject(param));
     },
     onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
@@ -59,11 +72,12 @@ const injectContextForExercise = (exercise: Exercise) => {
     async onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
       return dryImportXlsForExercise(exercise.exercise_id, importId, input).then(result => result.data);
     },
-    onBulkDeleteInjects(injectIds: string[]): void {
-      return dispatch(bulkDeleteInjectsForExercise(exercise.exercise_id, injectIds));
+    onBulkDeleteInjects(param: InjectBulkProcessingInput): void {
+      // exercise.exercise_id
+      return dispatch(bulkDeleteInjects(param));
     },
-    bulkTestInjects(injectIds: string[]): Promise<{ uri: string; data: InjectTestStatus[] }> {
-      return bulkTestInjects(injectIds).then(result => ({
+    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatus[] }> {
+      return bulkTestInjects(param).then(result => ({
         uri: `/admin/simulations/${exercise.exercise_id}/tests`,
         data: result.data,
       }));

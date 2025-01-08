@@ -18,7 +18,15 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type { Article, FilterGroup, Inject, InjectTestStatus, Team, Variable } from '../../../../utils/api-types';
+import type {
+  Article,
+  FilterGroup,
+  Inject,
+  InjectBulkUpdateOperation,
+  InjectTestStatus,
+  Team,
+  Variable,
+} from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { splitDuration } from '../../../../utils/Time';
@@ -336,7 +344,9 @@ const Injects: FunctionComponent<Props> = ({
     handleToggleSelectAll,
     onToggleEntity,
     numberOfSelectedElements,
-  } = useEntityToggle<{ inject_id: string }>('inject', injects.length);
+  } = useEntityToggle<{
+    inject_id: string;
+  }>('inject', injects.length, queryableHelpers.paginationHelpers.getTotalElements());
   const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
@@ -381,9 +391,15 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const injectsToProcess = selectAll
-    ? injects.filter((inject: InjectOutputType) => !R.keys(deSelectedElements).includes(inject.inject_id))
+    ? []
     : injects.filter(
         (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
+      );
+
+  const injectsToIgnore = selectAll
+    ? injects.filter((inject: InjectOutputType) => R.keys(deSelectedElements).includes(inject.inject_id))
+    : injects.filter(
+        (inject: InjectOutputType) => !R.keys(selectedElements).includes(inject.inject_id) && R.keys(deSelectedElements).includes(inject.inject_id),
       );
 
   const massUpdateInjects = async (actions: {
@@ -391,84 +407,49 @@ const Injects: FunctionComponent<Props> = ({
     type: string;
     values: { value: string }[];
   }[]) => {
-    const updateFields = [
-      'inject_title',
-      'inject_description',
-      'inject_injector_contract',
-      'inject_content',
-      'inject_depends_on',
-      'inject_depends_duration',
-      'inject_teams',
-      'inject_assets',
-      'inject_asset_groups',
-      'inject_documents',
-      'inject_all_teams',
-      'inject_country',
-      'inject_city',
-      'inject_tags',
-    ];
-    const injectsToUpdate = injectsToProcess.filter((inject: InjectOutputType) => inject.inject_injector_contract?.convertedContent);
+    const operationsToPerform: InjectBulkUpdateOperation[] = [];
     for (const action of actions) {
-      for (const element of injectsToUpdate) {
-        const injectToUpdate: Omit<InjectOutputType, 'inject_injector_contract'> & { inject_injector_contract: string } = {
-          ...element,
-          inject_injector_contract: element.inject_injector_contract.injector_contract_id,
-        };
-        switch (action.type) {
-          case 'ADD':
-            // @ts-expect-error define type
-            if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
-              // @ts-expect-error define type
-              injectToUpdate[`inject_${action.field}`] = R.uniq([...injectToUpdate[`inject_${action.field}`], ...action.values.map(n => n.value)]);
-            } else {
-              // @ts-expect-error define type
-              injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map(n => n.value));
-            }
-            // eslint-disable-next-line no-await-in-loop
-            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
-              .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
-                onUpdate(result);
-              });
-            break;
-          case 'REPLACE':
-            // @ts-expect-error define type
-            injectToUpdate[`inject_${action.field}`] = R.uniq(action.values.map(n => n.value));
-            // eslint-disable-next-line no-await-in-loop
-            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
-              .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
-                onUpdate(result);
-              });
-            break;
-          case 'REMOVE':
-            // @ts-expect-error define type
-            if (isNotEmptyField(injectToUpdate[`inject_${action.field}`])) {
-              // @ts-expect-error define type
-              injectToUpdate[`inject_${action.field}`] = injectToUpdate[`inject_${action.field}`].filter((n: string) => !action.values.map(o => o.value).includes(n));
-            } else {
-              // @ts-expect-error define type
-              injectToUpdate[`inject_${action.field}`] = [];
-            }
-            // eslint-disable-next-line no-await-in-loop
-            await injectContext.onBulkUpdateInject(injectToUpdate.inject_id, R.pick(updateFields, injectToUpdate))
-              .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
-                onUpdate(result);
-              });
-            break;
-          default:
-            return;
-        }
-      }
+      // Case where no values where given
+      if (!action.values.length || !action.values[0].value) continue;
+      operationsToPerform.push({
+        operation: action.type.toLowerCase(),
+        field: action.field,
+        values: R.uniq(action.values.map(n => n.value)),
+      } as InjectBulkUpdateOperation); // Cast is necessary because typeof enum don't work with operation and fields
     }
+    await injectContext.onBulkUpdateInject({
+      search_pagination_input: selectAll ? searchPaginationInput : undefined,
+      inject_ids_to_process: selectAll ? undefined : injectsToProcess.map((inject: InjectOutputType) => inject.inject_id),
+      inject_ids_to_ignore: injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id),
+      simulation_or_scenario_id: exerciseOrScenarioId,
+      update_operations: operationsToPerform,
+    })
+      .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+        onUpdate(result);
+      });
   };
 
   const bulkDeleteInjects = () => {
     const deleteIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
-    injectContext.onBulkDeleteInjects(deleteIds);
+    const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
+    injectContext.onBulkDeleteInjects({
+      search_pagination_input: selectAll ? searchPaginationInput : undefined,
+      inject_ids_to_process: selectAll ? undefined : deleteIds,
+      inject_ids_to_ignore: ignoreIds,
+      simulation_or_scenario_id: exerciseOrScenarioId,
+    });
     onMassDelete(deleteIds);
   };
 
   const massTestInjects = () => {
-    injectContext.bulkTestInjects(injectsToProcess.map((inject: InjectOutputType) => inject.inject_id)).then((result: { uri: string; data: InjectTestStatus[] }) => {
+    const testIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
+    const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
+    injectContext.bulkTestInjects({
+      search_pagination_input: selectAll ? searchPaginationInput : undefined,
+      inject_ids_to_process: selectAll ? undefined : testIds,
+      inject_ids_to_ignore: ignoreIds,
+      simulation_or_scenario_id: exerciseOrScenarioId,
+    }).then((result: { uri: string; data: InjectTestStatus[] }) => {
       if (numberOfSelectedElements === 1) {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
           itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link>,
@@ -669,6 +650,7 @@ const Injects: FunctionComponent<Props> = ({
           />
           <ToolBar
             numberOfSelectedElements={numberOfSelectedElements}
+            totalNumberOfElements={queryableHelpers.paginationHelpers.getTotalElements()}
             selectedElements={selectedElements}
             deSelectedElements={deSelectedElements}
             selectAll={selectAll}

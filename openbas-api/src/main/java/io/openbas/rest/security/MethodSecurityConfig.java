@@ -1,8 +1,8 @@
 package io.openbas.rest.security;
 
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.service.ScenarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +16,11 @@ public class MethodSecurityConfig {
 
   private final UserRepository userRepository;
   private final ExerciseRepository exerciseRepository;
-  private final ScenarioService scenarioService;
+  private final ScenarioRepository scenarioRepository;
 
   @Bean
   MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
     return new SecurityExpressionHandler(
-        this.userRepository, this.exerciseRepository, this.scenarioService);
+        this.userRepository, this.exerciseRepository, this.scenarioRepository);
   }
 }

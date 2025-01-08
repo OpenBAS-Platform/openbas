@@ -27,6 +27,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Executor;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.DirectInjectInput;
+import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
@@ -294,11 +295,14 @@ class InjectApiTest extends IntegrationTest {
             .isEmpty(),
         "There should be expectations for the scenario in the database");
 
+    // -- PREPARE --
+    InjectBulkProcessingInput input = new InjectBulkProcessingInput();
+    input.setInjectIDsToProcess(List.of(createdInject.getId()));
+    input.setSimulationOrScenarioId(SCENARIO.getId());
+
     // -- EXECUTE --
     mvc.perform(
-            delete(SCENARIO_URI + "/" + SCENARIO.getId() + "/injects")
-                .content(asJsonString(List.of(createdInject.getId())))
-                .contentType(MediaType.APPLICATION_JSON))
+            delete(INJECT_URI).content(asJsonString(input)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful());
 
     // -- ASSERT --
@@ -595,11 +599,14 @@ class InjectApiTest extends IntegrationTest {
             .findAllByInjectAndTeam(createdInject2.getId(), TEAM.getId())
             .size());
 
+    // -- PREPARE --
+    InjectBulkProcessingInput input = new InjectBulkProcessingInput();
+    input.setInjectIDsToProcess(List.of(createdInject1.getId(), createdInject2.getId()));
+    input.setSimulationOrScenarioId(EXERCISE.getId());
+
     // -- EXECUTE --
     mvc.perform(
-            delete(EXERCISE_URI + "/" + EXERCISE.getId() + "/injects")
-                .content(asJsonString(List.of(createdInject1.getId(), createdInject2.getId())))
-                .contentType(MediaType.APPLICATION_JSON))
+            delete(INJECT_URI).content(asJsonString(input)).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful());
 
     // -- ASSERT --
