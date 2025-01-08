@@ -324,7 +324,7 @@ public class ScenarioService {
                   .map(Tag::getId)
                   .toList());
 
-      // Add/remove the default asset grou^ps to/from the injects
+      // Add/remove the default asset groups to/from the injects
       scenario
           .getInjects()
           .forEach(
