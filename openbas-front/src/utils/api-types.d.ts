@@ -420,6 +420,22 @@ export interface ChannelUpdateLogoInput {
   channel_logo_light?: string;
 }
 
+export interface CheckExerciseRulesInput {
+  new_tags?: string[];
+}
+
+export interface CheckExerciseRulesOutput {
+  rules_found: boolean;
+}
+
+export interface CheckScenarioRulesInput {
+  new_tags?: string[];
+}
+
+export interface CheckScenarioRulesOutput {
+  rules_found: boolean;
+}
+
 export interface Collector {
   /** @format date-time */
   collector_created_at: string;
@@ -3393,13 +3409,13 @@ export interface TagCreateInput {
 }
 
 export interface TagRuleInput {
+  asset_groups?: string[];
   tag_name: string;
-  tag_rule_assets?: string[];
 }
 
 export interface TagRuleOutput {
+  asset_groups?: Record<string, string>;
   tag_name: string;
-  tag_rule_assets?: Record<string, string>;
   tag_rule_id: string;
 }
 

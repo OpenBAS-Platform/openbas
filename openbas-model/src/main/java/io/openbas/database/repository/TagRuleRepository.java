@@ -19,4 +19,8 @@ public interface TagRuleRepository
 
   @Query("select tr from TagRule tr where tr.tag.id IN :tagids")
   List<TagRule> findByTags(@Param("tagids") List<String> tagIds);
+
+  @Query("select tr from TagRule tr "
+          + "where tr.tag.name IN :tagnames")
+  List<TagRule> findByTagNames(@Param("tagnames") List<String> tagNames);
 }

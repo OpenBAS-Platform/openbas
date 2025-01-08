@@ -169,14 +169,11 @@ public class InjectService {
    *
    * @param injectId
    * @param defaultAssetGroupsToAdd
-   * @param defaultAssetGroupsToRemove
    * @return
    */
   @Transactional
   public Inject applyDefaultAssetGroupsToInject(
-      final String injectId,
-      final List<AssetGroup> defaultAssetGroupsToAdd,
-      final List<AssetGroup> defaultAssetGroupsToRemove) {
+      final String injectId, final List<AssetGroup> defaultAssetGroupsToAdd) {
 
     // fetch the inject
     Inject inject =
@@ -184,16 +181,10 @@ public class InjectService {
 
     // remove/add default asset groups and remove duplicates
     List<AssetGroup> currentAssetGroups = inject.getAssetGroups();
-    // Get the Id of the asset groups to remove and filter the assets that are in both lists
-    List<String> assetGroupIdsToRemove =
-        defaultAssetGroupsToRemove.stream()
-            .filter(assetGroup -> !defaultAssetGroupsToAdd.contains(assetGroup))
-            .map(AssetGroup::getId)
-            .toList();
+
     Set<String> uniqueAssetGroupIds = new HashSet<>();
     List<AssetGroup> newListOfAssetGroups =
         Stream.concat(currentAssetGroups.stream(), defaultAssetGroupsToAdd.stream())
-            .filter(assetGroup -> !assetGroupIdsToRemove.contains(assetGroup.getId()))
             .filter(assetGroup -> uniqueAssetGroupIds.add(assetGroup.getId()))
             .collect(Collectors.toList());
 

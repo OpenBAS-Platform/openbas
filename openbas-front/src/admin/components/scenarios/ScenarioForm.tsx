@@ -1,5 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, AlertTitle, Autocomplete, Button, Chip, Grid, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
+import {
+    Alert,
+    AlertTitle,
+    Autocomplete,
+    Button,
+    Chip, DialogContent,
+    DialogTitle,
+    Grid,
+    MenuItem,
+    TextField as MuiTextField,
+    Typography
+} from '@mui/material';
 import { FunctionComponent, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -11,6 +22,8 @@ import { useFormatter } from '../../../components/i18n';
 import type { ScenarioInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
 import { scenarioCategories } from './constants';
+import Dialog from "../../../components/common/Dialog";
+import AttackPatternForm from "../settings/attack_patterns/AttackPatternForm";
 
 interface Props {
   onSubmit: SubmitHandler<ScenarioInput>;
@@ -30,6 +43,8 @@ const ScenarioForm: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const [inputValue, setInputValue] = useState('');
+
+
 
   const {
     register,
@@ -169,20 +184,20 @@ const ScenarioForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
-      <Controller
-        control={control}
-        name="scenario_tags"
-        render={({ field: { onChange, value } }) => (
-          <TagField
-            name="scenarios_tags"
-            label={t('Tags')}
-            fieldValue={value ?? []}
-            fieldOnChange={onChange}
-            errors={errors}
-            style={{ marginTop: 20 }}
-          />
-        )}
-      />
+        <Controller
+            control={control}
+            name="scenario_tags"
+            render={({ field: { onChange, value } }) => (
+                <TagField
+                    name="scenarios_tags"
+                    label={t('Tags')}
+                    fieldValue={value ?? []}
+                    fieldOnChange={onChange}
+                    errors={errors}
+                    style={{ marginTop: 20 }}
+                />
+            )}
+        />
       <Typography
         variant="h2"
         gutterBottom
@@ -302,6 +317,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
           {editing ? t('Update') : t('Create')}
         </Button>
       </div>
+
     </form>
   );
 };

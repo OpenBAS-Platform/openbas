@@ -1,5 +1,5 @@
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
@@ -11,11 +11,20 @@ import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Exercise, ExerciseInput } from '../../../../utils/api-types';
+import type {
+  CheckScenarioRulesOutput,
+  Exercise,
+  ExerciseInput,
+  UpdateExerciseInput,
+  UpdateScenarioInput
+} from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
+import DialogApplyTagRule from "../../../../components/common/DialogApplyTagRule";
+import {checkScenarioTagRules} from "../../../../actions/scenarios/scenario-actions";
+import {checkExerciseTagRules} from "../../../../actions/exercises/exercise-action";
 
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
 
@@ -37,12 +46,47 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+
+  // Form
+  const initialValues: UpdateExerciseInput = {
+    exercise_name: exercise.exercise_name,
+    exercise_subtitle: exercise.exercise_subtitle ?? '',
+    exercise_description: exercise.exercise_description,
+    exercise_category: exercise.exercise_category ?? 'attack-scenario',
+    exercise_main_focus: exercise.exercise_main_focus ?? 'incident-response',
+    exercise_severity: exercise.exercise_severity ?? 'high',
+    exercise_tags: exercise.exercise_tags ?? [],
+    exercise_mail_from: exercise.exercise_mail_from ?? '',
+    exercise_mails_reply_to: exercise.exercise_mails_reply_to ?? [],
+    exercise_message_header: exercise.exercise_message_header ?? '',
+    exercise_message_footer: exercise.exercise_message_footer ?? '',
+    apply_tag_rule: false,
+  };
+
   // Edit
   const [openEdit, setOpenEdit] = useState(false);
   const handleOpenEdit = () => setOpenEdit(true);
   const handleCloseEdit = () => setOpenEdit(false);
+  const [exerciseFormData, setExerciseFormData] = useState<UpdateExerciseInput>(initialValues);
 
-  const onSubmit = (data: ExerciseInput) => {
+  const onSubmit = (data: UpdateExerciseInput) => {
+    setExerciseFormData(data);
+    //before updating the exercise we are checking if tag rules could apply
+    //-> if yes we ask the user to apply or not apply the rules at the update
+    checkExerciseTagRules(exercise.exercise_id, data.exercise_tags ?? []).then(
+        (result: { data: CheckScenarioRulesOutput })  => {
+          if(result.data.rules_found){
+            handleOpenApplyRule();
+          } else {
+            submitExerciseUpdate(data)
+          }
+        },
+    );
+  };
+
+  const submitExerciseUpdate = (data: UpdateExerciseInput) => {
+
+
     const input = {
       exercise_name: data.exercise_name,
       exercise_subtitle: data.exercise_subtitle,
@@ -56,8 +100,21 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_mail_from: data.exercise_mail_from,
       exercise_message_header: data.exercise_message_header,
       exercise_message_footer: data.exercise_message_footer,
+      apply_tag_rule: data.apply_tag_rule
+
     };
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
+  }
+
+  const handleApplyRule = () => {
+    exerciseFormData.apply_tag_rule = true;
+    submitExerciseUpdate(exerciseFormData);
+    handleCloseApplyRule();
+  };
+  const handleDontApplyRule = () => {
+    exerciseFormData.apply_tag_rule = false;
+    submitExerciseUpdate(exerciseFormData)
+    handleCloseApplyRule();
   };
 
   // Delete
@@ -84,6 +141,11 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     });
   };
 
+  //apply rule dialog
+  const [openApplyRule, setOpenApplyRule] = useState(false);
+  const handleOpenApplyRule = () => setOpenApplyRule(true);
+  const handleCloseApplyRule = () => setOpenApplyRule(false);
+
   // Export
   const [openExport, setOpenExport] = useState(false);
   const [exportTeams, setExportTeams] = useState(false);
@@ -108,20 +170,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
   const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
 
-  // Form
-  const initialValues: ExerciseInput = {
-    exercise_name: exercise.exercise_name,
-    exercise_subtitle: exercise.exercise_subtitle ?? '',
-    exercise_description: exercise.exercise_description,
-    exercise_category: exercise.exercise_category ?? 'attack-scenario',
-    exercise_main_focus: exercise.exercise_main_focus ?? 'incident-response',
-    exercise_severity: exercise.exercise_severity ?? 'high',
-    exercise_tags: exercise.exercise_tags ?? [],
-    exercise_mail_from: exercise.exercise_mail_from ?? '',
-    exercise_mails_reply_to: exercise.exercise_mails_reply_to ?? [],
-    exercise_message_header: exercise.exercise_message_header ?? '',
-    exercise_message_footer: exercise.exercise_message_footer ?? '',
-  };
+
   const permissions = usePermissions(exercise.exercise_id);
 
   // Fetching data
@@ -154,6 +203,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         />
 
       </Drawer>
+      <DialogApplyTagRule
+          open={openApplyRule}
+          handleClose={handleCloseApplyRule}
+          handleApplyRule={handleApplyRule}
+          handleDontApplyRule={handleDontApplyRule}
+      />
       <Drawer
         open={openReports}
         containerStyle={{ padding: '0px' }}

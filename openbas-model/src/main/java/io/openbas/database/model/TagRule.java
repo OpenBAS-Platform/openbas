@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -23,10 +24,13 @@ public class TagRule implements Base {
   @UuidGenerator
   @JsonProperty("tag_rule_id")
   @NotBlank
+  @Queryable(filterable = true, searchable = true, sortable = true)
   private String id;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "tag_id")
+  @JsonProperty("tag_rule_tag")
+  @Queryable(searchable = true, filterable = true, sortable = true, path = "tag.name")
   private Tag tag;
 
   @ManyToMany(fetch = FetchType.LAZY)
@@ -34,6 +38,8 @@ public class TagRule implements Base {
       name = "tag_rule_asset_groups",
       joinColumns = @JoinColumn(name = "tag_rule_id"),
       inverseJoinColumns = @JoinColumn(name = "asset_group_id"))
+  @Queryable(filterable = true, path = "assetGroups.name")
+  @JsonProperty("tag_rule_asset_groups")
   private List<AssetGroup> assetGroups = new ArrayList<>();
 
   @JsonIgnore

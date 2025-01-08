@@ -172,3 +172,9 @@ export const fetchExercisesGlobalScores = (exercisesGlobalScoresInput: Exercises
   const uri = `${EXERCISE_URI}/global-scores`;
   return simplePostCall(uri, data);
 };
+
+export const checkExerciseTagRules = (exerciseId: string, newTagIds: string[]) => {
+  const uri = `/api/exercises/${exerciseId}/check-rules`;
+  const input = { new_tags: newTagIds };
+  return simplePostCall(uri, input);
+};

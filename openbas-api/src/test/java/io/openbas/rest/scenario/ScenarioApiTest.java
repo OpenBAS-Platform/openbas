@@ -10,11 +10,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
+import io.openbas.database.model.AssetGroup;
+import io.openbas.database.model.Scenario;
+import io.openbas.database.model.Tag;
+import io.openbas.database.model.TagRule;
+import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.TagRuleRepository;
+import io.openbas.rest.scenario.form.CheckScenarioRulesInput;
 import io.openbas.rest.scenario.form.ScenarioInformationInput;
 import io.openbas.rest.scenario.form.ScenarioInput;
+import io.openbas.utils.fixtures.AssetGroupFixture;
+import io.openbas.utils.fixtures.ScenarioFixture;
+import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,11 +44,20 @@ public class ScenarioApiTest {
 
   @Autowired private ScenarioRepository scenarioRepository;
 
+  @Autowired private TagRepository tagRepository;
+
+  @Autowired private TagRuleRepository tagRuleRepository;
+
+  @Autowired private AssetGroupRepository assetGroupRepository;
+
   static String SCENARIO_ID;
 
   @AfterAll
   void afterAll() {
     this.scenarioRepository.deleteById(SCENARIO_ID);
+    this.tagRuleRepository.deleteAll();
+    this.tagRepository.deleteAll();
+    this.assetGroupRepository.deleteAll();
   }
 
   @DisplayName("Create scenario succeed")
@@ -193,5 +214,74 @@ public class ScenarioApiTest {
     this.mvc
         .perform(delete(SCENARIO_URI + "/" + SCENARIO_ID))
         .andExpect(status().is2xxSuccessful());
+  }
+
+  @DisplayName("Check if a rule applies when a rule is found")
+  @Test
+  @Order(7)
+  @WithMockPlannerUser
+  void checkIfRuleAppliesTest_WHEN_rule_found() throws Exception {
+    this.tagRuleRepository.deleteAll();
+    this.tagRepository.deleteAll();
+    Tag tag2 = TagFixture.getTag();
+    tag2.setName("tag2");
+    tag2 = this.tagRepository.save(tag2);
+
+    AssetGroup assetGroup =
+        assetGroupRepository.save(AssetGroupFixture.createDefaultAssetGroup("assetGroup"));
+    TagRule tagRule = new TagRule();
+    tagRule.setTag(tag2);
+    tagRule.setAssetGroups(List.of(assetGroup));
+    this.tagRuleRepository.save(tagRule);
+
+    Scenario scenario = this.scenarioRepository.save(ScenarioFixture.getScenario());
+
+    CheckScenarioRulesInput input = new CheckScenarioRulesInput();
+    input.setNewTags(List.of(tag2.getId()));
+    String response =
+        this.mvc
+            .perform(
+                post(SCENARIO_URI + "/" + scenario.getId() + "/check-rules")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    assertNotNull(response);
+    assertEquals(true, JsonPath.read(response, "$.rules_found"));
+  }
+
+  @DisplayName("Check if a rule applies when no rule is found")
+  @Test
+  @Order(8)
+  @WithMockPlannerUser
+  void checkIfRuleAppliesTest_WHEN_no_rule_found() throws Exception {
+    this.tagRuleRepository.deleteAll();
+    this.tagRepository.deleteAll();
+    Tag tag2 = TagFixture.getTag();
+    tag2.setName("tag2");
+    tag2 = this.tagRepository.save(tag2);
+    CheckScenarioRulesInput input = new CheckScenarioRulesInput();
+    input.setNewTags(List.of(tag2.getId()));
+
+    Scenario scenario = this.scenarioRepository.save(ScenarioFixture.getScenario());
+
+    String response =
+        this.mvc
+            .perform(
+                post(SCENARIO_URI + "/" + scenario.getId() + "/check-rules")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    assertNotNull(response);
+    assertEquals(false, JsonPath.read(response, "$.rules_found"));
   }
 }
