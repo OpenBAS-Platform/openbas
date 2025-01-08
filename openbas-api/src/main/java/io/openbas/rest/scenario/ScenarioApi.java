@@ -286,4 +286,14 @@ public class ScenarioApi extends RestBehavior {
     return scenarioToExerciseService.toExercise(
         scenario, now().truncatedTo(MINUTES).plus(1, MINUTES), true);
   }
+
+  @PostMapping(SCENARIO_URI + "/{scenarioId}/check-rules")
+  public CheckScenarioRulesOutput checkIfRuleApplies(
+      @PathVariable @NotBlank final String scenarioId,
+      @Valid @RequestBody final CheckScenarioRulesInput input) {
+    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    return CheckScenarioRulesOutput.builder()
+        .rulesFound(this.scenarioService.checkIfTagRulesApplies(scenario, input.getNewTags()))
+        .build();
+  }
 }

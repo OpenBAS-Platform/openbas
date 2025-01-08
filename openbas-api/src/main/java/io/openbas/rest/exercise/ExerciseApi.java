@@ -915,5 +915,14 @@ public class ExerciseApi extends RestBehavior {
     importService.handleFileImport(file);
   }
 
+  @PostMapping(EXERCISE_URI + "/{exerciseId}/check-rules")
+  public CheckExerciseRulesOutput checkIfRuleApplies(
+      @PathVariable @NotBlank final String exerciseId,
+      @Valid @RequestBody final CheckExerciseRulesInput input) {
+    Exercise exercise = this.exerciseService.exercise(exerciseId);
+    return CheckExerciseRulesOutput.builder()
+        .rulesFound(this.exerciseService.checkIfTagRulesApplies(exercise, input.getNewTags()))
+        .build();
+  }
   // endregion
 }
