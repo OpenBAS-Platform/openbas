@@ -31,6 +31,27 @@ export interface Agent {
   listened?: boolean;
 }
 
+/** List of agents */
+export interface AgentOutput {
+  /** Indicates whether the endpoint is active. The endpoint is considered active if it was seen in the last 3 minutes. */
+  agent_active?: boolean;
+  /** Agent deployment mode */
+  agent_deployment_mode?: "service" | "session";
+  /** User */
+  agent_executed_by_user?: string;
+  /** Agent executor */
+  agent_executor?: ExecutorOutput;
+  /** Agent id */
+  agent_id: string;
+  /**
+   * Instant when agent was last seen
+   * @format date-time
+   */
+  agent_last_seen?: string;
+  /** Agent privilege */
+  agent_privilege?: "admin" | "standard";
+}
+
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
@@ -670,17 +691,13 @@ export interface DryrunCreateInput {
 }
 
 export interface Endpoint {
-  asset_active?: boolean;
   asset_agents?: Agent[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: string;
   asset_id: string;
-  /** @format date-time */
-  asset_last_seen?: string;
   asset_name: string;
   asset_tags?: string[];
   asset_type?: string;
@@ -694,22 +711,44 @@ export interface Endpoint {
   listened?: boolean;
 }
 
-export interface EndpointInput {
-  asset_description?: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
+export interface EndpointOutput {
+  /** List of agents */
+  asset_agents: AgentOutput[];
+  /** Asset Id */
+  asset_id: string;
+  /** Asset name */
   asset_name: string;
+  /** Tags */
   asset_tags?: string[];
-  endpoint_agent_version?: string;
+  /** Asset type */
+  asset_type?: string;
+  /** Architecture */
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
-  endpoint_hostname?: string;
-  /**
-   * @maxItems 2147483647
-   * @minItems 1
-   */
-  endpoint_ips: string[];
-  endpoint_mac_addresses?: string[];
+  /** Platform */
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
+export interface EndpointOverviewOutput {
+  /** List of agents */
+  asset_agents: AgentOutput[];
+  /** Endpoint description */
+  asset_description?: string;
+  /** Asset Id */
+  asset_id: string;
+  /** Endpoint name */
+  asset_name: string;
+  /** Tags */
+  asset_tags?: string[];
+  /** Architecture */
+  endpoint_arch?: "x86_64" | "arm64" | "Unknown";
+  /** Hostname */
+  endpoint_hostname?: string;
+  /** List IPs */
+  endpoint_ips?: string[];
+  /** List of MAC addresses */
+  endpoint_mac_addresses?: string[];
+  /** Platform */
+  endpoint_platform?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
 export interface EndpointRegisterInput {
@@ -729,6 +768,12 @@ export interface EndpointRegisterInput {
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
+export interface EndpointUpdateInput {
+  asset_description?: string;
+  asset_name: string;
+  asset_tags?: string[];
 }
 
 export interface Evaluation {
@@ -797,6 +842,16 @@ export interface ExecutorCreateInput {
   executor_name: string;
   executor_platforms?: string[];
   executor_type: string;
+}
+
+/** Agent executor */
+export interface ExecutorOutput {
+  /** Agent executor id */
+  executor_id?: string;
+  /** Agent executor name */
+  executor_name?: string;
+  /** Agent executor type */
+  executor_type?: string;
 }
 
 export interface ExecutorUpdateInput {
@@ -1398,6 +1453,7 @@ export interface InjectInput {
   inject_depends_on?: InjectDependencyInput[];
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
+  inject_enabled?: boolean;
   inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
@@ -2218,8 +2274,8 @@ export interface PageAttackPattern {
   totalPages?: number;
 }
 
-export interface PageEndpoint {
-  content?: Endpoint[];
+export interface PageEndpointOutput {
+  content?: EndpointOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2524,6 +2580,25 @@ export interface PageSecurityPlatform {
 
 export interface PageTag {
   content?: Tag[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageTagRuleOutput {
+  content?: TagRuleOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3266,6 +3341,17 @@ export interface Tag {
 export interface TagCreateInput {
   tag_color: string;
   tag_name: string;
+}
+
+export interface TagRuleInput {
+  tag_name: string;
+  tag_rule_assets?: string[];
+}
+
+export interface TagRuleOutput {
+  tag_name: string;
+  tag_rule_assets?: Record<string, string>;
+  tag_rule_id: string;
 }
 
 export interface TagUpdateInput {

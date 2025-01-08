@@ -4,13 +4,13 @@ import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 
 import com.cronutils.utils.VisibleForTesting;
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

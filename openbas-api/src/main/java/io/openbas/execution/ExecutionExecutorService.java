@@ -1,6 +1,5 @@
 package io.openbas.execution;
 
-import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Executor;
 import io.openbas.database.repository.InjectStatusRepository;
@@ -11,6 +10,7 @@ import io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorContextServic
 import io.openbas.executors.openbas.service.OpenBASExecutorContextService;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.service.TaniumExecutorContextService;
+import io.openbas.service.AssetGroupService;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;

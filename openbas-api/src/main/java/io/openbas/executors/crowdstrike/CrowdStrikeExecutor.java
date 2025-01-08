@@ -1,12 +1,12 @@
 package io.openbas.executors.crowdstrike;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorContextService;
 import io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import io.openbas.service.EndpointService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

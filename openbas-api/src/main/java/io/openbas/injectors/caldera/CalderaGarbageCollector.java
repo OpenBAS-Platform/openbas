@@ -1,9 +1,9 @@
 package io.openbas.injectors.caldera;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.config.CalderaInjectorConfig;
 import io.openbas.injectors.caldera.service.CalderaGarbageCollectorService;
+import io.openbas.service.EndpointService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;

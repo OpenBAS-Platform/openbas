@@ -1,48 +1,43 @@
-package io.openbas.executors.crowdstrike.service;
+package io.openbas.executors.tanium.service;
 
 import static java.time.Instant.now;
 import static java.time.ZoneOffset.UTC;
 
-import io.openbas.asset.EndpointService;
-import io.openbas.database.model.Agent;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Executor;
-import io.openbas.database.model.Injector;
-import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
-import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
-import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
+import io.openbas.database.model.*;
+import io.openbas.executors.tanium.client.TaniumExecutorClient;
+import io.openbas.executors.tanium.config.TaniumExecutorConfig;
+import io.openbas.executors.tanium.model.NodeEndpoint;
+import io.openbas.executors.tanium.model.TaniumEndpoint;
 import io.openbas.integrations.ExecutorService;
 import io.openbas.integrations.InjectorService;
+import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-@ConditionalOnProperty(prefix = "executor.crowdstrike", name = "enable")
+@ConditionalOnProperty(prefix = "executor.tanium", name = "enable")
 @Log
 @Service
-public class CrowdStrikeExecutorService implements Runnable {
+public class TaniumExecutorService implements Runnable {
   private static final int CLEAR_TTL = 1800000; // 30 minutes
   private static final int DELETE_TTL = 86400000; // 24 hours
-  private static final String CROWDSTRIKE_EXECUTOR_TYPE = "openbas_crowdstrike";
-  private static final String CROWDSTRIKE_EXECUTOR_NAME = "CrowdStrike";
+  private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
+  private static final String TANIUM_EXECUTOR_NAME = "Tanium";
 
-  private final CrowdStrikeExecutorClient client;
+  private final TaniumExecutorClient client;
 
   private final EndpointService endpointService;
 
-  private final CrowdStrikeExecutorContextService crowdStrikeExecutorContextService;
+  private final TaniumExecutorContextService taniumExecutorContextService;
 
   private final InjectorService injectorService;
 
@@ -52,39 +47,39 @@ public class CrowdStrikeExecutorService implements Runnable {
     return switch (platform) {
       case "Linux" -> Endpoint.PLATFORM_TYPE.Linux;
       case "Windows" -> Endpoint.PLATFORM_TYPE.Windows;
-      case "Mac" -> Endpoint.PLATFORM_TYPE.MacOS;
+      case "MacOS" -> Endpoint.PLATFORM_TYPE.MacOS;
       default -> Endpoint.PLATFORM_TYPE.Unknown;
     };
   }
 
   public static Endpoint.PLATFORM_ARCH toArch(@NotBlank final String arch) {
     return switch (arch) {
-      case "x64", "x86_64" -> Endpoint.PLATFORM_ARCH.x86_64;
-      case "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
+      case "x64-based PC", "x86_64" -> Endpoint.PLATFORM_ARCH.x86_64;
+      case "arm64-based PC", "arm64" -> Endpoint.PLATFORM_ARCH.arm64;
       default -> Endpoint.PLATFORM_ARCH.Unknown;
     };
   }
 
   @Autowired
-  public CrowdStrikeExecutorService(
+  public TaniumExecutorService(
       ExecutorService executorService,
-      CrowdStrikeExecutorClient client,
-      CrowdStrikeExecutorConfig config,
-      CrowdStrikeExecutorContextService crowdStrikeExecutorContextService,
+      TaniumExecutorClient client,
+      TaniumExecutorConfig config,
+      TaniumExecutorContextService taniumExecutorContextService,
       EndpointService endpointService,
       InjectorService injectorService) {
     this.client = client;
     this.endpointService = endpointService;
-    this.crowdStrikeExecutorContextService = crowdStrikeExecutorContextService;
+    this.taniumExecutorContextService = taniumExecutorContextService;
     this.injectorService = injectorService;
     try {
       if (config.isEnable()) {
         this.executor =
             executorService.register(
                 config.getId(),
-                CROWDSTRIKE_EXECUTOR_TYPE,
-                CROWDSTRIKE_EXECUTOR_NAME,
-                getClass().getResourceAsStream("/img/icon-crowdstrike.png"),
+                TANIUM_EXECUTOR_TYPE,
+                TANIUM_EXECUTOR_NAME,
+                getClass().getResourceAsStream("/img/icon-tanium.png"),
                 new String[] {
                   Endpoint.PLATFORM_TYPE.Windows.name(),
                   Endpoint.PLATFORM_TYPE.Linux.name(),
@@ -94,17 +89,18 @@ public class CrowdStrikeExecutorService implements Runnable {
         executorService.remove(config.getId());
       }
     } catch (Exception e) {
-      log.log(Level.SEVERE, "Error creating CrowdStrike executor: " + e);
+      log.log(Level.SEVERE, "Error creating Tanium executor: " + e);
     }
   }
 
   @Override
   public void run() {
-    log.info("Running CrowdStrike executor endpoints gathering...");
-    List<CrowdStrikeDevice> devices = this.client.devices().getResources().stream().toList();
+    log.info("Running Tanium executor endpoints gathering...");
+    List<NodeEndpoint> nodeEndpoints =
+        this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
     List<Endpoint> endpoints =
-        toEndpoint(devices).stream().filter(endpoint -> endpoint.getActive()).toList();
-    log.info("CrowdStrike executor provisioning based on " + endpoints.size() + " assets");
+        toEndpoint(nodeEndpoints).stream().filter(endpoint -> endpoint.getActive()).toList();
+    log.info("Tanium executor provisioning based on " + endpoints.size() + " assets");
     endpoints.forEach(
         endpoint -> {
           List<Endpoint> existingEndpoints =
@@ -128,7 +124,7 @@ public class CrowdStrikeExecutorService implements Runnable {
           }
         });
     List<Endpoint> inactiveEndpoints =
-        toEndpoint(devices).stream().filter(endpoint -> !endpoint.getActive()).toList();
+        toEndpoint(nodeEndpoints).stream().filter(endpoint -> !endpoint.getActive()).toList();
     inactiveEndpoints.forEach(
         endpoint -> {
           Optional<Endpoint> optionalExistingEndpoint =
@@ -147,29 +143,29 @@ public class CrowdStrikeExecutorService implements Runnable {
 
   // -- PRIVATE --
 
-  private List<Endpoint> toEndpoint(@NotNull final List<CrowdStrikeDevice> devices) {
-    return devices.stream()
+  private List<Endpoint> toEndpoint(@NotNull final List<NodeEndpoint> nodeEndpoints) {
+    return nodeEndpoints.stream()
         .map(
-            (crowdStrikeDevice) -> {
+            (nodeEndpoint) -> {
+              TaniumEndpoint taniumEndpoint = nodeEndpoint.getNode();
               Endpoint endpoint = new Endpoint();
               Agent agent = new Agent();
               agent.setExecutor(this.executor);
-              agent.setExternalReference(crowdStrikeDevice.getDevice_id());
-              agent.setPrivilege(Agent.PRIVILEGE.admin);
+              agent.setExternalReference(taniumEndpoint.getId());
+              agent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
               agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-              endpoint.setName(crowdStrikeDevice.getHostname());
-              endpoint.setDescription("Asset collected by CrowdStrike executor context.");
-              endpoint.setIps(new String[] {crowdStrikeDevice.getConnection_ip()});
-              endpoint.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
-              endpoint.setHostname(crowdStrikeDevice.getHostname());
-              endpoint.setPlatform(toPlatform(crowdStrikeDevice.getPlatform_name()));
+              endpoint.setName(taniumEndpoint.getName());
+              endpoint.setDescription("Asset collected by Tanium executor context.");
+              endpoint.setIps(taniumEndpoint.getIpAddresses());
+              endpoint.setMacAddresses(taniumEndpoint.getMacAddresses());
+              endpoint.setHostname(taniumEndpoint.getName());
+              endpoint.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
               agent.setExecutedByUser(
                   Endpoint.PLATFORM_TYPE.Windows.equals(endpoint.getPlatform())
                       ? Agent.ADMIN_SYSTEM_WINDOWS
                       : Agent.ADMIN_SYSTEM_UNIX);
-              // Cannot find arch in CrowdStrike for the moment
-              endpoint.setArch(toArch("x64"));
-              agent.setLastSeen(toInstant(crowdStrikeDevice.getLast_seen()));
+              endpoint.setArch(toArch(taniumEndpoint.getProcessor().getArchitecture()));
+              agent.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
               agent.setAsset(endpoint);
               endpoint.setAgents(List.of(agent));
               return endpoint;
@@ -202,7 +198,7 @@ public class CrowdStrikeExecutorService implements Runnable {
         injectors.forEach(
             injector -> {
               if (injector.getExecutorClearCommands() != null) {
-                this.crowdStrikeExecutorContextService.launchExecutorClear(
+                this.taniumExecutorContextService.launchExecutorClear(
                     injector, matchingExistingEndpoint);
               }
             });
