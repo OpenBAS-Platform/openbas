@@ -7,8 +7,8 @@ import static io.openbas.utils.fixtures.EndpointFixture.*;
 import static io.openbas.utils.fixtures.TagFixture.getTag;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.jayway.jsonpath.JsonPath;
@@ -160,5 +160,35 @@ class EndpointApiTest extends IntegrationTest {
 
     // --ASSERT--
     assertEquals(newName, JsonPath.read(response, "$.asset_name"));
+  }
+
+  @DisplayName("Given valid input, should delete an endpoint successfully")
+  @Test
+  @WithMockAdminUser
+  void given_validInput_should_deleteEndpointSuccessfully() throws Exception {
+    // --PREPARE--
+    Tag tag = tagRepository.save(getTag());
+    String externalReference = "external01";
+    EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
+    Endpoint endpoint = new Endpoint();
+    endpoint.setUpdateAttributes(endpointInput);
+    Agent agent = createAgent(endpoint, externalReference);
+    endpoint.setAgents(
+        new ArrayList<>() {
+          {
+            add(agent);
+          }
+        });
+    Endpoint endpointCreated = endpointRepository.save(endpoint);
+
+    // -- EXECUTE --
+    mvc.perform(
+            delete(ENDPOINT_URI + "/" + endpointCreated.getId()).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful());
+
+    // -- ASSERT --
+    mvc.perform(
+            get(ENDPOINT_URI + "/" + endpointCreated.getId()).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is4xxClientError());
   }
 }
