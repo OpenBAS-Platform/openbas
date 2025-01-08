@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Tag;
@@ -21,6 +20,7 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.service.EndpointService;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.ArrayList;
 import java.util.List;
