@@ -20,6 +20,7 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.ArrayList;
@@ -141,14 +142,15 @@ class EndpointApiTest extends IntegrationTest {
         });
     Endpoint endpointCreated = endpointRepository.save(endpoint);
 
+    EndpointUpdateInput updateInput = new EndpointUpdateInput();
     String newName = "New hostname";
-    endpointInput.setHostname(newName);
+    updateInput.setName(newName);
 
     // --EXECUTE--
     String response =
         mvc.perform(
                 put(ENDPOINT_URI + "/" + endpointCreated.getId())
-                    .content(asJsonString(endpointInput))
+                    .content(asJsonString(updateInput))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
@@ -157,6 +159,6 @@ class EndpointApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(newName, JsonPath.read(response, "$.endpoint_hostname"));
+    assertEquals(newName, JsonPath.read(response, "$.asset_name"));
   }
 }
