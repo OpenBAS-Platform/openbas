@@ -222,10 +222,10 @@ public class TagRuleServiceTest {
 
   @Test
   void testApplyTagRuleToInjectCreation() {
-    AssetGroup assetGroup1 = AssetGroupFixture.createDefaultAssetGroup("assetgroup1");
-    AssetGroup assetGroup2 = AssetGroupFixture.createDefaultAssetGroup("assetgroup2");
-    AssetGroup assetGroup3 = AssetGroupFixture.createDefaultAssetGroup("assetgroup3");
-    AssetGroup assetGroup4 = AssetGroupFixture.createDefaultAssetGroup("assetgroup4");
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
+    AssetGroup assetGroup4 = getAssetGroup("assetgroup4");
 
     Tag tag1 = TagFixture.getTag("tag2");
     Tag tag2 = TagFixture.getTag("tag3");
@@ -242,5 +242,11 @@ public class TagRuleServiceTest {
             List.of(tag1.getId(), tag2.getId()), currentAssetGroups);
     List<AssetGroup> expected = List.of(assetGroup1, assetGroup2, assetGroup3, assetGroup4);
     assertEquals(new HashSet<>(expected), new HashSet<>(result));
+  }
+
+  private AssetGroup getAssetGroup(String name) {
+    AssetGroup assetGroup = AssetGroupFixture.createDefaultAssetGroup(name);
+    assetGroup.setId(name);
+    return assetGroup;
   }
 }
