@@ -2464,14 +2464,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-leaflet/core@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@react-leaflet/core@npm:2.1.0"
+"@react-leaflet/core@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@react-leaflet/core@npm:3.0.0"
   peerDependencies:
     leaflet: ^1.9.0
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  checksum: 10c0/d5218c79ab9decd458e1fa8a0ec3757542e3ea4e569afa151a32ef0e9ceb63a13174f3fbc740fe0d514df8b0b3e30d913bfb0b8b661dac13924934d7e430bfc9
+    react: ^19.0.0
+    react-dom: ^19.0.0
+  checksum: 10c0/1e20f92ea99d378121d7ba57b9571ca3a67a86247729d8cd5726ded26105fcbffbbdf727da34b2ad5976438979819a38c93b94389313abb3ff80ca81632609a6
   languageName: node
   linkType: hard
 
@@ -8058,13 +8058,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdi-material-ui@npm:7.9.2":
-  version: 7.9.2
-  resolution: "mdi-material-ui@npm:7.9.2"
+"mdi-material-ui@npm:7.9.3":
+  version: 7.9.3
+  resolution: "mdi-material-ui@npm:7.9.3"
   peerDependencies:
     "@mui/material": ^5.0.0 || ^6.0.0
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/c772d74d7979936a686142c97daa20ba956465f394be4a988c2b1e2cbc3e211b5cdd62c013949257064e1ec180da91daffd6075354711af5d805777908e0755d
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/67d9e037be721a4440ffa113a44794d22d02888229b5407d0b38826eece6bfddec4f54a4bfe93b9afc03a363e3ee567e9036cf18d24473a7f95c29c3ef1b806b
   languageName: node
   linkType: hard
 
@@ -9021,7 +9021,7 @@ __metadata:
     js-file-download: "npm:0.4.12"
     jsdom: "npm:25.0.1"
     leaflet: "npm:1.9.4"
-    mdi-material-ui: "npm:7.9.2"
+    mdi-material-ui: "npm:7.9.3"
     moment: "npm:2.30.1"
     moment-timezone: "npm:0.5.45"
     monocart-coverage-reports: "npm:2.11.3"
@@ -9041,7 +9041,7 @@ __metadata:
     react-final-form-arrays: "npm:3.1.4"
     react-hook-form: "npm:7.54.1"
     react-intl: "npm:7.1.0"
-    react-leaflet: "npm:4.2.1"
+    react-leaflet: "npm:5.0.0"
     react-markdown: "npm:9.0.1"
     react-redux: "npm:9.2.0"
     react-router: "npm:7.1.1"
@@ -9697,16 +9697,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-leaflet@npm:4.2.1":
-  version: 4.2.1
-  resolution: "react-leaflet@npm:4.2.1"
+"react-leaflet@npm:5.0.0":
+  version: 5.0.0
+  resolution: "react-leaflet@npm:5.0.0"
   dependencies:
-    "@react-leaflet/core": "npm:^2.1.0"
+    "@react-leaflet/core": "npm:^3.0.0"
   peerDependencies:
     leaflet: ^1.9.0
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  checksum: 10c0/2e9d1687e883fd7d2e9798e51a04600e1b14784dc98b981a44507e65eb39a24f08c7f237c7522ae5667e999eb53b8d565ebd0f5baa25ef73a0278d6bfcc369e1
+    react: ^19.0.0
+    react-dom: ^19.0.0
+  checksum: 10c0/f0b6fb797cc2d81bc8cbb54e0cb32aefa689d35ca5f52d203ce3c5a1d14668e51244f10844bd2c88d5cb4aca5eb05bc280794e6d1652727ff9da2358e89d1b86
   languageName: node
   linkType: hard
 
