@@ -57,7 +57,7 @@ public class TagRuleService {
 
     tagRule.setTag(getTag(tagName));
 
-    // if one of the asset group doesn't exist throw a ResourceNotFoundException
+    // if one of the asset groups doesn't exist throw a ResourceNotFoundException
     tagRule.setAssetGroups(getAssetGroups(assetGroupIds));
 
     return tagRuleRepository.save(tagRule);

@@ -142,7 +142,7 @@ public class InjectService {
   }
 
   /**
-   * Update an inject with default assets
+   * Update an inject with default asset groups
    *
    * @param injectId
    * @param defaultAssetGroupsToAdd
@@ -159,9 +159,9 @@ public class InjectService {
     Inject inject =
         this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
-    // remove/add default assets and remove duplicates
+    // remove/add default asset groups and remove duplicates
     List<AssetGroup> currentAssetGroups = inject.getAssetGroups();
-    // Get the Id of the assets to remove and filter the assets that are in both lists
+    // Get the Id of the asset groups to remove and filter the assets that are in both lists
     List<String> assetGroupIdsToRemove =
         defaultAssetGroupsToRemove.stream()
             .filter(asset -> !defaultAssetGroupsToAdd.contains(asset))
