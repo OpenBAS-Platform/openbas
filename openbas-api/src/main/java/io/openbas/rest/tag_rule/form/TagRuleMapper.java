@@ -1,6 +1,6 @@
 package io.openbas.rest.tag_rule.form;
 
-import io.openbas.database.model.Asset;
+import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.TagRule;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -11,8 +11,9 @@ public class TagRuleMapper {
     return TagRuleOutput.builder()
         .id(tagRule.getId())
         .tagName(tagRule.getTag().getName())
-        .assets(
-            tagRule.getAssets().stream().collect(Collectors.toMap(Asset::getId, Asset::getName)))
+        .assetGroups(
+            tagRule.getAssetGroups().stream()
+                .collect(Collectors.toMap(AssetGroup::getId, AssetGroup::getName)))
         .build();
   }
 }

@@ -6,14 +6,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import io.openbas.database.model.Asset;
+import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.TagRule;
-import io.openbas.database.repository.AssetRepository;
+import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.fixtures.AssetFixture;
+import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.fixtures.TagRuleFixture;
 import java.util.HashSet;
@@ -31,7 +31,7 @@ public class TagRuleServiceTest {
 
   @Mock private TagRuleRepository tagRuleRepository;
 
-  @Mock private AssetRepository assetRepository;
+  @Mock private AssetGroupRepository assetGroupRepository;
 
   @Mock private TagRepository tagRepository;
 
@@ -71,13 +71,16 @@ public class TagRuleServiceTest {
     when(tagRepository.findByName(expected.getTag().getName()))
         .thenReturn(Optional.of(TagFixture.getTag()));
     expected
-        .getAssets()
+        .getAssetGroups()
         .forEach(
-            asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.of(assetGroup)));
 
     TagRule result =
         tagRuleService.createTagRule(
-            expected.getTag().getName(), expected.getAssets().stream().map(Asset::getId).toList());
+            expected.getTag().getName(),
+            expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
     assertEquals(expected, result);
   }
 
@@ -89,14 +92,16 @@ public class TagRuleServiceTest {
     when(tagRepository.findByName(expected.getTag().getName())).thenReturn(null);
     when(tagRepository.save(any())).thenReturn(tag);
     expected
-        .getAssets()
+        .getAssetGroups()
         .forEach(
-            asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.of(assetGroup)));
     assertThrows(
         ElementNotFoundException.class,
         () -> {
           tagRuleService.createTagRule(
-              expected.getId(), expected.getAssets().stream().map(Asset::getId).toList());
+              expected.getId(), expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
         });
   }
 
@@ -107,15 +112,18 @@ public class TagRuleServiceTest {
     when(tagRepository.findByName(expected.getTag().getName()))
         .thenReturn(Optional.of(TagFixture.getTag()));
     expected
-        .getAssets()
+        .getAssetGroups()
         .forEach(
-            asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.empty()));
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.empty()));
     assertThrows(
         ElementNotFoundException.class,
         () -> {
           TagRule result =
               tagRuleService.createTagRule(
-                  expected.getId(), expected.getAssets().stream().map(Asset::getId).toList());
+                  expected.getId(),
+                  expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
         });
   }
 
@@ -127,15 +135,17 @@ public class TagRuleServiceTest {
         .thenReturn(Optional.of(TagFixture.getTag()));
     when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.of(expected));
     expected
-        .getAssets()
+        .getAssetGroups()
         .forEach(
-            asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.of(assetGroup)));
 
     TagRule result =
         tagRuleService.updateTagRule(
             expected.getId(),
             expected.getTag().getName(),
-            expected.getAssets().stream().map(Asset::getId).toList());
+            expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
     assertEquals(expected, result);
   }
 
@@ -148,37 +158,41 @@ public class TagRuleServiceTest {
     when(tagRepository.save(any())).thenReturn(tag);
     when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.of(expected));
     expected
-        .getAssets()
+        .getAssetGroups()
         .forEach(
-            asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.of(asset)));
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.of(assetGroup)));
     assertThrows(
         ElementNotFoundException.class,
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
               expected.getTag().getName(),
-              expected.getAssets().stream().map(Asset::getId).toList());
+              expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
         });
   }
 
   @Test
-  void testUpdateTagRule_WITH_non_existing_asset() {
+  void testUpdateTagRule_WITH_non_existing_asset_group() {
     TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
     when(tagRuleRepository.save(any())).thenReturn(expected);
     when(tagRepository.findByName(expected.getTag().getName()))
         .thenReturn(Optional.of(TagFixture.getTag()));
     when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.of(expected));
     expected
-        .getAssets()
+        .getAssetGroups()
         .forEach(
-            asset -> when(assetRepository.findById(asset.getId())).thenReturn(Optional.empty()));
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.empty()));
     assertThrows(
         ElementNotFoundException.class,
         () -> {
           tagRuleService.updateTagRule(
               expected.getId(),
               expected.getTag().getName(),
-              expected.getAssets().stream().map(Asset::getId).toList());
+              expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
         });
   }
 
@@ -192,7 +206,7 @@ public class TagRuleServiceTest {
           tagRuleService.updateTagRule(
               expected.getId(),
               expected.getTag().getName(),
-              expected.getAssets().stream().map(Asset::getId).toList());
+              expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
         });
   }
 
@@ -202,31 +216,31 @@ public class TagRuleServiceTest {
     TagRule tagRule = TagRuleFixture.createTagRule(TAG_RULE_ID);
     when(tagRuleRepository.findByTags(tagIds)).thenReturn(List.of(tagRule));
     assertEquals(
-        new HashSet<>(tagRule.getAssets()),
-        new HashSet<>(tagRuleService.getAssetsFromTagIds(tagIds)));
+        new HashSet<>(tagRule.getAssetGroups()),
+        new HashSet<>(tagRuleService.getAssetGroupsFromTagIds(tagIds)));
   }
 
   @Test
-  void testApplyTagRuleToInjectCreation() throws Exception {
-    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
-    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
-    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
-    Asset asset4 = AssetFixture.createDefaultAsset("asset4");
+  void testApplyTagRuleToInjectCreation() {
+    AssetGroup assetGroup1 = AssetGroupFixture.createDefaultAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = AssetGroupFixture.createDefaultAssetGroup("assetgroup2");
+    AssetGroup assetGroup3 = AssetGroupFixture.createDefaultAssetGroup("assetgroup3");
+    AssetGroup assetGroup4 = AssetGroupFixture.createDefaultAssetGroup("assetgroup4");
 
     Tag tag1 = TagFixture.getTag("tag2");
     Tag tag2 = TagFixture.getTag("tag3");
 
-    List<Asset> currentAssets = List.of(asset1, asset2);
-    List<Asset> defaultAssets = List.of(asset2, asset3, asset4);
-    TagRule tagRule = TagRuleFixture.createTagRule("tag_rule1", defaultAssets);
+    List<AssetGroup> currentAssetGroups = List.of(assetGroup1, assetGroup2);
+    List<AssetGroup> defaultAssetGroups = List.of(assetGroup2, assetGroup3, assetGroup4);
+    TagRule tagRule = TagRuleFixture.createTagRule("tag_rule1", defaultAssetGroups);
 
     when(tagRuleRepository.findByTags(List.of(tag1.getId(), tag2.getId())))
         .thenReturn(List.of(tagRule));
 
-    List<Asset> result =
+    List<AssetGroup> result =
         tagRuleService.applyTagRuleToInjectCreation(
-            List.of(tag1.getId(), tag2.getId()), currentAssets);
-    List<Asset> expected = List.of(asset1, asset2, asset3, asset4);
+            List.of(tag1.getId(), tag2.getId()), currentAssetGroups);
+    List<AssetGroup> expected = List.of(assetGroup1, assetGroup2, assetGroup3, assetGroup4);
     assertEquals(new HashSet<>(expected), new HashSet<>(result));
   }
 }

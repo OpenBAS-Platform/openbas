@@ -3,10 +3,10 @@ package io.openbas.service;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import com.cronutils.utils.VisibleForTesting;
-import io.openbas.database.model.Asset;
+import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.TagRule;
-import io.openbas.database.repository.AssetRepository;
+import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class TagRuleService {
   private final TagRuleRepository tagRuleRepository;
   private final TagRepository tagRepository;
-  private final AssetRepository assetRepository;
+  private final AssetGroupRepository assetGroupRepository;
 
   public Optional<TagRule> findById(String id) {
     return tagRuleRepository.findById(id);
@@ -37,16 +37,16 @@ public class TagRuleService {
         .collect(Collectors.toList());
   }
 
-  public TagRule createTagRule(@NotBlank final String tagName, final List<String> assetIds) {
-    // if the tag  or one of the asset doesn't exist we exist throw a ElementNotFoundException
+  public TagRule createTagRule(@NotBlank final String tagName, final List<String> assetGroupIds) {
+    // if the tag  or one of the asset group doesn't exist we exist throw a ElementNotFoundException
     TagRule tagRule = new TagRule();
     tagRule.setTag(getTag(tagName));
-    tagRule.setAssets(getAssets(assetIds));
+    tagRule.setAssetGroups(getAssetGroups(assetGroupIds));
     return tagRuleRepository.save(tagRule);
   }
 
   public TagRule updateTagRule(
-      @NotBlank final String tagRuleId, final String tagName, final List<String> assetIds) {
+      @NotBlank final String tagRuleId, final String tagName, final List<String> assetGroupIds) {
 
     // verify that the tag rule exists
     TagRule tagRule =
@@ -57,8 +57,8 @@ public class TagRuleService {
 
     tagRule.setTag(getTag(tagName));
 
-    // if one of the asset doesn't exist throw a ResourceNotFoundException
-    tagRule.setAssets(getAssets(assetIds));
+    // if one of the asset group doesn't exist throw a ResourceNotFoundException
+    tagRule.setAssetGroups(getAssetGroups(assetGroupIds));
 
     return tagRuleRepository.save(tagRule);
   }
@@ -84,46 +84,50 @@ public class TagRuleService {
   }
 
   /**
-   * Return the set of assets to add from a tag id list
+   * Return the set of asset groups to add from a tag id list
    *
    * @param tagIds
-   * @return set of assets to add by default
+   * @return set of asset groups to add by default
    */
-  public List<Asset> getAssetsFromTagIds(@NotNull final List<String> tagIds) {
+  public List<AssetGroup> getAssetGroupsFromTagIds(@NotNull final List<String> tagIds) {
     return this.tagRuleRepository.findByTags(tagIds).stream()
-        .flatMap(tagRule -> tagRule.getAssets().stream())
+        .flatMap(tagRule -> tagRule.getAssetGroups().stream())
         .toList();
   }
 
   /**
-   * Apply the rule to add the default assets to the input assets during Injects creation
+   * Apply the rule to add the default asset groups to the input asset groups during Injects
+   * creation
    *
-   * @param tagIds list of Assets of the Inject before applying the rules
-   * @param inputAssets list of Assets of the Inject before applying the rules
-   * @return return the new list of assets
+   * @param tagIds list of Asset Groups of the Inject before applying the rules
+   * @param inputAssetGroups list of Asset Groups of the Inject before applying the rules
+   * @return return the new list of Asset Groups
    */
-  public List<Asset> applyTagRuleToInjectCreation(List<String> tagIds, List<Asset> inputAssets) {
+  public List<AssetGroup> applyTagRuleToInjectCreation(
+      List<String> tagIds, List<AssetGroup> inputAssetGroups) {
 
-    List<Asset> defaultAssets = this.getAssetsFromTagIds(tagIds);
+    List<AssetGroup> defaultAssetGroups = this.getAssetGroupsFromTagIds(tagIds);
 
-    // remove duplicate
-    Set<String> uniqueAssetsIds = new HashSet<>();
-    return Stream.concat(inputAssets.stream(), defaultAssets.stream())
-        .filter(asset -> uniqueAssetsIds.add(asset.getId()))
+    // remove duplicates
+    Set<String> uniqueAssetGrousIds = new HashSet<>();
+    return Stream.concat(inputAssetGroups.stream(), defaultAssetGroups.stream())
+        .filter(assetGroup -> uniqueAssetGrousIds.add(assetGroup.getId()))
         .toList();
   }
 
   @VisibleForTesting
-  protected List<Asset> getAssets(final List<String> assetIds) {
-    return assetIds == null
+  protected List<AssetGroup> getAssetGroups(final List<String> assetGroupIds) {
+    return assetGroupIds == null
         ? new ArrayList<>()
-        : assetIds.stream()
+        : assetGroupIds.stream()
             .map(
                 id ->
-                    assetRepository
+                    assetGroupRepository
                         .findById(id)
                         .orElseThrow(
-                            () -> new ElementNotFoundException("Asset not found with id: " + id)))
+                            () ->
+                                new ElementNotFoundException(
+                                    "Asset Group not found with id: " + id)))
             .collect(Collectors.toList());
   }
 }

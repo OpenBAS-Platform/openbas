@@ -145,39 +145,39 @@ public class InjectService {
    * Update an inject with default assets
    *
    * @param injectId
-   * @param defaultAssetsToAdd
-   * @param defaultAssetsToRemove
+   * @param defaultAssetGroupsToAdd
+   * @param defaultAssetGroupsToRemove
    * @return
    */
   @Transactional
-  public Inject applyDefaultAssetsToInject(
+  public Inject applyDefaultAssetGroupsToInject(
       final String injectId,
-      final List<Asset> defaultAssetsToAdd,
-      final List<Asset> defaultAssetsToRemove) {
+      final List<AssetGroup> defaultAssetGroupsToAdd,
+      final List<AssetGroup> defaultAssetGroupsToRemove) {
 
     // fetch the inject
     Inject inject =
         this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     // remove/add default assets and remove duplicates
-    List<Asset> currentAssets = inject.getAssets();
+    List<AssetGroup> currentAssetGroups = inject.getAssetGroups();
     // Get the Id of the assets to remove and filter the assets that are in both lists
-    List<String> assetIdsToRemove =
-        defaultAssetsToRemove.stream()
-            .filter(asset -> !defaultAssetsToAdd.contains(asset))
-            .map(Asset::getId)
+    List<String> assetGroupIdsToRemove =
+        defaultAssetGroupsToRemove.stream()
+            .filter(asset -> !defaultAssetGroupsToAdd.contains(asset))
+            .map(AssetGroup::getId)
             .toList();
     Set<String> uniqueAssetsIds = new HashSet<>();
-    List<Asset> newListOfAssets =
-        Stream.concat(currentAssets.stream(), defaultAssetsToAdd.stream())
-            .filter(asset -> !assetIdsToRemove.contains(asset.getId()))
-            .filter(asset -> uniqueAssetsIds.add(asset.getId()))
+    List<AssetGroup> newListOfAssetGroups =
+        Stream.concat(currentAssetGroups.stream(), defaultAssetGroupsToAdd.stream())
+            .filter(assetGroup -> !assetGroupIdsToRemove.contains(assetGroup.getId()))
+            .filter(assetGroup -> uniqueAssetsIds.add(assetGroup.getId()))
             .collect(Collectors.toList());
 
-    if (new HashSet<>(currentAssets).equals(new HashSet<>(newListOfAssets))) {
+    if (new HashSet<>(currentAssetGroups).equals(new HashSet<>(newListOfAssetGroups))) {
       return inject;
     } else {
-      inject.setAssets(newListOfAssets);
+      inject.setAssetGroups(newListOfAssetGroups);
       return this.injectRepository.save(inject);
     }
   }
