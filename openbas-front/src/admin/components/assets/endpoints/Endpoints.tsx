@@ -97,17 +97,6 @@ const Endpoints = () => {
     dispatch(fetchTags());
   });
 
-  // Headers
-  const headers = [
-    { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'endpoint_active', label: 'Status', isSortable: false },
-    { field: 'endpoint_agents_privilege', label: 'Agents Privileges', isSortable: false },
-    { field: 'endpoint_platform', label: 'Platform', isSortable: true },
-    { field: 'endpoint_arch', label: 'Architecture', isSortable: true },
-    { field: 'endpoint_agents_executor', label: 'Executors', isSortable: false },
-    { field: 'asset_tags', label: 'Tags', isSortable: false },
-  ];
-
   const availableFilterNames = [
     'endpoint_platform',
     'endpoint_arch',
@@ -167,6 +156,115 @@ const Endpoints = () => {
     }, {} as Record<string, ExecutorOutput[]>);
   };
 
+  // Headers
+  const headers = [
+    {
+      field: 'asset_name',
+      label: 'Name',
+      isSortable: true,
+      value: (endpoint: EndpointOutput) => endpoint.asset_name,
+    },
+    {
+      field: 'endpoint_active',
+      label: 'Status',
+      isSortable: false,
+      value: (endpoint: EndpointOutput) => {
+        const status = getActiveMsgTooltip(endpoint);
+        return (
+          <Tooltip title={status.activeMsgTooltip}>
+            <span>
+              <AssetStatus variant="list" status={status.isActive ? 'Active' : 'Inactive'} />
+            </span>
+          </Tooltip>
+        );
+      },
+    },
+    {
+      field: 'endpoint_agents_privilege',
+      label: 'Agents Privileges',
+      isSortable: false,
+      value: (endpoint: EndpointOutput) => {
+        const privileges = getPrivilegesCount(endpoint);
+        return (
+          <>
+            <Tooltip title={t('Admin') + `: ${privileges.adminCount}`} placement="top">
+              <span>
+                {privileges.adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
+              </span>
+            </Tooltip>
+            <Tooltip title={t('User') + `: ${privileges.userCount}`} placement="top">
+              <span>
+                {privileges.userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
+              </span>
+            </Tooltip>
+          </>
+        );
+      },
+    },
+    {
+      field: 'endpoint_platform',
+      label: 'Platform',
+      isSortable: true,
+      value: (endpoint: EndpointOutput) => {
+        return (
+          <>
+            <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={10} />
+            {endpoint.endpoint_platform}
+          </>
+        );
+      },
+    },
+    {
+      field: 'endpoint_arch',
+      label: 'Architecture',
+      isSortable: true,
+      value: (endpoint: EndpointOutput) => endpoint.endpoint_arch,
+    },
+    {
+      field: 'endpoint_agents_executor',
+      label: 'Executors',
+      isSortable: false,
+      value: (endpoint: EndpointOutput) => {
+        const groupedExecutors = getExecutorsCount(endpoint);
+        return (
+          <>
+            {
+              Object.keys(groupedExecutors).map((executorType) => {
+                const executorsOfType = groupedExecutors[executorType];
+                const count = executorsOfType.length;
+                const base = executorsOfType[0];
+
+                if (count > 0) {
+                  return (
+                    <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
+                      <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        <img
+                          src={`/api/images/executors/${executorType}`}
+                          alt={executorType}
+                          style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                        />
+                      </div>
+                    </Tooltip>
+                  );
+                } else {
+                  return t('Unknown');
+                }
+              })
+            }
+          </>
+        );
+      },
+    },
+    {
+      field: 'asset_tags',
+      label: 'Tags',
+      isSortable: false,
+      value: (endpoint: EndpointOutput) => {
+        return (<ItemTags variant="list" tags={endpoint.asset_tags} />);
+      },
+    },
+  ];
+
   return (
     <>
       <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
@@ -210,10 +308,6 @@ const Endpoints = () => {
           />
         </ListItem>
         {endpoints.map((endpoint: EndpointOutput) => {
-          const status = getActiveMsgTooltip(endpoint);
-          const privileges = getPrivilegesCount(endpoint);
-          const groupedExecutors = getExecutorsCount(endpoint);
-
           return (
             <ListItem
               key={endpoint.asset_id}
@@ -241,61 +335,15 @@ const Endpoints = () => {
                 <ListItemText
                   primary={(
                     <div className={classes.bodyItems}>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_name}>
-                        {endpoint.asset_name}
-                      </div>
-                      <div className={classes.bodyItem} style={inlineStyles.endpoint_active}>
-                        <Tooltip title={status.activeMsgTooltip}>
-                          <span>
-                            <AssetStatus variant="list" status={status.isActive ? 'Active' : 'Inactive'} />
-                          </span>
-                        </Tooltip>
-                      </div>
-                      <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_privilege}>
-                        <Tooltip title={t('Admin') + `: ${privileges.adminCount}`} placement="top">
-                          <span>
-                            {privileges.adminCount > 0 && (<AgentPrivilege variant="list" privilege="admin" />)}
-                          </span>
-                        </Tooltip>
-                        <Tooltip title={t('User') + `: ${privileges.userCount}`} placement="top">
-                          <span>
-                            {privileges.userCount > 0 && (<AgentPrivilege variant="list" privilege="user" />)}
-                          </span>
-                        </Tooltip>
-                      </div>
-                      <div className={classes.bodyItem} style={inlineStyles.endpoint_platform}>
-                        <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={10} />
-                        {endpoint.endpoint_platform}
-                      </div>
-                      <div className={classes.bodyItem} style={inlineStyles.endpoint_arch}>
-                        {endpoint.endpoint_arch}
-                      </div>
-                      <div className={classes.bodyItem} style={inlineStyles.endpoint_agents_executor}>
-                        {Object.keys(groupedExecutors).map((executorType) => {
-                          const executorsOfType = groupedExecutors[executorType];
-                          const count = executorsOfType.length;
-                          const base = executorsOfType[0];
-
-                          if (count > 0) {
-                            return (
-                              <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
-                                <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-                                  <img
-                                    src={`/api/images/executors/${executorType}`}
-                                    alt={executorType}
-                                    style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
-                                  />
-                                </div>
-                              </Tooltip>
-                            );
-                          } else {
-                            return t('Unknown');
-                          }
-                        })}
-                      </div>
-                      <div className={classes.bodyItem} style={inlineStyles.asset_tags}>
-                        <ItemTags variant="list" tags={endpoint.asset_tags} />
-                      </div>
+                      {headers.map(header => (
+                        <div
+                          key={header.field}
+                          className={classes.bodyItem}
+                          style={inlineStyles[header.field]}
+                        >
+                          {header.value(endpoint)}
+                        </div>
+                      ))}
                     </div>
                   )}
                 />
