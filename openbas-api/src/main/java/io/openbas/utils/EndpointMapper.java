@@ -54,7 +54,7 @@ public class EndpointMapper {
 
   private Set<AgentOutput> toAgentOutputs(List<Agent> agents) {
     return Optional.ofNullable(agents).orElse(emptyList()).stream()
-        .map(agent -> toAgentOutput(agent))
+        .map(this::toAgentOutput)
         .collect(Collectors.toSet());
   }
 
