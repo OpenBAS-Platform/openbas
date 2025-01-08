@@ -1,6 +1,7 @@
 package io.openbas.utils;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.Endpoint;
@@ -9,9 +10,10 @@ import io.openbas.rest.asset.endpoint.form.AgentOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.ExecutorOutput;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +29,7 @@ public class EndpointMapper {
         .agents(toAgentOutputs(endpoint.getAgents()))
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
-        .tags(endpoint.getTags().stream().map(Tag::getId).toList())
+        .tags(endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .build();
   }
 
@@ -39,20 +41,18 @@ public class EndpointMapper {
         .hostname(endpoint.getHostname())
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
-        .ips(endpoint.getIps() != null ? Arrays.asList(endpoint.getIps()) : emptyList())
+        .ips(endpoint.getIps() != null ? Set.of(endpoint.getIps()) : emptySet())
         .macAddresses(
-            endpoint.getMacAddresses() != null
-                ? Arrays.asList(endpoint.getMacAddresses())
-                : emptyList())
+            endpoint.getMacAddresses() != null ? Set.of(endpoint.getMacAddresses()) : emptySet())
         .agents(toAgentOutputs(endpoint.getAgents()))
-        .tags(endpoint.getTags().stream().map(Tag::getId).toList())
+        .tags(endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .build();
   }
 
-  private List<AgentOutput> toAgentOutputs(List<Agent> agents) {
+  private Set<AgentOutput> toAgentOutputs(List<Agent> agents) {
     return Optional.ofNullable(agents).orElse(emptyList()).stream()
         .map(agent -> toAgentOutput(agent))
-        .toList();
+        .collect(Collectors.toSet());
   }
 
   private AgentOutput toAgentOutput(Agent agent) {
