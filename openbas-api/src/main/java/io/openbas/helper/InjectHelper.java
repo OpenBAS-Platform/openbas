@@ -5,9 +5,7 @@ import static java.util.stream.Stream.concat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.DryInjectRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.specification.DryInjectSpecification;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
@@ -32,7 +30,6 @@ public class InjectHelper {
   @Resource protected ObjectMapper mapper;
 
   private final InjectRepository injectRepository;
-  private final DryInjectRepository dryInjectRepository;
   private final ExecutionContextService executionContextService;
 
   // -- INJECT --
@@ -53,9 +50,7 @@ public class InjectHelper {
   // -- INJECTION --
 
   private Stream<Tuple2<User, String>> getUsersFromInjection(Injection injection) {
-    if (injection instanceof DryInject dryInject) {
-      return dryInject.getRun().getUsers().stream().map(user -> Tuples.of(user, "Dryrun"));
-    } else if (injection instanceof Inject inject) {
+    if (injection instanceof Inject inject) {
       List<Team> teams = getInjectTeams(inject);
       // We get all the teams for this inject
       // But those team can be used in other exercises with different players enabled
@@ -121,23 +116,6 @@ public class InjectHelper {
                       inject.getAssetGroups(),
                       usersFromInjection(inject));
                 });
-    // Get dry injects
-    List<DryInject> dryInjects =
-        this.dryInjectRepository.findAll(DryInjectSpecification.executable());
-    Stream<ExecutableInject> executableDryInjects =
-        dryInjects.stream()
-            .filter(this::isBeforeOrEqualsNow)
-            .sorted(DryInject.executionComparator)
-            .map(
-                dry ->
-                    new ExecutableInject(
-                        false,
-                        false,
-                        dry,
-                        List.of(),
-                        dry.getInject().getAssets(),
-                        dry.getInject().getAssetGroups(),
-                        usersFromInjection(dry)));
     // Get atomic testing injects
     List<Inject> atomicTests =
         this.injectRepository.findAll(InjectSpecification.forAtomicTesting());
@@ -159,7 +137,6 @@ public class InjectHelper {
                       usersFromInjection(inject));
                 });
     // Combine injects and dry
-    return concat(concat(executableInjects, executableDryInjects), executableAtomicTests)
-        .collect(Collectors.toList());
+    return concat(executableInjects, executableAtomicTests).collect(Collectors.toList());
   }
 }
