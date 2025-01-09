@@ -298,7 +298,7 @@ public class ScenarioService {
   }
 
   /**
-   * Update the scenario and each of the injects to add/remove default assets
+   * Update the scenario and each of the injects to add/remove default asset groups
    *
    * @param scenario
    * @param currentTags list of the tags before the update
@@ -308,29 +308,29 @@ public class ScenarioService {
   public Scenario updateScenario(
       @NotNull final Scenario scenario, Set<Tag> currentTags, boolean applyRule) {
     if (applyRule) {
-      // Get assets from the TagRule of the added tags
-      List<Asset> defaultAssetsToAdd =
-          tagRuleService.getAssetsFromTagIds(
+      // Get asset groups from the TagRule of the added tags
+      List<AssetGroup> defaultAssetGroupsToAdd =
+          tagRuleService.getAssetGroupsFromTagIds(
               scenario.getTags().stream()
                   .filter(tag -> !currentTags.contains(tag))
                   .map(Tag::getId)
                   .toList());
 
-      // Get assets from the TagRule of the removed tags
-      List<Asset> defaultAssetsToRemove =
-          tagRuleService.getAssetsFromTagIds(
+      // Get asset groups from the TagRule of the removed tags
+      List<AssetGroup> defaultAssetGroupsToRemove =
+          tagRuleService.getAssetGroupsFromTagIds(
               currentTags.stream()
                   .filter(tag -> !scenario.getTags().contains(tag))
                   .map(Tag::getId)
                   .toList());
 
-      // Add/remove the default assets to/from the injects
+      // Add/remove the default asset groups to/from the injects
       scenario
           .getInjects()
           .forEach(
               inject ->
-                  injectService.applyDefaultAssetsToInject(
-                      inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
+                  injectService.applyDefaultAssetGroupsToInject(
+                      inject.getId(), defaultAssetGroupsToAdd, defaultAssetGroupsToRemove));
     }
     scenario.setUpdatedAt(now());
     return this.scenarioRepository.save(scenario);

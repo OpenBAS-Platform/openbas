@@ -22,7 +22,7 @@ import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.utils.InjectMapper;
-import io.openbas.utils.fixtures.AssetFixture;
+import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,86 +72,98 @@ class InjectServiceTest {
   }
 
   @Test
-  public void testApplyDefaultAssetsToInject_WITH_unexisting_inject() {
+  public void testApplyDefaultAssetGroupsToInject_WITH_unexisting_inject() {
     doReturn(Optional.empty()).when(injectRepository).findById(INJECT_ID);
     assertThrows(
         ElementNotFoundException.class,
-        () -> injectService.applyDefaultAssetsToInject(INJECT_ID, List.of(), List.of()));
+        () -> injectService.applyDefaultAssetGroupsToInject(INJECT_ID, List.of(), List.of()));
   }
 
   @Test
-  public void testApplyDefaultAssetsToInject_WITH_add_and_remove() {
-    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
-    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
-    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
-    Asset asset4 = AssetFixture.createDefaultAsset("asset4");
+  public void testApplyDefaultAssetGroupsToInject_WITH_add_and_remove() {
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
+    AssetGroup assetGroup4 = getAssetGroup("assetgroup4");
     Inject inject = new Inject();
     inject.setId(INJECT_ID);
-    inject.setAssets(List.of(asset1, asset2, asset3));
+    inject.setAssetGroups(List.of(assetGroup1, assetGroup2, assetGroup3));
     doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
 
-    injectService.applyDefaultAssetsToInject(INJECT_ID, List.of(asset4), List.of(asset3));
+    injectService.applyDefaultAssetGroupsToInject(
+        INJECT_ID, List.of(assetGroup4), List.of(assetGroup3));
 
     ArgumentCaptor<Inject> injectCaptor = ArgumentCaptor.forClass(Inject.class);
     verify(injectRepository).save(injectCaptor.capture());
     Inject capturedInject = injectCaptor.getValue();
     assertEquals(INJECT_ID, capturedInject.getId());
     assertEquals(
-        new HashSet<>(List.of(asset1, asset2, asset4)), new HashSet<>(capturedInject.getAssets()));
+        new HashSet<>(List.of(assetGroup1, assetGroup2, assetGroup4)),
+        new HashSet<>(capturedInject.getAssetGroups()));
   }
 
   @Test
-  public void testApplyDefaultAssetsToInject_WITH_remove_all() {
-    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
-    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
-    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+  public void testApplyDefaultAssetGroupsToInject_WITH_remove_all() {
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
     Inject inject = new Inject();
     inject.setId(INJECT_ID);
-    inject.setAssets(List.of(asset1, asset2, asset3));
+    inject.setAssetGroups(List.of(assetGroup1, assetGroup2, assetGroup3));
     doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
 
-    injectService.applyDefaultAssetsToInject(INJECT_ID, List.of(), List.of(asset1, asset2, asset3));
+    injectService.applyDefaultAssetGroupsToInject(
+        INJECT_ID, List.of(), List.of(assetGroup1, assetGroup2, assetGroup3));
 
     ArgumentCaptor<Inject> injectCaptor = ArgumentCaptor.forClass(Inject.class);
     verify(injectRepository).save(injectCaptor.capture());
     Inject capturedInject = injectCaptor.getValue();
     assertEquals(INJECT_ID, capturedInject.getId());
-    assertEquals(List.of(), capturedInject.getAssets());
+    assertEquals(List.of(), capturedInject.getAssetGroups());
   }
 
   @Test
-  public void testApplyDefaultAssetsToInject_WITH_add_all() {
-    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
-    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
-    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+  public void testApplyDefaultAssetGroupsToInject_WITH_add_all() {
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
     Inject inject = new Inject();
     inject.setId(INJECT_ID);
-    inject.setAssets(List.of());
+    inject.setAssetGroups(List.of());
     doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
 
-    injectService.applyDefaultAssetsToInject(INJECT_ID, List.of(asset1, asset2, asset3), List.of());
+    injectService.applyDefaultAssetGroupsToInject(
+        INJECT_ID, List.of(assetGroup1, assetGroup2, assetGroup3), List.of());
 
     ArgumentCaptor<Inject> injectCaptor = ArgumentCaptor.forClass(Inject.class);
     verify(injectRepository).save(injectCaptor.capture());
     Inject capturedInject = injectCaptor.getValue();
     assertEquals(INJECT_ID, capturedInject.getId());
     assertEquals(
-        new HashSet<>(List.of(asset1, asset2, asset3)), new HashSet<>(capturedInject.getAssets()));
+        new HashSet<>(List.of(assetGroup1, assetGroup2, assetGroup3)),
+        new HashSet<>(capturedInject.getAssetGroups()));
   }
 
   @Test
-  public void testApplyDefaultAssetsToInject_WITH_no_change() {
-    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
-    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
-    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+  public void testApplyDefaultAssetGroupsToInject_WITH_no_change() {
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
     Inject inject = new Inject();
     inject.setId(INJECT_ID);
-    inject.setAssets(List.of(asset1, asset2, asset3));
+    inject.setAssetGroups(List.of(assetGroup1, assetGroup2, assetGroup3));
     doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
 
-    injectService.applyDefaultAssetsToInject(INJECT_ID, List.of(asset1), List.of(asset1));
+    injectService.applyDefaultAssetGroupsToInject(
+        INJECT_ID, List.of(assetGroup1), List.of(assetGroup1));
 
     verify(injectRepository, never()).save(any());
+  }
+
+  private AssetGroup getAssetGroup(String name) {
+    AssetGroup assetGroup = AssetGroupFixture.createDefaultAssetGroup(name);
+    assetGroup.setId(name);
+    return assetGroup;
   }
 
   @DisplayName("Test get inject specification with valid search input")

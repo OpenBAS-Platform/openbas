@@ -342,14 +342,14 @@ public class InjectApi extends RestBehavior {
                   .toList());
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
 
-    // add default assets
-    inject.setAssets(
+    // add default asset groups
+    inject.setAssetGroups(
         this.tagRuleService.applyTagRuleToInjectCreation(
             exercise.getTags().stream().map(Tag::getId).toList(),
-            assetService.assets(input.getAssets())));
+            assetGroupService.assetGroups(input.getAssetGroups())));
 
-    inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =
         input.getDocuments().stream()
@@ -582,14 +582,14 @@ public class InjectApi extends RestBehavior {
                   .toList());
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
 
-    // add default assets
-    inject.setAssets(
+    // add default asset groups
+    inject.setAssetGroups(
         this.tagRuleService.applyTagRuleToInjectCreation(
             scenario.getTags().stream().map(Tag::getId).toList(),
-            assetService.assets(input.getAssets())));
+            assetGroupService.assetGroups(input.getAssetGroups())));
 
-    inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =
         input.getDocuments().stream()

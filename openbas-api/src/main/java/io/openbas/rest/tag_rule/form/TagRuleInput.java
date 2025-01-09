@@ -20,6 +20,6 @@ public class TagRuleInput {
   @JsonProperty("tag_name")
   private String tagName;
 
-  @JsonProperty("tag_rule_assets")
-  private List<String> assets = new ArrayList<>();
+  @JsonProperty("asset_groups")
+  private List<String> assetGroups = new ArrayList<>();
 }

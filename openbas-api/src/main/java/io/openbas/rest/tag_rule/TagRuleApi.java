@@ -66,32 +66,32 @@ public class TagRuleApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI)
   @Transactional(rollbackFor = Exception.class)
-  @Operation(summary = "Create TagRule", description = "Tag and assets needs to exists")
+  @Operation(summary = "Create TagRule", description = "Tag and Asset Groups needs to exists")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "TagRule created"),
-        @ApiResponse(responseCode = "404", description = "Tag or Asset not found")
+        @ApiResponse(responseCode = "404", description = "Tag or Asset Group not found")
       })
   public TagRuleOutput createTagRule(@Valid @RequestBody final TagRuleInput input) {
     return tagRuleMapper.toTagRuleOutput(
-        tagRuleService.createTagRule(input.getTagName(), input.getAssets()));
+        tagRuleService.createTagRule(input.getTagName(), input.getAssetGroups()));
   }
 
   @Secured(ROLE_ADMIN)
   @LogExecutionTime
   @PutMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
   @Transactional(rollbackFor = Exception.class)
-  @Operation(summary = "Update TagRule", description = "Tag and assets needs to exists")
+  @Operation(summary = "Update TagRule", description = "Tag and Asset Groups needs to exists")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "TagRule updated"),
-        @ApiResponse(responseCode = "404", description = "TagRule, Tag  or Asset not found")
+        @ApiResponse(responseCode = "404", description = "TagRule, Tag  or Asset Group not found")
       })
   public TagRuleOutput updateTagRule(
       @PathVariable @NotBlank final String tagRuleId,
       @Valid @RequestBody final TagRuleInput input) {
     return tagRuleMapper.toTagRuleOutput(
-        tagRuleService.updateTagRule(tagRuleId, input.getTagName(), input.getAssets()));
+        tagRuleService.updateTagRule(tagRuleId, input.getTagName(), input.getAssetGroups()));
   }
 
   @LogExecutionTime

@@ -22,6 +22,6 @@ public class TagRuleOutput {
   @JsonProperty("tag_name")
   private String tagName;
 
-  @JsonProperty("tag_rule_assets")
-  Map<String, String> assets = new HashMap<>();
+  @JsonProperty("asset_groups")
+  Map<String, String> assetGroups = new HashMap<>();
 }

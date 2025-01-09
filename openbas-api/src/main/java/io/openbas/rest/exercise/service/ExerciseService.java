@@ -620,7 +620,7 @@ public class ExerciseService {
   }
 
   /**
-   * Update the simulation and each of the injects to add/remove default assets
+   * Update the simulation and each of the injects to add/remove default asset groups
    *
    * @param exercise
    * @param currentTags list of the tags before the update
@@ -630,29 +630,29 @@ public class ExerciseService {
   public Exercise updateExercice(
       @NotNull final Exercise exercise, @NotNull final Set<Tag> currentTags, boolean applyRule) {
     if (applyRule) {
-      // Get assets from the TagRule of the added tags
-      List<Asset> defaultAssetsToAdd =
-          tagRuleService.getAssetsFromTagIds(
+      // Get asset groups from the TagRule of the added tags
+      List<AssetGroup> defaultAssetGroupsToAdd =
+          tagRuleService.getAssetGroupsFromTagIds(
               exercise.getTags().stream()
                   .filter(tag -> !currentTags.contains(tag))
                   .map(Tag::getId)
                   .toList());
 
-      // Get assets from the TagRule of the removed tags
-      List<Asset> defaultAssetsToRemove =
-          tagRuleService.getAssetsFromTagIds(
+      // Get asset groups from the TagRule of the removed tags
+      List<AssetGroup> defaultAssetGroupsToRemove =
+          tagRuleService.getAssetGroupsFromTagIds(
               currentTags.stream()
                   .filter(tag -> !exercise.getTags().contains(tag))
                   .map(Tag::getId)
                   .toList());
 
-      // Add/remove the default assets to/from the injects
+      // Add/remove the default asset groups to/from the injects
       exercise
           .getInjects()
           .forEach(
               inject ->
-                  injectService.applyDefaultAssetsToInject(
-                      inject.getId(), defaultAssetsToAdd, defaultAssetsToRemove));
+                  injectService.applyDefaultAssetGroupsToInject(
+                      inject.getId(), defaultAssetGroupsToAdd, defaultAssetGroupsToRemove));
     }
     exercise.setUpdatedAt(now());
     return exerciseRepository.save(exercise);

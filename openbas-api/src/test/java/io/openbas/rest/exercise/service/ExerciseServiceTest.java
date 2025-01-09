@@ -3,9 +3,7 @@ package io.openbas.rest.exercise.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Exercise;
-import io.openbas.database.model.Inject;
+import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
@@ -112,9 +110,9 @@ class ExerciseServiceTest {
 
   @Test
   public void testUpdateExercise_WITH_apply_rule_true() {
-    Asset asset1 = AssetFixture.createDefaultAsset("asset1");
-    Asset asset2 = AssetFixture.createDefaultAsset("asset2");
-    Asset asset3 = AssetFixture.createDefaultAsset("asset3");
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
     Tag tag1 = TagFixture.getTag("Tag1");
     Tag tag2 = TagFixture.getTag("Tag2");
     Tag tag3 = TagFixture.getTag("Tag3");
@@ -126,11 +124,13 @@ class ExerciseServiceTest {
     exercise.setInjects(List.of(inject1, inject2));
     exercise.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
-    List<Asset> assetsToAdd = List.of(asset1, asset2);
-    List<Asset> assetsToRemove = List.of(asset3);
+    List<AssetGroup> assetGroupsToAdd = List.of(assetGroup1, assetGroup2);
+    List<AssetGroup> assetGroupsToRemove = List.of(assetGroup3);
 
-    when(tagRuleService.getAssetsFromTagIds(List.of(tag1.getId()))).thenReturn(assetsToAdd);
-    when(tagRuleService.getAssetsFromTagIds(List.of(tag3.getId()))).thenReturn(assetsToRemove);
+    when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag1.getId())))
+        .thenReturn(assetGroupsToAdd);
+    when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag3.getId())))
+        .thenReturn(assetGroupsToRemove);
     when(exerciseRepository.save(exercise)).thenReturn(exercise);
 
     exerciseService.updateExercice(exercise, currentTags, true);
@@ -140,15 +140,16 @@ class ExerciseServiceTest {
         .forEach(
             inject ->
                 verify(injectService)
-                    .applyDefaultAssetsToInject(inject.getId(), assetsToAdd, assetsToRemove));
+                    .applyDefaultAssetGroupsToInject(
+                        inject.getId(), assetGroupsToAdd, assetGroupsToRemove));
     verify(exerciseRepository).save(exercise);
   }
 
   @Test
   public void testUpdateExercise_WITH_apply_rule_false() {
-    io.openbas.database.model.Tag tag1 = TagFixture.getTag("Tag1");
-    io.openbas.database.model.Tag tag2 = TagFixture.getTag("Tag2");
-    io.openbas.database.model.Tag tag3 = TagFixture.getTag("Tag3");
+    Tag tag1 = TagFixture.getTag("Tag1");
+    Tag tag2 = TagFixture.getTag("Tag2");
+    Tag tag3 = TagFixture.getTag("Tag3");
     Inject inject1 = new Inject();
     inject1.setId("1");
     Inject inject2 = new Inject();
@@ -162,6 +163,12 @@ class ExerciseServiceTest {
 
     exerciseService.updateExercice(exercise, currentTags, false);
 
-    verify(injectService, never()).applyDefaultAssetsToInject(any(), any(), any());
+    verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any(), any());
+  }
+
+  private AssetGroup getAssetGroup(String name) {
+    AssetGroup assetGroup = AssetGroupFixture.createDefaultAssetGroup(name);
+    assetGroup.setId(name);
+    return assetGroup;
   }
 }

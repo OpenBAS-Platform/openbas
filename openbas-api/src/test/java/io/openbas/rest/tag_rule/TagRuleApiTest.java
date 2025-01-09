@@ -8,11 +8,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.Asset;
+import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.TagRule;
 import io.openbas.database.repository.*;
 import io.openbas.rest.tag_rule.form.TagRuleInput;
+import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.List;
@@ -33,7 +34,7 @@ public class TagRuleApiTest extends IntegrationTest {
 
   @Autowired private MockMvc mvc;
 
-  @Autowired private AssetRepository assetRepository;
+  @Autowired private AssetGroupRepository assetGroupRepository;
   @Autowired private TagRepository tagRepository;
   @Autowired private TagRuleRepository tagRuleRepository;
 
@@ -41,15 +42,15 @@ public class TagRuleApiTest extends IntegrationTest {
   void afterEach() {
     tagRuleRepository.deleteAll();
     tagRepository.deleteAll();
-    assetRepository.deleteAll();
+    assetGroupRepository.deleteAll();
   }
 
   @Test
   @WithMockAdminUser
   void findTagRule() throws Exception {
-    String assetName = "assetName";
+    String assetGroupName = "assetGroupName";
     String tagId = "tagName";
-    TagRule expected = createTagRule(tagId, List.of(assetName));
+    TagRule expected = createTagRule(tagId, List.of(assetGroupName));
 
     String response =
         mvc.perform(get(TAG_RULE_URI + "/" + expected.getId()).accept(MediaType.APPLICATION_JSON))
@@ -61,16 +62,16 @@ public class TagRuleApiTest extends IntegrationTest {
     assertNotNull(response);
     assertEquals(expected.getId(), JsonPath.read(response, "$.tag_rule_id"));
     assertEquals(expected.getTag().getName(), JsonPath.read(response, "$.tag_name"));
-    Map<String, Object> tagRuleAssets = JsonPath.read(response, "$.tag_rule_assets");
-    assertTrue(tagRuleAssets.containsKey(expected.getAssets().getFirst().getId()));
+    Map<String, Object> tagRuleAssetGroups = JsonPath.read(response, "$.asset_groups");
+    assertTrue(tagRuleAssetGroups.containsKey(expected.getAssetGroups().getFirst().getId()));
   }
 
   @Test
   @WithMockAdminUser
   void deleteTagRule() throws Exception {
-    String assetName = "assetName";
+    String assetGroupName = "assetGroupName";
     String tagId = "tagName";
-    TagRule expected = createTagRule(tagId, List.of(assetName));
+    TagRule expected = createTagRule(tagId, List.of(assetGroupName));
     mvc.perform(delete(TAG_RULE_URI + "/" + expected.getId()).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().is2xxSuccessful())
         .andReturn()
@@ -94,9 +95,10 @@ public class TagRuleApiTest extends IntegrationTest {
   @WithMockAdminUser
   void createTagRule_with_nonExistingTag() throws Exception {
 
-    String assetId = "assetId";
+    String assetGroupId = "assetGroupId";
     String tagName = "tagName";
-    TagRuleInput input = TagRuleInput.builder().tagName(tagName).assets(List.of(assetId)).build();
+    TagRuleInput input =
+        TagRuleInput.builder().tagName(tagName).assetGroups(List.of(assetGroupId)).build();
     mvc.perform(
             post(TAG_RULE_URI)
                 .content(asJsonString(input))
@@ -109,10 +111,14 @@ public class TagRuleApiTest extends IntegrationTest {
   @WithMockAdminUser
   void createTagRule() throws Exception {
 
-    Asset asset = createAsset("assetName");
+    AssetGroup assetGroup = createAssetGroup("assetGroupName");
+
     Tag tag = createTag("tagName");
     TagRuleInput input =
-        TagRuleInput.builder().tagName(tag.getName()).assets(List.of(asset.getId())).build();
+        TagRuleInput.builder()
+            .tagName(tag.getName())
+            .assetGroups(List.of(assetGroup.getId()))
+            .build();
 
     String response =
         mvc.perform(
@@ -127,22 +133,25 @@ public class TagRuleApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(tag.getName(), JsonPath.read(response, "$.tag_name"));
-    Map<String, Object> tagRuleAssets = JsonPath.read(response, "$.tag_rule_assets");
-    assertTrue(tagRuleAssets.containsKey(asset.getId()));
+    Map<String, Object> tagRuleAssetGroups = JsonPath.read(response, "$.asset_groups");
+    assertTrue(tagRuleAssetGroups.containsKey(assetGroup.getId()));
   }
 
   @Test
   @WithMockAdminUser
   void updateTagRule() throws Exception {
 
-    String assetName1 = "assetName1";
-    String assetName2 = "assetName2";
+    String assetGroupName1 = "assetGroupName1";
+    String assetGroupName2 = "assetGroupName2";
     Tag tag = createTag("tagName");
-    TagRule toUpdate = createTagRule(tag.getName(), List.of(assetName1));
-    Asset asset2 = createAsset(assetName2);
+    TagRule toUpdate = createTagRule(tag.getName(), List.of(assetGroupName1));
+    AssetGroup assetGroup2 = createAssetGroup(assetGroupName2);
 
     TagRuleInput input =
-        TagRuleInput.builder().tagName(tag.getName()).assets(List.of(asset2.getId())).build();
+        TagRuleInput.builder()
+            .tagName(tag.getName())
+            .assetGroups(List.of(assetGroup2.getId()))
+            .build();
 
     String response =
         mvc.perform(
@@ -157,22 +166,25 @@ public class TagRuleApiTest extends IntegrationTest {
     // -- ASSERT --
     assertNotNull(response);
     assertEquals(tag.getName(), JsonPath.read(response, "$.tag_name"));
-    Map<String, Object> tagRuleAssets = JsonPath.read(response, "$.tag_rule_assets");
-    assertTrue(tagRuleAssets.containsKey(asset2.getId()));
+    Map<String, Object> tagRuleAssetGroups = JsonPath.read(response, "$.asset_groups");
+    assertTrue(tagRuleAssetGroups.containsKey(assetGroup2.getId()));
   }
 
   @Test
   @WithMockAdminUser
   void updateTagRule_WITH_non_existing_tag() throws Exception {
 
-    String assetName1 = "assetName1";
-    String assetName2 = "assetName2";
+    String assetGroupName1 = "assetGroupName1";
+    String assetGroupName2 = "assetGroupName2";
     Tag tag = createTag("tagName");
-    TagRule toUpdate = createTagRule(tag.getName(), List.of(assetName1));
-    Asset asset2 = createAsset(assetName2);
+    TagRule toUpdate = createTagRule(tag.getName(), List.of(assetGroupName1));
+    AssetGroup assetGroup2 = createAssetGroup(assetGroupName2);
 
     TagRuleInput input =
-        TagRuleInput.builder().tagName("randomtagname").assets(List.of(asset2.getId())).build();
+        TagRuleInput.builder()
+            .tagName("randomtagname")
+            .assetGroups(List.of(assetGroup2.getId()))
+            .build();
 
     mvc.perform(
             put(TAG_RULE_URI + "/" + toUpdate.getId())
@@ -186,14 +198,17 @@ public class TagRuleApiTest extends IntegrationTest {
   @WithMockAdminUser
   void updateTagRule_WITH_non_existing_id() throws Exception {
 
-    String assetName1 = "assetName1";
-    String assetName2 = "assetName2";
+    String assetGroupName1 = "assetGroupName1";
+    String assetGroupName2 = "assetGroupName2";
     Tag tag = createTag("tagName");
-    createTagRule(tag.getName(), List.of(assetName1));
-    Asset asset2 = createAsset(assetName2);
+    createTagRule(tag.getName(), List.of(assetGroupName1));
+    AssetGroup assetGroup2 = createAssetGroup(assetGroupName2);
 
     TagRuleInput input =
-        TagRuleInput.builder().tagName(tag.getName()).assets(List.of(asset2.getId())).build();
+        TagRuleInput.builder()
+            .tagName(tag.getName())
+            .assetGroups(List.of(assetGroup2.getId()))
+            .build();
 
     mvc.perform(
             put(TAG_RULE_URI + "/" + "randomid")
@@ -205,14 +220,14 @@ public class TagRuleApiTest extends IntegrationTest {
 
   @Test
   @WithMockAdminUser
-  void updateTagRule_WITH_non_existing_asset() throws Exception {
+  void updateTagRule_WITH_non_existing_asset_group() throws Exception {
 
-    String assetName1 = "assetName1";
+    String assetName1 = "assetGroupName1";
     Tag tag = createTag("tagName");
     TagRule toUpdate = createTagRule(tag.getName(), List.of(assetName1));
 
     TagRuleInput input =
-        TagRuleInput.builder().tagName(tag.getName()).assets(List.of("randomasset")).build();
+        TagRuleInput.builder().tagName(tag.getName()).assetGroups(List.of("random")).build();
 
     mvc.perform(
             put(TAG_RULE_URI + "/" + toUpdate.getId())
@@ -225,8 +240,8 @@ public class TagRuleApiTest extends IntegrationTest {
   @Test
   @WithMockAdminUser
   void findAllTagRules() throws Exception {
-    TagRule tagRule1 = createTagRule("tag1", List.of("asset1"));
-    TagRule tagRule2 = createTagRule("tag2", List.of("asset2"));
+    TagRule tagRule1 = createTagRule("tag1", List.of("assetgroup1"));
+    TagRule tagRule2 = createTagRule("tag2", List.of("assetgroup2"));
     String response =
         mvc.perform(
                 get(TAG_RULE_URI)
@@ -246,10 +261,10 @@ public class TagRuleApiTest extends IntegrationTest {
   @Test
   @WithMockAdminUser
   void searchTagRule() throws Exception {
-    createTagRule("tag1", List.of("asset1"));
-    createTagRule("tag2", List.of("asset2"));
-    createTagRule("tag3", List.of("asset3"));
-    createTagRule("tag4", List.of("asset4"));
+    createTagRule("tag1", List.of("assetgroup1"));
+    createTagRule("tag2", List.of("assetgroup2"));
+    createTagRule("tag3", List.of("assetgroup3"));
+    createTagRule("tag4", List.of("assetgroup4"));
 
     SearchPaginationInput input = new SearchPaginationInput();
     input.setSize(2);
@@ -271,11 +286,12 @@ public class TagRuleApiTest extends IntegrationTest {
     assertEquals(Integer.valueOf(4), JsonPath.read(response, "$.totalElements"));
   }
 
-  private TagRule createTagRule(String tagName, List<String> assetNames) {
+  private TagRule createTagRule(String tagName, List<String> assetGroupNames) {
     TagRule tagRule = new TagRule();
     tagRule.setId(tagName);
     tagRule.setTag(createTag(tagName));
-    assetNames.forEach(assetName -> tagRule.getAssets().add(createAsset(assetName)));
+    assetGroupNames.forEach(
+        assetGroupName -> tagRule.getAssetGroups().add(createAssetGroup(assetGroupName)));
     return tagRuleRepository.save(tagRule);
   }
 
@@ -286,9 +302,8 @@ public class TagRuleApiTest extends IntegrationTest {
     return tagRepository.save(tag);
   }
 
-  private Asset createAsset(String assetName) {
-    Asset asset = new Asset();
-    asset.setName(assetName);
-    return assetRepository.save(asset);
+  private AssetGroup createAssetGroup(String assetGroupName) {
+    AssetGroup assetGroup = AssetGroupFixture.createDefaultAssetGroup(assetGroupName);
+    return assetGroupRepository.save(assetGroup);
   }
 }

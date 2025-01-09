@@ -31,10 +31,10 @@ public class TagRule implements Base {
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-      name = "tag_rule_assets",
+      name = "tag_rule_asset_groups",
       joinColumns = @JoinColumn(name = "tag_rule_id"),
-      inverseJoinColumns = @JoinColumn(name = "asset_id"))
-  private List<Asset> assets = new ArrayList<>();
+      inverseJoinColumns = @JoinColumn(name = "asset_group_id"))
+  private List<AssetGroup> assetGroups = new ArrayList<>();
 
   @JsonIgnore
   @Override
