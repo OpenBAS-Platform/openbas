@@ -5,10 +5,15 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class AssetAgentJobSpecification {
 
-  public static Specification<AssetAgentJob> forEndpoint(String externalReference) {
+  public static Specification<AssetAgentJob> forEndpoint(
+      String externalReference, String deploymentMode, String privilege, String executedByUser) {
     // TODO Add time limitation
     // TODO add cleanup
     return (root, query, cb) ->
-        cb.equal(root.get("asset").get("agents").get("externalReference"), externalReference);
+        cb.and(
+            cb.equal(root.get("agent").get("externalReference"), externalReference),
+            cb.equal(root.get("agent").get("deploymentMode"), deploymentMode),
+            cb.equal(root.get("agent").get("privilege"), privilege),
+            cb.equal(root.get("agent").get("executedByUser"), executedByUser));
   }
 }
