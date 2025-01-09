@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -14,7 +13,6 @@ import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
 import io.openbas.rest.inject.form.InjectBulkUpdateSupportedFields;
@@ -24,7 +22,7 @@ import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.utils.InjectMapper;
-import io.openbas.utils.fixtures.AssetFixture;
+import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +76,7 @@ class InjectServiceTest {
     doReturn(Optional.empty()).when(injectRepository).findById(INJECT_ID);
     assertThrows(
         ElementNotFoundException.class,
-        () -> injectService.applyDefaultAssetsToInject(INJECT_ID, List.of(), List.of()));
+        () -> injectService.applyDefaultAssetGroupsToInject(INJECT_ID, List.of(), List.of()));
   }
 
   @Test
@@ -162,12 +160,12 @@ class InjectServiceTest {
     verify(injectRepository, never()).save(any());
   }
 
- private AssetGroup getAssetGroup(String name) {
+  private AssetGroup getAssetGroup(String name) {
     AssetGroup assetGroup = AssetGroupFixture.createDefaultAssetGroup(name);
     assetGroup.setId(name);
     return assetGroup;
- }
-  
+  }
+
   @DisplayName("Test get inject specification with valid search input")
   @Test
   void getInjectSpecificationWithValidSearchInput() {
