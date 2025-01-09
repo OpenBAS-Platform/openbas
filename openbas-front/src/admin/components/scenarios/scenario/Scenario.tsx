@@ -221,7 +221,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 searchPaginationInput={searchPaginationInput}
                 setContent={setExercises}
                 entityPrefix="exercise"
-                availableFilterNames={['exercise_kill_chain_phases', 'exercise_scenario', 'exercise_tags']}
+                availableFilterNames={['exercise_kill_chain_phases', 'exercise_name', 'exercise_tags']}
                 queryableHelpers={queryableHelpers}
                 searchEnable={false}
               />
