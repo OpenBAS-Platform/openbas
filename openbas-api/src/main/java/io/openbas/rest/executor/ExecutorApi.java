@@ -1,9 +1,9 @@
 package io.openbas.rest.executor;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.service.EndpointService.JFROG_BASE;
 import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
 import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
-import static io.openbas.service.EndpointService.JFROG_BASE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Executor;
