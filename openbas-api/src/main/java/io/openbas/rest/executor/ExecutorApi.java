@@ -1,10 +1,9 @@
 package io.openbas.rest.executor;
 
-import static io.openbas.asset.EndpointService.JFROG_BASE;
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.service.EndpointService.JFROG_BASE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Executor;
 import io.openbas.database.model.Token;
 import io.openbas.database.repository.ExecutorRepository;
@@ -13,6 +12,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.executor.form.ExecutorCreateInput;
 import io.openbas.rest.executor.form.ExecutorUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.EndpointService;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;

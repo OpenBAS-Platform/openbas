@@ -69,10 +69,10 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
     setActiveTab(newValue);
   };
 
-  const [injectorContract, setInjectorContract] = useState(null);
+  const [injectorContractContent, setInjectorContractContent] = useState(null);
   useEffect(() => {
     if (inject?.inject_injector_contract?.injector_contract_content) {
-      setInjectorContract(getInjectorContractWithEmptyPredefinedExpectations(inject.inject_injector_contract?.injector_contract_content));
+      setInjectorContractContent(getInjectorContractWithEmptyPredefinedExpectations(inject.inject_injector_contract?.injector_contract_content));
     }
   }, [inject]);
   return (
@@ -98,7 +98,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
           <UpdateInjectDetails
             drawerRef={drawerRef}
-            contractContent={injectorContract}
+            contractContent={injectorContractContent}
             injectId={injectId}
             inject={inject}
             handleClose={handleClose}

@@ -1,7 +1,6 @@
-import type { Exercise, Variable } from '../../utils/api-types';
-import type { ScenarioStore } from '../scenarios/Scenario';
+import type { Exercise, Scenario, Variable } from '../../utils/api-types';
 
 export interface VariablesHelper {
   getExerciseVariables: (exerciseId: Exercise['exercise_id']) => Variable[];
-  getScenarioVariables: (scenarioId: ScenarioStore['scenario_id']) => Variable[];
+  getScenarioVariables: (scenarioId: Scenario['scenario_id']) => Variable[];
 }

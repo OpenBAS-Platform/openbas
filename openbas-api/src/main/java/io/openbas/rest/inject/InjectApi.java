@@ -14,8 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.aop.LogExecutionTime;
-import io.openbas.asset.AssetGroupService;
-import io.openbas.asset.AssetService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
@@ -25,24 +23,27 @@ import io.openbas.execution.ExecutionContextService;
 import io.openbas.executors.Executor;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultOutput;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.ExecutableInjectService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.service.AssetGroupService;
+import io.openbas.service.AssetService;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.ScenarioService;
+import io.openbas.service.TagRuleService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,6 +86,7 @@ public class InjectApi extends RestBehavior {
   private final ExecutableInjectService executableInjectService;
   private final InjectSearchService injectSearchService;
   private final InjectDuplicateService injectDuplicateService;
+  private final TagRuleService tagRuleService;
 
   // -- INJECTS --
 
@@ -107,9 +110,11 @@ public class InjectApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
+  @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
   public Inject injectExecutionCallback(
-      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+      @PathVariable String agentId,
+      @PathVariable String injectId,
+      @Valid @RequestBody InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
@@ -167,7 +172,8 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping(INJECT_URI + "/{injectId}/executable-payload")
   @Tracing(name = "Get payload ready to be executed", layer = "api", operation = "GET")
-  public Payload getExecutablePayloadInject(@PathVariable @NotBlank final String injectId) {
+  public Payload getExecutablePayloadInject(@PathVariable @NotBlank final String injectId)
+      throws Exception {
     return executableInjectService.getExecutablePayloadInject(injectId);
   }
 
@@ -194,17 +200,6 @@ public class InjectApi extends RestBehavior {
               }
             });
     this.exerciseRepository.save(exercise);
-    return injectRepository.save(inject);
-  }
-
-  @Transactional(rollbackFor = Exception.class)
-  @PutMapping(INJECT_URI + "/{exerciseId}/{injectId}/bulk")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Inject bulkUpdateInject(
-      @PathVariable String exerciseId,
-      @PathVariable String injectId,
-      @Valid @RequestBody InjectInput input) {
-    Inject inject = bulkUpdateInject(injectId, input);
     return injectRepository.save(inject);
   }
 
@@ -318,7 +313,9 @@ public class InjectApi extends RestBehavior {
     // Get common attributes
     Inject inject = input.toInject(injectorContract);
     inject.setUser(
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     inject.setExercise(exercise);
     // Set dependencies
     if (input.getDependsOn() != null) {
@@ -346,7 +343,13 @@ public class InjectApi extends RestBehavior {
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
-    inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
+
+    // add default asset groups
+    inject.setAssetGroups(
+        this.tagRuleService.applyTagRuleToInjectCreation(
+            exercise.getTags().stream().map(Tag::getId).toList(),
+            assetGroupService.assetGroups(input.getAssetGroups())));
+
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =
         input.getDocuments().stream()
@@ -488,7 +491,8 @@ public class InjectApi extends RestBehavior {
                     .isUserHasAccess(
                         userRepository
                             .findById(currentUser().getId())
-                            .orElseThrow(ElementNotFoundException::new)))
+                            .orElseThrow(
+                                () -> new ElementNotFoundException("Current user not found"))))
         // Order by near execution
         .sorted(Inject.executionComparator)
         // Keep only the expected size
@@ -551,7 +555,7 @@ public class InjectApi extends RestBehavior {
     inject.setUser(
         this.userRepository
             .findById(currentUser().getId())
-            .orElseThrow(ElementNotFoundException::new));
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     inject.setScenario(scenario);
     // Set dependencies
     if (input.getDependsOn() != null) {
@@ -579,7 +583,13 @@ public class InjectApi extends RestBehavior {
     }
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
-    inject.setAssetGroups(fromIterable(assetGroupService.assetGroups(input.getAssetGroups())));
+
+    // add default asset groups
+    inject.setAssetGroups(
+        this.tagRuleService.applyTagRuleToInjectCreation(
+            scenario.getTags().stream().map(Tag::getId).toList(),
+            assetGroupService.assetGroups(input.getAssetGroups())));
+
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =
         input.getDocuments().stream()
@@ -636,17 +646,6 @@ public class InjectApi extends RestBehavior {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}/bulk")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Inject bulkUpdateInjectForScenario(
-      @PathVariable String scenarioId,
-      @PathVariable String injectId,
-      @Valid @RequestBody InjectInput input) {
-    Inject inject = bulkUpdateInject(injectId, input);
-    return injectRepository.save(inject);
-  }
-
-  @Transactional(rollbackFor = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Inject updateInjectForScenario(
@@ -688,6 +687,61 @@ public class InjectApi extends RestBehavior {
     assert scenarioId.equals(scenario.getId());
     this.injectDocumentRepository.deleteDocumentsFromInject(injectId);
     this.injectRepository.deleteById(injectId);
+  }
+
+  @Operation(
+      description = "Bulk update of injects",
+      tags = {"Injects"})
+  @Transactional(rollbackFor = Exception.class)
+  @PutMapping(INJECT_URI)
+  @LogExecutionTime
+  @Tracing(name = "Bulk update of injects", layer = "api", operation = "PUT")
+  public List<Inject> bulkUpdateInject(@RequestBody @Valid final InjectBulkUpdateInputs input) {
+
+    // Control and format inputs
+    List<Inject> injectsToUpdate = getInjectsAndCheckInputForBulkProcessing(input);
+
+    // Bulk update
+    return this.injectService.bulkUpdateInject(injectsToUpdate, input.getUpdateOperations());
+  }
+
+  @Operation(
+      description = "Bulk delete of injects",
+      tags = {"injects-api"})
+  @Transactional(rollbackFor = Exception.class)
+  @DeleteMapping(INJECT_URI)
+  @LogExecutionTime
+  @Tracing(name = "Bulk delete of injects", layer = "api", operation = "DELETE")
+  public void bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
+
+    // Control and format inputs
+    List<Inject> injectsToDelete = getInjectsAndCheckInputForBulkProcessing(input);
+
+    // Bulk delete
+    this.injectService.deleteAllByIds(injectsToDelete.stream().map(Inject::getId).toList());
+  }
+
+  /**
+   * Retrieve injects that match the search input and check that the user is allowed to bulk process
+   * them
+   *
+   * @param input The input for the bulk processing
+   * @return The list of injects to process
+   * @throws BadRequestException If the input is not correctly formatted
+   */
+  private List<Inject> getInjectsAndCheckInputForBulkProcessing(InjectBulkProcessingInput input) {
+    // Control and format inputs
+    if ((CollectionUtils.isEmpty(input.getInjectIDsToProcess())
+            && (input.getSearchPaginationInput() == null))
+        || (!CollectionUtils.isEmpty(input.getInjectIDsToProcess())
+            && (input.getSearchPaginationInput() != null))) {
+      throw new BadRequestException(
+          "Either inject_ids_to_process or search_pagination_input must be provided, and not both at the same time");
+    }
+
+    // Retrieve injects that match the search input and check that the user is allowed to bulk
+    // process them
+    return this.injectService.getInjectsAndCheckIsPlanner(input);
   }
 
   // -- PRIVATE --
@@ -812,18 +866,6 @@ public class InjectApi extends RestBehavior {
           injectDoc.setAttached(attached);
         });
     inject.setDocuments(injectDocuments);
-
-    return inject;
-  }
-
-  private Inject bulkUpdateInject(@NotBlank final String injectId, @NotNull InjectInput input) {
-    Inject inject =
-        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-
-    // Set dependencies
-    inject.setTeams(fromIterable(this.teamRepository.findAllById(input.getTeams())));
-    inject.setAssets(fromIterable(this.assetService.assets(input.getAssets())));
-    inject.setAssetGroups(fromIterable(this.assetGroupService.assetGroups(input.getAssetGroups())));
 
     return inject;
   }

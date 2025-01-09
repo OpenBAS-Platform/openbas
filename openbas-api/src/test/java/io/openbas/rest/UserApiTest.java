@@ -2,7 +2,12 @@ package io.openbas.rest;
 
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.UserFixture.EMAIL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,10 +16,15 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.user.form.login.LoginUserInput;
+import io.openbas.rest.user.form.login.ResetUserInput;
 import io.openbas.rest.user.form.user.CreateUserInput;
+import io.openbas.service.MailingService;
 import io.openbas.utils.fixtures.UserFixture;
+import java.util.List;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +37,8 @@ class UserApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
 
   @Autowired private UserRepository userRepository;
+
+  @MockBean private MailingService mailingService;
 
   @BeforeAll
   public void setup() {
@@ -141,6 +153,47 @@ class UserApiTest extends IntegrationTest {
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(asJsonString(input)))
           .andExpect(status().isConflict());
+    }
+  }
+
+  @Nested
+  @DisplayName("Reset Password from I forget my pwd option")
+  class ResetPassword {
+    @DisplayName("With a known email")
+    @Test
+    void resetPassword() throws Exception {
+      // -- PREPARE --
+      ResetUserInput input = UserFixture.getResetUserInput();
+
+      // -- EXECUTE --
+      mvc.perform(
+              post("/api/reset")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().isOk());
+
+      // -- ASSERT --
+      ArgumentCaptor<List<User>> userCaptor = ArgumentCaptor.forClass(List.class);
+      verify(mailingService).sendEmail(anyString(), anyString(), userCaptor.capture());
+      assertEquals(EMAIL, userCaptor.getValue().get(0).getEmail());
+    }
+
+    @DisplayName("With a unknown email")
+    @Test
+    void resetPasswordWithUnknownEmail() throws Exception {
+      // -- PREPARE --
+      ResetUserInput input = UserFixture.getResetUserInput();
+      input.setLogin("unknown@filigran.io");
+
+      // -- EXECUTE --
+      mvc.perform(
+              post("/api/reset")
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(asJsonString(input)))
+          .andExpect(status().isBadRequest());
+
+      // -- ASSERT --
+      verify(mailingService, never()).sendEmail(anyString(), anyString(), any(List.class));
     }
   }
 }

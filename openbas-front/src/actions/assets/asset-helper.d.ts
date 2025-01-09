@@ -1,12 +1,12 @@
-import type { SecurityPlatformStore } from '../../admin/components/assets/security_platforms/SecurityPlatform';
-import { Endpoint } from '../../utils/api-types';
+import { Endpoint, EndpointOverviewOutput, SecurityPlatform } from '../../utils/api-types';
 
 export interface EndpointHelper {
+  getEndpoint: (endpointId: EndpointOverviewOutput['asset_id']) => EndpointOverviewOutput;
   getEndpoints: () => Endpoint[];
   getEndpointsMap: () => Record<string, Endpoint>;
 }
 
 export interface SecurityPlatformHelper {
-  getSecurityPlatforms: () => SecurityPlatformStore[];
-  getSecurityPlatformsMap: () => Record<string, SecurityPlatformStore>;
+  getSecurityPlatforms: () => SecurityPlatform[];
+  getSecurityPlatformsMap: () => Record<string, SecurityPlatform>;
 }

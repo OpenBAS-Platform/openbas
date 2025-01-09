@@ -2,10 +2,10 @@ import { Grid, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
 
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
+import { Scenario } from '../../../../utils/api-types';
 import ScenarioArticles from './articles/ScenarioArticles';
 import ScenarioChallenges from './challenges/ScenarioChallenges';
 import ScenarioTeams from './teams/ScenarioTeams';
@@ -23,7 +23,7 @@ const ScenarioDefinition = () => {
   // Standard hooks
   const classes = useStyles();
   const { t } = useFormatter();
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   // Fetching data
   const { scenario } = useHelper((helper: ScenariosHelper) => ({
     scenario: helper.getScenario(scenarioId),

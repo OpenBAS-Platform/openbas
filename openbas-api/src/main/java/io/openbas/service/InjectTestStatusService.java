@@ -1,9 +1,6 @@
 package io.openbas.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.specification.InjectSpecification.byIds;
-import static io.openbas.database.specification.InjectSpecification.testable;
-import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.Execution;
@@ -18,9 +15,9 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.executors.Injector;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +45,6 @@ public class InjectTestStatusService {
     this.context = context;
   }
 
-  @Transactional
   public InjectTestStatus testInject(String injectId) {
     Inject inject =
         this.injectRepository
@@ -67,12 +63,16 @@ public class InjectTestStatusService {
     return testInject(inject, user);
   }
 
-  @Transactional
-  public List<InjectTestStatus> bulkTestInjects(List<String> injectIds) {
-    List<Inject> injects =
-        fromIterable(this.injectRepository.findAll(byIds(injectIds).and(testable())));
-    if (injects.isEmpty()) {
-      throw new IllegalArgumentException("No inject ID is testable");
+  /**
+   * Bulk tests of injects
+   *
+   * @param searchSpecifications the criteria to search injects to test
+   * @return the list of inject test status
+   */
+  public List<InjectTestStatus> bulkTestInjects(final Specification<Inject> searchSpecifications) {
+    List<Inject> searchResult = this.injectRepository.findAll(searchSpecifications);
+    if (searchResult.isEmpty()) {
+      throw new BadRequestException("No inject ID is testable");
     }
     User user =
         this.userRepository
@@ -80,7 +80,7 @@ public class InjectTestStatusService {
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
     List<InjectTestStatus> results = new ArrayList<>();
-    injects.forEach(inject -> results.add(testInject(inject, user)));
+    searchResult.forEach(inject -> results.add(testInject(inject, user)));
     return results;
   }
 

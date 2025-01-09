@@ -14,9 +14,8 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import type { SearchPaginationInput } from '../../../../utils/api-types';
+import type { SearchPaginationInput, SecurityPlatform } from '../../../../utils/api-types';
 import { isNotEmptyField } from '../../../../utils/utils';
-import type { SecurityPlatformStore } from './SecurityPlatform';
 import SecurityPlatformCreation from './SecurityPlatformCreation';
 import SecurityPlatformPopover from './SecurityPlatformPopover';
 
@@ -84,7 +83,7 @@ const SecurityPlatforms = () => {
     { field: 'asset_tags', label: 'Tags', isSortable: true },
   ];
 
-  const [securityPlatforms, setSecurityPlatforms] = useState<SecurityPlatformStore[]>([]);
+  const [securityPlatforms, setSecurityPlatforms] = useState<SecurityPlatform[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
     sorts: initSorting('asset_name'),
     textSearch: search,
@@ -141,7 +140,7 @@ const SecurityPlatforms = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {securityPlatforms.map((securityPlatform: SecurityPlatformStore) => {
+        {securityPlatforms.map((securityPlatform: SecurityPlatform) => {
           return (
             <ListItem
               key={securityPlatform.asset_id}

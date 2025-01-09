@@ -3,16 +3,7 @@ import { useParams } from 'react-router';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchExercise, fetchPlayerExercise } from '../../../actions/Exercise';
-import type { ExerciseStore } from '../../../actions/exercises/Exercise';
-import {
-  addLessonsAnswers,
-  fetchLessonsAnswers,
-  fetchLessonsCategories,
-  fetchLessonsQuestions,
-  fetchPlayerLessonsAnswers,
-  fetchPlayerLessonsCategories,
-  fetchPlayerLessonsQuestions,
-} from '../../../actions/exercises/exercise-action';
+import { addLessonsAnswers, fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/exercises/exercise-action';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
 import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
@@ -31,7 +22,7 @@ const ExerciseViewLessons = () => {
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const isPreview = preview === 'true';
 
-  const processToGenericSource = (exercise: ExerciseStore | undefined) => {
+  const processToGenericSource = (exercise: Exercise | undefined) => {
     if (!exercise) return undefined;
     return {
       id: exerciseId,

@@ -1,10 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import arrayMutators from 'final-form-arrays';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
-import { Form } from 'react-final-form';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
@@ -13,8 +14,8 @@ import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import { isEmptyField } from '../../../../utils/utils';
 import { PermissionsContext } from '../Context';
-import InjectDefinition from './InjectDefinition';
-import InjectForm from './InjectForm';
+import InjectDefinition from './form/InjectDefinition';
+import InjectForm from './form/InjectForm';
 
 const useStyles = makeStyles(theme => ({
   details: {
@@ -74,22 +75,7 @@ const UpdateInjectDetails = ({
       setOpenDetails(true);
     }
   };
-  const validate = (values) => {
-    const errors = {};
 
-    const requiredFields = [
-      'inject_title',
-      'inject_depends_duration_days',
-      'inject_depends_duration_hours',
-      'inject_depends_duration_minutes',
-    ];
-    requiredFields.forEach((field) => {
-      if (R.isNil(values[field])) {
-        errors[field] = t('This field is required.');
-      }
-    });
-    return errors;
-  };
   const onSubmit = async (data) => {
     if (contractContent) {
       const finalData = {};
@@ -200,19 +186,17 @@ const UpdateInjectDetails = ({
     'attachments',
     'expectations',
   ];
-  if (isEmptyField(inject?.inject_content)) {
-    contractContent?.fields
-      .filter(f => !builtInFields.includes(f.key))
-      .forEach((field) => {
-        if (!initialValues[field.key]) {
-          if (field.cardinality && field.cardinality === '1') {
-            initialValues[field.key] = R.head(field.defaultValue);
-          } else {
-            initialValues[field.key] = field.defaultValue;
-          }
+  contractContent?.fields
+    .filter(f => !builtInFields.includes(f.key))
+    .forEach((field) => {
+      if (!initialValues[field.key]) {
+        if (field.cardinality && field.cardinality === '1') {
+          initialValues[field.key] = R.head(field.defaultValue);
+        } else {
+          initialValues[field.key] = field.defaultValue;
         }
-      });
-  }
+      }
+    });
   // Specific processing for some fields
   contractContent?.fields
     .filter(f => !builtInFields.includes(f.key))
@@ -273,12 +257,37 @@ const UpdateInjectDetails = ({
         }
       }
     });
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    mode: 'onTouched',
+    resolver: zodResolver(
+      z.object({
+        inject_title: z.string().min(1, { message: t('This field is required.') }),
+        inject_depends_duration_days: z.number().int().min(0, { message: t('This field is required.') }),
+        inject_depends_duration_hours: z.number().int().min(0, { message: t('This field is required.') }),
+        inject_depends_duration_minutes: z.number().int().min(0, { message: t('This field is required.') }),
+        ...Object.keys(initialValues).reduce((acc, key) => {
+          acc[key] = z.any();
+          return acc;
+        }, {}),
+      })),
+    defaultValues: initialValues,
+  });
+
   return (
     <>
       <Card elevation={0} classes={{ root: classes.injectorContract }}>
         <CardHeader
           classes={{ root: classes.injectorContractHeader }}
-          avatar={contractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${contractContent.config.type}`} />
+          avatar={contractContent
+            ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${contractContent.config.type}`} />
             : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
           title={contractContent?.contract_attack_patterns_external_ids.join(', ')}
           action={(
@@ -293,74 +302,61 @@ const UpdateInjectDetails = ({
           {contractContent !== null ? tPick(contractContent.label) : ''}
         </CardContent>
       </Card>
-      <Form
-        keepDirtyOnReinitialize={true}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        validate={validate}
-        mutators={{
-          ...arrayMutators,
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-        }}
-      >
-        {({ form, handleSubmit, submitting, values, errors }) => {
-          return (
-            <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 10 }}>
-              <InjectForm form={form} values={values} disabled={!contractContent} isAtomic={isAtomic} />
-              {contractContent && (
-                <div className={classes.details}>
-                  {openDetails && (
-                    <InjectDefinition
-                      form={form}
-                      values={values}
-                      submitting={submitting}
-                      inject={initialValues}
-                      injectorContract={contractContent}
-                      handleClose={handleClose}
-                      tagsMap={tagsMap}
-                      permissions={permissions}
-                      articlesFromExerciseOrScenario={[]}
-                      variablesFromExerciseOrScenario={[]}
-                      onUpdateInject={onUpdateInject}
-                      setInjectDetailsState={setInjectDetailsState}
-                      uriVariable=""
-                      allUsersNumber={0}
-                      usersNumber={0}
-                      teamsUsers={[]}
-                      isAtomic={isAtomic}
-                      {...props}
-                    />
-                  )}
-                  <div className={classes.openDetails} onClick={toggleInjectContent}>
-                    {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
-                    {t('Inject content')}
-                  </div>
-                </div>
-              )}
-              <div style={{ float: 'right', marginTop: 20 }}>
-                <Button
-                  variant="contained"
-                  onClick={handleClose}
-                  style={{ marginRight: 10 }}
-                  disabled={submitting}
-                >
-                  {t('Cancel')}
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  type="submit"
-                  disabled={submitting || Object.keys(errors).length > 0 || !contractContent}
-                >
-                  {t('Update')}
-                </Button>
-              </div>
-            </form>
-          );
-        }}
-      </Form>
+
+      <form id="injectContentForm" onSubmit={handleSubmit(onSubmit)} style={{ marginTop: 10 }}>
+        <InjectForm control={control} disabled={!contractContent} isAtomic={isAtomic} register={register} />
+        {contractContent && (
+          <div className={classes.details}>
+            {openDetails && (
+              <InjectDefinition
+                control={control}
+                register={register}
+                values={getValues()}
+                setValue={setValue}
+                getValues={key => getValues(key)}
+                submitting={isSubmitting}
+                inject={initialValues}
+                injectorContract={contractContent}
+                handleClose={handleClose}
+                tagsMap={tagsMap}
+                permissions={permissions}
+                articlesFromExerciseOrScenario={[]}
+                variablesFromExerciseOrScenario={[]}
+                onUpdateInject={onUpdateInject}
+                setInjectDetailsState={setInjectDetailsState}
+                uriVariable=""
+                allUsersNumber={0}
+                usersNumber={0}
+                teamsUsers={[]}
+                isAtomic={isAtomic}
+                {...props}
+              />
+            )}
+            <div className={classes.openDetails} onClick={toggleInjectContent}>
+              {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
+              {t('Inject content')}
+            </div>
+          </div>
+        )}
+        <div style={{ float: 'right', marginTop: 20 }}>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            style={{ marginRight: 10 }}
+            disabled={isSubmitting}
+          >
+            {t('Cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            disabled={isSubmitting || Object.keys(errors).length > 0 || !contractContent}
+          >
+            {t('Update')}
+          </Button>
+        </div>
+      </form>
     </>
   );
 };

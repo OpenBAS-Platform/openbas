@@ -1,18 +1,18 @@
 import { FunctionComponent, useState } from 'react';
 
 import { deleteLessonsTemplateQuestion, updateLessonsTemplateQuestion } from '../../../../../../actions/Lessons';
-import type { LessonsTemplateQuestionStore } from '../../../../../../actions/lessons/Lessons';
 import ButtonPopover from '../../../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../../../components/common/DialogDelete';
 import Drawer from '../../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../../components/i18n';
+import type { LessonsTemplateQuestion } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import LessonsTemplateQuestionForm, { LessonsTemplateQuestionInputForm } from './LessonsTemplateQuestionForm';
 
 interface Props {
   lessonsTemplateId: string;
   lessonsTemplateCategoryId: string;
-  lessonsTemplateQuestion: LessonsTemplateQuestionStore;
+  lessonsTemplateQuestion: LessonsTemplateQuestion;
 }
 
 const LessonsTemplateQuestionPopover: FunctionComponent<Props> = ({

@@ -1,11 +1,10 @@
 import { HubOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import * as React from 'react';
+import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
-import type { ExerciseSimpleStore, ExerciseStore } from '../../../actions/exercises/Exercise';
 import { fetchExercisesGlobalScores } from '../../../actions/exercises/exercise-action';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
@@ -15,11 +14,7 @@ import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import Loader from '../../../components/Loader';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type {
-  ExercisesGlobalScoresOutput,
-  ExerciseSimple,
-  ExpectationResultsByType,
-} from '../../../utils/api-types';
+import type { ExercisesGlobalScoresOutput, ExerciseSimple, ExpectationResultsByType } from '../../../utils/api-types';
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ExerciseStatus from './simulation/ExerciseStatus';
 
@@ -90,11 +85,11 @@ function getGlobalScoreComponentAsync(
 }
 
 interface Props {
-  exercises: ExerciseSimpleStore[];
+  exercises: ExerciseSimple[];
   queryableHelpers?: QueryableHelpers;
   hasHeader?: boolean;
   variant?: string;
-  secondaryAction?: (exercise: ExerciseStore) => React.ReactNode;
+  secondaryAction?: (exercise: ExerciseSimple) => React.ReactNode;
   loading: boolean;
   isGlobalScoreAsync?: boolean;
 }
@@ -209,7 +204,7 @@ const ExerciseList: FunctionComponent<Props> = ({
       {
         loading
           ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} />
-          : exercises.map((exercise: ExerciseStore, index) => (
+          : exercises.map((exercise: ExerciseSimple, index) => (
               <ListItem
                 key={exercise.exercise_id}
                 secondaryAction={secondaryAction && secondaryAction(exercise)}

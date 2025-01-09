@@ -64,6 +64,9 @@ const renderSelectField = ({
   </FormControl>
 );
 
+/**
+ * @deprecated The component use old form library react-final-form
+ */
 const OldSelectField = props => (
   <Field name={props.name} component={renderSelectField} {...props} />
 );

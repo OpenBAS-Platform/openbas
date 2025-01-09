@@ -65,9 +65,6 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
   // Pagination
   const [assetGroups, setAssetGroups] = useState<AssetGroupOutput[]>([]);
 
-  const availableFilterNames = [
-    'asset_group_tags',
-  ];
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
 
   const paginationComponent = (
@@ -76,7 +73,7 @@ const AssetGroupDialogAdding: FunctionComponent<Props> = ({
       searchPaginationInput={searchPaginationInput}
       setContent={setAssetGroups}
       entityPrefix="asset_group"
-      availableFilterNames={availableFilterNames}
+      availableFilterNames={['asset_group_tags']}
       queryableHelpers={queryableHelpers}
     />
   );

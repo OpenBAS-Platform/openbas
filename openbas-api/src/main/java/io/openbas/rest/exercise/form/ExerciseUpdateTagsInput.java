@@ -12,4 +12,7 @@ public class ExerciseUpdateTagsInput {
 
   @JsonProperty("exercise_tags")
   private List<String> tagIds = new ArrayList<>();
+
+  @JsonProperty("apply_tag_rule")
+  private boolean applyTagRule = false;
 }

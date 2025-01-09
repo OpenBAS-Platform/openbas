@@ -5,6 +5,9 @@ import { Link } from 'react-router';
 
 import { truncate } from '../utils/String';
 
+export const BACK_LABEL = 'backlabel';
+export const BACK_URI = 'backuri';
+
 export interface BreadcrumbsElement {
   label: string;
   link?: string;

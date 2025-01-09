@@ -9,18 +9,18 @@ import static io.openbas.model.expectation.ManualExpectation.manualExpectationFo
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
 
-import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
-import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.service.AssetGroupService;
+import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Stream;

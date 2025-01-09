@@ -8,9 +8,8 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { SecurityPlatformInput } from '../../../../utils/api-types';
+import type { SecurityPlatform, SecurityPlatformInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { SecurityPlatformStore } from './SecurityPlatform';
 import SecurityPlatformForm from './SecurityPlatformForm';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   inline?: boolean;
-  onCreate?: (result: SecurityPlatformStore) => void;
+  onCreate?: (result: SecurityPlatform) => void;
 }
 
 const SecurityPlatformCreation: FunctionComponent<Props> = ({
@@ -38,7 +37,7 @@ const SecurityPlatformCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: SecurityPlatformInput) => {
     dispatch(addSecurityPlatform(data)).then(
-      (result: { result: string; entities: { securityplatforms: Record<string, SecurityPlatformStore> } }) => {
+      (result: { result: string; entities: { securityplatforms: Record<string, SecurityPlatform> } }) => {
         if (result.entities) {
           if (onCreate) {
             const securityPlatformCreated = result.entities.securityplatforms[result.result];

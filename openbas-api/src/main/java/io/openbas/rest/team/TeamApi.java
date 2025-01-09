@@ -48,6 +48,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TeamApi extends RestBehavior {
 
+  public static final String TEAM_URI = "/api/teams";
+
   private final ExerciseRepository exerciseRepository;
   private final ScenarioRepository scenarioRepository;
   private final TeamRepository teamRepository;
@@ -57,7 +59,7 @@ public class TeamApi extends RestBehavior {
   private final TeamService teamService;
 
   @LogExecutionTime
-  @GetMapping("/api/teams")
+  @GetMapping(TEAM_URI)
   @PreAuthorize("isObserver()")
   @Tracing(name = "Get teams", layer = "api", operation = "GET")
   public Iterable<TeamSimple> getTeams() {
@@ -69,7 +71,9 @@ public class TeamApi extends RestBehavior {
     } else {
       // We get the teams that are linked to the organizations we are part of
       User local =
-          userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
+          userRepository
+              .findById(currentUser.getId())
+              .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
       List<String> organizationIds =
           local.getGroups().stream()
               .flatMap(group -> group.getOrganizations().stream())
@@ -113,7 +117,7 @@ public class TeamApi extends RestBehavior {
     return teamRepository.findById(teamId).orElseThrow(ElementNotFoundException::new).getUsers();
   }
 
-  @PostMapping("/api/teams")
+  @PostMapping(TEAM_URI)
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public Team createTeam(@Valid @RequestBody TeamCreateInput input) {

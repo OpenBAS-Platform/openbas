@@ -3,36 +3,32 @@ package io.openbas.rest.asset.endpoint;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.EndpointSpecification.fromIds;
-import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
-import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
-import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import io.openbas.asset.EndpointService;
+import io.openbas.aop.LogExecutionTime;
+import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
-import io.openbas.database.repository.ExecutorRepository;
-import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
 import io.openbas.database.specification.EndpointSpecification;
-import io.openbas.rest.asset.endpoint.form.EndpointInput;
+import io.openbas.rest.asset.endpoint.form.EndpointOutput;
+import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.EndpointService;
 import io.openbas.telemetry.Tracing;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,109 +37,75 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @Secured(ROLE_USER)
-public class EndpointApi {
+public class EndpointApi extends RestBehavior {
 
   public static final String ENDPOINT_URI = "/api/endpoints";
 
-  @Value("${info.app.version:unknown}")
-  String version;
-
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
-  private final ExecutorRepository executorRepository;
-  private final TagRepository tagRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
 
-  @PostMapping(ENDPOINT_URI)
-  @PreAuthorize("isPlanner()")
-  @Transactional(rollbackFor = Exception.class)
-  public Endpoint createEndpoint(@Valid @RequestBody final EndpointInput input) {
-    Endpoint endpoint = new Endpoint();
-    endpoint.setUpdateAttributes(input);
-    endpoint.setPlatform(input.getPlatform());
-    endpoint.setArch(input.getArch());
-    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.endpointService.createEndpoint(endpoint);
-  }
+  private final EndpointMapper endpointMapper;
 
   @Secured(ROLE_ADMIN)
   @PostMapping(ENDPOINT_URI + "/register")
   @Transactional(rollbackFor = Exception.class)
   public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input)
       throws IOException {
-    Optional<Endpoint> optionalEndpoint =
-        this.endpointService.findByExternalReference(input.getExternalReference());
-    Endpoint endpoint;
-    if (optionalEndpoint.isPresent()) {
-      endpoint = optionalEndpoint.get();
-      endpoint.setIps(input.getIps());
-      endpoint.setMacAddresses(input.getMacAddresses());
-      endpoint.setHostname(input.getHostname());
-      endpoint.setPlatform(input.getPlatform());
-      endpoint.setArch(input.getArch());
-      endpoint.setName(input.getName());
-      endpoint.setAgentVersion(input.getAgentVersion());
-      endpoint.setDescription(input.getDescription());
-      endpoint.setLastSeen(Instant.now());
-      endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
-    } else {
-      endpoint = new Endpoint();
-      endpoint.setUpdateAttributes(input);
-      endpoint.setLastSeen(Instant.now());
-      endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-      endpoint.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
-    }
-    Endpoint updatedEndpoint = this.endpointService.updateEndpoint(endpoint);
-    // If agent is not temporary and not the same version as the platform => Create an upgrade task
-    // for the agent
-    if (updatedEndpoint.getParent() == null && !updatedEndpoint.getAgentVersion().equals(version)) {
-      AssetAgentJob assetAgentJob = new AssetAgentJob();
-      assetAgentJob.setCommand(
-          this.endpointService.generateUpgradeCommand(updatedEndpoint.getPlatform().name()));
-      assetAgentJob.setAsset(updatedEndpoint);
-      assetAgentJobRepository.save(assetAgentJob);
-    }
-    return updatedEndpoint;
+    return this.endpointService.register(input);
   }
 
-  @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
+  @LogExecutionTime
+  @PostMapping(ENDPOINT_URI + "/jobs")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
-  public List<AssetAgentJob> getEndpointJobs(
-      @PathVariable @NotBlank final String endpointExternalReference) {
+  public List<AssetAgentJob> getEndpointJobs(@RequestBody final EndpointRegisterInput input) {
     return this.assetAgentJobRepository.findAll(
-        AssetAgentJobSpecification.forEndpoint(endpointExternalReference));
+        AssetAgentJobSpecification.forEndpoint(
+            input.getExternalReference(),
+            input.isService()
+                ? Agent.DEPLOYMENT_MODE.service.name()
+                : Agent.DEPLOYMENT_MODE.session.name(),
+            input.isElevated() ? Agent.PRIVILEGE.admin.name() : Agent.PRIVILEGE.standard.name(),
+            input.getExecutedByUser()));
   }
 
-  @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
+  @DeleteMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
   }
 
+  @LogExecutionTime
   @GetMapping(ENDPOINT_URI)
   @PreAuthorize("isObserver()")
   public List<Endpoint> endpoints() {
     return this.endpointService.endpoints(EndpointSpecification.findEndpointsForInjection());
   }
 
+  @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
-  public Endpoint endpoint(@PathVariable @NotBlank final String endpointId) {
-    return this.endpointService.endpoint(endpointId);
+  @Tracing(name = "Endpoint overview", layer = "api", operation = "POST")
+  public EndpointOverviewOutput endpoint(@PathVariable @NotBlank final String endpointId) {
+    return endpointMapper.toEndpointOverviewOutput(this.endpointService.getEndpoint(endpointId));
   }
 
+  @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/search")
-  public Page<Endpoint> endpoints(@RequestBody @Valid SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-        (Specification<Endpoint> specification, Pageable pageable) ->
-            this.endpointRepository.findAll(
-                EndpointSpecification.findEndpointsForInjection().and(specification), pageable),
-        handleEndpointFilter(searchPaginationInput),
-        Endpoint.class);
+  @Tracing(name = "Get a page of endpoints", layer = "api", operation = "POST")
+  public Page<EndpointOutput> endpoints(
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
+    Page<Endpoint> endpointPage = endpointService.searchEndpoints(searchPaginationInput);
+    // Convert the Page of Endpoint to a Page of EndpointOutput
+    List<EndpointOutput> endpointOutputs =
+        endpointPage.getContent().stream().map(endpointMapper::toEndpointOutput).toList();
+    return new PageImpl<>(
+        endpointOutputs, endpointPage.getPageable(), endpointPage.getTotalElements());
   }
 
+  @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/find")
   @Transactional(readOnly = true)
   @Tracing(name = "Find assets", layer = "api", operation = "POST")
@@ -151,22 +113,18 @@ public class EndpointApi {
     return this.endpointRepository.findAll(fromIds(endpointIds));
   }
 
+  @Secured(ROLE_ADMIN)
   @PutMapping(ENDPOINT_URI + "/{endpointId}")
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
-  public Endpoint updateEndpoint(
+  public EndpointOverviewOutput updateEndpoint(
       @PathVariable @NotBlank final String endpointId,
-      @Valid @RequestBody final EndpointInput input) {
-    Endpoint endpoint = this.endpointService.endpoint(endpointId);
-    endpoint.setUpdateAttributes(input);
-    endpoint.setPlatform(input.getPlatform());
-    endpoint.setArch(input.getArch());
-    endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.endpointService.updateEndpoint(endpoint);
+      @Valid @RequestBody final EndpointUpdateInput input) {
+    return endpointMapper.toEndpointOverviewOutput(
+        this.endpointService.updateEndpoint(endpointId, input));
   }
 
+  @Secured(ROLE_ADMIN)
   @DeleteMapping(ENDPOINT_URI + "/{endpointId}")
-  @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void deleteEndpoint(@PathVariable @NotBlank final String endpointId) {
     this.endpointService.deleteEndpoint(endpointId);
