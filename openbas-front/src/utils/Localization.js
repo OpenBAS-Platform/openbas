@@ -1560,6 +1560,7 @@ const i18n = {
         '你想要删除这个注入么?',
       'Do you want to delete these {count} injects?':
         '你想要删除这些{count} 注入么 ?',
+      'Do you want to test these {count} injects?': '你想要测试这些{count} 注入么 ?',
       'Do you want to delete this channel?':
         '你想要删除这个频道么 ?',
       'Start date (optional)': '开始日期 (可选)',

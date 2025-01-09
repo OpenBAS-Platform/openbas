@@ -8,6 +8,16 @@ export const fetchInject = injectId => (dispatch) => {
   return getReferential(schema.inject, uri)(dispatch);
 };
 
+export const bulkDeleteInjects = data => (dispatch) => {
+  const uri = `/api/injects`;
+  return bulkDeleteReferential(uri, 'injects', data)(dispatch);
+};
+
+export const bulkUpdateInject = data => (dispatch) => {
+  const uri = `/api/injects`;
+  return putReferential(schema.inject, uri, data)(dispatch);
+};
+
 // -- EXERCISES --
 
 export const fetchExerciseInjects = exerciseId => (dispatch) => {
@@ -22,11 +32,6 @@ export const fetchInjectTeams = (exerciseId, injectId) => (dispatch) => {
 
 export const updateInjectForExercise = (exerciseId, injectId, data) => (dispatch) => {
   const uri = `/api/injects/${exerciseId}/${injectId}`;
-  return putReferential(schema.inject, uri, data)(dispatch);
-};
-
-export const bulkUpdateInjectForExercise = (exerciseId, injectId, data) => (dispatch) => {
-  const uri = `/api/injects/${exerciseId}/${injectId}/bulk`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
@@ -53,11 +58,6 @@ export const duplicateInjectForExercise = (exerciseId, injectId) => (dispatch) =
 export const deleteInjectForExercise = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
-};
-
-export const bulkDeleteInjectsForExercise = (exerciseId, injectIds) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects`;
-  return bulkDeleteReferential(uri, 'injects', injectIds)(dispatch);
 };
 
 export const executeInject = (exerciseId, values, files) => (dispatch) => {
@@ -92,11 +92,6 @@ export const fetchScenarioInjects = scenarioId => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
-export const bulkUpdateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/injects/${injectId}/bulk`;
-  return putReferential(schema.inject, uri, data)(dispatch);
-};
-
 export const updateInjectForScenario = (scenarioId, injectId, data) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects/${injectId}`;
   return putReferential(schema.inject, uri, data)(dispatch);
@@ -110,9 +105,4 @@ export const updateInjectActivationForScenario = (exerciseId, injectId, data) =>
 export const deleteInjectScenario = (scenarioId, injectId) => (dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
-};
-
-export const bulkDeleteInjectsForScenario = (scenarioId, injectIds) => (dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/injects`;
-  return bulkDeleteReferential(uri, 'injects', injectIds)(dispatch);
 };
