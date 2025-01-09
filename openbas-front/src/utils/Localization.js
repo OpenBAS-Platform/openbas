@@ -1661,7 +1661,6 @@ const i18n = {
       'Scheduled': '已计划',
       'Finished': '已完成',
       'Execution': '执行',
-      'Dryrun': '运行中',
       'Comcheck': '通信检查',
       'Send': '发送',
       'Remove': '移除',
@@ -1744,8 +1743,6 @@ const i18n = {
         '平台中没有组织.',
       'No injects to send in this platform.':
         '平台中没有要发送的注入.',
-      'Before starting the simulation, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        '在开始模拟前,你可以启动一个通信检查来验证选手的邮箱地址并且使用运行发送注入到动作团队.',
       'Apply a template': '应用模板',
       'Auto assign': '自动分配',
       'Auto observer': '自动观察',
@@ -1874,7 +1871,6 @@ const i18n = {
       'Messages header': '消息头',
       'Messages footer': '消息页脚',
       'Send a new comcheck': '发送新通信检查',
-      'Launch a new dryrun': '启动新运行',
       'Hello': '你好',
       'Statistics': '统计',
       'Reports': '报告',
@@ -1888,8 +1884,6 @@ const i18n = {
         '[${exercise.name}] 经验教训调查问卷',
       'Best regards': '此致',
       'The simulation control team': '模拟控制团队',
-      'Do you want to launch a new dryrun?':
-        '你想要启动新运行么?',
       'Add tags to this simulation': '添加标记到这个模拟',
       'Add tags to this scenario': '添加标记到这个场景',
       'No comcheck in this simulation.': '这个模拟没有通信检查',
@@ -1928,11 +1922,8 @@ const i18n = {
       'of which': '其中',
       'contain comments': '包含评论',
       'Verification done at': '核查在',
-      'No dryrun in this simulation.': '该模拟中没有运行.',
       'No objectives in this simulation.': '该模拟中没有目标.',
       'There is no evaluation for this objective yet': '该目标还没有评估',
-      'Do you want to delete this dryrun?':
-        '你想要删除这个运行么 ?',
       'Overall objectives score': '总体目标得分',
       'Do you want to delete this poll?':
         '是否要删除此投票?',
@@ -1957,7 +1948,6 @@ const i18n = {
       'Create a new poll': '创建新投票',
       'Update the log': '更新日志',
       'Create a new user': '创建新用户',
-      'Dryrun recipients': '运行接收者',
       'Create a new report': '创建新报告',
       'Update inject comment': '编辑刺激评论',
       'Do you want to delete this report?':
