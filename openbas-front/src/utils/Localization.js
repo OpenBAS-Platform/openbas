@@ -479,11 +479,8 @@ const i18n = {
       'of which': 'dont',
       'contain comments': 'contiennent des commentaires',
       'Verification done at': 'Vérification faite le',
-      'No dryrun in this simulation.': 'Aucune simulation dans cette simulation.',
       'No objectives in this simulation.': 'Aucun objectif dans cette simulation.',
       'There is no evaluation for this objective yet': 'Il n’y a pas encore d’évaluation pour cet objectif',
-      'Do you want to delete this dryrun?':
-        'Souhaitez-vous supprimer cette simulation ?',
       'Overall objectives score': 'Score global des objectifs',
       'Do you want to delete this poll?':
         'Souhaitez-vous supprimer ce sondage ?',
@@ -508,7 +505,6 @@ const i18n = {
       'Create a new poll': 'Créer un nouveau sondage',
       'Update the log': 'Modifier l\'entrée',
       'Create a new user': 'Créer un nouvel utilisateur',
-      'Dryrun recipients': 'Destinataires de la simulation',
       'Create a new report': 'Créer un nouveau rapport',
       'Update inject comment': 'Modifier le commentaire du stimuli',
       'Do you want to delete this report?':
