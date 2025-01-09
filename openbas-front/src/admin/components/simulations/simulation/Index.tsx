@@ -22,7 +22,6 @@ import ExerciseDatePopover from './ExerciseDatePopover';
 import ExerciseHeader from './ExerciseHeader';
 
 const Exercise = lazy(() => import('./overview/ExerciseComponent'));
-const Dryrun = lazy(() => import('./controls/Dryrun'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
 const Lessons = lazy(() => import('./lessons/ExerciseLessons'));
 const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
@@ -135,7 +134,6 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(Exercise)()} />
-              <Route path="controls/dryruns/:dryrunId" element={errorWrapper(Dryrun)()} />
               <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
               <Route path="definition" element={errorWrapper(ExerciseDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />

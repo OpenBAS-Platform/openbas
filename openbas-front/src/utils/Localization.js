@@ -218,7 +218,6 @@ const i18n = {
       'Scheduled': 'Planifié',
       'Finished': 'Terminé',
       'Execution': 'Exécution',
-      'Dryrun': 'Simulation',
       'Comcheck': 'Vérification',
       'Send': 'Envoyer',
       'Remove': 'Retirer',
@@ -297,8 +296,6 @@ const i18n = {
         'Aucune organisation dans cette plateforme.',
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
-      'Before starting the simulation, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        'Avant de démarrer la simulation, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l\'équipe d’animation.',
       'Apply a template': 'Appliquer un template',
       'Auto assign': 'Auto assignation',
       'Auto observer': 'Auto observateur',
@@ -428,11 +425,9 @@ const i18n = {
       'Controls': 'Contrôles',
       'Planning': 'Planification',
       'Comchecks': 'Vérifications',
-      'Dryruns': 'Simulations',
       'Messages header': 'En-tête des messages',
       'Messages footer': 'Pied des messages',
       'Send a new comcheck': 'Envoyer une nouvelle vérification',
-      'Launch a new dryrun': 'Démarrer une nouvelle simulation',
       'Hello': 'Bonjour',
       'Statistics': 'Statistiques',
       'Reports': 'Rapports',
@@ -446,8 +441,6 @@ const i18n = {
         '[${exercise.name}] Questionnaire de retour d\'expérience',
       'Best regards': 'Bien cordialement',
       'The simulation control team': 'L\'équipe d\'animation de la simulation',
-      'Do you want to launch a new dryrun?':
-        'Souhaitez-vous lancer une nouvelle simulation ?',
       'Add tags to this simulation': 'Ajouter des tags à cette simulation',
       'Add tags to this scenario': 'Ajouter des tags à ce scenario',
       'No comcheck in this simulation.': 'Aucune vérification dans cette simulation',

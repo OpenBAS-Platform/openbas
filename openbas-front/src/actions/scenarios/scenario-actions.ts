@@ -10,7 +10,6 @@ import type {
   LessonsQuestionCreateInput,
   LessonsQuestionUpdateInput,
   Scenario,
-  ScenarioInformationInput,
   ScenarioInput,
   ScenarioRecurrenceInput,
   ScenarioTeamPlayersEnableInput,
@@ -47,14 +46,6 @@ export const updateScenario = (
   data: ScenarioInput,
 ) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/${scenarioId}`;
-  return putReferential(scenario, uri, data)(dispatch);
-};
-
-export const updateScenarioInformation = (
-  scenarioId: Scenario['scenario_id'],
-  data: ScenarioInformationInput,
-) => (dispatch: Dispatch) => {
-  const uri = `${SCENARIO_URI}/${scenarioId}/information`;
   return putReferential(scenario, uri, data)(dispatch);
 };
 
@@ -116,11 +107,6 @@ export const removeScenarioTeamPlayers = (scenarioId: Scenario['scenario_id'], t
 )(dispatch);
 
 // -- EXERCISES --
-
-export const fetchScenarioExercises = (scenarioId: Scenario['scenario_id']) => (dispatch: Dispatch) => {
-  const uri = `/api/scenarios/${scenarioId}/exercises`;
-  return getReferential(schema.arrayOfExercises, uri)(dispatch);
-};
 
 export const searchScenarioExercises = (scenarioId: Scenario['scenario_id'], paginationInput: SearchPaginationInput) => {
   const data = paginationInput;

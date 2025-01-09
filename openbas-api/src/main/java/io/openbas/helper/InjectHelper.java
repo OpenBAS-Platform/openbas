@@ -136,7 +136,7 @@ public class InjectHelper {
                       inject.getAssetGroups(),
                       usersFromInjection(inject));
                 });
-    // Combine injects and dry
+    // Combine injects
     return concat(executableInjects, executableAtomicTests).collect(Collectors.toList());
   }
 }
