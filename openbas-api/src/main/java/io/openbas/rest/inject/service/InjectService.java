@@ -164,14 +164,14 @@ public class InjectService {
     // Get the Id of the asset groups to remove and filter the assets that are in both lists
     List<String> assetGroupIdsToRemove =
         defaultAssetGroupsToRemove.stream()
-            .filter(asset -> !defaultAssetGroupsToAdd.contains(asset))
+            .filter(assetGroup -> !defaultAssetGroupsToAdd.contains(assetGroup))
             .map(AssetGroup::getId)
             .toList();
-    Set<String> uniqueAssetsIds = new HashSet<>();
+    Set<String> uniqueAssetGroupIds = new HashSet<>();
     List<AssetGroup> newListOfAssetGroups =
         Stream.concat(currentAssetGroups.stream(), defaultAssetGroupsToAdd.stream())
             .filter(assetGroup -> !assetGroupIdsToRemove.contains(assetGroup.getId()))
-            .filter(assetGroup -> uniqueAssetsIds.add(assetGroup.getId()))
+            .filter(assetGroup -> uniqueAssetGroupIds.add(assetGroup.getId()))
             .collect(Collectors.toList());
 
     if (new HashSet<>(currentAssetGroups).equals(new HashSet<>(newListOfAssetGroups))) {
