@@ -1,11 +1,10 @@
 package io.openbas.migration;
 
+import java.sql.Connection;
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Connection;
-import java.sql.Statement;
 
 @Component
 public class V3_59__Delete_all_dryInject_dryrun extends BaseJavaMigration {
