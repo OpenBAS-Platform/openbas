@@ -1,9 +1,10 @@
 package io.openbas.rest.security;
 
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.service.ScenarioService;
 import java.util.function.Supplier;
+import lombok.Getter;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -18,15 +19,17 @@ public class SecurityExpressionHandler extends DefaultMethodSecurityExpressionHa
   private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
   private final UserRepository userRepository;
   private final ExerciseRepository exerciseRepository;
-  private final ScenarioService scenarioService;
+  private final ScenarioRepository scenarioRepository;
+
+  @Getter private SecurityExpression securityExpression;
 
   public SecurityExpressionHandler(
       final UserRepository userRepository,
       final ExerciseRepository exerciseRepository,
-      final ScenarioService scenarioService) {
+      final ScenarioRepository scenarioRepository) {
     this.userRepository = userRepository;
     this.exerciseRepository = exerciseRepository;
-    this.scenarioService = scenarioService;
+    this.scenarioRepository = scenarioRepository;
   }
 
   @Override
@@ -37,16 +40,16 @@ public class SecurityExpressionHandler extends DefaultMethodSecurityExpressionHa
     MethodSecurityExpressionOperations delegate =
         (MethodSecurityExpressionOperations) context.getRootObject().getValue();
     assert delegate != null;
-    SecurityExpression root =
+    this.securityExpression =
         new SecurityExpression(
             delegate.getAuthentication(),
             this.userRepository,
             this.exerciseRepository,
-            this.scenarioService);
-    root.setPermissionEvaluator(getPermissionEvaluator());
-    root.setTrustResolver(this.trustResolver);
-    root.setRoleHierarchy(getRoleHierarchy());
-    context.setRootObject(root);
+            this.scenarioRepository);
+    this.securityExpression.setPermissionEvaluator(getPermissionEvaluator());
+    this.securityExpression.setTrustResolver(this.trustResolver);
+    this.securityExpression.setRoleHierarchy(getRoleHierarchy());
+    context.setRootObject(this.securityExpression);
     return context;
   }
 }

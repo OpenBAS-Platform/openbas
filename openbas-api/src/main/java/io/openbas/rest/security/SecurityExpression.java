@@ -7,8 +7,8 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.service.ScenarioService;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class SecurityExpression extends SecurityExpressionRoot
 
   private final UserRepository userRepository;
   private final ExerciseRepository exerciseRepository;
-  private final ScenarioService scenarioService;
+  private final ScenarioRepository scenarioRepository;
 
   private Object filterObject;
   private Object returnObject;
@@ -32,11 +32,11 @@ public class SecurityExpression extends SecurityExpressionRoot
       Authentication authentication,
       final UserRepository userRepository,
       final ExerciseRepository exerciseRepository,
-      final ScenarioService scenarioService) {
+      final ScenarioRepository scenarioRepository) {
     super(authentication);
     this.exerciseRepository = exerciseRepository;
     this.userRepository = userRepository;
-    this.scenarioService = scenarioService;
+    this.scenarioRepository = scenarioRepository;
   }
 
   private OpenBASPrincipal getUser() {
@@ -57,12 +57,30 @@ public class SecurityExpression extends SecurityExpressionRoot
   // endregion
 
   // region exercise annotations
-  @SuppressWarnings("unused")
+
+  /**
+   * Check that a user is a planner for a given exercise
+   *
+   * @deprecated use isSimulationPlanner instead
+   * @param exerciseId the exercice to search
+   * @return true if the user is a planner for given exercise
+   */
+  @Deprecated(since = "1.11.0", forRemoval = true)
   public boolean isExercisePlanner(String exerciseId) {
+    return isSimulationPlanner(exerciseId);
+  }
+
+  /**
+   * Check that a user is a planner for a given simulation
+   *
+   * @param simulationId the simulation to check
+   * @return true if the user is a planner for given simulation
+   */
+  public boolean isSimulationPlanner(String simulationId) {
     if (isUserHasBypass()) {
       return true;
     }
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(simulationId).orElseThrow();
     List<User> planners = exercise.getPlanners();
     Optional<User> planner =
         planners.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
@@ -100,12 +118,11 @@ public class SecurityExpression extends SecurityExpressionRoot
   // endregion
 
   // region scenario annotations
-  @SuppressWarnings("unused")
   public boolean isScenarioPlanner(@NotBlank final String scenarioId) {
     if (isUserHasBypass()) {
       return true;
     }
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Scenario scenario = scenarioRepository.findById(scenarioId).orElseThrow();
     List<User> planners = scenario.getPlanners();
     Optional<User> planner =
         planners.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
@@ -117,7 +134,7 @@ public class SecurityExpression extends SecurityExpressionRoot
     if (isUserHasBypass()) {
       return true;
     }
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Scenario scenario = scenarioRepository.findById(scenarioId).orElseThrow();
     List<User> observers = scenario.getObservers();
     Optional<User> observer =
         observers.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();
@@ -127,7 +144,6 @@ public class SecurityExpression extends SecurityExpressionRoot
   // endregion
 
   // region user annotations
-  @SuppressWarnings("unused")
   public boolean isPlanner() {
     if (isUserHasBypass()) {
       return true;
@@ -136,7 +152,6 @@ public class SecurityExpression extends SecurityExpressionRoot
     return user.isPlanner();
   }
 
-  @SuppressWarnings("unused")
   public boolean isObserver() {
     if (isUserHasBypass()) {
       return true;

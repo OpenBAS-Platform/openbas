@@ -1,6 +1,6 @@
 import * as R from 'ramda';
-import { useState } from 'react';
 import * as React from 'react';
+import { useState } from 'react';
 
 export interface UseEntityToggle<T> {
   selectedElements: Record<string, T>;
@@ -20,6 +20,7 @@ export interface UseEntityToggle<T> {
 const useEntityToggle = <T extends Record<string, string>>(
   prefix: string,
   numberOfElements: number,
+  totalNumberOfElements?: number,
 ): UseEntityToggle<T> => {
   const [selectedElements, setSelectedElements] = useState<Record<string, T>>(
     {},
@@ -91,7 +92,9 @@ const useEntityToggle = <T extends Record<string, string>>(
   };
   let numberOfSelectedElements = Object.keys(selectedElements).length;
   if (selectAll) {
-    numberOfSelectedElements = (numberOfElements ?? 0) - Object.keys(deSelectedElements).length;
+    numberOfSelectedElements = selectAll
+      ? (totalNumberOfElements ?? 0) - Object.keys(deSelectedElements).length
+      : (numberOfElements ?? 0) - Object.keys(deSelectedElements).length;
   }
   return {
     onToggleEntity,

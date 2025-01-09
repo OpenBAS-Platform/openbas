@@ -37,7 +37,7 @@ export interface AgentOutput {
   agent_active?: boolean;
   /** Agent deployment mode */
   agent_deployment_mode?: "service" | "session";
-  /** User */
+  /** The user who executed the agent */
   agent_executed_by_user?: string;
   /** Agent executor */
   agent_executor?: ExecutorOutput;
@@ -153,6 +153,7 @@ export interface AssetGroup {
   asset_group_created_at: string;
   asset_group_description?: string;
   asset_group_dynamic_assets?: string[];
+  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
@@ -164,6 +165,7 @@ export interface AssetGroup {
 
 export interface AssetGroupInput {
   asset_group_description?: string;
+  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -173,6 +175,7 @@ export interface AssetGroupOutput {
   /** @uniqueItems true */
   asset_group_assets?: string[];
   asset_group_description?: string;
+  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
@@ -712,13 +715,19 @@ export interface Endpoint {
 }
 
 export interface EndpointOutput {
-  /** List of agents */
+  /**
+   * List of agents
+   * @uniqueItems true
+   */
   asset_agents: AgentOutput[];
   /** Asset Id */
   asset_id: string;
   /** Asset name */
   asset_name: string;
-  /** Tags */
+  /**
+   * Tags
+   * @uniqueItems true
+   */
   asset_tags?: string[];
   /** Asset type */
   asset_type?: string;
@@ -729,23 +738,35 @@ export interface EndpointOutput {
 }
 
 export interface EndpointOverviewOutput {
-  /** List of agents */
+  /**
+   * List of agents
+   * @uniqueItems true
+   */
   asset_agents: AgentOutput[];
-  /** Endpoint description */
+  /** Asset description */
   asset_description?: string;
   /** Asset Id */
   asset_id: string;
-  /** Endpoint name */
+  /** Asset name */
   asset_name: string;
-  /** Tags */
+  /**
+   * Tags
+   * @uniqueItems true
+   */
   asset_tags?: string[];
   /** Architecture */
   endpoint_arch?: "x86_64" | "arm64" | "Unknown";
   /** Hostname */
   endpoint_hostname?: string;
-  /** List IPs */
+  /**
+   * List IPs
+   * @uniqueItems true
+   */
   endpoint_ips?: string[];
-  /** List of MAC addresses */
+  /**
+   * List of MAC addresses
+   * @uniqueItems true
+   */
   endpoint_mac_addresses?: string[];
   /** Platform */
   endpoint_platform?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
@@ -1041,6 +1062,7 @@ export interface ExerciseUpdateStatusInput {
 }
 
 export interface ExerciseUpdateTagsInput {
+  apply_tag_rule?: boolean;
   exercise_tags?: string[];
 }
 
@@ -1124,6 +1146,7 @@ export interface Filter {
   values?: string[];
 }
 
+/** Filter object to search within filterable attributes */
 export interface FilterGroup {
   filters?: Filter[];
   mode: "and" | "or";
@@ -1304,6 +1327,27 @@ export interface Inject {
   /** @format int64 */
   inject_users_number?: number;
   listened?: boolean;
+}
+
+export interface InjectBulkProcessingInput {
+  inject_ids_to_ignore?: string[];
+  inject_ids_to_process?: string[];
+  search_pagination_input?: SearchPaginationInput;
+  simulation_or_scenario_id?: string;
+}
+
+export interface InjectBulkUpdateInputs {
+  inject_ids_to_ignore?: string[];
+  inject_ids_to_process?: string[];
+  search_pagination_input?: SearchPaginationInput;
+  simulation_or_scenario_id?: string;
+  update_operations?: InjectBulkUpdateOperation[];
+}
+
+export interface InjectBulkUpdateOperation {
+  field?: "assets" | "asset_groups" | "teams";
+  operation?: "add" | "remove" | "replace";
+  values?: string[];
 }
 
 export interface InjectDependency {
@@ -3180,6 +3224,7 @@ export interface ScenarioTeamUser {
 }
 
 export interface ScenarioUpdateTagsInput {
+  apply_tag_rule?: boolean;
   scenario_tags?: string[];
 }
 
@@ -3188,6 +3233,7 @@ export interface ScenarioUpdateTeamsInput {
 }
 
 export interface SearchPaginationInput {
+  /** Filter object to search within filterable attributes */
   filterGroup?: FilterGroup;
   /**
    * Page number to get
@@ -3462,6 +3508,23 @@ export interface UpdateAssetsOnAssetGroupInput {
   asset_group_assets?: string[];
 }
 
+export interface UpdateExerciseInput {
+  apply_tag_rule?: boolean;
+  exercise_category?: string;
+  exercise_description?: string;
+  exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
+  exercise_message_footer?: string;
+  exercise_message_header?: string;
+  exercise_name: string;
+  exercise_severity?: string;
+  /** @format date-time */
+  exercise_start_date?: string | null;
+  exercise_subtitle?: string;
+  exercise_tags?: string[];
+}
+
 export interface UpdateMePasswordInput {
   user_current_password: string;
   user_plain_password: string;
@@ -3475,6 +3538,23 @@ export interface UpdateProfileInput {
   user_lastname: string;
   user_organization?: string;
   user_theme?: string;
+}
+
+export interface UpdateScenarioInput {
+  apply_tag_rule?: boolean;
+  scenario_category?: string;
+  scenario_description?: string;
+  scenario_external_reference?: string;
+  scenario_external_url?: string;
+  scenario_mail_from?: string;
+  scenario_mails_reply_to?: string[];
+  scenario_main_focus?: string;
+  scenario_message_footer?: string;
+  scenario_message_header?: string;
+  scenario_name: string;
+  scenario_severity?: "low" | "medium" | "high" | "critical";
+  scenario_subtitle?: string;
+  scenario_tags?: string[];
 }
 
 export interface UpdateUserInfoInput {
