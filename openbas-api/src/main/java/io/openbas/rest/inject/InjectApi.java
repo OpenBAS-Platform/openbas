@@ -107,9 +107,11 @@ public class InjectApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
+  @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
   public Inject injectExecutionCallback(
-      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+      @PathVariable String agentId,
+      @PathVariable String injectId,
+      @Valid @RequestBody InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);

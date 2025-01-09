@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
@@ -7,10 +8,15 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import io.openbas.config.OpenBASConfig;
+import io.openbas.database.model.Agent;
+import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
+import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.EndpointSpecification;
+import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -22,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +61,8 @@ public class EndpointService {
   private String executorOpenbasBinariesVersion;
 
   private final EndpointRepository endpointRepository;
+  private final ExecutorRepository executorRepository;
+  private final AssetAgentJobRepository assetAgentJobRepository;
   private final TagRepository tagRepository;
 
   // -- CRUD --
@@ -116,6 +125,63 @@ public class EndpointService {
   }
 
   // -- INSTALLATION AGENT --
+
+  public Endpoint register(final EndpointRegisterInput input) throws IOException {
+    Optional<Endpoint> optionalEndpoint = findByExternalReference(input.getExternalReference());
+    Endpoint endpoint;
+    if (optionalEndpoint.isPresent()) {
+      endpoint = optionalEndpoint.get();
+      endpoint.setIps(input.getIps());
+      endpoint.setMacAddresses(input.getMacAddresses());
+      endpoint.setHostname(input.getHostname());
+      endpoint.setPlatform(input.getPlatform());
+      endpoint.setArch(input.getArch());
+      endpoint.setName(input.getName());
+      endpoint.getAgents().getFirst().setVersion(input.getAgentVersion());
+      endpoint.setDescription(input.getDescription());
+      endpoint.getAgents().getFirst().setLastSeen(Instant.now());
+      endpoint
+          .getAgents()
+          .getFirst()
+          .setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      endpoint
+          .getAgents()
+          .getFirst()
+          .setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
+      endpoint
+          .getAgents()
+          .getFirst()
+          .setDeploymentMode(
+              input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
+      endpoint.getAgents().getFirst().setExecutedByUser(input.getExecutedByUser());
+    } else {
+      endpoint = new Endpoint();
+      Agent agent = new Agent();
+      agent.setVersion(input.getAgentVersion());
+      agent.setExternalReference(input.getExternalReference());
+      endpoint.setUpdateAttributes(input);
+      agent.setLastSeen(Instant.now());
+      agent.setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
+      agent.setDeploymentMode(
+          input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
+      agent.setExecutedByUser(input.getExecutedByUser());
+      endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
+      agent.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+      agent.setAsset(endpoint);
+      endpoint.setAgents(List.of(agent));
+    }
+    Endpoint updatedEndpoint = updateEndpoint(endpoint);
+    // If agent is not temporary and not the same version as the platform => Create an upgrade task
+    // for the agent
+    if (updatedEndpoint.getAgents().getFirst().getParent() == null
+        && !updatedEndpoint.getAgents().getFirst().getVersion().equals(version)) {
+      AssetAgentJob assetAgentJob = new AssetAgentJob();
+      assetAgentJob.setCommand(generateUpgradeCommand(updatedEndpoint.getPlatform().name()));
+      assetAgentJob.setAgent(updatedEndpoint.getAgents().getFirst());
+      assetAgentJobRepository.save(assetAgentJob);
+    }
+    return updatedEndpoint;
+  }
 
   public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken)
       throws IOException {
