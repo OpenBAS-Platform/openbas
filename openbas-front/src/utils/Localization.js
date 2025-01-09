@@ -1871,7 +1871,6 @@ const i18n = {
       'Controls': '控制',
       'Planning': '计划',
       'Comchecks': '检查',
-      'Dryruns': '运行',
       'Messages header': '消息头',
       'Messages footer': '消息页脚',
       'Send a new comcheck': '发送新通信检查',
