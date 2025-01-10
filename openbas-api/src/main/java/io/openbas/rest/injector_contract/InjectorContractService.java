@@ -15,6 +15,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -131,6 +132,7 @@ public class InjectorContractService {
             payloadCollectorJoin.get("type").alias("collector_type"),
             injectorContractInjectorJoin.get("type").alias("injector_contract_injector_type"),
             attackPatternIdsExpression.alias("injector_contract_attack_patterns"),
+            injectorContractRoot.get("updatedAt").alias("injector_contract_updated_at"),
             injectorContractPayloadJoin.get("executionArch").alias("payload_execution_arch"))
         .distinct(true);
 
@@ -156,6 +158,7 @@ public class InjectorContractService {
                     tuple.get("collector_type", String.class),
                     tuple.get("injector_contract_injector_type", String.class),
                     tuple.get("injector_contract_attack_patterns", String[].class),
+                    tuple.get("injector_contract_updated_at", Instant.class),
                     tuple.get("payload_execution_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
         .toList();
   }
