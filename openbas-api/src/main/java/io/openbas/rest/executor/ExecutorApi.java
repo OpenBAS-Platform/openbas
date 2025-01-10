@@ -223,7 +223,7 @@ public class ExecutorApi extends RestBehavior {
             description = "Invalid platform or architecture specified."),
       })
   @GetMapping(
-      value = "/{platform}/{architecture}",
+      value = "/api/agent/package/openbas/{platform}/{architecture}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(
       @Parameter(
