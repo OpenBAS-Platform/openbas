@@ -2,16 +2,9 @@ package io.openbas.rest.helper;
 
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
-import io.openbas.database.repository.CommunicationRepository;
-import io.openbas.database.repository.ExerciseTeamUserRepository;
-import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.ScenarioRepository;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TeamHelper {
