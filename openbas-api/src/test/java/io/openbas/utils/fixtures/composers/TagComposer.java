@@ -5,9 +5,6 @@ import io.openbas.database.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class TagComposer extends ComposerBase<Tag> {
   @Autowired private TagRepository tagRepository;
