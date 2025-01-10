@@ -1,11 +1,11 @@
 package io.openbas.rest.exercise;
 
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
@@ -15,6 +15,7 @@ import io.openbas.service.ChallengeService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
@@ -44,7 +45,6 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private VariableService variableService;
   @Autowired private ChallengeService challengeService;
   @Resource protected ObjectMapper mapper;
-  @Autowired private TagRepository tagRepository;
 
   private Exercise getExercise() {
         return exerciseComposer
@@ -106,17 +106,15 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String jsonExport =
+    String actualJson =
         ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
     ObjectMapper exportMapper = mapper.copy();
-    JsonNode expectedJson =
-        exportMapper.readTree(
-            exportMapper.writeValueAsBytes(
+    String expectedJson =
+            exportMapper.writeValueAsString(
                 ExerciseFileExport.fromExercise(
                         ex, exportMapper, variableService, challengeService)
-                    .withOptions(0)));
-    JsonNode actualJson = exportMapper.readTree(jsonExport);
+                    .withOptions(0));
 
-    Assertions.assertEquals(expectedJson, actualJson);
+    assertThat(expectedJson, jsonEquals(actualJson));
   }
 }
