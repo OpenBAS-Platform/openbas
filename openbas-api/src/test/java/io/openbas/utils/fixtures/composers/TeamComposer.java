@@ -7,7 +7,6 @@ import io.openbas.database.repository.TeamRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +33,6 @@ public class TeamComposer {
 
     public Composer withTag(TagComposer.Composer tagComposer) {
       tagComposers.add(tagComposer);
-      this.tagComposers.add(tagComposer);
       Set<Tag> tempTags = this.team.getTags();
       tempTags.add(tagComposer.get());
       this.team.setTags(tempTags);

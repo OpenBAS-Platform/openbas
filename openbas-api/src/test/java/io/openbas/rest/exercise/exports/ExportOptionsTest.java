@@ -24,9 +24,11 @@ public class ExportOptionsTest extends IntegrationTest {
     Assertions.assertEquals(7, ExportOptions.mask(true, true, true));
   }
 
-  @DisplayName("Given a mask and a standalone option, return correctly whether the option is within the mask or not")
+  @DisplayName(
+      "Given a mask and a standalone option, return correctly whether the option is within the mask or not")
   @Test
-  public void given_a_mask_and_a_standalone_option_return_correctly_whether_the_option_is_within_the_mask_or_not() {
+  public void
+      given_a_mask_and_a_standalone_option_return_correctly_whether_the_option_is_within_the_mask_or_not() {
     Assertions.assertFalse(
         ExportOptions.has(ExportOptions.WITH_PLAYERS, ExportOptions.mask(false, false, false)));
     Assertions.assertFalse(

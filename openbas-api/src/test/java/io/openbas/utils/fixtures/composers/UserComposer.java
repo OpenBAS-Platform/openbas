@@ -3,12 +3,11 @@ package io.openbas.utils.fixtures.composers;
 import io.openbas.database.model.Tag;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserComposer {
@@ -31,7 +30,6 @@ public class UserComposer {
 
     public Composer withTag(TagComposer.Composer tagComposer) {
       tagComposers.add(tagComposer);
-      this.tagComposers.add(tagComposer);
       Set<Tag> tempTags = this.user.getTags();
       tempTags.add(tagComposer.get());
       this.user.setTags(tempTags);

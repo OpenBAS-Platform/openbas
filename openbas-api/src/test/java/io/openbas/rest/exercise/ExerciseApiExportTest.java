@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.VariableService;
@@ -43,13 +44,10 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private VariableService variableService;
   @Autowired private ChallengeService challengeService;
   @Resource protected ObjectMapper mapper;
+  @Autowired private TagRepository tagRepository;
 
-  static Exercise EXERCISE;
-
-  @BeforeEach
-  void beforeAll() {
-    EXERCISE =
-        exerciseComposer
+  private Exercise getExercise() {
+        return exerciseComposer
             .forExercise(ExerciseFixture.createDefaultCrisisExercise())
             .withArticle(
                 articleComposer
@@ -64,20 +62,31 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .withTeam(
                 teamComposer
                     .forTeam(TeamFixture.getEmptyTeam())
+                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
                     .withUser(
                         userComposer
                             .forUser(UserFixture.getUser())
+                            .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
                             .withOrganization(
-                                organizationComposer.forOrganization(
-                                    OrganizationFixture.createOrganization()))))
+                                organizationComposer
+                                    .forOrganization(OrganizationFixture.createOrganization())
+                                    .withTag(
+                                        tagComposer.forTag(
+                                            TagFixture.getTagWithText("Organization tag"))))))
             .withInject(
                 injectComposer
                     .forInject(InjectFixture.getInjectWithoutContract())
                     .withChallenge(
-                        challengeComposer.forChallenge(ChallengeFixture.createDefaultChallenge())))
-            .withDocument(documentComposer.forDocument(DocumentFixture.getDocumentJpeg()))
+                        challengeComposer
+                            .forChallenge(ChallengeFixture.createDefaultChallenge())
+                            .withTag(
+                                tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
+            .withDocument(
+                documentComposer
+                    .forDocument(DocumentFixture.getDocumentJpeg())
+                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
             .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
-            .withTag(tagComposer.forTag(TagFixture.getTag()))
+            .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
             .persist()
             .get();
   }
@@ -85,10 +94,12 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @DisplayName("Given a valid simulation, the export file is found in zip and correct")
   @Test
   @WithMockAdminUser
-  public void given_a_valid_simulation_the_export_file_is_found_in_zip_and_correct() throws Exception {
+  public void given_a_valid_simulation_the_export_file_is_found_in_zip_and_correct()
+      throws Exception {
+    Exercise ex = getExercise();
     byte[] response =
         mvc.perform(
-                get(EXERCISE_URI + "/" + EXERCISE.getId() + "/export")
+                get(EXERCISE_URI + "/" + ex.getId() + "/export")
                     .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
@@ -96,13 +107,13 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getContentAsByteArray();
 
     String jsonExport =
-            ZipUtils.getZipEntryAsString(response, "%s.json".formatted(EXERCISE.getName()));
+        ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
     ObjectMapper exportMapper = mapper.copy();
     JsonNode expectedJson =
         exportMapper.readTree(
             exportMapper.writeValueAsBytes(
                 ExerciseFileExport.fromExercise(
-                        EXERCISE, exportMapper, variableService, challengeService)
+                        ex, exportMapper, variableService, challengeService)
                     .withOptions(0)));
     JsonNode actualJson = exportMapper.readTree(jsonExport);
 

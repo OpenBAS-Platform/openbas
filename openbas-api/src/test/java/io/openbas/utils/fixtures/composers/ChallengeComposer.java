@@ -3,12 +3,11 @@ package io.openbas.utils.fixtures.composers;
 import io.openbas.database.model.Challenge;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.ChallengeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ChallengeComposer {
@@ -24,7 +23,6 @@ public class ChallengeComposer {
 
     public Composer withTag(TagComposer.Composer tagComposer) {
       tagComposers.add(tagComposer);
-      this.tagComposers.add(tagComposer);
       Set<Tag> tempTags = this.challenge.getTags();
       tempTags.add(tagComposer.get());
       this.challenge.setTags(tempTags);
