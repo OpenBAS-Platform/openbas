@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TeamComposer {
+public class TeamComposer extends ComposerBase<Team> {
   @Autowired private TeamRepository teamRepository;
 
   public class Composer extends InnerComposerBase<Team> {
@@ -54,6 +54,7 @@ public class TeamComposer {
   }
 
   public Composer forTeam(Team team) {
+    generatedItems.add(team);
     return new Composer(team);
   }
 }

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExerciseComposer {
+public class ExerciseComposer extends ComposerBase<Exercise> {
   @Autowired private ExerciseRepository exerciseRepository;
 
   public class Composer extends InnerComposerBase<Exercise> {
@@ -103,6 +103,7 @@ public class ExerciseComposer {
   }
 
   public Composer forExercise(Exercise exercise) {
+    generatedItems.add(exercise);
     return new Composer(exercise);
   }
 }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LessonsQuestionsComposer {
+public class LessonsQuestionsComposer extends ComposerBase<LessonsQuestion> {
 
   @Autowired private LessonsQuestionRepository lessonsQuestionRepository;
 
@@ -30,6 +30,7 @@ public class LessonsQuestionsComposer {
   }
 
   public Composer forLessonsQuestion(LessonsQuestion lessonsQuestion) {
+    generatedItems.add(lessonsQuestion);
     return new Composer(lessonsQuestion);
   }
 }

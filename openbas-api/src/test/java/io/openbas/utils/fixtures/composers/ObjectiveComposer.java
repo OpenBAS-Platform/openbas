@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ObjectiveComposer {
+public class ObjectiveComposer extends ComposerBase<Objective> {
   @Autowired private ObjectiveRepository objectiveRepository;
 
   public class Composer extends InnerComposerBase<Objective> {
@@ -29,6 +29,7 @@ public class ObjectiveComposer {
   }
 
   public Composer forObjective(Objective objective) {
+    generatedItems.add(objective);
     return new Composer(objective);
   }
 }

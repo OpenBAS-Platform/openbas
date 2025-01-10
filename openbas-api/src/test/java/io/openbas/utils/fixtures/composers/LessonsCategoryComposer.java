@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LessonsCategoryComposer {
+public class LessonsCategoryComposer extends ComposerBase<LessonsCategory> {
 
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
 
@@ -44,6 +44,7 @@ public class LessonsCategoryComposer {
   }
 
   public Composer forLessonsCategory(LessonsCategory lessonsCategory) {
+    generatedItems.add(lessonsCategory);
     return new Composer(lessonsCategory);
   }
 }

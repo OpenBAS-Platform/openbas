@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ChannelComposer {
+public class ChannelComposer extends ComposerBase<Channel> {
   @Autowired private ChannelRepository channelRepository;
 
   public class Composer extends InnerComposerBase<Channel> {
@@ -29,6 +29,7 @@ public class ChannelComposer {
   }
 
   public Composer forChannel(Channel channel) {
+    generatedItems.add(channel);
     return new Composer(channel);
   }
 }

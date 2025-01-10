@@ -132,7 +132,6 @@ public class ExerciseFileExport {
                               allTags.addAll(injectorContract.getPayload().getTags());
                             }
                           });
-                  allTags.addAll(inject.getTags());
                 });
 
         return allTags;

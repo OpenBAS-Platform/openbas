@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrganizationComposer {
+public class OrganizationComposer extends ComposerBase<Organization> {
   @Autowired OrganizationRepository organizationRepository;
 
   public class Composer extends InnerComposerBase<Organization> {
@@ -43,6 +43,7 @@ public class OrganizationComposer {
   }
 
   public Composer forOrganization(Organization organization) {
+    generatedItems.add(organization);
     return new Composer(organization);
   }
 }

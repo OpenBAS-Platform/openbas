@@ -3,18 +3,21 @@ package io.openbas.utils.fixtures.composers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
+import io.openbas.database.model.Tag;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.challenge.ChallengeContract;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 // TODO: injector contract, payloads...
 @Component
-public class InjectComposer {
+public class InjectComposer extends ComposerBase<Inject> {
   @Autowired private InjectRepository injectRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private ObjectMapper objectMapper;
@@ -22,6 +25,7 @@ public class InjectComposer {
   public class Composer extends InnerComposerBase<Inject> {
     private final Inject inject;
     private final List<ChallengeComposer.Composer> challengeComposers = new ArrayList<>();
+    private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
 
     public Composer(Inject inject) {
       this.inject = inject;
@@ -36,8 +40,17 @@ public class InjectComposer {
       return this;
     }
 
+    public Composer withTag(TagComposer.Composer tagComposer) {
+      tagComposers.add(tagComposer);
+      Set<Tag> tempTags = this.inject.getTags();
+      tempTags.add(tagComposer.get());
+      this.inject.setTags(tempTags);
+      return this;
+    }
+
     @Override
     public Composer persist() {
+      tagComposers.forEach(TagComposer.Composer::persist);
       challengeComposers.forEach(ChallengeComposer.Composer::persist);
       // replace the inject content if applicable, after persisting the challenges
       ChallengeContent cc = new ChallengeContent();
@@ -55,6 +68,7 @@ public class InjectComposer {
   }
 
   public Composer forInject(Inject inject) {
+    generatedItems.add(inject);
     return new Composer(inject);
   }
 }

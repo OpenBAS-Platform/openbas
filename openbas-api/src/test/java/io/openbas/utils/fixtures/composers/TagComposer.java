@@ -5,8 +5,11 @@ import io.openbas.database.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
-public class TagComposer {
+public class TagComposer extends ComposerBase<Tag> {
   @Autowired private TagRepository tagRepository;
 
   public class Composer extends InnerComposerBase<Tag> {
@@ -29,6 +32,7 @@ public class TagComposer {
   }
 
   public Composer forTag(Tag tag) {
+    generatedItems.add(tag);
     return new Composer(tag);
   }
 }

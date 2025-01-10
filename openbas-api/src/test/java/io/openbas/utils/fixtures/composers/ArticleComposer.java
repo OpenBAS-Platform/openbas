@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ArticleComposer {
+public class ArticleComposer extends ComposerBase<Article> {
   @Autowired private ArticleRepository articleRepository;
 
   public class Composer extends InnerComposerBase<Article> {
@@ -37,6 +37,7 @@ public class ArticleComposer {
   }
 
   public Composer forArticle(Article article) {
+    generatedItems.add(article);
     return new Composer(article);
   }
 }

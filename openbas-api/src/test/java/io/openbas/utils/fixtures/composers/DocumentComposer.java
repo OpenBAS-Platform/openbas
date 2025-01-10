@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DocumentComposer {
+public class DocumentComposer extends ComposerBase<Document> {
   @Autowired private DocumentRepository documentRepository;
 
   public class Composer extends InnerComposerBase<Document> {
@@ -43,6 +43,7 @@ public class DocumentComposer {
   }
 
   public Composer forDocument(Document document) {
+    generatedItems.add(document);
     return new Composer(document);
   }
 }

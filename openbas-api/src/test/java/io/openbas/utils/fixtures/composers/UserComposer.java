@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserComposer {
+public class UserComposer extends ComposerBase<User> {
   @Autowired UserRepository userRepository;
 
   public class Composer extends InnerComposerBase<User> {
@@ -51,6 +51,7 @@ public class UserComposer {
   }
 
   public Composer forUser(User user) {
+    generatedItems.add(user);
     return new Composer(user);
   }
 }
