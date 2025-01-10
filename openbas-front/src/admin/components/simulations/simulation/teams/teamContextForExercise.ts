@@ -1,5 +1,5 @@
 import { addExerciseTeamPlayers, disableExerciseTeamPlayers, enableExerciseTeamPlayers, removeExerciseTeamPlayers } from '../../../../../actions/Exercise';
-import { addExerciseTeams, removeExerciseTeams, replaceExerciseTeams, searchExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
+import { removeExerciseTeams, replaceExerciseTeams, searchExerciseTeams } from '../../../../../actions/exercises/exercise-teams-action';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { Page } from '../../../../../components/common/queryable/Page';
 import { Exercise, ExerciseTeamUser, SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
@@ -19,9 +19,6 @@ const teamContextForExercise = (exerciseId: Exercise['exercise_id'], exerciseTea
       await dispatch(removeExerciseTeamPlayers(exerciseId, teamId, { exercise_team_players: userIds }));
       return dispatch(fetchTeams());
     },
-    onAddTeam(teamId: Team['team_id']): Promise<void> {
-      return dispatch(addExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
-    },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({ ...team, team_exercises: [exerciseId] }));
     },
@@ -31,8 +28,8 @@ const teamContextForExercise = (exerciseId: Exercise['exercise_id'], exerciseTea
     computeTeamUsersEnabled(teamId: Team['team_id']) {
       return (exerciseTeamsUsers ?? []).filter((o: ExerciseTeamUser) => o.team_id === teamId).length;
     },
-    onRemoveTeam(teamId: Team['team_id']): void {
-      dispatch(removeExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
+    onRemoveTeam(teamId: Team['team_id']): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
+      return dispatch(removeExerciseTeams(exerciseId, { exercise_teams: [teamId] }));
     },
     onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
       return dispatch(replaceExerciseTeams(exerciseId, { exercise_teams: teamIds }));

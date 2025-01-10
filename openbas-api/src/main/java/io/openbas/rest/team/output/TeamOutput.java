@@ -23,6 +23,14 @@ public class TeamOutput {
   @JsonProperty("team_description")
   private String description;
 
+  @JsonProperty("team_exercises")
+  @NotBlank
+  private Set<String> exercises;
+
+  @JsonProperty("team_scenarios")
+  @NotBlank
+  private Set<String> scenarios;
+
   @JsonProperty("team_contextual")
   private Boolean contextual;
 

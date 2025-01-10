@@ -25,12 +25,10 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   addedTeamIds: Team['team_id'][];
-  setTeams: (teams: Team[]) => void;
 }
 
 const UpdateTeams: React.FC<Props> = ({
   addedTeamIds,
-  setTeams,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -50,13 +48,7 @@ const UpdateTeams: React.FC<Props> = ({
 
   const handleSubmit = async () => {
     setOpen(false);
-    onReplaceTeam?.(selectedTeamValues.map(v => v.team_id)).then((result) => {
-      if (result.result.length === 0) {
-        setTeams([]);
-      } else {
-        setTeams(Object.values(result.entities.teams));
-      }
-    });
+    onReplaceTeam?.(selectedTeamValues.map(v => v.team_id));
   };
 
   useEffect(() => {

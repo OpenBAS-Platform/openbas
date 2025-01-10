@@ -3,6 +3,7 @@ package io.openbas.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
 import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
+import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.rest.scenario.utils.ScenarioUtils.handleCustomFilter;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
@@ -37,6 +38,7 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.export.ScenarioExportMixins;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
+import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -54,6 +56,7 @@ import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
@@ -508,20 +511,8 @@ public class ScenarioService {
 
   // -- TEAMS --
 
-  public Iterable<Team> addTeams(
-      @NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
-    Scenario scenario = this.scenario(scenarioId);
-    List<Team> teams = scenario.getTeams();
-    List<Team> teamsToAdd = fromIterable(this.teamRepository.findAllById(teamIds));
-    List<String> existingTeamIds = teams.stream().map(Team::getId).toList();
-    teams.addAll(teamsToAdd.stream().filter(t -> !existingTeamIds.contains(t.getId())).toList());
-    scenario.setTeams(teams);
-    scenario.setUpdatedAt(now());
-    return teamsToAdd;
-  }
-
   @Transactional(rollbackFor = Exception.class)
-  public Iterable<Team> removeTeams(
+  public Iterable<TeamOutput> removeTeams(
       @NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
     // Remove teams from exercise
     this.scenarioRepository.removeTeams(scenarioId, teamIds);
@@ -531,17 +522,24 @@ public class ScenarioService {
     this.injectRepository.removeTeamsForScenario(scenarioId, teamIds);
     // Remove all association between lessons learned and teams
     this.lessonsCategoryRepository.removeTeamsForScenario(scenarioId, teamIds);
-    return teamRepository.findAllById(teamIds);
+    return teamService.find(fromIds(teamIds));
   }
 
-  public Iterable<Team> replaceTeams(
+  public List<TeamOutput> replaceTeams(
       @NotBlank final String scenarioId, @NotNull final List<String> teamIds) {
     Scenario scenario = this.scenario(scenarioId);
+    List<String> previousTeamList = scenario.getTeams().stream().map(Team::getId).toList();
+
     // Replace teams from exercise
     List<Team> teams = fromIterable(this.teamRepository.findAllById(teamIds));
     scenario.setTeams(teams);
-    this.updateScenario(scenario);
-    return teams;
+
+    // You must return all the modified teams to ensure the frontend store updates correctly
+    List<String> modifiedTeamIds =
+        Stream.concat(previousTeamList.stream(), teams.stream().map(Team::getId))
+            .distinct()
+            .toList();
+    return teamService.find(fromIds(modifiedTeamIds));
   }
 
   public Scenario enablePlayers(

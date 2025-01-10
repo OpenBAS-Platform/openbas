@@ -1,5 +1,5 @@
 import { addScenarioTeamPlayers, disableScenarioTeamPlayers, enableScenarioTeamPlayers, removeScenarioTeamPlayers } from '../../../../../actions/scenarios/scenario-actions';
-import { addScenarioTeams, removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
+import { removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
 import type { Page } from '../../../../../components/common/queryable/Page';
 import { Scenario, ScenarioTeamUser, SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
@@ -18,9 +18,6 @@ const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTea
       await dispatch(removeScenarioTeamPlayers(scenarioId, teamId, { scenario_team_players: userIds }));
       return dispatch(fetchTeams());
     },
-    onAddTeam(teamId: Team['team_id']): Promise<void> {
-      return dispatch(addScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
-    },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
       return dispatch(addTeam({ ...team, team_scenarios: [scenarioId] }));
     },
@@ -30,8 +27,8 @@ const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTea
     computeTeamUsersEnabled(teamId: Team['team_id']) {
       return scenarioTeamsUsers?.filter((o: ScenarioTeamUser) => o.team_id === teamId).length ?? 0;
     },
-    onRemoveTeam(teamId: Team['team_id']): void {
-      dispatch(removeScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
+    onRemoveTeam(teamId: Team['team_id']): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
+      return dispatch(removeScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
     },
     onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
       return dispatch(replaceScenarioTeams(scenarioId, { scenario_teams: teamIds }));
