@@ -360,15 +360,6 @@ public class Inject implements Base, Injection {
         .toList();
   }
 
-  @JsonIgnore
-  public DryInject toDryInject(Dryrun run) {
-    DryInject dryInject = new DryInject();
-    dryInject.setRun(run);
-    dryInject.setInject(this);
-    dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
-    return dryInject;
-  }
-
   @JsonProperty("inject_communications_number")
   public long getCommunicationsNumber() {
     return this.getCommunications().size();

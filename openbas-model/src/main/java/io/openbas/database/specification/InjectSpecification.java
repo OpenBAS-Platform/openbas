@@ -75,15 +75,6 @@ public class InjectSpecification {
     };
   }
 
-  public static Specification<Inject> forDryrun(String exerciseId) {
-    return (root, query, cb) ->
-        cb.and(
-            // cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
-            cb.equal(root.get("enabled"), true), // isEnable
-            cb.equal(root.get("exercise").get("id"), exerciseId) // fromWantedExercise
-            );
-  }
-
   public static Specification<Inject> forAtomicTesting() {
     return (root, query, cb) ->
         cb.and(

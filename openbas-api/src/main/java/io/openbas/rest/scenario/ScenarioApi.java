@@ -109,16 +109,6 @@ public class ScenarioApi extends RestBehavior {
     return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
   }
 
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/information")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario updateScenarioInformation(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioInformationInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    scenario.setUpdateAttributes(input);
-    return this.scenarioService.updateScenario(scenario);
-  }
-
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {

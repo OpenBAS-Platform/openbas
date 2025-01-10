@@ -628,71 +628,6 @@ export interface DocumentUpdateInput {
   document_tags?: string[];
 }
 
-export interface DryInject {
-  /** @format date-time */
-  dryinject_date: string;
-  dryinject_dryrun?: string;
-  dryinject_exercise?: string;
-  dryinject_id?: string;
-  dryinject_inject?: Inject;
-  dryinject_status?: DryInjectStatus;
-  listened?: boolean;
-}
-
-export interface DryInjectStatus {
-  listened?: boolean;
-  status_id?: string;
-  status_name?:
-    | "SUCCESS"
-    | "ERROR"
-    | "MAYBE_PREVENTED"
-    | "DRAFT"
-    | "QUEUING"
-    | "EXECUTING"
-    | "PENDING"
-    | "PARTIAL"
-    | "MAYBE_PARTIAL_PREVENTED";
-  status_traces?: InjectStatusExecution[];
-  /** @format date-time */
-  tracking_ack_date?: string;
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-  /** @format int32 */
-  tracking_total_count?: number;
-  /** @format int32 */
-  tracking_total_error?: number;
-  /** @format int64 */
-  tracking_total_execution_time?: number;
-  /** @format int32 */
-  tracking_total_success?: number;
-}
-
-export interface Dryrun {
-  /** @format date-time */
-  dryrun_date: string;
-  /** @format date-time */
-  dryrun_end_date?: string;
-  dryrun_exercise?: string;
-  dryrun_finished?: boolean;
-  dryrun_id: string;
-  dryrun_name?: string;
-  /** @format int32 */
-  dryrun_speed?: number;
-  /** @format date-time */
-  dryrun_start_date?: string;
-  dryrun_users?: string[];
-  /** @format int64 */
-  dryrun_users_number?: number;
-  listened?: boolean;
-}
-
-export interface DryrunCreateInput {
-  dryrun_name: string;
-  dryrun_users?: string[];
-}
-
 export interface Endpoint {
   asset_agents?: Agent[];
   /** @format date-time */
@@ -3171,13 +3106,6 @@ export interface Scenario {
   scenario_users_number?: number;
 }
 
-export interface ScenarioInformationInput {
-  scenario_mail_from: string;
-  scenario_mails_reply_to?: string[];
-  scenario_message_footer?: string;
-  scenario_message_header?: string;
-}
-
 export interface ScenarioInput {
   scenario_category?: string;
   scenario_description?: string;
@@ -3393,13 +3321,13 @@ export interface TagCreateInput {
 }
 
 export interface TagRuleInput {
+  asset_groups?: string[];
   tag_name: string;
-  tag_rule_assets?: string[];
 }
 
 export interface TagRuleOutput {
+  asset_groups?: Record<string, string>;
   tag_name: string;
-  tag_rule_assets?: Record<string, string>;
   tag_rule_id: string;
 }
 

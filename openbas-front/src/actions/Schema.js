@@ -99,20 +99,6 @@ export const comcheckStatus = new schema.Entity(
 );
 export const arrayOfComcheckStatuses = new schema.Array(comcheckStatus);
 
-export const dryrun = new schema.Entity(
-  'dryruns',
-  {},
-  { idAttribute: 'dryrun_id' },
-);
-export const arrayOfDryruns = new schema.Array(dryrun);
-
-export const dryinject = new schema.Entity(
-  'dryinjects',
-  {},
-  { idAttribute: 'dryinject_id' },
-);
-export const arrayOfDryinjects = new schema.Array(dryinject);
-
 export const team = new schema.Entity(
   'teams',
   {},
@@ -309,7 +295,6 @@ export const storeHelper = state => ({
   getExercises: () => entities('exercises', state),
   getExercisesMap: () => maps('exercises', state),
   getExercise: id => entity(id, 'exercises', state),
-  getExerciseDryruns: id => entities('dryruns', state).filter(i => i.dryrun_exercise === id),
   getExerciseComchecks: id => entities('comchecks', state).filter(i => i.comcheck_exercise === id),
   getExerciseTeams: id => entities('teams', state).filter(i => i.team_exercises?.includes(id)),
   getExerciseVariables: id => entities('variables', state).filter(i => i.variable_exercise === id),
@@ -336,10 +321,6 @@ export const storeHelper = state => ({
   getExerciseReports: exerciseId => entities('reports', state).filter(l => l.report_exercise === exerciseId),
   // report
   getReport: id => entity(id, 'reports', state),
-  // dryrun
-  getDryrun: id => entity(id, 'dryruns', state),
-  getDryrunInjects: id => entities('dryinjects', state).filter(i => i.dryinject_dryrun === id),
-  getDryrunUsers: id => entities('users', state).filter(i => (entity(id, 'dryruns', state) || {}).dryrun_users?.includes(i.user_id)),
   // comcheck
   getComcheck: id => entity(id, 'comchecks', state),
   getComcheckStatus: id => entity(id, 'comcheckstatuses', state),

@@ -18,8 +18,6 @@ export const entitiesInitializer = Immutable({
     comcheckstatuses: Immutable({}),
     channelreaders: Immutable({}),
     challengesreaders: Immutable({}),
-    dryruns: Immutable({}),
-    dryinjects: Immutable({}),
     teams: Immutable({}),
     injects: Immutable({}),
     atomics: Immutable({}),

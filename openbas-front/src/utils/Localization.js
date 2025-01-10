@@ -218,7 +218,6 @@ const i18n = {
       'Scheduled': 'Planifié',
       'Finished': 'Terminé',
       'Execution': 'Exécution',
-      'Dryrun': 'Simulation',
       'Comcheck': 'Vérification',
       'Send': 'Envoyer',
       'Remove': 'Retirer',
@@ -297,8 +296,6 @@ const i18n = {
         'Aucune organisation dans cette plateforme.',
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
-      'Before starting the simulation, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        'Avant de démarrer la simulation, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l\'équipe d’animation.',
       'Apply a template': 'Appliquer un template',
       'Auto assign': 'Auto assignation',
       'Auto observer': 'Auto observateur',
@@ -428,11 +425,9 @@ const i18n = {
       'Controls': 'Contrôles',
       'Planning': 'Planification',
       'Comchecks': 'Vérifications',
-      'Dryruns': 'Simulations',
       'Messages header': 'En-tête des messages',
       'Messages footer': 'Pied des messages',
       'Send a new comcheck': 'Envoyer une nouvelle vérification',
-      'Launch a new dryrun': 'Démarrer une nouvelle simulation',
       'Hello': 'Bonjour',
       'Statistics': 'Statistiques',
       'Reports': 'Rapports',
@@ -446,8 +441,6 @@ const i18n = {
         '[${exercise.name}] Questionnaire de retour d\'expérience',
       'Best regards': 'Bien cordialement',
       'The simulation control team': 'L\'équipe d\'animation de la simulation',
-      'Do you want to launch a new dryrun?':
-        'Souhaitez-vous lancer une nouvelle simulation ?',
       'Add tags to this simulation': 'Ajouter des tags à cette simulation',
       'Add tags to this scenario': 'Ajouter des tags à ce scenario',
       'No comcheck in this simulation.': 'Aucune vérification dans cette simulation',
@@ -486,11 +479,8 @@ const i18n = {
       'of which': 'dont',
       'contain comments': 'contiennent des commentaires',
       'Verification done at': 'Vérification faite le',
-      'No dryrun in this simulation.': 'Aucune simulation dans cette simulation.',
       'No objectives in this simulation.': 'Aucun objectif dans cette simulation.',
       'There is no evaluation for this objective yet': 'Il n’y a pas encore d’évaluation pour cet objectif',
-      'Do you want to delete this dryrun?':
-        'Souhaitez-vous supprimer cette simulation ?',
       'Overall objectives score': 'Score global des objectifs',
       'Do you want to delete this poll?':
         'Souhaitez-vous supprimer ce sondage ?',
@@ -515,7 +505,6 @@ const i18n = {
       'Create a new poll': 'Créer un nouveau sondage',
       'Update the log': 'Modifier l\'entrée',
       'Create a new user': 'Créer un nouvel utilisateur',
-      'Dryrun recipients': 'Destinataires de la simulation',
       'Create a new report': 'Créer un nouveau rapport',
       'Update inject comment': 'Modifier le commentaire du stimuli',
       'Do you want to delete this report?':
@@ -1672,7 +1661,6 @@ const i18n = {
       'Scheduled': '已计划',
       'Finished': '已完成',
       'Execution': '执行',
-      'Dryrun': '运行中',
       'Comcheck': '通信检查',
       'Send': '发送',
       'Remove': '移除',
@@ -1755,8 +1743,6 @@ const i18n = {
         '平台中没有组织.',
       'No injects to send in this platform.':
         '平台中没有要发送的注入.',
-      'Before starting the simulation, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        '在开始模拟前,你可以启动一个通信检查来验证选手的邮箱地址并且使用运行发送注入到动作团队.',
       'Apply a template': '应用模板',
       'Auto assign': '自动分配',
       'Auto observer': '自动观察',
@@ -1882,11 +1868,9 @@ const i18n = {
       'Controls': '控制',
       'Planning': '计划',
       'Comchecks': '检查',
-      'Dryruns': '运行',
       'Messages header': '消息头',
       'Messages footer': '消息页脚',
       'Send a new comcheck': '发送新通信检查',
-      'Launch a new dryrun': '启动新运行',
       'Hello': '你好',
       'Statistics': '统计',
       'Reports': '报告',
@@ -1900,8 +1884,6 @@ const i18n = {
         '[${exercise.name}] 经验教训调查问卷',
       'Best regards': '此致',
       'The simulation control team': '模拟控制团队',
-      'Do you want to launch a new dryrun?':
-        '你想要启动新运行么?',
       'Add tags to this simulation': '添加标记到这个模拟',
       'Add tags to this scenario': '添加标记到这个场景',
       'No comcheck in this simulation.': '这个模拟没有通信检查',
@@ -1940,11 +1922,8 @@ const i18n = {
       'of which': '其中',
       'contain comments': '包含评论',
       'Verification done at': '核查在',
-      'No dryrun in this simulation.': '该模拟中没有运行.',
       'No objectives in this simulation.': '该模拟中没有目标.',
       'There is no evaluation for this objective yet': '该目标还没有评估',
-      'Do you want to delete this dryrun?':
-        '你想要删除这个运行么 ?',
       'Overall objectives score': '总体目标得分',
       'Do you want to delete this poll?':
         '是否要删除此投票?',
@@ -1969,7 +1948,6 @@ const i18n = {
       'Create a new poll': '创建新投票',
       'Update the log': '更新日志',
       'Create a new user': '创建新用户',
-      'Dryrun recipients': '运行接收者',
       'Create a new report': '创建新报告',
       'Update inject comment': '编辑刺激评论',
       'Do you want to delete this report?':
