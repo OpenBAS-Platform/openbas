@@ -106,22 +106,18 @@ public class InjectsExecutionJob implements Job {
               Injection source = executableInject.getInjection();
               Inject executingInject = null;
               InjectStatus injectRunningStatus = null;
-              if (source instanceof Inject) {
-                executingInject = injectRepository.findById(source.getId()).orElseThrow();
-                injectRunningStatus = executingInject.getStatus().orElseThrow();
-              }
+              executingInject = injectRepository.findById(source.getId()).orElseThrow();
+              injectRunningStatus = executingInject.getStatus().orElseThrow();
               try {
                 String jsonInject = mapper.writeValueAsString(executableInject);
                 queueService.publish(injectorContract.getInjector().getType(), jsonInject);
               } catch (Exception e) {
-                if (source instanceof Inject) {
-                  injectRunningStatus
-                      .getTraces()
-                      .add(InjectStatusExecution.traceError(e.getMessage()));
-                  injectStatusRepository.save(injectRunningStatus);
-                  executingInject.setUpdatedAt(now());
-                  injectRepository.save(executingInject);
-                }
+                injectRunningStatus
+                    .getTraces()
+                    .add(InjectStatusExecution.traceError(e.getMessage()));
+                injectStatusRepository.save(injectRunningStatus);
+                executingInject.setUpdatedAt(now());
+                injectRepository.save(executingInject);
               }
             });
   }
@@ -142,14 +138,12 @@ public class InjectsExecutionJob implements Job {
               // After execution, expectations are already created
               // Injection status is filled after complete execution
               // Report inject execution
-              if (source instanceof Inject) {
-                Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
-                InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
-                injectStatusRepository.save(completeStatus);
-                executedInject.setUpdatedAt(now());
-                executedInject.setStatus(completeStatus);
-                injectRepository.save(executedInject);
-              }
+              Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
+              InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
+              injectStatusRepository.save(completeStatus);
+              executedInject.setUpdatedAt(now());
+              executedInject.setStatus(completeStatus);
+              injectRepository.save(executedInject);
             });
   }
 
