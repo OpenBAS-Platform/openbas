@@ -9,6 +9,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -102,6 +103,23 @@ public class InjectorContractService {
     Long total = countQuery(cb, this.entityManager, InjectorContract.class, specificationCount);
 
     return new PageImpl<>(injectorContractOutputs, pageable, total);
+  }
+
+  public void deleteInjectorContract(final String injectorContractId) {
+    InjectorContract injectorContract =
+        this.injectorContractRepository
+            .findById(injectorContractId)
+            .orElseThrow(
+                () ->
+                    new ElementNotFoundException(
+                        "Injector contract not found: " + injectorContractId));
+    if (!injectorContract.getCustom()) {
+      throw new IllegalArgumentException(
+          "This injector contract can't be removed because is not a custom one: "
+              + injectorContractId);
+    } else {
+      this.injectorContractRepository.deleteById(injectorContractId);
+    }
   }
 
   // -- CRITERIA BUILDER --
