@@ -12,14 +12,11 @@ import io.openbas.database.model.Exercise;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.VariableService;
+import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -85,9 +82,10 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .get();
   }
 
+  @DisplayName("Given a valid simulation, the export file is found in zip and correct")
   @Test
   @WithMockAdminUser
-  public void test_export() throws Exception {
+  public void given_a_valid_simulation_the_export_file_is_found_in_zip_and_correct() throws Exception {
     byte[] response =
         mvc.perform(
                 get(EXERCISE_URI + "/" + EXERCISE.getId() + "/export")
@@ -98,7 +96,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getContentAsByteArray();
 
     String jsonExport =
-        getZipEntryAsStringFromByteArrayByName(response, "%s.json".formatted(EXERCISE.getName()));
+            ZipUtils.getZipEntryAsString(response, "%s.json".formatted(EXERCISE.getName()));
     ObjectMapper exportMapper = mapper.copy();
     JsonNode expectedJson =
         exportMapper.readTree(
@@ -109,28 +107,5 @@ public class ExerciseApiExportTest extends IntegrationTest {
     JsonNode actualJson = exportMapper.readTree(jsonExport);
 
     Assertions.assertEquals(expectedJson, actualJson);
-  }
-
-  // looks for a specific entry in a zip buffer by name, and returns a string representation of it
-  // ensure you are using this for text files within zips, not binary files
-  private String getZipEntryAsStringFromByteArrayByName(byte[] byteArray, String entryName)
-      throws IOException {
-    try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(byteArray))) {
-      ZipEntry entry;
-      while ((entry = zis.getNextEntry()) != null) {
-        if (entry.getName().equals(entryName)) {
-          StringBuilder sb = new StringBuilder();
-          byte[] buffer = new byte[1024];
-          int read = 0;
-          while ((read = zis.read(buffer, 0, 1024)) >= 0) {
-            sb.append(new String(buffer, 0, read));
-          }
-          // force exit of test since we have found the correct entry
-          return sb.toString();
-        }
-      }
-      // no zip entry corresponding to expected json
-      throw new IOException("Zip entry '%s' not found".formatted(entryName));
-    }
   }
 }

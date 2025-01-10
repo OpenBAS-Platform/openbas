@@ -17,7 +17,7 @@ public class TagComposer {
     }
 
     @Override
-    public InnerComposerBase<Tag> persist() {
+    public Composer persist() {
       tagRepository.save(tag);
       return this;
     }

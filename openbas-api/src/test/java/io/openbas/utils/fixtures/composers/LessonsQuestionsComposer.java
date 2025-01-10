@@ -18,7 +18,7 @@ public class LessonsQuestionsComposer {
     }
 
     @Override
-    public InnerComposerBase<LessonsQuestion> persist() {
+    public Composer persist() {
       lessonsQuestionRepository.save(lessonsQuestion);
       return this;
     }

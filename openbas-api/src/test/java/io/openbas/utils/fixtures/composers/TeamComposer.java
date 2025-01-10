@@ -1,10 +1,13 @@
 package io.openbas.utils.fixtures.composers;
 
+import io.openbas.database.model.Tag;
 import io.openbas.database.model.Team;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.TeamRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +18,7 @@ public class TeamComposer {
   public class Composer extends InnerComposerBase<Team> {
     private final Team team;
     private final List<UserComposer.Composer> userComposers = new ArrayList<>();
+    private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
 
     public Composer(Team team) {
       this.team = team;
@@ -28,9 +32,19 @@ public class TeamComposer {
       return this;
     }
 
+    public Composer withTag(TagComposer.Composer tagComposer) {
+      tagComposers.add(tagComposer);
+      this.tagComposers.add(tagComposer);
+      Set<Tag> tempTags = this.team.getTags();
+      tempTags.add(tagComposer.get());
+      this.team.setTags(tempTags);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       userComposers.forEach(UserComposer.Composer::persist);
+      tagComposers.forEach(TagComposer.Composer::persist);
       teamRepository.save(team);
       return this;
     }
