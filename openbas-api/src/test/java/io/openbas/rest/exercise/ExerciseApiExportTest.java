@@ -2,6 +2,7 @@ package io.openbas.rest.exercise;
 
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -9,13 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
-import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
-import static org.hamcrest.MatcherAssert.assertThat;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
@@ -47,48 +46,47 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Resource protected ObjectMapper mapper;
 
   private Exercise getExercise() {
-        return exerciseComposer
-            .forExercise(ExerciseFixture.createDefaultCrisisExercise())
-            .withArticle(
-                articleComposer
-                    .forArticle(ArticleFixture.getArticleNoChannel())
-                    .withChannel(channelComposer.forChannel(ChannelFixture.getChannel())))
-            .withLessonCategory(
-                lessonsCategoryComposer
-                    .forLessonsCategory(LessonsCategoryFixture.createLessonCategory())
-                    .withLessonsQuestion(
-                        lessonsQuestionsComposer.forLessonsQuestion(
-                            LessonsQuestionFixture.createLessonsQuestion())))
-            .withTeam(
-                teamComposer
-                    .forTeam(TeamFixture.getEmptyTeam())
-                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
-                    .withUser(
-                        userComposer
-                            .forUser(UserFixture.getUser())
-                            .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
-                            .withOrganization(
-                                organizationComposer
-                                    .forOrganization(OrganizationFixture.createOrganization())
-                                    .withTag(
-                                        tagComposer.forTag(
-                                            TagFixture.getTagWithText("Organization tag"))))))
-            .withInject(
-                injectComposer
-                    .forInject(InjectFixture.getInjectWithoutContract())
-                    .withChallenge(
-                        challengeComposer
-                            .forChallenge(ChallengeFixture.createDefaultChallenge())
-                            .withTag(
-                                tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
-            .withDocument(
-                documentComposer
-                    .forDocument(DocumentFixture.getDocumentJpeg())
-                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
-            .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
-            .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
-            .persist()
-            .get();
+    return exerciseComposer
+        .forExercise(ExerciseFixture.createDefaultCrisisExercise())
+        .withArticle(
+            articleComposer
+                .forArticle(ArticleFixture.getArticleNoChannel())
+                .withChannel(channelComposer.forChannel(ChannelFixture.getChannel())))
+        .withLessonCategory(
+            lessonsCategoryComposer
+                .forLessonsCategory(LessonsCategoryFixture.createLessonCategory())
+                .withLessonsQuestion(
+                    lessonsQuestionsComposer.forLessonsQuestion(
+                        LessonsQuestionFixture.createLessonsQuestion())))
+        .withTeam(
+            teamComposer
+                .forTeam(TeamFixture.getEmptyTeam())
+                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
+                .withUser(
+                    userComposer
+                        .forUser(UserFixture.getUser())
+                        .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
+                        .withOrganization(
+                            organizationComposer
+                                .forOrganization(OrganizationFixture.createOrganization())
+                                .withTag(
+                                    tagComposer.forTag(
+                                        TagFixture.getTagWithText("Organization tag"))))))
+        .withInject(
+            injectComposer
+                .forInject(InjectFixture.getInjectWithoutContract())
+                .withChallenge(
+                    challengeComposer
+                        .forChallenge(ChallengeFixture.createDefaultChallenge())
+                        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
+        .withDocument(
+            documentComposer
+                .forDocument(DocumentFixture.getDocumentJpeg())
+                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
+        .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
+        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
+        .persist()
+        .get();
   }
 
   @DisplayName("Given a valid simulation, the export file is found in zip and correct")
@@ -99,21 +97,18 @@ public class ExerciseApiExportTest extends IntegrationTest {
     Exercise ex = getExercise();
     byte[] response =
         mvc.perform(
-                get(EXERCISE_URI + "/" + ex.getId() + "/export")
-                    .accept(MediaType.APPLICATION_JSON))
+                get(EXERCISE_URI + "/" + ex.getId() + "/export").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().is2xxSuccessful())
             .andReturn()
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson =
-        ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
     ObjectMapper exportMapper = mapper.copy();
     String expectedJson =
-            exportMapper.writeValueAsString(
-                ExerciseFileExport.fromExercise(
-                        ex, exportMapper, variableService, challengeService)
-                    .withOptions(0));
+        exportMapper.writeValueAsString(
+            ExerciseFileExport.fromExercise(ex, exportMapper, variableService, challengeService)
+                .withOptions(0));
 
     assertThat(expectedJson, jsonEquals(actualJson));
   }

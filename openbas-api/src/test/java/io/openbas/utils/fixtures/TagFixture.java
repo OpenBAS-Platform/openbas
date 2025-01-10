@@ -1,7 +1,6 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Tag;
-
 import java.util.UUID;
 
 public class TagFixture {
