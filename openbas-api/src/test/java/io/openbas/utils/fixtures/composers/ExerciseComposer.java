@@ -22,9 +22,16 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
     private final List<ObjectiveComposer.Composer> objectiveComposers = new ArrayList<>();
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
     private final List<DocumentComposer.Composer> documentComposers = new ArrayList<>();
+    private final List<VariableComposer.Composer> variableComposers = new ArrayList<>();
 
     public Composer(Exercise exercise) {
       this.exercise = exercise;
+    }
+
+    public Composer withVariable(VariableComposer.Composer variableComposer) {
+      variableComposers.add(variableComposer);
+      variableComposer.get().setExercise(exercise);
+      return this;
     }
 
     public Composer withInject(InjectComposer.Composer injectComposer) {
@@ -93,6 +100,7 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       this.tagComposers.forEach(TagComposer.Composer::persist);
       this.documentComposers.forEach(DocumentComposer.Composer::persist);
       exerciseRepository.save(exercise);
+      this.variableComposers.forEach(VariableComposer.Composer::persist);
       return this;
     }
 

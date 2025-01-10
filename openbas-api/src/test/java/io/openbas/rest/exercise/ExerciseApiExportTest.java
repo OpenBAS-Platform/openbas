@@ -16,6 +16,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
+import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.ZipUtils;
@@ -41,6 +42,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private ChannelComposer channelComposer;
   @Autowired private LessonsQuestionsComposer lessonsQuestionsComposer;
   @Autowired private LessonsCategoryComposer lessonsCategoryComposer;
+  @Autowired private VariableComposer variableComposer;
   @Autowired private TeamComposer teamComposer;
   @Autowired private UserComposer userComposer;
   @Autowired private OrganizationComposer organizationComposer;
@@ -59,6 +61,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     lessonsCategoryComposer.reset();
     teamComposer.reset();
     userComposer.reset();
+    variableComposer.reset();
     organizationComposer.reset();
     injectComposer.reset();
     challengeComposer.reset();
@@ -111,6 +114,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
         .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
+        .withVariable(variableComposer.forVariable(VariableFixture.getVariable()))
         .persist()
         .get();
   }
@@ -290,6 +294,32 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .when(IGNORING_ARRAY_ORDER)
             .node("exercise_documents")
             .isEqualTo(documentJson);
+  }
+
+
+  @DisplayName("Given a valid simulation and default options, exported variables have no value")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_simulation_and_default_options_exported_variables_have_no_value() throws Exception {
+    ObjectMapper objectMapper = mapper.copy();
+    Exercise ex = getExercise();
+    byte[] response =
+            mvc.perform(
+                            get(EXERCISE_URI + "/" + ex.getId() + "/export").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsByteArray();
+
+    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+
+    objectMapper.addMixIn(Variable.class, VariableMixin.class);
+    String variableJson = objectMapper.writeValueAsString(variableComposer.generatedItems);
+
+    assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("exercise_variables")
+            .isEqualTo(variableJson);
   }
 
   @DisplayName("Given a valid simulation and default options, exported teams is empty array")
