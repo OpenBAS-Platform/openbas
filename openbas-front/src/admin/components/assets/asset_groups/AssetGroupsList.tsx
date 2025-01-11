@@ -75,10 +75,12 @@ const AssetGroupsList: FunctionComponent<Props> = ({
     },
   ], []);
 
+  const isLoading = loading && assetGroupIds.length > 0;
+
   return (
     <>
       {
-        loading
+        isLoading
           ? <ListLoader Icon={SelectGroup} headers={[]} headerStyles={inlineStyles} />
           : (
               <List>
