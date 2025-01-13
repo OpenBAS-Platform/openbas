@@ -6,8 +6,6 @@ import io.openbas.database.repository.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,16 +58,23 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       return this;
     }
 
-    // special composition that injects the currently set users in currently set teams as "ExerciseTeamUsers"
+    // special composition that injects the currently set users in currently set teams as
+    // "ExerciseTeamUsers"
     public Composer withTeamUsers() {
       List<ExerciseTeamUser> tempTeamUsers = new ArrayList<>();
-      this.exercise.getTeams().forEach(team -> team.getUsers().forEach(user -> {
-        ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
-        exerciseTeamUser.setExercise(exercise);
-        exerciseTeamUser.setUser(user);
-        exerciseTeamUser.setTeam(team);
-        tempTeamUsers.add(exerciseTeamUser);
-      }));
+      this.exercise
+          .getTeams()
+          .forEach(
+              team ->
+                  team.getUsers()
+                      .forEach(
+                          user -> {
+                            ExerciseTeamUser exerciseTeamUser = new ExerciseTeamUser();
+                            exerciseTeamUser.setExercise(exercise);
+                            exerciseTeamUser.setUser(user);
+                            exerciseTeamUser.setTeam(team);
+                            tempTeamUsers.add(exerciseTeamUser);
+                          }));
       this.exercise.setTeamUsers(tempTeamUsers);
       return this;
     }

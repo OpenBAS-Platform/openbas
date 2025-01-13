@@ -1,7 +1,6 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Variable;
-import java.util.UUID;
 
 public class VariableFixture {
   public static Variable getVariable() {
