@@ -116,6 +116,6 @@ public class InjectorContractApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @DeleteMapping("/api/injector_contracts/{injectorContractId}")
   public void deleteInjectorContract(@PathVariable String injectorContractId) {
-    injectorContractRepository.deleteById(injectorContractId);
+    this.injectorContractService.deleteInjectorContract(injectorContractId);
   }
 }
