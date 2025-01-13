@@ -116,13 +116,13 @@ const ResponsePie: FunctionComponent<Props> = ({
         {expectationResultsByType?.type === 'HUMAN_RESPONSE' && displayHumanValidationBtn && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Button
-            startIcon={<InfoOutlined />}
-            color="primary"
-            component={Link}
-            to={humanValidationLink}
-          >
-            {`${pending.length} ${t('validations needed')}`}
-          </Button>
+              startIcon={<InfoOutlined />}
+              color="primary"
+              component={Link}
+              to={humanValidationLink}
+            >
+              {`${pending.length} ${t('validations needed')}`}
+            </Button>
           </Box>
         )}
       </Grid>
