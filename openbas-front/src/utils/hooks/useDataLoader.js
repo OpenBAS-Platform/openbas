@@ -61,8 +61,8 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
         }
       }
     });
-    sseClient.addEventListener('ping', (event) => {
-      lastPingDate = event.data * 1000;
+    sseClient.addEventListener('ping', () => {
+      lastPingDate = new Date().getTime();
     });
     sseClient.onerror = () => {
       clearInterval(autoReConnect);
