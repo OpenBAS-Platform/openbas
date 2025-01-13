@@ -170,7 +170,7 @@ const CreateInjectDetails = ({
         inject_title: data.inject_title,
         inject_injector_contract: contractContent.contract_id,
         inject_description: data.inject_description,
-        inject_tags: data.inject_title,
+        inject_tags: data.inject_tags,
         inject_content: isEmptyField(finalData) ? null : finalData,
         inject_all_teams: allTeams,
         inject_teams: teamsIds,
