@@ -12,9 +12,6 @@
   ],
   "prConcurrentLimit": 2,
   "baseBranches": ["release/current", "master"],
-  "vulnerabilityAlerts": {
-    "baseBranches": []
-  },
   "packageRules": [
     {
       "matchUpdateTypes": [
