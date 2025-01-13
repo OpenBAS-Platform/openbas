@@ -12,7 +12,7 @@ import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import type { Theme } from '../../../../components/Theme';
-import type { Team, TeamOutput } from '../../../../utils/api-types';
+import type { TeamOutput } from '../../../../utils/api-types';
 import CreateTeam from '../../components/teams/CreateTeam';
 import { PermissionsContext, TeamContext } from '../Context';
 
