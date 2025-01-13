@@ -75,10 +75,12 @@ const EndpointsList: FunctionComponent<Props> = ({
     });
   }, [endpointIds]);
 
+  const isLoading = loading && endpointIds.length > 0;
+
   return (
     <>
       {
-        loading
+        isLoading
           ? <ListLoader Icon={DevicesOtherOutlined} headers={[]} headerStyles={inlineStyles} />
           : (
               <List>

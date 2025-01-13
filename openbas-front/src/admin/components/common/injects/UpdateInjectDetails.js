@@ -10,7 +10,6 @@ import { z } from 'zod';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { tagOptions } from '../../../../utils/Option';
 import { splitDuration } from '../../../../utils/Time';
 import { isEmptyField } from '../../../../utils/utils';
 import { PermissionsContext } from '../Context';
@@ -147,12 +146,11 @@ const UpdateInjectDetails = ({
       const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
         + data.inject_depends_duration_hours * 3600
         + data.inject_depends_duration_minutes * 60;
-      const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
       const values = {
         inject_title: data.inject_title,
         inject_injector_contract: contractContent.contract_id,
         inject_description: data.inject_description,
-        inject_tags,
+        inject_tags: data.inject_tags,
         inject_content: isEmptyField(finalData) ? null : finalData,
         inject_all_teams: allTeams,
         inject_teams: teamsIds,
@@ -171,7 +169,6 @@ const UpdateInjectDetails = ({
   const initialValues = {
     ...inject,
     ...inject?.inject_content,
-    inject_tags: tagOptions(inject?.inject_tags, tagsMap),
     inject_depends_duration_days: duration.days,
     inject_depends_duration_hours: duration.hours,
     inject_depends_duration_minutes: duration.minutes,
