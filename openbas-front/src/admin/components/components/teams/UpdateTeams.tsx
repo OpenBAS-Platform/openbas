@@ -135,7 +135,7 @@ const UpdateTeams: React.FC<Props> = ({
               buttonComponent={(
                 <CreateTeam
                   inline
-                  onCreate={team => setSelectedTeamValues([...selectedTeamValues, team])}
+                  onCreate={team => setSelectedTeamValues([...selectedTeamValues, team as TeamOutput])}
                 />
               )}
             />
