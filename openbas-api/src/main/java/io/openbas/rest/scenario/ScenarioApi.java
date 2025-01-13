@@ -151,7 +151,7 @@ public class ScenarioApi extends RestBehavior {
   }
 
   // -- TEAMS --
-
+  @LogExecutionTime
   @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public List<TeamOutput> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {

@@ -3391,9 +3391,13 @@ export interface TeamCreateInput {
 export interface TeamOutput {
   team_contextual?: boolean;
   team_description?: string;
+  /** @uniqueItems true */
+  team_exercises: string[];
   team_id: string;
   team_name: string;
   team_organization?: string;
+  /** @uniqueItems true */
+  team_scenarios: string[];
   /** @uniqueItems true */
   team_tags?: string[];
   /** @format date-time */
