@@ -14,6 +14,7 @@ import io.openbas.database.model.Tag;
 import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
+import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.VariableService;
 import io.openbas.utils.ZipUtils;
@@ -96,6 +97,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
                                 .withTag(
                                     tagComposer.forTag(
                                         TagFixture.getTagWithText("Organization tag"))))))
+        .withTeamUsers()
         .withInject(
             injectComposer
                 .forInject(InjectFixture.getInjectWithoutContract())
@@ -161,7 +163,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
         tagComposer.generatedItems.stream()
             .filter(
                 tag ->
-                    Arrays.asList("exercise tag", "document tag", "challenge tag", "inject tag")
+                    Arrays.asList("exercise tag", "document tag", "challenge tag", "inject tag", "organization tag")
                         .contains(tag.getName()))
             .toList();
     String tagsJson = objectMapper.writeValueAsString(expectedTags);
@@ -299,6 +301,32 @@ public class ExerciseApiExportTest extends IntegrationTest {
         .isEqualTo(documentJson);
   }
 
+  @DisplayName("Given a valid simulation and default options, exported exercise info are correct")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_simulation_and_default_options_exported_exercise_info_are_correct()
+          throws Exception {
+    ObjectMapper objectMapper = mapper.copy();
+    Exercise ex = getExercise();
+    byte[] response =
+            mvc.perform(
+                            get(EXERCISE_URI + "/" + ex.getId() + "/export").accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsByteArray();
+
+    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+
+    objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
+    String exerciseJson = objectMapper.writeValueAsString(ex);
+
+    assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("exercise_information")
+            .isEqualTo(exerciseJson);
+  }
+
   @DisplayName("Given a valid simulation and default options, exported variables have no value")
   @Test
   @WithMockAdminUser
@@ -325,6 +353,34 @@ public class ExerciseApiExportTest extends IntegrationTest {
         .isEqualTo(variableJson);
   }
 
+  @DisplayName("Given a valid simulation, given isWithVariableValues options, exported variables have values")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_simulation_given_isWithVariableValues_option_exported_variables_have_values()
+          throws Exception {
+    ObjectMapper objectMapper = mapper.copy();
+    Exercise ex = getExercise();
+    byte[] response =
+            mvc.perform(
+                            get(EXERCISE_URI + "/" + ex.getId() + "/export")
+                    .queryParam("isWithVariableValues", "true")
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsByteArray();
+
+    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+
+    objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
+    String variableJson = objectMapper.writeValueAsString(variableComposer.generatedItems);
+
+    assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("exercise_variables")
+            .isEqualTo(variableJson);
+  }
+
   @DisplayName("Given a valid simulation and default options, exported teams is empty array")
   @Test
   @WithMockAdminUser
@@ -342,6 +398,36 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
 
     assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_teams").isEqualTo("[]");
+  }
+
+  @DisplayName("Given a valid simulation, given isWithTeams and NOT isWithPlayers options, exported teams have empty users")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_simulation_given_isWithTeams_and_not_isWithPlayers_options_exported_teams_have_empty_users()
+          throws Exception {
+    ObjectMapper objectMapper = mapper.copy();
+    Exercise ex = getExercise();
+    byte[] response =
+            mvc.perform(
+                            get(EXERCISE_URI + "/" + ex.getId() + "/export")
+                                    .queryParam("isWithTeams", "true")
+                                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsByteArray();
+
+    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+
+    objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
+    String teamsJson = objectMapper.writeValueAsString(teamComposer.generatedItems);
+
+    assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("exercise_teams")
+            .isEqualTo(teamsJson);
+    // users still not included
+    assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_users").isAbsent();
   }
 
   @DisplayName("Given a valid simulation and default options, exported users is absent key")
@@ -363,6 +449,32 @@ public class ExerciseApiExportTest extends IntegrationTest {
     assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_users").isAbsent();
   }
 
+  @DisplayName("Given a valid simulation, given isWithPlayers and NOT isWithTeams option, exported users are correct")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_simulation_given_isWithPlayers_and_not_isWithTeams_options_exported_users_are_correct()
+          throws Exception {
+    ObjectMapper objectMapper = mapper.copy();
+    Exercise ex = getExercise();
+    byte[] response =
+            mvc.perform(
+                            get(EXERCISE_URI + "/" + ex.getId() + "/export")
+                                    .queryParam("isWithPlayers", "true")
+                                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsByteArray();
+
+    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+
+    objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
+    String usersJson = objectMapper.writeValueAsString(userComposer.generatedItems);
+
+    assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_users").isEqualTo(usersJson);
+    assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_teams").isEqualTo("[]");
+  }
+
   @DisplayName("Given a valid simulation and default options, exported organisations is absent key")
   @Test
   @WithMockAdminUser
@@ -380,5 +492,30 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
 
     assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_users").isAbsent();
+  }
+
+  @DisplayName("Given a valid simulation, given isWithPlayers option, exported organisations are correct")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_simulation_given_isWithPlayers_option_exported_organisations_are_correct()
+          throws Exception {
+    ObjectMapper objectMapper = mapper.copy();
+    Exercise ex = getExercise();
+    byte[] response =
+            mvc.perform(
+            get(EXERCISE_URI + "/" + ex.getId() + "/export")
+                    .queryParam("isWithPlayers", "true")
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsByteArray();
+
+    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+
+    objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
+    String orgJson = objectMapper.writeValueAsString(organizationComposer.generatedItems);
+
+    assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_organizations").isEqualTo(orgJson);
   }
 }
