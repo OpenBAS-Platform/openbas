@@ -40,8 +40,6 @@ public class InjectorService {
 
   private AttackPatternRepository attackPatternRepository;
 
-  private PayloadService payloadService;
-
   @Resource
   public void setFileService(FileService fileService) {
     this.fileService = fileService;
@@ -60,11 +58,6 @@ public class InjectorService {
   @Autowired
   public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
     this.injectorContractRepository = injectorContractRepository;
-  }
-
-  @Autowired
-  public void setPayloadService(PayloadService payloadService) {
-    this.payloadService = payloadService;
   }
 
   @Transactional
@@ -102,7 +95,7 @@ public class InjectorService {
       }
     }
     // Check error to avoid changing ID
-    List<Contract> contracts = contractor.contracts();
+    List<Contract> contractSTATIQUE = contractor.contracts();
     if (injector != null) {
       injector.setName(name);
       injector.setExternal(false);
@@ -119,43 +112,53 @@ public class InjectorService {
       injector
           .getContracts()
           .forEach(
-              contract -> {
+              contractDB -> {
+
+                // Contractor -> code static
+                // Injector -> code DB
+
+                // 1. contrat statique a changé
+                // 2. contrat dynamique a changé
                 Optional<Contract> current =
-                    contracts.stream().filter(c -> c.getId().equals(contract.getId())).findFirst();
+                    contractSTATIQUE.stream()
+                        .filter(cSTATIQUE -> cSTATIQUE.getId().equals(contractDB.getId()))
+                        .findFirst();
                 if (current.isPresent()) {
-                  existing.add(contract.getId());
-                  contract.setManual(current.get().isManual());
-                  contract.setAtomicTesting(current.get().isAtomicTesting());
-                  contract.setPlatforms(current.get().getPlatforms().toArray(new PLATFORM_TYPE[0]));
-                  contract.setNeedsExecutor(current.get().isNeedsExecutor());
+                  existing.add(contractDB.getId());
+                  contractDB.setManual(current.get().isManual());
+                  contractDB.setAtomicTesting(current.get().isAtomicTesting());
+                  contractDB.setPlatforms(
+                      current.get().getPlatforms().toArray(new PLATFORM_TYPE[0]));
+                  contractDB.setNeedsExecutor(current.get().isNeedsExecutor());
                   Map<String, String> labels =
                       current.get().getLabel().entrySet().stream()
                           .collect(
                               Collectors.toMap(e -> e.getKey().toString(), Map.Entry::getValue));
-                  contract.setLabels(labels);
+                  contractDB.setLabels(labels);
                   // If no override of TTPs, retrieve those of the contract
-                  if (contract.getAttackPatterns().isEmpty()) {
+                  if (contractDB.getAttackPatterns().isEmpty()) {
                     if (!current.get().getAttackPatternsExternalIds().isEmpty()) {
                       List<AttackPattern> attackPatterns =
                           fromIterable(
                               attackPatternRepository.findAllByExternalIdInIgnoreCase(
                                   current.get().getAttackPatternsExternalIds()));
-                      contract.setAttackPatterns(attackPatterns);
+                      contractDB.setAttackPatterns(attackPatterns);
                     }
                   }
                   try {
-                    contract.setContent(mapper.writeValueAsString(current.get()));
+                    contractDB.setContent(mapper.writeValueAsString(current.get()));
                   } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                   }
-                  toUpdates.add(contract);
-                } else if (!contract.getCustom()
-                    && (!injector.isPayloads() || contract.getPayload() == null)) {
-                  toDeletes.add(contract.getId());
+                  toUpdates.add(contractDB);
+                  // pas custom && (pas de payloads OU payload est null)
+                } else if (!contractDB.getCustom()
+                    && (!injector.isPayloads() || contractDB.getPayload() == null)) {
+                  toDeletes.add(contractDB.getId());
                 }
               });
       List<InjectorContract> toCreates =
-          contracts.stream()
+          contractSTATIQUE.stream()
               .filter(c -> !existing.contains(c.getId()))
               .map(
                   in -> {
@@ -206,7 +209,7 @@ public class InjectorService {
       Injector savedInjector = injectorRepository.save(newInjector);
       // Save the contracts
       List<InjectorContract> injectorContracts =
-          contracts.stream()
+          contractSTATIQUE.stream()
               .map(
                   in -> {
                     InjectorContract injectorContract = new InjectorContract();

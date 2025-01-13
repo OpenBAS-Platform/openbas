@@ -2,11 +2,11 @@ package io.openbas.injectors.caldera.service;
 
 import static java.time.Instant.now;
 
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.injectors.caldera.client.CalderaInjectorClient;
 import io.openbas.injectors.caldera.client.model.Agent;
+import io.openbas.service.EndpointService;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;

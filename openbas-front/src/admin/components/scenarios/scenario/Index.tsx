@@ -5,7 +5,6 @@ import cronstrue from 'cronstrue';
 import { FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -15,6 +14,7 @@ import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
+import { Scenario } from '../../../../utils/api-types';
 import { parseCron, ParsedCron } from '../../../../utils/Cron';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -23,7 +23,7 @@ import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext
 import injectContextForScenario from './ScenarioContext';
 import ScenarioHeader from './ScenarioHeader';
 
-const Scenario = lazy(() => import('./Scenario'));
+const ScenarioComponent = lazy(() => import('./Scenario'));
 const ScenarioDefinition = lazy(() => import('./ScenarioDefinition'));
 const Injects = lazy(() => import('./injects/ScenarioInjects'));
 const Tests = lazy(() => import('./tests/ScenarioTests'));
@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = ({
+const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({
   scenario,
 }) => {
   const { t, ft, locale, fld } = useFormatter();
@@ -69,7 +69,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
   const [selectRecurring, setSelectRecurring] = useState('noRepeat');
   const [cronExpression, setCronExpression] = useState<string | null>(scenario.scenario_recurrence || null);
   const [parsedCronExpression, setParsedCronExpression] = useState<ParsedCron | null>(scenario.scenario_recurrence ? parseCron(scenario.scenario_recurrence) : null);
-  const noRepeat = scenario.scenario_recurrence_end && scenario.scenario_recurrence_start
+  const noRepeat = !!scenario.scenario_recurrence_end && !!scenario.scenario_recurrence_start
     && new Date(scenario.scenario_recurrence_end).getTime() - new Date(scenario.scenario_recurrence_start).getTime() <= _MS_PER_DAY
     && ['noRepeat', 'daily'].includes(selectRecurring);
   const getHumanReadableScheduling = () => {
@@ -179,7 +179,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: ScenarioStore }> = (
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="" element={errorWrapper(Scenario)({ setOpenInstantiateSimulationAndStart })} />
+              <Route path="" element={errorWrapper(ScenarioComponent)({ setOpenInstantiateSimulationAndStart })} />
               <Route path="definition" element={errorWrapper(ScenarioDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
@@ -201,7 +201,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const { t } = useFormatter();
   // Fetching data
-  const { scenarioId } = useParams() as { scenarioId: ScenarioStore['scenario_id'] };
+  const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const scenario = useHelper((helper: ScenariosHelper) => helper.getScenario(scenarioId));
   useDataLoader(() => {
     setLoading(true);

@@ -1,13 +1,12 @@
 import { Box, Button, Chip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useEffect, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
 import mitreAttack from '../../../../static/images/misc/attack.png';
-import type { Filter, PropertySchemaDTO, SearchPaginationInput } from '../../../../utils/api-types';
+import type { AttackPattern, Filter, PropertySchemaDTO, SearchPaginationInput } from '../../../../utils/api-types';
 import { useFormatter } from '../../../i18n';
 import ClickableModeChip from '../../chips/ClickableModeChip';
 import Drawer from '../../Drawer';
@@ -48,7 +47,7 @@ interface Props<T> {
   availableFilterNames?: string[];
   queryableHelpers: QueryableHelpers;
   topBarButtons?: React.ReactElement | null;
-  attackPatterns?: AttackPatternStore[];
+  attackPatterns?: AttackPattern[];
   reloadContentCount?: number;
 }
 
@@ -108,7 +107,7 @@ const PaginationComponentV2 = <T extends object>({
       (f: Filter) => f.key === MITRE_FILTER_KEY,
     )?.[0]?.values?.map(
       (externalId: string) => attackPatterns?.find(
-        (a: AttackPatternStore) => a.attack_pattern_external_id === externalId,
+        (a: AttackPattern) => a.attack_pattern_external_id === externalId,
       )?.attack_pattern_name,
     );
   };

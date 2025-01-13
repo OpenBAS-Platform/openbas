@@ -1,5 +1,5 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
+import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import { findEndpoints } from '../../../../actions/assets/endpoint-actions';
 import ListLoader from '../../../../components/common/loader/ListLoader';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { Endpoint } from '../../../../utils/api-types';
+import { EndpointOutput, EndpointOverviewOutput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -47,7 +47,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
 };
 
-export type EndpointStoreWithType = Endpoint & { type: string };
+export type EndpointStoreWithType = EndpointOutput & EndpointOverviewOutput & { type: string };
 
 interface Props {
   endpointIds: string[];
@@ -61,12 +61,12 @@ const EndpointsList: FunctionComponent<Props> = ({
   // Standard hooks
   const classes = useStyles();
 
-  const component = (endpoint: Endpoint) => {
+  const component = (endpoint: EndpointOutput) => {
     return React.cloneElement(actions as React.ReactElement, { endpoint });
   };
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [endpointValues, setEndpointValues] = useState<Endpoint[]>([]);
+  const [endpointValues, setEndpointValues] = useState<EndpointOutput[]>([]);
   useEffect(() => {
     setLoading(true);
     findEndpoints(endpointIds).then((result) => {
@@ -75,10 +75,12 @@ const EndpointsList: FunctionComponent<Props> = ({
     });
   }, [endpointIds]);
 
+  const isLoading = loading && endpointIds.length > 0;
+
   return (
     <>
       {
-        loading
+        isLoading
           ? <ListLoader Icon={DevicesOtherOutlined} headers={[]} headerStyles={inlineStyles} />
           : (
               <List>
@@ -88,6 +90,7 @@ const EndpointsList: FunctionComponent<Props> = ({
                       key={endpoint.asset_id}
                       classes={{ root: classes.item }}
                       divider={true}
+                      secondaryAction={component(endpoint)}
                     >
                       <ListItemIcon>
                         <DevicesOtherOutlined color="primary" />
@@ -130,9 +133,6 @@ const EndpointsList: FunctionComponent<Props> = ({
                           </>
                         )}
                       />
-                      <ListItemSecondaryAction>
-                        {component(endpoint)}
-                      </ListItemSecondaryAction>
                     </ListItem>
                   );
                 })}

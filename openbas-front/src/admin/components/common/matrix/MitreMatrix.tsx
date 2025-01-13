@@ -2,12 +2,10 @@ import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import type { InjectExpectationResultsByAttackPatternStore } from '../../../../actions/exercises/Exercise';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { useHelper } from '../../../../store';
-import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
+import type { AttackPattern, InjectExpectationResultsByAttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
 import MitreMatrixDummy from './MitreMatrixDummy';
 
@@ -24,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 interface Props {
   goToLink?: string;
-  injectResults: InjectExpectationResultsByAttackPatternStore[];
+  injectResults: InjectExpectationResultsByAttackPattern[];
 }
 
 const MitreMatrix: FunctionComponent<Props> = ({
@@ -52,10 +50,10 @@ const MitreMatrix: FunctionComponent<Props> = ({
       .filter(injectResult => !!injectResult.inject_attack_pattern)
       .flatMap(injectResult => injectResult.inject_attack_pattern) as unknown as string[],
   );
-  const resultAttackPatterns: AttackPatternStore[] = resultAttackPatternIds.map((attackPatternId: string) => attackPatternMap[attackPatternId])
+  const resultAttackPatterns: AttackPattern[] = resultAttackPatternIds.map((attackPatternId: string) => attackPatternMap[attackPatternId])
     .filter((attackPattern: AttackPattern) => !!attackPattern);
   const getAttackPatterns = (killChainPhase: KillChainPhase) => {
-    return resultAttackPatterns.filter((attackPattern: AttackPatternStore) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id));
+    return resultAttackPatterns.filter((attackPattern: AttackPattern) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id));
   };
   // Kill Chain Phase
   const resultKillChainPhases = R.uniq(resultAttackPatterns

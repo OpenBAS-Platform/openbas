@@ -6,8 +6,12 @@ import io.openbas.database.model.Base;
 import io.openbas.utils.schema.PropertySchema;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 public class JpaUtils {
 
@@ -106,5 +110,34 @@ public class JpaUtils {
       CriteriaBuilder cb, Root<X> root, String attributeName) {
     Join<X, Y> join = createLeftJoin(root, attributeName);
     return arrayAggOnId((HibernateCriteriaBuilder) cb, join);
+  }
+
+  /**
+   * Create a "in" specification for searches
+   *
+   * @param fieldName the JPA field on which the in rule is based
+   * @param inValues the values to include in the search for given field
+   * @param <T> the data type of the specification (usually a JPA entity)
+   * @return the built JPA Specification
+   */
+  public static <T> Specification<T> computeIn(
+      @Nullable final String fieldName, @Nullable final List<String> inValues) {
+    if (!hasText(fieldName) || CollectionUtils.isEmpty(inValues)) {
+      return Specification.where(null);
+    }
+    return (root, query, cb) -> root.get(fieldName).in(inValues);
+  }
+
+  /**
+   * Create a "not in" specification for searches
+   *
+   * @param fieldName the JPA field on which the exclusion rule is based
+   * @param excludedValues the values to exclude from the search in given field
+   * @param <T> the data type of the specification (usually a JPA entity)
+   * @return the built JPA Specification
+   */
+  public static <T> Specification<T> computeNotIn(
+      @Nullable final String fieldName, @Nullable final List<String> excludedValues) {
+    return Specification.not(computeIn(fieldName, excludedValues));
   }
 }

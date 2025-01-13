@@ -12,15 +12,12 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.asset.AssetGroupService;
-import io.openbas.asset.EndpointService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.PayloadCommandBlock;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
-import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.injectors.caldera.client.model.Ability;
 import io.openbas.injectors.caldera.client.model.Agent;
 import io.openbas.injectors.caldera.client.model.ExploitResult;
@@ -31,6 +28,9 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.service.AssetGroupService;
+import io.openbas.service.EndpointService;
+import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -62,7 +62,10 @@ public class CalderaExecutor extends Injector {
       @NotNull final Execution execution, @NotNull final ExecutableInject injection)
       throws Exception {
     CalderaInjectContent content = contentConvert(injection, CalderaInjectContent.class);
-    String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "base64";
+    String obfuscator =
+        content.getObfuscator() != null
+            ? content.getObfuscator()
+            : CalderaInjectContent.getDefaultObfuscator();
     Inject inject =
         this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
 
@@ -133,18 +136,25 @@ public class CalderaExecutor extends Injector {
                           String result =
                               this.calderaService.exploit(
                                   obfuscator,
-                                  executionEndpoint.getExternalReference(),
+                                  executionEndpoint.getAgents().getFirst().getExternalReference(),
                                   contract,
                                   additionalFields);
                           if (result.contains("complete")) {
                             ExploitResult exploitResult =
                                 this.calderaService.exploitResult(
-                                    executionEndpoint.getExternalReference(), contract);
+                                    executionEndpoint.getAgents().getFirst().getExternalReference(),
+                                    contract);
                             asyncIds.add(exploitResult.getLinkId());
                             execution.addTrace(
                                 traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
                             // Compute expectations
-                            boolean isInGroup = assets.get(executionEndpoint.getParent());
+                            boolean isInGroup =
+                                assets.get(
+                                    executionEndpoint
+                                        .getAgents()
+                                        .getFirst()
+                                        .getParent()
+                                        .getAsset());
                             List<InjectExpectationSignature> injectExpectationSignatures =
                                 new ArrayList<>();
                             if (injectorContract.getPayload() != null) {
@@ -153,7 +163,11 @@ public class CalderaExecutor extends Injector {
                                   injectExpectationSignatures.add(
                                       InjectExpectationSignature.builder()
                                           .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                                          .value(executionEndpoint.getProcessName())
+                                          .value(
+                                              executionEndpoint
+                                                  .getAgents()
+                                                  .getFirst()
+                                                  .getProcessName())
                                           .build());
                                   break;
                                 case PayloadType.EXECUTABLE:
@@ -198,13 +212,14 @@ public class CalderaExecutor extends Injector {
                               injectExpectationSignatures.add(
                                   InjectExpectationSignature.builder()
                                       .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                                      .value(executionEndpoint.getProcessName())
+                                      .value(
+                                          executionEndpoint.getAgents().getFirst().getProcessName())
                                       .build());
                             }
                             computeExpectationsForAsset(
                                 expectations,
                                 content,
-                                executionEndpoint.getParent(),
+                                executionEndpoint.getAgents().getFirst().getParent().getAsset(),
                                 isInGroup,
                                 injectExpectationSignatures);
                             execution.addTrace(
@@ -212,9 +227,12 @@ public class CalderaExecutor extends Injector {
                                     "Caldera executed the ability on asset "
                                         + asset.getName()
                                         + " using "
-                                        + executionEndpoint.getProcessName()
+                                        + executionEndpoint.getAgents().getFirst().getProcessName()
                                         + " (paw: "
-                                        + executionEndpoint.getExternalReference()
+                                        + executionEndpoint
+                                            .getAgents()
+                                            .getFirst()
+                                            .getExternalReference()
                                         + ", linkID: "
                                         + exploitResult.getLinkId()
                                         + ")"));
@@ -350,7 +368,7 @@ public class CalderaExecutor extends Injector {
                       agent.getExe_name().contains("implant")
                           && (now().toEpochMilli()
                                   - Time.toInstant(agent.getCreated()).toEpochMilli())
-                              < Asset.ACTIVE_THRESHOLD
+                              < io.openbas.database.model.Agent.ACTIVE_THRESHOLD
                           && (agent.getHost().equals(assetEndpoint.getHostname())
                               || agent
                                   .getHost()
@@ -370,16 +388,22 @@ public class CalderaExecutor extends Injector {
           if (resolvedExistingEndpoint.isEmpty()) {
             log.log(Level.INFO, "Agent found and not present in the database, creating it...");
             Endpoint newEndpoint = new Endpoint();
-            newEndpoint.setInject(inject);
-            newEndpoint.setParent(asset);
+            io.openbas.database.model.Agent newAgent = new io.openbas.database.model.Agent();
+            newAgent.setInject(inject);
+            newAgent.setParent(assetEndpoint.getAgents().getFirst());
             newEndpoint.setName(assetEndpoint.getName());
             newEndpoint.setIps(assetEndpoint.getIps());
             newEndpoint.setHostname(assetEndpoint.getHostname());
             newEndpoint.setPlatform(assetEndpoint.getPlatform());
             newEndpoint.setArch(assetEndpoint.getArch());
-            newEndpoint.setExternalReference(agent.getPaw());
-            newEndpoint.setExecutor(assetEndpoint.getExecutor());
-            newEndpoint.setProcessName(agent.getExe_name());
+            newAgent.setProcessName(agent.getExe_name());
+            newAgent.setExecutor(assetEndpoint.getExecutor());
+            newAgent.setExternalReference(agent.getPaw());
+            newAgent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
+            newAgent.setDeploymentMode(io.openbas.database.model.Agent.DEPLOYMENT_MODE.session);
+            newAgent.setExecutedByUser(agent.getUsername());
+            newAgent.setAsset(newEndpoint);
+            newEndpoint.setAgents(List.of(newAgent));
             endpointForExecution = this.endpointService.createEndpoint(newEndpoint);
             break;
           }

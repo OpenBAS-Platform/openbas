@@ -36,6 +36,8 @@ import org.hibernate.annotations.UuidGenerator;
 public class Inject implements Base, Injection {
 
   public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
+  public static final String ID_COLUMN_NAME = "inject_id";
+  public static final String ID_FIELD_NAME = "id";
 
   public static final Comparator<Inject> executionComparator =
       (o1, o2) -> {
@@ -47,7 +49,7 @@ public class Inject implements Base, Injection {
 
   @Getter
   @Id
-  @Column(name = "inject_id")
+  @Column(name = ID_COLUMN_NAME)
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
   @JsonProperty("inject_id")
@@ -358,15 +360,6 @@ public class Inject implements Base, Injection {
         .toList();
   }
 
-  @JsonIgnore
-  public DryInject toDryInject(Dryrun run) {
-    DryInject dryInject = new DryInject();
-    dryInject.setRun(run);
-    dryInject.setInject(this);
-    dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
-    return dryInject;
-  }
-
   @JsonProperty("inject_communications_number")
   public long getCommunicationsNumber() {
     return this.getCommunications().size();
@@ -562,7 +555,7 @@ public class Inject implements Base, Injection {
     }
 
     // We add the teams to the inject
-    ArrayList<Team> injectTeams = new ArrayList();
+    ArrayList<Team> injectTeams = new ArrayList<>();
     for (String injectTeamId : rawInject.getInject_teams()) {
       Team team = new Team();
       team.setId(rawTeams.get(injectTeamId).getTeam_id());
@@ -572,7 +565,7 @@ public class Inject implements Base, Injection {
     inject.setTeams(injectTeams);
 
     // We add the assets to the inject
-    ArrayList<Asset> injectAssets = new ArrayList();
+    ArrayList<Asset> injectAssets = new ArrayList<>();
     for (String injectAssetId : rawInject.getInject_assets()) {
       RawAsset rawAsset = mapOfAsset.get(injectAssetId);
 
@@ -597,7 +590,7 @@ public class Inject implements Base, Injection {
     inject.setAssets(injectAssets);
 
     // Add the asset groups to the inject
-    ArrayList<AssetGroup> injectAssetGroups = new ArrayList();
+    ArrayList<AssetGroup> injectAssetGroups = new ArrayList<>();
     for (String injectAssetGroupId : rawInject.getInject_asset_groups()) {
       Optional<RawAssetGroup> rawAssetGroup =
           Optional.ofNullable(mapOfAssetGroups.get(injectAssetGroupId));

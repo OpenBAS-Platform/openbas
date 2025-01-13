@@ -1,17 +1,18 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined, HighlightOffOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, IconButton } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import arrayMutators from 'final-form-arrays';
 import * as R from 'ramda';
-import { useContext, useState } from 'react';
-import { Form } from 'react-final-form';
+import { useContext, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { isEmptyField, isNotEmptyField } from '../../../../utils/utils';
 import { PermissionsContext } from '../Context';
-import InjectDefinition from './InjectDefinition';
-import InjectForm from './InjectForm';
+import InjectDefinition from './form/InjectDefinition';
+import InjectForm from './form/InjectForm';
 import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles(theme => ({
@@ -79,6 +80,7 @@ const CreateInjectDetails = ({
   const classes = useStyles();
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(false);
+  const [defaultValues, setDefaultValues] = useState({});
   const [injectDetailsState, setInjectDetailsState] = useState({});
 
   const { tagsMap } = useHelper(helper => ({
@@ -92,21 +94,7 @@ const CreateInjectDetails = ({
       setOpenDetails(true);
     }
   };
-  const validate = (values) => {
-    const errors = {};
-    const requiredFields = [
-      'inject_title',
-      'inject_depends_duration_days',
-      'inject_depends_duration_hours',
-      'inject_depends_duration_minutes',
-    ];
-    requiredFields.forEach((field) => {
-      if (R.isNil(values[field])) {
-        errors[field] = t('This field is required.');
-      }
-    });
-    return errors;
-  };
+
   const onSubmit = async (data) => {
     if (contractContent) {
       const finalData = {};
@@ -178,12 +166,11 @@ const CreateInjectDetails = ({
       const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
         + data.inject_depends_duration_hours * 3600
         + data.inject_depends_duration_minutes * 60;
-      const inject_tags = !R.isEmpty(data.inject_tags) ? R.pluck('id', data.inject_tags) : [];
       const values = {
         inject_title: data.inject_title,
         inject_injector_contract: contractContent.contract_id,
         inject_description: data.inject_description,
-        inject_tags,
+        inject_tags: data.inject_title,
         inject_content: isEmptyField(finalData) ? null : finalData,
         inject_all_teams: allTeams,
         inject_teams: teamsIds,
@@ -196,96 +183,132 @@ const CreateInjectDetails = ({
     }
     handleClose();
   };
-  const initialValues = {
-    inject_title: contractContent ? tPick(contractContent.label) : '',
-    inject_tags: [],
-    inject_depends_duration_days: presetValues?.inject_depends_duration_days ?? 0,
-    inject_depends_duration_hours: presetValues?.inject_depends_duration_hours ?? 0,
-    inject_depends_duration_minutes: presetValues?.inject_depends_duration_minutes ?? 0,
-  };
-  // Enrich initialValues with default contract value
-  if (contractContent) {
-    const builtInFields = [
-      'teams',
-      'assets',
-      'assetgroups',
-      'articles',
-      'challenges',
-      'attachments',
-      'expectations',
-    ];
-    contractContent.fields
-      .filter(f => !builtInFields.includes(f.key))
-      .forEach((field) => {
-        if (!initialValues[field.key]) {
-          if (field.cardinality && field.cardinality === '1') {
-            initialValues[field.key] = R.head(field.defaultValue);
-          } else {
-            initialValues[field.key] = field.defaultValue;
-          }
-        }
-      });
-    // Specific processing for some fields
-    contractContent.fields
-      .filter(f => !builtInFields.includes(f.key))
-      .forEach((field) => {
-        if (
-          field.type === 'textarea'
-          && field.richText
-          && initialValues[field.key]
-          && initialValues[field.key].length > 0
-        ) {
-          initialValues[field.key] = initialValues[field.key]
-            .replaceAll(
-              '<#list challenges as challenge>',
-              '&lt;#list challenges as challenge&gt;',
-            )
-            .replaceAll(
-              '<#list articles as article>',
-              '&lt;#list articles as article&gt;',
-            )
-            .replaceAll('</#list>', '&lt;/#list&gt;');
-        } else if (field.type === 'tuple' && initialValues[field.key]) {
-          if (field.cardinality && field.cardinality === '1') {
-            if (
-              initialValues[field.key].value
-              && initialValues[field.key].value.includes(
-                `${field.tupleFilePrefix}`,
-              )
-            ) {
-              initialValues[field.key] = {
-                type: 'attachment',
-                key: initialValues[field.key].key,
-                value: initialValues[field.key].value.replace(
-                  `${field.tupleFilePrefix}`,
-                  '',
-                ),
-              };
+
+  const getInitialValues = () => {
+    const initialValues = {
+      inject_title: contractContent ? tPick(contractContent.label) : '',
+      inject_tags: [],
+      inject_depends_duration_days: presetValues?.inject_depends_duration_days ?? 0,
+      inject_depends_duration_hours: presetValues?.inject_depends_duration_hours ?? 0,
+      inject_depends_duration_minutes: presetValues?.inject_depends_duration_minutes ?? 0,
+    };
+    // Enrich initialValues with default contract value
+    if (contractContent) {
+      const builtInFields = [
+        'teams',
+        'assets',
+        'assetgroups',
+        'articles',
+        'challenges',
+        'attachments',
+        'expectations',
+      ];
+      contractContent.fields
+        .filter(f => !builtInFields.includes(f.key))
+        .forEach((field) => {
+          if (!initialValues[field.key]) {
+            if (field.cardinality && field.cardinality === '1') {
+              initialValues[field.key] = R.head(field.defaultValue);
             } else {
-              initialValues[field.key] = R.assoc(
-                'type',
-                'text',
-                initialValues[field.key],
-              );
+              initialValues[field.key] = field.defaultValue;
             }
-          } else {
-            initialValues[field.key] = initialValues[field.key].map((pair) => {
-              if (
-                pair.value
-                && pair.value.includes(`${field.tupleFilePrefix}`)
-              ) {
-                return {
-                  type: 'attachment',
-                  key: pair.key,
-                  value: pair.value.replace(`${field.tupleFilePrefix}`, ''),
-                };
-              }
-              return R.assoc('type', 'text', pair);
-            });
           }
-        }
-      });
-  }
+        });
+      // Specific processing for some fields
+      contractContent.fields
+        .filter(f => !builtInFields.includes(f.key))
+        .forEach((field) => {
+          if (
+            field.type === 'textarea'
+            && field.richText
+            && initialValues[field.key]
+            && initialValues[field.key].length > 0
+          ) {
+            initialValues[field.key] = initialValues[field.key]
+              .replaceAll(
+                '<#list challenges as challenge>',
+                '&lt;#list challenges as challenge&gt;',
+              )
+              .replaceAll(
+                '<#list articles as article>',
+                '&lt;#list articles as article&gt;',
+              )
+              .replaceAll('</#list>', '&lt;/#list&gt;');
+          } else if (field.type === 'tuple' && initialValues[field.key]) {
+            if (field.cardinality && field.cardinality === '1') {
+              if (
+                initialValues[field.key].value
+                && initialValues[field.key].value.includes(
+                  `${field.tupleFilePrefix}`,
+                )
+              ) {
+                initialValues[field.key] = {
+                  type: 'attachment',
+                  key: initialValues[field.key].key,
+                  value: initialValues[field.key].value.replace(
+                    `${field.tupleFilePrefix}`,
+                    '',
+                  ),
+                };
+              } else {
+                initialValues[field.key] = R.assoc(
+                  'type',
+                  'text',
+                  initialValues[field.key],
+                );
+              }
+            } else {
+              initialValues[field.key] = initialValues[field.key].map((pair) => {
+                if (
+                  pair.value
+                  && pair.value.includes(`${field.tupleFilePrefix}`)
+                ) {
+                  return {
+                    type: 'attachment',
+                    key: pair.key,
+                    value: pair.value.replace(`${field.tupleFilePrefix}`, ''),
+                  };
+                }
+                return R.assoc('type', 'text', pair);
+              });
+            }
+          }
+        });
+    }
+
+    return initialValues;
+  };
+
+  const {
+    reset,
+    control,
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    mode: 'onTouched',
+    resolver: zodResolver(
+      z.object({
+        inject_title: z.string().min(1, { message: t('This field is required.') }),
+        inject_depends_duration_days: z.number().int().min(0, { message: t('This field is required.') }),
+        inject_depends_duration_hours: z.number().int().min(0, { message: t('This field is required.') }),
+        inject_depends_duration_minutes: z.number().int().min(0, { message: t('This field is required.') }),
+        ...Object.keys(defaultValues).reduce((acc, key) => {
+          acc[key] = z.any();
+          return acc;
+        }, {}),
+      })),
+    defaultValues: getInitialValues(),
+  });
+
+  useEffect(() => {
+    const initialValues = getInitialValues();
+    setDefaultValues(initialValues);
+    reset(initialValues, { keepDirtyValues: true });
+  }, [contractContent, presetValues]);
+
   return (
     <>
       <Card elevation={0} classes={{ root: contractContent ? classes.injectorContract : classes.injectorContractDisabled }}>
@@ -294,12 +317,12 @@ const CreateInjectDetails = ({
           avatar={contractContent ? (
             <InjectIcon
               type={
-                contract.injector_contract_payload
-                  ? contract.injector_contract_payload?.payload_collector_type
-                  || contract.injector_contract_payload?.payload_type
-                  : contract.injector_contract_injector_type
+                contract?.injector_contract_payload
+                  ? contract?.injector_contract_payload?.payload_collector_type
+                  || contract?.injector_contract_payload?.payload_type
+                  : contract?.injector_contract_injector_type
               }
-              isPayload={isNotEmptyField(contract.injector_contract_payload)}
+              isPayload={isNotEmptyField(contract?.injector_contract_payload)}
             />
           ) : (
             <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>
@@ -315,81 +338,67 @@ const CreateInjectDetails = ({
           {contractContent ? tPick(contractContent.label) : t('Select an inject in the left panel')}
         </CardContent>
       </Card>
-      <Form
-        keepDirtyOnReinitialize={true}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        validate={validate}
-        mutators={{
-          ...arrayMutators,
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-        }}
-      >
-        {({ form, handleSubmit, submitting, values, errors }) => {
-          return (
-            <form id="injectContentForm" onSubmit={handleSubmit} style={{ marginTop: 40 }}>
-              <InjectForm form={form} values={values} disabled={!contractContent} isAtomic={isAtomic} />
-              {contractContent && (
-                <div className={classes.details}>
-                  {openDetails && (
-                    <InjectDefinition
-                      form={form}
-                      values={values}
-                      submitting={submitting}
-                      inject={{
-                        inject_injector_contract: { injector_contract_id: contractId, injector_contract_arch: contract.injector_contract_arch },
-                        inject_type: contractContent.config.type,
-                        inject_teams: [],
-                        inject_assets: [],
-                        inject_asset_groups: [],
-                        inject_documents: [],
-                      }}
-                      injectorContract={{ ...contractContent }}
-                      handleClose={handleClose}
-                      tagsMap={tagsMap}
-                      permissions={permissions}
-                      articlesFromExerciseOrScenario={[]}
-                      variablesFromExerciseOrScenario={[]}
-                      onCreateInject={onCreateInject}
-                      setInjectDetailsState={setInjectDetailsState}
-                      uriVariable=""
-                      allUsersNumber={0}
-                      usersNumber={0}
-                      teamsUsers={[]}
-                      isAtomic={isAtomic}
-                      {...props}
-                    />
-                  )}
-                  <div className={classes.openDetails} onClick={toggleInjectContent}>
-                    {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
-                    {t('Inject content')}
-                  </div>
-                </div>
-              )}
-              <div style={{ float: 'right', marginTop: 20 }}>
-                <Button
-                  variant="contained"
-                  onClick={handleClose}
-                  style={{ marginRight: 10 }}
-                  disabled={submitting}
-                >
-                  {t('Cancel')}
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  type="submit"
-                  disabled={submitting || Object.keys(errors).length > 0 || !contractContent}
-                >
-                  {t('Create')}
-                </Button>
-              </div>
-            </form>
-          );
-        }}
-      </Form>
+      <form id="injectContentForm" onSubmit={handleSubmit(onSubmit)} style={{ marginTop: 40 }}>
+        <InjectForm control={control} register={register} disabled={!contractContent} isAtomic={isAtomic} />
+        {contractContent && (
+          <div className={classes.details}>
+            {openDetails && (
+              <InjectDefinition
+                control={control}
+                register={register}
+                values={getValues()}
+                setValue={setValue}
+                getValues={key => getValues(key)}
+                submitting={isSubmitting}
+                inject={{
+                  inject_injector_contract: { injector_contract_id: contractId, injector_contract_arch: contract.injector_contract_arch },
+                  inject_type: contractContent.config.type,
+                  inject_teams: [],
+                  inject_assets: [],
+                  inject_asset_groups: [],
+                  inject_documents: [],
+                }}
+                injectorContract={{ ...contractContent }}
+                handleClose={handleClose}
+                tagsMap={tagsMap}
+                permissions={permissions}
+                articlesFromExerciseOrScenario={[]}
+                variablesFromExerciseOrScenario={[]}
+                onCreateInject={onCreateInject}
+                setInjectDetailsState={setInjectDetailsState}
+                uriVariable=""
+                allUsersNumber={0}
+                usersNumber={0}
+                teamsUsers={[]}
+                isAtomic={isAtomic}
+                {...props}
+              />
+            )}
+            <div className={classes.openDetails} onClick={toggleInjectContent}>
+              {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
+              {t('Inject content')}
+            </div>
+          </div>
+        )}
+        <div style={{ float: 'right', marginTop: 20 }}>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            style={{ marginRight: 10 }}
+            disabled={isSubmitting}
+          >
+            {t('Cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            disabled={isSubmitting || Object.keys(errors).length > 0 || !contractContent}
+          >
+            {t('Create')}
+          </Button>
+        </div>
+      </form>
     </>
   );
 };

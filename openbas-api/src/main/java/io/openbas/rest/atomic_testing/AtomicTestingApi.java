@@ -2,10 +2,10 @@ package io.openbas.rest.atomic_testing;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.inject_expectation.InjectExpectationService;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
+import io.openbas.service.InjectExpectationService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -34,7 +34,7 @@ public class AtomicTestingApi extends RestBehavior {
   @Tracing(name = "Get a page of atomic testings", layer = "api", operation = "POST")
   public Page<InjectResultOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return atomicTestingService.findAllAtomicTestings(searchPaginationInput);
+    return atomicTestingService.searchAtomicTestings(searchPaginationInput);
   }
 
   @LogExecutionTime

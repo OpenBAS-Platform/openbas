@@ -10,18 +10,45 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 public class InjectSpecification {
 
   private InjectSpecification() {}
 
+  /**
+   * Create a specification to get an exercise
+   *
+   * @deprecated Use fromSimulation instead
+   * @param exerciseId the exercice ID to search
+   * @return the built specification
+   */
+  @Deprecated(since = "1.11.0", forRemoval = true)
   public static Specification<Inject> fromExercise(String exerciseId) {
-    return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
+    return fromSimulation(exerciseId);
+  }
+
+  public static Specification<Inject> fromSimulation(String simulationId) {
+    return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), simulationId);
   }
 
   public static Specification<Inject> fromScenario(String scenarioId) {
     return (root, query, cb) -> cb.equal(root.get("scenario").get("id"), scenarioId);
+  }
+
+  /**
+   * Get injects from a scenario or a simulation
+   *
+   * @param scenarioOrSimulationId the id of the scenario or the simulation
+   * @return the constructed specification
+   */
+  public static Specification<Inject> fromScenarioOrSimulation(String scenarioOrSimulationId) {
+    if (StringUtils.isBlank(scenarioOrSimulationId)) {
+      // Return an empty specification
+      return Specification.where(null);
+    }
+    return fromSimulation(scenarioOrSimulationId).or(fromScenario(scenarioOrSimulationId));
   }
 
   public static Specification<Inject> next() {
@@ -46,15 +73,6 @@ public class InjectSpecification {
           cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
           );
     };
-  }
-
-  public static Specification<Inject> forDryrun(String exerciseId) {
-    return (root, query, cb) ->
-        cb.and(
-            // cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
-            cb.equal(root.get("enabled"), true), // isEnable
-            cb.equal(root.get("exercise").get("id"), exerciseId) // fromWantedExercise
-            );
   }
 
   public static Specification<Inject> forAtomicTesting() {

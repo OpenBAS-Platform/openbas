@@ -5,13 +5,12 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { updateExerciseStatus } from '../../../../actions/Exercise';
-import type { ExerciseStore } from '../../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
-import type { Exercise as ExerciseType } from '../../../../utils/api-types';
+import type { Exercise, Exercise as ExerciseType } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
@@ -31,16 +30,16 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
-  exerciseId: ExerciseStore['exercise_id'];
-  exerciseStatus: ExerciseStore['exercise_status'];
-  exerciseName: ExerciseStore['exercise_name'];
+  exerciseId: Exercise['exercise_id'];
+  exerciseStatus: Exercise['exercise_status'];
+  exerciseName: Exercise['exercise_name'];
 }) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const permissions = usePermissions(exerciseId);
-  const [openChangeStatus, setOpenChangeStatus] = useState<ExerciseStore['exercise_status'] | null>(null);
-  const submitUpdateStatus = (status: ExerciseStore['exercise_status']) => {
+  const [openChangeStatus, setOpenChangeStatus] = useState<Exercise['exercise_status'] | null>(null);
+  const submitUpdateStatus = (status: { exercise_status: Exercise['exercise_status'] | null }) => {
     dispatch(updateExerciseStatus(exerciseId, status));
     setOpenChangeStatus(null);
   };

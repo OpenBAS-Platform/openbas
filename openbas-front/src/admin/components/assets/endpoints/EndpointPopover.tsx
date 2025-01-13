@@ -1,15 +1,14 @@
-import { MoreVert } from '@mui/icons-material';
-import { IconButton, Menu, MenuItem } from '@mui/material';
-import { useState } from 'react';
 import * as React from 'react';
+import { useState } from 'react';
 
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
+import ButtonPopover from '../../../../components/common/ButtonPopover';
 import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { Endpoint, EndpointInput } from '../../../../utils/api-types';
+import type { EndpointOverviewOutput, EndpointUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointForm from './EndpointForm';
 import { EndpointStoreWithType } from './EndpointsList';
@@ -22,7 +21,7 @@ interface Props {
   onRemoveEndpointFromInject?: (assetId: string) => void;
   onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
-  onUpdate?: (result: Endpoint) => void;
+  onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
 }
 
@@ -41,18 +40,10 @@ const EndpointPopover: React.FC<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-
   const initialValues = {
     asset_name: endpoint.asset_name,
     asset_description: endpoint.asset_description ?? '',
-    asset_last_seen: endpoint.asset_last_seen ?? undefined,
     asset_tags: endpoint.asset_tags,
-    endpoint_hostname: endpoint.endpoint_hostname,
-    endpoint_ips: endpoint.endpoint_ips,
-    endpoint_mac_addresses: endpoint.endpoint_mac_addresses ?? [],
-    endpoint_platform: endpoint.endpoint_platform,
-    endpoint_arch: endpoint.endpoint_arch,
   };
 
   // Edition
@@ -60,11 +51,10 @@ const EndpointPopover: React.FC<Props> = ({
 
   const handleEdit = () => {
     setEdition(true);
-    setAnchorEl(null);
   };
-  const submitEdit = (data: EndpointInput) => {
+  const submitEdit = (data: EndpointUpdateInput) => {
     dispatch(updateEndpoint(endpoint.asset_id, data)).then(
-      (result: { result: string; entities: { endpoints: Record<string, Endpoint> } }) => {
+      (result: { result: string; entities: { endpoints: Record<string, EndpointOverviewOutput> } }) => {
         if (result.entities) {
           if (onUpdate) {
             const endpointUpdated = result.entities.endpoints[result.result];
@@ -82,7 +72,6 @@ const EndpointPopover: React.FC<Props> = ({
 
   const handleRemoveFromAssetGroup = () => {
     setRemovalFromAssetGroup(true);
-    setAnchorEl(null);
   };
   const submitRemoveFromAssetGroup = () => {
     if (assetGroupId) {
@@ -104,7 +93,6 @@ const EndpointPopover: React.FC<Props> = ({
 
   const handleDelete = () => {
     setDeletion(true);
-    setAnchorEl(null);
   };
   const submitDelete = () => {
     dispatch(deleteEndpoint(endpoint.asset_id)).then(
@@ -117,43 +105,16 @@ const EndpointPopover: React.FC<Props> = ({
     setDeletion(false);
   };
 
+  // Button Popover
+  const entries = [];
+  if (onUpdate) entries.push({ label: 'Update', action: () => handleEdit() });
+  if (onRemoveEndpointFromInject) entries.push({ label: 'Remove from the inject', action: () => onRemoveEndpointFromInject(endpoint.asset_id) });
+  if ((assetGroupId && endpoint.type !== 'dynamic')) entries.push({ label: 'Remove from the asset group', action: () => handleRemoveFromAssetGroup() });
+  if (onDelete) entries.push({ label: 'Delete', action: () => handleDelete() });
+
   return (
     <>
-      <IconButton
-        color="primary"
-        onClick={(ev) => {
-          ev.stopPropagation();
-          setAnchorEl(ev.currentTarget);
-        }}
-        aria-label={`endpoint menu for ${endpoint.asset_name}`}
-        aria-haspopup="true"
-        size="large"
-      >
-        <MoreVert />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
-        <MenuItem onClick={handleEdit}>
-          {t('Update')}
-        </MenuItem>
-        {(assetGroupId && endpoint.type !== 'dynamic') && (
-          <MenuItem onClick={handleRemoveFromAssetGroup}>
-            {t('Remove from the asset group')}
-          </MenuItem>
-        )}
-        {onRemoveEndpointFromInject && (
-          <MenuItem onClick={() => onRemoveEndpointFromInject(endpoint.asset_id)}>
-            {t('Remove from the inject')}
-          </MenuItem>
-        )}
-        <MenuItem onClick={handleDelete}>
-          {t('Delete')}
-        </MenuItem>
-      </Menu>
-
+      <ButtonPopover entries={entries} variant={inline ? 'icon' : 'toggle'} />
       {inline ? (
         <Dialog
           open={edition}
@@ -191,7 +152,7 @@ const EndpointPopover: React.FC<Props> = ({
         open={deletion}
         handleClose={() => setDeletion(false)}
         handleSubmit={submitDelete}
-        text={t('Do you want to delete the endpoint ?')}
+        text={`${t('Do you want to delete the endpoint:')} ${endpoint.asset_name} ?`}
       />
     </>
   );

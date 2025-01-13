@@ -31,7 +31,9 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
   };
 
   const handleSubmitAllTest = () => {
-    bulkTestInjects(injectIds!).then((result: { data: InjectTestStatus[] }) => {
+    bulkTestInjects({
+      inject_ids_to_process: injectIds!,
+    }!).then((result: { data: InjectTestStatus[] }) => {
       onTest?.(result.data);
       MESSAGING$.notifySuccess(t('{testNumber} test(s) sent', { testNumber: injectIds?.length }));
       return result;

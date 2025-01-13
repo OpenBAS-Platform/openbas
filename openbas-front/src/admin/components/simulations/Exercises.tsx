@@ -2,7 +2,6 @@ import { ToggleButtonGroup } from '@mui/material';
 import { useState } from 'react';
 
 import { searchExercises } from '../../../actions/Exercise';
-import type { ExerciseStore } from '../../../actions/exercises/Exercise';
 import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
 import type { UserHelper } from '../../../actions/helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
@@ -14,7 +13,7 @@ import { buildSearchPagination } from '../../../components/common/queryable/Quer
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
+import type { ExerciseSimple, FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
 import ExerciseList from './ExerciseList';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import ExerciseCreation from './simulation/ExerciseCreation';
@@ -30,7 +29,7 @@ const Exercises = () => {
   }));
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [exercises, setExercises] = useState<ExerciseStore[]>([]);
+  const [exercises, setExercises] = useState<ExerciseSimple[]>([]);
 
   // Filters
   const availableFilterNames = [
@@ -70,8 +69,9 @@ const Exercises = () => {
     exportFileName: `${t('Simulations')}.csv`,
   };
 
-  const secondaryAction = (exercise: ExerciseStore) => (
+  const secondaryAction = (exercise: ExerciseSimple) => (
     <ExercisePopover
+      // @ts-expect-error: should pass Exercise model IF we have update as action
       exercise={exercise}
       actions={['Duplicate', 'Export', 'Delete']}
       onDelete={result => setExercises(exercises.filter(e => (e.exercise_id !== result)))}

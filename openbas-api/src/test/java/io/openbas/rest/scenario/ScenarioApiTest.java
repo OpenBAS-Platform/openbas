@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.rest.scenario.form.ScenarioInformationInput;
 import io.openbas.rest.scenario.form.ScenarioInput;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
@@ -155,38 +154,9 @@ public class ScenarioApiTest {
     assertEquals(subtitle, JsonPath.read(response, "$.scenario_subtitle"));
   }
 
-  @DisplayName("Update scenario information")
-  @Test
-  @Order(5)
-  @WithMockPlannerUser
-  void updateScenarioInformationTest() throws Exception {
-    // -- PREPARE --
-    ScenarioInformationInput scenarioInformationInput = new ScenarioInformationInput();
-    String header = "NEW HEADER";
-    scenarioInformationInput.setFrom("no-reply@filigran.io");
-    scenarioInformationInput.setHeader(header);
-
-    // -- EXECUTE --
-    String response =
-        this.mvc
-            .perform(
-                put(SCENARIO_URI + "/" + SCENARIO_ID + "/information")
-                    .content(asJsonString(scenarioInformationInput))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    // -- ASSERT --
-    assertNotNull(response);
-    assertEquals(header, JsonPath.read(response, "$.scenario_message_header"));
-  }
-
   @DisplayName("Delete scenario")
   @Test
-  @Order(6)
+  @Order(5)
   @WithMockPlannerUser
   void deleteScenarioTest() throws Exception {
     // -- EXECUTE 1 ASSERT --

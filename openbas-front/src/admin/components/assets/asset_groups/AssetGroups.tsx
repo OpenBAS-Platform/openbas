@@ -161,7 +161,7 @@ const AssetGroups = () => {
     {
       field: 'asset_group_assets',
       label: 'Rules',
-      isSortable: true,
+      isSortable: false,
       value: (assetGroup: AssetGroupOutput) => {
         return computeRuleValues(assetGroup, t);
       },
@@ -169,7 +169,7 @@ const AssetGroups = () => {
     {
       field: 'asset_group_tags',
       label: 'Tags',
-      isSortable: true,
+      isSortable: false,
       value: (assetGroup: AssetGroupOutput) => <ItemTags variant="list" tags={assetGroup.asset_group_tags} />,
     },
   ], []);
@@ -215,7 +215,6 @@ const AssetGroups = () => {
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
-          divider={false}
           style={{ paddingTop: 0 }}
           secondaryAction={<>&nbsp;</>}
         >

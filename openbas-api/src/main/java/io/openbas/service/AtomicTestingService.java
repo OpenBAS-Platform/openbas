@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.injector_contract.ContractType;
@@ -103,7 +102,10 @@ public class AtomicTestingService {
     injectToSave.setAllTeams(input.isAllTeams());
     injectToSave.setDescription(input.getDescription());
     injectToSave.setDependsDuration(0L);
-    injectToSave.setUser(userRepository.findById(currentUser().getId()).orElseThrow());
+    injectToSave.setUser(
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     injectToSave.setExercise(null);
 
     // Set dependencies
@@ -216,7 +218,7 @@ public class AtomicTestingService {
 
   // -- PAGINATION --
 
-  public Page<InjectResultOutput> findAllAtomicTestings(
+  public Page<InjectResultOutput> searchAtomicTestings(
       @NotNull final SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();
 

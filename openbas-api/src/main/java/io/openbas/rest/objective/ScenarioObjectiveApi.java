@@ -101,7 +101,9 @@ public class ScenarioObjectiveApi extends RestBehavior {
     Objective objective = resolveRelation(objectiveId, objectiveRepository);
     evaluation.setObjective(objective);
     evaluation.setUser(
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     Evaluation result = evaluationRepository.save(evaluation);
     objective.setUpdatedAt(now());
     objectiveRepository.save(objective);

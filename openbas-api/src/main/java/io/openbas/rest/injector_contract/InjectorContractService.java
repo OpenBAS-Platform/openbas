@@ -9,12 +9,14 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.email.EmailContract;
 import io.openbas.injectors.ovh.OvhSmsContract;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.injector_contract.output.InjectorContractOutput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -104,6 +106,23 @@ public class InjectorContractService {
     return new PageImpl<>(injectorContractOutputs, pageable, total);
   }
 
+  public void deleteInjectorContract(final String injectorContractId) {
+    InjectorContract injectorContract =
+        this.injectorContractRepository
+            .findById(injectorContractId)
+            .orElseThrow(
+                () ->
+                    new ElementNotFoundException(
+                        "Injector contract not found: " + injectorContractId));
+    if (!injectorContract.getCustom()) {
+      throw new IllegalArgumentException(
+          "This injector contract can't be removed because is not a custom one: "
+              + injectorContractId);
+    } else {
+      this.injectorContractRepository.deleteById(injectorContractId);
+    }
+  }
+
   // -- CRITERIA BUILDER --
 
   private void selectForInjectorContract(
@@ -131,6 +150,7 @@ public class InjectorContractService {
             payloadCollectorJoin.get("type").alias("collector_type"),
             injectorContractInjectorJoin.get("type").alias("injector_contract_injector_type"),
             attackPatternIdsExpression.alias("injector_contract_attack_patterns"),
+            injectorContractRoot.get("updatedAt").alias("injector_contract_updated_at"),
             injectorContractPayloadJoin.get("executionArch").alias("payload_execution_arch"))
         .distinct(true);
 
@@ -156,6 +176,7 @@ public class InjectorContractService {
                     tuple.get("collector_type", String.class),
                     tuple.get("injector_contract_injector_type", String.class),
                     tuple.get("injector_contract_attack_patterns", String[].class),
+                    tuple.get("injector_contract_updated_at", Instant.class),
                     tuple.get("payload_execution_arch", Payload.PAYLOAD_EXECUTION_ARCH.class)))
         .toList();
   }

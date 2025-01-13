@@ -57,7 +57,9 @@ public class PlayerApi extends RestBehavior {
       players = fromIterable(userRepository.rawAllPlayers());
     } else {
       User local =
-          userRepository.findById(currentUser.getId()).orElseThrow(ElementNotFoundException::new);
+          userRepository
+              .findById(currentUser.getId())
+              .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
       List<String> organizationIds =
           local.getGroups().stream()
               .flatMap(group -> group.getOrganizations().stream())

@@ -3,7 +3,6 @@ import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText,
 import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
 
-import type { AttackPatternStore } from '../../../../actions/attack_patterns/AttackPattern';
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
@@ -18,7 +17,7 @@ import { Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
+import { AttackPattern, FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import { isNotEmptyField } from '../../../../utils/utils';
 import CreateInjectDetails from './CreateInjectDetails';
@@ -101,7 +100,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       field: 'kill_chain_phase',
       label: 'Kill chain phase',
       isSortable: false,
-      value: (_: InjectorContractOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPatternStore>) => {
+      value: (_: InjectorContractOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPattern>) => {
         return <>{(killChainPhase ? killChainPhase.phase_name : t('Unknown'))}</>;
       },
     },
@@ -109,7 +108,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       field: 'injector_contract_labels',
       label: 'Label',
       isSortable: false,
-      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPatternStore>) => (
+      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
         <Tooltip title={tPick(contract.injector_contract_labels)}>
           <>{tPick(contract.injector_contract_labels)}</>
         </Tooltip>
@@ -119,24 +118,32 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       field: 'injector_contract_platforms',
       label: 'Platforms',
       isSortable: false,
-      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPatternStore>) => contract.injector_contract_platforms?.map(
-        (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+      value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
+        <>
+          {(contract.injector_contract_platforms ?? []).map(
+            (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+          )}
+        </>
       ),
     },
     {
       field: 'attack_patterns',
       label: 'Attack patterns',
       isSortable: false,
-      value: (contract: InjectorContractOutput, _: KillChainPhase, contractAttackPatterns: Record<string, AttackPatternStore>) => contractAttackPatterns
-        .map((contractAttackPattern: AttackPatternStore) => (
-          <Chip
-            key={`${contract.injector_contract_id}-${contractAttackPattern.attack_pattern_id}-${Math.random()}`}
-            variant="outlined"
-            classes={{ root: classes.chipInList }}
-            color="primary"
-            label={contractAttackPattern.attack_pattern_external_id}
-          />
-        )),
+      value: (contract: InjectorContractOutput, _: KillChainPhase, contractAttackPatterns: Record<string, AttackPattern>) => (
+        <>
+          {Object.values(contractAttackPatterns)
+            .map((contractAttackPattern: AttackPattern) => (
+              <Chip
+                key={`${contract.injector_contract_id}-${contractAttackPattern.attack_pattern_id}-${Math.random()}`}
+                variant="outlined"
+                classes={{ root: classes.chipInList }}
+                color="primary"
+                label={contractAttackPattern.attack_pattern_external_id}
+              />
+            ))}
+        </>
+      ),
     },
   ], []);
 
@@ -216,7 +223,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
   if (selectedContract !== null && contracts[selectedContract] !== undefined) {
     const selectedContractAttackPatterns = computeAttackPatterns(contracts[selectedContract], attackPatternsMap);
     // eslint-disable-next-line max-len
-    const killChainPhaseforSelection = selectedContractAttackPatterns.map((contractAttackPattern: AttackPatternStore) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
+    const killChainPhaseforSelection = selectedContractAttackPatterns.map((contractAttackPattern: AttackPattern) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
     selectedContractKillChainPhase = killChainPhaseforSelection && killChainPhasesMap[killChainPhaseforSelection] && killChainPhasesMap[killChainPhaseforSelection].phase_name;
   }
 
@@ -264,7 +271,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               {contracts.map((contract, index) => {
                 const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
                 // eslint-disable-next-line max-len
-                const contractKillChainPhase = contractAttackPatterns.map((contractAttackPattern: AttackPatternStore) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
+                const contractKillChainPhase = contractAttackPatterns.map((contractAttackPattern: AttackPattern) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
                 const resolvedContractKillChainPhase = contractKillChainPhase && killChainPhasesMap[contractKillChainPhase];
                 return (
                   <ListItemButton

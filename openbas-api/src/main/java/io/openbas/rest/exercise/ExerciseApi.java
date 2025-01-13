@@ -83,8 +83,6 @@ public class ExerciseApi extends RestBehavior {
   private final TeamRepository teamRepository;
   private final ExerciseTeamUserRepository exerciseTeamUserRepository;
   private final LogRepository exerciseLogRepository;
-  private final DryRunRepository dryRunRepository;
-  private final DryInjectRepository dryInjectRepository;
   private final ComcheckRepository comcheckRepository;
   private final ImportService importService;
   private final LessonsCategoryRepository lessonsCategoryRepository;
@@ -102,7 +100,6 @@ public class ExerciseApi extends RestBehavior {
   // endregion
 
   // region services
-  private final DryrunService dryrunService;
   private final FileService fileService;
   private final InjectService injectService;
   private final ChallengeService challengeService;
@@ -127,7 +124,9 @@ public class ExerciseApi extends RestBehavior {
     log.setExercise(exercise);
     log.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     log.setUser(
-        userRepository.findById(currentUser().getId()).orElseThrow(ElementNotFoundException::new));
+        userRepository
+            .findById(currentUser().getId())
+            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
     return exerciseLogRepository.save(log);
   }
 
@@ -149,54 +148,6 @@ public class ExerciseApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   public void deleteLog(@PathVariable String exerciseId, @PathVariable String logId) {
     logRepository.deleteById(logId);
-  }
-
-  // endregion
-
-  // region dryruns
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/dryruns")
-  public Iterable<Dryrun> dryruns(@PathVariable String exerciseId) {
-    return dryRunRepository.findAll(DryRunSpecification.fromExercise(exerciseId));
-  }
-
-  @PostMapping(EXERCISE_URI + "/{exerciseId}/dryruns")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  @Transactional(rollbackOn = Exception.class)
-  public Dryrun createDryrun(
-      @PathVariable String exerciseId, @Valid @RequestBody DryrunCreateInput input) {
-    Exercise exercise =
-        exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    List<String> userIds = input.getUserIds();
-    List<User> users =
-        userIds.isEmpty()
-            ? List.of(
-                userRepository
-                    .findById(currentUser().getId())
-                    .orElseThrow(ElementNotFoundException::new))
-            : fromIterable(userRepository.findAllById(userIds));
-    return dryrunService.provisionDryrun(exercise, users, input.getName());
-  }
-
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/dryruns/{dryrunId}")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public Dryrun dryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
-    Specification<Dryrun> filters =
-        DryRunSpecification.fromExercise(exerciseId).and(DryRunSpecification.id(dryrunId));
-    return dryRunRepository.findOne(filters).orElseThrow(ElementNotFoundException::new);
-  }
-
-  @DeleteMapping(EXERCISE_URI + "/{exerciseId}/dryruns/{dryrunId}")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  @Transactional(rollbackOn = Exception.class)
-  public void deleteDryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
-    dryRunRepository.deleteById(dryrunId);
-  }
-
-  @GetMapping(EXERCISE_URI + "/{exerciseId}/dryruns/{dryrunId}/dryinjects")
-  @PreAuthorize("isExerciseObserver(#exerciseId)")
-  public List<DryInject> dryrunInjects(
-      @PathVariable String exerciseId, @PathVariable String dryrunId) {
-    return dryInjectRepository.findAll(DryInjectSpecification.fromDryRun(dryrunId));
   }
 
   // endregion
@@ -399,12 +350,13 @@ public class ExerciseApi extends RestBehavior {
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackOn = Exception.class)
   public Exercise updateExerciseInformation(
-      @PathVariable String exerciseId, @Valid @RequestBody ExerciseInput input) {
+      @PathVariable String exerciseId, @Valid @RequestBody UpdateExerciseInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Set<Tag> currentTagList = exercise.getTags();
     exercise.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
     exercise.setUpdateAttributes(input);
-    return exerciseRepository.save(exercise);
+    return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
@@ -430,8 +382,9 @@ public class ExerciseApi extends RestBehavior {
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTagsInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
+    Set<Tag> currentTagList = exercise.getTags();
     exercise.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    return exerciseRepository.save(exercise);
+    return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/logos")

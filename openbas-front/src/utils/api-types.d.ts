@@ -9,6 +9,49 @@
  * ---------------------------------------------------------------
  */
 
+export interface Agent {
+  agent_active?: boolean;
+  agent_asset: string;
+  /** @format date-time */
+  agent_created_at: string;
+  agent_deployment_mode: "service" | "session";
+  agent_executed_by_user: string;
+  agent_executor?: string;
+  agent_external_reference?: string;
+  agent_id: string;
+  agent_inject?: string;
+  /** @format date-time */
+  agent_last_seen?: string;
+  agent_parent?: string;
+  agent_privilege: "admin" | "standard";
+  agent_process_name?: string;
+  /** @format date-time */
+  agent_updated_at: string;
+  agent_version?: string;
+  listened?: boolean;
+}
+
+/** List of agents */
+export interface AgentOutput {
+  /** Indicates whether the endpoint is active. The endpoint is considered active if it was seen in the last 3 minutes. */
+  agent_active?: boolean;
+  /** Agent deployment mode */
+  agent_deployment_mode?: "service" | "session";
+  /** The user who executed the agent */
+  agent_executed_by_user?: string;
+  /** Agent executor */
+  agent_executor?: ExecutorOutput;
+  /** Agent id */
+  agent_id: string;
+  /**
+   * Instant when agent was last seen
+   * @format date-time
+   */
+  agent_last_seen?: string;
+  /** Agent privilege */
+  agent_privilege?: "admin" | "standard";
+}
+
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
@@ -97,7 +140,7 @@ export interface ArticleUpdateInput {
 }
 
 export interface AssetAgentJob {
-  asset_agent_asset?: string;
+  asset_agent_agent?: string;
   asset_agent_command: string;
   asset_agent_id: string;
   asset_agent_inject?: string;
@@ -110,6 +153,7 @@ export interface AssetGroup {
   asset_group_created_at: string;
   asset_group_description?: string;
   asset_group_dynamic_assets?: string[];
+  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
@@ -121,6 +165,7 @@ export interface AssetGroup {
 
 export interface AssetGroupInput {
   asset_group_description?: string;
+  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -130,6 +175,7 @@ export interface AssetGroupOutput {
   /** @uniqueItems true */
   asset_group_assets?: string[];
   asset_group_description?: string;
+  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
@@ -233,7 +279,7 @@ interface BasePayload {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -461,7 +507,7 @@ export interface Command {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -537,7 +583,7 @@ export interface DnsResolution {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -582,93 +628,19 @@ export interface DocumentUpdateInput {
   document_tags?: string[];
 }
 
-export interface DryInject {
-  /** @format date-time */
-  dryinject_date: string;
-  dryinject_dryrun?: string;
-  dryinject_exercise?: string;
-  dryinject_id?: string;
-  dryinject_inject?: Inject;
-  dryinject_status?: DryInjectStatus;
-  listened?: boolean;
-}
-
-export interface DryInjectStatus {
-  listened?: boolean;
-  status_id?: string;
-  status_name?:
-    | "SUCCESS"
-    | "ERROR"
-    | "MAYBE_PREVENTED"
-    | "DRAFT"
-    | "QUEUING"
-    | "EXECUTING"
-    | "PENDING"
-    | "PARTIAL"
-    | "MAYBE_PARTIAL_PREVENTED";
-  status_traces?: InjectStatusExecution[];
-  /** @format date-time */
-  tracking_ack_date?: string;
-  /** @format date-time */
-  tracking_end_date?: string;
-  /** @format date-time */
-  tracking_sent_date?: string;
-  /** @format int32 */
-  tracking_total_count?: number;
-  /** @format int32 */
-  tracking_total_error?: number;
-  /** @format int64 */
-  tracking_total_execution_time?: number;
-  /** @format int32 */
-  tracking_total_success?: number;
-}
-
-export interface Dryrun {
-  /** @format date-time */
-  dryrun_date: string;
-  /** @format date-time */
-  dryrun_end_date?: string;
-  dryrun_exercise?: string;
-  dryrun_finished?: boolean;
-  dryrun_id: string;
-  dryrun_name?: string;
-  /** @format int32 */
-  dryrun_speed?: number;
-  /** @format date-time */
-  dryrun_start_date?: string;
-  dryrun_users?: string[];
-  /** @format int64 */
-  dryrun_users_number?: number;
-  listened?: boolean;
-}
-
-export interface DryrunCreateInput {
-  dryrun_name: string;
-  dryrun_users?: string[];
-}
-
 export interface Endpoint {
-  asset_active?: boolean;
-  asset_children?: string[];
+  asset_agents?: Agent[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: string;
-  asset_external_reference?: string;
   asset_id: string;
-  asset_inject?: string;
-  /** @format date-time */
-  asset_last_seen?: string;
   asset_name: string;
-  asset_parent?: string;
-  asset_process_name?: string;
   asset_tags?: string[];
   asset_type?: string;
   /** @format date-time */
   asset_updated_at: string;
-  endpoint_agent_version?: string;
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   endpoint_hostname?: string;
   endpoint_ips: string[];
@@ -677,25 +649,68 @@ export interface Endpoint {
   listened?: boolean;
 }
 
-export interface EndpointInput {
-  asset_description?: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
-  asset_name: string;
-  asset_tags?: string[];
-  endpoint_agent_version?: string;
-  endpoint_arch: "x86_64" | "arm64" | "Unknown";
-  endpoint_hostname?: string;
+export interface EndpointOutput {
   /**
-   * @maxItems 2147483647
-   * @minItems 1
+   * List of agents
+   * @uniqueItems true
    */
-  endpoint_ips: string[];
-  endpoint_mac_addresses?: string[];
+  asset_agents: AgentOutput[];
+  /** Asset Id */
+  asset_id: string;
+  /** Asset name */
+  asset_name: string;
+  /**
+   * Tags
+   * @uniqueItems true
+   */
+  asset_tags?: string[];
+  /** Asset type */
+  asset_type?: string;
+  /** Architecture */
+  endpoint_arch: "x86_64" | "arm64" | "Unknown";
+  /** Platform */
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
 }
 
+export interface EndpointOverviewOutput {
+  /**
+   * List of agents
+   * @uniqueItems true
+   */
+  asset_agents: AgentOutput[];
+  /** Asset description */
+  asset_description?: string;
+  /** Asset Id */
+  asset_id: string;
+  /** Asset name */
+  asset_name: string;
+  /**
+   * Tags
+   * @uniqueItems true
+   */
+  asset_tags?: string[];
+  /** Architecture */
+  endpoint_arch?: "x86_64" | "arm64" | "Unknown";
+  /** Hostname */
+  endpoint_hostname?: string;
+  /**
+   * List IPs
+   * @uniqueItems true
+   */
+  endpoint_ips?: string[];
+  /**
+   * List of MAC addresses
+   * @uniqueItems true
+   */
+  endpoint_mac_addresses?: string[];
+  /** Platform */
+  endpoint_platform?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
 export interface EndpointRegisterInput {
+  agent_executed_by_user?: string;
+  agent_is_elevated?: boolean;
+  agent_is_service?: boolean;
   asset_description?: string;
   asset_external_reference: string;
   /** @format date-time */
@@ -712,6 +727,12 @@ export interface EndpointRegisterInput {
   endpoint_ips: string[];
   endpoint_mac_addresses?: string[];
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+}
+
+export interface EndpointUpdateInput {
+  asset_description?: string;
+  asset_name: string;
+  asset_tags?: string[];
 }
 
 export interface Evaluation {
@@ -747,7 +768,7 @@ export interface Executable {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -780,6 +801,16 @@ export interface ExecutorCreateInput {
   executor_name: string;
   executor_platforms?: string[];
   executor_type: string;
+}
+
+/** Agent executor */
+export interface ExecutorOutput {
+  /** Agent executor id */
+  executor_id?: string;
+  /** Agent executor name */
+  executor_name?: string;
+  /** Agent executor type */
+  executor_type?: string;
 }
 
 export interface ExecutorUpdateInput {
@@ -966,6 +997,7 @@ export interface ExerciseUpdateStatusInput {
 }
 
 export interface ExerciseUpdateTagsInput {
+  apply_tag_rule?: boolean;
   exercise_tags?: string[];
 }
 
@@ -1015,7 +1047,7 @@ export interface FileDrop {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -1049,6 +1081,7 @@ export interface Filter {
   values?: string[];
 }
 
+/** Filter object to search within filterable attributes */
 export interface FilterGroup {
   filters?: Filter[];
   mode: "and" | "or";
@@ -1231,6 +1264,27 @@ export interface Inject {
   listened?: boolean;
 }
 
+export interface InjectBulkProcessingInput {
+  inject_ids_to_ignore?: string[];
+  inject_ids_to_process?: string[];
+  search_pagination_input?: SearchPaginationInput;
+  simulation_or_scenario_id?: string;
+}
+
+export interface InjectBulkUpdateInputs {
+  inject_ids_to_ignore?: string[];
+  inject_ids_to_process?: string[];
+  search_pagination_input?: SearchPaginationInput;
+  simulation_or_scenario_id?: string;
+  update_operations?: InjectBulkUpdateOperation[];
+}
+
+export interface InjectBulkUpdateOperation {
+  field?: "assets" | "asset_groups" | "teams";
+  operation?: "add" | "remove" | "replace";
+  values?: string[];
+}
+
 export interface InjectDependency {
   dependency_condition?: InjectDependencyCondition;
   /** @format date-time */
@@ -1381,6 +1435,7 @@ export interface InjectInput {
   inject_depends_on?: InjectDependencyInput[];
   inject_description?: string;
   inject_documents?: InjectDocumentInput[];
+  inject_enabled?: boolean;
   inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
@@ -2081,7 +2136,7 @@ export interface NetworkTraffic {
   payload_created_at: string;
   payload_description?: string;
   payload_elevation_required?: boolean;
-  payload_execution_arch: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
@@ -2201,8 +2256,8 @@ export interface PageAttackPattern {
   totalPages?: number;
 }
 
-export interface PageEndpoint {
-  content?: Endpoint[];
+export interface PageEndpointOutput {
+  content?: EndpointOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -2524,6 +2579,25 @@ export interface PageTag {
   totalPages?: number;
 }
 
+export interface PageTagRuleOutput {
+  content?: TagRuleOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageTeamOutput {
   content?: TeamOutput[];
   empty?: boolean;
@@ -2543,8 +2617,8 @@ export interface PageTeamOutput {
   totalPages?: number;
 }
 
-export interface PageUser {
-  content?: User[];
+export interface PageUserOutput {
+  content?: UserOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -3032,13 +3106,6 @@ export interface Scenario {
   scenario_users_number?: number;
 }
 
-export interface ScenarioInformationInput {
-  scenario_mail_from: string;
-  scenario_mails_reply_to?: string[];
-  scenario_message_footer?: string;
-  scenario_message_header?: string;
-}
-
 export interface ScenarioInput {
   scenario_category?: string;
   scenario_description?: string;
@@ -3085,6 +3152,7 @@ export interface ScenarioTeamUser {
 }
 
 export interface ScenarioUpdateTagsInput {
+  apply_tag_rule?: boolean;
   scenario_tags?: string[];
 }
 
@@ -3093,6 +3161,7 @@ export interface ScenarioUpdateTeamsInput {
 }
 
 export interface SearchPaginationInput {
+  /** Filter object to search within filterable attributes */
   filterGroup?: FilterGroup;
   /**
    * Page number to get
@@ -3117,22 +3186,14 @@ export interface SearchTerm {
 }
 
 export interface SecurityPlatform {
-  asset_active?: boolean;
-  asset_children?: string[];
   /** @format date-time */
   asset_cleared_at?: string;
   /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
-  asset_executor?: string;
   asset_external_reference?: string;
   asset_id: string;
-  asset_inject?: string;
-  /** @format date-time */
-  asset_last_seen?: string;
   asset_name: string;
-  asset_parent?: string;
-  asset_process_name?: string;
   asset_tags?: string[];
   asset_type?: string;
   /** @format date-time */
@@ -3145,8 +3206,6 @@ export interface SecurityPlatform {
 
 export interface SecurityPlatformInput {
   asset_description?: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
@@ -3157,8 +3216,6 @@ export interface SecurityPlatformInput {
 export interface SecurityPlatformUpsertInput {
   asset_description?: string;
   asset_external_reference?: string;
-  /** @format date-time */
-  asset_last_seen?: string | null;
   asset_name: string;
   asset_tags?: string[];
   security_platform_logo_dark?: string;
@@ -3225,7 +3282,7 @@ export interface StatusPayload {
 
 export interface StatusPayloadOutput {
   dns_resolution_hostname?: string;
-  executable_arch?: "X86_64" | "ARM64" | "ALL_ARCHITECTURES";
+  executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   executable_file?: Document;
   file_drop_file?: Document;
   network_traffic_ip_dst: string;
@@ -3243,6 +3300,7 @@ export interface StatusPayloadOutput {
   payload_description?: string;
   payload_external_id?: string;
   payload_name?: string;
+  payload_obfuscator?: string;
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */
@@ -3260,6 +3318,17 @@ export interface Tag {
 export interface TagCreateInput {
   tag_color: string;
   tag_name: string;
+}
+
+export interface TagRuleInput {
+  asset_groups?: string[];
+  tag_name: string;
+}
+
+export interface TagRuleOutput {
+  asset_groups?: Record<string, string>;
+  tag_name: string;
+  tag_rule_id: string;
 }
 
 export interface TagUpdateInput {
@@ -3367,6 +3436,23 @@ export interface UpdateAssetsOnAssetGroupInput {
   asset_group_assets?: string[];
 }
 
+export interface UpdateExerciseInput {
+  apply_tag_rule?: boolean;
+  exercise_category?: string;
+  exercise_description?: string;
+  exercise_mail_from?: string;
+  exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
+  exercise_message_footer?: string;
+  exercise_message_header?: string;
+  exercise_name: string;
+  exercise_severity?: string;
+  /** @format date-time */
+  exercise_start_date?: string | null;
+  exercise_subtitle?: string;
+  exercise_tags?: string[];
+}
+
 export interface UpdateMePasswordInput {
   user_current_password: string;
   user_plain_password: string;
@@ -3380,6 +3466,23 @@ export interface UpdateProfileInput {
   user_lastname: string;
   user_organization?: string;
   user_theme?: string;
+}
+
+export interface UpdateScenarioInput {
+  apply_tag_rule?: boolean;
+  scenario_category?: string;
+  scenario_description?: string;
+  scenario_external_reference?: string;
+  scenario_external_url?: string;
+  scenario_mail_from?: string;
+  scenario_mails_reply_to?: string[];
+  scenario_main_focus?: string;
+  scenario_message_footer?: string;
+  scenario_message_header?: string;
+  scenario_name: string;
+  scenario_severity?: "low" | "medium" | "high" | "critical";
+  scenario_subtitle?: string;
+  scenario_tags?: string[];
 }
 
 export interface UpdateUserInfoInput {
@@ -3440,6 +3543,17 @@ export interface User {
   user_theme?: string;
   /** @format date-time */
   user_updated_at: string;
+}
+
+export interface UserOutput {
+  user_admin?: boolean;
+  user_email: string;
+  user_firstname?: string;
+  user_id: string;
+  user_lastname?: string;
+  user_organization_name?: string;
+  /** @uniqueItems true */
+  user_tags?: string[];
 }
 
 export interface ValidationContent {

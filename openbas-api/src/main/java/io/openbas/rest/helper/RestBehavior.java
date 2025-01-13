@@ -163,13 +163,18 @@ public class RestBehavior {
 
   // --- Open channel access
   public User impersonateUser(UserRepository userRepository, Optional<String> userId) {
-    if (currentUser().getId().equals(ANONYMOUS)) {
-      if (userId.isPresent()) {
-        return userRepository.findById(userId.get()).orElseThrow();
+    if (ANONYMOUS.equals(currentUser().getId())) {
+      if (userId.isEmpty()) {
+        throw new UnsupportedOperationException(
+            "User must be logged or dynamic player is required");
       }
-      throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+      return userRepository
+          .findById(userId.get())
+          .orElseThrow(() -> new ElementNotFoundException("User not found"));
     }
-    return userRepository.findById(currentUser().getId()).orElseThrow();
+    return userRepository
+        .findById(currentUser().getId())
+        .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
   }
 
   public void checkUserAccess(UserRepository userRepository, String userId) {
@@ -177,7 +182,10 @@ public class RestBehavior {
     if (askedUser.getOrganization() != null) {
       OpenBASPrincipal currentUser = currentUser();
       if (!currentUser.isAdmin()) {
-        User local = userRepository.findById(currentUser.getId()).orElseThrow();
+        User local =
+            userRepository
+                .findById(currentUser.getId())
+                .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
         List<String> localOrganizationIds =
             local.getGroups().stream()
                 .flatMap(group -> group.getOrganizations().stream())
@@ -194,7 +202,10 @@ public class RestBehavior {
     if (organizationId != null) {
       OpenBASPrincipal currentUser = currentUser();
       if (!currentUser.isAdmin()) {
-        User local = userRepository.findById(currentUser.getId()).orElseThrow();
+        User local =
+            userRepository
+                .findById(currentUser.getId())
+                .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
         List<String> localOrganizationIds =
             local.getGroups().stream()
                 .flatMap(group -> group.getOrganizations().stream())

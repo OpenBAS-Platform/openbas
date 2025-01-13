@@ -4,8 +4,8 @@ import * as PropTypes from 'prop-types';
 import { Component } from 'react';
 import { Form } from 'react-final-form';
 
+import OldSwitchField from '../../../../components/fields/OldSwitchField';
 import OldTextField from '../../../../components/fields/OldTextField';
-import SwitchField from '../../../../components/fields/SwitchField';
 import inject18n from '../../../../components/i18n';
 
 class GroupForm extends Component {
@@ -50,7 +50,7 @@ class GroupForm extends Component {
             />
             <Grid container spacing={3} style={{ marginTop: 0 }}>
               <Grid item xs={12} style={{ display: 'flex' }}>
-                <SwitchField
+                <OldSwitchField
                   name="group_default_user_assign"
                   label={t('Auto assign')}
                 />
@@ -74,7 +74,7 @@ class GroupForm extends Component {
                     </Typography>
                   </Grid>
                   <Grid item xs={6} style={{ display: 'flex' }}>
-                    <SwitchField
+                    <OldSwitchField
                       name="group_default_scenario_observer"
                       label={t('Auto observer')}
                     />
@@ -91,7 +91,7 @@ class GroupForm extends Component {
                     </Tooltip>
                   </Grid>
                   <Grid item xs={6} style={{ display: 'flex' }}>
-                    <SwitchField
+                    <OldSwitchField
                       name="group_default_scenario_planner"
                       label={t('Auto planner')}
                     />
@@ -117,7 +117,7 @@ class GroupForm extends Component {
                     </Typography>
                   </Grid>
                   <Grid item xs={6} style={{ display: 'flex' }}>
-                    <SwitchField
+                    <OldSwitchField
                       name="group_default_exercise_observer"
                       label={t('Auto observer')}
                     />
@@ -134,7 +134,7 @@ class GroupForm extends Component {
                     </Tooltip>
                   </Grid>
                   <Grid item xs={6} style={{ display: 'flex' }}>
-                    <SwitchField
+                    <OldSwitchField
                       name="group_default_exercise_planner"
                       label={t('Auto planner')}
                     />

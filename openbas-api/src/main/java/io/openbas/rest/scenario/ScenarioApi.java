@@ -31,6 +31,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -100,21 +101,12 @@ public class ScenarioApi extends RestBehavior {
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenario(
       @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioInput input) {
+      @Valid @RequestBody final UpdateScenarioInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Set<Tag> currentTagList = scenario.getTags();
     scenario.setUpdateAttributes(input);
     scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return this.scenarioService.updateScenario(scenario);
-  }
-
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/information")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Scenario updateScenarioInformation(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioInformationInput input) {
-    Scenario scenario = this.scenarioService.scenario(scenarioId);
-    scenario.setUpdateAttributes(input);
-    return this.scenarioService.updateScenario(scenario);
+    return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
   }
 
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}")
@@ -131,8 +123,9 @@ public class ScenarioApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTagsInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
+    Set<Tag> currentTagList = scenario.getTags();
     scenario.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-    return scenarioService.updateScenario(scenario);
+    return this.scenarioService.updateScenario(scenario, currentTagList, input.isApplyTagRule());
   }
 
   // -- EXPORT --

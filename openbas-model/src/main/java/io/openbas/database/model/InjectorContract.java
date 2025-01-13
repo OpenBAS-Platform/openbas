@@ -93,6 +93,7 @@ public class InjectorContract implements Base {
   @Column(name = "injector_contract_updated_at")
   @JsonProperty("injector_contract_updated_at")
   @NotNull
+  @Queryable(sortable = true)
   private Instant updatedAt = now();
 
   @ManyToOne(fetch = FetchType.EAGER)

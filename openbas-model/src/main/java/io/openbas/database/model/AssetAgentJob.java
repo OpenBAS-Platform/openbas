@@ -36,11 +36,11 @@ public class AssetAgentJob implements Base {
 
   @Getter
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "asset_agent_asset")
+  @JoinColumn(name = "asset_agent_agent")
   @JsonSerialize(using = MonoIdDeserializer.class)
-  @JsonProperty("asset_agent_asset")
+  @JsonProperty("asset_agent_agent")
   @Schema(type = "string")
-  private Asset asset;
+  private Agent agent;
 
   @Getter
   @Column(name = "asset_agent_command")

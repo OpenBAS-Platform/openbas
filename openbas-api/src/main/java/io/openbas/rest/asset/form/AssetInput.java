@@ -3,9 +3,7 @@ package io.openbas.rest.asset.form;
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -19,10 +17,6 @@ public abstract class AssetInput {
 
   @JsonProperty("asset_description")
   private String description;
-
-  @Schema(nullable = true)
-  @JsonProperty("asset_last_seen")
-  private Instant lastSeen;
 
   @JsonProperty("asset_tags")
   private List<String> tagIds = new ArrayList<>();

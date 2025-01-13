@@ -1,12 +1,11 @@
 import { Button, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { FunctionComponent, useState } from 'react';
 import * as React from 'react';
+import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router';
 
-import type { InjectExpectationResultsByAttackPatternStore, InjectExpectationResultsByTypeStore } from '../../../../actions/exercises/Exercise';
 import type { Theme } from '../../../../components/Theme';
-import type { AttackPattern, ExpectationResultsByType } from '../../../../utils/api-types';
+import type { AttackPattern, ExpectationResultsByType, InjectExpectationResultsByAttackPattern, InjectExpectationResultsByType } from '../../../../utils/api-types';
 import { hexToRGB } from '../../../../utils/Colors';
 import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
 
@@ -42,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface AttackPatternBoxProps {
   goToLink?: string;
   attackPattern: AttackPattern;
-  injectResult: InjectExpectationResultsByAttackPatternStore | undefined;
+  injectResult: InjectExpectationResultsByAttackPattern | undefined;
   dummy?: boolean;
 }
 
@@ -57,7 +56,7 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
   const theme = useTheme<Theme>();
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const results: InjectExpectationResultsByTypeStore[] = injectResult?.inject_expectation_results ?? [];
+  const results: InjectExpectationResultsByType[] = injectResult?.inject_expectation_results ?? [];
 
   if (dummy) {
     const content = () => (
@@ -97,9 +96,9 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
     }
     return 'SUCCESS';
   };
-  const aggregatedPrevention = (results ?? []).map(result => result.results?.filter(r => r.type === 'PREVENTION').map(r => r.avgResult)).flat();
-  const aggregatedDetection = (results ?? []).map(result => result.results?.filter(r => r.type === 'DETECTION').map(r => r.avgResult)).flat();
-  const aggregatedHumanResponse = (results ?? []).map(result => result.results?.filter(r => r.type === 'HUMAN_RESPONSE').map(r => r.avgResult)).flat();
+  const aggregatedPrevention = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'PREVENTION').map((r: ExpectationResultsByType) => r.avgResult)).flat();
+  const aggregatedDetection = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'DETECTION').map((r: ExpectationResultsByType) => r.avgResult)).flat();
+  const aggregatedHumanResponse = (results ?? []).map(result => result.results?.filter((r: ExpectationResultsByType) => r.type === 'HUMAN_RESPONSE').map((r: ExpectationResultsByType) => r.avgResult)).flat();
   const aggregatedResults: ExpectationResultsByType[] = [
     {
       type: 'PREVENTION',

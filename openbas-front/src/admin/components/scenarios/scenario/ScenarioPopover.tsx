@@ -2,13 +2,13 @@ import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import type { ScenarioStore } from '../../../../actions/scenarios/Scenario';
 import { deleteScenario, duplicateScenario, exportScenarioUri } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
+import { Scenario } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import ScenarioExportDialog from './ScenarioExportDialog';
@@ -17,7 +17,7 @@ import ScenarioUpdate from './ScenarioUpdate';
 type ScenarioActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
 interface Props {
-  scenario: ScenarioStore;
+  scenario: Scenario;
   actions: ScenarioActionType[];
   onDelete?: (result: string) => void;
   inList?: boolean;
@@ -45,7 +45,7 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const handleOpenDuplicate = () => setDuplicate(true);
   const handleCloseDuplicate = () => setDuplicate(false);
   const submitDuplicate = () => {
-    dispatch(duplicateScenario(scenario.scenario_id)).then((result: { result: string; entities: { scenarios: Record<string, ScenarioStore> } }) => {
+    dispatch(duplicateScenario(scenario.scenario_id)).then((result: { result: string; entities: { scenarios: Record<string, Scenario> } }) => {
       handleCloseDuplicate();
       navigate(`/admin/scenarios/${result.result}`);
     });

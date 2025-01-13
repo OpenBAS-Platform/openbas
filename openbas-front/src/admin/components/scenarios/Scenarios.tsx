@@ -6,7 +6,6 @@ import { Link } from 'react-router';
 
 import { fetchStatistics } from '../../../actions/Application';
 import type { TagHelper, UserHelper } from '../../../actions/helper';
-import type { ScenarioStore } from '../../../actions/scenarios/Scenario';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
@@ -23,7 +22,7 @@ import ItemTags from '../../../components/ItemTags';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import type { FilterGroup, SearchPaginationInput } from '../../../utils/api-types';
+import type { FilterGroup, Scenario, SearchPaginationInput } from '../../../utils/api-types';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import ScenarioStatus from './scenario/ScenarioStatus';
@@ -91,13 +90,13 @@ const Scenarios = () => {
       field: 'scenario_name',
       label: 'Name',
       isSortable: true,
-      value: (scenario: ScenarioStore) => scenario.scenario_name,
+      value: (scenario: Scenario) => scenario.scenario_name,
     },
     {
       field: 'scenario_severity',
       label: 'Severity',
       isSortable: true,
-      value: (scenario: ScenarioStore) => (
+      value: (scenario: Scenario) => (
         <ItemSeverity
           label={t(scenario.scenario_severity ?? 'Unknown')}
           severity={scenario.scenario_severity ?? 'Unknown'}
@@ -109,7 +108,7 @@ const Scenarios = () => {
       field: 'scenario_category',
       label: 'Category',
       isSortable: true,
-      value: (scenario: ScenarioStore) => (
+      value: (scenario: Scenario) => (
         <ItemCategory
           category={scenario.scenario_category ?? 'Unknown'}
           label={t(scenario.scenario_category ?? 'Unknown')}
@@ -121,19 +120,23 @@ const Scenarios = () => {
       field: 'scenario_recurrence',
       label: 'Status',
       isSortable: false,
-      value: (scenario: ScenarioStore) => <ScenarioStatus scenario={scenario} variant="list" />,
+      value: (scenario: Scenario) => <ScenarioStatus scenario={scenario} variant="list" />,
     },
     {
       field: 'scenario_platforms',
       label: 'Platforms',
       isSortable: false,
-      value: (scenario: ScenarioStore) => {
+      value: (scenario: Scenario) => {
         const platforms = scenario.scenario_platforms ?? [];
         if (platforms.length === 0) {
           return <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />;
         }
-        return platforms.map(
-          (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
+        return (
+          <>
+            {platforms.map(
+              (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
+            )}
+          </>
         );
       },
     },
@@ -141,17 +144,17 @@ const Scenarios = () => {
       field: 'scenario_tags',
       label: 'Tags',
       isSortable: false,
-      value: (scenario: ScenarioStore) => <ItemTags tags={scenario.scenario_tags} variant="list" />,
+      value: (scenario: Scenario) => <ItemTags tags={scenario.scenario_tags} variant="list" />,
     },
     {
       field: 'scenario_updated_at',
       label: 'Updated',
       isSortable: true,
-      value: (scenario: ScenarioStore) => nsdt(scenario.scenario_updated_at),
+      value: (scenario: Scenario) => nsdt(scenario.scenario_updated_at),
     },
   ], []);
 
-  const [scenarios, setScenarios] = useState<ScenarioStore[]>([]);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
 
   // Filters
   const availableFilterNames = [
@@ -238,7 +241,7 @@ const Scenarios = () => {
         {
           loading
             ? <PaginatedListLoader Icon={MovieFilterOutlined} headers={headers} headerStyles={inlineStyles} />
-            : scenarios.map((scenario: ScenarioStore, index) => {
+            : scenarios.map((scenario: Scenario, index) => {
                 return (
                   <ListItem
                     key={scenario.scenario_id}
@@ -284,7 +287,7 @@ const Scenarios = () => {
       </List>
       {userAdmin && (
         <ScenarioCreation
-          onCreate={(result: ScenarioStore) => {
+          onCreate={(result: Scenario) => {
             setScenarios([result, ...scenarios]);
             fetchStatistics();
           }}

@@ -11,6 +11,7 @@
     "**/node_modules/**"
   ],
   "prConcurrentLimit": 2,
+  "baseBranches": ["release/current", "master"],
   "packageRules": [
     {
       "matchUpdateTypes": [
@@ -41,10 +42,19 @@
     },
     {
       "matchPackageNames": [
-        "react-apexcharts",
-        "org.flywaydb:flyway-core"
+        "react-apexcharts"
       ],
-      "commitMessage": "[DANGER] Do not merge, breaking changes incoming"
+      "commitMessagePrefix": "[DANGER]"
+    },
+    {
+      "matchJsonata": ["$exists(isVulnerabilityAlert)"],
+      "matchBaseBranches": ["release/current"],
+      "enabled": false
+    },
+    {
+      "matchJsonata": ["$not($exists(isVulnerabilityAlert))"],
+      "matchBaseBranches": ["master"],
+      "enabled": false
     }
   ],
   "customManagers": [

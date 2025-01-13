@@ -42,11 +42,9 @@ public class InjectsExecutionJob implements Job {
 
   private final ApplicationContext context;
   private final InjectHelper injectHelper;
-  private final DryInjectRepository dryInjectRepository;
   private final InjectRepository injectRepository;
   private final InjectorRepository injectorRepository;
   private final InjectStatusRepository injectStatusRepository;
-  private final DryInjectStatusRepository dryInjectStatusRepository;
   private final ExerciseRepository exerciseRepository;
   private final QueueService queueService;
   private final ExecutionExecutorService executionExecutorService;
@@ -108,34 +106,18 @@ public class InjectsExecutionJob implements Job {
               Injection source = executableInject.getInjection();
               Inject executingInject = null;
               InjectStatus injectRunningStatus = null;
-              DryInjectStatus dryInjectRunningStatus = null;
-              if (source instanceof Inject) {
-                executingInject = injectRepository.findById(source.getId()).orElseThrow();
-                injectRunningStatus = executingInject.getStatus().orElseThrow();
-              }
-              if (source instanceof DryInject) {
-                DryInject executingInjectDry =
-                    dryInjectRepository.findById(source.getId()).orElseThrow();
-                dryInjectRunningStatus = executingInjectDry.getStatus().orElseThrow();
-              }
+              executingInject = injectRepository.findById(source.getId()).orElseThrow();
+              injectRunningStatus = executingInject.getStatus().orElseThrow();
               try {
                 String jsonInject = mapper.writeValueAsString(executableInject);
                 queueService.publish(injectorContract.getInjector().getType(), jsonInject);
               } catch (Exception e) {
-                if (source instanceof Inject) {
-                  injectRunningStatus
-                      .getTraces()
-                      .add(InjectStatusExecution.traceError(e.getMessage()));
-                  injectStatusRepository.save(injectRunningStatus);
-                  executingInject.setUpdatedAt(now());
-                  injectRepository.save(executingInject);
-                }
-                if (source instanceof DryInject) {
-                  dryInjectRunningStatus
-                      .getTraces()
-                      .add(InjectStatusExecution.traceError(e.getMessage()));
-                  dryInjectStatusRepository.save(dryInjectRunningStatus);
-                }
+                injectRunningStatus
+                    .getTraces()
+                    .add(InjectStatusExecution.traceError(e.getMessage()));
+                injectStatusRepository.save(injectRunningStatus);
+                executingInject.setUpdatedAt(now());
+                injectRepository.save(executingInject);
               }
             });
   }
@@ -156,23 +138,12 @@ public class InjectsExecutionJob implements Job {
               // After execution, expectations are already created
               // Injection status is filled after complete execution
               // Report inject execution
-              if (source instanceof Inject) {
-                Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
-                InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
-                injectStatusRepository.save(completeStatus);
-                executedInject.setUpdatedAt(now());
-                executedInject.setStatus(completeStatus);
-                injectRepository.save(executedInject);
-              }
-              // Report dry inject execution
-              if (source instanceof DryInject) {
-                DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
-                DryInjectStatus completeStatus =
-                    DryInjectStatus.fromExecution(execution, executedDry);
-                dryInjectStatusRepository.save(completeStatus);
-                executedDry.setStatus(completeStatus);
-                dryInjectRepository.save(executedDry);
-              }
+              Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
+              InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
+              injectStatusRepository.save(completeStatus);
+              executedInject.setUpdatedAt(now());
+              executedInject.setStatus(completeStatus);
+              injectRepository.save(executedInject);
             });
   }
 

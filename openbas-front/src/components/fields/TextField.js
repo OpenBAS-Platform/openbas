@@ -8,6 +8,7 @@ const TextFieldBase = ({ askAi, control, setValue, ...props }) => {
   return (
     <MuiTextField
       {...props}
+      value={currentValue ?? undefined}
       InputProps={{
         endAdornment: askAi && (
           <TextFieldAskAI

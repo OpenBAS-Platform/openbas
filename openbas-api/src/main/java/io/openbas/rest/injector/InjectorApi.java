@@ -1,11 +1,13 @@
 package io.openbas.rest.injector;
 
-import static io.openbas.asset.EndpointService.JFROG_BASE;
 import static io.openbas.asset.QueueService.EXCHANGE_KEY;
 import static io.openbas.asset.QueueService.ROUTING_KEY;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.InjectorSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.service.EndpointService.JFROG_BASE;
+import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
+import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -338,6 +340,13 @@ public class InjectorApi extends RestBehavior {
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasImplant(
       @PathVariable String platform, @PathVariable String architecture) throws IOException {
+    if (!AVAILABLE_PLATFORMS.contains(platform)) {
+      throw new IllegalArgumentException("Platform invalid : " + platform);
+    }
+    if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
+      throw new IllegalArgumentException("Architecture invalid : " + architecture);
+    }
+
     InputStream in = null;
     String filename = "";
     String resourcePath = "/openbas-implant/" + platform + "/" + architecture + "/";

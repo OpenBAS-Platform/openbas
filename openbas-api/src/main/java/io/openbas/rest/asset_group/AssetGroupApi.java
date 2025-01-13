@@ -5,12 +5,14 @@ import static io.openbas.database.specification.AssetGroupSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
-import io.openbas.asset.AssetGroupService;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
+import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.helper.RestBehavior;
+import io.openbas.service.AssetGroupService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Secured(ROLE_USER)
-public class AssetGroupApi {
+public class AssetGroupApi extends RestBehavior {
 
   public static final String ASSET_GROUP_URI = "/api/asset_groups";
 
@@ -101,6 +103,11 @@ public class AssetGroupApi {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void deleteAssetGroup(@PathVariable @NotBlank final String assetGroupId) {
+    try {
+      assetGroupService.assetGroup(assetGroupId);
+    } catch (IllegalArgumentException ex) {
+      throw new ElementNotFoundException(ex.getMessage());
+    }
     this.assetGroupService.deleteAssetGroup(assetGroupId);
   }
 }
