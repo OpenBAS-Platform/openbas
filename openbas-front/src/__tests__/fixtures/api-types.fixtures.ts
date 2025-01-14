@@ -1,3 +1,4 @@
+/* eslint-disable  import/no-extraneous-dependencies */
 import { faker } from '@faker-js/faker';
 
 import { Exercise, Organization, Scenario, Tag } from '../../utils/api-types';
