@@ -18,6 +18,9 @@ jobs:
           command: yarn install
       - run:
           working_directory: ~/openbas/openbas-front
+          command: yarn run test
+      - run:
+          working_directory: ~/openbas/openbas-front
           command: NODE_OPTIONS=--max-old-space-size=8096 yarn build
           no_output_timeout: 30m
       - run:
