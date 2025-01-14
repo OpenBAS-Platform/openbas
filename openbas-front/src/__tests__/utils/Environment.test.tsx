@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { describe, expect, it } from 'vitest';
 
 import { exportData } from '../../utils/Environment';
-import { createOrganisationsMap, createTagMap } from '../fixtures/api-types.fixtures.test';
+import { createOrganisationsMap, createTagMap } from '../fixtures/api-types.fixtures';
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 type testobj = { [key: string]: any };
