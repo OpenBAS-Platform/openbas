@@ -146,7 +146,7 @@ describe('exportData tests', () => {
 
       const keys = [
         `${objtype}_name`,
-        `${objtype}_organizations`,
+        `${objtype}_organization`,
       ];
       const result = exportData(
         objtype,
@@ -156,7 +156,7 @@ describe('exportData tests', () => {
       );
       const line = result[0];
       it('does not incorporate orgs in line', () => {
-        expect(Object.keys(line)).not.toContain(`${objtype}_tags`);
+        expect(Object.keys(line)).not.toContain(`${objtype}_organization`);
       });
     });
 
