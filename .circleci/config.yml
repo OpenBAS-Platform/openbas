@@ -458,7 +458,7 @@ workflows:
           filters:
             branches:
               only:
-                - /^release\/\d+\.\d+\.\d+$/
+                - release/current
       - docker_build_platform:
           requires:
             - build_frontend
