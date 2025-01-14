@@ -200,11 +200,12 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api()
     .delete(buildUri(uri), { data })
-    .then(() => {
+    .then((response) => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
         payload: Immutable({ type, data }),
       });
+      return response.data;
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });

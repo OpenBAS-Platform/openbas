@@ -712,13 +712,17 @@ public class InjectApi extends RestBehavior {
   @DeleteMapping(INJECT_URI)
   @LogExecutionTime
   @Tracing(name = "Bulk delete of injects", layer = "api", operation = "DELETE")
-  public void bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
+  public List<Inject> bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs
     List<Inject> injectsToDelete = getInjectsAndCheckInputForBulkProcessing(input);
 
+    // FIXME: This is a workaround to prevent the GUI from blocking when deleting elements
+    injectsToDelete.forEach(inject -> inject.setListened(false));
+
     // Bulk delete
-    this.injectService.deleteAllByIds(injectsToDelete.stream().map(Inject::getId).toList());
+    this.injectService.deleteAll(injectsToDelete);
+    return injectsToDelete;
   }
 
   /**

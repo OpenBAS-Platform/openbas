@@ -72,7 +72,7 @@ const injectContextForExercise = (exercise: Exercise) => {
     async onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
       return dryImportXlsForExercise(exercise.exercise_id, importId, input).then(result => result.data);
     },
-    onBulkDeleteInjects(param: InjectBulkProcessingInput): void {
+    onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
       // exercise.exercise_id
       return dispatch(bulkDeleteInjects(param));
     },

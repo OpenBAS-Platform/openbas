@@ -103,7 +103,7 @@ export type InjectContextType = {
   onDeleteInject: (injectId: Inject['inject_id']) => Promise<void>;
   onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>;
   onDryImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>;
-  onBulkDeleteInjects: (param: InjectBulkProcessingInput) => void;
+  onBulkDeleteInjects: (param: InjectBulkProcessingInput) => Promise<Inject[]>;
   bulkTestInjects: (param: InjectBulkProcessingInput) => Promise<{
     uri: string;
     data: InjectTestStatus[];
@@ -235,7 +235,9 @@ export const InjectContext = createContext<InjectContextType>({
     return new Promise<ImportTestSummary>(() => {
     });
   },
-  onBulkDeleteInjects(_param: InjectBulkProcessingInput): void {
+  onBulkDeleteInjects(_param: InjectBulkProcessingInput): Promise<Inject[]> {
+    return new Promise<Inject[]>(() => {
+    });
   },
   bulkTestInjects(_param: InjectBulkProcessingInput): Promise<{
     uri: string;
