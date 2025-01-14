@@ -4,6 +4,7 @@ import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
+import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
@@ -29,9 +30,9 @@ import io.openbas.rest.exercise.form.*;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
@@ -90,9 +91,6 @@ public class ExerciseApi extends RestBehavior {
   private final LessonsAnswerRepository lessonsAnswerRepository;
   private final InjectStatusRepository injectStatusRepository;
   private final InjectRepository injectRepository;
-  private final InjectExpectationRepository injectExpectationRepository;
-  private final ScenarioRepository scenarioRepository;
-  private final CommunicationRepository communicationRepository;
   private final ObjectiveRepository objectiveRepository;
   private final EvaluationRepository evaluationRepository;
   private final KillChainPhaseRepository killChainPhaseRepository;
@@ -105,6 +103,7 @@ public class ExerciseApi extends RestBehavior {
   private final ChallengeService challengeService;
   private final VariableService variableService;
   private final ExerciseService exerciseService;
+  private final TeamService teamService;
 
   // endregion
 
@@ -178,36 +177,14 @@ public class ExerciseApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Tracing(name = "Get teams of the exercise", layer = "api", operation = "GET")
-  public Iterable<TeamSimple> getExerciseTeams(@PathVariable String exerciseId) {
-    return TeamHelper.rawTeamToSimplerTeam(
-        teamRepository.rawTeamByExerciseId(exerciseId),
-        injectExpectationRepository,
-        injectRepository,
-        communicationRepository,
-        exerciseTeamUserRepository,
-        scenarioRepository);
-  }
-
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/add")
-  @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Iterable<Team> addExerciseTeams(
-      @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
-    Exercise exercise = this.exerciseService.exercise(exerciseId);
-    // Add teams to exercise
-    List<Team> teams = exercise.getTeams();
-    List<Team> teamsToAdd = fromIterable(this.teamRepository.findAllById(input.getTeamIds()));
-    List<String> existingTeamIds = teams.stream().map(Team::getId).toList();
-    teams.addAll(teamsToAdd.stream().filter(t -> !existingTeamIds.contains(t.getId())).toList());
-    exercise.setTeams(teams);
-    this.exerciseService.updateExercise(exercise);
-    return teamsToAdd;
+  public List<TeamOutput> getExerciseTeams(@PathVariable String exerciseId) {
+    return this.teamService.find(fromExercise(exerciseId));
   }
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/remove")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Iterable<Team> removeExerciseTeams(
+  public Iterable<TeamOutput> removeExerciseTeams(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
     return this.exerciseService.removeTeams(exerciseId, input.getTeamIds());
   }
@@ -215,14 +192,9 @@ public class ExerciseApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(EXERCISE_URI + "/{exerciseId}/teams/replace")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
-  public Iterable<Team> replaceExerciseTeams(
+  public Iterable<TeamOutput> replaceExerciseTeams(
       @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTeamsInput input) {
-    Exercise exercise = this.exerciseService.exercise(exerciseId);
-    // Replace teams from exercise
-    List<Team> teams = fromIterable(this.teamRepository.findAllById(input.getTeamIds()));
-    exercise.setTeams(teams);
-    this.exerciseService.updateExercise(exercise);
-    return teams;
+    return this.exerciseService.replaceTeams(exerciseId, input.getTeamIds());
   }
 
   @GetMapping(EXERCISE_URI + "/{exerciseId}/players")

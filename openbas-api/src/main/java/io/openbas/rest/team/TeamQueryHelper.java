@@ -27,6 +27,8 @@ public class TeamQueryHelper {
     // Array aggregations
     Expression<String[]> tagIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "tags");
     Expression<String[]> userIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "users");
+    Expression<String[]> exerciseIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "exercises");
+    Expression<String[]> scenarioIdsExpression = createJoinArrayAggOnId(cb, teamRoot, "scenarios");
     Expression<String[]> organizationIdExpression =
         createLeftJoin(teamRoot, "organization").get("id");
 
@@ -39,7 +41,9 @@ public class TeamQueryHelper {
             teamRoot.get("updatedAt").alias("team_updated_at"),
             tagIdsExpression.alias("team_tags"),
             userIdsExpression.alias("team_users"),
-            organizationIdExpression.alias("team_organization"))
+            organizationIdExpression.alias("team_organization"),
+            exerciseIdsExpression.alias("team_exercises"),
+            scenarioIdsExpression.alias("team_scenarios"))
         .distinct(true);
 
     // Group by
@@ -58,6 +62,12 @@ public class TeamQueryHelper {
                     .description(tuple.get("team_description", String.class))
                     .contextual(tuple.get("team_contextual", Boolean.class))
                     .updatedAt(tuple.get("team_updated_at", Instant.class))
+                    .exercises(
+                        Arrays.stream(tuple.get("team_exercises", String[].class))
+                            .collect(Collectors.toSet()))
+                    .scenarios(
+                        Arrays.stream(tuple.get("team_scenarios", String[].class))
+                            .collect(Collectors.toSet()))
                     .tags(
                         Arrays.stream(tuple.get("team_tags", String[].class))
                             .collect(Collectors.toSet()))

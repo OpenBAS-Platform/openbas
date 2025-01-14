@@ -122,7 +122,7 @@ const TeamPopover: FunctionComponent<TeamPopoverProps> = ({
   const handleCloseRemove = () => setOpenRemove(false);
 
   const submitRemove = () => {
-    return dispatch(onRemoveTeam!(team.team_id)).then(() => handleCloseRemove());
+    return onRemoveTeam!(team.team_id).then(() => handleCloseRemove());
   };
 
   // Remove

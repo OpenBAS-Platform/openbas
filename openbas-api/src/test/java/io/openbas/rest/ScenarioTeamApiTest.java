@@ -7,11 +7,14 @@ import static io.openbas.utils.JsonUtils.asJsonString;
 import static io.openbas.utils.fixtures.ScenarioFixture.getScenario;
 import static io.openbas.utils.fixtures.TeamFixture.TEAM_NAME;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Scenario;
@@ -28,7 +31,9 @@ import io.openbas.rest.scenario.form.ScenarioUpdateTeamsInput;
 import io.openbas.utils.fixtures.UserFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -51,32 +56,57 @@ class ScenarioTeamApiTest extends IntegrationTest {
   @DisplayName("Given a valid scenario and team input, should add team to scenario successfully")
   @Test
   @WithMockAdminUser
-  void given_validScenarioAndTeamInput_should_addTeamToScenarioSuccessfully() throws Exception {
+  void given_validScenarioAndTeamInput_should_replaceTeamToScenarioSuccessfully() throws Exception {
     // -- PREPARE --
     Scenario scenario = getScenario();
+    Team teamToRemove = new Team();
+    teamToRemove.setName("teamToRemove");
+    Team teamToRemoveSaved = this.teamRepository.save(teamToRemove);
+    scenario.setTeams(List.of(teamToRemoveSaved));
     Scenario scenarioCreated = this.scenarioRepository.save(scenario);
-    Team team = new Team();
-    team.setName(TEAM_NAME);
-    Team teamCreated = this.teamRepository.save(team);
+
+    Team teamToAdd = new Team();
+    teamToAdd.setName(TEAM_NAME);
+    Team teamCreated = this.teamRepository.save(teamToAdd);
     ScenarioUpdateTeamsInput input = new ScenarioUpdateTeamsInput();
     input.setTeamIds(List.of(teamCreated.getId()));
 
     // -- EXECUTE --
-    this.mvc
-        .perform(
-            put(SCENARIO_URI + "/" + scenarioCreated.getId() + "/teams/add")
-                .content(asJsonString(input))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    String response =
+        this.mvc
+            .perform(
+                put(SCENARIO_URI + "/" + scenarioCreated.getId() + "/teams/replace")
+                    .content(asJsonString(input))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // -- ASSERT --
+    ObjectMapper objectMapper = new ObjectMapper();
+    List<Map<String, Object>> responseList =
+        objectMapper.readValue(response, new TypeReference<List<Map<String, Object>>>() {});
+    assertEquals(2, responseList.size());
+    Map<String, Map<String, Object>> responseMap =
+        responseList.stream()
+            .collect(
+                Collectors.toMap(
+                    obj -> (String) obj.get("team_name"),
+                    obj -> obj,
+                    (existing, duplicate) -> {
+                      throw new IllegalStateException("Duplicate key found: " + existing);
+                    }));
+
+    assertEquals(List.of(), responseMap.get("teamToRemove").get("team_scenarios"));
+    assertEquals(
+        List.of(scenarioCreated.getId()), responseMap.get(TEAM_NAME).get("team_scenarios"));
+
     Optional<Scenario> scenarioSaved = this.scenarioRepository.findById(scenarioCreated.getId());
     assertTrue(scenarioSaved.isPresent());
-    assertEquals(TEAM_NAME, scenarioSaved.get().getTeams().getFirst().getName());
+    assertEquals(1, (long) scenarioSaved.get().getTeams().size());
+    assertEquals(teamCreated.getId(), scenarioSaved.get().getTeams().getFirst().getId());
   }
 
   @DisplayName("Given a valid scenario with teams, should retrieve teams successfully")

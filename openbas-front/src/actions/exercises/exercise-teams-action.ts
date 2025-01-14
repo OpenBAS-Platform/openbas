@@ -10,12 +10,6 @@ export const searchExerciseTeams = (exerciseId: Scenario['scenario_id'], paginat
   return simplePostCall(uri, paginationInput);
 };
 
-export const addExerciseTeams = (exerciseId: Scenario['scenario_id'], data: ExerciseUpdateTeamsInput) => (dispatch: Dispatch) => putReferential(
-  schema.arrayOfTeams,
-  `${EXERCISE_URI}/${exerciseId}/teams/add`,
-  data,
-)(dispatch);
-
 export const removeExerciseTeams = (exerciseId: Scenario['scenario_id'], data: ExerciseUpdateTeamsInput) => (dispatch: Dispatch) => putReferential(
   schema.arrayOfTeams,
   `${EXERCISE_URI}/${exerciseId}/teams/remove`,
