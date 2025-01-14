@@ -2,6 +2,8 @@ package io.openbas.rest.exercise.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.TeamSpecification.fromIds;
+import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.utils.Constants.ARTICLES;
 import static io.openbas.utils.JpaUtils.arrayAggOnId;
 import static io.openbas.utils.StringUtils.duplicateString;
@@ -25,6 +27,7 @@ import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.GrantService;
 import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
@@ -606,7 +609,7 @@ public class ExerciseService {
 
   // -- TEAMS --
   @Transactional(rollbackFor = Exception.class)
-  public Iterable<Team> removeTeams(
+  public Iterable<TeamOutput> removeTeams(
       @NotBlank final String exerciseId, @NotNull final List<String> teamIds) {
     // Remove teams from exercise
     this.exerciseRepository.removeTeams(exerciseId, teamIds);
@@ -616,7 +619,24 @@ public class ExerciseService {
     this.injectRepository.removeTeamsForExercise(exerciseId, teamIds);
     // Remove all association between lessons learned and teams
     this.lessonsCategoryRepository.removeTeamsForExercise(exerciseId, teamIds);
-    return teamRepository.findAllById(teamIds);
+    return teamService.find(fromIds(teamIds));
+  }
+
+  public List<TeamOutput> replaceTeams(
+      @NotBlank final String exerciseId, @NotNull final List<String> teamIds) {
+    Exercise exercise = this.exercise(exerciseId);
+    List<String> previousTeamIds = exercise.getTeams().stream().map(Team::getId).toList();
+
+    // Replace teams from exercise
+    List<Team> teams = fromIterable(this.teamRepository.findAllById(teamIds));
+    exercise.setTeams(teams);
+
+    // You must return all the modified teams to ensure the frontend store updates correctly
+    List<String> modifiedTeamIds =
+        Stream.concat(previousTeamIds.stream(), teams.stream().map(Team::getId))
+            .distinct()
+            .toList();
+    return teamService.find(fromIds(modifiedTeamIds));
   }
 
   /**

@@ -1,5 +1,5 @@
 import { Paper, Typography } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import * as React from 'react';
 import { useParams } from 'react-router';
 
@@ -36,11 +36,6 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
     dispatch(fetchScenarioTeams(scenarioId));
   });
 
-  const [teams, setTeams] = useState<Team[]>([]);
-  useEffect(() => {
-    setTeams(teamsStore);
-  }, [teamsStore]);
-
   return (
     <TeamContext.Provider value={teamContextForScenario(scenarioId, scenarioTeamsUsers)}>
       <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
@@ -49,13 +44,12 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
       {permissions.canWrite
       && (
         <UpdateTeams
-          addedTeamIds={teams.map((team: Team) => team.team_id)}
-          setTeams={(ts: Team[]) => setTeams(ts)}
+          addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
         />
       )}
       <div className="clearfix" />
       <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
-        <ContextualTeams teams={teams} />
+        <ContextualTeams teams={teamsStore} />
       </Paper>
     </TeamContext.Provider>
   );

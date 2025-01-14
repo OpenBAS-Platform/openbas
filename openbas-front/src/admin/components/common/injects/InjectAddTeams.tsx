@@ -146,8 +146,8 @@ const InjectAddTeams: FunctionComponent<Props> = ({
                 <CreateTeam
                   inline
                   onCreate={(team) => {
-                    setTeamValues([...teamValues, team]);
-                    setSelectedTeamValues([...selectedTeamValues, team]);
+                    setTeamValues([...teamValues, team as TeamOutput]);
+                    setSelectedTeamValues([...selectedTeamValues, team as TeamOutput]);
                   }}
                 />
               )}

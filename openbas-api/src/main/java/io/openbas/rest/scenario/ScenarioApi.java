@@ -3,6 +3,7 @@ package io.openbas.rest.scenario;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.ScenarioSpecification.byName;
+import static io.openbas.database.specification.TeamSpecification.fromScenario;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
@@ -16,11 +17,12 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.LessonsInput;
 import io.openbas.rest.exercise.form.ScenarioTeamPlayersEnableInput;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.helper.TeamHelper;
 import io.openbas.rest.scenario.form.*;
+import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.ImportService;
 import io.openbas.service.ScenarioService;
 import io.openbas.service.ScenarioToExerciseService;
+import io.openbas.service.TeamService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -50,17 +52,14 @@ public class ScenarioApi extends RestBehavior {
 
   public static final String SCENARIO_URI = "/api/scenarios";
 
-  private final ScenarioService scenarioService;
   private final TagRepository tagRepository;
-  private final ImportService importService;
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
-  private final InjectExpectationRepository injectExpectationRepository;
-  private final InjectRepository injectRepository;
-  private final CommunicationRepository communicationRepository;
-  private final ExerciseTeamUserRepository exerciseTeamUserRepository;
   private final ScenarioRepository scenarioRepository;
   private final ScenarioToExerciseService scenarioToExerciseService;
+  private final ImportService importService;
+  private final ScenarioService scenarioService;
+  private final TeamService teamService;
 
   @PostMapping(SCENARIO_URI)
   public Scenario createScenario(@Valid @RequestBody final ScenarioInput input) {
@@ -152,32 +151,17 @@ public class ScenarioApi extends RestBehavior {
   }
 
   // -- TEAMS --
-
+  @LogExecutionTime
   @GetMapping(SCENARIO_URI + "/{scenarioId}/teams")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
-  public Iterable<TeamSimple> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
-    return TeamHelper.rawTeamToSimplerTeam(
-        teamRepository.rawTeamByScenarioId(scenarioId),
-        injectExpectationRepository,
-        injectRepository,
-        communicationRepository,
-        exerciseTeamUserRepository,
-        scenarioRepository);
-  }
-
-  @Transactional(rollbackOn = Exception.class)
-  @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/add")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Iterable<Team> addScenarioTeams(
-      @PathVariable @NotBlank final String scenarioId,
-      @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
-    return this.scenarioService.addTeams(scenarioId, input.getTeamIds());
+  public List<TeamOutput> scenarioTeams(@PathVariable @NotBlank final String scenarioId) {
+    return this.teamService.find(fromScenario(scenarioId));
   }
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/remove")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Iterable<Team> removeScenarioTeams(
+  public Iterable<TeamOutput> removeScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
     return this.scenarioService.removeTeams(scenarioId, input.getTeamIds());
@@ -186,7 +170,7 @@ public class ScenarioApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   @PutMapping(SCENARIO_URI + "/{scenarioId}/teams/replace")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
-  public Iterable<Team> replaceScenarioTeams(
+  public List<TeamOutput> replaceScenarioTeams(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioUpdateTeamsInput input) {
     return this.scenarioService.replaceTeams(scenarioId, input.getTeamIds());
