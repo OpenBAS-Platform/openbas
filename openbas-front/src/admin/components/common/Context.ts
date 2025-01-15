@@ -89,10 +89,7 @@ export type TeamContextType = {
 export type InjectContextType = {
   searchInjects: (input: SearchPaginationInput) => Promise<{ data: Page<InjectOutputType> }>;
   onAddInject: (inject: Inject) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
-  onBulkUpdateInject: (param: InjectBulkUpdateInputs) => Promise<{
-    result: string;
-    entities: { injects: Record<string, InjectStore> };
-  }>;
+  onBulkUpdateInject: (param: InjectBulkUpdateInputs) => Promise<Inject[]>;
   onUpdateInject: (injectId: Inject['inject_id'], inject: Inject) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
   onUpdateInjectTrigger?: (injectId: Inject['inject_id']) => Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }>;
   onUpdateInjectActivation: (injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }) => Promise<{
@@ -203,11 +200,8 @@ export const InjectContext = createContext<InjectContextType>({
   onAddInject(_inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });
   },
-  onBulkUpdateInject(_param: InjectBulkUpdateInputs): Promise<{
-    result: string;
-    entities: { injects: Record<string, InjectStore> };
-  }> {
-    return Promise.resolve({ result: '', entities: { injects: {} } });
+  onBulkUpdateInject(_param: InjectBulkUpdateInputs): Promise<Inject[]> {
+    return Promise.resolve([]);
   },
   onUpdateInject(_injectId: Inject['inject_id'], _inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
     return Promise.resolve({ result: '', entities: { injects: {} } });

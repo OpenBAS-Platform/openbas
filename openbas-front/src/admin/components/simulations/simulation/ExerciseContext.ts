@@ -2,8 +2,8 @@ import { fetchExercise, fetchExerciseTeams } from '../../../../actions/Exercise'
 import { dryImportXlsForExercise, importXlsForExercise } from '../../../../actions/exercises/exercise-action';
 import {
   addInjectForExercise,
-  bulkDeleteInjects,
-  bulkUpdateInject,
+  bulkDeleteInjectsSimple,
+  bulkUpdateInjectSimple,
   deleteInjectForExercise,
   fetchExerciseInjects,
   injectDone,
@@ -36,12 +36,8 @@ const injectContextForExercise = (exercise: Exercise) => {
     onAddInject(inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(addInjectForExercise(exercise.exercise_id, inject));
     },
-    onBulkUpdateInject(param: InjectBulkUpdateInputs): Promise<{
-      result: string;
-      entities: { injects: Record<string, InjectStore> };
-    }> {
-      // exercise.exercise_id
-      return dispatch(bulkUpdateInject(param));
+    onBulkUpdateInject(param: InjectBulkUpdateInputs): Promise<Inject[] | void> {
+      return bulkUpdateInjectSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
     onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
@@ -73,8 +69,7 @@ const injectContextForExercise = (exercise: Exercise) => {
       return dryImportXlsForExercise(exercise.exercise_id, importId, input).then(result => result.data);
     },
     onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
-      // exercise.exercise_id
-      return dispatch(bulkDeleteInjects(param));
+      return bulkDeleteInjectsSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
     bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatus[] }> {
       return bulkTestInjects(param).then(result => ({

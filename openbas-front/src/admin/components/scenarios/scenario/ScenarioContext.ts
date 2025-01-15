@@ -1,7 +1,7 @@
 import {
   addInjectForScenario,
-  bulkDeleteInjects,
-  bulkUpdateInject,
+  bulkDeleteInjectsSimple,
+  bulkUpdateInjectSimple,
   deleteInjectScenario,
   fetchScenarioInjects,
   updateInjectActivationForScenario,
@@ -38,11 +38,8 @@ const injectContextForScenario = (scenario: Scenario) => {
     onAddInject(inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(addInjectForScenario(scenario.scenario_id, inject));
     },
-    onBulkUpdateInject(param: InjectBulkUpdateInputs): Promise<{
-      result: string;
-      entities: { injects: Record<string, InjectStore> };
-    }> {
-      return dispatch(bulkUpdateInject(param));
+    onBulkUpdateInject(param: InjectBulkUpdateInputs): Promise<Inject[] | void> {
+      return bulkUpdateInjectSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
     onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
       return dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
@@ -68,7 +65,7 @@ const injectContextForScenario = (scenario: Scenario) => {
       return dryImportXlsForScenario(scenario.scenario_id, importId, input).then(result => result.data);
     },
     onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
-      return dispatch(bulkDeleteInjects(param));
+      return bulkDeleteInjectsSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
     bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatus[] }> {
       return bulkTestInjects(param).then(result => ({

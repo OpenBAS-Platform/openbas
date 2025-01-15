@@ -115,7 +115,8 @@ export const simplePutCall = (uri: string, data?: unknown, defaultNotifyErrorBeh
     }
     throw error;
   });
-export const simpleDelCall = (uri: string, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.delete(buildUri(uri))
+// eslint-disable-next-line max-len
+export const simpleDelCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.delete(buildUri(uri), data ? { data: data } : undefined)
   .then((response) => {
     if (defaultSuccessBehavior) {
       notifySuccess('The element has been successfully deleted.');
