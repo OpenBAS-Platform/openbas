@@ -108,7 +108,9 @@ describe('exportData tests', () => {
         [obj],
         tagMap,
       );
+
       const line = result[0];
+
       it('has key _tags in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_tags`);
       });
@@ -130,13 +132,16 @@ describe('exportData tests', () => {
         `${objtype}_name`,
         `${objtype}_tags`,
       ];
+
       const result = exportData(
         objtype,
         keys,
         [obj],
         tagMap,
       );
+
       const line = result[0];
+
       it('has key _tags in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_tags`);
       });
@@ -153,12 +158,15 @@ describe('exportData tests', () => {
         `${objtype}_name`,
         `${objtype}_organization`,
       ];
+
       const result = exportData(
         objtype,
         keys,
         [obj],
       );
+
       const line = result[0];
+
       it('does not incorporate orgs in line', () => {
         expect(Object.keys(line)).not.toContain(`${objtype}_organization`);
       });
@@ -183,7 +191,9 @@ describe('exportData tests', () => {
         null, // tagMap
         orgMap,
       );
+
       const line = result[0];
+
       it('has key _organization in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_organization`);
       });
@@ -212,7 +222,9 @@ describe('exportData tests', () => {
         null, // tagMap
         orgMap,
       );
+
       const line = result[0];
+
       it('has key _organization in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_organization`);
       });
@@ -234,7 +246,9 @@ describe('exportData tests', () => {
         keys,
         [obj],
       );
+
       const line = result[0];
+
       it('does not incorporate exercises in line', () => {
         expect(Object.keys(line)).not.toContain(`${objtype}_exercises`);
       });
@@ -262,7 +276,9 @@ describe('exportData tests', () => {
         null, // orgMap
         exerciseMap,
       );
+
       const line = result[0];
+
       it('has key _exercises in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_exercises`);
       });
@@ -292,7 +308,9 @@ describe('exportData tests', () => {
         null, // orgMap
         exerciseMap,
       );
+
       const line = result[0];
+
       it('has key _exercises in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_exercises`);
       });
@@ -314,7 +332,9 @@ describe('exportData tests', () => {
         keys,
         [obj],
       );
+
       const line = result[0];
+
       it('does not incorporate scenarios in line', () => {
         expect(Object.keys(line)).not.toContain(`${objtype}_scenarios`);
       });
@@ -334,6 +354,7 @@ describe('exportData tests', () => {
         `${objtype}_name`,
         `${objtype}_scenarios`,
       ];
+
       const result = exportData(
         objtype,
         keys,
@@ -343,7 +364,9 @@ describe('exportData tests', () => {
         null, // exerciseMap
         scenarioMap,
       );
+
       const line = result[0];
+
       it('has key _scenarios in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_scenarios`);
       });
@@ -365,6 +388,7 @@ describe('exportData tests', () => {
         `${objtype}_name`,
         `${objtype}_scenarios`,
       ];
+
       const result = exportData(
         objtype,
         keys,
@@ -374,7 +398,9 @@ describe('exportData tests', () => {
         null, // exerciseMap
         scenarioMap,
       );
+
       const line = result[0];
+
       it('has key _scenarios in line', () => {
         expect(Object.keys(line)).toContain(`${objtype}_scenarios`);
       });
@@ -394,15 +420,18 @@ describe('exportData tests', () => {
       obj[`${objtype}_content`] = object_content;
       // mirror what's being done in the tested method
       const expected_string_content = JSON.stringify(object_content).toString().replaceAll('"', '""');
+
       const keys = [
         `${objtype}_name`,
         `${objtype}_content`,
       ];
+
       const result = exportData(
         objtype,
         keys,
         [obj],
       );
+
       const line = result[0];
 
       it('transforms content into escaped string', async () => {
