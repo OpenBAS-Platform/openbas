@@ -17,6 +17,7 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import { useFormatter } from '../../../../components/i18n';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
+import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import type {
   Article,
@@ -224,8 +225,34 @@ const Injects: FunctionComponent<Props> = ({
     },
   ], []);
 
+  // Filters
+  const availableFilterNames = [
+    'inject_platforms',
+    'inject_kill_chain_phases',
+    'inject_injector_contract',
+    'inject_type',
+    'inject_title',
+  ];
+
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildEmptyFilter('inject_platforms', 'contains'),
+      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
+      buildEmptyFilter('inject_injector_contract', 'contains'),
+    ],
+  };
+
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
+    sorts: initSorting('inject_depends_duration', 'ASC'),
+    filterGroup: quickFilter,
+    size: 20,
+  }));
+
   // Injects
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
+  // Bulk loading indcator for tests and delete
+  const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
   const [reloadInjectCount, setReloadInjectCount] = useState(0);
 
@@ -234,27 +261,27 @@ const Injects: FunctionComponent<Props> = ({
     if (result.entities) {
       const created = result.entities.injects[result.result];
       setInjects([created as InjectOutputType, ...injects]);
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(queryableHelpers.paginationHelpers.getTotalElements() + 1);
     }
   };
 
   const onUpdate = (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
     if (result.entities) {
-      const updated = result.entities.injects[result.result];
-      setInjects(injects.map((i) => {
-        return (i.inject_id !== updated.inject_id ? i as InjectOutputType : (updated as InjectOutputType));
-      }));
+      const updatedResults = result.entities.injects[result.result];
+      setInjects(injects.map(i => i.inject_id !== updatedResults.inject_id ? i : updatedResults as InjectOutputType));
     }
+  };
+
+  const onBulkUpdate = (updatedResults: Inject[]) => {
+    setInjects(injects.map((originalInject) => {
+      return updatedResults.find(updatedInject => updatedInject.inject_id === originalInject.inject_id) as unknown as InjectOutputType || originalInject;
+    }));
   };
 
   const onDelete = (result: string) => {
     if (result) {
       setInjects(injects.filter(i => (i.inject_id !== result)));
-    }
-  };
-
-  const onMassDelete = (results: string[]) => {
-    if (results.length !== 0) {
-      setInjects(injects.filter(i => (!results.includes(i.inject_id))));
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(queryableHelpers.paginationHelpers.getTotalElements() - 1);
     }
   };
 
@@ -310,30 +337,6 @@ const Injects: FunctionComponent<Props> = ({
     setOpenCreateDrawer(true);
     setPresetCreationValues(data);
   };
-
-  // Filters
-  const availableFilterNames = [
-    'inject_platforms',
-    'inject_kill_chain_phases',
-    'inject_injector_contract',
-    'inject_type',
-    'inject_title',
-  ];
-
-  const quickFilter: FilterGroup = {
-    mode: 'and',
-    filters: [
-      buildEmptyFilter('inject_platforms', 'contains'),
-      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
-      buildEmptyFilter('inject_injector_contract', 'contains'),
-    ],
-  };
-
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
-    sorts: initSorting('inject_depends_duration', 'ASC'),
-    filterGroup: quickFilter,
-    size: 20,
-  }));
 
   // Toolbar
   const {
@@ -424,12 +427,13 @@ const Injects: FunctionComponent<Props> = ({
       simulation_or_scenario_id: exerciseOrScenarioId,
       update_operations: operationsToPerform,
     })
-      .then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
-        onUpdate(result);
+      .then((result) => {
+        if (result) onBulkUpdate(result);
       });
   };
 
   const bulkDeleteInjects = () => {
+    setIsBulkLoading(true);
     const deleteIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
     const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
     injectContext.onBulkDeleteInjects({
@@ -437,11 +441,20 @@ const Injects: FunctionComponent<Props> = ({
       inject_ids_to_process: selectAll ? undefined : deleteIds,
       inject_ids_to_ignore: ignoreIds,
       simulation_or_scenario_id: exerciseOrScenarioId,
+    }).then((result) => {
+      // We update the numbers of elements in the pagination
+      const newNumbers = Math.max(0, (queryableHelpers.paginationHelpers.getTotalElements() - result.length));
+      // We remove the deleted injects from the current data table
+      const deletedIds = result.map(inject => inject.inject_id);
+      setInjects(newNumbers !== 0 ? injects.filter(inject => !deletedIds.includes(inject.inject_id)) : []);
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(newNumbers);
+    }).finally(() => {
+      setIsBulkLoading(false);
     });
-    onMassDelete(deleteIds);
   };
 
   const massTestInjects = () => {
+    setIsBulkLoading(true);
     const testIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
     const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
     injectContext.bulkTestInjects({
@@ -459,6 +472,8 @@ const Injects: FunctionComponent<Props> = ({
           itsDedicatedPage: <Link to={`${result.uri}`}>{t('its dedicated page')}</Link>,
         }));
       }
+    }).finally(() => {
+      setIsBulkLoading(false);
     });
   };
 
@@ -469,6 +484,9 @@ const Injects: FunctionComponent<Props> = ({
 
   const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
 
+  if (isBulkLoading) {
+    return <Loader />;
+  }
   return (
     <>
       <PaginationComponentV2
