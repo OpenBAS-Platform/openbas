@@ -224,6 +224,30 @@ const Injects: FunctionComponent<Props> = ({
     },
   ], []);
 
+  // Filters
+  const availableFilterNames = [
+    'inject_platforms',
+    'inject_kill_chain_phases',
+    'inject_injector_contract',
+    'inject_type',
+    'inject_title',
+  ];
+
+  const quickFilter: FilterGroup = {
+    mode: 'and',
+    filters: [
+      buildEmptyFilter('inject_platforms', 'contains'),
+      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
+      buildEmptyFilter('inject_injector_contract', 'contains'),
+    ],
+  };
+
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
+    sorts: initSorting('inject_depends_duration', 'ASC'),
+    filterGroup: quickFilter,
+    size: 20,
+  }));
+
   // Injects
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
@@ -234,6 +258,7 @@ const Injects: FunctionComponent<Props> = ({
     if (result.entities) {
       const created = result.entities.injects[result.result];
       setInjects([created as InjectOutputType, ...injects]);
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(queryableHelpers.paginationHelpers.getTotalElements() + 1);
     }
   };
 
@@ -249,12 +274,7 @@ const Injects: FunctionComponent<Props> = ({
   const onDelete = (result: string) => {
     if (result) {
       setInjects(injects.filter(i => (i.inject_id !== result)));
-    }
-  };
-
-  const onMassDelete = (results: string[]) => {
-    if (results.length !== 0) {
-      setInjects(injects.filter(i => (!results.includes(i.inject_id))));
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(queryableHelpers.paginationHelpers.getTotalElements() - 1);
     }
   };
 
@@ -310,30 +330,6 @@ const Injects: FunctionComponent<Props> = ({
     setOpenCreateDrawer(true);
     setPresetCreationValues(data);
   };
-
-  // Filters
-  const availableFilterNames = [
-    'inject_platforms',
-    'inject_kill_chain_phases',
-    'inject_injector_contract',
-    'inject_type',
-    'inject_title',
-  ];
-
-  const quickFilter: FilterGroup = {
-    mode: 'and',
-    filters: [
-      buildEmptyFilter('inject_platforms', 'contains'),
-      buildEmptyFilter('inject_kill_chain_phases', 'contains'),
-      buildEmptyFilter('inject_injector_contract', 'contains'),
-    ],
-  };
-
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`${exerciseOrScenarioId}-injects`, buildSearchPagination({
-    sorts: initSorting('inject_depends_duration', 'ASC'),
-    filterGroup: quickFilter,
-    size: 20,
-  }));
 
   // Toolbar
   const {
@@ -437,8 +433,14 @@ const Injects: FunctionComponent<Props> = ({
       inject_ids_to_process: selectAll ? undefined : deleteIds,
       inject_ids_to_ignore: ignoreIds,
       simulation_or_scenario_id: exerciseOrScenarioId,
+    }).then((result) => {
+      // We update the numbers of elements in the pagination
+      const newNumbers = Math.max(0, (queryableHelpers.paginationHelpers.getTotalElements() - result.length));
+      // We remove the deleted injects from the current data table
+      const deletedIds = result.map(inject => inject.inject_id);
+      setInjects(newNumbers !== 0 ? injects.filter(inject => !deletedIds.includes(inject.inject_id)) : []);
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(newNumbers);
     });
-    onMassDelete(deleteIds);
   };
 
   const massTestInjects = () => {

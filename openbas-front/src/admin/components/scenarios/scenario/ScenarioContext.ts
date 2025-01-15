@@ -67,7 +67,7 @@ const injectContextForScenario = (scenario: Scenario) => {
     async onDryImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
       return dryImportXlsForScenario(scenario.scenario_id, importId, input).then(result => result.data);
     },
-    onBulkDeleteInjects(param: InjectBulkProcessingInput): void {
+    onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
       return dispatch(bulkDeleteInjects(param));
     },
     bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatus[] }> {
