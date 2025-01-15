@@ -296,19 +296,11 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
-  const [presetCreationValues, setPresetCreationValues] = useState<{
-    inject_depends_duration_days?: number;
-    inject_depends_duration_hours?: number;
-    inject_depends_duration_minutes?: number;
-  }>();
 
-  const openCreateInjectDrawer = (data: {
-    inject_depends_duration_days?: number;
-    inject_depends_duration_hours?: number;
-    inject_depends_duration_minutes?: number;
-  }) => {
+  const [presetInjectDuration, setPresetInjectDuration] = useState<number>(0);
+  const openCreateInjectDrawer = (duration: number) => {
     setOpenCreateDrawer(true);
-    setPresetCreationValues(data);
+    setPresetInjectDuration(duration);
   };
 
   // Filters
@@ -496,7 +488,7 @@ const Injects: FunctionComponent<Props> = ({
               injects={injects}
               exerciseOrScenarioId={exerciseOrScenarioId}
               onUpdateInject={massUpdateInject}
-              openCreateInjectDrawer={openCreateInjectDrawer}
+              onTimelineClick={openCreateInjectDrawer}
               onSelectedInject={(inject) => {
                 const injectContract = inject?.inject_injector_contract.convertedContent;
                 const isContractExposed = injectContract?.config.expose;
@@ -645,7 +637,7 @@ const Injects: FunctionComponent<Props> = ({
           )}
           <ButtonCreate onClick={() => {
             setOpenCreateDrawer(true);
-            setPresetCreationValues(undefined);
+            setPresetInjectDuration(0);
           }}
           />
           <ToolBar
@@ -666,7 +658,7 @@ const Injects: FunctionComponent<Props> = ({
             open={openCreateDrawer}
             handleClose={() => setOpenCreateDrawer(false)}
             onCreateInject={onCreateInject}
-            presetValues={presetCreationValues}
+            presetInjectDuration={presetInjectDuration}
             // @ts-expect-error typing
             teamsFromExerciseOrScenario={teams}
             articlesFromExerciseOrScenario={articles}

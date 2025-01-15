@@ -5,6 +5,7 @@ import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
@@ -109,10 +110,13 @@ public class InjectService {
     injectDocumentRepository.deleteAll(updatedInjects);
   }
 
-  public <T> T convertInjectContent(@NotNull final Inject inject, @NotNull final Class<T> converter)
-      throws Exception {
+  public <T> T convertInjectContent(@NotNull final Inject inject, @NotNull final Class<T> converter) {
     ObjectNode content = inject.getContent();
-    return this.mapper.treeToValue(content, converter);
+      try {
+          return this.mapper.treeToValue(content, converter);
+      } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+      }
   }
 
   public void cleanInjectsDocScenario(String scenarioId, String documentId) {

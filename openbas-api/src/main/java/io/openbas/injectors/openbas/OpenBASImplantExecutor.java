@@ -19,6 +19,7 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.inject.service.ExecutableInjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +37,7 @@ public class OpenBASImplantExecutor extends Injector {
   private final AssetGroupService assetGroupService;
   private final InjectRepository injectRepository;
   private final InjectExpectationService injectExpectationService;
+  private final ExecutableInjectService executableInjectService;
 
   private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
     Map<Asset, Boolean> assets = new HashMap<>();
@@ -285,6 +287,16 @@ public class OpenBASImplantExecutor extends Injector {
     signatures.add(
         createSignature(
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME, "obas-implant-" + inject.getId()));
+
+    if (payload.getType().equals("Command")) {
+      Command executablePayload =
+          (Command) executableInjectService.getExecutablePayloadInject(inject.getId());
+
+      byte[] decodedBytes = Base64.getDecoder().decode(executablePayload.getContent());
+      String attackCommand = new String(decodedBytes);
+
+      signatures.add(createSignature(EXPECTATION_SIGNATURE_TYPE_COMMAND_LINE, attackCommand));
+    }
 
     if (!knownPayloadTypes.contains(payload.getType())) {
       throw new UnsupportedOperationException(

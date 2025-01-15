@@ -121,7 +121,7 @@ public class ExecutableInjectService {
     return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }
 
-  public Payload getExecutablePayloadInject(String injectId) throws Exception {
+  public Payload getExecutablePayloadInject(String injectId) {
     Inject inject =
         this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     InjectorContract contract =
