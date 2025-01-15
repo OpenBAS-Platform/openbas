@@ -24,13 +24,13 @@ public class TagRule implements Base {
   @UuidGenerator
   @JsonProperty("tag_rule_id")
   @NotBlank
-  @Queryable(filterable = true, searchable = true, sortable = true)
+  @Queryable(searchable = true)
   private String id;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "tag_id")
   @JsonProperty("tag_rule_tag")
-  @Queryable(searchable = true, filterable = true, sortable = true, path = "tag.name")
+  @Queryable(searchable = true, filterable = true, path = "tag.name")
   private Tag tag;
 
   @ManyToMany(fetch = FetchType.LAZY)
