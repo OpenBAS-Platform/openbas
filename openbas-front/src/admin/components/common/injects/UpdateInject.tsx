@@ -1,4 +1,4 @@
-import { Tab, Tabs } from '@mui/material';
+import { Avatar, Tab, Tabs } from '@mui/material';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -7,10 +7,12 @@ import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
+import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
 import type { Inject } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import InjectDetailsForm from './form/InjectDetailsForm';
 import UpdateInjectDetails from './UpdateInjectDetails';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
 
@@ -25,7 +27,7 @@ interface Props {
 }
 
 const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, injects, ...props }) => {
-  const { t } = useFormatter();
+  const { t, tPick } = useFormatter();
   const dispatch = useAppDispatch();
   const drawerRef = useRef(null);
   const [availableTabs] = useState<string[]>(['Inject details', 'Logical chains']);
@@ -72,15 +74,41 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             })}
           </Tabs>
         )}
+        {/* {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && ( */}
+        {/*  <UpdateInjectDetails */}
+        {/*    drawerRef={drawerRef} */}
+        {/*    contractContent={injectorContractContent} */}
+        {/*    injectId={injectId} */}
+        {/*    inject={inject} */}
+        {/*    handleClose={handleClose} */}
+        {/*    onUpdateInject={onUpdateInject} */}
+        {/*    isAtomic={isAtomic} */}
+        {/*    {...props} */}
+        {/*  /> */}
+        {/* )} */}
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
-          <UpdateInjectDetails
-            drawerRef={drawerRef}
-            contractContent={injectorContractContent}
-            injectId={injectId}
-            inject={inject}
-            handleClose={handleClose}
-            onUpdateInject={onUpdateInject}
+          <InjectDetailsForm
+            // contractContent
+            injectorContractLabel={tPick(injectorContractContent?.label)}
+            injectContractIcon={
+              injectorContractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${injectorContractContent.config.type}`} /> : undefined
+            }
+            injectHeaderAction={(
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {inject?.inject_injector_contract?.injector_contract_platforms?.map(
+                  platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+                )}
+              </div>
+            )}
+            injectHeaderTitle=""
+            disabled={!injectorContractContent}
             isAtomic={isAtomic}
+            inject={inject}
+            drawerRef={drawerRef}
+            handleClose={handleClose}
+            injectorContractContent={injectorContractContent}
+            onSubmitInject={onUpdateInject}
+            openDetail
             {...props}
           />
         )}
