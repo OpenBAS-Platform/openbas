@@ -428,7 +428,7 @@ const Injects: FunctionComponent<Props> = ({
       update_operations: operationsToPerform,
     })
       .then((result) => {
-        onBulkUpdate(result);
+        if (result) onBulkUpdate(result);
       });
   };
 
