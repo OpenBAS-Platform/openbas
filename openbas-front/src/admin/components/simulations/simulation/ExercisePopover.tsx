@@ -3,8 +3,11 @@ import React, { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
+import { checkExerciseTagRules } from '../../../../actions/exercises/exercise-action';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import { checkScenarioTagRules } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
+import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import Drawer from '../../../../components/common/Drawer';
@@ -16,15 +19,12 @@ import type {
   Exercise,
   ExerciseInput,
   UpdateExerciseInput,
-  UpdateScenarioInput
+  UpdateScenarioInput,
 } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
-import DialogApplyTagRule from "../../../../components/common/DialogApplyTagRule";
-import {checkScenarioTagRules} from "../../../../actions/scenarios/scenario-actions";
-import {checkExerciseTagRules} from "../../../../actions/exercises/exercise-action";
 
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
 
@@ -45,7 +45,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
 
   // Form
   const initialValues: UpdateExerciseInput = {
@@ -71,22 +70,20 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   const onSubmit = (data: UpdateExerciseInput) => {
     setExerciseFormData(data);
-    //before updating the exercise we are checking if tag rules could apply
-    //-> if yes we ask the user to apply or not apply the rules at the update
+    // before updating the exercise we are checking if tag rules could apply
+    // -> if yes we ask the user to apply or not apply the rules at the update
     checkExerciseTagRules(exercise.exercise_id, data.exercise_tags ?? []).then(
-        (result: { data: CheckScenarioRulesOutput })  => {
-          if(result.data.rules_found){
-            handleOpenApplyRule();
-          } else {
-            submitExerciseUpdate(data)
-          }
-        },
+      (result: { data: CheckScenarioRulesOutput }) => {
+        if (result.data.rules_found) {
+          handleOpenApplyRule();
+        } else {
+          submitExerciseUpdate(data);
+        }
+      },
     );
   };
 
   const submitExerciseUpdate = (data: UpdateExerciseInput) => {
-
-
     const input = {
       exercise_name: data.exercise_name,
       exercise_subtitle: data.exercise_subtitle,
@@ -100,11 +97,11 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_mail_from: data.exercise_mail_from,
       exercise_message_header: data.exercise_message_header,
       exercise_message_footer: data.exercise_message_footer,
-      apply_tag_rule: data.apply_tag_rule
+      apply_tag_rule: data.apply_tag_rule,
 
     };
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
-  }
+  };
 
   const handleApplyRule = () => {
     exerciseFormData.apply_tag_rule = true;
@@ -113,7 +110,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   };
   const handleDontApplyRule = () => {
     exerciseFormData.apply_tag_rule = false;
-    submitExerciseUpdate(exerciseFormData)
+    submitExerciseUpdate(exerciseFormData);
     handleCloseApplyRule();
   };
 
@@ -141,7 +138,7 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     });
   };
 
-  //apply rule dialog
+  // apply rule dialog
   const [openApplyRule, setOpenApplyRule] = useState(false);
   const handleOpenApplyRule = () => setOpenApplyRule(true);
   const handleCloseApplyRule = () => setOpenApplyRule(false);
@@ -169,7 +166,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleToggleExportTeams = () => setExportTeams(!exportTeams);
   const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
   const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
-
 
   const permissions = usePermissions(exercise.exercise_id);
 
@@ -204,10 +200,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
       </Drawer>
       <DialogApplyTagRule
-          open={openApplyRule}
-          handleClose={handleCloseApplyRule}
-          handleApplyRule={handleApplyRule}
-          handleDontApplyRule={handleDontApplyRule}
+        open={openApplyRule}
+        handleClose={handleCloseApplyRule}
+        handleApplyRule={handleApplyRule}
+        handleDontApplyRule={handleDontApplyRule}
       />
       <Drawer
         open={openReports}
