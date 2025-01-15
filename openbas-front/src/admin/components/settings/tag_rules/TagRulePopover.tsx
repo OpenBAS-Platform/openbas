@@ -7,7 +7,7 @@ import Drawer from '../../../../components/common/Drawer';
 import IconPopover from '../../../../components/common/IconPopover';
 import { useFormatter } from '../../../../components/i18n';
 import type { TagRuleOutput } from '../../../../utils/api-types';
-import { OPEN_CTI_TAG_NAME } from './TagRuleConstants';
+import OPEN_CTI_TAG_NAME from './TagRuleConstants';
 import TagRuleUpdate from './TagRuleUpdate';
 
 interface Props {

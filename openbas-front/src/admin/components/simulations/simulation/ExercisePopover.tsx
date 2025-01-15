@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router';
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { checkExerciseTagRules } from '../../../../actions/exercises/exercise-action';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import { checkScenarioTagRules } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -17,9 +16,7 @@ import { useHelper } from '../../../../store';
 import type {
   CheckScenarioRulesOutput,
   Exercise,
-  ExerciseInput,
   UpdateExerciseInput,
-  UpdateScenarioInput,
 } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -68,20 +65,73 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseEdit = () => setOpenEdit(false);
   const [exerciseFormData, setExerciseFormData] = useState<UpdateExerciseInput>(initialValues);
 
-  const onSubmit = (data: UpdateExerciseInput) => {
-    setExerciseFormData(data);
-    // before updating the exercise we are checking if tag rules could apply
-    // -> if yes we ask the user to apply or not apply the rules at the update
-    checkExerciseTagRules(exercise.exercise_id, data.exercise_tags ?? []).then(
-      (result: { data: CheckScenarioRulesOutput }) => {
-        if (result.data.rules_found) {
-          handleOpenApplyRule();
-        } else {
-          submitExerciseUpdate(data);
-        }
-      },
-    );
+  // Delete
+  const [openDelete, setOpenDelete] = useState(false);
+  const handleOpenDelete = () => setOpenDelete(true);
+  const handleCloseDelete = () => setOpenDelete(false);
+
+  const submitDelete = () => {
+    dispatch(deleteExercise(exercise.exercise_id)).then(() => {
+      handleCloseDelete();
+      if (onDelete) onDelete(exercise.exercise_id);
+    });
   };
+
+  // Duplicate
+  const [openDuplicate, setOpenDuplicate] = useState(false);
+  const handleOpenDuplicate = () => setOpenDuplicate(true);
+  const handleCloseDuplicate = () => setOpenDuplicate(false);
+
+  const submitDuplicate = () => {
+    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string; entities: { exercises: Exercise } }) => {
+      handleCloseDuplicate();
+      navigate(`/admin/simulations/${result.result}`);
+    });
+  };
+
+  // Export
+  const [openExport, setOpenExport] = useState(false);
+  const [exportTeams, setExportTeams] = useState(false);
+  const [exportPlayers, setExportPlayers] = useState(false);
+  const [exportVariableValues, setExportVariableValues] = useState(false);
+  const handleOpenExport = () => setOpenExport(true);
+  const handleCloseExport = () => setOpenExport(false);
+
+  // Reports
+  const [openReports, setOpenReports] = useState(false);
+  const handleOpenReports = () => setOpenReports(true);
+  const handleCloseReports = () => setOpenReports(false);
+
+  // apply rule dialog
+  const [openApplyRule, setOpenApplyRule] = useState(false);
+  const handleOpenApplyRule = () => setOpenApplyRule(true);
+  const handleCloseApplyRule = () => setOpenApplyRule(false);
+
+  const submitExport = () => {
+    const link = document.createElement('a');
+    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithTeams=${exportTeams}&isWithPlayers=${exportPlayers}&isWithVariableValues=${exportVariableValues}`;
+    link.click();
+    handleCloseExport();
+  };
+
+  const handleToggleExportTeams = () => setExportTeams(!exportTeams);
+  const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
+  const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
+
+  const permissions = usePermissions(exercise.exercise_id);
+
+  // Fetching data
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
+    userAdmin: helper.getMe()?.user_admin ?? false,
+  }));
+
+  // Button Popover
+  const entries = [];
+  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
+  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
+  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !userAdmin });
+  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
+  if (actions.includes('Access reports')) entries.push({ label: 'Access reports', action: () => handleOpenReports() });
 
   const submitExerciseUpdate = (data: UpdateExerciseInput) => {
     const input = {
@@ -114,74 +164,20 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     handleCloseApplyRule();
   };
 
-  // Delete
-  const [openDelete, setOpenDelete] = useState(false);
-  const handleOpenDelete = () => setOpenDelete(true);
-  const handleCloseDelete = () => setOpenDelete(false);
-
-  const submitDelete = () => {
-    dispatch(deleteExercise(exercise.exercise_id)).then(() => {
-      handleCloseDelete();
-      if (onDelete) onDelete(exercise.exercise_id);
-    });
+  const onSubmit = (data: UpdateExerciseInput) => {
+    setExerciseFormData(data);
+    // before updating the exercise we are checking if tag rules could apply
+    // -> if yes we ask the user to apply or not apply the rules at the update
+    checkExerciseTagRules(exercise.exercise_id, data.exercise_tags ?? []).then(
+      (result: { data: CheckScenarioRulesOutput }) => {
+        if (result.data.rules_found) {
+          handleOpenApplyRule();
+        } else {
+          submitExerciseUpdate(data);
+        }
+      },
+    );
   };
-
-  // Duplicate
-  const [openDuplicate, setOpenDuplicate] = useState(false);
-  const handleOpenDuplicate = () => setOpenDuplicate(true);
-  const handleCloseDuplicate = () => setOpenDuplicate(false);
-
-  const submitDuplicate = () => {
-    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string; entities: { exercises: Exercise } }) => {
-      handleCloseDuplicate();
-      navigate(`/admin/simulations/${result.result}`);
-    });
-  };
-
-  // apply rule dialog
-  const [openApplyRule, setOpenApplyRule] = useState(false);
-  const handleOpenApplyRule = () => setOpenApplyRule(true);
-  const handleCloseApplyRule = () => setOpenApplyRule(false);
-
-  // Export
-  const [openExport, setOpenExport] = useState(false);
-  const [exportTeams, setExportTeams] = useState(false);
-  const [exportPlayers, setExportPlayers] = useState(false);
-  const [exportVariableValues, setExportVariableValues] = useState(false);
-  const handleOpenExport = () => setOpenExport(true);
-  const handleCloseExport = () => setOpenExport(false);
-
-  // Reports
-  const [openReports, setOpenReports] = useState(false);
-  const handleOpenReports = () => setOpenReports(true);
-  const handleCloseReports = () => setOpenReports(false);
-
-  const submitExport = () => {
-    const link = document.createElement('a');
-    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithTeams=${exportTeams}&isWithPlayers=${exportPlayers}&isWithVariableValues=${exportVariableValues}`;
-    link.click();
-    handleCloseExport();
-  };
-
-  const handleToggleExportTeams = () => setExportTeams(!exportTeams);
-  const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
-  const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
-
-  const permissions = usePermissions(exercise.exercise_id);
-
-  // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
-
-  // Button Popover
-  const entries = [];
-  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !userAdmin });
-  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
-  if (actions.includes('Access reports')) entries.push({ label: 'Access reports', action: () => handleOpenReports() });
-
   return (
     <>
       <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />

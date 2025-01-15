@@ -4,8 +4,7 @@ import {
   AlertTitle,
   Autocomplete,
   Button,
-  Chip, DialogContent,
-  DialogTitle,
+  Chip,
   Grid,
   MenuItem,
   TextField as MuiTextField,
@@ -15,14 +14,12 @@ import { FunctionComponent, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import Dialog from '../../../components/common/Dialog';
 import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
 import { useFormatter } from '../../../components/i18n';
 import type { ScenarioInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
-import AttackPatternForm from '../settings/attack_patterns/AttackPatternForm';
 import { scenarioCategories } from './constants';
 
 interface Props {

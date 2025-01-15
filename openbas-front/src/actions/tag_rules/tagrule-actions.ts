@@ -1,5 +1,3 @@
-import { Dispatch } from 'redux';
-
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 import type { SearchPaginationInput, TagRuleInput, TagRuleOutput } from '../../utils/api-types';
 

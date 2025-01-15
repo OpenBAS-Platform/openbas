@@ -15,7 +15,7 @@ import { zodImplement } from '../../../../utils/Zod';
 import AssetGroupPopover from '../../assets/asset_groups/AssetGroupPopover';
 import AssetGroupsList from '../../assets/asset_groups/AssetGroupsList';
 import InjectAddAssetGroups from '../../simulations/simulation/injects/asset_groups/InjectAddAssetGroups';
-import { OPEN_CTI_TAG_NAME } from './TagRuleConstants';
+import OPEN_CTI_TAG_NAME from './TagRuleConstants';
 
 interface Props {
   onSubmit: SubmitHandler<TagRuleInput>;
