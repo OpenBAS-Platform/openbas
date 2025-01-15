@@ -83,10 +83,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
       .then((result: { entities: { tags: Record<string, Tag> }; result: string }) => {
         if (result.result) {
           const newTag = result.entities.tags[result.result];
-          const newTags = R.append(
-            newTag.tag_name,
-          );
-          fieldOnChange(newTags);
+          fieldOnChange(newTag.tag_name);
           handleCloseTagCreation();
         }
         return result;

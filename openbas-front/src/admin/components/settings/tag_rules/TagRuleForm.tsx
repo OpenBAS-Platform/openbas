@@ -101,6 +101,7 @@ const TagRuleForm: React.FC<Props> = ({
                         inline
                         onRemoveAssetGroupFromList={result =>
                           onChange(assetGroupIds.filter(ag => ag !== result))}
+                        onDelete={result => onChange(assetGroupIds.filter(ag => ag !== result))}
                         removeAssetGroupFromListMessage="Remove from the Asset Rule"
                       />
                     )}
