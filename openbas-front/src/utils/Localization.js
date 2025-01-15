@@ -1453,8 +1453,11 @@ const i18n = {
       'Update the asset rule': 'Mettre à jour la règle d\'actifs',
       'tag_rule_asset_groups': 'Groupes d\'actifs',
       'tag_rule_tag': 'Tag',
-
-    },
+      'Create an asset rule': 'Créer une règle d\'actif',
+      'Tag': 'Tag',
+      'Select a Tag': 'Sélectionnez un tag',
+      'asset rule': 'règle d\'actif',
+  },
     zh: {
       'Email address': 'email地址',
       'Password': '密码',
@@ -2855,6 +2858,10 @@ const i18n = {
       'Update the asset rule': '更新此资产规则',
       'tag_rule_asset_groups': '资产组',
       'tag_rule_tag': '标签',
+      'Create an asset rule': '创建资产规则',
+      'Tag': '标签',
+      'Select a Tag': '选择一个标签',
+      'asset rule': '资产规则',
     },
     en: {
       'openbas_email': 'Email',
@@ -3033,6 +3040,10 @@ const i18n = {
       'Update the asset rule': 'Update the asset rule',
       'tag_rule_asset_groups': 'Asset groups',
       'tag_rule_tag': 'Tag',
+      'Create an asset rule': 'Create an asset rule',
+      'Tag': 'Tag',
+      'Select a Tag': 'Select a Tag',
+      'asset rule': 'asset rule',
     },
   },
 };
