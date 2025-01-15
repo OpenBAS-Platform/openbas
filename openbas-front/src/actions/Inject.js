@@ -1,4 +1,12 @@
-import { bulkDeleteReferential, delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import {
+  bulkDeleteReferential,
+  delReferential,
+  getReferential,
+  postReferential,
+  putReferential,
+  simpleDelCall,
+  simplePutCall,
+} from '../utils/Action';
 import * as schema from './Schema';
 
 // -- INJECTS --
@@ -13,9 +21,19 @@ export const bulkDeleteInjects = data => (dispatch) => {
   return bulkDeleteReferential(uri, 'injects', data)(dispatch);
 };
 
+export const bulkDeleteInjectsSimple = (data) => {
+  const uri = `/api/injects`;
+  return simpleDelCall(uri, data);
+};
+
 export const bulkUpdateInject = data => (dispatch) => {
   const uri = `/api/injects`;
   return putReferential(schema.inject, uri, data)(dispatch);
+};
+
+export const bulkUpdateInjectSimple = (data) => {
+  const uri = `/api/injects`;
+  return simplePutCall(uri, data);
 };
 
 // -- EXERCISES --
