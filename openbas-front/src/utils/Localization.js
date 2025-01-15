@@ -1457,7 +1457,7 @@ const i18n = {
       'Tag': 'Tag',
       'Select a Tag': 'Sélectionnez un tag',
       'asset rule': 'règle d\'actif',
-  },
+    },
     zh: {
       'Email address': 'email地址',
       'Password': '密码',
