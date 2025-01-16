@@ -115,7 +115,8 @@ const TimelineOverview = () => {
 
   const filteredInjects = filtering.filterAndSort(injects);
 
-  const pendingInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status === null));
+  const isEnable = (inject: InjectStore): boolean => inject.inject_injector_contract.injector_contract_content_parsed?.config.expose && inject.inject_enabled;
+  const pendingInjects = filtering.filterAndSort(injects.filter((inject: InjectStore) => inject.inject_status === null && isEnable(inject)));
 
   const processedInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status !== null));
 
@@ -160,7 +161,6 @@ const TimelineOverview = () => {
               {pendingInjects.length > 0 ? (
                 <List style={{ paddingTop: 0 }}>
                   {pendingInjects.map((inject: InjectStore) => {
-                    const isDisabled = !inject.inject_injector_contract.injector_contract_content_parsed?.config.expose;
                     return (
                       <ListItem
                         key={inject.inject_id}
@@ -168,7 +168,6 @@ const TimelineOverview = () => {
                           <InjectPopover
                             inject={inject}
                             setSelectedInjectId={setSelectedInjectId}
-                            isDisabled={isDisabled}
                             canDone
                             canTriggerNow
                           />
@@ -178,7 +177,6 @@ const TimelineOverview = () => {
                           dense
                           classes={{ root: classes.item }}
                           divider
-                          disabled={isDisabled || !inject.inject_enabled}
                           onClick={() => setSelectedInjectId(inject.inject_id)}
                         >
                           <ListItemIcon>
