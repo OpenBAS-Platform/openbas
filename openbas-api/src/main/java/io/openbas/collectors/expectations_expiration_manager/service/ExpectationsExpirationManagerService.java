@@ -47,7 +47,7 @@ public class ExpectationsExpirationManagerService {
         });
   }
 
-  //TODO
+  // TODO
   private void computeExpectationsForAgents(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssets =
         expectations.stream().filter(e -> e.getAsset() != null).toList();
@@ -61,7 +61,7 @@ public class ExpectationsExpirationManagerService {
         });
   }
 
-  //TODO
+  // TODO
   private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssets =
         expectations.stream().filter(e -> e.getAsset() != null).toList();

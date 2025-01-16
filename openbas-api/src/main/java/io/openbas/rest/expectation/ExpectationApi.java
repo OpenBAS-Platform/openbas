@@ -142,7 +142,7 @@ public class ExpectationApi extends RestBehavior {
                   expectationAssetGroup.getType());
           // Every expectation assets are filled
           if (expectationAssets.stream().noneMatch(e -> e.getResults().isEmpty())) {
-            //TODO Add compute for agents expectations
+            // TODO Add compute for agents expectations
             this.injectExpectationService.computeExpectationGroup(
                 expectationAssetGroup,
                 expectationAssets,
