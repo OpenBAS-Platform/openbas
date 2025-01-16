@@ -71,7 +71,7 @@ public class ExportService {
             .writerWithDefaultPrettyPrinter()
             .writeValueAsBytes(importExport));
     zipExport.closeEntry();
-    // Add the documents
+    // Add the actual files for the documents
     importExport.getAllDocumentIds().stream()
         .distinct()
         .forEach(

@@ -1,19 +1,22 @@
 package io.openbas.rest.exercise;
 
+import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
-import io.openbas.service.ChallengeService;
-import io.openbas.service.VariableService;
+import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.rest.exercise.exports.ExportOptions;
+import io.openbas.rest.exercise.service.ExportService;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
-import jakarta.annotation.Resource;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import io.openbas.utils.mockUser.WithMockAdminUser;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExerciseApiImportTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ExerciseComposer exerciseComposer;
+  @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private ArticleComposer articleComposer;
   @Autowired private ChannelComposer channelComposer;
   @Autowired private LessonsQuestionsComposer lessonsQuestionsComposer;
@@ -35,9 +39,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
   @Autowired private ObjectiveComposer objectiveComposer;
   @Autowired private DocumentComposer documentComposer;
   @Autowired private TagComposer tagComposer;
-  @Autowired private VariableService variableService;
-  @Autowired private ChallengeService challengeService;
-  @Resource protected ObjectMapper mapper;
+  @Autowired private ExportService exportService;
+
+  private static int DEFAULT_EXPORT_OPTIONS = ExportOptions.mask(false, false, false);
 
   @BeforeEach
   void before() {
@@ -103,9 +107,22 @@ public class ExerciseApiImportTest extends IntegrationTest {
         .get();
   }
 
+  @DisplayName("Given a valid export zip file, all objects created as expected")
   @Test
-  public void testImport() {
+  @WithMockAdminUser
+  public void testImport() throws Exception {
     Exercise exercise = getExercise();
-    byte[] zipBytes = null;
+    byte[] zipBytes = exportService.exportExerciseToZip(exercise, DEFAULT_EXPORT_OPTIONS);
+
+    MockMultipartFile mmf = new MockMultipartFile("export.zip", zipBytes);
+
+    mvc.perform(
+      multipart(EXERCISE_URI + "/import")
+            .file(mmf)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().is2xxSuccessful());
+
+    Assertions.assertEquals(exerciseRepository.findById(exercise.getId()), exercise);
+
   }
 }
