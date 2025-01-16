@@ -115,8 +115,8 @@ const TimelineOverview = () => {
 
   const filteredInjects = filtering.filterAndSort(injects);
 
-  const isNotDisable = (inject: InjectStore): boolean => inject.inject_injector_contract.injector_contract_content_parsed?.config.expose && inject.inject_enabled;
-  const pendingInjects = filtering.filterAndSort(injects.filter((inject: InjectStore) => inject.inject_status === null && isNotDisable(inject)));
+  const isEnable = (inject: InjectStore): boolean => inject.inject_injector_contract.injector_contract_content_parsed?.config.expose && inject.inject_enabled;
+  const pendingInjects = filtering.filterAndSort(injects.filter((inject: InjectStore) => inject.inject_status === null && isEnable(inject)));
 
   const processedInjects = filtering.filterAndSort(injects.filter((i: InjectStore) => i.inject_status !== null));
 
