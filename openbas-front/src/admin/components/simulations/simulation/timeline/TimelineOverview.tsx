@@ -168,7 +168,6 @@ const TimelineOverview = () => {
                           <InjectPopover
                             inject={inject}
                             setSelectedInjectId={setSelectedInjectId}
-                            isDisabled={false}
                             canDone
                             canTriggerNow
                           />
