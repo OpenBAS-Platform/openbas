@@ -20,6 +20,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Transactional
 @TestInstance(PER_CLASS)
 public class ExerciseApiImportTest extends IntegrationTest {
@@ -63,47 +65,47 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
   private Exercise getExercise() {
     return exerciseComposer
-        .forExercise(ExerciseFixture.createDefaultCrisisExercise())
+        .forExercise(ExerciseFixture.createDefaultCrisisExercise()).withId(UUID.randomUUID().toString())
         .withArticle(
             articleComposer
-                .forArticle(ArticleFixture.getArticleNoChannel())
+                .forArticle(ArticleFixture.getArticleNoChannel()).withId(UUID.randomUUID().toString())
                 .withChannel(channelComposer.forChannel(ChannelFixture.getChannel())))
         .withLessonCategory(
             lessonsCategoryComposer
-                .forLessonsCategory(LessonsCategoryFixture.createLessonCategory())
+                .forLessonsCategory(LessonsCategoryFixture.createLessonCategory()).withId(UUID.randomUUID().toString())
                 .withLessonsQuestion(
                     lessonsQuestionsComposer.forLessonsQuestion(
-                        LessonsQuestionFixture.createLessonsQuestion())))
+                        LessonsQuestionFixture.createLessonsQuestion()).withId(UUID.randomUUID().toString())))
         .withTeam(
             teamComposer
-                .forTeam(TeamFixture.getEmptyTeam())
+                .forTeam(TeamFixture.getEmptyTeam()).withId(UUID.randomUUID().toString())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
                 .withUser(
                     userComposer
-                        .forUser(UserFixture.getUser())
+                        .forUser(UserFixture.getUser()).withId(UUID.randomUUID().toString())
                         .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
                         .withOrganization(
                             organizationComposer
-                                .forOrganization(OrganizationFixture.createOrganization())
+                                .forOrganization(OrganizationFixture.createOrganization()).withId(UUID.randomUUID().toString())
                                 .withTag(
                                     tagComposer.forTag(
                                         TagFixture.getTagWithText("Organization tag"))))))
         .withTeamUsers()
         .withInject(
             injectComposer
-                .forInject(InjectFixture.getInjectWithoutContract())
+                .forInject(InjectFixture.getInjectWithoutContract()).withId(UUID.randomUUID().toString())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Inject tag")))
                 .withChallenge(
                     challengeComposer
-                        .forChallenge(ChallengeFixture.createDefaultChallenge())
+                        .forChallenge(ChallengeFixture.createDefaultChallenge()).withId(UUID.randomUUID().toString())
                         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
         .withDocument(
             documentComposer
-                .forDocument(DocumentFixture.getDocumentJpeg())
+                .forDocument(DocumentFixture.getDocumentJpeg()).withId(UUID.randomUUID().toString())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
-        .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
-        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
-        .withVariable(variableComposer.forVariable(VariableFixture.getVariable()))
+        .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()).withId(UUID.randomUUID().toString()))
+        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")).withId(UUID.randomUUID().toString()))
+        .withVariable(variableComposer.forVariable(VariableFixture.getVariable()).withId(UUID.randomUUID().toString()))
         .get();
   }
 

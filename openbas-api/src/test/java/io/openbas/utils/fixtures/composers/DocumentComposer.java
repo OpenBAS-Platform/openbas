@@ -29,6 +29,11 @@ public class DocumentComposer extends ComposerBase<Document> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.document.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);

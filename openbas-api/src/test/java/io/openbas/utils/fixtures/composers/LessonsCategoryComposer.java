@@ -26,6 +26,11 @@ public class LessonsCategoryComposer extends ComposerBase<LessonsCategory> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.lessonsCategory.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       lessonsCategoryRepository.save(lessonsCategory);

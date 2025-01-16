@@ -5,6 +5,8 @@ import io.openbas.database.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class ArticleComposer extends ComposerBase<Article> {
   @Autowired private ArticleRepository articleRepository;
@@ -20,6 +22,11 @@ public class ArticleComposer extends ComposerBase<Article> {
     public Composer withChannel(ChannelComposer.Composer channelComposer) {
       this.channelComposer = channelComposer;
       this.article.setChannel(channelComposer.get());
+      return this;
+    }
+
+    public Composer withId(String id) {
+      this.article.setId(id);
       return this;
     }
 

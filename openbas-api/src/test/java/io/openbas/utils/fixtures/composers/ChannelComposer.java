@@ -22,6 +22,11 @@ public class ChannelComposer extends ComposerBase<Channel> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.channel.setId(id);
+      return this;
+    }
+
     @Override
     public Channel get() {
       return channel;

@@ -29,6 +29,11 @@ public class OrganizationComposer extends ComposerBase<Organization> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.organization.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);

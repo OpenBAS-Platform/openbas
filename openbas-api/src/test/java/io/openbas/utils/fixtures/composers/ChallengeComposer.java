@@ -6,6 +6,8 @@ import io.openbas.database.repository.ChallengeRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,11 @@ public class ChallengeComposer extends ComposerBase<Challenge> {
       Set<Tag> tempTags = this.challenge.getTags();
       tempTags.add(tagComposer.get());
       this.challenge.setTags(tempTags);
+      return this;
+    }
+
+    public Composer withId(String id) {
+      this.challenge.setId(id);
       return this;
     }
 

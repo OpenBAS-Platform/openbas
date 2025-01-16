@@ -39,6 +39,11 @@ public class TeamComposer extends ComposerBase<Team> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.team.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       userComposers.forEach(UserComposer.Composer::persist);

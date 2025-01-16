@@ -16,6 +16,11 @@ public class TagComposer extends ComposerBase<Tag> {
       this.tag = tag;
     }
 
+    public Composer withId(String id) {
+      this.tag.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       tagRepository.save(tag);

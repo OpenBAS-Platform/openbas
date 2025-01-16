@@ -111,6 +111,11 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.exercise.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.articleComposers.forEach(ArticleComposer.Composer::persist);

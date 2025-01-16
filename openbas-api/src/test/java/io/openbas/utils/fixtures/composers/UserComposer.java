@@ -36,6 +36,11 @@ public class UserComposer extends ComposerBase<User> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.user.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);

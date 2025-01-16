@@ -47,6 +47,11 @@ public class InjectComposer extends ComposerBase<Inject> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.inject.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       tagComposers.forEach(TagComposer.Composer::persist);

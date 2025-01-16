@@ -16,6 +16,11 @@ public class VariableComposer extends ComposerBase<Variable> {
       this.variable = variable;
     }
 
+    public Composer withId(String id) {
+      this.variable.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       variableRepository.save(variable);
