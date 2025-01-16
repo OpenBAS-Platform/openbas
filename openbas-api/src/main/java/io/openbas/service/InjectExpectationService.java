@@ -209,6 +209,7 @@ public class InjectExpectationService {
     List<Team> teams = executableInject.getTeams();
     List<Asset> assets = executableInject.getAssets();
     List<AssetGroup> assetGroups = executableInject.getAssetGroups();
+
     if ((isScheduledInject || isAtomicTesting) && !expectations.isEmpty()) {
       if (!teams.isEmpty()) {
         List<InjectExpectation> injectExpectationsByTeam;
@@ -285,10 +286,16 @@ public class InjectExpectationService {
                                       expectationConverter(team, executableInject, expectation)))
                   .collect(Collectors.toList());
         }
-
         injectExpectationsByTeam.addAll(injectExpectationsByUserAndTeam);
         injectExpectationRepository.saveAll(injectExpectationsByTeam);
-      } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
+
+      } else if (!assets.isEmpty()) {
+        List<InjectExpectation> injectExpectations =
+            expectations.stream()
+                .map(expectation -> expectationConverter(executableInject, expectation))
+                .toList();
+        injectExpectationRepository.saveAll(injectExpectations);
+      } else if (!assetGroups.isEmpty()) {
         List<InjectExpectation> injectExpectations =
             expectations.stream()
                 .map(expectation -> expectationConverter(executableInject, expectation))
