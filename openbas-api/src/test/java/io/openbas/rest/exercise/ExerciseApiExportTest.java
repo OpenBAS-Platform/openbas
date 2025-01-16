@@ -133,8 +133,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     ObjectMapper exportMapper = mapper.copy();
     String expectedJson =
         exportMapper.writeValueAsString(
-            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService)
-                .withOptions(0));
+            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService).withOptions(0));
 
     assertThatJson(expectedJson).isObject().isEqualTo(actualJson);
   }
@@ -163,8 +162,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     ObjectMapper exportMapper = mapper.copy();
     String expectedJson =
         exportMapper.writeValueAsString(
-            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService)
-                .withOptions(7));
+            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService).withOptions(7));
 
     assertThatJson(expectedJson).isObject().isEqualTo(actualJson);
   }

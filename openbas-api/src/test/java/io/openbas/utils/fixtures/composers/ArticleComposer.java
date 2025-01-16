@@ -5,8 +5,6 @@ import io.openbas.database.repository.ArticleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
 public class ArticleComposer extends ComposerBase<Article> {
   @Autowired private ArticleRepository articleRepository;

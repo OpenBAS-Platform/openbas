@@ -243,9 +243,7 @@ public class ExerciseFileExport {
 
   @JsonIgnore private int exportOptionsMask = 0;
 
-  private ExerciseFileExport(
-      ObjectMapper objectMapper,
-      ChallengeService challengeService) {
+  private ExerciseFileExport(ObjectMapper objectMapper, ChallengeService challengeService) {
     this.objectMapper = objectMapper;
     this.challengeService = challengeService;
 
@@ -270,11 +268,8 @@ public class ExerciseFileExport {
   }
 
   public static final ExerciseFileExport fromExercise(
-      Exercise exercise,
-      ObjectMapper objectMapper,
-      ChallengeService challengeService) {
-    ExerciseFileExport efe =
-        new ExerciseFileExport(objectMapper, challengeService);
+      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
+    ExerciseFileExport efe = new ExerciseFileExport(objectMapper, challengeService);
     efe.setExercise(exercise);
     return efe;
   }

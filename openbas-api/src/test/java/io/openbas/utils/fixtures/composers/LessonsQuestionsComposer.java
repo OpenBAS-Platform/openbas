@@ -21,6 +21,7 @@ public class LessonsQuestionsComposer extends ComposerBase<LessonsQuestion> {
       this.lessonsQuestion.setId(id);
       return this;
     }
+
     @Override
     public Composer persist() {
       lessonsQuestionRepository.save(lessonsQuestion);

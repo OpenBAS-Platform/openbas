@@ -6,8 +6,6 @@ import io.openbas.database.repository.ChallengeRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
