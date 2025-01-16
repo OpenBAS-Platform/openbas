@@ -219,7 +219,7 @@ public class ExerciseFileExport {
     if (variables == null) {
       return this.exercise == null
           ? new ArrayList<>()
-          : this.variableService.variablesFromExercise(this.exercise.getId()).stream().toList();
+          : this.exercise.getVariables().stream().toList();
     }
     return variables;
   }
@@ -245,10 +245,8 @@ public class ExerciseFileExport {
 
   private ExerciseFileExport(
       ObjectMapper objectMapper,
-      VariableService variableService,
       ChallengeService challengeService) {
     this.objectMapper = objectMapper;
-    this.variableService = variableService;
     this.challengeService = challengeService;
 
     this.objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
@@ -274,10 +272,9 @@ public class ExerciseFileExport {
   public static final ExerciseFileExport fromExercise(
       Exercise exercise,
       ObjectMapper objectMapper,
-      VariableService variableService,
       ChallengeService challengeService) {
     ExerciseFileExport efe =
-        new ExerciseFileExport(objectMapper, variableService, challengeService);
+        new ExerciseFileExport(objectMapper, challengeService);
     efe.setExercise(exercise);
     return efe;
   }

@@ -57,7 +57,7 @@ public class ExportService {
 
     ExerciseFileExport importExport =
         ExerciseFileExport.fromExercise(
-                exercise, objectMapper, this.variableService, this.challengeService)
+                exercise, objectMapper, this.challengeService)
             .withOptions(exportOptionsMask);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

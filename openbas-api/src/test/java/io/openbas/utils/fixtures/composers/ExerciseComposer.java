@@ -30,7 +30,9 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
 
     public Composer withVariable(VariableComposer.Composer variableComposer) {
       variableComposers.add(variableComposer);
-      variableComposer.get().setExercise(exercise);
+      List<Variable> variables = exercise.getVariables();
+      variables.add(variableComposer.get());
+      this.exercise.setVariables(variables);
       return this;
     }
 
@@ -125,8 +127,8 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       this.objectiveComposers.forEach(ObjectiveComposer.Composer::persist);
       this.tagComposers.forEach(TagComposer.Composer::persist);
       this.documentComposers.forEach(DocumentComposer.Composer::persist);
-      exerciseRepository.save(exercise);
       this.variableComposers.forEach(VariableComposer.Composer::persist);
+      exerciseRepository.save(exercise);
       return this;
     }
 
