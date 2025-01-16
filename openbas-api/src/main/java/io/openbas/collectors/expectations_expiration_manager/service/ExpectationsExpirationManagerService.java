@@ -26,6 +26,7 @@ public class ExpectationsExpirationManagerService {
   public void computeExpectations() {
     List<InjectExpectation> expectations = this.injectExpectationService.expectationsNotFill();
     if (!expectations.isEmpty()) {
+      this.computeExpectationsForAgents(expectations);
       this.computeExpectationsForAssets(expectations);
       this.computeExpectationsForAssetGroups(expectations);
       this.computeExpectations(expectations);
@@ -46,6 +47,21 @@ public class ExpectationsExpirationManagerService {
         });
   }
 
+  //TODO
+  private void computeExpectationsForAgents(@NotNull final List<InjectExpectation> expectations) {
+    List<InjectExpectation> expectationAssets =
+        expectations.stream().filter(e -> e.getAsset() != null).toList();
+    expectationAssets.forEach(
+        (expectation) -> {
+          if (isExpired(expectation)) {
+            String result = computeFailedMessage(expectation.getType());
+            this.injectExpectationService.computeExpectation(
+                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
+          }
+        });
+  }
+
+  //TODO
   private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssets =
         expectations.stream().filter(e -> e.getAsset() != null).toList();
