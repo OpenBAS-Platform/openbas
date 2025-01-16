@@ -47,6 +47,10 @@
       "commitMessagePrefix": "[DANGER]"
     },
     {
+      "matchBaseBranches": ["release/current"],
+      "commitMessageSuffix": null
+    },
+    {
       "matchJsonata": ["$exists(isVulnerabilityAlert)"],
       "matchBaseBranches": ["release/current"],
       "enabled": false
