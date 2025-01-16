@@ -35,6 +35,7 @@
     "html-react-parser": "5.2.2",
     "html-to-image": "1.11.13",
     "http-proxy-middleware": "3.0.3",
+    "i18n-auto-translation": "1.10.0",
     "js-file-download": "0.4.12",
     "mdi-material-ui": "7.9.3",
     "moment": "2.30.1",
