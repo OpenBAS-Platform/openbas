@@ -28,6 +28,12 @@ public class VariableComposer extends ComposerBase<Variable> {
     }
 
     @Override
+    public Composer delete() {
+      variableRepository.delete(variable);
+      return this;
+    }
+
+    @Override
     public Variable get() {
       return this.variable;
     }

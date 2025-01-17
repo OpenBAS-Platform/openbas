@@ -28,6 +28,12 @@ public class TagComposer extends ComposerBase<Tag> {
     }
 
     @Override
+    public Composer delete() {
+      tagRepository.delete(tag);
+      return this;
+    }
+
+    @Override
     public Tag get() {
       return this.tag;
     }

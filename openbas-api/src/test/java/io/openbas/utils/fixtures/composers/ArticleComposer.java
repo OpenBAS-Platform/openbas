@@ -36,6 +36,13 @@ public class ArticleComposer extends ComposerBase<Article> {
     }
 
     @Override
+    public Composer delete() {
+      articleRepository.delete(article);
+      this.channelComposer.delete();
+      return null;
+    }
+
+    @Override
     public Article get() {
       return article;
     }

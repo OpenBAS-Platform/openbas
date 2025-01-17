@@ -28,6 +28,12 @@ public class ObjectiveComposer extends ComposerBase<Objective> {
     }
 
     @Override
+    public Composer delete() {
+      objectiveRepository.delete(objective);
+      return this;
+    }
+
+    @Override
     public Objective get() {
       return this.objective;
     }

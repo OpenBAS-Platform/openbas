@@ -29,6 +29,12 @@ public class LessonsQuestionsComposer extends ComposerBase<LessonsQuestion> {
     }
 
     @Override
+    public Composer delete() {
+      lessonsQuestionRepository.delete(lessonsQuestion);
+      return this;
+    }
+
+    @Override
     public LessonsQuestion get() {
       return this.lessonsQuestion;
     }

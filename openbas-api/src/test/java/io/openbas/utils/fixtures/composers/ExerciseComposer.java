@@ -133,6 +133,20 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
     }
 
     @Override
+    public InnerComposerBase<Exercise> delete() {
+      exerciseRepository.delete(exercise);
+      this.variableComposers.forEach(VariableComposer.Composer::delete);
+      this.documentComposers.forEach(DocumentComposer.Composer::delete);
+      this.tagComposers.forEach(TagComposer.Composer::delete);
+      this.objectiveComposers.forEach(ObjectiveComposer.Composer::delete);
+      this.injectComposers.forEach(InjectComposer.Composer::delete);
+      this.teamComposers.forEach(TeamComposer.Composer::delete);
+      this.categoryComposers.forEach(LessonsCategoryComposer.Composer::delete);
+      this.articleComposers.forEach(ArticleComposer.Composer::delete);
+      return this;
+    }
+
+    @Override
     public Exercise get() {
       return this.exercise;
     }

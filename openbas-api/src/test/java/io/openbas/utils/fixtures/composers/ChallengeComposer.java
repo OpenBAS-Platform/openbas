@@ -42,6 +42,13 @@ public class ChallengeComposer extends ComposerBase<Challenge> {
     }
 
     @Override
+    public Composer delete() {
+      challengeRepository.delete(challenge);
+      this.tagComposers.forEach(TagComposer.Composer::delete);
+      return null;
+    }
+
+    @Override
     public Challenge get() {
       return this.challenge;
     }

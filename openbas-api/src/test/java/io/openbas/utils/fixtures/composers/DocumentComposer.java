@@ -42,6 +42,13 @@ public class DocumentComposer extends ComposerBase<Document> {
     }
 
     @Override
+    public Composer delete() {
+      documentRepository.delete(document);
+      this.tagComposers.forEach(TagComposer.Composer::delete);
+      return this;
+    }
+
+    @Override
     public Document get() {
       return this.document;
     }

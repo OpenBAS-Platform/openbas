@@ -42,6 +42,13 @@ public class OrganizationComposer extends ComposerBase<Organization> {
     }
 
     @Override
+    public Composer delete() {
+      organizationRepository.delete(organization);
+      this.tagComposers.forEach(TagComposer.Composer::delete);
+      return this;
+    }
+
+    @Override
     public Organization get() {
       return this.organization;
     }

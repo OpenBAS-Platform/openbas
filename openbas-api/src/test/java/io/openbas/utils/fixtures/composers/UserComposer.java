@@ -50,6 +50,14 @@ public class UserComposer extends ComposerBase<User> {
     }
 
     @Override
+    public Composer delete() {
+      userRepository.delete(user);
+      organizationComposer.delete();
+      this.tagComposers.forEach(TagComposer.Composer::delete);
+      return this;
+    }
+
+    @Override
     public User get() {
       return this.user;
     }

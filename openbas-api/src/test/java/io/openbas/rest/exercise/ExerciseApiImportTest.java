@@ -8,12 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.exercise.service.ExportService;
+import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import java.util.UUID;
+import java.io.File;
+import java.io.FileOutputStream;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -27,6 +30,8 @@ public class ExerciseApiImportTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ExerciseRepository exerciseRepository;
+
+  @Autowired private TeamRepository teamRepository;
   @Autowired private ArticleComposer articleComposer;
   @Autowired private ChannelComposer channelComposer;
   @Autowired private LessonsQuestionsComposer lessonsQuestionsComposer;
@@ -43,6 +48,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
   @Autowired private ExportService exportService;
 
   private static int DEFAULT_EXPORT_OPTIONS = ExportOptions.mask(false, false, false);
+  private static int FULL_EXPORT_OPTIONS = ExportOptions.mask(true, true, true);
 
   @BeforeEach
   void before() {
@@ -62,37 +68,30 @@ public class ExerciseApiImportTest extends IntegrationTest {
     exerciseComposer.reset();
   }
 
-  private Exercise getExercise() {
+  private ExerciseComposer.Composer getExercise() {
     return exerciseComposer
         .forExercise(ExerciseFixture.createDefaultCrisisExercise())
-        .withId(UUID.randomUUID().toString())
         .withArticle(
             articleComposer
                 .forArticle(ArticleFixture.getArticleNoChannel())
-                .withId(UUID.randomUUID().toString())
                 .withChannel(channelComposer.forChannel(ChannelFixture.getChannel())))
         .withLessonCategory(
             lessonsCategoryComposer
                 .forLessonsCategory(LessonsCategoryFixture.createLessonCategory())
-                .withId(UUID.randomUUID().toString())
                 .withLessonsQuestion(
-                    lessonsQuestionsComposer
-                        .forLessonsQuestion(LessonsQuestionFixture.createLessonsQuestion())
-                        .withId(UUID.randomUUID().toString())))
+                    lessonsQuestionsComposer.forLessonsQuestion(
+                        LessonsQuestionFixture.createLessonsQuestion())))
         .withTeam(
             teamComposer
                 .forTeam(TeamFixture.getEmptyTeam())
-                .withId(UUID.randomUUID().toString())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
                 .withUser(
                     userComposer
                         .forUser(UserFixture.getUser())
-                        .withId(UUID.randomUUID().toString())
                         .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
                         .withOrganization(
                             organizationComposer
                                 .forOrganization(OrganizationFixture.createOrganization())
-                                .withId(UUID.randomUUID().toString())
                                 .withTag(
                                     tagComposer.forTag(
                                         TagFixture.getTagWithText("Organization tag"))))))
@@ -100,41 +99,35 @@ public class ExerciseApiImportTest extends IntegrationTest {
         .withInject(
             injectComposer
                 .forInject(InjectFixture.getInjectWithoutContract())
-                .withId(UUID.randomUUID().toString())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Inject tag")))
                 .withChallenge(
                     challengeComposer
                         .forChallenge(ChallengeFixture.createDefaultChallenge())
-                        .withId(UUID.randomUUID().toString())
                         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
         .withDocument(
             documentComposer
                 .forDocument(DocumentFixture.getDocumentJpeg())
-                .withId(UUID.randomUUID().toString())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
-        .withObjective(
-            objectiveComposer
-                .forObjective(ObjectiveFixture.getObjective())
-                .withId(UUID.randomUUID().toString()))
-        .withTag(
-            tagComposer
-                .forTag(TagFixture.getTagWithText("Exercise tag"))
-                .withId(UUID.randomUUID().toString()))
-        .withVariable(
-            variableComposer
-                .forVariable(VariableFixture.getVariable())
-                .withId(UUID.randomUUID().toString()))
-        .get();
+        .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
+        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
+        .withVariable(variableComposer.forVariable(VariableFixture.getVariable()));
   }
 
   @DisplayName("Given a valid export zip file, all objects created as expected")
   @Test
   @WithMockAdminUser
   public void testImport() throws Exception {
-    Exercise exercise = getExercise();
-    byte[] zipBytes = exportService.exportExerciseToZip(exercise, DEFAULT_EXPORT_OPTIONS);
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    Exercise exercise = exerciseWrapper.persist().get();
+    byte[] zipBytes = exportService.exportExerciseToZip(exercise, FULL_EXPORT_OPTIONS);
+    File outputFile = new File("/home/antoinemzs/testExercise.zip");
+    try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+      outputStream.write(zipBytes);
+    }
+    String json = ZipUtils.getZipEntryAsString(zipBytes, "%s.json".formatted(exercise.getName()));
+    exerciseWrapper.delete();
 
-    MockMultipartFile mmf = new MockMultipartFile("export.zip", zipBytes);
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
 
     mvc.perform(
             multipart(EXERCISE_URI + "/import")
@@ -142,6 +135,6 @@ public class ExerciseApiImportTest extends IntegrationTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().is2xxSuccessful());
 
-    Assertions.assertEquals(exerciseRepository.findById(exercise.getId()), exercise);
+    Assertions.assertEquals(exerciseRepository.findAll().getFirst(), exercise);
   }
 }

@@ -53,6 +53,14 @@ public class TeamComposer extends ComposerBase<Team> {
     }
 
     @Override
+    public Composer delete() {
+      teamRepository.delete(team);
+      tagComposers.forEach(TagComposer.Composer::delete);
+      userComposers.forEach(UserComposer.Composer::delete);
+      return this;
+    }
+
+    @Override
     public Team get() {
       return this.team;
     }

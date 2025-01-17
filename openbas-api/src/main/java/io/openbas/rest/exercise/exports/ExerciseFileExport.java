@@ -179,6 +179,8 @@ public class ExerciseFileExport {
     if (challenges == null) {
       return this.exercise == null
           ? new ArrayList<>()
+          // this forces export to first persist to database before this can work
+          // TODO: refactor to allow for pure in-memory simulation export
           : fromIterable(challengeService.getExerciseChallenges(this.exercise.getId()));
     }
     return challenges;

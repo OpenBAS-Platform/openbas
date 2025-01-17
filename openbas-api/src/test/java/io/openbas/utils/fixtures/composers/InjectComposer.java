@@ -66,6 +66,14 @@ public class InjectComposer extends ComposerBase<Inject> {
     }
 
     @Override
+    public Composer delete() {
+      injectRepository.delete(inject);
+      challengeComposers.forEach(ChallengeComposer.Composer::delete);
+      tagComposers.forEach(TagComposer.Composer::delete);
+      return this;
+    }
+
+    @Override
     public Inject get() {
       return this.inject;
     }

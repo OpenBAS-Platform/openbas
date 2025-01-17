@@ -1,6 +1,7 @@
 package io.openbas.utils.fixtures.composers;
 
 import io.openbas.database.model.LessonsCategory;
+import io.openbas.database.model.LessonsQuestion;
 import io.openbas.database.repository.LessonsCategoryRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,10 @@ public class LessonsCategoryComposer extends ComposerBase<LessonsCategory> {
 
     public Composer withLessonsQuestion(LessonsQuestionsComposer.Composer lessonsQuestionComposer) {
       lessonsQuestionComposers.add(lessonsQuestionComposer);
+      List<LessonsQuestion> tempQuestions = this.lessonsCategory.getQuestions();
+      lessonsQuestionComposer.get().setCategory(lessonsCategory);
+      tempQuestions.add(lessonsQuestionComposer.get());
+      this.lessonsCategory.setQuestions(tempQuestions);
       return this;
     }
 
@@ -39,6 +44,13 @@ public class LessonsCategoryComposer extends ComposerBase<LessonsCategory> {
             composer.get().setCategory(lessonsCategory);
             composer.persist();
           });
+      return this;
+    }
+
+    @Override
+    public Composer delete() {
+      lessonsQuestionComposers.forEach(LessonsQuestionsComposer.Composer::delete);
+      lessonsCategoryRepository.delete(lessonsCategory);
       return this;
     }
 
