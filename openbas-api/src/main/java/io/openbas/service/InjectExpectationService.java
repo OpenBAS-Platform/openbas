@@ -313,14 +313,9 @@ public class InjectExpectationService {
         // 1 row for injectexpectation asset and 1 row for (at least) 1 agent installed on this
         // asset
         List<InjectExpectation> injectExpectationsAsset =
-            assets.stream()
-                .flatMap(
-                    asset ->
-                        expectations.stream()
-                            .map(
-                                expectation ->
-                                    expectationConverter(asset, executableInject, expectation)))
-                .collect(Collectors.toList());
+            expectations.stream()
+                .map(expectation -> expectationConverter(executableInject, expectation))
+                .toList();
 
         List<InjectExpectation> injectExpectationsAgent =
             assets.stream()
@@ -334,7 +329,7 @@ public class InjectExpectationService {
                                       .map(
                                           expectation ->
                                               expectationConverter(
-                                                  asset, agent, executableInject, expectation)));
+                                                  agent, executableInject, expectation)));
                     })
                 .toList();
 
