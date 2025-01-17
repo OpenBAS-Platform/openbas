@@ -49,9 +49,9 @@ public class ExpectationsExpirationManagerService {
 
   // TODO
   private void computeExpectationsForAgents(@NotNull final List<InjectExpectation> expectations) {
-    List<InjectExpectation> expectationAssets =
-        expectations.stream().filter(e -> e.getAsset() != null).toList();
-    expectationAssets.forEach(
+    List<InjectExpectation> expectationAgents =
+        expectations.stream().filter(e -> e.getAgent() != null).toList();
+    expectationAgents.forEach(
         (expectation) -> {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
