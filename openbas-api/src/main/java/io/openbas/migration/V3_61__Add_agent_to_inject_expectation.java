@@ -16,7 +16,7 @@ public class V3_61__Add_agent_to_inject_expectation extends BaseJavaMigration {
     // Add asset to inject expectation
     select.execute(
         """
-        ALTER TABLE injects_expectations ADD COLUMN agent_id varchar(256) constraint fk_asset references agents on delete cascade;
+        ALTER TABLE injects_expectations ADD COLUMN agent_id varchar(256) constraint fk_agent references agents on delete cascade;
         """);
     select.execute(
         "CREATE INDEX IF NOT EXISTS idx_inject_expectation_agent_id ON injects_expectations(agent_id);");

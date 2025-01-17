@@ -41,7 +41,7 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findById(injectExpectationId);
   }
 
-  public InjectExpectation computeExpectation(
+  public InjectExpectation computeExpectationAgent(
       @NotNull final InjectExpectation expectation,
       @NotBlank final String sourceId,
       @NotBlank final String sourceType,
@@ -53,6 +53,25 @@ public class InjectExpectationService {
         success
             ? expectation.getExpectedScore()
             : expectation.getScore() == null ? 0.0 : expectation.getScore();
+    computeResult(expectation, sourceId, sourceType, sourceName, result, actualScore, metadata);
+    expectation.setScore(actualScore);
+    return this.update(expectation);
+  }
+
+  // todo asset
+  public InjectExpectation computeExpectation(
+      @NotNull final InjectExpectation expectation,
+      @NotBlank final String sourceId,
+      @NotBlank final String sourceType,
+      @NotBlank final String sourceName,
+      @NotBlank final String result,
+      @NotBlank final Boolean success,
+      final Map<String, String> metadata) {
+    // TODO with compute rule: AND (all 1 ->1, at least 1:0 -> 0)
+    double actualScore =
+        success
+            ? expectation.getExpectedScore()
+            : expectation.getScore() == null ? 0.0 : expectation.getScore();// compute and/stric
     computeResult(expectation, sourceId, sourceType, sourceName, result, actualScore, metadata);
     expectation.setScore(actualScore);
     return this.update(expectation);
@@ -107,7 +126,7 @@ public class InjectExpectationService {
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
         .stream()
         .filter(e -> e.getAsset() != null)
-        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))//todo
         .toList();
   }
 
@@ -290,11 +309,13 @@ public class InjectExpectationService {
         injectExpectationRepository.saveAll(injectExpectationsByTeam);
 
       } else if (!assets.isEmpty()) {
-        // TODO Add for agents
+        // 1 row for injectexpectation asset and 1 row for (at least) 1 agent installed on this asset
         List<InjectExpectation> injectExpectations =
             expectations.stream()
                 .map(expectation -> expectationConverter(executableInject, expectation))
                 .toList();
+        // TODO Add for agents
+
         injectExpectationRepository.saveAll(injectExpectations);
       } else if (!assetGroups.isEmpty()) {
         List<InjectExpectation> injectExpectations =
