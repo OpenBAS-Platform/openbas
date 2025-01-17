@@ -24,7 +24,7 @@ import org.hibernate.annotations.UuidGenerator;
 @EntityListeners(ModelBaseListener.class)
 public class Agent implements Base {
 
-  public static final int ACTIVE_THRESHOLD = 180000; // 180 000 ms = 3 minutes
+  public static final int ACTIVE_THRESHOLD = 3600000; // 3 600 000 ms = 1 hour
 
   public static final String ADMIN_SYSTEM_WINDOWS = "nt authority\\system";
   public static final String ADMIN_SYSTEM_UNIX = "root";
