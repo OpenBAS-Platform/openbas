@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +72,7 @@ public class InjectExpectationService {
     double actualScore =
         success
             ? expectation.getExpectedScore()
-            : expectation.getScore() == null ? 0.0 : expectation.getScore();// compute and/stric
+            : expectation.getScore() == null ? 0.0 : expectation.getScore(); // compute and/stric
     computeResult(expectation, sourceId, sourceType, sourceName, result, actualScore, metadata);
     expectation.setScore(actualScore);
     return this.update(expectation);
@@ -126,7 +127,7 @@ public class InjectExpectationService {
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
         .stream()
         .filter(e -> e.getAsset() != null)
-        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))//todo
+        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId()))) // todo
         .toList();
   }
 
@@ -217,7 +218,7 @@ public class InjectExpectationService {
     }
   }
 
-  // -- BUILD AND SAVE EXPECTATION AFTER SUCCESSFUL INJECT EXECUTION --
+  // -- BUILD AND SAVE INJECT EXPECTATION --
 
   @Transactional
   public void buildAndSaveInjectExpectations(
@@ -309,14 +310,36 @@ public class InjectExpectationService {
         injectExpectationRepository.saveAll(injectExpectationsByTeam);
 
       } else if (!assets.isEmpty()) {
-        // 1 row for injectexpectation asset and 1 row for (at least) 1 agent installed on this asset
-        List<InjectExpectation> injectExpectations =
-            expectations.stream()
-                .map(expectation -> expectationConverter(executableInject, expectation))
-                .toList();
-        // TODO Add for agents
+        // 1 row for injectexpectation asset and 1 row for (at least) 1 agent installed on this
+        // asset
+        List<InjectExpectation> injectExpectationsAsset =
+            assets.stream()
+                .flatMap(
+                    asset ->
+                        expectations.stream()
+                            .map(
+                                expectation ->
+                                    expectationConverter(asset, executableInject, expectation)))
+                .collect(Collectors.toList());
 
-        injectExpectationRepository.saveAll(injectExpectations);
+        List<InjectExpectation> injectExpectationsAgent =
+            assets.stream()
+                .flatMap(
+                    asset -> {
+                      Endpoint endpoint = (Endpoint) Hibernate.unproxy(asset);
+                      return endpoint.getAgents().stream()
+                          .flatMap(
+                              agent ->
+                                  expectations.stream()
+                                      .map(
+                                          expectation ->
+                                              expectationConverter(
+                                                  asset, agent, executableInject, expectation)));
+                    })
+                .toList();
+
+        injectExpectationRepository.saveAll(injectExpectationsAsset);
+        injectExpectationRepository.saveAll(injectExpectationsAgent);
       } else if (!assetGroups.isEmpty()) {
         List<InjectExpectation> injectExpectations =
             expectations.stream()

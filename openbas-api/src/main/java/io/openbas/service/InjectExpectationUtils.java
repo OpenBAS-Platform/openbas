@@ -71,6 +71,26 @@ public class InjectExpectationUtils {
   }
 
   public static InjectExpectation expectationConverter(
+      @NotNull final Asset asset,
+      @NotNull final ExecutableInject executableInject,
+      Expectation expectation) {
+    InjectExpectation expectationExecution = new InjectExpectation();
+    expectationExecution.setAsset(asset);
+    return expectationConverter(expectationExecution, executableInject, expectation);
+  }
+
+  public static InjectExpectation expectationConverter(
+      @NotNull final Asset asset,
+      @NotNull final Agent agent,
+      @NotNull final ExecutableInject executableInject,
+      Expectation expectation) {
+    InjectExpectation expectationExecution = new InjectExpectation();
+    expectationExecution.setAsset(asset);
+    expectationExecution.setAgent(agent);
+    return expectationConverter(expectationExecution, executableInject, expectation);
+  }
+
+  public static InjectExpectation expectationConverter(
       @NotNull InjectExpectation expectationExecution,
       @NotNull final ExecutableInject executableInject,
       @NotNull final Expectation expectation) {
@@ -96,21 +116,27 @@ public class InjectExpectationUtils {
         DetectionExpectation detectionExpectation = (DetectionExpectation) expectation;
         expectationExecution.setName(detectionExpectation.getName());
         expectationExecution.setDetection(
-            detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
+            detectionExpectation.getAgent(),
+            detectionExpectation.getAsset(),
+            detectionExpectation.getAssetGroup());
         expectationExecution.setSignatures(detectionExpectation.getInjectExpectationSignatures());
       }
       case PREVENTION -> {
         PreventionExpectation preventionExpectation = (PreventionExpectation) expectation;
         expectationExecution.setName(preventionExpectation.getName());
         expectationExecution.setPrevention(
-            preventionExpectation.getAsset(), preventionExpectation.getAssetGroup());
+            preventionExpectation.getAgent(),
+            preventionExpectation.getAsset(),
+            preventionExpectation.getAssetGroup());
         expectationExecution.setSignatures(preventionExpectation.getInjectExpectationSignatures());
       }
       case MANUAL -> {
         ManualExpectation manualExpectation = (ManualExpectation) expectation;
         expectationExecution.setName(((ManualExpectation) expectation).getName());
         expectationExecution.setManual(
-            manualExpectation.getAsset(), manualExpectation.getAssetGroup());
+            manualExpectation.getAgent(),
+            manualExpectation.getAsset(),
+            manualExpectation.getAssetGroup());
         expectationExecution.setDescription(((ManualExpectation) expectation).getDescription());
       }
       default -> throw new IllegalStateException("Unexpected value: " + expectation);
