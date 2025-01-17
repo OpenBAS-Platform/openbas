@@ -233,20 +233,32 @@ public class InjectExpectation implements Base {
     this.challenge = challenge;
   }
 
-  public void setManual(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
+  public void setManual(
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.MANUAL;
+    this.agent = agent;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }
 
-  public void setPrevention(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
+  public void setPrevention(
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.PREVENTION;
+    this.agent = agent;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }
 
-  public void setDetection(@NotNull final Asset asset, @NotNull final AssetGroup assetGroup) {
+  public void setDetection(
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      @NotNull final AssetGroup assetGroup) {
     this.type = EXPECTATION_TYPE.DETECTION;
+    this.agent = agent;
     this.asset = asset;
     this.assetGroup = assetGroup;
   }
