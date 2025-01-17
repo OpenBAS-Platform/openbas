@@ -119,7 +119,7 @@ public class InjectApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
   public Inject injectExecutionCallback(
-      @PathVariable String agentId, // must allow null
+      @PathVariable String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
