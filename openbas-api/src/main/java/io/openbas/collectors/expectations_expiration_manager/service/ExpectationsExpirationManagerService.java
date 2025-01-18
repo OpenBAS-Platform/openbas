@@ -47,7 +47,6 @@ public class ExpectationsExpirationManagerService {
         });
   }
 
-  // TODO
   private void computeExpectationsForAgents(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAgents =
         expectations.stream().filter(e -> e.getAgent() != null).toList();
@@ -61,18 +60,26 @@ public class ExpectationsExpirationManagerService {
         });
   }
 
-  // TODO
   private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssets =
-        expectations.stream().filter(e -> e.getAsset() != null).toList();
+        expectations.stream().filter(e -> e.getAsset() != null && e.getAgent() == null).toList();
     expectationAssets.forEach(
-        (expectation) -> {
-          if (isExpired(expectation)) {
-            String result = computeFailedMessage(expectation.getType());
-            this.injectExpectationService.computeExpectation(
-                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
+        (expectationAsset -> {
+          List<InjectExpectation> expectationAgents =
+              this.injectExpectationService.expectationsForAgents(
+                  expectationAsset.getInject(),
+                  expectationAsset.getAsset(),
+                  expectationAsset.getType());
+          // Every expectation agent are filled
+          if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
+            this.injectExpectationService.computeExpectationAsset(
+                expectationAsset,
+                expectationAgents,
+                this.config.getId(),
+                "collector",
+                PRODUCT_NAME);
           }
-        });
+        }));
   }
 
   private void computeExpectationsForAssetGroups(

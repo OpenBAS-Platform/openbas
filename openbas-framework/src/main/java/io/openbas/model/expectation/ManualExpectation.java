@@ -2,7 +2,6 @@ package io.openbas.model.expectation;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 
-import io.openbas.database.model.Agent;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.model.Expectation;
@@ -20,7 +19,6 @@ public class ManualExpectation implements Expectation {
   private Double score;
   private String name;
   private String description;
-  private Agent agent;
   private Asset asset;
   private AssetGroup assetGroup;
   private boolean expectationGroup;
@@ -38,23 +36,6 @@ public class ManualExpectation implements Expectation {
     this.description = expectation.getDescription();
     this.expectationGroup = expectation.isExpectationGroup();
     this.expirationTime = expectation.getExpirationTime();
-  }
-
-  public static ManualExpectation manualExpectationForAgent(
-      @Nullable final Double score,
-      @NotBlank final String name,
-      final String description,
-      @NotNull final Agent agent,
-      final Long expirationTime,
-      final boolean expectationGroup) {
-    ManualExpectation manualExpectation = new ManualExpectation();
-    manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
-    manualExpectation.setName(name);
-    manualExpectation.setDescription(description);
-    manualExpectation.setAgent(agent);
-    manualExpectation.setExpirationTime(expirationTime);
-    manualExpectation.setExpectationGroup(expectationGroup);
-    return manualExpectation;
   }
 
   public static ManualExpectation manualExpectationForAsset(

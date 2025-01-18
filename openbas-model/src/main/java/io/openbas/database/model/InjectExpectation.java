@@ -102,7 +102,7 @@ public class InjectExpectation implements Base {
     if (this.getScore() >= this.getExpectedScore()) {
       return EXPECTATION_STATUS.SUCCESS;
     }
-    if (this.getScore() == 0) {
+    if (0.0 == this.getScore()) {
       return EXPECTATION_STATUS.FAILED;
     }
     return EXPECTATION_STATUS.PARTIAL;

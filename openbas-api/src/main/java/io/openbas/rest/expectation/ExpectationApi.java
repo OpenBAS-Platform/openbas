@@ -129,23 +129,46 @@ public class ExpectationApi extends RestBehavior {
             input.getIsSuccess(),
             input.getMetadata());
 
-    // Compute potential expectations for asset groups
     Inject inject = injectExpectation.getInject();
+
+    // Compute potential expectations for asset
+    List<InjectExpectation> expectationAssets =
+        inject.getExpectations().stream()
+            .filter(e -> e.getAsset() != null && e.getAgent() == null)
+            .toList();
+    expectationAssets.forEach(
+        (expectationAsset -> {
+          List<InjectExpectation> expectationAgents =
+              this.injectExpectationService.expectationsForAgents(
+                  expectationAsset.getInject(),
+                  expectationAsset.getAsset(),
+                  expectationAsset.getType());
+          // Every expectation assets are filled
+          if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
+            this.injectExpectationService.computeExpectationGroup(
+                expectationAsset,
+                expectationAgents,
+                collector.getId(),
+                "collector",
+                collector.getName());
+          }
+        }));
+
+    // Compute potential expectations for asset groups
     List<InjectExpectation> expectationAssetGroups =
         inject.getExpectations().stream().filter(e -> e.getAssetGroup() != null).toList();
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
-          List<InjectExpectation> expectationAssets =
+          List<InjectExpectation> expectationAssetsByAssetGroup =
               this.injectExpectationService.expectationsForAssets(
                   expectationAssetGroup.getInject(),
                   expectationAssetGroup.getAssetGroup(),
                   expectationAssetGroup.getType());
           // Every expectation assets are filled
-          if (expectationAssets.stream().noneMatch(e -> e.getResults().isEmpty())) {
-            // TODO Add compute for agents expectations
+          if (expectationAssetsByAssetGroup.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.injectExpectationService.computeExpectationGroup(
                 expectationAssetGroup,
-                expectationAssets,
+                expectationAssetsByAssetGroup,
                 collector.getId(),
                 "collector",
                 collector.getName());

@@ -32,6 +32,7 @@ public class InjectExpectationService {
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectRepository injectRepository;
   private final AssetGroupService assetGroupService;
+  private final EndpointService endpointService;
 
   @Resource protected ObjectMapper mapper;
 
@@ -42,7 +43,7 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findById(injectExpectationId);
   }
 
-  public InjectExpectation computeExpectationAgent(
+  public InjectExpectation computeExpectation(
       @NotNull final InjectExpectation expectation,
       @NotBlank final String sourceId,
       @NotBlank final String sourceType,
@@ -59,23 +60,24 @@ public class InjectExpectationService {
     return this.update(expectation);
   }
 
-  // todo asset
-  public InjectExpectation computeExpectation(
-      @NotNull final InjectExpectation expectation,
-      @NotBlank final String sourceId,
-      @NotBlank final String sourceType,
-      @NotBlank final String sourceName,
-      @NotBlank final String result,
-      @NotBlank final Boolean success,
-      final Map<String, String> metadata) {
-    // TODO with compute rule: AND (all 1 ->1, at least 1:0 -> 0)
-    double actualScore =
-        success
-            ? expectation.getExpectedScore()
-            : expectation.getScore() == null ? 0.0 : expectation.getScore(); // compute and/stric
-    computeResult(expectation, sourceId, sourceType, sourceName, result, actualScore, metadata);
-    expectation.setScore(actualScore);
-    return this.update(expectation);
+  public void computeExpectationAsset(
+      InjectExpectation expectationAsset,
+      List<InjectExpectation> expectationAgents,
+      String sourceId,
+      String sourceType,
+      String sourceName) {
+    boolean success =
+        expectationAgents.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore()));
+    computeResult(
+        expectationAsset,
+        sourceId,
+        sourceType,
+        sourceName,
+        success ? "SUCCESS" : "FAILED",
+        success ? expectationAsset.getExpectedScore() : 0.0,
+        null);
+    expectationAsset.setScore(success ? expectationAsset.getExpectedScore() : 0.0);
+    this.update(expectationAsset);
   }
 
   public void computeExpectationGroup(
@@ -98,7 +100,7 @@ public class InjectExpectationService {
         sourceType,
         sourceName,
         success ? "SUCCESS" : "FAILED",
-        success ? expectationAssetGroup.getExpectedScore() : 0,
+        success ? expectationAssetGroup.getExpectedScore() : 0.0,
         null);
     expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0.0);
     this.update(expectationAssetGroup);
@@ -120,27 +122,20 @@ public class InjectExpectationService {
         .toList();
   }
 
-  // -- PREVENTION --
-
-  public List<InjectExpectation> preventionExpectationsNotFill(@NotBlank final String source) {
-    return this.injectExpectationRepository
-        .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
-        .stream()
-        .filter(e -> e.getAsset() != null)
-        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId()))) // todo
-        .toList();
+  public List<InjectExpectation> expectationsForAgents(
+      @NotNull final Inject inject,
+      @NotNull final Asset asset,
+      @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
+    Endpoint resolvedEndpoint = endpointService.endpoint(asset.getId());
+    List<String> agentIds =
+        resolvedEndpoint.getAgents().stream()
+            .map(Agent::getId)
+            .distinct()
+            .toList(); // fixme agents could de empty/null
+    return this.injectExpectationRepository.findAll(
+        Specification.where(InjectExpectationSpecification.type(expectationType))
+            .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds)));
   }
-
-  public List<InjectExpectation> preventionExpectationsNotFill() {
-    return this.injectExpectationRepository
-        .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
-        .stream()
-        .filter(e -> e.getAsset() != null)
-        .filter(e -> e.getResults().stream().toList().isEmpty())
-        .toList();
-  }
-
-  // -- DETECTION --
 
   public List<InjectExpectation> expectationsForAssets(
       @NotNull final Inject inject,
@@ -158,6 +153,28 @@ public class InjectExpectationService {
         Specification.where(InjectExpectationSpecification.type(expectationType))
             .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds)));
   }
+
+  // -- PREVENTION --
+
+  public List<InjectExpectation> preventionExpectationsNotFill(@NotBlank final String source) {
+    return this.injectExpectationRepository
+        .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
+        .stream()
+        .filter(e -> e.getAsset() != null)
+        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .toList();
+  }
+
+  public List<InjectExpectation> preventionExpectationsNotFill() {
+    return this.injectExpectationRepository
+        .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
+        .stream()
+        .filter(e -> e.getAsset() != null)
+        .filter(e -> e.getResults().stream().toList().isEmpty())
+        .toList();
+  }
+
+  // -- DETECTION --
 
   public List<InjectExpectation> detectionExpectationsNotFill(@NotBlank final String source) {
     return this.injectExpectationRepository
@@ -310,8 +327,6 @@ public class InjectExpectationService {
         injectExpectationRepository.saveAll(injectExpectationsByTeam);
 
       } else if (!assets.isEmpty()) {
-        // 1 row for injectexpectation asset and 1 row for (at least) 1 agent installed on this
-        // asset
         List<InjectExpectation> injectExpectationsAsset =
             expectations.stream()
                 .map(expectation -> expectationConverter(executableInject, expectation))
@@ -323,6 +338,7 @@ public class InjectExpectationService {
                     asset -> {
                       Endpoint endpoint = (Endpoint) Hibernate.unproxy(asset);
                       return endpoint.getAgents().stream()
+                          .filter(Agent::isActive)
                           .flatMap(
                               agent ->
                                   expectations.stream()
@@ -333,8 +349,8 @@ public class InjectExpectationService {
                     })
                 .toList();
 
+        injectExpectationsAsset.addAll(injectExpectationsAgent);
         injectExpectationRepository.saveAll(injectExpectationsAsset);
-        injectExpectationRepository.saveAll(injectExpectationsAgent);
       } else if (!assetGroups.isEmpty()) {
         List<InjectExpectation> injectExpectations =
             expectations.stream()
