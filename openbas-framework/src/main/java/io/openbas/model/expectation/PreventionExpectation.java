@@ -2,7 +2,6 @@ package io.openbas.model.expectation;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
 
-import io.openbas.database.model.Agent;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -23,7 +22,6 @@ public class PreventionExpectation implements Expectation {
   private Double score;
   private String name;
   private String description;
-  private Agent agent;
   private Asset asset;
   private AssetGroup assetGroup;
   private boolean expectationGroup;
@@ -35,25 +33,6 @@ public class PreventionExpectation implements Expectation {
   @Override
   public EXPECTATION_TYPE type() {
     return PREVENTION;
-  }
-
-  public static PreventionExpectation preventionExpectationForAgent(
-      @Nullable final Double score,
-      @NotBlank final String name,
-      final String description,
-      @NotNull final Agent agent,
-      final boolean expectationGroup,
-      final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
-    PreventionExpectation preventionExpectation = new PreventionExpectation();
-    preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
-    preventionExpectation.setName(name);
-    preventionExpectation.setDescription(description);
-    preventionExpectation.setAgent(agent);
-    preventionExpectation.setExpectationGroup(expectationGroup);
-    preventionExpectation.setExpirationTime(expirationTime);
-    preventionExpectation.setInjectExpectationSignatures(expectationSignatures);
-    return preventionExpectation;
   }
 
   public static PreventionExpectation preventionExpectationForAsset(

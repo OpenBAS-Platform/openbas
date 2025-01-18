@@ -18,6 +18,14 @@ public class InjectExpectationSpecification {
     return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), date);
   }
 
+  public static Specification<InjectExpectation> fromAgents(
+      @NotBlank final String injectId, @NotEmpty final List<String> agentIds) {
+    return (root, query, cb) ->
+        cb.and(
+            cb.equal(root.get("inject").get("id"), injectId),
+            root.get("agent").get("id").in(agentIds)); // fixme agentIds could be empty
+  }
+
   public static Specification<InjectExpectation> fromAssets(
       @NotBlank final String injectId, @NotEmpty final List<String> assetIds) {
     return (root, query, cb) ->
