@@ -10,8 +10,13 @@ import type { Theme } from '../../../../components/Theme';
 const useStyles = makeStyles((theme: Theme) => ({
   title: {
     textTransform: 'uppercase',
-    fontSize: 12,
-    fontWeight: 500,
+    fontSize: theme.typography.h4.fontSize,
+    fontWeight: theme.typography.h4.fontWeight,
+    color: theme.palette.text?.secondary,
+  },
+  subtitle: {
+    fontSize: theme.typography.h4.fontSize,
+    fontWeight: theme.typography.h4.fontWeight,
     color: theme.palette.text?.secondary,
   },
   number: {
@@ -29,6 +34,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props {
   title: string;
+  subTitle: string;
   icon: React.ReactElement;
   number?: number;
   progression?: number;
@@ -36,6 +42,7 @@ interface Props {
 
 const PaperMetric: FunctionComponent<Props> = ({
   title,
+  subTitle,
   icon,
   number,
   progression,
@@ -47,7 +54,11 @@ const PaperMetric: FunctionComponent<Props> = ({
   return (
     <Paper variant="outlined" className={classes.container}>
       <div>
-        <div className={classes.title}>{t(title)}</div>
+        <div>
+          <span className={classes.title}>{t(title)}</span>
+          <span> </span>
+          <span className={classes.subtitle}>{t(subTitle)}</span>
+        </div>
         <div className={classes.number}>
           {number ?? '-'}
         </div>
