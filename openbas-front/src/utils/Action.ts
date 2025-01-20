@@ -51,7 +51,11 @@ const notifyError = (error: AxiosError) => {
   } else if (error.status === 409) {
     MESSAGING$.notifyError(intl.formatMessage({ id: 'The element already exists' }));
   } else if (error.status === 400) {
-    MESSAGING$.notifyError(intl.formatMessage({ id: 'Bad request' }));
+    if (error.message) {
+      MESSAGING$.notifyError(intl.formatMessage({ id: error.message }));
+    } else {
+      MESSAGING$.notifyError(intl.formatMessage({ id: 'Bad request' }));
+    }
   } else if (error.status === 500) {
     MESSAGING$.notifyError(intl.formatMessage({ id: 'Internal error' }));
   } else if (error.message) {
