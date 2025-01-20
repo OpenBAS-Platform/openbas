@@ -272,7 +272,6 @@ public class User implements Base {
   }
 
   @JsonProperty("user_last_comcheck")
-  @Schema(description = "Last communication date of the user")
   public Optional<Instant> getLastComcheck() {
     return getComcheckStatuses().stream()
         .filter(comcheckStatus -> comcheckStatus.getReceiveDate().isPresent())
