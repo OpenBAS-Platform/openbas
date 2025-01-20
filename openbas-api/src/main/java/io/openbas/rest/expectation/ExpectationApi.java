@@ -16,32 +16,15 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 public class ExpectationApi extends RestBehavior {
 
-  private ExerciseExpectationService exerciseExpectationService;
-  private InjectExpectationService injectExpectationService;
-  private CollectorRepository collectorRepository;
-
-  @Autowired
-  public void setExerciseExpectationService(
-      final ExerciseExpectationService exerciseExpectationService) {
-    this.exerciseExpectationService = exerciseExpectationService;
-  }
-
-  @Autowired
-  public void setInjectExpectationService(final InjectExpectationService injectExpectationService) {
-    this.injectExpectationService = injectExpectationService;
-  }
-
-  @Autowired
-  public void setCollectorRepository(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
-  }
+  private final ExerciseExpectationService exerciseExpectationService;
+  private final InjectExpectationService injectExpectationService;
+  private final CollectorRepository collectorRepository;
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/expectations/{expectationId}")
@@ -129,22 +112,46 @@ public class ExpectationApi extends RestBehavior {
             input.getIsSuccess(),
             input.getMetadata());
 
-    // Compute potential expectations for asset groups
     Inject inject = injectExpectation.getInject();
+
+    // Compute potential expectations for asset
+    List<InjectExpectation> expectationAssets =
+        inject.getExpectations().stream()
+            .filter(e -> e.getAsset() != null && e.getAgent() == null)
+            .toList();
+    expectationAssets.forEach(
+        (expectationAsset -> {
+          List<InjectExpectation> expectationAgents =
+              this.injectExpectationService.expectationsForAgents(
+                  expectationAsset.getInject(),
+                  expectationAsset.getAsset(),
+                  expectationAsset.getType());
+          // Every expectation assets are filled
+          if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
+            this.injectExpectationService.computeExpectationGroup(
+                expectationAsset,
+                expectationAgents,
+                collector.getId(),
+                "collector",
+                collector.getName());
+          }
+        }));
+
+    // Compute potential expectations for asset groups
     List<InjectExpectation> expectationAssetGroups =
         inject.getExpectations().stream().filter(e -> e.getAssetGroup() != null).toList();
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
-          List<InjectExpectation> expectationAssets =
+          List<InjectExpectation> expectationAssetsByAssetGroup =
               this.injectExpectationService.expectationsForAssets(
                   expectationAssetGroup.getInject(),
                   expectationAssetGroup.getAssetGroup(),
                   expectationAssetGroup.getType());
           // Every expectation assets are filled
-          if (expectationAssets.stream().noneMatch(e -> e.getResults().isEmpty())) {
+          if (expectationAssetsByAssetGroup.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.injectExpectationService.computeExpectationGroup(
                 expectationAssetGroup,
-                expectationAssets,
+                expectationAssetsByAssetGroup,
                 collector.getId(),
                 "collector",
                 collector.getName());

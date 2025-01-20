@@ -102,7 +102,7 @@ public class InjectExpectation implements Base {
     if (this.getScore() >= this.getExpectedScore()) {
       return EXPECTATION_STATUS.SUCCESS;
     }
-    if (this.getScore() == 0) {
+    if (0.0 == this.getScore()) {
       return EXPECTATION_STATUS.FAILED;
     }
     return EXPECTATION_STATUS.PARTIAL;
@@ -182,6 +182,14 @@ public class InjectExpectation implements Base {
   @JsonProperty("inject_expectation_team")
   @Schema(type = "string")
   private Team team;
+
+  @Setter
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "agent_id")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_expectation_agent")
+  @Schema(type = "string")
+  private Agent agent;
 
   @Setter
   @ManyToOne(fetch = FetchType.LAZY)

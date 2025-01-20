@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class InjectExpectationService {
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectRepository injectRepository;
   private final AssetGroupService assetGroupService;
+  private final EndpointService endpointService;
 
   @Resource protected ObjectMapper mapper;
 
@@ -58,6 +60,26 @@ public class InjectExpectationService {
     return this.update(expectation);
   }
 
+  public void computeExpectationAsset(
+      InjectExpectation expectationAsset,
+      List<InjectExpectation> expectationAgents,
+      String sourceId,
+      String sourceType,
+      String sourceName) {
+    boolean success =
+        expectationAgents.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore()));
+    computeResult(
+        expectationAsset,
+        sourceId,
+        sourceType,
+        sourceName,
+        success ? "SUCCESS" : "FAILED",
+        success ? expectationAsset.getExpectedScore() : 0.0,
+        null);
+    expectationAsset.setScore(success ? expectationAsset.getExpectedScore() : 0.0);
+    this.update(expectationAsset);
+  }
+
   public void computeExpectationGroup(
       @NotNull final InjectExpectation expectationAssetGroup,
       @NotNull final List<InjectExpectation> expectationAssets,
@@ -78,7 +100,7 @@ public class InjectExpectationService {
         sourceType,
         sourceName,
         success ? "SUCCESS" : "FAILED",
-        success ? expectationAssetGroup.getExpectedScore() : 0,
+        success ? expectationAssetGroup.getExpectedScore() : 0.0,
         null);
     expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0.0);
     this.update(expectationAssetGroup);
@@ -98,6 +120,38 @@ public class InjectExpectationService {
     return fromIterable(this.injectExpectationRepository.findAll()).stream()
         .filter(e -> e.getResults().stream().toList().isEmpty())
         .toList();
+  }
+
+  public List<InjectExpectation> expectationsForAgents(
+      @NotNull final Inject inject,
+      @NotNull final Asset asset,
+      @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
+    Endpoint resolvedEndpoint = endpointService.endpoint(asset.getId());
+    List<String> agentIds =
+        resolvedEndpoint.getAgents().stream()
+            .map(Agent::getId)
+            .distinct()
+            .toList(); // fixme agents could de empty/null
+    return this.injectExpectationRepository.findAll(
+        Specification.where(InjectExpectationSpecification.type(expectationType))
+            .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds)));
+  }
+
+  public List<InjectExpectation> expectationsForAssets(
+      @NotNull final Inject inject,
+      @NotNull final AssetGroup assetGroup,
+      @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
+    AssetGroup resolvedAssetGroup = assetGroupService.assetGroup(assetGroup.getId());
+    List<String> assetIds =
+        Stream.concat(
+                resolvedAssetGroup.getAssets().stream(),
+                resolvedAssetGroup.getDynamicAssets().stream())
+            .map(Asset::getId)
+            .distinct()
+            .toList();
+    return this.injectExpectationRepository.findAll(
+        Specification.where(InjectExpectationSpecification.type(expectationType))
+            .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds)));
   }
 
   // -- PREVENTION --
@@ -121,23 +175,6 @@ public class InjectExpectationService {
   }
 
   // -- DETECTION --
-
-  public List<InjectExpectation> expectationsForAssets(
-      @NotNull final Inject inject,
-      @NotNull final AssetGroup assetGroup,
-      @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
-    AssetGroup resolvedAssetGroup = assetGroupService.assetGroup(assetGroup.getId());
-    List<String> assetIds =
-        Stream.concat(
-                resolvedAssetGroup.getAssets().stream(),
-                resolvedAssetGroup.getDynamicAssets().stream())
-            .map(Asset::getId)
-            .distinct()
-            .toList();
-    return this.injectExpectationRepository.findAll(
-        Specification.where(InjectExpectationSpecification.type(expectationType))
-            .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds)));
-  }
 
   public List<InjectExpectation> detectionExpectationsNotFill(@NotBlank final String source) {
     return this.injectExpectationRepository
@@ -198,7 +235,7 @@ public class InjectExpectationService {
     }
   }
 
-  // -- BUILD AND SAVE EXPECTATION AFTER SUCCESSFUL INJECT EXECUTION --
+  // -- BUILD AND SAVE INJECT EXPECTATION --
 
   @Transactional
   public void buildAndSaveInjectExpectations(
@@ -209,6 +246,7 @@ public class InjectExpectationService {
     List<Team> teams = executableInject.getTeams();
     List<Asset> assets = executableInject.getAssets();
     List<AssetGroup> assetGroups = executableInject.getAssetGroups();
+
     if ((isScheduledInject || isAtomicTesting) && !expectations.isEmpty()) {
       if (!teams.isEmpty()) {
         List<InjectExpectation> injectExpectationsByTeam;
@@ -285,10 +323,35 @@ public class InjectExpectationService {
                                       expectationConverter(team, executableInject, expectation)))
                   .collect(Collectors.toList());
         }
-
         injectExpectationsByTeam.addAll(injectExpectationsByUserAndTeam);
         injectExpectationRepository.saveAll(injectExpectationsByTeam);
-      } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
+
+      } else if (!assets.isEmpty()) {
+        List<InjectExpectation> injectExpectationsAsset =
+            expectations.stream()
+                .map(expectation -> expectationConverter(executableInject, expectation))
+                .toList();
+
+        List<InjectExpectation> injectExpectationsAgent =
+            assets.stream()
+                .flatMap(
+                    asset -> {
+                      Endpoint endpoint = (Endpoint) Hibernate.unproxy(asset);
+                      return endpoint.getAgents().stream()
+                          .filter(Agent::isActive)
+                          .flatMap(
+                              agent ->
+                                  expectations.stream()
+                                      .map(
+                                          expectation ->
+                                              expectationConverter(
+                                                  agent, executableInject, expectation)));
+                    })
+                .toList();
+
+        injectExpectationsAsset.addAll(injectExpectationsAgent);
+        injectExpectationRepository.saveAll(injectExpectationsAsset);
+      } else if (!assetGroups.isEmpty()) {
         List<InjectExpectation> injectExpectations =
             expectations.stream()
                 .map(expectation -> expectationConverter(executableInject, expectation))

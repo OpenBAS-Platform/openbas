@@ -21,6 +21,7 @@ import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
@@ -226,7 +227,9 @@ public class OpenBASImplantExecutor extends Injector {
   public ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception {
     Inject inject =
-        this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
+        this.injectRepository
+            .findById(injection.getInjection().getInject().getId())
+            .orElseThrow(() -> new EntityNotFoundException("Inject not found"));
     Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
 
     // Check assets target

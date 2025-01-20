@@ -26,6 +26,7 @@ public class ExpectationsExpirationManagerService {
   public void computeExpectations() {
     List<InjectExpectation> expectations = this.injectExpectationService.expectationsNotFill();
     if (!expectations.isEmpty()) {
+      this.computeExpectationsForAgents(expectations);
       this.computeExpectationsForAssets(expectations);
       this.computeExpectationsForAssetGroups(expectations);
       this.computeExpectations(expectations);
@@ -46,10 +47,10 @@ public class ExpectationsExpirationManagerService {
         });
   }
 
-  private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
-    List<InjectExpectation> expectationAssets =
-        expectations.stream().filter(e -> e.getAsset() != null).toList();
-    expectationAssets.forEach(
+  private void computeExpectationsForAgents(@NotNull final List<InjectExpectation> expectations) {
+    List<InjectExpectation> expectationAgents =
+        expectations.stream().filter(e -> e.getAgent() != null).toList();
+    expectationAgents.forEach(
         (expectation) -> {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
@@ -57,6 +58,28 @@ public class ExpectationsExpirationManagerService {
                 expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
           }
         });
+  }
+
+  private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
+    List<InjectExpectation> expectationAssets =
+        expectations.stream().filter(e -> e.getAsset() != null && e.getAgent() == null).toList();
+    expectationAssets.forEach(
+        (expectationAsset -> {
+          List<InjectExpectation> expectationAgents =
+              this.injectExpectationService.expectationsForAgents(
+                  expectationAsset.getInject(),
+                  expectationAsset.getAsset(),
+                  expectationAsset.getType());
+          // Every expectation agent are filled
+          if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
+            this.injectExpectationService.computeExpectationAsset(
+                expectationAsset,
+                expectationAgents,
+                this.config.getId(),
+                "collector",
+                PRODUCT_NAME);
+          }
+        }));
   }
 
   private void computeExpectationsForAssetGroups(
