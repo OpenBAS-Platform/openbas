@@ -9,7 +9,7 @@ import {
   createTagMap,
 } from '../fixtures/api-types.fixtures';
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
+/* eslint-disable-next-line  @typescript-eslint/no-explicit-any */
 type testobj = { [key: string]: any };
 function createObjWithDefaultKeys(objtype: string): testobj {
   const obj: testobj = {};
