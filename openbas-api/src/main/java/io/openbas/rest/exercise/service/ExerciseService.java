@@ -664,9 +664,9 @@ public class ExerciseService {
                   .map(Tag::getId)
                   .toList());
 
-      // Add the default asset groups to/from the injects
-      exercise
-          .getInjects()
+      // Add the default asset groups to the injects
+      exercise.getInjects().stream()
+          .filter(injectService::canApplyAssetToInject)
           .forEach(
               inject ->
                   injectService.applyDefaultAssetGroupsToInject(

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -39,6 +40,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class InjectServiceTest {
 
@@ -63,12 +65,18 @@ class InjectServiceTest {
 
   @Mock private InjectMapper injectMapper;
 
+  ObjectMapper mapper;
+
   @InjectMocks private InjectService injectService;
 
   @BeforeEach
   void setUp() {
+
     MockitoAnnotations.openMocks(this);
     when(methodSecurityExpressionHandler.getSecurityExpression()).thenReturn(securityExpression);
+
+    mapper = new ObjectMapper();
+    ReflectionTestUtils.setField(injectService, "mapper", mapper);
   }
 
   @Test
@@ -554,5 +562,29 @@ class InjectServiceTest {
 
     // Assert
     verify(securityExpression, times(0)).isSimulationPlanner("exercise1");
+  }
+
+  @DisplayName("Test canApplyAssetToInject with manual inject")
+  @Test
+  void testCanApplyAssetToInject_WITH_no_asset() {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setContent(
+        "{\"manual\":true,\"fields\":[{\"key\":\"content\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"textarea\"}]}");
+    Inject inject = new Inject();
+    inject.setInjectorContract(injectorContract);
+
+    assertFalse(injectService.canApplyAssetToInject(inject));
+  }
+
+  @DisplayName("Test canApplyAssetToInject with inject with assets")
+  @Test
+  void testCanApplyAssetToInject_WITH_assets() {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setContent(
+        "{\"manual\":true,\"fields\":[{\"key\":\"asset\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"asset\"}]}");
+    Inject inject = new Inject();
+    inject.setInjectorContract(injectorContract);
+
+    assertTrue(injectService.canApplyAssetToInject(inject));
   }
 }

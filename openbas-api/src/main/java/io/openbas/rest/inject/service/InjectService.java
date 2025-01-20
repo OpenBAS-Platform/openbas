@@ -5,6 +5,8 @@ import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
@@ -13,6 +15,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.specification.InjectSpecification;
+import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -40,6 +43,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.jpa.domain.Specification;
@@ -194,6 +198,32 @@ public class InjectService {
       inject.setAssetGroups(newListOfAssetGroups);
       return this.injectRepository.save(inject);
     }
+  }
+
+  /**
+   * Check if asset can be applied to a specific inject (will return false for Manual/Email...
+   * injects)
+   *
+   * @param inject
+   * @return
+   */
+  public boolean canApplyAssetToInject(final Inject inject) {
+
+    JsonNode jsonNode = null;
+    try {
+      jsonNode = mapper.readTree(inject.getInjectorContract().orElseThrow().getContent());
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Unable to injector contract", e);
+    }
+    return !StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
+        .filter(
+            contractElement ->
+                contractElement
+                    .get("type")
+                    .asText()
+                    .equals(ContractType.Asset.name().toLowerCase()))
+        .toList()
+        .isEmpty();
   }
 
   private Inject findAndDuplicateInject(String id) {

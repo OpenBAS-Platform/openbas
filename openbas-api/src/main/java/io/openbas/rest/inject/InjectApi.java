@@ -344,11 +344,14 @@ public class InjectApi extends RestBehavior {
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
 
-    // add default asset groups
-    inject.setAssetGroups(
-        this.tagRuleService.applyTagRuleToInjectCreation(
-            exercise.getTags().stream().map(Tag::getId).toList(),
-            assetGroupService.assetGroups(input.getAssetGroups())));
+    // verify if the inject is not manual/sms/emails...
+    if (this.injectService.canApplyAssetToInject(inject)) {
+      // add default asset groups
+      inject.setAssetGroups(
+          this.tagRuleService.applyTagRuleToInjectCreation(
+              exercise.getTags().stream().map(Tag::getId).toList(),
+              assetGroupService.assetGroups(input.getAssetGroups())));
+    }
 
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =
@@ -584,11 +587,14 @@ public class InjectApi extends RestBehavior {
     inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
 
-    // add default asset groups
-    inject.setAssetGroups(
-        this.tagRuleService.applyTagRuleToInjectCreation(
-            scenario.getTags().stream().map(Tag::getId).toList(),
-            assetGroupService.assetGroups(input.getAssetGroups())));
+    // verify if the inject is not manual/sms/emails...
+    if (this.injectService.canApplyAssetToInject(inject)) {
+      // add default asset groups
+      inject.setAssetGroups(
+          this.tagRuleService.applyTagRuleToInjectCreation(
+              scenario.getTags().stream().map(Tag::getId).toList(),
+              assetGroupService.assetGroups(input.getAssetGroups())));
+    }
 
     inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     List<InjectDocument> injectDocuments =

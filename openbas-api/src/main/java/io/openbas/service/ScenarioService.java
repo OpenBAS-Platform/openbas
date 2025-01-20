@@ -320,8 +320,8 @@ public class ScenarioService {
                   .toList());
 
       // Add the default asset groups to/from the injects
-      scenario
-          .getInjects()
+      scenario.getInjects().stream()
+          .filter(injectService::canApplyAssetToInject)
           .forEach(
               inject ->
                   injectService.applyDefaultAssetGroupsToInject(
