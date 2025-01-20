@@ -29,6 +29,7 @@ import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -381,9 +382,13 @@ public class InjectService {
 
   @Transactional
   public void initializeInjectStatus(
-      @NotNull final Inject inject,
+      @NotNull final String injectId,
       @NotNull ExecutionStatus status,
       @Nullable final InjectStatusExecution trace) {
+
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow(() ->
+            new EntityNotFoundException("No inject found with id: "+ injectId));
+
     InjectStatus injectStatus =
         inject
             .getStatus()
@@ -401,7 +406,6 @@ public class InjectService {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     injectStatusRepository.save(injectStatus);
-    inject.setStatus(injectStatus);
   }
 
   /**
