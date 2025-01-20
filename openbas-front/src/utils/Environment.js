@@ -33,7 +33,7 @@ const isEmptyPath = R.isNil(window.BASE_PATH) || R.isEmpty(window.BASE_PATH);
 const contextPath = isEmptyPath || window.BASE_PATH === '/' ? '' : window.BASE_PATH;
 export const APP_BASE_PATH = isEmptyPath || contextPath.startsWith('/') ? contextPath : `/${contextPath}`;
 
-export const fileUri = fileImport => `${APP_BASE_PATH}${fileImport}`; // No slash here, will be replace by the builder
+export const fileUri = fileImport => `${APP_BASE_PATH}${fileImport}`; // No slash here, will be replaced by the builder
 
 // Export
 const escape = value => value?.toString().replaceAll('"', '""');
@@ -58,28 +58,28 @@ export const exportData = (
       if (entry[`${type}_tags`]) {
         entry = R.assoc(
           `${type}_tags`,
-          entry[`${type}_tags`].map(t => tagsMap[t]?.tag_name),
+          entry[`${type}_tags`].map(t => tagsMap[t]?.tag_name).filter(x => !!x),
           entry,
         );
       }
       if (entry[`${type}_exercises`]) {
         entry = R.assoc(
           `${type}_exercises`,
-          entry[`${type}_exercises`].map(e => exercisesMap[e]?.exercise_name),
+          entry[`${type}_exercises`].map(e => exercisesMap[e]?.exercise_name).filter(x => !!x),
           entry,
         );
       }
       if (entry[`${type}_scenarios`]) {
         entry = R.assoc(
           `${type}_scenarios`,
-          entry[`${type}_scenarios`].map(e => scenariosMap[e]?.scenario_name),
+          entry[`${type}_scenarios`].map(e => scenariosMap[e]?.scenario_name).filter(x => !!x),
           entry,
         );
       }
       if (entry[`${type}_organization`]) {
         entry = R.assoc(
           `${type}_organization`,
-          organizationsMap[entry[`${type}_organization`]]?.organization_name,
+          organizationsMap[entry[`${type}_organization`]]?.organization_name || '',
           entry,
         );
       }
