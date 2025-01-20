@@ -10,10 +10,8 @@ import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
-import io.openbas.integrations.InjectorService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.InjectUtils;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -189,7 +187,8 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 // Status
-                this.injectService.initializeInjectStatus(inject,
+                this.injectService.initializeInjectStatus(
+                    inject,
                     ExecutionStatus.ERROR,
                     InjectStatusExecution.traceError(
                         "The inject is not ready to be executed (missing mandatory fields)"));
@@ -205,7 +204,7 @@ public class InjectsExecutionJob implements Job {
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
                 // Status
-                  this.injectService.initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
+                this.injectService.initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
@@ -227,7 +226,7 @@ public class InjectsExecutionJob implements Job {
               }
             },
             () ->
-                    this.injectService.initializeInjectStatus(
+                this.injectService.initializeInjectStatus(
                     inject,
                     ExecutionStatus.ERROR,
                     InjectStatusExecution.traceError("Inject does not have a contract")));

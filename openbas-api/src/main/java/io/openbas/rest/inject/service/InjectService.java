@@ -380,19 +380,19 @@ public class InjectService {
   }
 
   @Transactional
-  public void  initializeInjectStatus(
-          @NotNull final Inject inject,
-          @NotNull ExecutionStatus status,
-          @Nullable final InjectStatusExecution trace) {
+  public void initializeInjectStatus(
+      @NotNull final Inject inject,
+      @NotNull ExecutionStatus status,
+      @Nullable final InjectStatusExecution trace) {
     InjectStatus injectStatus =
-            inject
-                    .getStatus()
-                    .orElseGet(
-                            () -> {
-                              InjectStatus newStatus = new InjectStatus();
-                              newStatus.setInject(inject);
-                              return newStatus;
-                            });
+        inject
+            .getStatus()
+            .orElseGet(
+                () -> {
+                  InjectStatus newStatus = new InjectStatus();
+                  newStatus.setInject(inject);
+                  return newStatus;
+                });
 
     if (trace != null) {
       injectStatus.getTraces().add(trace);
@@ -403,7 +403,6 @@ public class InjectService {
     injectStatusRepository.save(injectStatus);
     inject.setStatus(injectStatus);
   }
-
 
   /**
    * Update the inject with the given input
