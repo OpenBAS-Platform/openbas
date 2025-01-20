@@ -30,7 +30,6 @@ import io.openbas.utils.JpaUtils;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
