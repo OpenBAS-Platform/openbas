@@ -154,14 +154,12 @@ public class TeamSimple {
   @NotNull
   @Schema(description = "Total expected score of expectations by simulation linked to this team")
   public Map<String, Double> getInjectExpectationsTotalExpectedScoreByExercise() {
-    Map<String, Double> result =
-        getInjectExpectations().stream()
-            .filter(expectation -> Objects.nonNull(expectation.getExercise()))
-            .collect(
-                Collectors.groupingBy(
-                    expectation -> expectation.getExercise().getId(),
-                    Collectors.summingDouble(InjectExpectation::getExpectedScore)));
-    return result;
+    return getInjectExpectations().stream()
+        .filter(expectation -> Objects.nonNull(expectation.getExercise()))
+        .collect(
+            Collectors.groupingBy(
+                expectation -> expectation.getExercise().getId(),
+                Collectors.summingDouble(InjectExpectation::getExpectedScore)));
   }
 
   // endregion
