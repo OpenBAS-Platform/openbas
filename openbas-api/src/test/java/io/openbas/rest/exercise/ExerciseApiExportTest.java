@@ -21,6 +21,8 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
+
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.*;
@@ -106,8 +108,9 @@ public class ExerciseApiExportTest extends IntegrationTest {
                         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
         .withDocument(
             documentComposer
-                .forDocument(DocumentFixture.getDocumentJpeg())
-                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
+                .forDocument(DocumentFixture.getDocumentTxt(FileFixture.getPlainTextFileContent()))
+                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag")))
+                .withInMemoryFile(FileFixture.getPlainTextFileContent()))
         .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
         .withVariable(variableComposer.forVariable(VariableFixture.getVariable()))
@@ -129,7 +132,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
     ObjectMapper exportMapper = mapper.copy();
     String expectedJson =
         exportMapper.writeValueAsString(
@@ -158,7 +161,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
     ObjectMapper exportMapper = mapper.copy();
     String expectedJson =
         exportMapper.writeValueAsString(
@@ -182,7 +185,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
     List<Tag> expectedTags =
@@ -217,7 +220,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
     String objectiveJson = objectMapper.writeValueAsString(objectiveComposer.generatedItems);
@@ -243,7 +246,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Challenge.class, ExerciseExportMixins.Challenge.class);
     String challengeJson = objectMapper.writeValueAsString(challengeComposer.generatedItems);
@@ -269,7 +272,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Article.class, ExerciseExportMixins.Article.class);
     String articleJson = objectMapper.writeValueAsString(articleComposer.generatedItems);
@@ -295,7 +298,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Channel.class, ExerciseExportMixins.Channel.class);
     String channelJson = objectMapper.writeValueAsString(channelComposer.generatedItems);
@@ -321,7 +324,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
     String documentJson = objectMapper.writeValueAsString(documentComposer.generatedItems);
@@ -347,7 +350,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
     String exerciseJson = objectMapper.writeValueAsString(ex);
@@ -373,7 +376,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Variable.class, VariableMixin.class);
     String variableJson = objectMapper.writeValueAsString(variableComposer.generatedItems);
@@ -403,7 +406,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
     String variableJson = objectMapper.writeValueAsString(variableComposer.generatedItems);
@@ -428,7 +431,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_teams").isEqualTo("[]");
   }
@@ -452,7 +455,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
     String teamsJson = objectMapper.writeValueAsString(teamComposer.generatedItems);
@@ -479,7 +482,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_users").isAbsent();
   }
@@ -503,7 +506,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
     String usersJson = objectMapper.writeValueAsString(userComposer.generatedItems);
@@ -529,7 +532,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("exercise_users").isAbsent();
   }
@@ -553,7 +556,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    String actualJson = ZipUtils.getZipEntryAsString(response, "%s.json".formatted(ex.getName()));
+    String actualJson = ZipUtils.getZipEntry(response, "%s.json".formatted(ex.getName()), ZipUtils::streamToString);
 
     objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
     String orgJson = objectMapper.writeValueAsString(organizationComposer.generatedItems);
@@ -562,5 +565,36 @@ public class ExerciseApiExportTest extends IntegrationTest {
         .when(IGNORING_ARRAY_ORDER)
         .node("exercise_organizations")
         .isEqualTo(orgJson);
+  }
+
+  @DisplayName(
+          "Given documents are provided, exported archive contains the documents")
+  @Test
+  @WithMockAdminUser
+  public void
+  given_documents_are_provided_exported_archive_contains_the_documents()
+          throws Exception {
+    ObjectMapper objectMapper = mapper.copy();
+    Exercise ex = getExercise();
+    byte[] response =
+            mvc.perform(
+                            get(EXERCISE_URI + "/" + ex.getId() + "/export")
+                                    .queryParam("isWithPlayers", "true")
+                                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().is2xxSuccessful())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsByteArray();
+
+    List<Document> docs = documentComposer.generatedItems;
+
+    for (Document document : docs) {
+      try(ByteArrayInputStream fis = new ByteArrayInputStream(FileFixture.getPlainTextFileContent().getContentBytes())) {
+        byte[] docFromZip = ZipUtils.getZipEntry(response, document.getTarget(), ZipUtils::streamToBytes);
+        byte[] docFromDisk = fis.readAllBytes();
+
+        Assertions.assertArrayEquals(docFromZip, docFromDisk);
+      }
+    }
   }
 }

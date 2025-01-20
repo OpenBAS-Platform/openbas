@@ -7,16 +7,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.exercise.service.ExportService;
-import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Optional;
+
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,6 +35,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ExerciseRepository exerciseRepository;
+  @Autowired private DocumentRepository documentRepository;
 
   @Autowired private TeamRepository teamRepository;
   @Autowired private ArticleComposer articleComposer;
@@ -46,9 +52,10 @@ public class ExerciseApiImportTest extends IntegrationTest {
   @Autowired private DocumentComposer documentComposer;
   @Autowired private TagComposer tagComposer;
   @Autowired private ExportService exportService;
+  @Autowired private EntityManager entityManager;
 
-  private static int DEFAULT_EXPORT_OPTIONS = ExportOptions.mask(false, false, false);
-  private static int FULL_EXPORT_OPTIONS = ExportOptions.mask(true, true, true);
+  private static final int DEFAULT_EXPORT_OPTIONS = ExportOptions.mask(false, false, false);
+  private static final int FULL_EXPORT_OPTIONS = ExportOptions.mask(true, true, true);
 
   @BeforeEach
   void before() {
@@ -106,8 +113,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
                         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
         .withDocument(
             documentComposer
-                .forDocument(DocumentFixture.getDocumentJpeg())
-                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag"))))
+                .forDocument(DocumentFixture.getDocumentTxt(FileFixture.getPlainTextFileContent()))
+                .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag")))
+                .withInMemoryFile(FileFixture.getPlainTextFileContent()))
         .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
         .withVariable(variableComposer.forVariable(VariableFixture.getVariable()));
@@ -120,11 +128,6 @@ public class ExerciseApiImportTest extends IntegrationTest {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
     Exercise exercise = exerciseWrapper.persist().get();
     byte[] zipBytes = exportService.exportExerciseToZip(exercise, FULL_EXPORT_OPTIONS);
-    File outputFile = new File("/home/antoinemzs/testExercise.zip");
-    try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
-      outputStream.write(zipBytes);
-    }
-    String json = ZipUtils.getZipEntryAsString(zipBytes, "%s.json".formatted(exercise.getName()));
     exerciseWrapper.delete();
 
     MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
@@ -135,6 +138,16 @@ public class ExerciseApiImportTest extends IntegrationTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().is2xxSuccessful());
 
-    Assertions.assertEquals(exerciseRepository.findAll().getFirst(), exercise);
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.clear();
+
+    Optional<Exercise> exerciseFromDb = exerciseRepository.findAll().stream().findFirst();
+    if (exerciseFromDb.isEmpty()) {
+      Assertions.fail();
+    }
+    Exercise imported = exerciseFromDb.get();
+
+    Assertions.assertEquals(imported, exercise);
   }
 }
