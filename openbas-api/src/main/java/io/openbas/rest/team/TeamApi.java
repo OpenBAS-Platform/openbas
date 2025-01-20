@@ -53,7 +53,7 @@ import org.springframework.web.bind.annotation.*;
 @Secured(ROLE_USER)
 @RequiredArgsConstructor
 @UserRoleDescription
-@Tag(name = "Team management")
+@Tag(name = "Teams management")
 public class TeamApi extends RestBehavior {
 
   public static final String TEAM_URI = "/api/teams";
