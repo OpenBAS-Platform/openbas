@@ -44,7 +44,9 @@ public class UserComposer extends ComposerBase<User> {
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);
-      organizationComposer.persist();
+      if (organizationComposer != null) {
+        organizationComposer.persist();
+      }
       userRepository.save(user);
       return this;
     }
@@ -52,7 +54,9 @@ public class UserComposer extends ComposerBase<User> {
     @Override
     public Composer delete() {
       userRepository.delete(user);
-      organizationComposer.delete();
+      if (organizationComposer != null) {
+        organizationComposer.delete();
+      }
       this.tagComposers.forEach(TagComposer.Composer::delete);
       return this;
     }

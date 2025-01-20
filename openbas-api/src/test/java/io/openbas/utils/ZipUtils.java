@@ -8,7 +8,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ZipUtils {
-  // not this only works
   public static <T> T getZipEntry(
       byte[] zipBlob, String entryName, Function<InputStream, T> readFunc) throws IOException {
     try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBlob))) {
@@ -18,7 +17,7 @@ public class ZipUtils {
           return readFunc.apply(zis);
         }
       }
-      // no zip entry corresponding to expected json
+      // no zip entry corresponding to expected name
       throw new IOException("Zip entry '%s' not found".formatted(entryName));
     }
   }
@@ -35,7 +34,6 @@ public class ZipUtils {
       }
       sb.append(new String(buffer, 0, read));
     }
-    // force exit of test since we have found the correct entry
     return sb.toString();
   }
 
