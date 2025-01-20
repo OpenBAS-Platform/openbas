@@ -93,7 +93,7 @@ public class ExerciseExpectationService {
     injectExpectation.setUpdatedAt(now());
     InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
 
-    // If The expectation is type manual, We should update expectations for teams and players
+    // If the expectation is type manual, We should update expectations for teams and players
     if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
