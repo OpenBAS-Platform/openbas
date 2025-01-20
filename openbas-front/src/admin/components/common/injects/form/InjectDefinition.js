@@ -676,7 +676,7 @@ class InjectDefinition extends Component {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore: Endpoint property handle by EndpointsList
               actions={
-                <AssetGroupPopover inline onRemoveAssetGroupFromInject={this.handleRemoveAssetGroup.bind(this)} />
+                <AssetGroupPopover inline onRemoveAssetGroupFromList={this.handleRemoveAssetGroup.bind(this)} />
               }
             />
             <InjectAddAssetGroups assetGroupIds={assetGroupIds} onSubmit={this.handleAddAssetGroups.bind(this)} />

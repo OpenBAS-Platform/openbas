@@ -1,7 +1,6 @@
 package io.openbas.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +12,7 @@ import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.ForbiddenException;
 import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.fixtures.TagFixture;
 import io.openbas.utils.fixtures.TagRuleFixture;
@@ -65,6 +65,19 @@ public class TagRuleServiceTest {
   }
 
   @Test
+  void testDeleteTagRule_WITH_octi_rule() {
+    TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    expected.getTag().setName("opencti");
+    when(tagRuleRepository.findById(TAG_RULE_ID)).thenReturn(Optional.of(expected));
+
+    assertThrows(
+        ForbiddenException.class,
+        () -> {
+          tagRuleService.deleteTagRule(TAG_RULE_ID);
+        });
+  }
+
+  @Test
   void testCreateTagRule() {
     TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
     when(tagRuleRepository.save(any())).thenReturn(expected);
@@ -82,6 +95,28 @@ public class TagRuleServiceTest {
             expected.getTag().getName(),
             expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
     assertEquals(expected, result);
+  }
+
+  @Test
+  void testCreateTagRule_WITH_octi_tag() {
+    TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    expected.getTag().setName("opencti");
+    when(tagRuleRepository.save(any())).thenReturn(expected);
+    when(tagRepository.findByName(expected.getTag().getName()))
+        .thenReturn(Optional.of(TagFixture.getTag()));
+    expected
+        .getAssetGroups()
+        .forEach(
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.of(assetGroup)));
+    assertThrows(
+        ForbiddenException.class,
+        () -> {
+          tagRuleService.createTagRule(
+              expected.getTag().getName(),
+              expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
+        });
   }
 
   @Test
@@ -129,11 +164,15 @@ public class TagRuleServiceTest {
 
   @Test
   void testUpdateTagRule() {
-    TagRule expected = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    TagRule beforeUpdate = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    TagRule expected = new TagRule();
+    expected.setId(TAG_RULE_ID);
+    expected.setTag(TagFixture.getTag("test"));
+
     when(tagRuleRepository.save(any())).thenReturn(expected);
     when(tagRepository.findByName(expected.getTag().getName()))
         .thenReturn(Optional.of(TagFixture.getTag()));
-    when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.of(expected));
+    when(tagRuleRepository.findById(beforeUpdate.getId())).thenReturn(Optional.of(beforeUpdate));
     expected
         .getAssetGroups()
         .forEach(
@@ -147,6 +186,34 @@ public class TagRuleServiceTest {
             expected.getTag().getName(),
             expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
     assertEquals(expected, result);
+  }
+
+  @Test
+  void testUpdateTagRule_WITH_octi_tag() {
+    TagRule beforeUpdate = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    beforeUpdate.getTag().setName("opencti");
+    TagRule expected = new TagRule();
+    expected.setId(TAG_RULE_ID);
+    expected.setTag(TagFixture.getTag("test"));
+
+    when(tagRuleRepository.save(any())).thenReturn(expected);
+    when(tagRepository.findByName(expected.getTag().getName()))
+        .thenReturn(Optional.of(TagFixture.getTag()));
+    when(tagRuleRepository.findById(expected.getId())).thenReturn(Optional.of(beforeUpdate));
+    expected
+        .getAssetGroups()
+        .forEach(
+            assetGroup ->
+                when(assetGroupRepository.findById(assetGroup.getId()))
+                    .thenReturn(Optional.of(assetGroup)));
+    assertThrows(
+        ForbiddenException.class,
+        () -> {
+          tagRuleService.updateTagRule(
+              expected.getId(),
+              expected.getTag().getName(),
+              expected.getAssetGroups().stream().map(AssetGroup::getId).toList());
+        });
   }
 
   @Test
@@ -222,10 +289,14 @@ public class TagRuleServiceTest {
 
   @Test
   void testApplyTagRuleToInjectCreation() {
-    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
-    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
-    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
-    AssetGroup assetGroup4 = getAssetGroup("assetgroup4");
+    AssetGroup assetGroup1 = AssetGroupFixture.createDefaultAssetGroup("assetgroup1");
+    assetGroup1.setId("assetgroup1");
+    AssetGroup assetGroup2 = AssetGroupFixture.createDefaultAssetGroup("assetgroup2");
+    assetGroup2.setId("assetgroup2");
+    AssetGroup assetGroup3 = AssetGroupFixture.createDefaultAssetGroup("assetgroup3");
+    assetGroup3.setId("assetgroup3");
+    AssetGroup assetGroup4 = AssetGroupFixture.createDefaultAssetGroup("assetgroup4");
+    assetGroup4.setId("assetgroup4");
 
     Tag tag1 = TagFixture.getTag("tag2");
     Tag tag2 = TagFixture.getTag("tag3");
@@ -242,6 +313,29 @@ public class TagRuleServiceTest {
             List.of(tag1.getId(), tag2.getId()), currentAssetGroups);
     List<AssetGroup> expected = List.of(assetGroup1, assetGroup2, assetGroup3, assetGroup4);
     assertEquals(new HashSet<>(expected), new HashSet<>(result));
+  }
+
+  @Test
+  void testCheckIfRulesApply_WITH_tag_rule_added() {
+    List<String> newTagIds = List.of("tag1", "tag2");
+    List<String> currentTagIds = List.of("tag2", "tag3");
+    TagRule tagRule = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    when(tagRuleRepository.findByTags(List.of("tag1"))).thenReturn(List.of(tagRule));
+
+    boolean result = tagRuleService.checkIfRulesApply(currentTagIds, newTagIds);
+
+    assertTrue(result);
+  }
+
+  @Test
+  void testCheckIfRulesApply_WITH_no_rules_to_apply() {
+    List<String> newTagIds = List.of("tag1", "tag2");
+    List<String> currentTagIds = List.of("tag2", "tag1");
+    TagRule tagRule = TagRuleFixture.createTagRule(TAG_RULE_ID);
+    when(tagRuleRepository.findByTags(List.of("tag2"))).thenReturn(List.of(tagRule));
+    when(tagRuleRepository.findByTags(List.of("tag1"))).thenReturn(List.of(tagRule));
+    boolean result = tagRuleService.checkIfRulesApply(currentTagIds, newTagIds);
+    assertFalse(result);
   }
 
   private AssetGroup getAssetGroup(String name) {

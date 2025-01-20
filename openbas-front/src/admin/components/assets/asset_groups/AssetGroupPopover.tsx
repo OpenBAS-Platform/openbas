@@ -26,7 +26,8 @@ const useStyles = makeStyles(() => ({
 interface Props {
   inline?: boolean;
   assetGroup: AssetGroup | AssetGroupOutput;
-  onRemoveAssetGroupFromInject?: (assetGroupId: string) => void;
+  onRemoveAssetGroupFromList?: (assetGroupId: string) => void;
+  removeAssetGroupFromListMessage?: string;
   onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
   onUpdate?: (result: AssetGroup) => void;
@@ -36,7 +37,8 @@ interface Props {
 const AssetGroupPopover: FunctionComponent<Props> = ({
   inline,
   assetGroup,
-  onRemoveAssetGroupFromInject,
+  onRemoveAssetGroupFromList,
+  removeAssetGroupFromListMessage = 'Remove from the inject',
   onRemoveEndpointFromAssetGroup,
   openEditOnInit = false,
   onUpdate,
@@ -56,7 +58,7 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
     asset_group_tags,
     asset_group_dynamic_filter,
   }) => ({
-    asset_group_name,
+    asset_group_name: asset_group_name ?? '',
     asset_group_description: asset_group_description ?? '',
     asset_group_tags: asset_group_tags ?? [],
     asset_group_dynamic_filter: asset_group_dynamic_filter ?? emptyFilterGroup,
@@ -139,9 +141,9 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
         <MenuItem onClick={handleManage}>
           {t('Manage assets')}
         </MenuItem>
-        {onRemoveAssetGroupFromInject && (
-          <MenuItem onClick={() => onRemoveAssetGroupFromInject(assetGroup.asset_group_id)}>
-            {t('Remove from the inject')}
+        {onRemoveAssetGroupFromList && (
+          <MenuItem onClick={() => onRemoveAssetGroupFromList(assetGroup.asset_group_id)}>
+            {t(removeAssetGroupFromListMessage)}
           </MenuItem>
         )}
         <MenuItem

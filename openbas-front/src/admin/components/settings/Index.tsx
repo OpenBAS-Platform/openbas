@@ -8,6 +8,7 @@ import Groups from './groups/Groups';
 import KillChainPhases from './kill_chain_phases/KillChainPhases';
 import Parameters from './Parameters';
 import Policies from './policies/Policies';
+import TagRules from './tag_rules/TagRules';
 import Tags from './tags/Tags';
 import Users from './users/Users';
 
@@ -24,6 +25,8 @@ const Index = () => (
     <Route path="taxonomies/kill_chain_phases" element={errorWrapper(KillChainPhases)()} />
     <Route path="data_ingestion" element={<Navigate to="xls_mappers" replace={true} />} />
     <Route path="data_ingestion/xls_mappers" element={errorWrapper(XlsMappers)()} />
+    <Route path="asset_rules" element={errorWrapper(TagRules)()} />
+
     {/* Not found */}
     <Route path="*" element={<NotFound />} />
   </Routes>

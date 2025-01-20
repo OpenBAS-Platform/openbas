@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import type {
+import {
   InjectsImportInput,
   LessonsCategoryCreateInput,
   LessonsCategoryTeamsInput,
@@ -15,6 +15,7 @@ import type {
   ScenarioTeamPlayersEnableInput,
   SearchPaginationInput,
   Team,
+  UpdateScenarioInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
@@ -43,7 +44,7 @@ export const fetchScenario = (scenarioId: string) => (dispatch: Dispatch) => {
 
 export const updateScenario = (
   scenarioId: Scenario['scenario_id'],
-  data: ScenarioInput,
+  data: UpdateScenarioInput,
 ) => (dispatch: Dispatch) => {
   const uri = `${SCENARIO_URI}/${scenarioId}`;
   return putReferential(scenario, uri, data)(dispatch);
@@ -232,4 +233,10 @@ export const deleteLessonsQuestion = (scenarioId: string, lessonsCategoryId: str
 export const emptyLessonsCategories = (scenarioId: string) => (dispatch: Dispatch) => {
   const uri = `/api/scenarios/${scenarioId}/lessons_empty`;
   return postReferential(schema.arrayOfLessonsCategories, uri, {})(dispatch);
+};
+
+export const checkScenarioTagRules = (scenarioId: string, newTagIds: string[]) => {
+  const uri = `/api/scenarios/${scenarioId}/check-rules`;
+  const input = { new_tags: newTagIds };
+  return simplePostCall(uri, input);
 };
