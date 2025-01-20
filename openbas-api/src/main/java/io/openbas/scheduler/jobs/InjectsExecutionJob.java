@@ -360,7 +360,6 @@ public class InjectsExecutionJob implements Job {
     exerciseRepository.save(exercise);
   }
 
-  @Transactional
   @Override
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     try {
