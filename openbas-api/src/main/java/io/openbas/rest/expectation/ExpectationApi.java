@@ -16,32 +16,15 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 public class ExpectationApi extends RestBehavior {
 
-  private ExerciseExpectationService exerciseExpectationService;
-  private InjectExpectationService injectExpectationService;
-  private CollectorRepository collectorRepository;
-
-  @Autowired
-  public void setExerciseExpectationService(
-      final ExerciseExpectationService exerciseExpectationService) {
-    this.exerciseExpectationService = exerciseExpectationService;
-  }
-
-  @Autowired
-  public void setInjectExpectationService(final InjectExpectationService injectExpectationService) {
-    this.injectExpectationService = injectExpectationService;
-  }
-
-  @Autowired
-  public void setCollectorRepository(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
-  }
+  private final ExerciseExpectationService exerciseExpectationService;
+  private final InjectExpectationService injectExpectationService;
+  private final CollectorRepository collectorRepository;
 
   @Transactional(rollbackOn = Exception.class)
   @PutMapping("/api/expectations/{expectationId}")

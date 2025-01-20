@@ -154,6 +154,25 @@ public class ExerciseExpectationService {
     injectExpectation.setUpdatedAt(now());
     InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
 
+    // Update InjectExpectations for Agents installed on this asset
+    List<InjectExpectation> expectationAgents =
+        injectExpectationService.expectationsForAgents(
+            updated.getInject(), updated.getAsset(), updated.getType());
+
+    expectationAgents.stream()
+        .map(
+            agentExp -> {
+              agentExp.setResults(
+                  agentExp.getResults().stream()
+                      .filter(r -> !sourceId.equals(r.getSourceId()))
+                      .toList());
+              agentExp.setScore(updated.getScore());
+              agentExp.setUpdatedAt(updated.getUpdatedAt());
+              return agentExp;
+            });
+
+    injectExpectationRepository.saveAll(expectationAgents);
+
     // If The expectation is type manual, We should update expectations for teams and players
     if (updated.getType() == EXPECTATION_TYPE.MANUAL && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, null);
