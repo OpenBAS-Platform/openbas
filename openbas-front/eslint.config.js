@@ -5,6 +5,7 @@ import 'eslint-import-resolver-oxc';
 
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
+import vitest from '@vitest/eslint-plugin';
 import i18next from 'eslint-plugin-i18next';
 import importPlugin from 'eslint-plugin-import';
 import playwright from 'eslint-plugin-playwright';
@@ -178,6 +179,27 @@ export default [
     },
   },
 
+  // unit tests config
+  {
+    files: ['src/__tests__/**/*'],
+    // rules recommended by vitest
+    plugins: {
+      vitest,
+    },
+    rules: {
+      ...vitest.configs.recommended.rules,
+      'import/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: [
+            '**/*.ts',
+            '**/*.tsx',
+          ],
+        },
+      ],
+    },
+  },
+
   // tests e2e config
   {
     files: ['tests_e2e/**/*'],
@@ -190,6 +212,7 @@ export default [
         {
           devDependencies: [
             '**/*.ts',
+            '**/*.tsx',
           ],
         },
       ],
