@@ -386,8 +386,10 @@ public class InjectService {
       @NotNull ExecutionStatus status,
       @Nullable final InjectStatusExecution trace) {
 
-    Inject inject = this.injectRepository.findById(injectId).orElseThrow(() ->
-            new EntityNotFoundException("No inject found with id: "+ injectId));
+    Inject inject =
+        this.injectRepository
+            .findById(injectId)
+            .orElseThrow(() -> new EntityNotFoundException("No inject found with id: " + injectId));
 
     InjectStatus injectStatus =
         inject

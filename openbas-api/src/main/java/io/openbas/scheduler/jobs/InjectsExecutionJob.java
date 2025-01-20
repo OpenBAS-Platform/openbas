@@ -203,7 +203,8 @@ public class InjectsExecutionJob implements Job {
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
                 // Status
-                this.injectService.initializeInjectStatus(inject.getId(), ExecutionStatus.EXECUTING, null);
+                this.injectService.initializeInjectStatus(
+                    inject.getId(), ExecutionStatus.EXECUTING, null);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
