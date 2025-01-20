@@ -22,8 +22,10 @@ import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.utils.InjectMapper;
+import io.openbas.utils.InjectUtils;
 import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -62,6 +64,8 @@ class InjectServiceTest {
   @Mock private InjectStatusRepository injectStatusRepository;
 
   @Mock private InjectMapper injectMapper;
+
+  @Mock private InjectUtils injectUtils;
 
   @InjectMocks private InjectService injectService;
 
@@ -598,5 +602,36 @@ class InjectServiceTest {
 
     // Assert
     verify(securityExpression, times(0)).isSimulationPlanner("exercise1");
+  }
+
+  @Test
+  void testInitializeInjectStatus_WITH_nonexisting_id() {
+    ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
+    String injectId = "randomid";
+
+    assertThrows(
+        EntityNotFoundException.class,
+        () -> injectService.initializeInjectStatus(injectId, executionStatus, null));
+  }
+
+  @Test
+  void testInitializeInjectStatus() {
+    ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
+    String injectId = "injectid";
+    Inject inject = new Inject();
+    inject.setId(injectId);
+    StatusPayload statusPayload = new StatusPayload();
+    when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
+    when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
+
+    injectService.initializeInjectStatus(injectId, executionStatus, null);
+
+    ArgumentCaptor<InjectStatus> statusCaptor = ArgumentCaptor.forClass(InjectStatus.class);
+    verify(injectStatusRepository).save(statusCaptor.capture());
+    InjectStatus savedStatus = statusCaptor.getValue();
+    assertNotNull(savedStatus);
+    assertEquals(inject, savedStatus.getInject());
+    assertEquals(executionStatus, savedStatus.getName());
+    assertEquals(statusPayload, savedStatus.getPayloadOutput());
   }
 }
