@@ -383,7 +383,7 @@ public class InjectService {
   @Transactional
   public void initializeInjectStatus(
       @NotNull final String injectId,
-      @NotNull ExecutionStatus status,
+      @NotNull final ExecutionStatus status,
       @Nullable final InjectStatusExecution trace) {
 
     Inject inject =
