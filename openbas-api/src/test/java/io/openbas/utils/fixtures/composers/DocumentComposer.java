@@ -3,17 +3,12 @@ package io.openbas.utils.fixtures.composers;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.DocumentRepository;
-
+import io.openbas.service.FileService;
+import io.openbas.utils.fixtures.files.BaseFile;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import io.openbas.service.FileService;
-import io.openbas.utils.fixtures.files.BaseFile;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
@@ -57,10 +52,12 @@ public class DocumentComposer extends ComposerBase<Document> {
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);
-      if(companionFile != null) {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(companionFile.getContentBytes())) {
+      if (companionFile != null) {
+        try (ByteArrayInputStream bais =
+            new ByteArrayInputStream(companionFile.getContentBytes())) {
           MultipartFile mmf = new MockMultipartFile(document.getTarget(), bais.readAllBytes());
-          fileService.uploadFile(document.getTarget(), mmf.getInputStream(), mmf.getSize(), document.getType());
+          fileService.uploadFile(
+              document.getTarget(), mmf.getInputStream(), mmf.getSize(), document.getType());
         }
       }
       documentRepository.save(document);

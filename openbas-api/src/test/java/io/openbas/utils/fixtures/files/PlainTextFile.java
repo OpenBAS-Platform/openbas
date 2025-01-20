@@ -1,22 +1,22 @@
 package io.openbas.utils.fixtures.files;
 
-public class PlainTextFile extends BaseFile<String>{
-    public PlainTextFile(String content, String fileName) {
-        super(content, fileName);
-    }
+public class PlainTextFile extends BaseFile<String> {
+  public PlainTextFile(String content, String fileName) {
+    super(content, fileName);
+  }
 
-    @Override
-    public String getMimeType() {
-        return "text/plain";
-    }
+  @Override
+  public String getMimeType() {
+    return "text/plain";
+  }
 
-    @Override
-    public byte[] getContentBytes() {
-        return getContent().getBytes();
-    }
+  @Override
+  public byte[] getContentBytes() {
+    return getContent().getBytes();
+  }
 
-    @Override
-    public int getContentLength() {
-        return getContentBytes().length;
-    }
+  @Override
+  public int getContentLength() {
+    return getContentBytes().length;
+  }
 }
