@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Transient;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +26,7 @@ public interface Base {
     BeanUtils.copyProperties(input, this);
   }
 
+  @Schema(hidden = true)
   default boolean isListened() {
     return true;
   }
