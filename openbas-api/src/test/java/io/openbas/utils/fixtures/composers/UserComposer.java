@@ -36,11 +36,28 @@ public class UserComposer extends ComposerBase<User> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.user.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);
-      organizationComposer.persist();
+      if (organizationComposer != null) {
+        organizationComposer.persist();
+      }
       userRepository.save(user);
+      return this;
+    }
+
+    @Override
+    public Composer delete() {
+      userRepository.delete(user);
+      if (organizationComposer != null) {
+        organizationComposer.delete();
+      }
+      this.tagComposers.forEach(TagComposer.Composer::delete);
       return this;
     }
 

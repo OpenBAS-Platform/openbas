@@ -29,11 +29,23 @@ public class ChallengeComposer extends ComposerBase<Challenge> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.challenge.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);
       challengeRepository.save(challenge);
       return this;
+    }
+
+    @Override
+    public Composer delete() {
+      challengeRepository.delete(challenge);
+      this.tagComposers.forEach(TagComposer.Composer::delete);
+      return null;
     }
 
     @Override

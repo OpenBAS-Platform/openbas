@@ -20,6 +20,10 @@ public class ArticleFixture {
     Article article = new Article();
     article.setName(ARTICLE_NAME);
     article.setContent("Lorem");
+    article.setShares(1);
+    article.setLikes(2);
+    article.setComments(4);
+    article.setAuthor("Charles Foster Kane");
     return article;
   }
 }

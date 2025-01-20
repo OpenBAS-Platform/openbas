@@ -23,11 +23,23 @@ public class ArticleComposer extends ComposerBase<Article> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.article.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.channelComposer.persist();
       articleRepository.save(article);
       return this;
+    }
+
+    @Override
+    public Composer delete() {
+      articleRepository.delete(article);
+      this.channelComposer.delete();
+      return null;
     }
 
     @Override

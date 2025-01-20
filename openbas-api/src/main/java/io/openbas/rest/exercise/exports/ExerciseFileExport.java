@@ -179,6 +179,8 @@ public class ExerciseFileExport {
     if (challenges == null) {
       return this.exercise == null
           ? new ArrayList<>()
+          // this forces export to first persist to database before this can work
+          // TODO: refactor to allow for pure in-memory simulation export
           : fromIterable(challengeService.getExerciseChallenges(this.exercise.getId()));
     }
     return challenges;
@@ -219,7 +221,7 @@ public class ExerciseFileExport {
     if (variables == null) {
       return this.exercise == null
           ? new ArrayList<>()
-          : this.variableService.variablesFromExercise(this.exercise.getId()).stream().toList();
+          : this.exercise.getVariables().stream().toList();
     }
     return variables;
   }
@@ -243,12 +245,8 @@ public class ExerciseFileExport {
 
   @JsonIgnore private int exportOptionsMask = 0;
 
-  private ExerciseFileExport(
-      ObjectMapper objectMapper,
-      VariableService variableService,
-      ChallengeService challengeService) {
+  private ExerciseFileExport(ObjectMapper objectMapper, ChallengeService challengeService) {
     this.objectMapper = objectMapper;
-    this.variableService = variableService;
     this.challengeService = challengeService;
 
     this.objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
@@ -272,12 +270,8 @@ public class ExerciseFileExport {
   }
 
   public static final ExerciseFileExport fromExercise(
-      Exercise exercise,
-      ObjectMapper objectMapper,
-      VariableService variableService,
-      ChallengeService challengeService) {
-    ExerciseFileExport efe =
-        new ExerciseFileExport(objectMapper, variableService, challengeService);
+      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
+    ExerciseFileExport efe = new ExerciseFileExport(objectMapper, challengeService);
     efe.setExercise(exercise);
     return efe;
   }

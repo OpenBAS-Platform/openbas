@@ -29,10 +29,22 @@ public class OrganizationComposer extends ComposerBase<Organization> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.organization.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       this.tagComposers.forEach(TagComposer.Composer::persist);
       organizationRepository.save(organization);
+      return this;
+    }
+
+    @Override
+    public Composer delete() {
+      organizationRepository.delete(organization);
+      this.tagComposers.forEach(TagComposer.Composer::delete);
       return this;
     }
 

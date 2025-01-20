@@ -39,11 +39,24 @@ public class TeamComposer extends ComposerBase<Team> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.team.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       userComposers.forEach(UserComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
       teamRepository.save(team);
+      return this;
+    }
+
+    @Override
+    public Composer delete() {
+      teamRepository.delete(team);
+      tagComposers.forEach(TagComposer.Composer::delete);
+      userComposers.forEach(UserComposer.Composer::delete);
       return this;
     }
 

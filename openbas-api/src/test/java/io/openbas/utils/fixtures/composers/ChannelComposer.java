@@ -23,6 +23,17 @@ public class ChannelComposer extends ComposerBase<Channel> {
     }
 
     @Override
+    public Composer delete() {
+      channelRepository.delete(channel);
+      return this;
+    }
+
+    public Composer withId(String id) {
+      this.channel.setId(id);
+      return this;
+    }
+
+    @Override
     public Channel get() {
       return channel;
     }
