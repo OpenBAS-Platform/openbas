@@ -40,6 +40,12 @@ public class TeamFixture {
     return getTeam(user, TEAM_NAME, false); // Call the other method with default value
   }
 
+  public static Team getEmptyTeam() {
+    Team t = new Team();
+    t.setName(TEAM_NAME);
+    return t;
+  }
+
   public static Team getTeam(final User user, String name, Boolean isContextualTeam) {
     Team team = new Team();
     team.setName(name);
