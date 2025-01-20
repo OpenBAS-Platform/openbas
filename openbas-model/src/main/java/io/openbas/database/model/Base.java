@@ -1,9 +1,11 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Transient;
 import org.springframework.beans.BeanUtils;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public interface Base {
   String getId();
 
@@ -23,7 +25,6 @@ public interface Base {
     BeanUtils.copyProperties(input, this);
   }
 
-  @JsonIgnore
   default boolean isListened() {
     return true;
   }

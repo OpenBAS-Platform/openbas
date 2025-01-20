@@ -27,6 +27,7 @@ import io.openbas.service.AssetService;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
@@ -61,6 +62,7 @@ public class InjectService {
   private final InjectStatusRepository injectStatusRepository;
   private final InjectMapper injectMapper;
   private final MethodSecurityExpressionHandler methodSecurityExpressionHandler;
+  private final InjectUtils injectUtils;
 
   @Resource protected ObjectMapper mapper;
 
@@ -376,6 +378,32 @@ public class InjectService {
       }
     }
   }
+
+  @Transactional
+  public void  initializeInjectStatus(
+          @NotNull final Inject inject,
+          @NotNull ExecutionStatus status,
+          @Nullable final InjectStatusExecution trace) {
+    InjectStatus injectStatus =
+            inject
+                    .getStatus()
+                    .orElseGet(
+                            () -> {
+                              InjectStatus newStatus = new InjectStatus();
+                              newStatus.setInject(inject);
+                              return newStatus;
+                            });
+
+    if (trace != null) {
+      injectStatus.getTraces().add(trace);
+    }
+    injectStatus.setName(status);
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
+    injectStatusRepository.save(injectStatus);
+    inject.setStatus(injectStatus);
+  }
+
 
   /**
    * Update the inject with the given input
