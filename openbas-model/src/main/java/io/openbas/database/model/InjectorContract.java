@@ -160,4 +160,16 @@ public class InjectorContract implements Base {
   public int hashCode() {
     return Objects.hash(id);
   }
+
+  // -- INJECTOR CONTRACT CONTENT --
+
+  public static final String CONTACT_CONTENT_FIELDS = "fields";
+  public static final String CONTACT_ELEMENT_CONTENT_KEY = "key";
+  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
+  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
+
+  public static final String CONTACT_ELEMENT_CONTENT_KEY_ASSETS = "assets";
+  public static final String CONTACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
+
+  public static final String DEFAULT_VALUE_FIELD = "defaultValue";
 }
