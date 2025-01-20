@@ -137,6 +137,7 @@ public class Team implements Base {
       orphanRemoval = true)
   @JsonProperty("team_exercises_users")
   @JsonSerialize(using = MultiModelDeserializer.class)
+  @Schema(description = "List of 3-tuple linking simulations and users to this team")
   private List<ExerciseTeamUser> exerciseTeamUsers = new ArrayList<>();
 
   @JsonProperty("team_users_number")
@@ -153,6 +154,7 @@ public class Team implements Base {
               type = "string"))
   @JsonProperty("team_exercise_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
+  @Schema(description = "List of injects from all simulations of the team")
   public List<Inject> getExercisesInjects() {
     Predicate<Inject> selectedInject =
         inject -> inject.isAllTeams() || inject.getTeams().contains(this);
@@ -175,6 +177,7 @@ public class Team implements Base {
               type = "string"))
   @JsonProperty("team_scenario_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
+  @Schema(description = "List of injects from all scenarios of the team")
   public List<Inject> getScenariosInjects() {
     Predicate<Inject> selectedInject =
         inject -> inject.isAllTeams() || inject.getTeams().contains(this);
@@ -196,6 +199,7 @@ public class Team implements Base {
   @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_inject_expectations")
+  @Schema(description = "List of expectations id linked to this team")
   private List<InjectExpectation> injectExpectations = new ArrayList<>();
 
   @JsonProperty("team_injects_expectations_number")
