@@ -15,4 +15,11 @@ public class ArticleFixture {
     article.setChannel(channel);
     return article;
   }
+
+  public static Article getArticleNoChannel() {
+    Article article = new Article();
+    article.setName(ARTICLE_NAME);
+    article.setContent("Lorem");
+    return article;
+  }
 }
