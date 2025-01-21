@@ -16,4 +16,10 @@ public class AssetAgentJobSpecification {
             cb.equal(root.get("agent").get("privilege"), privilege),
             cb.equal(root.get("agent").get("executedByUser"), executedByUser));
   }
+
+  @Deprecated(since = "1.11.0")
+  public static Specification<AssetAgentJob> forEndpoint(String externalReference) {
+    return (root, query, cb) ->
+        cb.equal(root.get("agent").get("externalReference"), externalReference);
+  }
 }
