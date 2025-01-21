@@ -605,7 +605,7 @@ class InjectServiceTest {
   }
 
   @Test
-  void testInitializeInjectStatus_WITH_nonexisting_id() {
+  void given_nonexisting_initializeInjectStatus_SHOULD_throw_EntityNotFoundException() {
     ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
     String injectId = "randomid";
 
@@ -615,7 +615,7 @@ class InjectServiceTest {
   }
 
   @Test
-  void testInitializeInjectStatus() {
+  void given_valid_input_initializeInjectStatus_SHOULD_save_the_injectstatus() {
     ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
     String injectId = "injectid";
     Inject inject = new Inject();
