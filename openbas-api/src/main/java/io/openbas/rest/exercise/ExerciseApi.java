@@ -38,6 +38,9 @@ import io.openbas.telemetry.Tracing;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.persistence.criteria.Join;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -916,6 +919,13 @@ public class ExerciseApi extends RestBehavior {
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/check-rules")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Returns whether or not the rules apply")
+      })
+  @Operation(
+      summary = "Check rules",
+      description = "Check if the rules apply to a simulation update")
   public CheckExerciseRulesOutput checkIfRuleApplies(
       @PathVariable @NotBlank final String exerciseId,
       @Valid @RequestBody final CheckExerciseRulesInput input) {

@@ -566,25 +566,25 @@ class InjectServiceTest {
 
   @DisplayName("Test canApplyAssetToInject with manual inject")
   @Test
-  void testCanApplyAssetToInject_WITH_no_asset() {
+  void testCanApplyAssetToInject_WITH_no_assetGroup() {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setContent(
         "{\"manual\":true,\"fields\":[{\"key\":\"content\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"textarea\"}]}");
     Inject inject = new Inject();
     inject.setInjectorContract(injectorContract);
 
-    assertFalse(injectService.canApplyAssetToInject(inject));
+    assertFalse(injectService.canApplyAssetGroupToInject(inject));
   }
 
   @DisplayName("Test canApplyAssetToInject with inject with assets")
   @Test
-  void testCanApplyAssetToInject_WITH_assets() {
+  void testCanApplyAssetGroupToInject_WITH_assets() {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setContent(
-        "{\"manual\":true,\"fields\":[{\"key\":\"asset\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"asset\"}]}");
+        "{\"manual\":true,\"fields\":[{\"key\":\"assetgroup\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"assetgroup\"}]}");
     Inject inject = new Inject();
     inject.setInjectorContract(injectorContract);
 
-    assertTrue(injectService.canApplyAssetToInject(inject));
+    assertTrue(injectService.canApplyAssetGroupToInject(inject));
   }
 }

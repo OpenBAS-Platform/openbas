@@ -345,7 +345,7 @@ public class InjectApi extends RestBehavior {
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
 
     // verify if the inject is not manual/sms/emails...
-    if (this.injectService.canApplyAssetToInject(inject)) {
+    if (this.injectService.canApplyAssetGroupToInject(inject)) {
       // add default asset groups
       inject.setAssetGroups(
           this.tagRuleService.applyTagRuleToInjectCreation(
@@ -588,7 +588,7 @@ public class InjectApi extends RestBehavior {
     inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
 
     // verify if the inject is not manual/sms/emails...
-    if (this.injectService.canApplyAssetToInject(inject)) {
+    if (this.injectService.canApplyAssetGroupToInject(inject)) {
       // add default asset groups
       inject.setAssetGroups(
           this.tagRuleService.applyTagRuleToInjectCreation(

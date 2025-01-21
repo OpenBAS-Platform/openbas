@@ -207,7 +207,7 @@ public class InjectService {
    * @param inject
    * @return
    */
-  public boolean canApplyAssetToInject(final Inject inject) {
+  public boolean canApplyAssetGroupToInject(final Inject inject) {
 
     JsonNode jsonNode = null;
     try {
@@ -221,7 +221,7 @@ public class InjectService {
                 contractElement
                     .get("type")
                     .asText()
-                    .equals(ContractType.Asset.name().toLowerCase()))
+                    .equals(ContractType.AssetGroup.name().toLowerCase()))
         .toList()
         .isEmpty();
   }

@@ -666,7 +666,7 @@ public class ExerciseService {
 
       // Add the default asset groups to the injects
       exercise.getInjects().stream()
-          .filter(injectService::canApplyAssetToInject)
+          .filter(injectService::canApplyAssetGroupToInject)
           .forEach(
               inject ->
                   injectService.applyDefaultAssetGroupsToInject(

@@ -26,6 +26,9 @@ import io.openbas.service.TeamService;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -288,6 +291,11 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/check-rules")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Returns whether or not the rules apply")
+      })
+  @Operation(summary = "Check rules", description = "Check if the rules apply to a scenario update")
   public CheckScenarioRulesOutput checkIfRuleApplies(
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final CheckScenarioRulesInput input) {
