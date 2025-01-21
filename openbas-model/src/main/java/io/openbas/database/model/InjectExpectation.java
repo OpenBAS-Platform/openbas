@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -72,7 +73,6 @@ public class InjectExpectation implements Base {
   @JsonProperty("inject_expectation_description")
   private String description;
 
-  @Setter
   @Type(JsonType.class)
   @Column(name = "inject_expectation_signatures")
   @JsonProperty("inject_expectation_signatures")
@@ -249,6 +249,20 @@ public class InjectExpectation implements Base {
     this.type = EXPECTATION_TYPE.DETECTION;
     this.asset = asset;
     this.assetGroup = assetGroup;
+  }
+
+  public void setSignatures(List<InjectExpectationSignature> injectExpectationSignatures) {
+    this.signatures =
+        injectExpectationSignatures.stream()
+            .filter(
+                signature ->
+                    EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME.equals(signature.getType()))
+            .map(
+                signature -> {
+                  signature.setValue(signature.getValue().concat("-").concat(this.agent.getId()));
+                  return signature;
+                })
+            .toList();
   }
 
   public boolean isUserHasAccess(User user) {
