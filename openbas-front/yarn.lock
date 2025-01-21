@@ -5625,21 +5625,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-import-resolver-oxc@npm:0.8.0":
-  version: 0.8.0
-  resolution: "eslint-import-resolver-oxc@npm:0.8.0"
+"eslint-import-resolver-oxc@npm:0.9.1":
+  version: 0.9.1
+  resolution: "eslint-import-resolver-oxc@npm:0.9.1"
   dependencies:
     oxc-resolver: "npm:^3.0.3"
   peerDependencies:
     eslint: "*"
     eslint-plugin-import: "*"
     eslint-plugin-import-x: "*"
+    vite: "*"
+    webpack: "*"
+    webpack-cli: "*"
   peerDependenciesMeta:
     eslint-plugin-import:
       optional: true
     eslint-plugin-import-x:
       optional: true
-  checksum: 10c0/12ed49c3568de0133dfbada97ac4d90ff746a1d1037a68444bfd7651e44a4b75fb232eefd122796f360d7c5aa068ab80228cbef24893f41c3c4812069d7f8b7c
+    vite:
+      optional: true
+    webpack:
+      optional: true
+    webpack-cli:
+      optional: true
+  checksum: 10c0/1dd4c140d72cb5094aea6d4c318d9a240958807605b87ed5630b3dc5265e5d02a14aae47a166f4fdfe036bb54a0d0fde51fb4d3376a39c5eb6fcad019d322d33
   languageName: node
   linkType: hard
 
@@ -9183,7 +9192,7 @@ __metadata:
     elkjs: "npm:0.9.3"
     esbuild: "npm:0.24.0"
     eslint: "npm:9.15.0"
-    eslint-import-resolver-oxc: "npm:0.8.0"
+    eslint-import-resolver-oxc: "npm:0.9.1"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
     eslint-plugin-i18next: "npm:6.1.1"
     eslint-plugin-import: "npm:2.31.0"
