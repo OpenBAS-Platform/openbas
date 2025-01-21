@@ -128,6 +128,7 @@ class ExerciseServiceTest {
     when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag1.getId())))
         .thenReturn(assetGroupsToAdd);
     when(exerciseRepository.save(exercise)).thenReturn(exercise);
+    when(injectService.canApplyAssetGroupToInject(any())).thenReturn(true);
 
     exerciseService.updateExercice(exercise, currentTags, true);
 
@@ -137,6 +138,34 @@ class ExerciseServiceTest {
             inject ->
                 verify(injectService)
                     .applyDefaultAssetGroupsToInject(inject.getId(), assetGroupsToAdd));
+    verify(exerciseRepository).save(exercise);
+  }
+
+  @Test
+  public void testUpdateExercise_WITH_apply_rule_true_and_manual_inject() {
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    Tag tag1 = TagFixture.getTag("Tag1");
+    Tag tag2 = TagFixture.getTag("Tag2");
+    Tag tag3 = TagFixture.getTag("Tag3");
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Exercise exercise = ExerciseFixture.getExercise(null);
+    exercise.setInjects(List.of(inject1, inject2));
+    exercise.setTags(Set.of(tag1, tag2));
+    Set<Tag> currentTags = Set.of(tag2, tag3);
+    List<AssetGroup> assetGroupsToAdd = List.of(assetGroup1, assetGroup2);
+
+    when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag1.getId())))
+        .thenReturn(assetGroupsToAdd);
+    when(exerciseRepository.save(exercise)).thenReturn(exercise);
+    when(injectService.canApplyAssetGroupToInject(any())).thenReturn(false);
+
+    exerciseService.updateExercice(exercise, currentTags, true);
+
+    verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any());
     verify(exerciseRepository).save(exercise);
   }
 

@@ -225,7 +225,6 @@ class ScenarioServiceTest {
     when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
     when(injectService.canApplyAssetGroupToInject(any())).thenReturn(true);
 
-
     scenarioService.updateScenario(scenario, currentTags, true);
 
     scenario
@@ -238,7 +237,7 @@ class ScenarioServiceTest {
   }
 
   @Test
-  public void testUpdateScenario_WITH_applyRule_true_and_manual_inject () {
+  public void testUpdateScenario_WITH_applyRule_true_and_manual_inject() {
     setUpWithMockRepository();
     AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
     AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
@@ -255,15 +254,13 @@ class ScenarioServiceTest {
     List<AssetGroup> assetGroupsToAdd = List.of(assetGroup1, assetGroup2);
 
     when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag1.getId())))
-            .thenReturn(assetGroupsToAdd);
+        .thenReturn(assetGroupsToAdd);
     when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
     when(injectService.canApplyAssetGroupToInject(any())).thenReturn(false);
 
-
     scenarioService.updateScenario(scenario, currentTags, true);
 
-
-    verify(injectService, never()).applyDefaultAssetGroupsToInject(any(),any());
+    verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any());
     verify(mockScenarioRepository).save(scenario);
   }
 
@@ -293,8 +290,6 @@ class ScenarioServiceTest {
 
     verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any());
   }
-
-
 
   private AssetGroup getAssetGroup(String name) {
     AssetGroup assetGroup = AssetGroupFixture.createDefaultAssetGroup(name);
