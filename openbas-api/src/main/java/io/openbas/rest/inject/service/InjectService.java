@@ -70,7 +70,7 @@ public class InjectService {
   public Inject inject(@NotBlank final String injectId) {
     return this.injectRepository
         .findById(injectId)
-        .orElseThrow(() -> new ElementNotFoundException("Inject not found"));
+        .orElseThrow(() -> new ElementNotFoundException("Inject not found with id: " + injectId));
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -387,9 +387,7 @@ public class InjectService {
       @Nullable final InjectStatusExecution trace) {
 
     Inject inject =
-        this.injectRepository
-            .findById(injectId)
-            .orElseThrow(() -> new EntityNotFoundException("No inject found with id: " + injectId));
+        this.inject(injectId);
 
     InjectStatus injectStatus =
         inject
