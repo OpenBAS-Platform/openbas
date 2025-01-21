@@ -581,7 +581,7 @@ class InjectServiceTest {
   void testCanApplyAssetGroupToInject_WITH_assets() {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setContent(
-        "{\"manual\":true,\"fields\":[{\"key\":\"assetgroup\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"assetgroup\"}]}");
+        "{\"manual\":true,\"fields\":[{\"key\":\"assetgroups\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"asset-group\"}]}");
     Inject inject = new Inject();
     inject.setInjectorContract(injectorContract);
 

@@ -218,10 +218,7 @@ public class InjectService {
     return !StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
         .filter(
             contractElement ->
-                contractElement
-                    .get("type")
-                    .asText()
-                    .equals(ContractType.AssetGroup.name().toLowerCase()))
+                contractElement.get("type").asText().equals(ContractType.AssetGroup.label))
         .toList()
         .isEmpty();
   }
