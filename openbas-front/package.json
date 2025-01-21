@@ -79,6 +79,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.15.0",
+    "@faker-js/faker": "9.3.0",
     "@playwright/test": "1.49.1",
     "@stylistic/eslint-plugin": "2.13.0",
     "@testing-library/dom": "10.4.0",
@@ -95,7 +96,9 @@
     "@types/seamless-immutable": "7.1.19",
     "@types/uuid": "10.0.0",
     "@typescript-eslint/parser": "8.18.1",
+    "@typescript-eslint/utils": "8.20.0",
     "@vitejs/plugin-react": "4.3.4",
+    "@vitest/eslint-plugin": "1.1.25",
     "chokidar": "4.0.3",
     "cross-env": "7.0.3",
     "esbuild": "0.24.0",
