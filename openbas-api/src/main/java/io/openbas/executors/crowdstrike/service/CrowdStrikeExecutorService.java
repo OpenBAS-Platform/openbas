@@ -37,6 +37,8 @@ public class CrowdStrikeExecutorService implements Runnable {
   private static final int DELETE_TTL = 86400000; // 24 hours
   private static final String CROWDSTRIKE_EXECUTOR_TYPE = "openbas_crowdstrike";
   private static final String CROWDSTRIKE_EXECUTOR_NAME = "CrowdStrike";
+  private static final String CROWDSTRIKE_EXECUTOR_DOCUMENTATION_LINK =
+      "https://docs.openbas.io/latest/deployment/ecosystem/executors/#crowdstrike-falcon-agent";
 
   private final CrowdStrikeExecutorClient client;
 
@@ -84,6 +86,7 @@ public class CrowdStrikeExecutorService implements Runnable {
                 config.getId(),
                 CROWDSTRIKE_EXECUTOR_TYPE,
                 CROWDSTRIKE_EXECUTOR_NAME,
+                CROWDSTRIKE_EXECUTOR_DOCUMENTATION_LINK,
                 getClass().getResourceAsStream("/img/icon-crowdstrike.png"),
                 new String[] {
                   Endpoint.PLATFORM_TYPE.Windows.name(),

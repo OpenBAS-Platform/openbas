@@ -6,11 +6,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 @Aspect
 @Component
+@ConditionalOnProperty(name = "logging.aspect.enabled", havingValue = "true", matchIfMissing = true)
 public class LoggingAspect {
 
   public static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);

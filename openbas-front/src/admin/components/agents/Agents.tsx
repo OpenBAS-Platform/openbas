@@ -1,28 +1,10 @@
-import { ArticleOutlined, ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
-import {
-  Alert,
-  Button,
-  Card,
-  CardActionArea,
-  CardContent,
-  Chip,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tab,
-  Tabs,
-  Typography,
-} from '@mui/material';
+import { ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
+import { Alert, Button, Card, CardActionArea, CardContent, Dialog, DialogContent, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs, Typography } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
 import { Bash, DownloadCircleOutline, Powershell } from 'mdi-material-ui';
 import * as R from 'ramda';
-import { useState } from 'react';
 import * as React from 'react';
+import { useState } from 'react';
 
 import { fetchExecutors } from '../../../actions/Executor';
 import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
@@ -39,6 +21,7 @@ import { useAppDispatch } from '../../../utils/hooks';
 import useAuth from '../../../utils/hooks/useAuth';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { copyToClipboard, download } from '../../../utils/utils';
+import ExecutorDocumentationLink from './ExecutorDocumentationLink';
 
 const useStyles = makeStyles(() => ({
   card: {
@@ -56,12 +39,6 @@ const useStyles = makeStyles(() => ({
   },
   icon: {
     padding: 0,
-  },
-  chip: {
-    height: 30,
-    fontSize: 12,
-    borderRadius: 4,
-    marginBottom: 10,
   },
 }));
 
@@ -547,26 +524,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().exclusions}</pre>
                 </div>
               )}
-              {currentSelectedExecutor.executor_type === 'openbas_tanium' && (
-                <div style={{ marginTop: 20 }}>
-                  <Chip
-                    variant="outlined"
-                    icon={<ArticleOutlined />}
-                    classes={{ root: classes.chip }}
-                    label={t('documentation')}
-                  />
-                  <Typography variant="body1" style={{ marginBottom: 20 }}>
-                    {t('To install the agent please follow the')}
-                    {' '}
-                    <a target="_blank" href={currentSelectedExecutor.executor_doc} rel="noreferrer">
-                      {currentSelectedExecutor.executor_name}
-                      {' '}
-                      {t('documentation')}
-                    </a>
-                    .
-                  </Typography>
-                </div>
-              )}
+              <ExecutorDocumentationLink executor={currentSelectedExecutor} />
             </div>
           )}
         </DialogContent>
