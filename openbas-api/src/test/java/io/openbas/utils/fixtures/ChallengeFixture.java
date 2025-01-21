@@ -14,6 +14,8 @@ public class ChallengeFixture {
     ChallengeFlag challengeFlag = createDefaultChallengeFlag();
     challenge.setFlags(List.of(challengeFlag));
     challengeFlag.setChallenge(challenge);
+    challenge.setScore(100.0);
+    challenge.setMaxAttempts(2);
     return challenge;
   }
 

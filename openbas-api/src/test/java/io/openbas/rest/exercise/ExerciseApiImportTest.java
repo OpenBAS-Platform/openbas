@@ -1,6 +1,7 @@
 package io.openbas.rest.exercise;
 
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -135,7 +136,10 @@ public class ExerciseApiImportTest extends IntegrationTest {
   }
 
   private Exercise findSingleExerciseFromDb() {
-    Optional<Exercise> exerciseOpt = exerciseRepository.findAll().stream().findFirst();
+    Optional<Exercise> exerciseOpt =
+        exerciseRepository.findAll().stream()
+            .filter(ex -> ex.getName().contains("(Import)"))
+            .findFirst();
     if (exerciseOpt.isEmpty()) {
       Assertions.fail("No exercise found");
     }
@@ -144,8 +148,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
   private byte[] doExport(ExerciseComposer.Composer composer) throws Exception {
     Exercise exercise = composer.persist().get();
-    byte[] zipBytes = exportService.exportExerciseToZip(exercise, FULL_EXPORT_OPTIONS);
-    return zipBytes;
+    return exportService.exportExerciseToZip(exercise, FULL_EXPORT_OPTIONS);
   }
 
   @DisplayName(
@@ -169,6 +172,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     Exercise imported = findSingleExerciseFromDb();
@@ -204,6 +208,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Team expected : teamComposer.generatedItems) {
@@ -242,6 +247,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Team expected : exerciseWrapper.get().getTeams()) {
@@ -271,6 +277,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (User expected : userComposer.generatedItems) {
@@ -320,6 +327,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (User expected : userComposer.generatedItems) {
@@ -352,6 +360,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Organization expected : organizationComposer.generatedItems) {
@@ -390,6 +399,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Organization expected : organizationComposer.generatedItems) {
@@ -421,6 +431,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Article expected : articleComposer.generatedItems) {
@@ -468,6 +479,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Article expected : articleComposer.generatedItems) {
@@ -497,6 +509,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     Channel expected = channelComposer.generatedItems.getFirst();
@@ -541,6 +554,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Channel expected : channelComposer.generatedItems) {
@@ -571,6 +585,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Tag expected : tagComposer.generatedItems) {
@@ -608,6 +623,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Tag expected : tagComposer.generatedItems) {
@@ -637,6 +653,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Objective expected : objectiveComposer.generatedItems) {
@@ -677,6 +694,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     // force hibernate to clear its cache to not pollute fetch operations
     // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
     entityManager.clear();
 
     for (Objective expected : objectiveComposer.generatedItems) {
@@ -684,6 +702,988 @@ public class ExerciseApiImportTest extends IntegrationTest {
           findSingleExerciseFromDb().getObjectives().stream()
               .anyMatch(objective -> objective.getTitle().equals(expected.getTitle())),
           "Objective " + expected.getTitle() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given no preexisting objects, create new lessons categories")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_no_preexisting_objects_create_new_lessons_categories()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
+      Optional<LessonsCategory> categoryFromDb =
+          StreamSupport.stream(lessonsCategoryRepository.findAll().spliterator(), false)
+              .filter(category -> category.getName().equals(expected.getName()))
+              .findFirst();
+      if (categoryFromDb.isEmpty()) {
+        Assertions.fail("Lessons Category " + expected.getName() + " not found");
+      }
+      LessonsCategory imported = categoryFromDb.get();
+
+      Assertions.assertEquals(expected.getName(), imported.getName());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+      Assertions.assertEquals(expected.getOrder(), imported.getOrder());
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given no preexisting objects, new lessons categories attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_no_preexisting_objects_new_lessons_categories_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getLessonsCategories().stream()
+              .anyMatch(category -> category.getName().equals(expected.getName())),
+          "Lessons Category " + expected.getName() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName("Given a valid export zip file, given no preexisting objects, create new documents")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_no_preexisting_objects_create_new_documents()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Document expected : documentComposer.generatedItems) {
+      Optional<Document> docFromDb = documentRepository.findByTarget(expected.getTarget());
+      if (docFromDb.isEmpty()) {
+        Assertions.fail("Document " + expected.getTarget() + " not found");
+      }
+      Document imported = docFromDb.get();
+
+      Assertions.assertEquals(expected.getName(), imported.getName());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+      Assertions.assertEquals(expected.getTarget(), imported.getTarget());
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given no preexisting objects, new documents attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_no_preexisting_objects_new_documents_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Document expected : documentComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getDocuments().stream()
+              .anyMatch(doc -> doc.getTarget().equals(expected.getTarget())),
+          "Document " + expected.getTarget() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName("Given a valid export zip file, given no preexisting objects, create injects")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_no_preexisting_objects_create_new_injects()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Inject expected : injectComposer.generatedItems) {
+      Optional<Inject> injectFromDb = injectRepository.findAll().stream().findFirst();
+      if (injectFromDb.isEmpty()) {
+        Assertions.fail("Inject " + expected.getTitle() + " not found");
+      }
+      Inject imported = injectFromDb.get();
+
+      Assertions.assertEquals(expected.getTitle(), imported.getTitle());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+      // the challenge ID is necessarily different from source and imported values, therefore ignore
+      // this
+      assertThatJson(imported.getContent())
+          .whenIgnoringPaths("challenges")
+          .isEqualTo(expected.getContent());
+      assertThatJson(imported.getContent()).node("challenges").isPresent().and().isArray();
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given no preexisting objects, new injects attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_no_preexisting_objects_new_injects_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Inject expected : injectComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getInjects().stream()
+              .anyMatch(doc -> doc.getTitle().equals(expected.getTitle())),
+          "Inject " + expected.getTitle() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName("Given a valid export zip file, given no preexisting objects, create new variables")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_no_preexisting_objects_create_new_variables()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.flush();
+
+    for (Variable expected : variableComposer.generatedItems) {
+      Optional<Variable> varFromDb =
+          StreamSupport.stream(variableRepository.findAll().spliterator(), false).findFirst();
+      if (varFromDb.isEmpty()) {
+        Assertions.fail("Variable " + expected.getKey() + " not found");
+      }
+      Variable imported = varFromDb.get();
+
+      Assertions.assertEquals(expected.getKey(), imported.getKey());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given no preexisting objects, new variables attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_no_preexisting_objects_new_variables_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Variable expected : variableComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getVariables().stream()
+              .anyMatch(var -> var.getKey().equals(expected.getKey())),
+          "Variable " + expected.getKey() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName("Given a valid export zip file, given no preexisting objects, create new challenges")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_no_preexisting_objects_create_new_challenges()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.flush();
+
+    for (Challenge expected : challengeComposer.generatedItems) {
+      Optional<Challenge> challengeFromDb =
+          StreamSupport.stream(challengeRepository.findAll().spliterator(), false).findFirst();
+      if (challengeFromDb.isEmpty()) {
+        Assertions.fail("Challenge " + expected.getName() + " not found");
+      }
+      Challenge imported = challengeFromDb.get();
+
+      Assertions.assertEquals(expected.getName(), imported.getName());
+      Assertions.assertEquals(expected.getContent(), imported.getContent());
+      Assertions.assertEquals(expected.getCategory(), imported.getCategory());
+      Assertions.assertEquals(expected.getScore(), imported.getScore());
+      Assertions.assertEquals(expected.getMaxAttempts(), imported.getMaxAttempts());
+      for (ChallengeFlag flag : expected.getFlags()) {
+        Assertions.assertTrue(
+            imported.getFlags().stream()
+                .anyMatch(
+                    flg ->
+                        flg.getType().equals(flag.getType())
+                            && flg.getValue().equals(flag.getValue())),
+            "Flag of type " + flag.getType() + " not found in challenge");
+      }
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given no preexisting objects, new challenges attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_no_preexisting_objects_new_challenges_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    exerciseWrapper.delete();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Challenge expected : challengeComposer.generatedItems) {
+      Optional<Challenge> challengeFromDb =
+          StreamSupport.stream(challengeRepository.findAll().spliterator(), false).findFirst();
+      if (challengeFromDb.isEmpty()) {
+        Assertions.fail("Challenge " + expected.getName() + " not found");
+      }
+      Challenge imported = challengeFromDb.get();
+
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getInjects().stream()
+              .anyMatch(inject -> inject.getContent().toString().contains(imported.getId())),
+          "Challenge " + expected.getName() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, assign existing teams to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_teams_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Team expected : exerciseWrapper.get().getTeams()) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getTeams().stream()
+              .anyMatch(team -> team.getId().equals(expected.getId())),
+          "Team %s not found in imported exercise".formatted(expected.getName()));
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, assign existing users to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_users_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (User expected : userComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getTeams().stream()
+              .flatMap(team -> team.getUsers().stream())
+              .toList()
+              .stream()
+              .anyMatch(userFromDb -> userFromDb.getId().equals(expected.getId())));
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, assign existing organisations to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_organisations_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Organization expected : organizationComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getTeams().stream()
+              .flatMap(team -> team.getUsers().stream().map(User::getOrganization))
+              .filter(Objects::nonNull)
+              .anyMatch(o -> o.getId().equals(expected.getId())),
+          "Expected organization " + expected.getName() + " not found");
+    }
+  }
+
+  @DisplayName("Given a valid export zip file, given existing objects, create new article anyway")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_existing_objects_create_new_article_anyway()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Article expected : articleComposer.generatedItems) {
+      Optional<Article> articleFromDb =
+          articleRepository
+              .findAll(
+                  (root, query, criteriaBuilder) ->
+                      criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+              .stream()
+              .findFirst();
+      if (articleFromDb.isEmpty()) {
+        Assertions.fail("Article " + expected.getName() + " not found");
+      }
+      Article imported = articleFromDb.get();
+
+      Assertions.assertEquals(expected.getName(), imported.getName());
+      Assertions.assertEquals(expected.getContent(), imported.getContent());
+      Assertions.assertEquals(expected.getShares(), imported.getShares());
+      Assertions.assertEquals(expected.getAuthor(), imported.getAuthor());
+      Assertions.assertEquals(expected.getLikes(), imported.getLikes());
+      Assertions.assertEquals(expected.getComments(), imported.getComments());
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, new articles attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_new_articles_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Article expected : articleComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getArticles().stream()
+              .anyMatch(art -> art.getName().equals(expected.getName())),
+          "Article " + expected.getName() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, assign existing channels to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_channels_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Channel expected : channelComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getArticles().stream()
+              .map(Article::getChannel)
+              .anyMatch(channel -> channel.getId().equals(expected.getId())),
+          "Channel " + expected.getName() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, assign existing tags to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_tags_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+    entityManager.flush();
+    entityManager.clear();
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Tag expected : tagComposer.generatedItems) {
+      Assertions.assertTrue(
+          ExerciseHelper.crawlAllTags(findSingleExerciseFromDb(), challengeService).stream()
+              .anyMatch(tag -> tag.getId().equals(expected.getId())),
+          "Tag " + expected.getName() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, create new objectives anyway")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_existing_objects_create_new_objectives_anyway()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Objective expected : objectiveComposer.generatedItems) {
+      Optional<Objective> objectiveFromDb =
+          StreamSupport.stream(
+                  objectiveRepository
+                      .findAll(
+                          (root, query, criteriaBuilder) ->
+                              criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                      .spliterator(),
+                  false)
+              .filter(objective -> objective.getTitle().equals(expected.getTitle()))
+              .findFirst();
+      if (objectiveFromDb.isEmpty()) {
+        Assertions.fail("Objective " + expected.getTitle() + " not found");
+      }
+      Objective imported = objectiveFromDb.get();
+
+      Assertions.assertEquals(expected.getTitle(), imported.getTitle());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, new objectives attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_new_objectives_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Objective expected : objectiveComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getObjectives().stream()
+              .anyMatch(objective -> objective.getTitle().equals(expected.getTitle())),
+          "Objective " + expected.getTitle() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, create new lessons categories anyway")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_create_new_lessons_categories_anyway()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
+      Optional<LessonsCategory> categoryFromDb =
+          StreamSupport.stream(
+                  lessonsCategoryRepository
+                      .findAll(
+                          (root, query, criteriaBuilder) ->
+                              criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                      .spliterator(),
+                  false)
+              .filter(category -> category.getName().equals(expected.getName()))
+              .findFirst();
+      if (categoryFromDb.isEmpty()) {
+        Assertions.fail("Lessons Category " + expected.getName() + " not found");
+      }
+      LessonsCategory imported = categoryFromDb.get();
+
+      Assertions.assertEquals(expected.getName(), imported.getName());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+      Assertions.assertEquals(expected.getOrder(), imported.getOrder());
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, new lessons categories attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_new_lessons_categories_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getLessonsCategories().stream()
+              .anyMatch(category -> category.getName().equals(expected.getName())),
+          "Lessons Category " + expected.getName() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, assign existing documents to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_documents_anyway()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Document expected : documentComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getDocuments().stream()
+              .anyMatch(doc -> doc.getId().equals(expected.getId())),
+          "Document " + expected.getTarget() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName("Given a valid export zip file, given existing objects, create new injects anyway")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_existing_objects_create_new_injects_anyway()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Inject expected : injectComposer.generatedItems) {
+      Optional<Inject> injectFromDb =
+          injectRepository
+              .findAll(
+                  (root, query, criteriaBuilder) ->
+                      criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+              .stream()
+              .findFirst();
+      if (injectFromDb.isEmpty()) {
+        Assertions.fail("Inject " + expected.getTitle() + " not found");
+      }
+      Inject imported = injectFromDb.get();
+
+      Assertions.assertEquals(expected.getTitle(), imported.getTitle());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+      // the challenge ID is necessarily different from source and imported values, therefore ignore
+      // this
+      assertThatJson(imported.getContent())
+          .whenIgnoringPaths("challenges")
+          .isEqualTo(expected.getContent());
+      assertThatJson(imported.getContent()).node("challenges").isPresent().and().isArray();
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, new injects attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_new_injects_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Inject expected : injectComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getInjects().stream()
+              .anyMatch(doc -> doc.getTitle().equals(expected.getTitle())),
+          "Inject " + expected.getTitle() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName("Given a valid export zip file, given existing objects, create new variables anyway")
+  @Test
+  @WithMockAdminUser
+  public void given_a_valid_export_zip_file_given_existing_objects_create_new_variables_anyway()
+      throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.flush();
+
+    for (Variable expected : variableComposer.generatedItems) {
+      Optional<Variable> varFromDb =
+          StreamSupport.stream(
+                  variableRepository
+                      .findAll(
+                          (root, query, criteriaBuilder) ->
+                              criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                      .spliterator(),
+                  false)
+              .findFirst();
+      if (varFromDb.isEmpty()) {
+        Assertions.fail("Variable " + expected.getKey() + " not found");
+      }
+      Variable imported = varFromDb.get();
+
+      Assertions.assertEquals(expected.getKey(), imported.getKey());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+      Assertions.assertEquals(expected.getDescription(), imported.getDescription());
+
+      Assertions.assertNotEquals(expected.getId(), imported.getId());
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, new variables attached to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_new_variables_attached_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Variable expected : variableComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getVariables().stream()
+              .anyMatch(var -> var.getKey().equals(expected.getKey())),
+          "Variable " + expected.getKey() + " not found in imported exercise");
+    }
+  }
+
+  @DisplayName(
+      "Given a valid export zip file, given existing objects, assign existing challenges to imported exercise")
+  @Test
+  @WithMockAdminUser
+  public void
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_challenges_to_imported_exercise()
+          throws Exception {
+    ExerciseComposer.Composer exerciseWrapper = getExercise();
+    byte[] zipBytes = doExport(exerciseWrapper);
+
+    MockMultipartFile mmf = new MockMultipartFile("file", zipBytes);
+
+    mvc.perform(
+            multipart(EXERCISE_URI + "/import")
+                .file(mmf)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().is2xxSuccessful());
+
+    // force hibernate to clear its cache to not pollute fetch operations
+    // TODO: make this automatic somehow, perhaps within Composers
+    entityManager.flush();
+    entityManager.clear();
+
+    for (Challenge expected : challengeComposer.generatedItems) {
+      Assertions.assertTrue(
+          findSingleExerciseFromDb().getInjects().stream()
+              .anyMatch(inject -> inject.getContent().toString().contains(expected.getId())),
+          "Challenge " + expected.getName() + " not found in imported exercise");
     }
   }
 }
