@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openbas</groupId>
         <artifactId>openbas-platform</artifactId>
-        <version>1.11.2</version>
+        <version>1.11.3</version>
     </parent>
 
     <artifactId>openbas-model</artifactId>
