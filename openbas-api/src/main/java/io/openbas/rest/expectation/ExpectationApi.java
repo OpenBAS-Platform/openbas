@@ -6,6 +6,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.service.ExerciseExpectationService;
 import io.openbas.service.InjectExpectationService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -59,7 +60,10 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  // add swagger
+  @Operation(
+      summary = "Get Inject Expectations for a Specific Source",
+      description =
+          "Retrieves inject expectations of agents installed on an asset for a given source ID.")
   @GetMapping("/api/injects/expectations/assets/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
       @PathVariable String sourceId) {

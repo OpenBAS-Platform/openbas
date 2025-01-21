@@ -254,12 +254,12 @@ public class InjectExpectation implements Base {
   public void setSignatures(List<InjectExpectationSignature> injectExpectationSignatures) {
     this.signatures =
         injectExpectationSignatures.stream()
-            .filter(
-                signature ->
-                    EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME.equals(signature.getType()))
             .map(
                 signature -> {
-                  signature.setValue(signature.getValue().concat("-").concat(this.agent.getId()));
+                  if (EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME.equals(signature.getType())
+                      && this.agent != null) {
+                    signature.setValue(signature.getValue() + "-" + this.agent.getId());
+                  }
                   return signature;
                 })
             .toList();
