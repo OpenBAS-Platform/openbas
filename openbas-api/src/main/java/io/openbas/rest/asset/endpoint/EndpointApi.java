@@ -70,10 +70,29 @@ public class EndpointApi extends RestBehavior {
             input.getExecutedByUser()));
   }
 
+  @Deprecated(since = "1.11.0")
+  @LogExecutionTime
+  @GetMapping(ENDPOINT_URI + "/jobs/{endpointExternalReference}")
+  @PreAuthorize("isPlanner()")
+  @Transactional(rollbackFor = Exception.class)
+  public List<AssetAgentJob> getEndpointJobs(
+      @PathVariable @NotBlank final String endpointExternalReference) {
+    return this.assetAgentJobRepository.findAll(
+        AssetAgentJobSpecification.forEndpoint(endpointExternalReference));
+  }
+
   @DeleteMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
+    this.assetAgentJobRepository.deleteById(assetAgentJobId);
+  }
+
+  @Deprecated(since = "1.11.0")
+  @PostMapping(ENDPOINT_URI + "/jobs/{assetAgentJobId}")
+  @PreAuthorize("isPlanner()")
+  @Transactional(rollbackFor = Exception.class)
+  public void cleanupAssetAgentJobDepreacted(@PathVariable @NotBlank final String assetAgentJobId) {
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
   }
 
