@@ -174,7 +174,6 @@ public class V1_DataImporter implements Importer {
 
   private Tag createTag(JsonNode jsonNode) {
     Tag tag = new Tag();
-    tag.setId(jsonNode.get("tag_id").textValue());
     tag.setName(jsonNode.get("tag_name").textValue());
     tag.setColor(jsonNode.get("tag_color").textValue());
     return tag;
@@ -320,8 +319,12 @@ public class V1_DataImporter implements Importer {
     } else if (savedScenario != null) {
       document.setScenarios(Set.of(savedScenario));
     }
-    document.setTags(
-        iterableToSet(tagRepository.findAllById(resolveJsonIds(nodeDoc, "document_tags"))));
+    // need to get real database-bound ids for tags
+    List<String> tagIds =
+        resolveJsonIds(nodeDoc, "document_tags").stream()
+            .map(tid -> baseIds.get(tid).getId())
+            .toList();
+    document.setTags(iterableToSet(tagRepository.findAllById(tagIds)));
     document.setType(contentType);
     Document savedDocument = this.documentRepository.save(document);
     baseIds.put(nodeDoc.get("document_id").textValue(), savedDocument);
