@@ -258,7 +258,9 @@ public class InjectExpectation implements Base {
                 signature -> {
                   if (EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME.equals(signature.getType())
                       && this.agent != null) {
-                    signature.setValue(signature.getValue() + "-" + this.agent.getId());
+                    return new InjectExpectationSignature(
+                        EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
+                        signature.getValue() + "-agent-" + this.agent.getId());
                   }
                   return signature;
                 })
