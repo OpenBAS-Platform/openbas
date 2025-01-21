@@ -235,8 +235,17 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
         .stream()
-        .filter(e -> e.getAgent() != null)
+        .filter(e -> e.getAsset() != null && e.getAgent() != null)
         .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .toList();
+  }
+
+  public List<InjectExpectation> preventionExpectationsNotFill() {
+    return this.injectExpectationRepository
+        .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
+        .stream()
+        .filter(e -> e.getAsset() != null && e.getAsset() != null)
+        .filter(e -> e.getResults().stream().toList().isEmpty())
         .toList();
   }
 
@@ -246,8 +255,35 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
         .stream()
-        .filter(e -> e.getAgent() != null)
+        .filter(e -> e.getAsset() != null && e.getAgent() != null)
         .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .toList();
+  }
+
+  public List<InjectExpectation> detectionExpectationsNotFill() {
+    return this.injectExpectationRepository
+        .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
+        .stream()
+        .filter(e -> e.getAsset() != null && e.getAgent() != null)
+        .filter(e -> e.getResults().stream().toList().isEmpty())
+        .toList();
+  }
+
+  // -- MANUAL
+
+  public List<InjectExpectation> manualExpectationsNotFill(@NotBlank final String source) {
+    return this.injectExpectationRepository
+        .findAll(Specification.where(InjectExpectationSpecification.type(MANUAL)))
+        .stream()
+        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
+        .toList();
+  }
+
+  public List<InjectExpectation> manualExpectationsNotFill() {
+    return this.injectExpectationRepository
+        .findAll(Specification.where(InjectExpectationSpecification.type(MANUAL)))
+        .stream()
+        .filter(e -> e.getResults().stream().toList().isEmpty())
         .toList();
   }
 

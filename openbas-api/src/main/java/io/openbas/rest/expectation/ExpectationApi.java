@@ -38,10 +38,29 @@ public class ExpectationApi extends RestBehavior {
     return this.exerciseExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
   }
 
-  // Collectors
+  @GetMapping("/api/injects/expectations")
+  public List<InjectExpectation> getInjectExpectationsNotFilled() {
+    return Stream.concat(
+            injectExpectationService.manualExpectationsNotFill().stream(),
+            Stream.concat(
+                injectExpectationService.preventionExpectationsNotFill().stream(),
+                injectExpectationService.detectionExpectationsNotFill().stream()))
+        .toList();
+  }
 
-  @GetMapping("/api/injects/expectations/agents/{sourceId}")
-  public List<InjectExpectation> getInjectExpectationsAgentsNotFilledForSource(
+  @GetMapping("/api/injects/expectations/{sourceId}")
+  public List<InjectExpectation> getInjectExpectationsNotFilledForSource(
+      @PathVariable String sourceId) {
+    return Stream.concat(
+            injectExpectationService.manualExpectationsNotFill(sourceId).stream(),
+            Stream.concat(
+                injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
+                injectExpectationService.detectionExpectationsNotFill(sourceId).stream()))
+        .toList();
+  }
+
+  @GetMapping("/api/injects/expectations/assets/{sourceId}")
+  public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
             injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
@@ -49,10 +68,20 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
+  @GetMapping("/api/injects/expectations/prevention")
+  public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
+    return injectExpectationService.preventionExpectationsNotFill().stream().toList();
+  }
+
   @GetMapping("/api/injects/expectations/prevention/{sourceId}")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.preventionExpectationsNotFill(sourceId).stream().toList();
+  }
+
+  @GetMapping("/api/injects/expectations/detection")
+  public List<InjectExpectation> getInjectDetectionExpectationsNotFilled() {
+    return injectExpectationService.detectionExpectationsNotFill().stream().toList();
   }
 
   @GetMapping("/api/injects/expectations/detection/{sourceId}")
