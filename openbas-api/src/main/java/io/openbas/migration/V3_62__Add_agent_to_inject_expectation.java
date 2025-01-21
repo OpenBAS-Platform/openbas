@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_61__Add_agent_to_inject_expectation extends BaseJavaMigration {
+public class V3_62__Add_agent_to_inject_expectation extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

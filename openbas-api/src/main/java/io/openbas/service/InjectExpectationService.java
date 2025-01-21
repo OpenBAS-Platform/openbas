@@ -330,7 +330,7 @@ public class InjectExpectationService {
         List<InjectExpectation> injectExpectationsAsset =
             expectations.stream()
                 .map(expectation -> expectationConverter(executableInject, expectation))
-                .toList();
+                .collect(Collectors.toList());
 
         List<InjectExpectation> injectExpectationsAgent =
             assets.stream()
