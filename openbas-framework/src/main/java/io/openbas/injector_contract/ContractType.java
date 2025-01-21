@@ -41,7 +41,4 @@ public enum ContractType {
   ContractType(String label) {
     this.label = label;
   }
-  ContractType() {
-    this.label = this.name();
-  }
 }
