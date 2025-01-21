@@ -8,12 +8,15 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.model.Expectation;
+import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -33,6 +36,7 @@ public class InjectExpectationService {
   private final InjectRepository injectRepository;
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
+  private final CollectorRepository collectorRepository;
 
   @Resource protected ObjectMapper mapper;
 
@@ -43,6 +47,77 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findById(injectExpectationId);
   }
 
+  // Update from collectors
+  public InjectExpectation updateInjectExpectation(
+      @NotBlank String expectationId, @Valid @NotNull InjectExpectationUpdateInput input) {
+    InjectExpectation injectExpectation = this.findInjectExpectation(expectationId).orElseThrow();
+    Collector collector = this.collectorRepository.findById(input.getCollectorId()).orElseThrow();
+    injectExpectation =
+        this.computeExpectation(
+            injectExpectation,
+            collector.getId(),
+            "collector",
+            collector.getName(),
+            input.getResult(),
+            input.getIsSuccess(),
+            input.getMetadata());
+
+    Inject inject = injectExpectation.getInject();
+
+    // Compute potential expectations for asset
+    InjectExpectation finalInjectExpectation = injectExpectation;
+    List<InjectExpectation> expectationAssets =
+        inject.getExpectations().stream()
+            .filter(
+                e ->
+                    e.getAsset() != null
+                        && e.getAgent() == null
+                        && e.getAsset().getId().equals(finalInjectExpectation.getAsset().getId()))
+            .toList();
+    expectationAssets.forEach(
+        (expectationAsset -> {
+          List<InjectExpectation> expectationAgents =
+              this.expectationsForAgents(
+                  expectationAsset.getInject(),
+                  expectationAsset.getAsset(),
+                  expectationAsset.getType());
+          // Every expectation assets are filled
+          if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
+            this.computeExpectationGroup(
+                expectationAsset,
+                expectationAgents,
+                collector.getId(),
+                "collector",
+                collector.getName());
+          }
+        }));
+
+    // Compute potential expectations for asset groups
+    List<InjectExpectation> expectationAssetGroups =
+        inject.getExpectations().stream().filter(e -> e.getAssetGroup() != null).toList();
+    expectationAssetGroups.forEach(
+        (expectationAssetGroup -> {
+          List<InjectExpectation> expectationAssetsByAssetGroup =
+              this.expectationsForAssets(
+                  expectationAssetGroup.getInject(),
+                  expectationAssetGroup.getAssetGroup(),
+                  expectationAssetGroup.getType());
+          // Every expectation assets are filled
+          if (expectationAssetsByAssetGroup.stream().noneMatch(e -> e.getResults().isEmpty())) {
+            this.computeExpectationGroup(
+                expectationAssetGroup,
+                expectationAssetsByAssetGroup,
+                collector.getId(),
+                "collector",
+                collector.getName());
+          }
+        }));
+    // end of computing
+
+    return injectExpectation;
+  }
+
+  // Compute results for expectations
   public InjectExpectation computeExpectation(
       @NotNull final InjectExpectation expectation,
       @NotBlank final String sourceId,
@@ -160,17 +235,8 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
         .stream()
-        .filter(e -> e.getAsset() != null)
+        .filter(e -> e.getAgent() != null)
         .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
-        .toList();
-  }
-
-  public List<InjectExpectation> preventionExpectationsNotFill() {
-    return this.injectExpectationRepository
-        .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
-        .stream()
-        .filter(e -> e.getAsset() != null)
-        .filter(e -> e.getResults().stream().toList().isEmpty())
         .toList();
   }
 
@@ -180,35 +246,8 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
         .stream()
-        .filter(e -> e.getAsset() != null)
+        .filter(e -> e.getAgent() != null)
         .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
-        .toList();
-  }
-
-  public List<InjectExpectation> detectionExpectationsNotFill() {
-    return this.injectExpectationRepository
-        .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
-        .stream()
-        .filter(e -> e.getAsset() != null)
-        .filter(e -> e.getResults().stream().toList().isEmpty())
-        .toList();
-  }
-
-  // -- MANUAL
-
-  public List<InjectExpectation> manualExpectationsNotFill(@NotBlank final String source) {
-    return this.injectExpectationRepository
-        .findAll(Specification.where(InjectExpectationSpecification.type(MANUAL)))
-        .stream()
-        .filter(e -> e.getResults().stream().noneMatch(r -> source.equals(r.getSourceId())))
-        .toList();
-  }
-
-  public List<InjectExpectation> manualExpectationsNotFill() {
-    return this.injectExpectationRepository
-        .findAll(Specification.where(InjectExpectationSpecification.type(MANUAL)))
-        .stream()
-        .filter(e -> e.getResults().stream().toList().isEmpty())
         .toList();
   }
 
