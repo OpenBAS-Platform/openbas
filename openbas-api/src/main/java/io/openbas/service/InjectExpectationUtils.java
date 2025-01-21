@@ -106,16 +106,14 @@ public class InjectExpectationUtils {
         expectationExecution.setName(detectionExpectation.getName());
         expectationExecution.setDetection(
             detectionExpectation.getAsset(), detectionExpectation.getAssetGroup());
-        expectationExecution.setSignatures(
-            detectionExpectation.getInjectExpectationSignatures()); // todo add agent id
+        expectationExecution.setSignatures(detectionExpectation.getInjectExpectationSignatures());
       }
       case PREVENTION -> {
         PreventionExpectation preventionExpectation = (PreventionExpectation) expectation;
         expectationExecution.setName(preventionExpectation.getName());
         expectationExecution.setPrevention(
             preventionExpectation.getAsset(), preventionExpectation.getAssetGroup());
-        expectationExecution.setSignatures(
-            preventionExpectation.getInjectExpectationSignatures()); // todo add agent id
+        expectationExecution.setSignatures(preventionExpectation.getInjectExpectationSignatures());
       }
       case MANUAL -> {
         ManualExpectation manualExpectation = (ManualExpectation) expectation;

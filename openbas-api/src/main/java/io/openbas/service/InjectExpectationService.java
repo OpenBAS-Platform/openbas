@@ -407,6 +407,7 @@ public class InjectExpectationService {
                 .map(expectation -> expectationConverter(executableInject, expectation))
                 .collect(Collectors.toList());
 
+        // Generate injectExpectations for Agents
         List<InjectExpectation> injectExpectationsAgent =
             assets.stream()
                 .flatMap(
@@ -430,7 +431,28 @@ public class InjectExpectationService {
         List<InjectExpectation> injectExpectations =
             expectations.stream()
                 .map(expectation -> expectationConverter(executableInject, expectation))
+                .collect(Collectors.toList());
+
+        // Generate injectExpectations for Agents
+        List<InjectExpectation> injectExpectationsAgent =
+            assetGroups.stream()
+                .map(AssetGroup::getAssets)
+                .flatMap(
+                    asset -> {
+                      Endpoint endpoint = (Endpoint) Hibernate.unproxy(asset);
+                      return endpoint.getAgents().stream()
+                          .filter(Agent::isActive)
+                          .flatMap(
+                              agent ->
+                                  expectations.stream()
+                                      .map(
+                                          expectation ->
+                                              expectationConverter(
+                                                  agent, executableInject, expectation)));
+                    })
                 .toList();
+
+        injectExpectations.addAll(injectExpectationsAgent);
         injectExpectationRepository.saveAll(injectExpectations);
       }
     }
