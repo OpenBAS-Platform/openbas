@@ -25,7 +25,6 @@ import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -605,12 +604,12 @@ class InjectServiceTest {
   }
 
   @Test
-  void given_nonexisting_initializeInjectStatus_SHOULD_throw_EntityNotFoundException() {
+  void given_nonexisting_initializeInjectStatus_SHOULD_throw_ElementNotFoundException() {
     ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
     String injectId = "randomid";
 
     assertThrows(
-        EntityNotFoundException.class,
+        ElementNotFoundException.class,
         () -> injectService.initializeInjectStatus(injectId, executionStatus, null));
   }
 
