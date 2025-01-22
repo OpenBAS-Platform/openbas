@@ -42,20 +42,7 @@ public class ExerciseImportApi extends RestBehavior {
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String importId,
       @Valid @RequestBody final InjectsImportInput input) {
-    Exercise exercise = this.exerciseService.exercise(exerciseId);
-
-    // Getting the mapper to use
-    ImportMapper importMapper =
-        this.importMapperRepository
-            .findById(UUID.fromString(input.getImportMapperId()))
-            .orElseThrow(
-                () ->
-                    new ElementNotFoundException(
-                        String.format(
-                            "The import mapper %s was not found", input.getImportMapperId())));
-
-    return this.injectImportService.importInjectIntoExerciseFromXLS(
-        exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
+    return validateInputsAndProduceSummary(exerciseId, importId, input);
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/xls/{importId}/import")
@@ -67,25 +54,27 @@ public class ExerciseImportApi extends RestBehavior {
       @PathVariable @NotBlank final String importId,
       @Valid @RequestBody final InjectsImportInput input) {
     Exercise exercise = this.exerciseService.exercise(exerciseId);
+    ImportTestSummary summary = validateInputsAndProduceSummary(exercise, importId, input);
+    this.exerciseService.updateExercise(exercise);
+    return summary;
+  }
 
-    if (input.getLaunchDate() != null) {
-      exercise.setStart(input.getLaunchDate().toInstant());
-    }
 
+  private ImportTestSummary validateInputsAndProduceSummary(String exerciseId, String importId, InjectsImportInput input) {
+    return validateInputsAndProduceSummary(this.exerciseService.exercise(exerciseId), importId, input);
+  }
+  private ImportTestSummary validateInputsAndProduceSummary(Exercise exercise, String importId, InjectsImportInput input) {
     // Getting the mapper to use
     ImportMapper importMapper =
-        importMapperRepository
-            .findById(UUID.fromString(input.getImportMapperId()))
-            .orElseThrow(
-                () ->
-                    new ElementNotFoundException(
-                        String.format(
-                            "The import mapper %s was not found", input.getImportMapperId())));
+            this.importMapperRepository
+                    .findById(UUID.fromString(input.getImportMapperId()))
+                    .orElseThrow(
+                            () ->
+                                    new ElementNotFoundException(
+                                            String.format(
+                                                    "The import mapper %s was not found", input.getImportMapperId())));
 
-    ImportTestSummary importTestSummary =
-        injectImportService.importInjectIntoExerciseFromXLS(
-            exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), true);
-    this.exerciseService.updateExercise(exercise);
-    return importTestSummary;
+    return this.injectImportService.importInjectIntoExerciseFromXLS(
+            exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
   }
 }
