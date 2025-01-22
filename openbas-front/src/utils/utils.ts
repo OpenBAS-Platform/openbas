@@ -95,9 +95,9 @@ export const debounce = <T>(func: (...param: T[]) => void, timeout = 500) => {
   };
 };
 
-export const isFeatureEnabled = (feature: string) => {
+// the argument type here is an exported enum type from Java; it's supposed to be a union of strings
+export const isFeatureEnabled = (feature: "_RESERVED") => {
   return useHelper((helper: LoggedHelper) => {
-    const DISABLED_FEATURE_FLAGS = helper.getPlatformSettings().disabled_dev_features ?? [];
-    return DISABLED_FEATURE_FLAGS.length === 0 || !DISABLED_FEATURE_FLAGS.includes(feature);
+    return (helper.getPlatformSettings().enabled_dev_features ?? []).includes(feature);
   });
 };
