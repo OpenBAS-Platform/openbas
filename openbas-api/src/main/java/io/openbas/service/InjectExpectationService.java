@@ -19,10 +19,12 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.Hibernate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -419,44 +421,36 @@ public class InjectExpectationService {
                               .filter(Agent::isActive)
                               .flatMap(
                                   agent ->
-                                      expectations.stream()
+                                      injectExpectations.stream()
+                                          .filter(
+                                              injectExpectation ->
+                                                  injectExpectation
+                                                      .getAsset()
+                                                      .getId()
+                                                      .equals(endpoint.getId()))
                                           .map(
-                                              expectation ->
-                                                  expectationConverter(
-                                                      agent, executableInject, expectation))))
+                                              injectExpectation ->
+                                                  cloneInjectExpectationForAgent(
+                                                      agent, injectExpectation))))
                   .toList();
-
-          injectExpectations.addAll(injectExpectationsAgent);
-        }
-
-        if (!assetGroups.isEmpty()) {
-          // Generate injectExpectations for Agents in asset groups
-          List<InjectExpectation> injectExpectationsAgent =
-              assetGroups.stream()
-                  .flatMap(assetGroup -> assetGroup.getAssets().stream())
-                  .filter(asset -> asset instanceof Endpoint)
-                  .map(asset -> (Endpoint) Hibernate.unproxy(asset))
-                  .flatMap(
-                      endpoint ->
-                          endpoint.getAgents().stream()
-                              .filter(Agent::isActive)
-                              .flatMap(
-                                  agent ->
-                                      expectations.stream()
-                                          .map(
-                                              expectation ->
-                                                  expectationConverter(
-                                                      agent,
-                                                      (Asset) endpoint,
-                                                      executableInject,
-                                                      expectation))))
-                  .toList();
-
           injectExpectations.addAll(injectExpectationsAgent);
         }
 
         injectExpectationRepository.saveAll(injectExpectations);
       }
+    }
+  }
+
+  private InjectExpectation cloneInjectExpectationForAgent(
+      Agent agent, InjectExpectation injectExpectation) {
+    InjectExpectation clone = new InjectExpectation();
+    try {
+      BeanUtils.copyProperties(clone, injectExpectation);
+      clone.setAgent(agent);
+      clone.setSignatures(injectExpectation.getSignatures());
+      return clone;
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      throw new RuntimeException("Failed to copy object", e);
     }
   }
 }
