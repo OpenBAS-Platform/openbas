@@ -65,9 +65,9 @@ class InjectServiceTest {
   @Mock private InjectStatusRepository injectStatusRepository;
 
   @Mock private InjectMapper injectMapper;
-  
+
   @Mock private InjectUtils injectUtils;
-  
+
   ObjectMapper mapper;
 
   @InjectMocks private InjectService injectService;
@@ -566,7 +566,6 @@ class InjectServiceTest {
     // Assert
     verify(securityExpression, times(0)).isSimulationPlanner("exercise1");
   }
-
 
   @DisplayName("Test canApplyAssetToInject with manual inject")
   @Test
