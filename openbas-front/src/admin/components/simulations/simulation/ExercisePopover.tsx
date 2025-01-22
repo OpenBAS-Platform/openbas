@@ -153,13 +153,8 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     return dispatch(updateExercise(exercise.exercise_id, input)).then(() => handleCloseEdit());
   };
 
-  const handleApplyRule = () => {
-    exerciseFormData.apply_tag_rule = true;
-    submitExerciseUpdate(exerciseFormData);
-    handleCloseApplyRule();
-  };
-  const handleDontApplyRule = () => {
-    exerciseFormData.apply_tag_rule = false;
+  const handleTagRuleChoice = (shouldApply: boolean) => {
+    exerciseFormData.apply_tag_rule = shouldApply;
     submitExerciseUpdate(exerciseFormData);
     handleCloseApplyRule();
   };
@@ -198,8 +193,8 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       <DialogApplyTagRule
         open={openApplyRule}
         handleClose={handleCloseApplyRule}
-        handleApplyRule={handleApplyRule}
-        handleDontApplyRule={handleDontApplyRule}
+        handleApplyRule={() => handleTagRuleChoice(true)}
+        handleDontApplyRule={() => handleTagRuleChoice(false)}
       />
       <Drawer
         open={openReports}

@@ -88,13 +88,8 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
     );
   };
 
-  const handleApplyRule = () => {
-    scenarioFormData.apply_tag_rule = true;
-    submitScenarioUpdate(scenarioFormData);
-    handleCloseApplyRule();
-  };
-  const handleDontApplyRule = () => {
-    scenarioFormData.apply_tag_rule = false;
+  const handleTagRuleChoice = (shouldApply: boolean) => {
+    scenarioFormData.apply_tag_rule = shouldApply;
     submitScenarioUpdate(scenarioFormData);
     handleCloseApplyRule();
   };
@@ -117,8 +112,8 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
       <DialogApplyTagRule
         open={openApplyRule}
         handleClose={handleCloseApplyRule}
-        handleApplyRule={handleApplyRule}
-        handleDontApplyRule={handleDontApplyRule}
+        handleApplyRule={() => handleTagRuleChoice(true)}
+        handleDontApplyRule={() => handleTagRuleChoice(false)}
       />
     </>
   );
