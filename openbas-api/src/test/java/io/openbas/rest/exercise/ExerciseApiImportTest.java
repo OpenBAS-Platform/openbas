@@ -19,7 +19,6 @@ import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.helpers.ExerciseHelper;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.persistence.EntityManager;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -178,7 +177,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
     Exercise imported = findImportedExerciseFromDb(exerciseWrapper.get().getName());
     Exercise expected = exerciseWrapper.get();
 
-    Assertions.assertEquals("%s %s".formatted(expected.getName(), Constants.IMPORTED_OBJECT_NAME_SUFFIX), imported.getName());
+    Assertions.assertEquals(
+        "%s %s".formatted(expected.getName(), Constants.IMPORTED_OBJECT_NAME_SUFFIX),
+        imported.getName());
     Assertions.assertEquals(expected.getDescription(), imported.getDescription());
     Assertions.assertEquals(expected.getStatus(), imported.getStatus());
     Assertions.assertEquals(expected.getSubtitle(), imported.getSubtitle());
@@ -284,13 +285,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
       Optional<User> userFromDb =
           userRepository.findByEmailIgnoreCase(expected.getEmail()).stream().findFirst();
       if (userFromDb.isEmpty()) {
-        Assertions.fail("User %s not found".formatted(expected.getName()));
+        Assertions.fail("User with email %s not found".formatted(expected.getEmail()));
       }
       User imported = userFromDb.get();
-      List<User> usersFromExercise =
-          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
-              .flatMap(team -> team.getUsers().stream())
-              .toList();
 
       Assertions.assertEquals(expected.getName(), imported.getName());
       Assertions.assertEquals(expected.getFirstname(), imported.getFirstname());
@@ -628,7 +625,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Tag expected : tagComposer.generatedItems) {
       Assertions.assertTrue(
-          ExerciseHelper.crawlAllTags(findImportedExerciseFromDb(exerciseWrapper.get().getName()), challengeService).stream()
+          ExerciseHelper.crawlAllTags(
+                  findImportedExerciseFromDb(exerciseWrapper.get().getName()), challengeService)
+              .stream()
               .anyMatch(tag -> tag.getName().equals(expected.getName())),
           "Tag " + expected.getName() + " not found in imported exercise");
     }
@@ -773,7 +772,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
       Assertions.assertTrue(
-          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getLessonsCategories().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName())
+              .getLessonsCategories()
+              .stream()
               .anyMatch(category -> category.getName().equals(expected.getName())),
           "Lessons Category " + expected.getName() + " not found in imported exercise");
     }
@@ -802,9 +803,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
     entityManager.clear();
 
     for (Document expected : documentComposer.generatedItems) {
-      Optional<Document> docFromDb = documentRepository.findByTarget(expected.getTarget());
+      Optional<Document> docFromDb = documentRepository.findByName(expected.getName());
       if (docFromDb.isEmpty()) {
-        Assertions.fail("Document " + expected.getTarget() + " not found");
+        Assertions.fail("Document " + expected.getName() + " not found");
       }
       Document imported = docFromDb.get();
 
@@ -843,8 +844,8 @@ public class ExerciseApiImportTest extends IntegrationTest {
     for (Document expected : documentComposer.generatedItems) {
       Assertions.assertTrue(
           findImportedExerciseFromDb(exerciseWrapper.get().getName()).getDocuments().stream()
-              .anyMatch(doc -> doc.getTarget().equals(expected.getTarget())),
-          "Document " + expected.getTarget() + " not found in imported exercise");
+              .anyMatch(doc -> doc.getName().equals(expected.getName())),
+          "Document " + expected.getName() + " not found in imported exercise");
     }
   }
 
@@ -871,7 +872,13 @@ public class ExerciseApiImportTest extends IntegrationTest {
     entityManager.clear();
 
     for (Inject expected : injectComposer.generatedItems) {
-      Optional<Inject> injectFromDb = injectRepository.findAll().stream().findFirst();
+      Optional<Inject> injectFromDb =
+          injectRepository
+              .findAll(
+                  (root, query, criteriaBuilder) ->
+                      criteriaBuilder.equal(root.get("title"), expected.getTitle()))
+              .stream()
+              .findFirst();
       if (injectFromDb.isEmpty()) {
         Assertions.fail("Inject " + expected.getTitle() + " not found");
       }
@@ -946,7 +953,12 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Variable expected : variableComposer.generatedItems) {
       Optional<Variable> varFromDb =
-          StreamSupport.stream(variableRepository.findAll().spliterator(), false).findFirst();
+          variableRepository
+              .findAll(
+                  (root, query, criteriaBuilder) ->
+                      criteriaBuilder.equal(root.get("key"), expected.getKey()))
+              .stream()
+              .findFirst();
       if (varFromDb.isEmpty()) {
         Assertions.fail("Variable " + expected.getKey() + " not found");
       }
@@ -1016,7 +1028,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Challenge expected : challengeComposer.generatedItems) {
       Optional<Challenge> challengeFromDb =
-          StreamSupport.stream(challengeRepository.findAll().spliterator(), false).findFirst();
+          challengeRepository.findByNameIgnoreCase(expected.getName()).stream().findFirst();
       if (challengeFromDb.isEmpty()) {
         Assertions.fail("Challenge " + expected.getName() + " not found");
       }
@@ -1067,7 +1079,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Challenge expected : challengeComposer.generatedItems) {
       Optional<Challenge> challengeFromDb =
-          StreamSupport.stream(challengeRepository.findAll().spliterator(), false).findFirst();
+          challengeRepository.findByNameIgnoreCase(expected.getName()).stream().findFirst();
       if (challengeFromDb.isEmpty()) {
         Assertions.fail("Challenge " + expected.getName() + " not found");
       }
@@ -1312,7 +1324,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Tag expected : tagComposer.generatedItems) {
       Assertions.assertTrue(
-          ExerciseHelper.crawlAllTags(findImportedExerciseFromDb(exerciseWrapper.get().getName()), challengeService).stream()
+          ExerciseHelper.crawlAllTags(
+                  findImportedExerciseFromDb(exerciseWrapper.get().getName()), challengeService)
+              .stream()
               .anyMatch(tag -> tag.getId().equals(expected.getId())),
           "Tag " + expected.getName() + " not found in imported exercise");
     }
@@ -1466,7 +1480,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
       Assertions.assertTrue(
-          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getLessonsCategories().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName())
+              .getLessonsCategories()
+              .stream()
               .anyMatch(category -> category.getName().equals(expected.getName())),
           "Lessons Category " + expected.getName() + " not found in imported exercise");
     }
