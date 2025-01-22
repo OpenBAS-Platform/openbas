@@ -13,6 +13,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import io.openbas.utils.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,7 +41,7 @@ class V1_DataImporterTest extends IntegrationTest {
 
   private JsonNode importNode;
 
-  public static final String EXERCISE_NAME = "Test Exercise (Import)";
+  public static final String EXERCISE_NAME = "Test Exercise %s".formatted(Constants.IMPORTED_OBJECT_NAME_SUFFIX);
   public static final String TEAM_NAME = "Animation team";
   public static final String USER_EMAIL = "Romuald.Lemesle@openbas.io";
   public static final String ORGANIZATION_NAME = "Filigran";

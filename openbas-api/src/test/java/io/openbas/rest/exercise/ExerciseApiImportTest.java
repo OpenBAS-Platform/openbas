@@ -13,6 +13,7 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.exercise.service.ExportService;
 import io.openbas.service.ChallengeService;
+import io.openbas.utils.Constants;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.helpers.ExerciseHelper;
@@ -133,13 +134,14 @@ public class ExerciseApiImportTest extends IntegrationTest {
         .withVariable(variableComposer.forVariable(VariableFixture.getDefaultVariable()));
   }
 
-  private Exercise findSingleExerciseFromDb() {
+  private Exercise findImportedExerciseFromDb(String baseName) {
+    String importedName = "%s %s".formatted(baseName, Constants.IMPORTED_OBJECT_NAME_SUFFIX);
     Optional<Exercise> exerciseOpt =
         exerciseRepository.findAll().stream()
-            .filter(ex -> ex.getName().contains("(Import)"))
+            .filter(ex -> ex.getName().equals(importedName))
             .findFirst();
     if (exerciseOpt.isEmpty()) {
-      Assertions.fail("No exercise found");
+      Assertions.fail("Imported exercise of name %s found".formatted(importedName));
     }
     return exerciseOpt.get();
   }
@@ -173,10 +175,10 @@ public class ExerciseApiImportTest extends IntegrationTest {
     entityManager.flush();
     entityManager.clear();
 
-    Exercise imported = findSingleExerciseFromDb();
+    Exercise imported = findImportedExerciseFromDb(exerciseWrapper.get().getName());
     Exercise expected = exerciseWrapper.get();
 
-    Assertions.assertEquals(expected.getName() + " (Import)", imported.getName());
+    Assertions.assertEquals("%s %s".formatted(expected.getName(), Constants.IMPORTED_OBJECT_NAME_SUFFIX), imported.getName());
     Assertions.assertEquals(expected.getDescription(), imported.getDescription());
     Assertions.assertEquals(expected.getStatus(), imported.getStatus());
     Assertions.assertEquals(expected.getSubtitle(), imported.getSubtitle());
@@ -250,7 +252,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Team expected : exerciseWrapper.get().getTeams()) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getTeams().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
               .anyMatch(team -> team.getName().equals(expected.getName())),
           "Team %s not found in imported exercise".formatted(expected.getName()));
     }
@@ -286,7 +288,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
       }
       User imported = userFromDb.get();
       List<User> usersFromExercise =
-          findSingleExerciseFromDb().getTeams().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
               .flatMap(team -> team.getUsers().stream())
               .toList();
 
@@ -330,7 +332,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (User expected : userComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getTeams().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
               .flatMap(team -> team.getUsers().stream())
               .toList()
               .stream()
@@ -402,7 +404,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Organization expected : organizationComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getTeams().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
               .flatMap(team -> team.getUsers().stream().map(User::getOrganization))
               .filter(Objects::nonNull)
               .anyMatch(o -> o.getName().equals(expected.getName())),
@@ -482,7 +484,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Article expected : articleComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getArticles().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getArticles().stream()
               .anyMatch(art -> art.getName().equals(expected.getName())),
           "Article " + expected.getName() + " not found in imported exercise");
     }
@@ -557,7 +559,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Channel expected : channelComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getArticles().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getArticles().stream()
               .map(Article::getChannel)
               .anyMatch(channel -> channel.getName().equals(expected.getName())),
           "Channel " + expected.getName() + " not found in imported exercise");
@@ -626,7 +628,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Tag expected : tagComposer.generatedItems) {
       Assertions.assertTrue(
-          ExerciseHelper.crawlAllTags(findSingleExerciseFromDb(), challengeService).stream()
+          ExerciseHelper.crawlAllTags(findImportedExerciseFromDb(exerciseWrapper.get().getName()), challengeService).stream()
               .anyMatch(tag -> tag.getName().equals(expected.getName())),
           "Tag " + expected.getName() + " not found in imported exercise");
     }
@@ -697,7 +699,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Objective expected : objectiveComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getObjectives().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getObjectives().stream()
               .anyMatch(objective -> objective.getTitle().equals(expected.getTitle())),
           "Objective " + expected.getTitle() + " not found in imported exercise");
     }
@@ -771,7 +773,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getLessonsCategories().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getLessonsCategories().stream()
               .anyMatch(category -> category.getName().equals(expected.getName())),
           "Lessons Category " + expected.getName() + " not found in imported exercise");
     }
@@ -840,7 +842,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Document expected : documentComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getDocuments().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getDocuments().stream()
               .anyMatch(doc -> doc.getTarget().equals(expected.getTarget())),
           "Document " + expected.getTarget() + " not found in imported exercise");
     }
@@ -914,7 +916,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Inject expected : injectComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getInjects().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getInjects().stream()
               .anyMatch(doc -> doc.getTitle().equals(expected.getTitle())),
           "Inject " + expected.getTitle() + " not found in imported exercise");
     }
@@ -984,7 +986,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Variable expected : variableComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getVariables().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getVariables().stream()
               .anyMatch(var -> var.getKey().equals(expected.getKey())),
           "Variable " + expected.getKey() + " not found in imported exercise");
     }
@@ -1072,7 +1074,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
       Challenge imported = challengeFromDb.get();
 
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getInjects().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getInjects().stream()
               .anyMatch(inject -> inject.getContent().toString().contains(imported.getId())),
           "Challenge " + expected.getName() + " not found in imported exercise");
     }
@@ -1103,7 +1105,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Team expected : exerciseWrapper.get().getTeams()) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getTeams().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
               .anyMatch(team -> team.getId().equals(expected.getId())),
           "Team %s not found in imported exercise".formatted(expected.getName()));
     }
@@ -1134,7 +1136,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (User expected : userComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getTeams().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
               .flatMap(team -> team.getUsers().stream())
               .toList()
               .stream()
@@ -1167,7 +1169,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Organization expected : organizationComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getTeams().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
               .flatMap(team -> team.getUsers().stream().map(User::getOrganization))
               .filter(Objects::nonNull)
               .anyMatch(o -> o.getId().equals(expected.getId())),
@@ -1245,7 +1247,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Article expected : articleComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getArticles().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getArticles().stream()
               .anyMatch(art -> art.getName().equals(expected.getName())),
           "Article " + expected.getName() + " not found in imported exercise");
     }
@@ -1276,7 +1278,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Channel expected : channelComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getArticles().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getArticles().stream()
               .map(Article::getChannel)
               .anyMatch(channel -> channel.getId().equals(expected.getId())),
           "Channel " + expected.getName() + " not found in imported exercise");
@@ -1310,7 +1312,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Tag expected : tagComposer.generatedItems) {
       Assertions.assertTrue(
-          ExerciseHelper.crawlAllTags(findSingleExerciseFromDb(), challengeService).stream()
+          ExerciseHelper.crawlAllTags(findImportedExerciseFromDb(exerciseWrapper.get().getName()), challengeService).stream()
               .anyMatch(tag -> tag.getId().equals(expected.getId())),
           "Tag " + expected.getName() + " not found in imported exercise");
     }
@@ -1386,7 +1388,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Objective expected : objectiveComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getObjectives().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getObjectives().stream()
               .anyMatch(objective -> objective.getTitle().equals(expected.getTitle())),
           "Objective " + expected.getTitle() + " not found in imported exercise");
     }
@@ -1464,7 +1466,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (LessonsCategory expected : lessonsCategoryComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getLessonsCategories().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getLessonsCategories().stream()
               .anyMatch(category -> category.getName().equals(expected.getName())),
           "Lessons Category " + expected.getName() + " not found in imported exercise");
     }
@@ -1495,7 +1497,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Document expected : documentComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getDocuments().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getDocuments().stream()
               .anyMatch(doc -> doc.getId().equals(expected.getId())),
           "Document " + expected.getTarget() + " not found in imported exercise");
     }
@@ -1573,7 +1575,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Inject expected : injectComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getInjects().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getInjects().stream()
               .anyMatch(doc -> doc.getTitle().equals(expected.getTitle())),
           "Inject " + expected.getTitle() + " not found in imported exercise");
     }
@@ -1648,7 +1650,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Variable expected : variableComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getVariables().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getVariables().stream()
               .anyMatch(var -> var.getKey().equals(expected.getKey())),
           "Variable " + expected.getKey() + " not found in imported exercise");
     }
@@ -1679,7 +1681,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
     for (Challenge expected : challengeComposer.generatedItems) {
       Assertions.assertTrue(
-          findSingleExerciseFromDb().getInjects().stream()
+          findImportedExerciseFromDb(exerciseWrapper.get().getName()).getInjects().stream()
               .anyMatch(inject -> inject.getContent().toString().contains(expected.getId())),
           "Challenge " + expected.getName() + " not found in imported exercise");
     }

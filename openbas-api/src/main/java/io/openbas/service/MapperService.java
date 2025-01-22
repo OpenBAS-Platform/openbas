@@ -10,8 +10,10 @@ import io.openbas.database.repository.ImportMapperRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.helper.ObjectMapperHelper;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.mapper.MapperApi;
 import io.openbas.rest.mapper.export.MapperExportMixins;
 import io.openbas.rest.mapper.form.*;
+import io.openbas.utils.Constants;
 import io.openbas.utils.CopyObjectListUtils;
 import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -281,7 +283,7 @@ public class MapperService {
     importMapperRepository.saveAll(
         mappers.stream()
             .map(this::createImportMapper)
-            .peek((m) -> m.setName(m.getName() + " (Import)"))
+            .peek((m) -> m.setName(m.getName() + " %s".formatted(Constants.IMPORTED_OBJECT_NAME_SUFFIX)))
             .toList());
   }
 }
