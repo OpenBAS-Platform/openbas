@@ -1,5 +1,7 @@
 package io.openbas.executors.openbas.service;
 
+import static io.openbas.executors.ExecutorHelper.replaceArgs;
+
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import jakarta.validation.constraints.NotNull;
@@ -31,30 +33,14 @@ public class OpenBASExecutorContextService {
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
-    switch (platform) {
-      case Endpoint.PLATFORM_TYPE.Windows -> {
-        return injector
-            .getExecutorCommands()
-            .get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
-            .replace("#{inject}", inject.getId())
-            .replace("#{agent}", agentId);
-      }
-      case Endpoint.PLATFORM_TYPE.Linux -> {
-        return injector
-            .getExecutorCommands()
-            .get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name())
-            .replace("#{inject}", inject.getId())
-            .replace("#{agent}", agentId);
-      }
-      case Endpoint.PLATFORM_TYPE.MacOS -> {
-        return injector
-            .getExecutorCommands()
-            .get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name())
-            .replace("#{inject}", inject.getId())
-            .replace("#{agent}", agentId);
+    return switch (platform) {
+      case Windows, Linux, MacOS -> {
+        String executorCommandKey = platform.name() + "." + arch.name();
+        String cmd = injector.getExecutorCommands().get(executorCommandKey);
+        yield replaceArgs(platform, cmd, inject.getId(), agentId);
       }
       default -> throw new RuntimeException("Unsupported platform: " + platform);
-    }
+    };
   }
 
   public void launchExecutorSubprocess(

@@ -1,5 +1,7 @@
 package io.openbas.executors.crowdstrike.service;
 
+import static io.openbas.executors.ExecutorHelper.replaceArgs;
+
 import io.openbas.database.model.*;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
@@ -43,46 +45,25 @@ public class CrowdStrikeExecutorContextService {
     if (platform == null || arch == null) {
       throw new RuntimeException("Unsupported platform: " + platform + " (arch:" + arch + ")");
     }
-    switch (platform) {
-      case Endpoint.PLATFORM_TYPE.Windows -> {
-        String command =
-            injector
-                .getExecutorCommands()
-                .get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
-                .replace("\"#{location}\"", "$PWD.Path")
-                .replace("#{inject}", inject.getId());
-        this.crowdStrikeExecutorClient.executeAction(
-            assetEndpoint.getAgents().getFirst().getExternalReference(),
-            this.crowdStrikeExecutorConfig.getWindowsScriptName(),
-            Base64.getEncoder().encodeToString(command.getBytes()));
-      }
-      case Endpoint.PLATFORM_TYPE.Linux -> {
-        String command =
-            injector
-                .getExecutorCommands()
-                .get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name())
-                .replace("\"#{location}\"", "$(pwd)")
-                .replace("#{inject}", inject.getId());
-        this.crowdStrikeExecutorClient.executeAction(
-            assetEndpoint.getAgents().getFirst().getExternalReference(),
-            this.crowdStrikeExecutorConfig.getUnixScriptName(),
-            Base64.getEncoder().encodeToString(command.getBytes()));
-      }
-      case Endpoint.PLATFORM_TYPE.MacOS -> {
-        String command =
-            injector
-                .getExecutorCommands()
-                .get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name())
-                .replace("\"#{location}\"", "$(pwd)")
-                .replace("#{inject}", inject.getId());
-        this.crowdStrikeExecutorClient.executeAction(
-            assetEndpoint.getAgents().getFirst().getExternalReference(),
-            this.crowdStrikeExecutorConfig.getUnixScriptName(),
-            Base64.getEncoder().encodeToString(command.getBytes()));
-      }
-      default -> throw new RuntimeException("Unsupported platform: " + platform);
-    }
-    ;
+
+    String scriptName =
+        switch (platform) {
+          case Windows -> this.crowdStrikeExecutorConfig.getWindowsScriptName();
+          case Linux, MacOS -> this.crowdStrikeExecutorConfig.getUnixScriptName();
+          default -> throw new RuntimeException("Unsupported platform: " + platform);
+        };
+
+    String executorCommandKey = platform.name() + "." + arch.name();
+    String command = injector.getExecutorCommands().get(executorCommandKey);
+
+    command =
+        replaceArgs(
+            platform, command, inject.getId(), assetEndpoint.getAgents().getFirst().getId());
+
+    this.crowdStrikeExecutorClient.executeAction(
+        assetEndpoint.getAgents().getFirst().getExternalReference(),
+        scriptName,
+        Base64.getEncoder().encodeToString(command.getBytes()));
   }
 
   public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {}
