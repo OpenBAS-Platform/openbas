@@ -1,11 +1,15 @@
 package io.openbas.helper;
 
 import static io.openbas.database.model.Inject.SPEED_STANDARD;
+import static io.openbas.database.model.InjectorContract.*;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.StreamSupport;
 
 public class InjectModelHelper {
@@ -28,47 +31,88 @@ public class InjectModelHelper {
       @NotNull final List<String> teams,
       @NotNull final List<String> assets,
       @NotNull final List<String> assetGroups) {
-    if (injectorContract == null) {
+    if (injectorContract == null || content == null) {
       return false;
     }
-    if (content == null) {
-      return false;
+
+    ObjectMapper mapper = new ObjectMapper();
+    ArrayNode injectContractFields;
+
+    try {
+      injectContractFields =
+          (ArrayNode)
+              mapper
+                  .readValue(injectorContract.getContent(), ObjectNode.class)
+                  .get(CONTACT_CONTENT_FIELDS);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error parsing injector contract content", e);
     }
-    AtomicBoolean ready = new AtomicBoolean(true);
+
     ObjectNode contractContent = injectorContract.getConvertedContent();
     List<JsonNode> contractMandatoryFields =
-        StreamSupport.stream(contractContent.get("fields").spliterator(), false)
+        StreamSupport.stream(contractContent.get(CONTACT_CONTENT_FIELDS).spliterator(), false)
             .filter(
-                contractElement ->
-                    (contractElement.get("key").asText().equals("assets")
-                        || contractElement.get("mandatory").asBoolean()
-                        || (contractElement.get("mandatoryGroups") != null
-                            && contractElement.get("mandatoryGroups").asBoolean())))
+                field -> {
+                  String key = field.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
+                  boolean isMandatory = field.get(CONTACT_ELEMENT_CONTENT_MANDATORY).asBoolean();
+                  boolean isMandatoryGroup =
+                      field.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS)
+                          && field.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS).asBoolean();
+                  return key.equals(CONTACT_ELEMENT_CONTENT_KEY_ASSETS)
+                      || isMandatory
+                      || isMandatoryGroup;
+                })
             .toList();
-    if (!contractMandatoryFields.isEmpty()) {
-      contractMandatoryFields.forEach(
-          jsonField -> {
-            String key = jsonField.get("key").asText();
-            if (key.equals("teams")) {
-              if (teams.isEmpty() && !allTeams) {
-                ready.set(false);
-              }
-            } else if (key.equals("assets")) {
-              if (assets.isEmpty() && assetGroups.isEmpty()) {
-                ready.set(false);
-              }
-            } else if ((jsonField.get("type").asText().equals("text")
-                    || jsonField.get("type").asText().equals("textarea"))
-                && content.get(key) == null) {
-              ready.set(false);
-            } else if ((jsonField.get("type").asText().equals("text")
-                    || jsonField.get("type").asText().equals("textarea"))
-                && content.get(key).asText().isEmpty()) {
-              ready.set(false);
-            }
-          });
+
+    boolean isReady = true;
+    for (JsonNode jsonField : contractMandatoryFields) {
+      String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
+
+      switch (key) {
+        case CONTACT_ELEMENT_CONTENT_KEY_TEAMS -> {
+          if (teams.isEmpty() && !allTeams) {
+            isReady = false;
+          }
+        }
+        case CONTACT_ELEMENT_CONTENT_KEY_ASSETS -> {
+          if (assets.isEmpty() && assetGroups.isEmpty()) {
+            isReady = false;
+          }
+        }
+        default -> {
+          if (isTextOrTextarea(jsonField) && !isFieldValid(content, injectContractFields, key)) {
+            isReady = false;
+          }
+        }
+      }
+      if (!isReady) {
+        break;
+      }
     }
-    return ready.get();
+    return isReady;
+  }
+
+  private static boolean isTextOrTextarea(JsonNode jsonField) {
+    String type = jsonField.get("type").asText();
+    return "text".equals(type) || "textarea".equals(type);
+  }
+
+  private static boolean isFieldValid(
+      ObjectNode content, ArrayNode injectContractFields, String key) {
+    JsonNode fieldValue = content.get(key);
+
+    if (fieldValue == null || fieldValue.asText().isEmpty()) {
+      for (JsonNode contractField : injectContractFields) {
+        if (key.equals(contractField.get(CONTACT_ELEMENT_CONTENT_KEY).asText())) {
+          JsonNode defaultValue = contractField.get(DEFAULT_VALUE_FIELD);
+          if (defaultValue == null || defaultValue.isNull()) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
   }
 
   public static Instant computeInjectDate(
