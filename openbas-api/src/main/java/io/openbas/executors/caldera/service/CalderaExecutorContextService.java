@@ -78,7 +78,13 @@ public class CalderaExecutorContextService {
             injector -> {
               if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
                 List<Map<String, String>> additionalFields =
-                    List.of(Map.of("trait", "inject", "value", inject.getId()));
+                    List.of(
+                        Map.of("trait", "inject", "value", inject.getId()),
+                        Map.of(
+                            "trait",
+                            "agent",
+                            "value",
+                            assetEndpoint.getAgents().getFirst().getId()));
                 calderaExecutorClient.exploit(
                     "base64",
                     assetEndpoint.getAgents().getFirst().getExternalReference(),

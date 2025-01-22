@@ -33,7 +33,7 @@ type InjectPopoverType = {
 interface Props {
   inject: InjectPopoverType;
   setSelectedInjectId: (injectId: Inject['inject_id']) => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   canBeTested?: boolean;
   canDone?: boolean;
   canTriggerNow?: boolean;
@@ -46,7 +46,7 @@ interface Props {
 const InjectPopover: FunctionComponent<Props> = ({
   inject,
   setSelectedInjectId,
-  isDisabled,
+  isDisabled = false,
   canBeTested = false,
   canDone = false,
   canTriggerNow = false,

@@ -9,8 +9,6 @@ import type { ArticlesHelper } from '../../../../../actions/channels/article-hel
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import type { ChallengeHelper } from '../../../../../actions/helper';
-import { fetchExerciseInjectsSimple } from '../../../../../actions/injects/inject-action';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
 import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { useFormatter } from '../../../../../components/i18n';
@@ -56,10 +54,9 @@ const ExerciseInjects: FunctionComponent = () => {
     setViewMode(mode);
   };
 
-  const { injects, exercise, teams, articles, variables } = useHelper(
-    (helper: InjectHelper & ExercisesHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
+  const { exercise, teams, articles, variables } = useHelper(
+    (helper: ExercisesHelper & ArticlesHelper & ChallengeHelper & VariablesHelper) => {
       return {
-        injects: helper.getExerciseInjects(exerciseId),
         exercise: helper.getExercise(exerciseId),
         teams: helper.getExerciseTeams(exerciseId),
         articles: helper.getExerciseArticles(exerciseId),
@@ -68,7 +65,6 @@ const ExerciseInjects: FunctionComponent = () => {
     },
   );
   useDataLoader(() => {
-    dispatch(fetchExerciseInjectsSimple(exerciseId));
     dispatch(fetchExerciseTeams(exerciseId));
     dispatch(fetchExerciseArticles(exerciseId));
     dispatch(fetchVariablesForExercise(exerciseId));
@@ -87,7 +83,6 @@ const ExerciseInjects: FunctionComponent = () => {
               <Injects
                 isExercise={true}
                 exerciseOrScenarioId={exerciseId}
-                injects={injects}
                 teams={teams}
                 articles={articles}
                 variables={variables}

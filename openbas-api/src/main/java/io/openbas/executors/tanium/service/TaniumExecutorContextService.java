@@ -1,10 +1,8 @@
 package io.openbas.executors.tanium.service;
 
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.Injector;
-import io.openbas.database.model.InjectorContract;
+import static io.openbas.executors.ExecutorHelper.replaceArgs;
+
+import io.openbas.database.model.*;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import jakarta.validation.constraints.NotNull;
@@ -47,46 +45,24 @@ public class TaniumExecutorContextService {
     if (platform == null || arch == null) {
       throw new RuntimeException("Unsupported platform: " + platform + " (arch:" + arch + ")");
     }
-    switch (platform) {
-      case Endpoint.PLATFORM_TYPE.Windows -> {
-        String command =
-            injector
-                .getExecutorCommands()
-                .get(Endpoint.PLATFORM_TYPE.Windows.name() + "." + arch.name())
-                .replace("\"#{location}\"", "$PWD.Path")
-                .replace("#{inject}", inject.getId());
-        this.taniumExecutorClient.executeAction(
-            assetEndpoint.getAgents().getFirst().getExternalReference(),
-            this.taniumExecutorConfig.getWindowsPackageId(),
-            Base64.getEncoder().encodeToString(command.getBytes()));
-      }
-      case Endpoint.PLATFORM_TYPE.Linux -> {
-        String command =
-            injector
-                .getExecutorCommands()
-                .get(Endpoint.PLATFORM_TYPE.Linux.name() + "." + arch.name())
-                .replace("\"#{location}\"", "$(pwd)")
-                .replace("#{inject}", inject.getId());
-        this.taniumExecutorClient.executeAction(
-            assetEndpoint.getAgents().getFirst().getExternalReference(),
-            this.taniumExecutorConfig.getUnixPackageId(),
-            Base64.getEncoder().encodeToString(command.getBytes()));
-      }
-      case Endpoint.PLATFORM_TYPE.MacOS -> {
-        String command =
-            injector
-                .getExecutorCommands()
-                .get(Endpoint.PLATFORM_TYPE.MacOS.name() + "." + arch.name())
-                .replace("\"#{location}\"", "$(pwd)")
-                .replace("#{inject}", inject.getId());
-        this.taniumExecutorClient.executeAction(
-            assetEndpoint.getAgents().getFirst().getExternalReference(),
-            this.taniumExecutorConfig.getUnixPackageId(),
-            Base64.getEncoder().encodeToString(command.getBytes()));
-      }
-      default -> throw new RuntimeException("Unsupported platform: " + platform);
-    }
-    ;
+
+    Integer packageId =
+        switch (platform) {
+          case Windows -> this.taniumExecutorConfig.getWindowsPackageId();
+          case Linux, MacOS -> this.taniumExecutorConfig.getUnixPackageId();
+          default -> throw new RuntimeException("Unsupported platform: " + platform);
+        };
+
+    String executorCommandKey = platform.name() + "." + arch.name();
+    String command = injector.getExecutorCommands().get(executorCommandKey);
+    command =
+        replaceArgs(
+            platform, command, inject.getId(), assetEndpoint.getAgents().getFirst().getId());
+
+    this.taniumExecutorClient.executeAction(
+        assetEndpoint.getAgents().getFirst().getExternalReference(),
+        packageId,
+        Base64.getEncoder().encodeToString(command.getBytes()));
   }
 
   public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {}

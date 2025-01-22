@@ -51,7 +51,11 @@ const notifyError = (error: AxiosError) => {
   } else if (error.status === 409) {
     MESSAGING$.notifyError(intl.formatMessage({ id: 'The element already exists' }));
   } else if (error.status === 400) {
-    MESSAGING$.notifyError(intl.formatMessage({ id: 'Bad request' }));
+    if (error.message) {
+      MESSAGING$.notifyError(intl.formatMessage({ id: error.message }));
+    } else {
+      MESSAGING$.notifyError(intl.formatMessage({ id: 'Bad request' }));
+    }
   } else if (error.status === 500) {
     MESSAGING$.notifyError(intl.formatMessage({ id: 'Internal error' }));
   } else if (error.message) {
@@ -115,7 +119,8 @@ export const simplePutCall = (uri: string, data?: unknown, defaultNotifyErrorBeh
     }
     throw error;
   });
-export const simpleDelCall = (uri: string, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.delete(buildUri(uri))
+// eslint-disable-next-line max-len
+export const simpleDelCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.delete(buildUri(uri), data ? { data: data } : undefined)
   .then((response) => {
     if (defaultSuccessBehavior) {
       notifySuccess('The element has been successfully deleted.');
@@ -200,11 +205,12 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   return api()
     .delete(buildUri(uri), { data })
-    .then(() => {
+    .then((response) => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
         payload: Immutable({ type, data }),
       });
+      return response.data;
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });

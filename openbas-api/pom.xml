@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.openbas</groupId>
         <artifactId>openbas-platform</artifactId>
-        <version>1.10.1</version>
+        <version>1.11.4</version>
     </parent>
 
     <artifactId>openbas-api</artifactId>
@@ -14,7 +14,7 @@
     <description>OpenBAS api</description>
 
     <properties>
-        <bcpg-jdk18on.version>1.79</bcpg-jdk18on.version>
+        <bcpg-jdk18on.version>1.80</bcpg-jdk18on.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-email.version>1.5</commons-email.version>
         <opensaml.version>4.3.2</opensaml.version>
@@ -22,7 +22,7 @@
         <springdoc-plugin.version>1.4</springdoc-plugin.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <apache-poi.version>5.4.0</apache-poi.version>
-        <opentelemetry.version>1.45.0</opentelemetry.version>
+        <opentelemetry.version>1.46.0</opentelemetry.version>
         <opentelemetry-semconv.version>1.27.0-alpha</opentelemetry-semconv.version>
     </properties>
 
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>io.openbas</groupId>
             <artifactId>openbas-framework</artifactId>
-            <version>1.10.1</version>
+            <version>1.11.4</version>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
@@ -236,12 +236,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.15</version>
+            <version>1.5.16</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.5.15</version>
+            <version>1.5.16</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback.contrib</groupId>
@@ -252,6 +252,12 @@
             <groupId>ch.qos.logback.contrib</groupId>
             <artifactId>logback-jackson</artifactId>
             <version>0.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
+            <version>4.1.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

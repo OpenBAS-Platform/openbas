@@ -110,9 +110,17 @@ public class InjectApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
+  @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
+  public Inject injectExecutionCallback(
+      @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
+    return injectExecutionCallback(null, injectId, input);
+  }
+
+  @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
   public Inject injectExecutionCallback(
-      @PathVariable String agentId,
+      @PathVariable
+          String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
@@ -718,13 +726,17 @@ public class InjectApi extends RestBehavior {
   @DeleteMapping(INJECT_URI)
   @LogExecutionTime
   @Tracing(name = "Bulk delete of injects", layer = "api", operation = "DELETE")
-  public void bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
+  public List<Inject> bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs
     List<Inject> injectsToDelete = getInjectsAndCheckInputForBulkProcessing(input);
 
+    // FIXME: This is a workaround to prevent the GUI from blocking when deleting elements
+    injectsToDelete.forEach(inject -> inject.setListened(false));
+
     // Bulk delete
-    this.injectService.deleteAllByIds(injectsToDelete.stream().map(Inject::getId).toList());
+    this.injectService.deleteAll(injectsToDelete);
+    return injectsToDelete;
   }
 
   /**

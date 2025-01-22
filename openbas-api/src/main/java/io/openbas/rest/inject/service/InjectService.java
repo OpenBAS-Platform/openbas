@@ -95,6 +95,18 @@ public class InjectService {
     }
   }
 
+  /**
+   * Delete all injects given as params
+   *
+   * @param injects the injects to delete
+   */
+  @Transactional(rollbackOn = Exception.class)
+  public void deleteAll(List<Inject> injects) {
+    if (!CollectionUtils.isEmpty(injects)) {
+      injectRepository.deleteAll(injects);
+    }
+  }
+
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
     // Delete document from all exercise injects
     List<Inject> exerciseInjects =
