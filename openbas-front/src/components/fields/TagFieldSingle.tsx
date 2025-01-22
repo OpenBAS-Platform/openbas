@@ -125,7 +125,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
         classes={{ clearIndicator: classes.autoCompleteIndicator }}
       />
       <IconButton
-        onClick={() => handleOpenTagCreation()}
+        onClick={handleOpenTagCreation}
         edge="end"
         style={{ position: 'absolute', top: 30, right: 35 }}
       >
