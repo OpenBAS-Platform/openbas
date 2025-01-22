@@ -1457,6 +1457,7 @@ const i18n = {
       'Tag': 'Tag',
       'Select a Tag': 'Sélectionnez un tag',
       'asset rule': 'règle d\'actif',
+      'Remove from the Asset Rule': 'Retirer de la règle d\'actif',
     },
     zh: {
       'Email address': 'email地址',
@@ -2862,6 +2863,7 @@ const i18n = {
       'Tag': '标签',
       'Select a Tag': '选择一个标签',
       'asset rule': '资产规则',
+      'Remove from the Asset Rule': '从资产规则中移除',
     },
     en: {
       'openbas_email': 'Email',
@@ -3044,6 +3046,7 @@ const i18n = {
       'Tag': 'Tag',
       'Select a Tag': 'Select a Tag',
       'asset rule': 'asset rule',
+      'Remove from the Asset Rule': 'Remove from the Asset Rule',
     },
   },
 };
