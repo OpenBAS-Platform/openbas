@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.beanutils.BeanUtils;
-import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +39,7 @@ public class InjectExpectationService {
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
   private final CollectorRepository collectorRepository;
+  private final AgentService agentService;
 
   @Resource protected ObjectMapper mapper;
 
@@ -409,33 +410,27 @@ public class InjectExpectationService {
                 .map(expectation -> expectationConverter(executableInject, expectation))
                 .collect(Collectors.toList());
 
-        if (!assets.isEmpty()) {
-          // Generate injectExpectations for Agents
-          List<InjectExpectation> injectExpectationsAgent =
-              assets.stream()
-                  .filter(asset -> asset instanceof Endpoint)
-                  .map(asset -> (Endpoint) Hibernate.unproxy(asset))
-                  .flatMap(
-                      endpoint ->
-                          endpoint.getAgents().stream()
-                              .filter(Agent::isActive)
-                              .flatMap(
-                                  agent ->
-                                      injectExpectations.stream()
-                                          .filter(
-                                              injectExpectation ->
-                                                  injectExpectation
-                                                      .getAsset()
-                                                      .getId()
-                                                      .equals(endpoint.getId()))
-                                          .map(
-                                              injectExpectation ->
-                                                  cloneInjectExpectationForAgent(
-                                                      agent, injectExpectation))))
-                  .toList();
-          injectExpectations.addAll(injectExpectationsAgent);
+        List<InjectExpectation> injectExpectationsByAsset =
+            injectExpectations.stream()
+                .filter(injectExpectation -> injectExpectation.getAsset() != null)
+                .toList();
+
+        List<String> assetIds =
+            injectExpectationsByAsset.stream().map(i -> i.getAsset().getId()).toList();
+
+        Map<String, List<Agent>> mapAssetAgents = agentService.getAgentsGroupedByAsset(assetIds);
+        List<InjectExpectation> injectExpectationsAgent = new ArrayList<>();
+
+        for (InjectExpectation injectExpectation : injectExpectationsByAsset) {
+          Asset asset = injectExpectation.getAsset();
+          List<Agent> agents = mapAssetAgents.getOrDefault(asset.getId(), Collections.emptyList());
+
+          for (Agent agent : agents) {
+            injectExpectationsAgent.add(cloneInjectExpectationForAgent(agent, injectExpectation));
+          }
         }
 
+        injectExpectations.addAll(injectExpectationsAgent);
         injectExpectationRepository.saveAll(injectExpectations);
       }
     }
@@ -446,6 +441,7 @@ public class InjectExpectationService {
     InjectExpectation clone = new InjectExpectation();
     try {
       BeanUtils.copyProperties(clone, injectExpectation);
+      clone.setType(injectExpectation.getType());
       clone.setAgent(agent);
       clone.setSignatures(injectExpectation.getSignatures());
       return clone;
