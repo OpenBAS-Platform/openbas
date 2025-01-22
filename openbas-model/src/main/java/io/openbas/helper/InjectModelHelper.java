@@ -65,33 +65,32 @@ public class InjectModelHelper {
                 })
             .toList();
 
-    AtomicBoolean isReady = new AtomicBoolean(true);
+    boolean isReady = true;
     for (JsonNode jsonField : contractMandatoryFields) {
       String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
 
       switch (key) {
         case CONTACT_ELEMENT_CONTENT_KEY_TEAMS -> {
           if (teams.isEmpty() && !allTeams) {
-            isReady.set(false);
+            isReady = false;
           }
         }
         case CONTACT_ELEMENT_CONTENT_KEY_ASSETS -> {
           if (assets.isEmpty() && assetGroups.isEmpty()) {
-            isReady.set(false);
+            isReady = false;
           }
         }
         default -> {
           if (isTextOrTextarea(jsonField) && !isFieldValid(content, injectContractFields, key)) {
-            isReady.set(false);
+            isReady = false;
           }
         }
       }
-
-      if (!isReady.get()) {
+      if (!isReady) {
         break;
       }
     }
-    return isReady.get();
+    return isReady;
   }
 
   private static boolean isTextOrTextarea(JsonNode jsonField) {
