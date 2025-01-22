@@ -301,6 +301,7 @@ public class InjectExpectationService {
         case PLAYER ->
             injectExpectationRepository.findAllByInjectAndTeamAndPlayer(
                 injectId, parentTargetId, targetId);
+        case AGENT -> injectExpectationRepository.findAllByInjectAndAgent(injectId, targetId);
         case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
         case ASSETS_GROUPS ->
             injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
@@ -448,7 +449,7 @@ public class InjectExpectationService {
                                       .map(
                                           expectation ->
                                               expectationConverter(
-                                                  agent, executableInject, expectation)));
+                                                  agent, (Asset) asset, executableInject, expectation)));
                     })
                 .toList();
 

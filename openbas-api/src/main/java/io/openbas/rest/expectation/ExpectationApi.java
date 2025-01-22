@@ -20,11 +20,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ExpectationApi extends RestBehavior {
 
+  public static final String API_EXPECTATIONS = "/api/expectations";
+  public static final String API_INJECTS_EXPECTATIONS = "/api/injects/expectations";
+
   private final ExerciseExpectationService exerciseExpectationService;
   private final InjectExpectationService injectExpectationService;
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping("/api/expectations/{expectationId}")
+  @PutMapping(API_EXPECTATIONS + "/{expectationId}")
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
       @Valid @RequestBody final ExpectationUpdateInput input) {
@@ -32,14 +35,14 @@ public class ExpectationApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping("/api/expectations/{expectationId}/{sourceId}/delete")
+  @PutMapping(API_EXPECTATIONS + "/{expectationId}/{sourceId}/delete")
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
     return this.exerciseExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
   }
 
-  @GetMapping("/api/injects/expectations")
+  @GetMapping(API_INJECTS_EXPECTATIONS)
   public List<InjectExpectation> getInjectExpectationsNotFilled() {
     return Stream.concat(
             injectExpectationService.manualExpectationsNotFill().stream(),
@@ -49,7 +52,7 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping("/api/injects/expectations/{sourceId}")
+  @GetMapping(API_INJECTS_EXPECTATIONS + "/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
@@ -64,7 +67,7 @@ public class ExpectationApi extends RestBehavior {
       summary = "Get Inject Expectations for a Specific Source",
       description =
           "Retrieves inject expectations of agents installed on an asset for a given source ID.")
-  @GetMapping("/api/injects/expectations/assets/{sourceId}")
+  @GetMapping(API_INJECTS_EXPECTATIONS + "/assets/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
@@ -73,29 +76,29 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping("/api/injects/expectations/prevention")
+  @GetMapping(API_INJECTS_EXPECTATIONS + "/prevention")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
     return injectExpectationService.preventionExpectationsNotFill().stream().toList();
   }
 
-  @GetMapping("/api/injects/expectations/prevention/{sourceId}")
+  @GetMapping(API_INJECTS_EXPECTATIONS + "/prevention/{sourceId}")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.preventionExpectationsNotFill(sourceId).stream().toList();
   }
 
-  @GetMapping("/api/injects/expectations/detection")
+  @GetMapping(API_INJECTS_EXPECTATIONS + "/detection")
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilled() {
     return injectExpectationService.detectionExpectationsNotFill().stream().toList();
   }
 
-  @GetMapping("/api/injects/expectations/detection/{sourceId}")
+  @GetMapping(API_INJECTS_EXPECTATIONS + "/detection/{sourceId}")
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.detectionExpectationsNotFill(sourceId).stream().toList();
   }
 
-  @PutMapping("/api/injects/expectations/{expectationId}")
+  @PutMapping(API_INJECTS_EXPECTATIONS + "/{expectationId}")
   @Transactional(rollbackOn = Exception.class)
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,

@@ -80,6 +80,17 @@ public class InjectExpectationUtils {
   }
 
   public static InjectExpectation expectationConverter(
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      @NotNull final ExecutableInject executableInject,
+      Expectation expectation) {
+    InjectExpectation expectationExecution = new InjectExpectation();
+    expectationExecution.setAgent(agent);
+    expectationExecution.setAsset(asset);
+    return expectationConverter(expectationExecution, executableInject, expectation);
+  }
+
+  public static InjectExpectation expectationConverter(
       @NotNull InjectExpectation expectationExecution,
       @NotNull final ExecutableInject executableInject,
       @NotNull final Expectation expectation) {

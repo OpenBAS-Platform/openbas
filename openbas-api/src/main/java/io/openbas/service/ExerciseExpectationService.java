@@ -101,22 +101,21 @@ public class ExerciseExpectationService {
         injectExpectationService.expectationsForAgents(
             updated.getInject(), updated.getAsset(), updated.getType());
 
-    expectationAgents.stream()
-        .map(
-            agentExp -> {
-              agentExp
-                  .getResults()
-                  .add(
-                      buildInjectExpectationResult(
-                          input.getSourceId(),
-                          input.getSourceType(),
-                          input.getSourceName(),
-                          result,
-                          input.getScore()));
-              agentExp.setScore(updated.getScore());
-              agentExp.setUpdatedAt(updated.getUpdatedAt());
-              return agentExp;
-            });
+    expectationAgents.forEach(
+        agentExp -> {
+          agentExp
+              .getResults()
+              .add(
+                  buildInjectExpectationResult(
+                      input.getSourceId(),
+                      input.getSourceType(),
+                      input.getSourceName(),
+                      result,
+                      input.getScore()));
+
+          agentExp.setScore(updated.getScore());
+          agentExp.setUpdatedAt(updated.getUpdatedAt());
+        });
 
     injectExpectationRepository.saveAll(expectationAgents);
 
@@ -159,17 +158,15 @@ public class ExerciseExpectationService {
         injectExpectationService.expectationsForAgents(
             updated.getInject(), updated.getAsset(), updated.getType());
 
-    expectationAgents.stream()
-        .map(
-            agentExp -> {
-              agentExp.setResults(
-                  agentExp.getResults().stream()
-                      .filter(r -> !sourceId.equals(r.getSourceId()))
-                      .toList());
-              agentExp.setScore(updated.getScore());
-              agentExp.setUpdatedAt(updated.getUpdatedAt());
-              return agentExp;
-            });
+    expectationAgents.forEach(
+        agentExp -> {
+          agentExp.setResults(
+              agentExp.getResults().stream()
+                  .filter(r -> !sourceId.equals(r.getSourceId()))
+                  .toList());
+          agentExp.setScore(updated.getScore());
+          agentExp.setUpdatedAt(updated.getUpdatedAt());
+        });
 
     injectExpectationRepository.saveAll(expectationAgents);
 
