@@ -31,6 +31,7 @@ public class InjectExpectationSpecification {
     return (root, query, cb) ->
         cb.and(
             cb.equal(root.get("inject").get("id"), injectId),
+            cb.isNull(root.get("agent")),
             root.get("asset").get("id").in(assetIds));
   }
 }

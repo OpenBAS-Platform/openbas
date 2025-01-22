@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -247,7 +246,7 @@ public class InjectExpectationService {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
         .stream()
-        .filter(e -> e.getAsset() != null && e.getAsset() != null)
+        .filter(e -> e.getAsset() != null && e.getAgent() != null)
         .filter(e -> e.getResults().stream().toList().isEmpty())
         .toList();
   }
