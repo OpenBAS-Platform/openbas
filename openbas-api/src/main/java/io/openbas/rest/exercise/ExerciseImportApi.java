@@ -42,7 +42,7 @@ public class ExerciseImportApi extends RestBehavior {
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String importId,
       @Valid @RequestBody final InjectsImportInput input) {
-    return validateInputsAndProduceSummary(exerciseId, importId, input);
+    return validateInputsAndProduceSummary(exerciseId, importId, input, false);
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/xls/{importId}/import")
@@ -53,17 +53,12 @@ public class ExerciseImportApi extends RestBehavior {
       @PathVariable @NotBlank final String exerciseId,
       @PathVariable @NotBlank final String importId,
       @Valid @RequestBody final InjectsImportInput input) {
-    Exercise exercise = this.exerciseService.exercise(exerciseId);
-    ImportTestSummary summary = validateInputsAndProduceSummary(exercise, importId, input);
-    this.exerciseService.updateExercise(exercise);
-    return summary;
+    return validateInputsAndProduceSummary(exerciseId, importId, input, true);
   }
 
 
-  private ImportTestSummary validateInputsAndProduceSummary(String exerciseId, String importId, InjectsImportInput input) {
-    return validateInputsAndProduceSummary(this.exerciseService.exercise(exerciseId), importId, input);
-  }
-  private ImportTestSummary validateInputsAndProduceSummary(Exercise exercise, String importId, InjectsImportInput input) {
+  private ImportTestSummary validateInputsAndProduceSummary(String exerciseId, String importId, InjectsImportInput input, boolean withSave) {
+    Exercise exercise = exerciseService.exercise(exerciseId);
     // Getting the mapper to use
     ImportMapper importMapper =
             this.importMapperRepository
@@ -74,7 +69,12 @@ public class ExerciseImportApi extends RestBehavior {
                                             String.format(
                                                     "The import mapper %s was not found", input.getImportMapperId())));
 
-    return this.injectImportService.importInjectIntoExerciseFromXLS(
-            exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), false);
+    ImportTestSummary its = this.injectImportService.importInjectIntoExerciseFromXLS(
+            exercise, importMapper, importId, input.getName(), input.getTimezoneOffset(), withSave);
+    if(withSave) {
+      this.exerciseService.updateExercise(exercise);
+    }
+
+    return its;
   }
 }
