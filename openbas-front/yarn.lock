@@ -4688,6 +4688,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^13.0.0":
+  version: 13.1.0
+  resolution: "commander@npm:13.1.0"
+  checksum: 10c0/7b8c5544bba704fbe84b7cab2e043df8586d5c114a4c5b607f83ae5060708940ed0b5bd5838cf8ce27539cde265c1cbd59ce3c8c6b017ed3eec8943e3a415164
+  languageName: node
+  linkType: hard
+
 "concat-map@npm:0.0.1":
   version: 0.0.1
   resolution: "concat-map@npm:0.0.1"
@@ -4706,6 +4713,13 @@ __metadata:
   version: 2.2.2
   resolution: "console-grid@npm:2.2.2"
   checksum: 10c0/6fe4dd9f7224e65d1bf84ccd68e214aa3c32050b1bbff2e921f837ff2c9541dac97626105f9b0536df835f2eb29ed0b0f03e1ef257d68d43f6d8fad7a3a97750
+  languageName: node
+  linkType: hard
+
+"console-grid@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "console-grid@npm:2.2.3"
+  checksum: 10c0/cd1a27c9995c2c03b79bacbef46ea193860501c6f819b86c71fd76a2cf6f075afcdb64ec0066ca0e4895e5f7876f698f6e53b5ba5c16cc93044b103e90e86895
   languageName: node
   linkType: hard
 
@@ -8970,7 +8984,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-coverage-reports@npm:2.11.3, monocart-coverage-reports@npm:^2.11.3":
+"monocart-coverage-reports@npm:2.12.0":
+  version: 2.12.0
+  resolution: "monocart-coverage-reports@npm:2.12.0"
+  dependencies:
+    acorn: "npm:^8.14.0"
+    acorn-loose: "npm:^8.4.0"
+    acorn-walk: "npm:^8.3.4"
+    commander: "npm:^13.0.0"
+    console-grid: "npm:^2.2.3"
+    eight-colors: "npm:^1.3.1"
+    foreground-child: "npm:^3.3.0"
+    istanbul-lib-coverage: "npm:^3.2.2"
+    istanbul-lib-report: "npm:^3.0.1"
+    istanbul-reports: "npm:^3.1.7"
+    lz-utils: "npm:^2.1.0"
+    monocart-locator: "npm:^1.0.2"
+  bin:
+    mcr: lib/cli.js
+  checksum: 10c0/3f1b965e4d3658080c7c9ba5a2fef6f2c494c140f39f2f3eda76299fd0ed51187730133724fd6142407d91fe3b3694e2c0c9798778dacaaf8b7b6c86ca4a722d
+  languageName: node
+  linkType: hard
+
+"monocart-coverage-reports@npm:^2.11.3":
   version: 2.11.3
   resolution: "monocart-coverage-reports@npm:2.11.3"
   dependencies:
@@ -9410,7 +9446,7 @@ __metadata:
     mdi-material-ui: "npm:7.9.2"
     moment: "npm:2.30.1"
     moment-timezone: "npm:0.5.45"
-    monocart-coverage-reports: "npm:2.11.3"
+    monocart-coverage-reports: "npm:2.12.0"
     monocart-reporter: "npm:2.9.11"
     normalizr: "npm:3.6.2"
     pdfmake: "npm:0.2.13"
