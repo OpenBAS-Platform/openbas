@@ -70,4 +70,10 @@ public class AssetAgentJob implements Base {
   public String getId() {
     return id;
   }
+
+  @Deprecated(since = "1.11.0")
+  @JsonProperty("asset_agent_asset")
+  public String getAgentId() {
+    return agent.getId();
+  }
 }

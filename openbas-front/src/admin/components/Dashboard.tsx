@@ -154,6 +154,7 @@ const Dashboard = () => {
       <Grid item xs={3}>
         <PaperMetric
           title={t('Scenarios')}
+          subTitle={t('(last 180 days)')}
           icon={<MovieFilterOutlined />}
           number={statistics?.scenarios_count?.global_count}
           progression={statistics?.scenarios_count?.progression_count}
@@ -162,6 +163,7 @@ const Dashboard = () => {
       <Grid item xs={3}>
         <PaperMetric
           title={t('Simulations')}
+          subTitle={t('(last 180 days)')}
           icon={<HubOutlined />}
           number={statistics?.exercises_count?.global_count}
           progression={statistics?.exercises_count?.progression_count}
@@ -170,6 +172,7 @@ const Dashboard = () => {
       <Grid item xs={3}>
         <PaperMetric
           title={t('Players')}
+          subTitle={t('(last 180 days)')}
           icon={<PersonOutlined />}
           number={statistics?.users_count?.global_count}
           progression={statistics?.users_count?.progression_count}
@@ -178,6 +181,7 @@ const Dashboard = () => {
       <Grid item xs={3}>
         <PaperMetric
           title={t('Assets')}
+          subTitle={t('(last 180 days)')}
           icon={<ComputerOutlined />}
           number={statistics?.assets_count?.global_count}
           progression={statistics?.assets_count?.progression_count}
