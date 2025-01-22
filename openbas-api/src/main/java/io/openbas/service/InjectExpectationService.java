@@ -401,59 +401,60 @@ public class InjectExpectationService {
         }
         injectExpectationsByTeam.addAll(injectExpectationsByUserAndTeam);
         injectExpectationRepository.saveAll(injectExpectationsByTeam);
-
-      } else if (!assets.isEmpty()) {
-        List<InjectExpectation> injectExpectationsAsset =
-            expectations.stream()
-                .map(expectation -> expectationConverter(executableInject, expectation))
-                .collect(Collectors.toList());
-
-        // Generate injectExpectations for Agents
-        List<InjectExpectation> injectExpectationsAgent =
-            assets.stream()
-                .flatMap(
-                    asset -> {
-                      Endpoint endpoint = (Endpoint) Hibernate.unproxy(asset);
-                      return endpoint.getAgents().stream()
-                          .filter(Agent::isActive)
-                          .flatMap(
-                              agent ->
-                                  expectations.stream()
-                                      .map(
-                                          expectation ->
-                                              expectationConverter(
-                                                  agent, executableInject, expectation)));
-                    })
-                .toList();
-
-        injectExpectationsAsset.addAll(injectExpectationsAgent);
-        injectExpectationRepository.saveAll(injectExpectationsAsset);
-      } else if (!assetGroups.isEmpty()) {
+      } else if (!assets.isEmpty() || !assetGroups.isEmpty()) {
         List<InjectExpectation> injectExpectations =
             expectations.stream()
                 .map(expectation -> expectationConverter(executableInject, expectation))
                 .collect(Collectors.toList());
 
-        // Generate injectExpectations for Agents
-        List<InjectExpectation> injectExpectationsAgent =
-            assetGroups.stream()
-                .map(AssetGroup::getAssets)
-                .flatMap(
-                    asset -> {
-                      Endpoint endpoint = (Endpoint) Hibernate.unproxy(asset);
-                      return endpoint.getAgents().stream()
-                          .filter(Agent::isActive)
-                          .flatMap(
-                              agent ->
-                                  expectations.stream()
-                                      .map(
-                                          expectation ->
-                                              expectationConverter(
-                                                  agent, (Asset) asset, executableInject, expectation)));
-                    })
-                .toList();
+        if (!assets.isEmpty()) {
+          // Generate injectExpectations for Agents
+          List<InjectExpectation> injectExpectationsAgent =
+              assets.stream()
+                  .filter(asset -> asset instanceof Endpoint)
+                  .map(asset -> (Endpoint) Hibernate.unproxy(asset))
+                  .flatMap(
+                      endpoint ->
+                          endpoint.getAgents().stream()
+                              .filter(Agent::isActive)
+                              .flatMap(
+                                  agent ->
+                                      expectations.stream()
+                                          .map(
+                                              expectation ->
+                                                  expectationConverter(
+                                                      agent, executableInject, expectation))))
+                  .toList();
 
-        injectExpectations.addAll(injectExpectationsAgent);
+          injectExpectations.addAll(injectExpectationsAgent);
+        }
+
+        if (!assetGroups.isEmpty()) {
+          // Generate injectExpectations for Agents in asset groups
+          List<InjectExpectation> injectExpectationsAgent =
+              assetGroups.stream()
+                  .flatMap(assetGroup -> assetGroup.getAssets().stream())
+                  .filter(asset -> asset instanceof Endpoint)
+                  .map(asset -> (Endpoint) Hibernate.unproxy(asset))
+                  .flatMap(
+                      endpoint ->
+                          endpoint.getAgents().stream()
+                              .filter(Agent::isActive)
+                              .flatMap(
+                                  agent ->
+                                      expectations.stream()
+                                          .map(
+                                              expectation ->
+                                                  expectationConverter(
+                                                      agent,
+                                                      (Asset) endpoint,
+                                                      executableInject,
+                                                      expectation))))
+                  .toList();
+
+          injectExpectations.addAll(injectExpectationsAgent);
+        }
+
         injectExpectationRepository.saveAll(injectExpectations);
       }
     }
