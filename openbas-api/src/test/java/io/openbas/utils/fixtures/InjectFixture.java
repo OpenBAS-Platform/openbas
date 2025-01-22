@@ -7,6 +7,7 @@ import io.openbas.database.model.*;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class InjectFixture {
 
@@ -14,8 +15,7 @@ public class InjectFixture {
   public static final String INJECT_CHALLENGE_NAME = "Test challenge inject";
 
   private static Inject createInject(InjectorContract injectorContract, String title) {
-    Inject inject = new Inject();
-    inject.setTitle(INJECT_EMAIL_NAME);
+    Inject inject = createInjectWithTitle(title);
     inject.setInjectorContract(injectorContract);
     inject.setEnabled(true);
     inject.setDependsDuration(0L);
@@ -23,8 +23,14 @@ public class InjectFixture {
   }
 
   public static Inject getInjectWithoutContract() {
-    Inject inject = new Inject();
-    inject.setTitle(INJECT_EMAIL_NAME);
+    Inject inject = createInjectWithTitle(INJECT_EMAIL_NAME);
+    inject.setEnabled(true);
+    inject.setDependsDuration(0L);
+    return inject;
+  }
+
+  public static Inject getDefaultInject() {
+    Inject inject = createInjectWithDefaultTitle();
     inject.setEnabled(true);
     inject.setDependsDuration(0L);
     return inject;
@@ -54,6 +60,17 @@ public class InjectFixture {
         (key, value) -> injectContent.set(key, objectMapper.convertValue(value, JsonNode.class)));
     inject.setContent(injectContent);
 
+    return inject;
+  }
+
+  private static Inject createInjectWithDefaultTitle() {
+    return createInjectWithTitle(null);
+  }
+
+  private static Inject createInjectWithTitle(String title) {
+    String new_title = title == null ? "inject-%s".formatted(UUID.randomUUID()) : title;
+    Inject inject = new Inject();
+    inject.setTitle(new_title);
     return inject;
   }
 }

@@ -7,6 +7,7 @@ import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Team;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 public class ExerciseFixture {
 
@@ -25,9 +26,17 @@ public class ExerciseFixture {
     return exercise;
   }
 
+  public static Exercise createDefaultExercise() {
+    Exercise exercise = createDefaultExerciseWithDefaultName();
+    exercise.setDescription("A default test exercise");
+    exercise.setSubtitle("Default test exercise");
+    exercise.setFrom("default_exercise@mail.fr");
+    exercise.setCategory("crisis-communication");
+    return exercise;
+  }
+
   public static Exercise createDefaultCrisisExercise() {
-    Exercise exercise = new Exercise();
-    exercise.setName("Crisis exercise");
+    Exercise exercise = createDefaultExerciseWithName("Crisis exercise");
     exercise.setDescription("A crisis exercise for my enterprise");
     exercise.setSubtitle("A crisis exercise");
     exercise.setFrom("exercise@mail.fr");
@@ -40,8 +49,7 @@ public class ExerciseFixture {
   }
 
   public static Exercise createDefaultIncidentResponseExercise(Instant startTime) {
-    Exercise exercise = new Exercise();
-    exercise.setName("Incident response exercise");
+    Exercise exercise = createDefaultExerciseWithName("Incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
     exercise.setSubtitle("An incident response exercise");
     exercise.setFrom("exercise@mail.fr");
@@ -56,8 +64,7 @@ public class ExerciseFixture {
   }
 
   public static Exercise createDefaultAttackExercise(Instant startTime) {
-    Exercise exercise = new Exercise();
-    exercise.setName("Draft incident response exercise");
+    Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
     exercise.setSubtitle("An incident response exercise");
     exercise.setFrom("exercise@mail.fr");
@@ -73,8 +80,7 @@ public class ExerciseFixture {
   }
 
   public static Exercise createRunningAttackExercise(Instant startTime) {
-    Exercise exercise = new Exercise();
-    exercise.setName("Draft incident response exercise");
+    Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
     exercise.setSubtitle("An incident response exercise");
     exercise.setFrom("exercise@mail.fr");
@@ -90,8 +96,7 @@ public class ExerciseFixture {
   }
 
   public static Exercise createCanceledAttackExercise(Instant startTime) {
-    Exercise exercise = new Exercise();
-    exercise.setName("Draft incident response exercise");
+    Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
     exercise.setSubtitle("An incident response exercise");
     exercise.setFrom("exercise@mail.fr");
@@ -107,8 +112,7 @@ public class ExerciseFixture {
   }
 
   public static Exercise createFinishedAttackExercise(Instant startTime) {
-    Exercise exercise = new Exercise();
-    exercise.setName("Draft incident response exercise");
+    Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
     exercise.setSubtitle("An incident response exercise");
     exercise.setFrom("exercise@mail.fr");
@@ -124,9 +128,8 @@ public class ExerciseFixture {
   }
 
   public static Exercise createPausedAttackExercise(Instant startTime) {
-    Exercise exercise = new Exercise();
+    Exercise exercise = createDefaultExerciseWithName("Draft incident response exercise");
     exercise.setCurrentPause(startTime.truncatedTo(MINUTES).minus(1, MINUTES));
-    exercise.setName("Draft incident response exercise");
     exercise.setDescription("An incident response exercise for my enterprise");
     exercise.setSubtitle("An incident response exercise");
     exercise.setFrom("exercise@mail.fr");
@@ -134,6 +137,17 @@ public class ExerciseFixture {
     exercise.setMainFocus("incident-response");
     exercise.setStatus(ExerciseStatus.PAUSED);
     exercise.setStart(startTime);
+    return exercise;
+  }
+
+  private static Exercise createDefaultExerciseWithDefaultName() {
+    return createDefaultExerciseWithName(null);
+  }
+
+  private static Exercise createDefaultExerciseWithName(String name) {
+    String new_name = name == null ? "exercise-%s".formatted(UUID.randomUUID()) : name;
+    Exercise exercise = new Exercise();
+    exercise.setName(new_name);
     return exercise;
   }
 }

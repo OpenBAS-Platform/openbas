@@ -88,38 +88,36 @@ public class ExerciseApiImportTest extends IntegrationTest {
 
   private ExerciseComposer.Composer getExercise() {
     return exerciseComposer
-        .forExercise(ExerciseFixture.createDefaultCrisisExercise())
+        .forExercise(ExerciseFixture.createDefaultExercise())
         .withArticle(
             articleComposer
-                .forArticle(ArticleFixture.getArticleNoChannel())
-                .withChannel(channelComposer.forChannel(ChannelFixture.getChannel())))
+                .forArticle(ArticleFixture.getDefaultArticle())
+                .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel())))
         .withLessonCategory(
             lessonsCategoryComposer
-                .forLessonsCategory(LessonsCategoryFixture.createLessonCategory())
+                .forLessonsCategory(LessonsCategoryFixture.createDefaultLessonsCategory())
                 .withLessonsQuestion(
                     lessonsQuestionsComposer.forLessonsQuestion(
-                        LessonsQuestionFixture.createLessonsQuestion())))
+                        LessonsQuestionFixture.createDefaultLessonsQuestion())))
         .withTeam(
             teamComposer
-                .forTeam(TeamFixture.getEmptyTeam())
+                .forTeam(TeamFixture.getDefaultTeam())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
-                .withUser(
-                    userComposer.forUser(
-                        UserFixture.getUser("Ferdinand", "Salsifitte", "tutu@filigran.io")))
+                .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()))
                 .withUser(
                     userComposer
-                        .forUser(UserFixture.getUser())
+                        .forUser(UserFixture.getUserWithDefaultEmail())
                         .withTag(tagComposer.forTag(TagFixture.getTagWithText("User tag")))
                         .withOrganization(
                             organizationComposer
-                                .forOrganization(OrganizationFixture.createOrganization())
+                                .forOrganization(OrganizationFixture.createDefaultOrganisation())
                                 .withTag(
                                     tagComposer.forTag(
                                         TagFixture.getTagWithText("Organization tag"))))))
         .withTeamUsers()
         .withInject(
             injectComposer
-                .forInject(InjectFixture.getInjectWithoutContract())
+                .forInject(InjectFixture.getDefaultInject())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Inject tag")))
                 .withChallenge(
                     challengeComposer
@@ -130,9 +128,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
                 .forDocument(DocumentFixture.getDocumentTxt(FileFixture.getPlainTextFileContent()))
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag")))
                 .withInMemoryFile(FileFixture.getPlainTextFileContent()))
-        .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getObjective()))
+        .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getDefaultObjective()))
         .withTag(tagComposer.forTag(TagFixture.getTagWithText("Exercise tag")))
-        .withVariable(variableComposer.forVariable(VariableFixture.getVariable()));
+        .withVariable(variableComposer.forVariable(VariableFixture.getDefaultVariable()));
   }
 
   private Exercise findSingleExerciseFromDb() {

@@ -5,12 +5,12 @@ import static io.openbas.database.model.ChallengeFlag.FLAG_TYPE.VALUE;
 import io.openbas.database.model.Challenge;
 import io.openbas.database.model.ChallengeFlag;
 import java.util.List;
+import java.util.UUID;
 
 public class ChallengeFixture {
 
   public static Challenge createDefaultChallenge() {
-    Challenge challenge = new Challenge();
-    challenge.setName("Default challenge");
+    Challenge challenge = createChallengeWithDefaultName();
     ChallengeFlag challengeFlag = createDefaultChallengeFlag();
     challenge.setFlags(List.of(challengeFlag));
     challengeFlag.setChallenge(challenge);
@@ -24,5 +24,16 @@ public class ChallengeFixture {
     challengeFlag.setType(VALUE);
     challengeFlag.setValue("flag value");
     return challengeFlag;
+  }
+
+  private static Challenge createChallengeWithDefaultName() {
+    return createChallengeWithName(null);
+  }
+
+  private static Challenge createChallengeWithName(String name) {
+    String new_name = name == null ? "challenge-%s".formatted(UUID.randomUUID()) : name;
+    Challenge challenge = new Challenge();
+    challenge.setName(new_name);
+    return challenge;
   }
 }
