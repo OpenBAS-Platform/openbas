@@ -133,7 +133,7 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
     }
 
     @Override
-    public InnerComposerBase<Exercise> delete() {
+    public Composer delete() {
       exerciseRepository.delete(exercise);
       this.variableComposers.forEach(VariableComposer.Composer::delete);
       this.documentComposers.forEach(DocumentComposer.Composer::delete);
