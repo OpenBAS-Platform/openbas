@@ -251,22 +251,23 @@ public class PlatformSettingsService {
     platformSettings.setPolicies(policies);
 
     // FEATURE FLAG
-    if (openBASConfig.getEnabledDevFeatures() == null || openBASConfig.getEnabledDevFeatures().isEmpty()) {
+    if (openBASConfig.getEnabledDevFeatures() == null
+        || openBASConfig.getEnabledDevFeatures().isEmpty()) {
       platformSettings.setEnabledDevFeatures(List.of());
-    }
-    else {
+    } else {
       platformSettings.setEnabledDevFeatures(
-        Arrays.stream(openBASConfig.getEnabledDevFeatures().split(","))
-            .map(featureStr -> {
-              try {
-                return PreviewFeatureEnum.fromStringIgnoreCase(featureStr.strip());
-              } catch (IllegalArgumentException e) {
-                log.warning("Invalid feature flag: " + e.getMessage());
-                return null;
-              }
-            })
-            .filter(Objects::nonNull)
-            .toList());
+          Arrays.stream(openBASConfig.getEnabledDevFeatures().split(","))
+              .map(
+                  featureStr -> {
+                    try {
+                      return PreviewFeatureEnum.fromStringIgnoreCase(featureStr.strip());
+                    } catch (IllegalArgumentException e) {
+                      log.warning("Invalid feature flag: " + e.getMessage());
+                      return null;
+                    }
+                  })
+              .filter(Objects::nonNull)
+              .toList());
     }
 
     // PLATFORM MESSAGE
