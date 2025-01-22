@@ -22,6 +22,7 @@ import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.utils.InjectMapper;
+import io.openbas.utils.InjectUtils;
 import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import java.util.ArrayList;
@@ -62,6 +63,8 @@ class InjectServiceTest {
   @Mock private InjectStatusRepository injectStatusRepository;
 
   @Mock private InjectMapper injectMapper;
+
+  @Mock private InjectUtils injectUtils;
 
   @InjectMocks private InjectService injectService;
 
@@ -598,5 +601,36 @@ class InjectServiceTest {
 
     // Assert
     verify(securityExpression, times(0)).isSimulationPlanner("exercise1");
+  }
+
+  @Test
+  void given_nonexisting_initializeInjectStatus_SHOULD_throw_ElementNotFoundException() {
+    ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
+    String injectId = "randomid";
+
+    assertThrows(
+        ElementNotFoundException.class,
+        () -> injectService.initializeInjectStatus(injectId, executionStatus, null));
+  }
+
+  @Test
+  void given_valid_input_initializeInjectStatus_SHOULD_save_the_injectstatus() {
+    ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
+    String injectId = "injectid";
+    Inject inject = new Inject();
+    inject.setId(injectId);
+    StatusPayload statusPayload = new StatusPayload();
+    when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
+    when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
+
+    injectService.initializeInjectStatus(injectId, executionStatus, null);
+
+    ArgumentCaptor<InjectStatus> statusCaptor = ArgumentCaptor.forClass(InjectStatus.class);
+    verify(injectStatusRepository).save(statusCaptor.capture());
+    InjectStatus savedStatus = statusCaptor.getValue();
+    assertNotNull(savedStatus);
+    assertEquals(inject, savedStatus.getInject());
+    assertEquals(executionStatus, savedStatus.getName());
+    assertEquals(statusPayload, savedStatus.getPayloadOutput());
   }
 }
