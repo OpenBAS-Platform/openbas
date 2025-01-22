@@ -1,6 +1,6 @@
 {
   "name": "openbas-front",
-  "version": "1.11.3",
+  "version": "1.11.4",
   "private": true,
   "main": "src/index.tsx",
   "license": "Apache-2.0",
@@ -121,7 +121,7 @@
     "swagger-typescript-api": "13.0.22",
     "typescript": "5.7.2",
     "typescript-eslint": "8.21.0",
-    "vite": "6.0.3",
+    "vite": "6.0.9",
     "vitest": "2.1.1"
   },
   "engines": {
