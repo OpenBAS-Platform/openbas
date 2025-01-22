@@ -36,7 +36,7 @@ public class ExecutorService {
       String id,
       String type,
       String name,
-      String documentationLink,
+      String documentationUrl,
       InputStream iconData,
       String[] platforms)
       throws Exception {
@@ -64,7 +64,7 @@ public class ExecutorService {
 
     executor.setName(name);
     executor.setType(type);
-    executor.setDoc(documentationLink);
+    executor.setDoc(documentationUrl);
     executor.setPlatforms(platforms);
 
     executorRepository.save(executor);

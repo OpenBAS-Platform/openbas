@@ -6,9 +6,6 @@ import { FunctionComponent } from 'react';
 import { useFormatter } from '../../../components/i18n';
 import type { Executor } from '../../../utils/api-types';
 
-const TANIUM_EXECUTOR_TYPE = 'openbas_tanium';
-const CROWDSTRIKE_EXECUTOR_TYPE = 'openbas_crowdstrike';
-
 const useStyles = makeStyles(() => ({
   chip: {
     height: 30,
@@ -29,9 +26,7 @@ const ExecutorDocumentationLink: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const classes = useStyles();
 
-  const isSupportedExecutor = [TANIUM_EXECUTOR_TYPE, CROWDSTRIKE_EXECUTOR_TYPE].includes(executor.executor_type);
-
-  if (!isSupportedExecutor) {
+  if (!executor.executor_doc) {
     return null;
   }
 
