@@ -30,6 +30,7 @@ import io.openbas.service.AssetService;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
@@ -65,13 +66,14 @@ public class InjectService {
   private final InjectStatusRepository injectStatusRepository;
   private final InjectMapper injectMapper;
   private final MethodSecurityExpressionHandler methodSecurityExpressionHandler;
+  private final InjectUtils injectUtils;
 
   @Resource protected ObjectMapper mapper;
 
   public Inject inject(@NotBlank final String injectId) {
     return this.injectRepository
         .findById(injectId)
-        .orElseThrow(() -> new ElementNotFoundException("Inject not found"));
+        .orElseThrow(() -> new ElementNotFoundException("Inject not found with id: " + injectId));
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -393,6 +395,33 @@ public class InjectService {
                 + scenarioOrExerciseId);
       }
     }
+  }
+
+  @Transactional
+  public void initializeInjectStatus(
+      @NotNull final String injectId,
+      @NotNull final ExecutionStatus status,
+      @Nullable final InjectStatusExecution trace) {
+
+    Inject inject = this.inject(injectId);
+
+    InjectStatus injectStatus =
+        inject
+            .getStatus()
+            .orElseGet(
+                () -> {
+                  InjectStatus newStatus = new InjectStatus();
+                  newStatus.setInject(inject);
+                  return newStatus;
+                });
+
+    if (trace != null) {
+      injectStatus.getTraces().add(trace);
+    }
+    injectStatus.setName(status);
+    injectStatus.setTrackingSentDate(Instant.now());
+    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
+    injectStatusRepository.save(injectStatus);
   }
 
   /**

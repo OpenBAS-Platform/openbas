@@ -10,8 +10,8 @@ import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.utils.InjectUtils;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -43,6 +43,7 @@ public class InjectsExecutionJob implements Job {
   private final ApplicationContext context;
   private final InjectHelper injectHelper;
   private final InjectRepository injectRepository;
+  private final InjectService injectService;
   private final InjectorRepository injectorRepository;
   private final InjectStatusRepository injectStatusRepository;
   private final ExerciseRepository exerciseRepository;
@@ -185,8 +186,8 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 // Status
-                initializeInjectStatus(
-                    inject,
+                this.injectService.initializeInjectStatus(
+                    inject.getId(),
                     ExecutionStatus.ERROR,
                     InjectStatusExecution.traceError(
                         "The inject is not ready to be executed (missing mandatory fields)"));
@@ -202,7 +203,8 @@ public class InjectsExecutionJob implements Job {
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
                 // Status
-                initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
+                this.injectService.initializeInjectStatus(
+                    inject.getId(), ExecutionStatus.EXECUTING, null);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
@@ -224,32 +226,10 @@ public class InjectsExecutionJob implements Job {
               }
             },
             () ->
-                initializeInjectStatus(
-                    inject,
+                this.injectService.initializeInjectStatus(
+                    inject.getId(),
                     ExecutionStatus.ERROR,
                     InjectStatusExecution.traceError("Inject does not have a contract")));
-  }
-
-  private void initializeInjectStatus(
-      Inject inject, ExecutionStatus status, @Nullable InjectStatusExecution trace) {
-    InjectStatus injectStatus =
-        inject
-            .getStatus()
-            .orElseGet(
-                () -> {
-                  InjectStatus newStatus = new InjectStatus();
-                  newStatus.setInject(inject);
-                  return newStatus;
-                });
-
-    if (trace != null) {
-      injectStatus.getTraces().add(trace);
-    }
-    injectStatus.setName(status);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
-    injectStatusRepository.save(injectStatus);
-    inject.setStatus(injectStatus);
   }
 
   /**
