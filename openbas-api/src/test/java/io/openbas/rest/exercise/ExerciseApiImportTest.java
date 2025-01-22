@@ -1215,7 +1215,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
           articleRepository
               .findAll(
                   (root, query, criteriaBuilder) ->
-                      criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                      criteriaBuilder.and(
+                          criteriaBuilder.notEqual(root.get("id"), expected.getId()),
+                          criteriaBuilder.equal(root.get("name"), expected.getName())))
               .stream()
               .findFirst();
       if (articleFromDb.isEmpty()) {
@@ -1360,7 +1362,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
                   objectiveRepository
                       .findAll(
                           (root, query, criteriaBuilder) ->
-                              criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                              criteriaBuilder.and(
+                                  criteriaBuilder.notEqual(root.get("id"), expected.getId()),
+                                  criteriaBuilder.equal(root.get("title"), expected.getTitle())))
                       .spliterator(),
                   false)
               .filter(objective -> objective.getTitle().equals(expected.getTitle()))
@@ -1437,7 +1441,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
                   lessonsCategoryRepository
                       .findAll(
                           (root, query, criteriaBuilder) ->
-                              criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                              criteriaBuilder.and(
+                                  criteriaBuilder.notEqual(root.get("id"), expected.getId()),
+                                  criteriaBuilder.equal(root.get("name"), expected.getName())))
                       .spliterator(),
                   false)
               .filter(category -> category.getName().equals(expected.getName()))
@@ -1493,7 +1499,7 @@ public class ExerciseApiImportTest extends IntegrationTest {
   @Test
   @WithMockAdminUser
   public void
-      given_a_valid_export_zip_file_given_existing_objects_assign_existing_documents_anyway()
+      given_a_valid_export_zip_file_given_existing_objects_assign_existing_documents_to_imported_exercise()
           throws Exception {
     ExerciseComposer.Composer exerciseWrapper = getExercise();
     byte[] zipBytes = doExport(exerciseWrapper);
@@ -1545,7 +1551,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
           injectRepository
               .findAll(
                   (root, query, criteriaBuilder) ->
-                      criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                      criteriaBuilder.and(
+                          criteriaBuilder.notEqual(root.get("id"), expected.getId()),
+                          criteriaBuilder.equal(root.get("title"), expected.getTitle())))
               .stream()
               .findFirst();
       if (injectFromDb.isEmpty()) {
@@ -1624,7 +1632,9 @@ public class ExerciseApiImportTest extends IntegrationTest {
                   variableRepository
                       .findAll(
                           (root, query, criteriaBuilder) ->
-                              criteriaBuilder.notEqual(root.get("id"), expected.getId()))
+                              criteriaBuilder.and(
+                                  criteriaBuilder.notEqual(root.get("id"), expected.getId()),
+                                  criteriaBuilder.equal(root.get("key"), expected.getKey())))
                       .spliterator(),
                   false)
               .findFirst();
