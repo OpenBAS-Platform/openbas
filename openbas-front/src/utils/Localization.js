@@ -1447,7 +1447,7 @@ const i18n = {
       'Asset rule': 'Règle d\'actifs',
       'Customization': 'Customisation',
       'Default asset rules': 'Règles d\'actifs par défaut',
-      'ASSET RULE DETECTED': 'ASSET RULE DETECTÉ',
+      'ASSET RULE DETECTED': 'RÈGLE D\'ACTIF DÉTECTÉ',
       'We detected that your change will trigger an {assetrule}. Would you like to apply the defined asset groups on your current existing injects ?': 'Nous avons detecté que vôtre modification va déclencher une {assetrule}. Voudriez-vous appliquer les groupes d\'actifs définis sur les injects existants',
       'Do you want to delete this asset rule ?': 'Voulez-vous supprimer cette règle d\'actifs?',
       'Update the asset rule': 'Mettre à jour la règle d\'actifs',
