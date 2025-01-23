@@ -14,7 +14,7 @@ import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import io.openbas.atomic_testing.TargetType;
+import io.openbas.utils.TargetType;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;

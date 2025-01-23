@@ -8,7 +8,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.atomic_testing.TargetType;
+import io.openbas.utils.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.AssetGroupRepository;

@@ -1,6 +1,5 @@
 package io.openbas.utils;
 
-import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
 import java.util.List;

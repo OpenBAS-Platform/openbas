@@ -6,7 +6,7 @@ import static io.openbas.service.InjectExpectationUtils.*;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.atomic_testing.TargetType;
+import io.openbas.utils.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
