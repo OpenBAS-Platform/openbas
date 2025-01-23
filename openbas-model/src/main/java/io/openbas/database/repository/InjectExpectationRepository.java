@@ -4,11 +4,9 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -169,7 +167,7 @@ public interface InjectExpectationRepository
               + "WHERE i.inject_id IN (:injectIds) "
               + "AND i.user_id is null ;",
       nativeQuery = true)
-    // We don't include expectations for players, only for the team, if applicable
+  // We don't include expectations for players, only for the team, if applicable
   List<RawInjectExpectation> rawForComputeGlobalByInjectIds(
       @Param("injectIds") Set<String> injectIds);
 
@@ -191,7 +189,7 @@ public interface InjectExpectationRepository
               + "WHERE i.exercise_id IN (:exerciseIds) "
               + "AND i.user_id is null ;",
       nativeQuery = true)
-    // We don't include expectations for players, only for the team, if applicable
+  // We don't include expectations for players, only for the team, if applicable
   List<RawInjectExpectation> rawForComputeGlobalByExerciseIds(
       @Param("exerciseIds") Set<String> exerciseIds);
 }

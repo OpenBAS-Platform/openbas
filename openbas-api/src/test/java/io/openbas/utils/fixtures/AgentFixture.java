@@ -3,7 +3,6 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.Asset;
 
-
 public class AgentFixture {
 
   public static Agent createAgent(Asset asset, String externalReference) {

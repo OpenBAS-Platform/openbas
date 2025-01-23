@@ -1,7 +1,6 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Injector;
-
 import java.time.Instant;
 
 public class InjectorFixture {

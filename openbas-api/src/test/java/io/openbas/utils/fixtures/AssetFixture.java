@@ -1,9 +1,7 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Asset;
-
 import java.time.Instant;
-
 import org.jetbrains.annotations.NotNull;
 
 public class AssetFixture {

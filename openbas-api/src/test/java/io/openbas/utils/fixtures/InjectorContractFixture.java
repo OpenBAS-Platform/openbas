@@ -8,7 +8,6 @@ import io.openbas.database.model.InjectorContract;
 import io.openbas.database.model.Payload;
 import io.openbas.injector_contract.ContractCardinality;
 import io.openbas.injector_contract.fields.ContractSelect;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,8 @@ public class InjectorContractFixture {
         injector, payloadCommand, List.of(obfuscatorSelect));
   }
 
-  public static InjectorContract createInjectorContract(String id, Map<String, String> labels, String content) {
+  public static InjectorContract createInjectorContract(
+      String id, Map<String, String> labels, String content) {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setId(id);
     injectorContract.setLabels(labels);
