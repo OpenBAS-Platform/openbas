@@ -261,7 +261,7 @@ public class PlatformSettingsService {
                     try {
                       return PreviewFeature.fromStringIgnoreCase(featureStr.strip());
                     } catch (IllegalArgumentException e) {
-                      log.warning("Invalid feature flag: " + e.getMessage());
+                      log.warning("Unrecognised feature flag: " + e.getMessage());
                       return null;
                     }
                   })
