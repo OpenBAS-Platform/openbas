@@ -55,8 +55,8 @@ public class OpenBASConfig {
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
 
-  @JsonProperty("disabled_dev_features")
-  private String disabledDevFeatures = "";
+  @JsonProperty("enabled_dev_features")
+  private String enabledDevFeatures = "";
 
   @JsonIgnore private String cookieName = "openbas_token";
 
