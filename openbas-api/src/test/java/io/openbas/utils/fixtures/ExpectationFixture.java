@@ -1,8 +1,10 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Asset;
+import io.openbas.database.model.AssetGroup;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+
 import java.util.Collections;
 
 public class ExpectationFixture {
@@ -22,12 +24,34 @@ public class ExpectationFixture {
         Collections.emptyList());
   }
 
+  public static PreventionExpectation createPreventionExpectationForAssetGroup(AssetGroup assetGroup) {
+    return PreventionExpectation.preventionExpectationForAssetGroup(
+        SCORE,
+        "Prevention",
+        "Prevention Expectation",
+        assetGroup,
+        false,
+        EXPIRATION_TIME_SIX_HOURS,
+        Collections.emptyList());
+  }
+
   public static DetectionExpectation createTechnicalDetectionExpectation(Asset asset) {
     return DetectionExpectation.detectionExpectationForAsset(
         SCORE,
         "Detection",
         "Detection Expectation",
         asset,
+        false,
+        EXPIRATION_TIME_SIX_HOURS,
+        Collections.emptyList());
+  }
+
+  public static DetectionExpectation createDetectionExpectationForAssetGroup(AssetGroup assetGroup) {
+    return DetectionExpectation.detectionExpectationForAssetGroup(
+        SCORE,
+        "Detection",
+        "Detection Expectation",
+        assetGroup,
         false,
         EXPIRATION_TIME_SIX_HOURS,
         Collections.emptyList());

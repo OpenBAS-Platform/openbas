@@ -1,6 +1,7 @@
 package io.openbas.rest.inject_expectation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
@@ -10,10 +11,12 @@ import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.fixtures.*;
+
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,19 +28,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ExtendWith(MockitoExtension.class)
 public class InjectExpectationServiceTest extends IntegrationTest {
 
-  @Autowired private InjectExpectationRepository injectExpectationRepository;
+  @Autowired
+  private InjectExpectationRepository injectExpectationRepository;
 
-  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired
+  private InjectorContractRepository injectorContractRepository;
 
-  @Autowired private InjectorRepository injectorRepository;
+  @Autowired
+  private InjectorRepository injectorRepository;
 
-  @Autowired private InjectRepository injectRepository;
+  @Autowired
+  private InjectRepository injectRepository;
 
-  @Autowired private AssetRepository assetRepository;
+  @Autowired
+  private AssetRepository assetRepository;
 
-  @Autowired private AgentRepository agentRepository;
+  @Autowired
+  private AssetGroupRepository assetGroupRepository;
 
-  @Autowired private InjectExpectationService injectExpectationService;
+  @Autowired
+  private AgentRepository agentRepository;
+
+  @Autowired
+  private InjectExpectationService injectExpectationService;
 
   private Injector injector;
   private Injector savedInjector;
@@ -69,13 +82,12 @@ public class InjectExpectationServiceTest extends IntegrationTest {
     assetRepository.delete(savedAsset);
     injectorContractRepository.delete(savedInjectorContract);
     injectorRepository.delete(savedInjector);
-    agentRepository.delete(savedAgent);
     injectExpectationRepository.deleteAll();
   }
 
   @Test
-  @DisplayName("Given an atomic testing its expectations must be created")
-  void given_an_atomic_testing_expectations_must_be_saved() throws Exception {
+  @DisplayName("Given an atomic testing with an asset linked to an agent its expectations must be created")
+  void given_an_atomic_testing_with_an_asset_linked_to_an_agent_expectations_must_be_saved() throws Exception {
     // -- PREPARE --
     savedInjector = this.injectorRepository.save(injector);
     injectorContract.setInjector(savedInjector);
@@ -111,5 +123,136 @@ public class InjectExpectationServiceTest extends IntegrationTest {
         injectExpectationRepository
             .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
             .size());
+
+    //-- THEN--
+    agentRepository.delete(savedAgent);
+  }
+
+  @Test
+  @DisplayName("Given an atomic testing with an asset with no agent its expectations must be created")
+  void given_an_atomic_testing_with_an_asset_with_no_agent_expectations_must_be_saved() throws Exception {
+    // -- PREPARE --
+    savedInjector = this.injectorRepository.save(injector);
+    injectorContract.setInjector(savedInjector);
+    savedInjectorContract = this.injectorContractRepository.save(injectorContract);
+    savedAsset = this.assetRepository.save(asset);
+    Inject inject =
+        InjectFixture.createTechnicalInject(
+            savedInjectorContract, "AMSI Bypass - AMSI InitFailed", savedAsset);
+    savedInject = this.injectRepository.save(inject);
+    ExecutableInject executableInject =
+        new ExecutableInject(
+            false, true, savedInject, Collections.emptyList(), List.of(asset), null, null);
+    DetectionExpectation detectionExpectation =
+        ExpectationFixture.createTechnicalDetectionExpectation(asset);
+    PreventionExpectation preventionExpectation =
+        ExpectationFixture.createTechnicalPreventionExpectation(asset);
+
+    // -- EXECUTE --
+    injectExpectationService.buildAndSaveInjectExpectations(
+        executableInject, List.of(preventionExpectation, detectionExpectation));
+
+    // -- ASSERT --
+    assertEquals(2, injectExpectationRepository.findAll().spliterator().getExactSizeIfKnown());
+    assertEquals(
+        2,
+        injectExpectationRepository
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
+            .size());
+  }
+
+  @Test
+  @DisplayName("Given an atomic testing with an assetGroup and an agent its expectations must be created")
+  void given_an_atomic_testing_with_an_assetGroup_and_an_agent_expectations_must_be_saved() throws Exception {
+    // -- PREPARE --
+    savedInjector = this.injectorRepository.save(injector);
+    injectorContract.setInjector(savedInjector);
+    savedInjectorContract = this.injectorContractRepository.save(injectorContract);
+    savedAsset = this.assetRepository.save(asset);
+    agent.setLastSeen(Instant.now());
+    savedAgent = this.agentRepository.save(agent);
+    AssetGroup assetGroup = AssetGroupFixture.createAssetGroupWithAssets("asset group name", List.of(savedAsset));
+    AssetGroup savedAssetGroup = assetGroupRepository.save(assetGroup);
+    Inject inject =
+        InjectFixture.createTechnicalInjectWithAssetGroup(
+            savedInjectorContract, "AMSI Bypass - AMSI InitFailed", savedAssetGroup);
+    savedInject = this.injectRepository.save(inject);
+    ExecutableInject executableInject =
+        new ExecutableInject(
+            false, true, savedInject, Collections.emptyList(), Collections.emptyList(), List.of(assetGroup), null);
+    DetectionExpectation detectionExpectation =
+        ExpectationFixture.createDetectionExpectationForAssetGroup(assetGroup);
+    PreventionExpectation preventionExpectation =
+        ExpectationFixture.createPreventionExpectationForAssetGroup(assetGroup);
+
+    // -- EXECUTE --
+    injectExpectationService.buildAndSaveInjectExpectations(
+        executableInject, List.of(preventionExpectation, detectionExpectation));
+
+    // -- ASSERT --
+    assertEquals(6, injectExpectationRepository.findAll().spliterator().getExactSizeIfKnown());
+    assertEquals(
+        2,
+        injectExpectationRepository
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
+            .size());
+    assertEquals(
+        2,
+        injectExpectationRepository
+            .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
+            .size());
+    assertEquals(
+        2,
+        injectExpectationRepository
+            .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
+            .size());
+
+    //-- THEN --
+    agentRepository.delete(savedAgent);
+    assetGroupRepository.delete(savedAssetGroup);
+  }
+
+  @Test
+  @DisplayName("Given an atomic testing with an assetGroup and no agent its expectations must be created")
+  void given_an_atomic_testing_with_an_assetGroup_and_no_agent_expectations_must_be_saved() throws Exception {
+    // -- PREPARE --
+    savedInjector = this.injectorRepository.save(injector);
+    injectorContract.setInjector(savedInjector);
+    savedInjectorContract = this.injectorContractRepository.save(injectorContract);
+    savedAsset = this.assetRepository.save(asset);
+    savedAgent = this.agentRepository.save(agent);
+    AssetGroup assetGroup = AssetGroupFixture.createAssetGroupWithAssets("asset group name", List.of(savedAsset));
+    AssetGroup savedAssetGroup = assetGroupRepository.save(assetGroup);
+    Inject inject =
+        InjectFixture.createTechnicalInjectWithAssetGroup(
+            savedInjectorContract, "AMSI Bypass - AMSI InitFailed", savedAssetGroup);
+    savedInject = this.injectRepository.save(inject);
+    ExecutableInject executableInject =
+        new ExecutableInject(
+            false, true, savedInject, Collections.emptyList(), Collections.emptyList(), List.of(assetGroup), null);
+    DetectionExpectation detectionExpectation =
+        ExpectationFixture.createDetectionExpectationForAssetGroup(assetGroup);
+    PreventionExpectation preventionExpectation =
+        ExpectationFixture.createPreventionExpectationForAssetGroup(assetGroup);
+
+    // -- EXECUTE --
+    injectExpectationService.buildAndSaveInjectExpectations(
+        executableInject, List.of(preventionExpectation, detectionExpectation));
+
+    // -- ASSERT --
+    assertEquals(4, injectExpectationRepository.findAll().spliterator().getExactSizeIfKnown());
+    assertEquals(
+        2,
+        injectExpectationRepository
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
+            .size());
+    assertEquals(
+        2,
+        injectExpectationRepository
+            .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
+            .size());
+
+    //-- THEN --
+    assetGroupRepository.delete(savedAssetGroup);
   }
 }
