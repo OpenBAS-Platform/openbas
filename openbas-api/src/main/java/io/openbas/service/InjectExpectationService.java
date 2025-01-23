@@ -6,7 +6,6 @@ import static io.openbas.service.InjectExpectationUtils.*;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.utils.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
@@ -15,6 +14,7 @@ import io.openbas.database.specification.InjectExpectationSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.model.Expectation;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
+import io.openbas.utils.TargetType;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
