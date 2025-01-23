@@ -36,6 +36,7 @@ public class CalderaExecutorContextService {
   public void registerAbilities() {
     // Create the abilities if not exist for all injectors that need it
     List<Ability> abilities = this.abilities();
+
     Iterable<Injector> injectors = injectorService.injectors();
     injectors.forEach(
         injector -> {

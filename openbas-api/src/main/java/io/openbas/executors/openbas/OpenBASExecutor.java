@@ -25,6 +25,7 @@ public class OpenBASExecutor {
           OPENBAS_EXECUTOR_ID,
           OPENBAS_EXECUTOR_TYPE,
           OPENBAS_EXECUTOR_NAME,
+          null,
           getClass().getResourceAsStream("/img/icon-openbas.png"),
           new String[] {
             Endpoint.PLATFORM_TYPE.Windows.name(),

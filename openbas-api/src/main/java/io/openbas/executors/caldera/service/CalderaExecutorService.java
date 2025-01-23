@@ -85,6 +85,7 @@ public class CalderaExecutorService implements Runnable {
                 config.getId(),
                 CALDERA_EXECUTOR_TYPE,
                 CALDERA_EXECUTOR_NAME,
+                null,
                 getClass().getResourceAsStream("/img/icon-caldera.png"),
                 new String[] {
                   Endpoint.PLATFORM_TYPE.Windows.name(),

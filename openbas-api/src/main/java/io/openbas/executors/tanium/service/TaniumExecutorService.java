@@ -32,6 +32,8 @@ public class TaniumExecutorService implements Runnable {
   private static final int DELETE_TTL = 86400000; // 24 hours
   private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
   private static final String TANIUM_EXECUTOR_NAME = "Tanium";
+  private static final String TANIUM_EXECUTOR_DOCUMENTATION_LINK =
+      "https://docs.openbas.io/latest/deployment/ecosystem/executors/#tanium-agent";
 
   private final TaniumExecutorClient client;
 
@@ -79,6 +81,7 @@ public class TaniumExecutorService implements Runnable {
                 config.getId(),
                 TANIUM_EXECUTOR_TYPE,
                 TANIUM_EXECUTOR_NAME,
+                TANIUM_EXECUTOR_DOCUMENTATION_LINK,
                 getClass().getResourceAsStream("/img/icon-tanium.png"),
                 new String[] {
                   Endpoint.PLATFORM_TYPE.Windows.name(),
