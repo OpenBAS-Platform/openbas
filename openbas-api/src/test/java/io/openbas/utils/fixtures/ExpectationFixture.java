@@ -24,6 +24,17 @@ public class ExpectationFixture {
         Collections.emptyList());
   }
 
+  public static PreventionExpectation createPreventionExpectationAssetForAssetGroup(Asset asset) {
+    return PreventionExpectation.preventionExpectationForAsset(
+        SCORE,
+        "Prevention",
+        "Prevention Expectation",
+        asset,
+        true,
+        EXPIRATION_TIME_SIX_HOURS,
+        Collections.emptyList());
+  }
+
   public static PreventionExpectation createPreventionExpectationForAssetGroup(AssetGroup assetGroup) {
     return PreventionExpectation.preventionExpectationForAssetGroup(
         SCORE,
@@ -42,6 +53,17 @@ public class ExpectationFixture {
         "Detection Expectation",
         asset,
         false,
+        EXPIRATION_TIME_SIX_HOURS,
+        Collections.emptyList());
+  }
+
+  public static DetectionExpectation createDetectionExpectationAssetForAssetGroup(Asset asset) {
+    return DetectionExpectation.detectionExpectationForAsset(
+        SCORE,
+        "Detection",
+        "Detection Expectation",
+        asset,
+        true,
         EXPIRATION_TIME_SIX_HOURS,
         Collections.emptyList());
   }

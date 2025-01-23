@@ -1,7 +1,6 @@
 package io.openbas.rest.inject_expectation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
@@ -184,10 +183,15 @@ public class InjectExpectationServiceTest extends IntegrationTest {
         ExpectationFixture.createDetectionExpectationForAssetGroup(assetGroup);
     PreventionExpectation preventionExpectation =
         ExpectationFixture.createPreventionExpectationForAssetGroup(assetGroup);
+    DetectionExpectation detectionExpectationAsset = ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+        asset);
+    PreventionExpectation preventionExpectationAsset = ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
+        asset);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
-        executableInject, List.of(preventionExpectation, detectionExpectation));
+        executableInject,
+        List.of(preventionExpectation, detectionExpectation, preventionExpectationAsset, detectionExpectationAsset));
 
     // -- ASSERT --
     assertEquals(6, injectExpectationRepository.findAll().spliterator().getExactSizeIfKnown());
@@ -209,7 +213,7 @@ public class InjectExpectationServiceTest extends IntegrationTest {
 
     //-- THEN --
     agentRepository.delete(savedAgent);
-    assetGroupRepository.delete(savedAssetGroup);
+    //assetGroupRepository.delete(savedAssetGroup);
   }
 
   @Test
@@ -234,10 +238,15 @@ public class InjectExpectationServiceTest extends IntegrationTest {
         ExpectationFixture.createDetectionExpectationForAssetGroup(assetGroup);
     PreventionExpectation preventionExpectation =
         ExpectationFixture.createPreventionExpectationForAssetGroup(assetGroup);
+    DetectionExpectation detectionExpectationAsset = ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+        asset);
+    PreventionExpectation preventionExpectationAsset = ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
+        asset);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
-        executableInject, List.of(preventionExpectation, detectionExpectation));
+        executableInject,
+        List.of(preventionExpectation, detectionExpectation, detectionExpectationAsset, preventionExpectationAsset));
 
     // -- ASSERT --
     assertEquals(4, injectExpectationRepository.findAll().spliterator().getExactSizeIfKnown());
@@ -253,6 +262,6 @@ public class InjectExpectationServiceTest extends IntegrationTest {
             .size());
 
     //-- THEN --
-    assetGroupRepository.delete(savedAssetGroup);
+    //assetGroupRepository.delete(savedAssetGroup);
   }
 }
