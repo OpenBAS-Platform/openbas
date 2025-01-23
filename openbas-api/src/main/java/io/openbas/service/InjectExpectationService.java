@@ -208,7 +208,7 @@ public class InjectExpectationService {
         resolvedEndpoint.getAgents().stream()
             .map(Agent::getId)
             .distinct()
-            .toList(); // fixme agents could de empty/null
+            .toList();
     return this.injectExpectationRepository.findAll(
         Specification.where(InjectExpectationSpecification.type(expectationType))
             .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds)));

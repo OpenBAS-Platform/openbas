@@ -23,7 +23,7 @@ public class InjectExpectationSpecification {
     return (root, query, cb) ->
         cb.and(
             cb.equal(root.get("inject").get("id"), injectId),
-            root.get("agent").get("id").in(agentIds)); // fixme agentIds could be empty
+            root.get("agent").get("id").in(agentIds));
   }
 
   public static Specification<InjectExpectation> fromAssets(
