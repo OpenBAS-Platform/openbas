@@ -64,8 +64,7 @@ public class PlatformServiceSettingsTest {
 
     PlatformSettings settings = platformSettingsService.findSettings();
 
-    assertThat(
-        settings.getEnabledDevFeatures(), is(equalTo(List.of(PreviewFeature._RESERVED))));
+    assertThat(settings.getEnabledDevFeatures(), is(equalTo(List.of(PreviewFeature._RESERVED))));
   }
 
   @Test
@@ -73,12 +72,10 @@ public class PlatformServiceSettingsTest {
   public void
       given_config_has_valid_flags_when_same_flag_stated_twice_enabled_features_accounts_for_flag_once() {
     openbasConfig.setEnabledDevFeatures(
-        "%s, %s"
-            .formatted(PreviewFeature._RESERVED.name(), PreviewFeature._RESERVED.name()));
+        "%s, %s".formatted(PreviewFeature._RESERVED.name(), PreviewFeature._RESERVED.name()));
 
     PlatformSettings settings = platformSettingsService.findSettings();
 
-    assertThat(
-        settings.getEnabledDevFeatures(), is(equalTo(List.of(PreviewFeature._RESERVED))));
+    assertThat(settings.getEnabledDevFeatures(), is(equalTo(List.of(PreviewFeature._RESERVED))));
   }
 }

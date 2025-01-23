@@ -10,7 +10,7 @@ package io.openbas.rest.settings;
  * and their corresponding flag will be removed from this enum.
  */
 public enum PreviewFeature {
-   // Reserved for internal use.
+  // Reserved for internal use.
   _RESERVED;
 
   public static PreviewFeature fromStringIgnoreCase(String str) {
