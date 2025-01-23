@@ -1,13 +1,12 @@
 package io.openbas.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.RabbitmqConfig;
-import io.openbas.rest.settings.PreviewFeatureEnum;
+import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.annotation.Resource;
@@ -55,17 +54,31 @@ public class PlatformServiceSettingsTest {
 
     PlatformSettings settings = platformSettingsService.findSettings();
 
-    assertThat(settings.getEnabledDevFeatures(), is(equalTo(List.of())));
+    assertThat(settings.getEnabledDevFeatures(), is(empty()));
   }
 
   @Test
   @WithMockAdminUser
   public void given_config_has_valid_flags_enabled_features_accounts_for_these_flags() {
-    openbasConfig.setEnabledDevFeatures(PreviewFeatureEnum._RESERVED.name());
+    openbasConfig.setEnabledDevFeatures(PreviewFeature._RESERVED.name());
 
     PlatformSettings settings = platformSettingsService.findSettings();
 
     assertThat(
-        settings.getEnabledDevFeatures(), is(equalTo(List.of(PreviewFeatureEnum._RESERVED))));
+        settings.getEnabledDevFeatures(), is(equalTo(List.of(PreviewFeature._RESERVED))));
+  }
+
+  @Test
+  @WithMockAdminUser
+  public void
+      given_config_has_valid_flags_when_same_flag_stated_twice_enabled_features_accounts_for_flag_once() {
+    openbasConfig.setEnabledDevFeatures(
+        "%s, %s"
+            .formatted(PreviewFeature._RESERVED.name(), PreviewFeature._RESERVED.name()));
+
+    PlatformSettings settings = platformSettingsService.findSettings();
+
+    assertThat(
+        settings.getEnabledDevFeatures(), is(equalTo(List.of(PreviewFeature._RESERVED))));
   }
 }

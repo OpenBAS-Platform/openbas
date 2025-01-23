@@ -3,7 +3,7 @@ package io.openbas.rest.settings.response;
 import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.rest.settings.PreviewFeatureEnum;
+import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
 import jakarta.validation.constraints.NotNull;
@@ -118,7 +118,7 @@ public class PlatformSettings {
 
   // FEATURE FLAG
   @JsonProperty("enabled_dev_features")
-  private List<PreviewFeatureEnum> enabledDevFeatures = new ArrayList<>();
+  private List<PreviewFeature> enabledDevFeatures = new ArrayList<>();
 
   // PLATFORM MESSAGE
   @JsonProperty("platform_banner_by_level")
