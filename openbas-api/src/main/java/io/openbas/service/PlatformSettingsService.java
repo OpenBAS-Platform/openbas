@@ -16,6 +16,7 @@ import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
+import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.*;
 import io.openbas.rest.settings.response.OAuthProvider;
 import io.openbas.rest.settings.response.PlatformSettings;
@@ -217,7 +218,7 @@ public class PlatformSettingsService {
       platformSettings.setXtmOpenctiEnable(openCTIConfig.getEnable());
       platformSettings.setXtmOpenctiUrl(openCTIConfig.getUrl());
       platformSettings.setAiEnabled(aiConfig.isEnabled());
-      platformSettings.setAiHasToken(!aiConfig.getToken().isBlank());
+      platformSettings.setAiHasToken(StringUtils.hasText(aiConfig.getToken()));
       platformSettings.setAiType(aiConfig.getType());
       platformSettings.setAiModel(aiConfig.getModel());
       platformSettings.setExecutorCalderaEnable(calderaExecutorConfig.isEnable());
@@ -250,9 +251,23 @@ public class PlatformSettingsService {
     platformSettings.setPolicies(policies);
 
     // FEATURE FLAG
-    if (!openBASConfig.getDisabledDevFeatures().isEmpty()) {
-      platformSettings.setDisabledDevFeatures(
-          Arrays.stream(openBASConfig.getDisabledDevFeatures().split(",")).toList());
+    if (!StringUtils.hasText(openBASConfig.getEnabledDevFeatures())) {
+      platformSettings.setEnabledDevFeatures(new ArrayList<>());
+    } else {
+      platformSettings.setEnabledDevFeatures(
+          Arrays.stream(openBASConfig.getEnabledDevFeatures().split(","))
+              .map(
+                  featureStr -> {
+                    try {
+                      return PreviewFeature.fromStringIgnoreCase(featureStr.strip());
+                    } catch (IllegalArgumentException e) {
+                      log.warning("Unrecognised feature flag: " + e.getMessage());
+                      return null;
+                    }
+                  })
+              .filter(Objects::nonNull)
+              .distinct()
+              .toList());
     }
 
     // PLATFORM MESSAGE

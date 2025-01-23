@@ -141,6 +141,8 @@ export interface ArticleUpdateInput {
 
 export interface AssetAgentJob {
   asset_agent_agent?: string;
+  /** @deprecated */
+  asset_agent_asset?: string;
   asset_agent_command: string;
   asset_agent_id: string;
   asset_agent_inject?: string;
@@ -1754,12 +1756,19 @@ export interface InjectorContractInput {
 
 export interface InjectorContractOutput {
   injector_contract_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  /** Attack pattern Ids */
   injector_contract_attack_patterns?: string[];
+  /** Content */
   injector_contract_content: string;
+  /** Injector contract Id */
   injector_contract_id: string;
+  /** Injector type */
   injector_contract_injector_type?: string;
+  /** Labels */
   injector_contract_labels?: Record<string, string>;
+  /** Payload type */
   injector_contract_payload_type?: string;
+  /** Platforms */
   injector_contract_platforms?: (
     | "Linux"
     | "Windows"
@@ -1770,6 +1779,11 @@ export interface InjectorContractOutput {
     | "Internal"
     | "Unknown"
   )[];
+  /**
+   * Timestamp when the injector contract was last updated
+   * @format date-time
+   */
+  injector_contract_updated_at: string;
 }
 
 /** Injector contract */
@@ -2758,7 +2772,7 @@ export interface PlatformSettings {
   auth_openid_enable?: boolean;
   default_mailer?: string;
   default_reply_to?: string;
-  disabled_dev_features?: string[];
+  enabled_dev_features?: "_RESERVED"[];
   executor_caldera_enable?: boolean;
   executor_caldera_public_url?: string;
   executor_tanium_enable?: boolean;
@@ -3391,18 +3405,27 @@ export interface TeamCreateInput {
 export interface TeamOutput {
   team_contextual?: boolean;
   team_description?: string;
-  /** @uniqueItems true */
+  /**
+   * exercise ids
+   * @uniqueItems true
+   */
   team_exercises: string[];
   team_id: string;
   team_name: string;
   team_organization?: string;
-  /** @uniqueItems true */
+  /**
+   * scenario ids
+   * @uniqueItems true
+   */
   team_scenarios: string[];
   /** @uniqueItems true */
   team_tags?: string[];
   /** @format date-time */
   team_updated_at: string;
-  /** @uniqueItems true */
+  /**
+   * user ids
+   * @uniqueItems true
+   */
   team_users?: string[];
   /** @format int64 */
   team_users_number?: number;
