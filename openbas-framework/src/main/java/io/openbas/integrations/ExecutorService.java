@@ -33,8 +33,18 @@ public class ExecutorService {
 
   @Transactional
   public Executor register(
-      String id, String type, String name, InputStream iconData, String[] platforms)
+      String id,
+      String type,
+      String name,
+      String documentationUrl,
+      InputStream iconData,
+      String[] platforms)
       throws Exception {
+    // Sanity checks
+    if (id == null || id.isEmpty()) {
+      throw new IllegalArgumentException("Executor ID must not be null or empty.");
+    }
+
     if (iconData != null) {
       fileService.uploadStream(EXECUTORS_IMAGES_BASE_PATH, type + ".png", iconData);
     }
@@ -47,21 +57,17 @@ public class ExecutorService {
                 + type
                 + " already exists with a different ID, please delete it or contact your administrator.");
       }
+
+      executor = new Executor();
+      executor.setId(id);
     }
-    if (executor != null) {
-      executor.setName(name);
-      executor.setType(type);
-      executor.setPlatforms(platforms);
-      executorRepository.save(executor);
-    } else {
-      // save the executor
-      Executor newExecutor = new Executor();
-      newExecutor.setId(id);
-      newExecutor.setName(name);
-      newExecutor.setType(type);
-      newExecutor.setPlatforms(platforms);
-      executorRepository.save(newExecutor);
-    }
+
+    executor.setName(name);
+    executor.setType(type);
+    executor.setDoc(documentationUrl);
+    executor.setPlatforms(platforms);
+
+    executorRepository.save(executor);
     return executor;
   }
 
