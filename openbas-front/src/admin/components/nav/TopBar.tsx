@@ -1,8 +1,8 @@
-import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined, NotificationsOutlined } from '@mui/icons-material';
+import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined } from '@mui/icons-material';
 import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { makeStyles, useTheme } from '@mui/styles';
-import { useEffect, useState } from 'react';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 
 import { logout } from '../../../actions/Application';
@@ -196,21 +196,6 @@ const TopBar: React.FC = () => {
               >
                 <ImportantDevicesOutlined fontSize="medium" />
               </IconButton>
-            </Tooltip>
-            <Tooltip title={t('Notifications - Coming soon')}>
-              <span>
-                <IconButton
-                  size="medium"
-                  classes={{ root: classes.button }}
-                  aria-haspopup="true"
-                  component={Link}
-                  to="/admin/profile/notifications"
-                  color={location.pathname === '/admin/profile/notifications' ? 'primary' : 'inherit'}
-                  disabled={true}
-                >
-                  <NotificationsOutlined fontSize="medium" />
-                </IconButton>
-              </span>
             </Tooltip>
             <IconButton
               color="inherit"

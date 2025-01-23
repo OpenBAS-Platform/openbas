@@ -4,9 +4,9 @@ import { FunctionComponent } from 'react';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router';
 
-import { isNotEmptyField } from '../../utils/utils';
-import { useFormatter } from '../i18n';
-import type { Theme } from '../Theme';
+import { isNotEmptyField } from '../../../utils/utils';
+import { useFormatter } from '../../i18n';
+import type { Theme } from '../../Theme';
 
 const useStyles = makeStyles((theme: Theme) => ({
   drawer: {

@@ -1,6 +1,6 @@
 import { TableViewOutlined } from '@mui/icons-material';
 
-import RightMenu, { RightMenuEntry } from '../../../components/common/RightMenu';
+import RightMenu, { RightMenuEntry } from '../../../components/common/menu/RightMenu';
 
 const DataIngestionMenu = () => {
   const entries: RightMenuEntry[] = [

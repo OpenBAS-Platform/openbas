@@ -2,7 +2,7 @@ import { AttachMoneyOutlined, EmojiEventsOutlined, GroupsOutlined } from '@mui/i
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import * as React from 'react';
 
-import RightMenu, { RightMenuEntry } from '../../../../components/common/RightMenu';
+import RightMenu, { RightMenuEntry } from '../../../../components/common/menu/RightMenu';
 import type { Exercise, Scenario } from '../../../../utils/api-types';
 
 interface Numbers {
