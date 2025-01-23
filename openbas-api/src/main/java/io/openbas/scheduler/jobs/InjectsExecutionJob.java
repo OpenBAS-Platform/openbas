@@ -186,8 +186,8 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 // Status
-                this.injectService.initializeInjectStatus(
-                    inject.getId(),
+                injectService.initializeInjectStatus(
+                    inject,
                     ExecutionStatus.ERROR,
                     InjectStatusExecution.traceError(
                         "The inject is not ready to be executed (missing mandatory fields)"));
@@ -203,8 +203,7 @@ public class InjectsExecutionJob implements Job {
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
                 // Status
-                this.injectService.initializeInjectStatus(
-                    inject.getId(), ExecutionStatus.EXECUTING, null);
+                this.injectService.initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
@@ -227,7 +226,7 @@ public class InjectsExecutionJob implements Job {
             },
             () ->
                 this.injectService.initializeInjectStatus(
-                    inject.getId(),
+                    inject,
                     ExecutionStatus.ERROR,
                     InjectStatusExecution.traceError("Inject does not have a contract")));
   }

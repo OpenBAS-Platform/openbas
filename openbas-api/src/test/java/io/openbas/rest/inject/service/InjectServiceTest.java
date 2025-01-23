@@ -604,26 +604,15 @@ class InjectServiceTest {
   }
 
   @Test
-  void given_nonexisting_initializeInjectStatus_SHOULD_throw_ElementNotFoundException() {
-    ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
-    String injectId = "randomid";
-
-    assertThrows(
-        ElementNotFoundException.class,
-        () -> injectService.initializeInjectStatus(injectId, executionStatus, null));
-  }
-
-  @Test
   void given_valid_input_initializeInjectStatus_SHOULD_save_the_injectstatus() {
     ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
     String injectId = "injectid";
     Inject inject = new Inject();
     inject.setId(injectId);
     StatusPayload statusPayload = new StatusPayload();
-    when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
     when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
 
-    injectService.initializeInjectStatus(injectId, executionStatus, null);
+    injectService.initializeInjectStatus(inject, executionStatus, null);
 
     ArgumentCaptor<InjectStatus> statusCaptor = ArgumentCaptor.forClass(InjectStatus.class);
     verify(injectStatusRepository).save(statusCaptor.capture());

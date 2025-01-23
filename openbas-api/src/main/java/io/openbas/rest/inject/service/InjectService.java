@@ -380,12 +380,10 @@ public class InjectService {
   }
 
   @Transactional
-  public void initializeInjectStatus(
-      @NotNull final String injectId,
+  public Inject initializeInjectStatus(
+      @NotNull Inject inject,
       @NotNull final ExecutionStatus status,
       @Nullable final InjectStatusExecution trace) {
-
-    Inject inject = this.inject(injectId);
 
     InjectStatus injectStatus =
         inject
@@ -404,6 +402,8 @@ public class InjectService {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     injectStatusRepository.save(injectStatus);
+    inject.setStatus(injectStatus);
+    return inject;
   }
 
   /**
