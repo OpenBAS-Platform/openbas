@@ -205,10 +205,7 @@ public class InjectExpectationService {
       @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
     Endpoint resolvedEndpoint = endpointService.endpoint(asset.getId());
     List<String> agentIds =
-        resolvedEndpoint.getAgents().stream()
-            .map(Agent::getId)
-            .distinct()
-            .toList();
+        resolvedEndpoint.getAgents().stream().map(Agent::getId).distinct().toList();
     return this.injectExpectationRepository.findAll(
         Specification.where(InjectExpectationSpecification.type(expectationType))
             .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds)));
