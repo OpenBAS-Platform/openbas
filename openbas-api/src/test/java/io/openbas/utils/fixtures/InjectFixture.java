@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.injectors.challenge.model.ChallengeContent;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +18,16 @@ public class InjectFixture {
   private static Inject createInject(InjectorContract injectorContract, String title) {
     Inject inject = createInjectWithTitle(title);
     inject.setInjectorContract(injectorContract);
+    inject.setEnabled(true);
+    inject.setDependsDuration(0L);
+    return inject;
+  }
+
+  public static Inject createTechnicalInject(InjectorContract injectorContract, String title, Asset asset) {
+    Inject inject = new Inject();
+    inject.setTitle(title);
+    inject.setInjectorContract(injectorContract);
+    inject.setAssets(List.of(asset));
     inject.setEnabled(true);
     inject.setDependsDuration(0L);
     return inject;
