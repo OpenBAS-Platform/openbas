@@ -36,17 +36,19 @@ public class AtomicTestingUtils {
     // Loop through the expectations to separate them by target
     expectations.forEach(
         expectation -> {
-          if (expectation.getTeam_id() != null && expectation.getTeam_id() != null) {
+          if (expectation.getTeam_id() != null) {
             if (expectation.getUser_id() != null) {
               playerExpectations.add(expectation);
             } else {
               teamExpectations.add(expectation);
             }
           }
-          if (expectation.getAsset_id() != null && expectation.getAsset_id() != null) {
+          if (expectation.getAsset_id() != null && expectation.getAgent_id() == null) {
             assetExpectations.add(expectation);
           }
-          if (expectation.getAsset_group_id() != null && expectation.getAsset_group_id() != null) {
+          if (expectation.getAsset_group_id() != null
+              && expectation.getAsset_id() == null
+              && expectation.getAgent_id() == null) {
             assetGroupExpectations.add(expectation);
           }
         });
