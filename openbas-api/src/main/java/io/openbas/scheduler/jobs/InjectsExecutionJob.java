@@ -186,11 +186,13 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 // Status
-                injectService.initializeInjectStatus(
-                    inject,
-                    ExecutionStatus.ERROR,
-                    InjectStatusExecution.traceError(
-                        "The inject is not ready to be executed (missing mandatory fields)"));
+                InjectStatus injectStatus =
+                    injectService.initializeInjectStatus(
+                        inject.getId(),
+                        ExecutionStatus.ERROR,
+                        InjectStatusExecution.traceError(
+                            "The inject is not ready to be executed (missing mandatory fields)"));
+                inject.setStatus(injectStatus);
                 return;
               }
 
@@ -203,18 +205,21 @@ public class InjectsExecutionJob implements Job {
               ExecutableInject newExecutableInject = executableInject;
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
                 // Status
-                this.injectService.initializeInjectStatus(inject, ExecutionStatus.EXECUTING, null);
+                InjectStatus injectStatus =
+                    this.injectService.initializeInjectStatus(
+                        inject.getId(), ExecutionStatus.EXECUTING, null);
+                inject.setStatus(injectStatus);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
 
                 } catch (Exception e) {
-                  InjectStatus injectStatus =
+                  InjectStatus status =
                       inject
                           .getStatus()
                           .orElseThrow(() -> new IllegalArgumentException("Status should exists"));
-                  injectStatus.setName(ExecutionStatus.ERROR);
-                  injectStatusRepository.save(injectStatus);
+                  status.setName(ExecutionStatus.ERROR);
+                  injectStatusRepository.save(status);
                   return;
                 }
               }
@@ -224,11 +229,14 @@ public class InjectsExecutionJob implements Job {
                 executeInternal(newExecutableInject);
               }
             },
-            () ->
-                this.injectService.initializeInjectStatus(
-                    inject,
-                    ExecutionStatus.ERROR,
-                    InjectStatusExecution.traceError("Inject does not have a contract")));
+            () -> {
+              InjectStatus injectStatus =
+                  this.injectService.initializeInjectStatus(
+                      inject.getId(),
+                      ExecutionStatus.ERROR,
+                      InjectStatusExecution.traceError("Inject does not have a contract"));
+              inject.setStatus(injectStatus);
+            });
   }
 
   /**

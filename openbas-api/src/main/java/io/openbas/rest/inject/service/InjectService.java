@@ -380,24 +380,23 @@ public class InjectService {
   }
 
   @Transactional
-  public Inject initializeInjectStatus(
-      @NotNull Inject inject,
+  public InjectStatus initializeInjectStatus(
+      @NotNull final String injectId,
       @NotNull final ExecutionStatus status,
       @Nullable final InjectStatusExecution trace) {
 
+    Inject inject = this.inject(injectId);
 
-    //re-fetch the injectstatus here to avoid the transactional issue at the deserialization
+    // re-fetch the injectstatus here to avoid the transactional issue at the deserialization
     InjectStatus injectStatus =
         inject
             .getStatus()
-                .map(existingStatus  -> injectStatusRepository.findById(existingStatus.getId()).orElseThrow())
             .orElseGet(
                 () -> {
                   InjectStatus newStatus = new InjectStatus();
                   newStatus.setInject(inject);
                   return newStatus;
                 });
-
 
     if (trace != null) {
       injectStatus.getTraces().add(trace);
@@ -406,8 +405,7 @@ public class InjectService {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     injectStatusRepository.save(injectStatus);
-    inject.setStatus(injectStatus);
-    return inject;
+    return injectStatus;
   }
 
   /**
