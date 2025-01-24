@@ -5,6 +5,7 @@ import io.openbas.database.model.User;
 import io.openbas.rest.team.form.TeamCreateInput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TeamFixture {
 
@@ -40,15 +41,16 @@ public class TeamFixture {
     return getTeam(user, TEAM_NAME, false); // Call the other method with default value
   }
 
+  public static Team getDefaultTeam() {
+    return createTeamWithDefaultName();
+  }
+
   public static Team getEmptyTeam() {
-    Team t = new Team();
-    t.setName(TEAM_NAME);
-    return t;
+    return createTeamWithName(TEAM_NAME);
   }
 
   public static Team getTeam(final User user, String name, Boolean isContextualTeam) {
-    Team team = new Team();
-    team.setName(name);
+    Team team = createTeamWithName(name);
     team.setContextual(isContextualTeam);
     if (user != null) {
       team.setUsers(
@@ -58,6 +60,17 @@ public class TeamFixture {
             }
           });
     }
+    return team;
+  }
+
+  private static Team createTeamWithDefaultName() {
+    return createTeamWithName(null);
+  }
+
+  private static Team createTeamWithName(String name) {
+    String new_name = name == null ? "team-%s".formatted(UUID.randomUUID()) : name;
+    Team team = new Team();
+    team.setName(new_name);
     return team;
   }
 }

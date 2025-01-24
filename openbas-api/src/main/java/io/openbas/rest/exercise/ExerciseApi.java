@@ -7,14 +7,11 @@ import static io.openbas.database.specification.ExerciseSpecification.findGrante
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
-import static io.openbas.service.ImportService.EXPORT_ENTRY_EXERCISE;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.*;
@@ -26,6 +23,7 @@ import io.openbas.rest.exercise.exports.*;
 import io.openbas.rest.exercise.form.*;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
+import io.openbas.rest.exercise.service.ExportService;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectService;
@@ -36,20 +34,17 @@ import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Instant;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -101,6 +96,7 @@ public class ExerciseApi extends RestBehavior {
   private final VariableService variableService;
   private final ExerciseService exerciseService;
   private final TeamService teamService;
+  private final ExportService exportService;
 
   // endregion
 
@@ -749,61 +745,19 @@ public class ExerciseApi extends RestBehavior {
       @RequestParam(required = false) final boolean isWithVariableValues,
       HttpServletResponse response)
       throws IOException {
-    ObjectMapper objectMapper = mapper.copy();
-
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    ExerciseFileExport importExport =
-        ExerciseFileExport.fromExercise(
-                exercise, objectMapper, this.variableService, this.challengeService)
-            .withOptions(ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues));
+    int exportOptionsMask = ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues);
 
-    // Build the response
-    String infos =
-        "("
-            + (isWithTeams ? "with_teams" : "no_teams")
-            + " & "
-            + (isWithPlayers ? "with_players" : "no_players")
-            + " & "
-            + (isWithVariableValues ? "with_variable_values" : "no_variable_values")
-            + ")";
-    String zipName = (exercise.getName() + "_" + now().toString()) + "_" + infos + ".zip";
+    byte[] zippedExport = exportService.exportExerciseToZip(exercise, exportOptionsMask);
+    String zipName = exportService.getZipFileName(exercise, exportOptionsMask);
+
     response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
     response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
     response.setStatus(HttpServletResponse.SC_OK);
-    ZipOutputStream zipExport = new ZipOutputStream(response.getOutputStream());
-    ZipEntry zipEntry = new ZipEntry(exercise.getName() + ".json");
-    zipEntry.setComment(EXPORT_ENTRY_EXERCISE);
-    zipExport.putNextEntry(zipEntry);
-    zipExport.write(
-        importExport
-            .getObjectMapper()
-            .writerWithDefaultPrettyPrinter()
-            .writeValueAsBytes(importExport));
-    zipExport.closeEntry();
-    // Add the documents
-    importExport.getAllDocumentIds().stream()
-        .distinct()
-        .forEach(
-            docId -> {
-              Document doc =
-                  documentRepository.findById(docId).orElseThrow(ElementNotFoundException::new);
-              Optional<InputStream> docStream = fileService.getFile(doc);
-              if (docStream.isPresent()) {
-                try {
-                  ZipEntry zipDoc = new ZipEntry(doc.getTarget());
-                  zipDoc.setComment(EXPORT_ENTRY_ATTACHMENT);
-                  byte[] data = docStream.get().readAllBytes();
-                  zipExport.putNextEntry(zipDoc);
-                  zipExport.write(data);
-                  zipExport.closeEntry();
-                } catch (IOException e) {
-                  LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                }
-              }
-            });
-    zipExport.finish();
-    zipExport.close();
+    ServletOutputStream outputStream = response.getOutputStream();
+    outputStream.write(zippedExport);
+    outputStream.close();
   }
 
   @PostMapping(EXERCISE_URI + "/import")

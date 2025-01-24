@@ -47,6 +47,11 @@ public class InjectComposer extends ComposerBase<Inject> {
       return this;
     }
 
+    public Composer withId(String id) {
+      this.inject.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       tagComposers.forEach(TagComposer.Composer::persist);
@@ -57,6 +62,14 @@ public class InjectComposer extends ComposerBase<Inject> {
           challengeComposers.stream().map(composer -> composer.get().getId()).toList());
       this.inject.setContent(objectMapper.valueToTree(cc));
       injectRepository.save(inject);
+      return this;
+    }
+
+    @Override
+    public Composer delete() {
+      injectRepository.delete(inject);
+      challengeComposers.forEach(ChallengeComposer.Composer::delete);
+      tagComposers.forEach(TagComposer.Composer::delete);
       return this;
     }
 

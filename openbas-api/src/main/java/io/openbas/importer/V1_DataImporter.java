@@ -26,6 +26,7 @@ import io.openbas.rest.payload.service.PayloadCreationService;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
 import io.openbas.service.ScenarioService;
+import io.openbas.utils.Constants;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
 import java.time.Instant;
@@ -174,7 +175,6 @@ public class V1_DataImporter implements Importer {
 
   private Tag createTag(JsonNode jsonNode) {
     Tag tag = new Tag();
-    tag.setId(jsonNode.get("tag_id").textValue());
     tag.setName(jsonNode.get("tag_name").textValue());
     tag.setColor(jsonNode.get("tag_color").textValue());
     return tag;
@@ -189,7 +189,9 @@ public class V1_DataImporter implements Importer {
     }
 
     Exercise exercise = new Exercise();
-    exercise.setName(exerciseNode.get("exercise_name").textValue() + " (Import)");
+    exercise.setName(
+        exerciseNode.get("exercise_name").textValue()
+            + " %s".formatted(Constants.IMPORTED_OBJECT_NAME_SUFFIX));
     exercise.setDescription(exerciseNode.get("exercise_description").textValue());
     exercise.setSubtitle(exerciseNode.get("exercise_subtitle").textValue());
     exercise.setHeader(exerciseNode.get("exercise_message_header").textValue());
@@ -213,7 +215,9 @@ public class V1_DataImporter implements Importer {
     }
 
     Scenario scenario = new Scenario();
-    scenario.setName(scenarioNode.get("scenario_name").textValue() + " (Import)");
+    scenario.setName(
+        scenarioNode.get("scenario_name").textValue()
+            + " %s".formatted(Constants.IMPORTED_OBJECT_NAME_SUFFIX));
     scenario.setDescription(scenarioNode.get("scenario_description").textValue());
     scenario.setSubtitle(scenarioNode.get("scenario_subtitle").textValue());
     scenario.setCategory(scenarioNode.get("scenario_category").textValue());
@@ -320,8 +324,12 @@ public class V1_DataImporter implements Importer {
     } else if (savedScenario != null) {
       document.setScenarios(Set.of(savedScenario));
     }
-    document.setTags(
-        iterableToSet(tagRepository.findAllById(resolveJsonIds(nodeDoc, "document_tags"))));
+    // need to get real database-bound ids for tags
+    List<String> tagIds =
+        resolveJsonIds(nodeDoc, "document_tags").stream()
+            .map(tid -> baseIds.get(tid).getId())
+            .toList();
+    document.setTags(iterableToSet(tagRepository.findAllById(tagIds)));
     document.setType(contentType);
     Document savedDocument = this.documentRepository.save(document);
     baseIds.put(nodeDoc.get("document_id").textValue(), savedDocument);
