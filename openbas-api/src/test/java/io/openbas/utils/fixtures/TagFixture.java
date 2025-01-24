@@ -1,7 +1,6 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.model.Tag;
-import java.util.UUID;
 
 public class TagFixture {
   public static final String TAG_ID = "id";
@@ -17,7 +16,6 @@ public class TagFixture {
 
   public static Tag getTagWithText(String text) {
     Tag tag = new Tag();
-    tag.setId(UUID.randomUUID().toString());
     tag.setName(text);
     tag.setColor("#FFFFFF");
     return tag;

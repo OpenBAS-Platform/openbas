@@ -16,9 +16,20 @@ public class ObjectiveComposer extends ComposerBase<Objective> {
       this.objective = objective;
     }
 
+    public Composer withId(String id) {
+      this.objective.setId(id);
+      return this;
+    }
+
     @Override
     public Composer persist() {
       objectiveRepository.save(objective);
+      return this;
+    }
+
+    @Override
+    public Composer delete() {
+      objectiveRepository.delete(objective);
       return this;
     }
 

@@ -260,6 +260,13 @@ public class Exercise implements Base {
   @JsonProperty("exercise_lessons_categories")
   private List<LessonsCategory> lessonsCategories = new ArrayList<>();
 
+  @ArraySchema(schema = @Schema(type = "string"))
+  @Getter
+  @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("exercise_variables")
+  private List<Variable> variables = new ArrayList<>();
+
   // region transient
   @JsonProperty("exercise_injects_statistics")
   public Map<String, Long> getInjectStatistics() {

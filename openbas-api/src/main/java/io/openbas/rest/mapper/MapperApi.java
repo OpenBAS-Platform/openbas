@@ -21,6 +21,7 @@ import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
 import io.openbas.service.InjectImportService;
 import io.openbas.service.MapperService;
+import io.openbas.utils.Constants;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
@@ -90,7 +91,11 @@ public class MapperApi extends RestBehavior {
       String jsonMappers = mapperService.exportMappers(exportMapperInput.getIdsToExport());
 
       String rightNow = DateTimeFormatter.ofPattern("yyyyMMdd").format(LocalDateTime.now());
-      String name = exportMapperInput.getName().replace("(Import)", "").replace(" ", "");
+      String name =
+          exportMapperInput
+              .getName()
+              .replace(Constants.IMPORTED_OBJECT_NAME_SUFFIX, "")
+              .replace(" ", "");
       String exportFileName = name.length() > 15 ? name.substring(0, 15) : name;
       String filename = MessageFormat.format("{0}-{1}.json", exportFileName, rightNow);
 

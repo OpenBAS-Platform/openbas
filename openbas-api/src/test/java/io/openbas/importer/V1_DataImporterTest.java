@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.utils.Constants;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -39,7 +40,8 @@ class V1_DataImporterTest extends IntegrationTest {
 
   private JsonNode importNode;
 
-  public static final String EXERCISE_NAME = "Test Exercise (Import)";
+  public static final String EXERCISE_NAME =
+      "Test Exercise %s".formatted(Constants.IMPORTED_OBJECT_NAME_SUFFIX);
   public static final String TEAM_NAME = "Animation team";
   public static final String USER_EMAIL = "Romuald.Lemesle@openbas.io";
   public static final String ORGANIZATION_NAME = "Filigran";
