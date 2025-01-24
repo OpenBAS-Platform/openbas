@@ -3,9 +3,7 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
-
 import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 
 public class AssetGroupFixture {
@@ -26,7 +24,8 @@ public class AssetGroupFixture {
     return assetGroupInput;
   }
 
-  public static AssetGroup createAssetGroupWithAssets(@NotNull final String name, List<Asset> assets) {
+  public static AssetGroup createAssetGroupWithAssets(
+      @NotNull final String name, List<Asset> assets) {
     AssetGroup assetGroup = new AssetGroup();
     assetGroup.setName(name);
     assetGroup.setDescription("An asset group");
