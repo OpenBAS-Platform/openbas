@@ -385,15 +385,19 @@ public class InjectService {
       @NotNull final ExecutionStatus status,
       @Nullable final InjectStatusExecution trace) {
 
+
+    //re-fetch the injectstatus here to avoid the transactional issue at the deserialization
     InjectStatus injectStatus =
         inject
             .getStatus()
+                .map(existingStatus  -> injectStatusRepository.findById(existingStatus.getId()).orElseThrow())
             .orElseGet(
                 () -> {
                   InjectStatus newStatus = new InjectStatus();
                   newStatus.setInject(inject);
                   return newStatus;
                 });
+
 
     if (trace != null) {
       injectStatus.getTraces().add(trace);

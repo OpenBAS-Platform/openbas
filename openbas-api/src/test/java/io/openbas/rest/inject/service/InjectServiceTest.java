@@ -607,10 +607,17 @@ class InjectServiceTest {
   void given_valid_input_initializeInjectStatus_SHOULD_save_the_injectstatus() {
     ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
     String injectId = "injectid";
+    String injectStatusID = "injectStatusID";
+    InjectStatus injectStatus = new InjectStatus();
+    injectStatus.setId(injectStatusID);
     Inject inject = new Inject();
     inject.setId(injectId);
+    inject.setStatus(injectStatus);
+    injectStatus.setInject(inject);
     StatusPayload statusPayload = new StatusPayload();
+
     when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
+    when(injectStatusRepository.findById(injectStatusID)).thenReturn(Optional.of(injectStatus));
 
     injectService.initializeInjectStatus(inject, executionStatus, null);
 
