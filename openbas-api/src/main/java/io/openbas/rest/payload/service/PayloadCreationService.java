@@ -11,11 +11,10 @@ import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Log
 @RequiredArgsConstructor

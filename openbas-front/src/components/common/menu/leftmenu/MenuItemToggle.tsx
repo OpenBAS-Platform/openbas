@@ -27,7 +27,7 @@ const MenuItemToggle: React.FC<Props> = ({ navOpen, onClick }) => {
     <MenuItem
       dense
       onClick={onClick}
-      aria-label={navOpen ? t('Collapse menu') : t('Expand menu')}
+      aria-label={navOpen ? 'Collapse menu' : 'Expand menu'}
     >
       <ListItemIcon style={{ minWidth: 20 }}>
         {navOpen ? <ChevronLeft /> : <ChevronRight />}
