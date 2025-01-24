@@ -136,7 +136,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: mkdir -p release/openbas
-      - run: cp -a ./openbas-api/target/openbas-api.jar release/openbas/ && cp -a ./openbas-api/src/main/resources/application.properties release/openbas/
+      - run: cp -a ./openbas-api/target/openbas-api.jar release/openbas/ && cp -a ./openbas-api/target/classes/application.properties release/openbas/
       - run:
           working_directory: ~/openbas/release
           command: tar -zcvf "openbas-$(date '+%Y%m%d').tar.gz" openbas
@@ -158,7 +158,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: mkdir -p release/openbas
-      - run: cp -a ./openbas-api/target/openbas-api.jar release/openbas/ && cp -a ./openbas-api/src/main/resources/application.properties release/openbas/
+      - run: cp -a ./openbas-api/target/openbas-api.jar release/openbas/ && cp -a ./openbas-api/target/classes/application.properties release/openbas/
       - run:
           working_directory: ~/openbas_musl/release
           command: tar -zcvf "openbas-$(date '+%Y%m%d')_musl.tar.gz" openbas
