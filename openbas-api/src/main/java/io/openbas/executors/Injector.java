@@ -1,6 +1,6 @@
 package io.openbas.executors;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,7 +60,7 @@ public abstract class Injector {
       ExecutionProcess executionProcess = process(execution, executableInject);
       execution.setAsync(executionProcess.isAsync());
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
     } finally {
       execution.stop();
     }
@@ -96,7 +96,7 @@ public abstract class Injector {
                         doc.getName(), doc.getOriginalFilename(), content, doc.getContentType()));
               } catch (Exception e) {
                 String message = "Error getting direct attachment " + doc.getName();
-                execution.addTrace(traceError(message));
+                execution.addTrace(getNewErrorTrace(message, ExecutionTraceAction.EXECUTION));
               }
             });
     // Add attachments from configuration
@@ -113,7 +113,7 @@ public abstract class Injector {
             // Can't fetch the attachments, ignore
             String docInfo = askedDocument.map(Document::getName).orElse(documentId);
             String message = "Error getting doc attachment " + docInfo;
-            execution.addTrace(traceError(message));
+            execution.addTrace(getNewErrorTrace(message, ExecutionTraceAction.EXECUTION));
           }
         });
     return resolved;

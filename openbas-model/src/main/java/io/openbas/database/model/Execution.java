@@ -26,11 +26,6 @@ public class Execution {
   private boolean async;
 
   @Getter
-  @Setter
-  @JsonProperty("execution_expected_count")
-  private Integer expectedCount;
-
-  @Getter
   @JsonProperty("execution_start")
   private Instant startTime;
 
@@ -40,7 +35,7 @@ public class Execution {
   @Getter
   @Setter
   @JsonProperty("execution_traces")
-  private List<InjectStatusExecution> traces = new ArrayList<>();
+  private List<ExecutionTraces> traces = new ArrayList<>();
 
   public Execution() {
     // Default constructor for serialization
@@ -60,7 +55,7 @@ public class Execution {
     this.stopTime = now();
   }
 
-  public void addTrace(InjectStatusExecution context) {
+  public void addTrace(ExecutionTraces context) {
     ExecutionTraceStatus status = context.getStatus();
     if (ExecutionTraceStatus.SUCCESS.equals(status) || ExecutionTraceStatus.INFO.equals(status)) {
       LOGGER.log(Level.INFO, context.getMessage());

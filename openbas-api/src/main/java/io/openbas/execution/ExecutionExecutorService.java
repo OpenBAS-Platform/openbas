@@ -10,8 +10,12 @@ import io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorContextServic
 import io.openbas.executors.openbas.service.OpenBASExecutorContextService;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.service.TaniumExecutorContextService;
+import io.openbas.rest.exception.DetailedException;
+import io.openbas.database.model.InjectStatus;
 import io.openbas.service.AssetGroupService;
+import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.stream.Stream;
@@ -34,6 +38,7 @@ public class ExecutionExecutorService {
   private final OpenBASExecutorContextService openBASExecutorContextService;
   private final InjectStatusRepository injectStatusRepository;
 
+  @Transactional
   public ExecutableInject launchExecutorContext(ExecutableInject executableInject, Inject inject)
       throws InterruptedException {
     // First, get the assets of this injects
@@ -55,15 +60,16 @@ public class ExecutionExecutorService {
           try {
             launchExecutorContextForAsset(inject, asset);
             atLeastOneExecution.set(true);
-          } catch (RuntimeException e) {
+          } catch (DetailedException e) {
             ExecutionTraceStatus traceStatus =
                 e.getMessage().startsWith("Asset error")
                     ? ExecutionTraceStatus.ASSET_INACTIVE
                     : ExecutionTraceStatus.ERROR;
-
-            injectStatus
-                .getTraces()
-                .add(InjectStatusExecution.traceError(traceStatus, e.getMessage()));
+            injectStatus.addTrace(
+                traceStatus,
+                e.getMessage(),
+                ExecutionTraceAction.COMPLETE,
+                (Agent) e.getAdditionalData().get("agent"));
             this.injectStatusRepository.save(injectStatus);
           }
         });
@@ -82,31 +88,42 @@ public class ExecutionExecutorService {
     if (executor == null) {
       log.log(Level.SEVERE, "Cannot find the executor for the asset " + assetEndpoint.getName());
     } else if (!assetEndpoint.getActive()) {
-      throw new RuntimeException("Asset error: " + assetEndpoint.getName() + " is inactive");
+      throw new DetailedException(
+          "Asset error: " + assetEndpoint.getName() + " is inactive",
+          Map.of(
+              "assetName", assetEndpoint.getName(), "agent", assetEndpoint.getAgents().getFirst()));
     } else {
       switch (executor.getType()) {
         case "openbas_caldera" -> {
           if (!this.calderaExecutorConfig.isEnable()) {
-            throw new RuntimeException("Fatal error: Caldera executor is not enabled");
+            throw new DetailedException(
+                "Fatal error: Caldera executor is not enabled",
+                Map.of("agent", assetEndpoint.getAgents().getFirst()));
           }
           this.calderaExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         }
         case "openbas_tanium" -> {
           if (!this.taniumExecutorConfig.isEnable()) {
-            throw new RuntimeException("Fatal error: Tanium executor is not enabled");
+            throw new DetailedException(
+                "Fatal error: Tanium executor is not enabled",
+                Map.of("agent", assetEndpoint.getAgents().getFirst()));
           }
           this.taniumExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         }
         case "openbas_crowdstrike" -> {
           if (!this.crowdStrikeExecutorConfig.isEnable()) {
-            throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
+            throw new DetailedException(
+                "Fatal error: CrowdStrike executor is not enabled",
+                Map.of("agent", assetEndpoint.getAgents().getFirst()));
           }
           this.crowdStrikeExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         }
         case "openbas_agent" ->
             this.openBASExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint);
         default ->
-            throw new RuntimeException("Fatal error: Unsupported executor " + executor.getType());
+            throw new DetailedException(
+                "Fatal error: Unsupported executor " + executor.getType(),
+                Map.of("agent", assetEndpoint.getAgents().getFirst()));
       }
     }
   }

@@ -1,7 +1,7 @@
 package io.openbas.injectors.openbas;
 
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.database.model.InjectExpectationSignature.*;
-import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
@@ -235,8 +235,9 @@ public class OpenBASImplantExecutor extends Injector {
     // Check assets target
     if (assets.isEmpty()) {
       execution.addTrace(
-          traceError(
-              "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
+          getNewErrorTrace(
+              "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)",
+              ExecutionTraceAction.PROCESS_FINISH));
     }
 
     // Compute expectations
@@ -257,10 +258,6 @@ public class OpenBASImplantExecutor extends Injector {
               return;
             }
             injectExpectationSignatures = spawnSignatures(inject, payload);
-            execution.setExpectedCount(
-                payload.getPrerequisites().size()
-                    + (payload.getCleanupCommand() != null ? 1 : 0)
-                    + payload.getNumberOfActions());
           }
           computeExpectationsForAsset(
               expectations, content, asset, isInGroup, injectExpectationSignatures);

@@ -1,17 +1,18 @@
 package io.openbas.executors;
 
-import static io.openbas.database.model.InjectStatusExecution.traceInfo;
 import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
+import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.Injector;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
+import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.util.Optional;
@@ -35,6 +36,7 @@ public class Executor {
   private QueueService queueService;
 
   private ExecutionExecutorService executionExecutorService;
+  @Autowired private InjectStatusService injectStatusService;
 
   @Autowired
   public void setQueueService(QueueService queueService) {
@@ -79,13 +81,16 @@ public class Executor {
     try {
       String jsonInject = mapper.writeValueAsString(executableInject);
       status.setName(ExecutionStatus.PENDING); // FIXME: need to be test with HTTP Collector
-      status
-          .getTraces()
-          .add(traceInfo("The inject has been published and is now waiting to be consumed."));
+      status.addTrace(
+          ExecutionTraceStatus.INFO,
+          "The inject has been published and is now waiting to be consumed.",
+          ExecutionTraceAction.EXECUTION,
+          null);
       queueService.publish(injectorContract.getInjector().getType(), jsonInject);
     } catch (Exception e) {
       status.setName(ExecutionStatus.ERROR);
-      status.getTraces().add(InjectStatusExecution.traceError(e.getMessage()));
+      status.setTrackingEndDate(Instant.now());
+      status.addErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH);
     } finally {
       return injectStatusRepository.save(status);
     }
@@ -103,7 +108,7 @@ public class Executor {
             injectorContract.getInjector().getType(), io.openbas.executors.Injector.class);
     Execution execution = executor.executeInjection(executableInject);
     Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
-    InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
+    InjectStatus completeStatus = injectStatusService.fromExecution(execution, executedInject);
     return injectStatusRepository.save(completeStatus);
   }
 

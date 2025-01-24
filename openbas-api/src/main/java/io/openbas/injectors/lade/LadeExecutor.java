@@ -1,10 +1,11 @@
 package io.openbas.injectors.lade;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceInfo;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Execution;
+import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.execution.ExecutableInject;
@@ -46,10 +47,13 @@ public class LadeExecutor extends Injector {
         default -> throw new UnsupportedOperationException(ladeType + " not supported");
       }
       String message = "Lade " + ladeType + " sent with workflow (" + actionWorkflowId + ")";
-      execution.addTrace(traceInfo(message, List.of(actionWorkflowId)));
+      execution.addTrace(
+          getNewInfoTrace(
+              message, ExecutionTraceAction.EXECUTION, List.of(actionWorkflowId)));
+      return new ExecutionProcess(true);
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      return new ExecutionProcess(false);
     }
-    return new ExecutionProcess(true);
   }
 }

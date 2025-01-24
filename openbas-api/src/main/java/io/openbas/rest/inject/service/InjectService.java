@@ -3,13 +3,13 @@ package io.openbas.rest.inject.service;
 import static io.openbas.utils.FilterUtilsJpa.*;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
-import static java.time.Instant.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
+import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
@@ -22,7 +22,6 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
 import io.openbas.rest.inject.form.InjectBulkUpdateSupportedOperations;
-import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.service.AssetGroupService;
@@ -30,7 +29,6 @@ import io.openbas.service.AssetService;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
@@ -74,20 +72,6 @@ public class InjectService {
     return this.injectRepository
         .findById(injectId)
         .orElseThrow(() -> new ElementNotFoundException("Inject not found with id: " + injectId));
-  }
-
-  @Transactional(rollbackOn = Exception.class)
-  public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
-    // build status
-    InjectStatus injectStatus = new InjectStatus();
-    injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(now());
-    injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
-    injectStatus.setTrackingTotalExecutionTime(0L);
-    // Save status for inject
-    inject.setStatus(injectStatus);
-    return injectRepository.save(inject);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -395,35 +379,6 @@ public class InjectService {
                 + scenarioOrExerciseId);
       }
     }
-  }
-
-  @Transactional
-  public InjectStatus initializeInjectStatus(
-      @NotNull final String injectId,
-      @NotNull final ExecutionStatus status,
-      @Nullable final InjectStatusExecution trace) {
-
-    Inject inject = this.inject(injectId);
-
-    // re-fetch the injectstatus here to avoid the transactional issue at the deserialization
-    InjectStatus injectStatus =
-        inject
-            .getStatus()
-            .orElseGet(
-                () -> {
-                  InjectStatus newStatus = new InjectStatus();
-                  newStatus.setInject(inject);
-                  return newStatus;
-                });
-
-    if (trace != null) {
-      injectStatus.getTraces().add(trace);
-    }
-    injectStatus.setName(status);
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
-    injectStatusRepository.save(injectStatus);
-    return injectStatus;
   }
 
   /**

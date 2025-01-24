@@ -1,10 +1,11 @@
 package io.openbas.injectors.ovh;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.model.Execution;
+import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.database.model.Inject;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
@@ -57,7 +58,7 @@ public class OvhSmsExecutor extends Injector {
               String email = user.getEmail();
               if (!StringUtils.hasLength(phone)) {
                 String message = "Sms fail for " + email + ": no phone number";
-                execution.addTrace(traceError(message));
+                execution.addTrace(getNewErrorTrace(message, ExecutionTraceAction.COMPLETE));
               } else {
                 try {
                   String callResult = smsService.sendSms(context, phone, smsMessage);
@@ -75,14 +76,17 @@ public class OvhSmsExecutor extends Injector {
                             + " contains error ("
                             + callResult
                             + ")";
-                    execution.addTrace(traceError(message));
+                    execution.addTrace(
+                        getNewErrorTrace(message, ExecutionTraceAction.COMPLETE));
                   } else {
                     String message =
                         "Sms sent to " + email + " through " + phone + " (" + callResult + ")";
-                    execution.addTrace(traceSuccess(message));
+                    execution.addTrace(
+                        getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE));
                   }
                 } catch (Exception e) {
-                  execution.addTrace(traceError(e.getMessage()));
+                  execution.addTrace(
+                      getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
                 }
               }
             });
@@ -98,8 +102,6 @@ public class OvhSmsExecutor extends Injector {
               .toList();
 
       injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
-
-      return new ExecutionProcess(false);
     }
     return new ExecutionProcess(false);
   }

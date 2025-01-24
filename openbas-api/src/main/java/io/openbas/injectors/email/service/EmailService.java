@@ -1,11 +1,14 @@
 package io.openbas.injectors.email.service;
 
-import static io.openbas.database.model.InjectStatusExecution.*;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
 import static io.openbas.helper.TemplateHelper.buildContextualContent;
 import static java.util.stream.Collectors.joining;
 
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
+import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.execution.ExecutionContext;
 import jakarta.activation.DataHandler;
 import jakarta.mail.Message;
@@ -69,7 +72,8 @@ public class EmailService {
     this.sendEmailWithRetry(mimeMessage);
     String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
     List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
-    execution.addTrace(traceSuccess("Mail sent to " + emails, userIds));
+    execution.addTrace(
+        getNewSuccessTrace("Mail sent to " + emails, ExecutionTraceAction.EXECUTION, userIds));
     // Store message in Imap after sending
     storeMessageImap(execution, mimeMessage);
   }
@@ -101,7 +105,8 @@ public class EmailService {
       this.sendEmailWithRetry(mimeMessage);
     }
     List<String> userIds = List.of(userContext.getUser().getId());
-    execution.addTrace(traceSuccess("Mail sent to " + email, userIds));
+    execution.addTrace(
+        getNewSuccessTrace("Mail sent to " + email, ExecutionTraceAction.EXECUTION, userIds));
     // Store message in Imap after sending
     storeMessageImap(execution, mimeMessage);
   }
@@ -120,14 +125,20 @@ public class EmailService {
       for (int i = 0; i < 3; i++) {
         try {
           imapService.storeSentMessage(mimeMessage);
-          execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
+          execution.addTrace(
+              getNewSuccessTrace(
+                  "Mail successfully stored in IMAP", ExecutionTraceAction.COMPLETE));
           return;
         } catch (Exception e) {
-          execution.addTrace(traceInfo("Fail to store mail in IMAP" + e.getMessage()));
+          execution.addTrace(
+              getNewInfoTrace(
+                  "Fail to store mail in IMAP " + e.getMessage(), ExecutionTraceAction.EXECUTION));
           Thread.sleep(2000);
         }
       }
-      execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts"));
+      execution.addTrace(
+          getNewErrorTrace(
+              "Fail to store mail in IMAP after 3 attempts", ExecutionTraceAction.COMPLETE));
     }
   }
 

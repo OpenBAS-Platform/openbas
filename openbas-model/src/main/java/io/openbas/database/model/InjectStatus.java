@@ -3,8 +3,10 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
-import java.time.Duration;
-import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -21,35 +23,60 @@ public class InjectStatus extends BaseInjectStatus {
   @JsonProperty("status_payload_output")
   private StatusPayload payloadOutput;
 
-  public static InjectStatus fromExecution(Execution execution, Inject executedInject) {
-    InjectStatus injectStatus = executedInject.getStatus().orElse(new InjectStatus());
-    injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setInject(executedInject);
-    injectStatus.getTraces().addAll(execution.getTraces());
-    int numberOfElements = execution.getTraces().size();
-    int numberOfError =
-        (int)
-            execution.getTraces().stream()
-                .filter(ex -> ExecutionTraceStatus.ERROR.equals(ex.getStatus()))
-                .count();
-    int numberOfSuccess =
-        (int)
-            execution.getTraces().stream()
-                .filter(ex -> ExecutionTraceStatus.SUCCESS.equals(ex.getStatus()))
-                .count();
-    injectStatus.setTrackingTotalError(numberOfError);
-    injectStatus.setTrackingTotalSuccess(numberOfSuccess);
-    injectStatus.setTrackingTotalCount(
-        execution.getExpectedCount() != null ? execution.getExpectedCount() : numberOfElements);
-    ExecutionStatus globalStatus =
-        numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
-    ExecutionStatus finalStatus =
-        numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
-    injectStatus.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
-    injectStatus.setTrackingEndDate(Instant.now());
-    injectStatus.setTrackingTotalExecutionTime(
-        Duration.between(injectStatus.getTrackingSentDate(), injectStatus.getTrackingEndDate())
-            .getSeconds());
-    return injectStatus;
+  @OneToMany(
+      mappedBy = "injectStatus",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.EAGER)
+  @JsonProperty("status_traces")
+  private List<ExecutionTraces> traces = new ArrayList<>();
+
+  // region transient
+  public List<String> statusIdentifiers() {
+    return this.getTraces().stream().flatMap(ex -> ex.getIdentifiers().stream()).toList();
+  }
+
+  public Map<String, Agent> getStatusMapIdentifierAgent() {
+    Map<String, Agent> info = new HashMap<>();
+    this.getTraces()
+        .forEach(
+            t -> {
+              if (t.getAgent() != null
+                  && t.getIdentifiers() != null
+                  && !t.getIdentifiers().isEmpty()) {
+                info.put(t.getIdentifiers().getFirst(), t.getAgent());
+              }
+            });
+    return info;
+  }
+
+  public void addTrace(ExecutionTraces trace) {
+    this.traces.add(trace);
+    trace.setInjectStatus(this);
+  }
+
+  public void addTrace(
+      ExecutionTraceStatus status, String message, ExecutionTraceAction action, Agent agent) {
+    ExecutionTraces newTrace = new ExecutionTraces(this, status, List.of(), message, action, agent);
+    this.getTraces().add(newTrace);
+  }
+
+  public void addMayBePreventedTrace(String message, ExecutionTraceAction action, Agent agent) {
+    ExecutionTraces newTrace =
+        new ExecutionTraces(
+            this, ExecutionTraceStatus.MAYBE_PREVENTED, List.of(), message, action, agent);
+    this.getTraces().add(newTrace);
+  }
+
+  public void addSuccess(String message, ExecutionTraceAction action, Agent agent) {
+    ExecutionTraces newTrace =
+        new ExecutionTraces(this, ExecutionTraceStatus.SUCCESS, List.of(), message, action, agent);
+    this.getTraces().add(newTrace);
+  }
+
+  public void addErrorTrace(String message, ExecutionTraceAction action) {
+    ExecutionTraces newTrace =
+        new ExecutionTraces(this, ExecutionTraceStatus.ERROR, List.of(), message, action, null);
+    this.getTraces().add(newTrace);
   }
 }

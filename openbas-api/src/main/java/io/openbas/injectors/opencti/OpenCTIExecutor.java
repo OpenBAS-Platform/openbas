@@ -1,6 +1,6 @@
 package io.openbas.injectors.opencti;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.injectors.opencti.OpenCTIContract.OPENCTI_CREATE_CASE;
 
 import io.openbas.database.model.*;
@@ -30,7 +30,7 @@ public class OpenCTIExecutor extends Injector {
     try {
       openCTIService.createCase(execution, name, description, attachments);
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
     }
   }
 
@@ -39,7 +39,7 @@ public class OpenCTIExecutor extends Injector {
     try {
       openCTIService.createReport(execution, name, description, attachments);
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
     }
   }
 
