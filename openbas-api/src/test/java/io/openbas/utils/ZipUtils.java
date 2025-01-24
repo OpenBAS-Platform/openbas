@@ -23,18 +23,11 @@ public class ZipUtils {
   }
 
   public static String streamToString(InputStream is) {
-    StringBuilder sb = new StringBuilder();
-    byte[] buffer = new byte[1024];
-    int read = 0;
-    while (true) {
-      try {
-        if (!((read = is.read(buffer, 0, 1024)) >= 0)) break;
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-      sb.append(new String(buffer, 0, read));
+    try {
+      return new String(is.readAllBytes());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
-    return sb.toString();
   }
 
   public static byte[] streamToBytes(InputStream is) {
