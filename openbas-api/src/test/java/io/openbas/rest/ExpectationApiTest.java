@@ -17,15 +17,14 @@ import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 @TestInstance(PER_CLASS)
 public class ExpectationApiTest extends IntegrationTest {
@@ -33,8 +32,7 @@ public class ExpectationApiTest extends IntegrationTest {
   public static final String API_EXPECTATIONS = "/api/expectations/";
   public static final String API_INJECTS_EXPECTATIONS = "/api/injects/expectations";
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
   private static SecurityPlatform SAVEDSECURITYPLATFORM;
   private static Injector SAVEDINJECTOR;
@@ -43,30 +41,22 @@ public class ExpectationApiTest extends IntegrationTest {
   private static Agent SAVEDAGENT;
   private static Inject SAVEDINJECT;
 
-  @Autowired
-  private AssetRepository assetRepository;
-  @Autowired
-  private AgentRepository agentRepository;
-  @Autowired
-  private SecurityPlatformRepository securityPlatformRepository;
-  @Autowired
-  private InjectRepository injectRepository;
-  @Autowired
-  private InjectorRepository injectorRepository;
-  @Autowired
-  private InjectorContractRepository injectorContractRepository;
-  @Autowired
-  private InjectStatusRepository injectStatusRepository;
-  @Autowired
-  private InjectExpectationService injectExpectationService;
-  @Autowired
-  private InjectExpectationRepository injectExpectationRepository;
+  @Autowired private AssetRepository assetRepository;
+  @Autowired private AgentRepository agentRepository;
+  @Autowired private SecurityPlatformRepository securityPlatformRepository;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private InjectorRepository injectorRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectStatusRepository injectStatusRepository;
+  @Autowired private InjectExpectationService injectExpectationService;
+  @Autowired private InjectExpectationRepository injectExpectationRepository;
 
   @BeforeAll
   void beforeAll() {
-    SAVEDSECURITYPLATFORM = securityPlatformRepository.save(
-        SecurityPlatformFixture.createSecurityPlatform("My platform",
-            SecurityPlatform.SECURITY_TYPE.SOAR));
+    SAVEDSECURITYPLATFORM =
+        securityPlatformRepository.save(
+            SecurityPlatformFixture.createSecurityPlatform(
+                "My platform", SecurityPlatform.SECURITY_TYPE.SOAR));
     InjectorContract injectorContract =
         InjectorContractFixture.createInjectorContract(
             "84b3b140-6b7d-47d9-9b61-8fa05882fc7e",
@@ -83,8 +73,10 @@ public class ExpectationApiTest extends IntegrationTest {
     Agent agent = AgentFixture.createAgent(SAVEDASSET, "external01");
     agent.setLastSeen(Instant.now());
     SAVEDAGENT = this.agentRepository.save(agent);
-    SAVEDINJECT = this.injectRepository.save(InjectFixture.createTechnicalInject(
-        SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", SAVEDASSET));
+    SAVEDINJECT =
+        this.injectRepository.save(
+            InjectFixture.createTechnicalInject(
+                SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", SAVEDASSET));
     ExecutableInject executableInject =
         new ExecutableInject(
             false, true, SAVEDINJECT, Collections.emptyList(), List.of(SAVEDASSET), null, null);
@@ -105,21 +97,25 @@ public class ExpectationApiTest extends IntegrationTest {
   @DisplayName("Update expectation result")
   @WithMockAdminUser
   void updateInjectExpectationResults() throws Exception {
-    //--PREPARE--
-    String injectExpectationId = injectExpectationRepository
-        .findAllByInjectAndAsset(SAVEDINJECT.getId(), SAVEDASSET.getId()).getFirst().getId();
+    // --PREPARE--
+    String injectExpectationId =
+        injectExpectationRepository
+            .findAllByInjectAndAsset(SAVEDINJECT.getId(), SAVEDASSET.getId())
+            .getFirst()
+            .getId();
     ExpectationUpdateInput expectationUpdateInput = buildExpectationUpdateInput();
 
-    //-- EXECUTE--
-    String response = mvc.perform(
-            put(API_EXPECTATIONS + "/" + injectExpectationId)
-                .content(asJsonString(expectationUpdateInput))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().is2xxSuccessful())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
+    // -- EXECUTE--
+    String response =
+        mvc.perform(
+                put(API_EXPECTATIONS + "/" + injectExpectationId)
+                    .content(asJsonString(expectationUpdateInput))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
     // --ASSERT--
     assertEquals(40.0, JsonPath.read(response, "$.inject_expectation_results[0].score"));
@@ -127,32 +123,27 @@ public class ExpectationApiTest extends IntegrationTest {
 
   @Test
   @DisplayName("Delete expectation result")
-  void deleteInjectExpectationResult() throws Exception {
-  }
+  void deleteInjectExpectationResult() throws Exception {}
 
   @Test
   @DisplayName("Get Inject Expectations for a Specific Source")
   @WithMockAdminUser
-  void getInjectExpectationsAssetsNotFilledForSource() throws Exception {
-  }
+  void getInjectExpectationsAssetsNotFilledForSource() throws Exception {}
 
   @Test
   @DisplayName("Get Prevention Inject Expectations for a Specific Source")
   @WithMockAdminUser
-  void getInjectPreventionExpectationsNotFilledForSource() throws Exception {
-  }
+  void getInjectPreventionExpectationsNotFilledForSource() throws Exception {}
 
   @Test
   @DisplayName("Get Detection Inject Expectations for a Specific Source")
   @WithMockAdminUser
-  void getInjectDetectionExpectationsNotFilledForSource() throws Exception {
-  }
+  void getInjectDetectionExpectationsNotFilledForSource() throws Exception {}
 
   @Test
   @DisplayName("Update Inject expectation")
   @WithMockAdminUser
-  void updateInjectExpectation() throws Exception {
-  }
+  void updateInjectExpectation() throws Exception {}
 
   @AfterAll
   void afterAll() {
@@ -162,10 +153,9 @@ public class ExpectationApiTest extends IntegrationTest {
     assetRepository.delete(SAVEDASSET);
     injectorContractRepository.delete(SAVEDINJECTORCONTRACT);
     injectorRepository.delete(SAVEDINJECTOR);
-
   }
 
-  //--PRIVATE--
+  // --PRIVATE--
   private ExpectationUpdateInput buildExpectationUpdateInput() {
     ExpectationUpdateInput expectationUpdateInput = new ExpectationUpdateInput();
     expectationUpdateInput.setSourceId(SAVEDSECURITYPLATFORM.getId());

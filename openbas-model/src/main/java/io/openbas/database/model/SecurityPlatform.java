@@ -35,9 +35,7 @@ public class SecurityPlatform extends Asset {
     ISPM,
   }
 
-  /**
-   * Used by collectors to set collector_id
-   */
+  /** Used by collectors to set collector_id */
   @Column(name = "asset_external_reference")
   @JsonProperty("asset_external_reference")
   private String externalReference;
@@ -63,11 +61,9 @@ public class SecurityPlatform extends Asset {
   @Schema(type = "string")
   private Document logoDark;
 
-  public SecurityPlatform() {
-  }
+  public SecurityPlatform() {}
 
-  public SecurityPlatform(
-      String id, String type, String name, SECURITY_TYPE securityPlatformType) {
+  public SecurityPlatform(String id, String type, String name, SECURITY_TYPE securityPlatformType) {
     super(id, type, name);
     this.securityPlatformType = securityPlatformType;
   }
