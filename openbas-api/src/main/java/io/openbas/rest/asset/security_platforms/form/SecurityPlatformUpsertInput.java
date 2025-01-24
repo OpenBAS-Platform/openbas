@@ -15,7 +15,7 @@ public class SecurityPlatformUpsertInput extends AssetInput {
 
   @NotNull(message = MANDATORY_MESSAGE)
   @JsonProperty("security_platform_type")
-  private SecurityPlatform.SECURITY_PLATFORM_TYPE securityPlatformType;
+  private SecurityPlatform.SECURITY_TYPE securityPlatformType;
 
   @JsonProperty("security_platform_logo_light")
   private String logoLight;
