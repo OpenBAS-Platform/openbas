@@ -349,34 +349,47 @@ public class ExerciseApiStatusTest {
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
     input.setStatus(ExerciseStatus.PAUSED);
 
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                put(EXERCISE_URI + "/" + RUNNING_EXERCISE.getId() + "/status")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+    Instant mockInstant = REFERENCE_TIME;
+    Clock clock = Clock.fixed(REFERENCE_TIME, ZoneId.of("UTC"));
 
-    List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+    try (MockedStatic<Instant> mockedInstant = mockStatic(Instant.class, CALLS_REAL_METHODS)) {
+      try (MockedStatic<Clock> mockedClock = mockStatic(Clock.class, CALLS_REAL_METHODS)) {
 
-    // --ASSERT--
-    Optional<Exercise> exercise =
-        exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
-    if (exercise.isPresent()) {
-      Exercise responseExercise = exercise.get();
-      Optional<Instant> pauseOpt = responseExercise.getCurrentPause();
-      pauseOpt.ifPresent(
-          instant ->
-              assertEquals(instant.truncatedTo(MINUTES), Instant.now().truncatedTo(MINUTES)));
+        mockedInstant.when(Instant::now).thenReturn(mockInstant);
+        // we need this other mock because the production code
+        // inconsistently calls Instant.now() and LocalDateTime.now()
+        mockedClock.when(Clock::systemDefaultZone).thenReturn(clock);
+
+        // --EXECUTE--
+        String response =
+                mvc.perform(
+                                put(EXERCISE_URI + "/" + RUNNING_EXERCISE.getId() + "/status")
+                                        .content(asJsonString(input))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(status().is2xxSuccessful())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        List<ExecutableInject> injects = injectHelper.getInjectsToRun();
+
+        // --ASSERT--
+        Optional<Exercise> exercise =
+                exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
+        if (exercise.isPresent()) {
+          Exercise responseExercise = exercise.get();
+          Optional<Instant> pauseOpt = responseExercise.getCurrentPause();
+          pauseOpt.ifPresent(
+                  instant ->
+                          assertEquals(instant.truncatedTo(MINUTES), mockInstant.truncatedTo(MINUTES)));
+        }
+        assertEquals(
+                Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.RUNNING.name()),
+                JsonPath.read(response, "$.exercise_next_possible_status"));
+        assertEquals(0, injects.size());
+      }
     }
-    assertEquals(
-        Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.RUNNING.name()),
-        JsonPath.read(response, "$.exercise_next_possible_status"));
-    assertEquals(0, injects.size());
   }
 
   @DisplayName("Check an exercise from running to canceled")
@@ -388,32 +401,46 @@ public class ExerciseApiStatusTest {
     ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
     input.setStatus(ExerciseStatus.CANCELED);
 
-    // --EXECUTE--
-    String response =
-        mvc.perform(
-                put(EXERCISE_URI + "/" + exercise.getId() + "/status")
-                    .content(asJsonString(input))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+    Instant mockInstant = REFERENCE_TIME;
+    Clock clock = Clock.fixed(REFERENCE_TIME, ZoneId.of("UTC"));
 
-    // --ASSERT--
-    Optional<Exercise> exerciseOpt =
-        exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
-    if (exerciseOpt.isPresent()) {
-      Exercise responseExercise = exerciseOpt.get();
-      Optional<Instant> endOpt = responseExercise.getEnd();
-      endOpt.ifPresent(
-          instant ->
-              assertEquals(instant.truncatedTo(MINUTES), Instant.now().truncatedTo(MINUTES)));
+    try (MockedStatic<Instant> mockedInstant = mockStatic(Instant.class, CALLS_REAL_METHODS)) {
+      try (MockedStatic<Clock> mockedClock = mockStatic(Clock.class, CALLS_REAL_METHODS)) {
+
+        mockedInstant.when(Instant::now).thenReturn(mockInstant);
+        // we need this other mock because the production code
+        // inconsistently calls Instant.now() and LocalDateTime.now()
+        mockedClock.when(Clock::systemDefaultZone).thenReturn(clock);
+
+        // --EXECUTE--
+        String response =
+                mvc.perform(
+                                put(EXERCISE_URI + "/" + exercise.getId() + "/status")
+                                        .content(asJsonString(input))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(status().is2xxSuccessful())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        // --ASSERT--
+
+        Optional<Exercise> exerciseOpt =
+                exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
+        if (exerciseOpt.isPresent()) {
+          Exercise responseExercise = exerciseOpt.get();
+          Optional<Instant> endOpt = responseExercise.getEnd();
+          endOpt.ifPresent(
+                  instant ->
+                          assertEquals(instant.truncatedTo(MINUTES), mockInstant.truncatedTo(MINUTES)));
+        }
+        assertEquals(
+                List.of(ExerciseStatus.SCHEDULED.name()),
+                JsonPath.read(response, "$.exercise_next_possible_status"));
+        exerciseRepository.delete(exercise);
+      }
     }
-    assertEquals(
-        List.of(ExerciseStatus.SCHEDULED.name()),
-        JsonPath.read(response, "$.exercise_next_possible_status"));
-    exerciseRepository.delete(exercise);
   }
 
   @DisplayName("Check an exercise next status")
