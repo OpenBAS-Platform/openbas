@@ -85,7 +85,7 @@ public class InjectExpectationService {
                   expectationAsset.getType());
           // Every expectation assets are filled
           if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
-            this.computeExpectationGroup(
+            this.computeExpectationAsset(
                 expectationAsset,
                 expectationAgents,
                 collector.getId(),
@@ -118,6 +118,8 @@ public class InjectExpectationService {
 
     return injectExpectation;
   }
+
+  // Compute Expectations
 
   // Compute results for expectations
   public InjectExpectation computeExpectation(
