@@ -13,6 +13,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.specification.InjectExpectationSpecification;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.model.Expectation;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.utils.TargetType;
 import jakarta.annotation.Resource;
@@ -52,8 +53,12 @@ public class InjectExpectationService {
   // Update from collectors
   public InjectExpectation updateInjectExpectation(
       @NotBlank String expectationId, @Valid @NotNull InjectExpectationUpdateInput input) {
-    InjectExpectation injectExpectation = this.findInjectExpectation(expectationId).orElseThrow();
-    Collector collector = this.collectorRepository.findById(input.getCollectorId()).orElseThrow();
+    InjectExpectation injectExpectation =
+        this.findInjectExpectation(expectationId).orElseThrow(ElementNotFoundException::new);
+    Collector collector =
+        this.collectorRepository
+            .findById(input.getCollectorId())
+            .orElseThrow(ElementNotFoundException::new);
     injectExpectation =
         this.computeExpectation(
             injectExpectation,
@@ -145,8 +150,8 @@ public class InjectExpectationService {
       String sourceId,
       String sourceType,
       String sourceName) {
-    boolean success =
-        expectationAgents.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore()));
+    boolean success = expectationAgents.size() > 0 ?
+        expectationAgents.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore())) : false;
     computeResult(
         expectationAsset,
         sourceId,

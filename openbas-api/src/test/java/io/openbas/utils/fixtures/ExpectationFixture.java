@@ -4,79 +4,91 @@ import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import java.util.Collections;
 
 public class ExpectationFixture {
 
-  static Long EXPIRATION_TIME_SIX_HOURS = 21600L;
-
   static Double SCORE = 100.0;
 
-  public static PreventionExpectation createTechnicalPreventionExpectation(Asset asset) {
+  public static PreventionExpectation createTechnicalPreventionExpectation(
+      Asset asset, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAsset(
         SCORE,
         "Prevention",
         "Prevention Expectation",
         asset,
         false,
-        EXPIRATION_TIME_SIX_HOURS,
+        expirationTime,
         Collections.emptyList());
   }
 
-  public static PreventionExpectation createPreventionExpectationAssetForAssetGroup(Asset asset) {
+  public static PreventionExpectation createPreventionExpectationAssetForAssetGroup(
+      Asset asset, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAsset(
         SCORE,
         "Prevention",
         "Prevention Expectation",
         asset,
         true,
-        EXPIRATION_TIME_SIX_HOURS,
+        expirationTime,
         Collections.emptyList());
   }
 
   public static PreventionExpectation createPreventionExpectationForAssetGroup(
-      AssetGroup assetGroup) {
+      AssetGroup assetGroup, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAssetGroup(
         SCORE,
         "Prevention",
         "Prevention Expectation",
         assetGroup,
         false,
-        EXPIRATION_TIME_SIX_HOURS,
+        expirationTime,
         Collections.emptyList());
   }
 
-  public static DetectionExpectation createTechnicalDetectionExpectation(Asset asset) {
+  public static DetectionExpectation createTechnicalDetectionExpectation(
+      Asset asset, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
         SCORE,
         "Detection",
         "Detection Expectation",
         asset,
         false,
-        EXPIRATION_TIME_SIX_HOURS,
+        expirationTime,
         Collections.emptyList());
   }
 
-  public static DetectionExpectation createDetectionExpectationAssetForAssetGroup(Asset asset) {
+  public static DetectionExpectation createDetectionExpectationAssetForAssetGroup(
+      Asset asset, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
         SCORE,
         "Detection",
         "Detection Expectation",
         asset,
         true,
-        EXPIRATION_TIME_SIX_HOURS,
+        expirationTime,
         Collections.emptyList());
   }
 
   public static DetectionExpectation createDetectionExpectationForAssetGroup(
-      AssetGroup assetGroup) {
+      AssetGroup assetGroup, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAssetGroup(
         SCORE,
         "Detection",
         "Detection Expectation",
         assetGroup,
         false,
-        EXPIRATION_TIME_SIX_HOURS,
+        expirationTime,
         Collections.emptyList());
+  }
+
+  public static ExpectationUpdateInput getExpectationUpdateInput(String sourceId, Double score) {
+    return ExpectationUpdateInput.builder()
+        .sourceId(sourceId)
+        .sourceName("security-platform-name")
+        .sourceType("security-platform-type")
+        .score(score)
+        .build();
   }
 }

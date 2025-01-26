@@ -47,4 +47,17 @@ public class EndpointFixture {
     input.setExternalReference(externalReference);
     return input;
   }
+
+  public static Endpoint createEndpoint() {
+    Endpoint endpoint = new Endpoint();
+    endpoint.setCreatedAt(Instant.now());
+    endpoint.setUpdatedAt(Instant.now());
+    endpoint.setName("Endpoint test");
+    endpoint.setDescription("Endpoint description");
+    endpoint.setHostname("Windows Hostname");
+    endpoint.setIps(IPS);
+    endpoint.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
+    endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
+    return endpoint;
+  }
 }

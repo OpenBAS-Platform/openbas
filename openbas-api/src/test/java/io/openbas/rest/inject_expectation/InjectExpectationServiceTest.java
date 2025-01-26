@@ -1,5 +1,6 @@
 package io.openbas.rest.inject_expectation;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.openbas.IntegrationTest;
@@ -10,8 +11,6 @@ import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.service.InjectExpectationService;
 import io.openbas.utils.fixtures.*;
-import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.*;
@@ -23,76 +22,87 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ExtendWith(MockitoExtension.class)
 public class InjectExpectationServiceTest extends IntegrationTest {
 
+  private static final String INJECTION_NAME = "AMSI Bypass - AMSI InitFailed";
+  private static final String INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0144";
+  private static final String INJECTOR_NAME = "OpenBAS Implant";
+  private static final String INJECTOR_TYPE = "openbas_implant";
+  static Long EXPIRATION_TIME_SIX_HOURS = 21600L;
+
   @Autowired private InjectExpectationRepository injectExpectationRepository;
-
   @Autowired private InjectorContractRepository injectorContractRepository;
-
   @Autowired private InjectorRepository injectorRepository;
-
   @Autowired private InjectRepository injectRepository;
-
   @Autowired private AssetRepository assetRepository;
-
   @Autowired private AssetGroupRepository assetGroupRepository;
-
   @Autowired private AgentRepository agentRepository;
-
   @Autowired private InjectExpectationService injectExpectationService;
 
-  private static Injector SAVEDINJECTOR;
-  private static InjectorContract SAVEDINJECTORCONTRACT;
-  private static Asset ASSET;
-  private static Asset SAVEDASSET;
+  private static Injector savedInjector;
+  private static InjectorContract savedInjectorContract;
+  private static Asset savedAsset;
 
   @BeforeAll
   void beforeAll() {
     InjectorContract injectorContract =
         InjectorContractFixture.createInjectorContract(
-            "84b3b140-6b7d-47d9-9b61-8fa05882fc7e",
-            Map.of("en", "AMSI Bypass - AMSI InitFailed"),
-            "{\"label\": {\"en\": \"AMSI Bypass - AMSI InitFailed\", \"fr\": \"AMSI Bypass - AMSI InitFailed\"}, \"config\": {\"type\": \"openbas_implant\", \"label\": {\"en\": \"OpenBAS Implant\", \"fr\": \"OpenBAS Implant\"}, \"expose\": true, \"color_dark\": \"#000000\", \"color_light\": \"#000000\"}, \"fields\": [{\"key\": \"assets\", \"type\": \"asset\", \"label\": \"Assets\", \"readOnly\": false, \"mandatory\": false, \"cardinality\": \"n\", \"defaultValue\": [], \"linkedFields\": [], \"linkedValues\": [], \"mandatoryGroups\": [\"assets\", \"assetgroups\"]}, {\"key\": \"assetgroups\", \"type\": \"asset-group\", \"label\": \"Asset groups\", \"readOnly\": false, \"mandatory\": false, \"cardinality\": \"n\", \"defaultValue\": [], \"linkedFields\": [], \"linkedValues\": [], \"mandatoryGroups\": [\"assets\", \"assetgroups\"]}, {\"key\": \"expectations\", \"type\": \"expectation\", \"label\": \"Expectations\", \"readOnly\": false, \"mandatory\": false, \"cardinality\": \"n\", \"defaultValue\": [], \"linkedFields\": [], \"linkedValues\": [], \"mandatoryGroups\": null, \"predefinedExpectations\": [{\"expectation_name\": \"Expect inject to be prevented\", \"expectation_type\": \"PREVENTION\", \"expectation_score\": 100.0, \"expectation_description\": null, \"expectation_expiration_time\": 21600, \"expectation_expectation_group\": false}, {\"expectation_name\": \"Expect inject to be detected\", \"expectation_type\": \"DETECTION\", \"expectation_score\": 100.0, \"expectation_description\": null, \"expectation_expiration_time\": 21600, \"expectation_expectation_group\": false}]}, {\"key\": \"obfuscator\", \"type\": \"choice\", \"label\": \"Obfuscator\", \"choices\": [{\"label\": \"base64\", \"value\": \"base64\", \"information\": \"CMD does not support base64 obfuscation\"}, {\"label\": \"plain-text\", \"value\": \"plain-text\", \"information\": \"\"}], \"readOnly\": false, \"mandatory\": false, \"cardinality\": \"1\", \"defaultValue\": [\"plain-text\"], \"linkedFields\": [], \"linkedValues\": [], \"mandatoryGroups\": null}], \"manual\": false, \"context\": {}, \"platforms\": [\"Windows\"], \"variables\": [{\"key\": \"user\", \"type\": \"String\", \"label\": \"User that will receive the injection\", \"children\": [{\"key\": \"user.id\", \"type\": \"String\", \"label\": \"Id of the user in the platform\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"user.email\", \"type\": \"String\", \"label\": \"Email of the user\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"user.firstname\", \"type\": \"String\", \"label\": \"First name of the user\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"user.lastname\", \"type\": \"String\", \"label\": \"Last name of the user\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"user.lang\", \"type\": \"String\", \"label\": \"Language of the user\", \"children\": [], \"cardinality\": \"1\"}], \"cardinality\": \"1\"}, {\"key\": \"exercise\", \"type\": \"Object\", \"label\": \"Exercise of the current injection\", \"children\": [{\"key\": \"exercise.id\", \"type\": \"String\", \"label\": \"Id of the user in the platform\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"exercise.name\", \"type\": \"String\", \"label\": \"Name of the exercise\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"exercise.description\", \"type\": \"String\", \"label\": \"Description of the exercise\", \"children\": [], \"cardinality\": \"1\"}], \"cardinality\": \"1\"}, {\"key\": \"teams\", \"type\": \"String\", \"label\": \"List of team name for the injection\", \"children\": [], \"cardinality\": \"n\"}, {\"key\": \"player_uri\", \"type\": \"String\", \"label\": \"Player interface platform link\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"challenges_uri\", \"type\": \"String\", \"label\": \"Challenges interface platform link\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"scoreboard_uri\", \"type\": \"String\", \"label\": \"Scoreboard interface platform link\", \"children\": [], \"cardinality\": \"1\"}, {\"key\": \"lessons_uri\", \"type\": \"String\", \"label\": \"Lessons learned interface platform link\", \"children\": [], \"cardinality\": \"1\"}], \"contract_id\": \"84b3b140-6b7d-47d9-9b61-8fa05882fc7e\", \"needs_executor\": true, \"is_atomic_testing\": true, \"contract_attack_patterns_external_ids\": []}");
-    ASSET = AssetFixture.createDefaultAsset("asset name");
-    SAVEDINJECTOR =
-        this.injectorRepository.save(
-            InjectorFixture.createInjector(
-                "49229430-b5b5-431f-ba5b-f36f599b0144", "OpenBAS Implant", "openbas_implant"));
-    injectorContract.setInjector(SAVEDINJECTOR);
-    SAVEDINJECTORCONTRACT = this.injectorContractRepository.save(injectorContract);
-    SAVEDASSET = this.assetRepository.save(ASSET);
+            INJECTOR_ID, Map.of("en", INJECTION_NAME), "{}");
+    savedInjector =
+        injectorRepository.save(
+            InjectorFixture.createInjector(INJECTOR_ID, INJECTOR_NAME, INJECTOR_TYPE));
+    injectorContract.setInjector(savedInjector);
+
+    savedInjectorContract = injectorContractRepository.save(injectorContract);
+    savedAsset = assetRepository.save(AssetFixture.createDefaultAsset("asset name"));
   }
 
   @AfterAll
   void afterAll() {
-    assetRepository.delete(SAVEDASSET);
-    injectorContractRepository.delete(SAVEDINJECTORCONTRACT);
-    injectorRepository.delete(SAVEDINJECTOR);
+    assetRepository.deleteAll();
   }
 
   @AfterEach
   void afterEach() {
     injectExpectationRepository.deleteAll();
+    injectRepository.deleteAll();
+    assetGroupRepository.deleteAll();
+    agentRepository.deleteAll();
+  }
+
+  private Inject saveInject(InjectorContract injectorContract) {
+    Inject inject =
+        InjectFixture.createTechnicalInject(injectorContract, INJECTION_NAME, savedAsset);
+    return injectRepository.save(inject);
+  }
+
+  private ExecutableInject createExecutableInject(
+      Inject savedInject, List<AssetGroup> assetGroups) {
+    return new ExecutableInject(
+        false, true, savedInject, emptyList(), List.of(savedAsset), assetGroups, emptyList());
+  }
+
+  private Agent createAgent(String external01) {
+    Agent agent = AgentFixture.createAgent(savedAsset, external01);
+    return this.agentRepository.save(agent);
+  }
+
+  private AssetGroup createAssetGroup(String name) {
+    AssetGroup assetGroup = AssetGroupFixture.createAssetGroupWithAssets(name, List.of(savedAsset));
+    return assetGroupRepository.save(assetGroup);
   }
 
   @Test
-  @DisplayName(
-      "Given an atomic testing with an asset linked to an agent its expectations must be created")
-  void given_an_atomic_testing_with_an_asset_linked_to_an_agent_expectations_must_be_saved()
-      throws Exception {
+  @DisplayName("Expectations should be created for asset linked to agent")
+  void expectationsForAssetLinkedToAgent() {
     // -- PREPARE --
-    Agent agent = AgentFixture.createAgent(ASSET, "external01");
-    agent.setLastSeen(Instant.now());
-    Agent savedAgent = this.agentRepository.save(agent);
-    Inject inject =
-        InjectFixture.createTechnicalInject(
-            SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", SAVEDASSET);
-    Inject savedInject = this.injectRepository.save(inject);
-    ExecutableInject executableInject =
-        new ExecutableInject(
-            false, true, savedInject, Collections.emptyList(), List.of(ASSET), null, null);
+    Agent savedAgent = createAgent("external01");
+    Inject savedInject = saveInject(savedInjectorContract);
+    ExecutableInject executableInject = createExecutableInject(savedInject, emptyList());
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectation(ASSET);
+        ExpectationFixture.createTechnicalDetectionExpectation(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectation(ASSET);
+        ExpectationFixture.createTechnicalPreventionExpectation(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -103,36 +113,27 @@ public class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), SAVEDASSET.getId())
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
         injectExpectationRepository
             .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
             .size());
-
-    // -- THEN--
-    agentRepository.delete(savedAgent);
-    injectRepository.delete(savedInject);
   }
 
   @Test
-  @DisplayName(
-      "Given an atomic testing with an asset with no agent its expectations must be created")
-  void given_an_atomic_testing_with_an_asset_with_no_agent_expectations_must_be_saved()
-      throws Exception {
+  @DisplayName("Expectations should be created for asset with no agent")
+  void expectationsForAssetWithNoAgent() {
     // -- PREPARE --
-    Inject inject =
-        InjectFixture.createTechnicalInject(
-            SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", SAVEDASSET);
-    Inject savedInject = this.injectRepository.save(inject);
-    ExecutableInject executableInject =
-        new ExecutableInject(
-            false, true, savedInject, Collections.emptyList(), List.of(ASSET), null, null);
+    Inject savedInject = saveInject(savedInjectorContract);
+    ExecutableInject executableInject = createExecutableInject(savedInject, emptyList());
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectation(ASSET);
+        ExpectationFixture.createTechnicalDetectionExpectation(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectation(ASSET);
+        ExpectationFixture.createTechnicalPreventionExpectation(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -143,46 +144,31 @@ public class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), SAVEDASSET.getId())
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
-
-    // -- THEN --
-    injectRepository.delete(savedInject);
   }
 
   @Test
-  @DisplayName(
-      "Given an atomic testing with an assetGroup and an agent its expectations must be created")
-  void given_an_atomic_testing_with_an_assetGroup_and_an_agent_expectations_must_be_saved()
-      throws Exception {
+  @DisplayName("Expectations should be created for asset group linked to agent")
+  void expectationsForAssetGroupLinkedToAgent() throws Exception {
     // -- PREPARE --
-    Agent agent = AgentFixture.createAgent(ASSET, "external01");
-    agent.setLastSeen(Instant.now());
-    Agent savedAgent = this.agentRepository.save(agent);
-    AssetGroup assetGroup =
-        AssetGroupFixture.createAssetGroupWithAssets("asset group name", List.of(SAVEDASSET));
-    AssetGroup savedAssetGroup = assetGroupRepository.save(assetGroup);
-    Inject inject =
-        InjectFixture.createTechnicalInjectWithAssetGroup(
-            SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", savedAssetGroup);
-    Inject savedInject = this.injectRepository.save(inject);
+    Agent savedAgent = createAgent("external01");
+    AssetGroup savedAssetGroup = createAssetGroup("asset group name");
+    Inject savedInject = saveInject(savedInjectorContract);
     ExecutableInject executableInject =
-        new ExecutableInject(
-            false,
-            true,
-            savedInject,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            List.of(assetGroup),
-            null);
+        createExecutableInject(savedInject, List.of(savedAssetGroup));
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createDetectionExpectationForAssetGroup(assetGroup);
+        ExpectationFixture.createDetectionExpectationForAssetGroup(
+            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createPreventionExpectationForAssetGroup(assetGroup);
+        ExpectationFixture.createPreventionExpectationForAssetGroup(
+            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAsset =
-        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(ASSET);
+        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectationAsset =
-        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(ASSET);
+        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -198,7 +184,7 @@ public class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), SAVEDASSET.getId())
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
@@ -210,43 +196,28 @@ public class InjectExpectationServiceTest extends IntegrationTest {
         injectExpectationRepository
             .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
             .size());
-
-    // -- THEN --
-    agentRepository.delete(savedAgent);
-    injectRepository.delete(savedInject);
-    assetGroupRepository.delete(savedAssetGroup);
   }
 
   @Test
-  @DisplayName(
-      "Given an atomic testing with an assetGroup and no agent its expectations must be created")
-  void given_an_atomic_testing_with_an_assetGroup_and_no_agent_expectations_must_be_saved()
-      throws Exception {
+  @DisplayName("Expectations should be created for asset group with no agent")
+  void expectationsForAssetGroupWithNoAgent() {
     // -- PREPARE --
-    AssetGroup assetGroup =
-        AssetGroupFixture.createAssetGroupWithAssets("asset group name", List.of(SAVEDASSET));
-    AssetGroup savedAssetGroup = assetGroupRepository.save(assetGroup);
-    Inject inject =
-        InjectFixture.createTechnicalInjectWithAssetGroup(
-            SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", savedAssetGroup);
-    Inject savedInject = this.injectRepository.save(inject);
+    AssetGroup savedAssetGroup = createAssetGroup("asset group name");
+    Inject savedInject = saveInject(savedInjectorContract);
     ExecutableInject executableInject =
-        new ExecutableInject(
-            false,
-            true,
-            savedInject,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            List.of(assetGroup),
-            null);
+        createExecutableInject(savedInject, List.of(savedAssetGroup));
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createDetectionExpectationForAssetGroup(assetGroup);
+        ExpectationFixture.createDetectionExpectationForAssetGroup(
+            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createPreventionExpectationForAssetGroup(assetGroup);
+        ExpectationFixture.createPreventionExpectationForAssetGroup(
+            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAsset =
-        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(ASSET);
+        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectationAsset =
-        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(ASSET);
+        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -262,42 +233,29 @@ public class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), SAVEDASSET.getId())
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
         injectExpectationRepository
             .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
             .size());
-
-    // -- THEN --
-    injectRepository.delete(savedInject);
-    assetGroupRepository.delete(savedAssetGroup);
   }
 
   @Test
-  @DisplayName(
-      "Given an atomic testing with an asset with two agents its expectations must be created")
-  void given_an_atomic_testing_with_an_asset_with_two_agents_expectations_must_be_saved()
-      throws Exception {
+  @DisplayName("Expectations should be created for asset with multiple agents")
+  void expectationsForAssetWithMultipleAgents() {
     // -- PREPARE --
-    Agent agent = AgentFixture.createAgent(ASSET, "external01");
-    agent.setLastSeen(Instant.now());
-    Agent savedAgent = this.agentRepository.save(agent);
-    Agent agent1 = AgentFixture.createAgent(ASSET, "external02");
-    agent1.setLastSeen(Instant.now());
-    Agent savedAgent1 = this.agentRepository.save(agent1);
-    Inject inject =
-        InjectFixture.createTechnicalInject(
-            SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", SAVEDASSET);
-    Inject savedInject = this.injectRepository.save(inject);
-    ExecutableInject executableInject =
-        new ExecutableInject(
-            false, true, savedInject, Collections.emptyList(), List.of(ASSET), null, null);
+    Agent savedAgent = createAgent("external01");
+    Agent savedAgent1 = createAgent("external02");
+    Inject savedInject = saveInject(savedInjectorContract);
+    ExecutableInject executableInject = createExecutableInject(savedInject, emptyList());
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectation(ASSET);
+        ExpectationFixture.createTechnicalDetectionExpectation(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectation(ASSET);
+        ExpectationFixture.createTechnicalPreventionExpectation(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -308,7 +266,7 @@ public class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), SAVEDASSET.getId())
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
@@ -320,49 +278,30 @@ public class InjectExpectationServiceTest extends IntegrationTest {
         injectExpectationRepository
             .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
             .size());
-
-    // -- THEN--
-    agentRepository.delete(savedAgent);
-    agentRepository.delete(savedAgent1);
-    injectRepository.delete(savedInject);
   }
 
   @Test
-  @DisplayName(
-      "Given an atomic testing with an assetGroup and two agents its expectations must be created")
-  void given_an_atomic_testing_with_an_assetGroup_and_two_agents_expectations_must_be_saved()
-      throws Exception {
+  @DisplayName("Expectations should be created for asset group with multiple agents")
+  void expectationsForAssetGroupWithMultipleAgents() {
     // -- PREPARE --
-    Agent agent = AgentFixture.createAgent(ASSET, "external01");
-    agent.setLastSeen(Instant.now());
-    Agent savedAgent = this.agentRepository.save(agent);
-    Agent agent1 = AgentFixture.createAgent(ASSET, "external02");
-    agent1.setLastSeen(Instant.now());
-    Agent savedAgent1 = this.agentRepository.save(agent1);
-    AssetGroup assetGroup =
-        AssetGroupFixture.createAssetGroupWithAssets("asset group name", List.of(SAVEDASSET));
-    AssetGroup savedAssetGroup = assetGroupRepository.save(assetGroup);
-    Inject inject =
-        InjectFixture.createTechnicalInjectWithAssetGroup(
-            SAVEDINJECTORCONTRACT, "AMSI Bypass - AMSI InitFailed", savedAssetGroup);
-    Inject savedInject = this.injectRepository.save(inject);
+    Agent savedAgent = createAgent("external01");
+    Agent savedAgent1 = createAgent("external02");
+    AssetGroup savedAssetGroup = createAssetGroup("assetGroup name");
+    Inject savedInject = saveInject(savedInjectorContract);
     ExecutableInject executableInject =
-        new ExecutableInject(
-            false,
-            true,
-            savedInject,
-            Collections.emptyList(),
-            Collections.emptyList(),
-            List.of(assetGroup),
-            null);
+        createExecutableInject(savedInject, List.of(savedAssetGroup));
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createDetectionExpectationForAssetGroup(assetGroup);
+        ExpectationFixture.createDetectionExpectationForAssetGroup(
+            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createPreventionExpectationForAssetGroup(assetGroup);
+        ExpectationFixture.createPreventionExpectationForAssetGroup(
+            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAsset =
-        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(ASSET);
+        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectationAsset =
-        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(ASSET);
+        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
+            savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -378,7 +317,7 @@ public class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), SAVEDASSET.getId())
+            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
@@ -395,11 +334,5 @@ public class InjectExpectationServiceTest extends IntegrationTest {
         injectExpectationRepository
             .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
             .size());
-
-    // -- THEN --
-    agentRepository.delete(savedAgent);
-    agentRepository.delete(savedAgent1);
-    injectRepository.delete(savedInject);
-    assetGroupRepository.delete(savedAssetGroup);
   }
 }

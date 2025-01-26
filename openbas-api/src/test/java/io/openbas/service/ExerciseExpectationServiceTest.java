@@ -72,8 +72,7 @@ public class ExerciseExpectationServiceTest {
     String id = expectations.getFirst().getId();
 
     // -- EXECUTE --
-    ExpectationUpdateInput input = new ExpectationUpdateInput();
-    input.setScore(7.0);
+    ExpectationUpdateInput input = ExpectationUpdateInput.builder().score(7.0).build();
     InjectExpectation expectation =
         this.exerciseExpectationService.updateInjectExpectation(id, input);
 

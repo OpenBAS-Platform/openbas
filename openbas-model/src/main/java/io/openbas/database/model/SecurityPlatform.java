@@ -20,7 +20,7 @@ public class SecurityPlatform extends Asset {
 
   public static final String SECURITY_PLATFORM_TYPE = "SecurityPlatform";
 
-  public enum SECURITY_TYPE {
+  public enum SECURITY_PLATFORM_TYPE {
     @JsonProperty("EDR")
     EDR,
     @JsonProperty("XDR")
@@ -45,7 +45,7 @@ public class SecurityPlatform extends Asset {
   @JsonProperty("security_platform_type")
   @Enumerated(EnumType.STRING)
   @NotNull
-  private SECURITY_TYPE securityPlatformType;
+  private SECURITY_PLATFORM_TYPE securityPlatformType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "security_platform_logo_light")
@@ -63,7 +63,8 @@ public class SecurityPlatform extends Asset {
 
   public SecurityPlatform() {}
 
-  public SecurityPlatform(String id, String type, String name, SECURITY_TYPE securityPlatformType) {
+  public SecurityPlatform(
+      String id, String type, String name, SECURITY_PLATFORM_TYPE securityPlatformType) {
     super(id, type, name);
     this.securityPlatformType = securityPlatformType;
   }

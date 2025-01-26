@@ -34,9 +34,8 @@ public class ExpectationsExpirationManagerService {
   }
 
   // -- PRIVATE --
-
   private void computeExpectations(@NotNull final List<InjectExpectation> expectations) {
-    List<InjectExpectation> expectationAssets = expectations.stream().toList();
+    List<InjectExpectation> expectationAssets = expectations.stream().filter(e->e.getScore() == null).toList();
     expectationAssets.forEach(
         (expectation) -> {
           if (isExpired(expectation)) {

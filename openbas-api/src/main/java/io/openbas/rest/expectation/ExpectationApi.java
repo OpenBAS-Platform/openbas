@@ -35,7 +35,7 @@ public class ExpectationApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping(API_EXPECTATIONS + "/{expectationId}/{sourceId}/delete")
+  @DeleteMapping(API_EXPECTATIONS + "/{expectationId}/{sourceId}")
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
@@ -81,6 +81,10 @@ public class ExpectationApi extends RestBehavior {
     return injectExpectationService.preventionExpectationsNotFill().stream().toList();
   }
 
+  @Operation(
+      summary = "Get Inject Expectations for a Specific Source and type Prevention",
+      description =
+          "Retrieves inject expectations of agents installed on an asset for a given source ID and type Prevention.")
   @GetMapping(API_INJECTS_EXPECTATIONS + "/prevention/{sourceId}")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
@@ -92,6 +96,10 @@ public class ExpectationApi extends RestBehavior {
     return injectExpectationService.detectionExpectationsNotFill().stream().toList();
   }
 
+  @Operation(
+      summary = "Get Inject Expectations for a Specific Source and type Detection",
+      description =
+          "Retrieves inject expectations of agents installed on an asset for a given source ID and type detection.")
   @GetMapping(API_INJECTS_EXPECTATIONS + "/detection/{sourceId}")
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
