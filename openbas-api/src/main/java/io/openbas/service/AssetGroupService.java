@@ -123,7 +123,7 @@ public class AssetGroupService {
     Specification<Endpoint> specification2 = EndpointSpecification.findEndpointsForInjection();
     List<Asset> assets =
         this.endpointService.endpoints(specification.and(specification2)).stream()
-            .map(endpoint -> (Asset) endpoint)
+            .map(Asset.class::cast)
             .distinct()
             .toList();
     assetGroup.setDynamicAssets(assets);

@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
-public class InjectExpectationServiceTest extends IntegrationTest {
+class InjectExpectationServiceTest extends IntegrationTest {
 
   private static final String INJECTION_NAME = "AMSI Bypass - AMSI InitFailed";
   private static final String INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0144";
@@ -150,7 +150,7 @@ public class InjectExpectationServiceTest extends IntegrationTest {
 
   @Test
   @DisplayName("Expectations should be created for asset group linked to agent")
-  void expectationsForAssetGroupLinkedToAgent() throws Exception {
+  void expectationsForAssetGroupLinkedToAgent() {
     // -- PREPARE --
     Agent savedAgent = createAgent("external01");
     AssetGroup savedAssetGroup = createAssetGroup("asset group name");

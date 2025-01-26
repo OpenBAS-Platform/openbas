@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Log
 public class ExpectationsExpirationManagerService {
 
+  public static final String COLLECTOR = "collector";
   private final InjectExpectationService injectExpectationService;
   private final ExpectationsExpirationManagerConfig config;
 
@@ -35,13 +36,12 @@ public class ExpectationsExpirationManagerService {
 
   // -- PRIVATE --
   private void computeExpectations(@NotNull final List<InjectExpectation> expectations) {
-    List<InjectExpectation> expectationAssets = expectations.stream().toList();
-    expectationAssets.forEach(
-        (expectation) -> {
+    expectations.forEach(
+        expectation -> {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
             this.injectExpectationService.computeExpectation(
-                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
+                expectation, this.config.getId(), COLLECTOR, PRODUCT_NAME, result, false, null);
           }
         });
   }
@@ -50,11 +50,11 @@ public class ExpectationsExpirationManagerService {
     List<InjectExpectation> expectationAgents =
         expectations.stream().filter(e -> e.getAgent() != null).toList();
     expectationAgents.forEach(
-        (expectation) -> {
+        expectation -> {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
             this.injectExpectationService.computeExpectation(
-                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
+                expectation, this.config.getId(), COLLECTOR, PRODUCT_NAME, result, false, null);
           }
         });
   }
@@ -72,11 +72,7 @@ public class ExpectationsExpirationManagerService {
           // Every expectation agent are filled
           if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.injectExpectationService.computeExpectationAsset(
-                expectationAsset,
-                expectationAgents,
-                this.config.getId(),
-                "collector",
-                PRODUCT_NAME);
+                expectationAsset, expectationAgents, this.config.getId(), COLLECTOR, PRODUCT_NAME);
           }
         }));
   }
@@ -98,7 +94,7 @@ public class ExpectationsExpirationManagerService {
                 expectationAssetGroup,
                 expectationAssets,
                 this.config.getId(),
-                "collector",
+                COLLECTOR,
                 PRODUCT_NAME);
           }
         }));

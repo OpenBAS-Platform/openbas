@@ -26,6 +26,8 @@ public class ExerciseExpectationServiceTest {
       "The animation team can validate the audience reaction";
   @Autowired private ExerciseExpectationService exerciseExpectationService;
 
+  @Autowired private InjectExpectationService injectExpectationService;
+
   @Autowired private ExerciseRepository exerciseRepository;
 
   @Autowired private InjectRepository injectRepository;
@@ -74,7 +76,7 @@ public class ExerciseExpectationServiceTest {
     // -- EXECUTE --
     ExpectationUpdateInput input = ExpectationUpdateInput.builder().score(7.0).build();
     InjectExpectation expectation =
-        this.exerciseExpectationService.updateInjectExpectation(id, input);
+        this.injectExpectationService.updateInjectExpectation(id, input);
 
     // -- ASSERT --
     assertNotNull(expectation);

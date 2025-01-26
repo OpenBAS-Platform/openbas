@@ -4,7 +4,6 @@ import io.openbas.database.model.InjectExpectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
-import io.openbas.service.ExerciseExpectationService;
 import io.openbas.service.InjectExpectationService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
@@ -23,7 +22,6 @@ public class ExpectationApi extends RestBehavior {
   public static final String API_EXPECTATIONS = "/api/expectations";
   public static final String API_INJECTS_EXPECTATIONS = "/api/injects/expectations";
 
-  private final ExerciseExpectationService exerciseExpectationService;
   private final InjectExpectationService injectExpectationService;
 
   @Transactional(rollbackOn = Exception.class)
@@ -31,7 +29,7 @@ public class ExpectationApi extends RestBehavior {
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
       @Valid @RequestBody final ExpectationUpdateInput input) {
-    return exerciseExpectationService.updateInjectExpectation(expectationId, input);
+    return injectExpectationService.updateInjectExpectation(expectationId, input);
   }
 
   @Transactional(rollbackOn = Exception.class)
@@ -39,7 +37,7 @@ public class ExpectationApi extends RestBehavior {
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
-    return this.exerciseExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
+    return this.injectExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
   }
 
   @GetMapping(API_INJECTS_EXPECTATIONS)

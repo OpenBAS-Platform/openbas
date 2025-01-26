@@ -112,7 +112,6 @@ public class AtomicTestingUtils {
           .filter(entry -> injectAssets.contains(entry.getKey()))
           .forEach(
               entry -> {
-                String assetId = entry.getKey();
                 RawAsset asset = entry.getValue();
                 // Check if there are no expectations matching the current asset
                 boolean noMatchingExpectations =
