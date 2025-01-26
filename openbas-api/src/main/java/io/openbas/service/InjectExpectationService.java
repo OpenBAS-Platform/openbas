@@ -150,8 +150,10 @@ public class InjectExpectationService {
       String sourceId,
       String sourceType,
       String sourceName) {
-    boolean success = expectationAgents.size() > 0 ?
-        expectationAgents.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore())) : false;
+    boolean success =
+        expectationAgents.size() > 0
+            ? expectationAgents.stream().allMatch((e) -> e.getExpectedScore().equals(e.getScore()))
+            : false;
     computeResult(
         expectationAsset,
         sourceId,

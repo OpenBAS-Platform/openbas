@@ -546,6 +546,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 <Grid container={true} spacing={2}>
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
                     const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
+                    // The actions are available for players, teams, asset groups and assets which are not part of asset group (issue #)
+                    const hasActions = !parentTargetId || injectExpectation.inject_expectation_user;
                     return (
                       <Grid key={index} item xs={4}>
                         <Card key={injectExpectation.inject_expectation_id}>
@@ -554,7 +556,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               content: classes.cardHeaderContent,
                             }}
                             avatar={getAvatar(injectExpectation, expectationResult)}
-                            action={(
+                            action={hasActions && (
                               <>
                                 <IconButton
                                   color="primary"

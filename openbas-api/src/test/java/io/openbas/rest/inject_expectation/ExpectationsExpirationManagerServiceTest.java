@@ -445,7 +445,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
                   .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
                   .get(0));
 
-      List<String> ids = injectExpectations.stream().map(e->e.getId()).toList();
+      List<String> ids = injectExpectations.stream().map(e -> e.getId()).toList();
 
       injectExpectationRepository.deleteAllById(ids);
 

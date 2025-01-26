@@ -97,6 +97,7 @@ public class ExerciseExpectationService {
     InjectExpectation updated = this.injectExpectationRepository.save(injectExpectation);
 
     boolean isAssetGroupExpectation = updated.getAssetGroup() != null && updated.getAsset() == null;
+    boolean isAssetExpectation = updated.getAsset() != null && updated.getAgent() == null;
 
     if (isAssetGroupExpectation) {
       // Update InjectExpectations for Assets linked to this asset group
@@ -120,7 +121,7 @@ public class ExerciseExpectationService {
             updateInjectExpectationAgent(input, assetExp, result);
           });
       injectExpectationRepository.saveAll(expectationAssets);
-    } else {
+    } else if (isAssetExpectation) {
       updateInjectExpectationAgent(input, updated, result);
     }
 

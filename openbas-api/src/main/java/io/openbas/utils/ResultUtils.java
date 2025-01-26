@@ -86,7 +86,6 @@ public class ResultUtils {
             .collect(Collectors.groupingBy(RawInjectExpectation::getInject_id));
 
     // -- TEAMS INJECT --
-
     Set<String> teamIds =
         rawInjectExpectations.stream()
             .map(RawInjectExpectation::getTeam_id)
@@ -98,7 +97,6 @@ public class ResultUtils {
         rawTeams.stream().collect(Collectors.toMap(RawTeam::getTeam_id, rawTeam -> rawTeam));
 
     // -- USER MAP FROM TEAMS --
-
     Set<String> userIds =
         rawInjectExpectations.stream()
             .map(RawInjectExpectation::getUser_id)
@@ -144,11 +142,20 @@ public class ResultUtils {
     Map<String, List<Endpoint>> dynamicForAssetGroupMap =
         assetGroupService.computeDynamicAssetFromRaw(rawAssetGroups);
 
+    Map<String, List<String>> injectAssetMap =
+        assetRepository.assetsByInjectIds(injectIds).stream()
+            .collect(
+                Collectors.groupingBy(
+                    injectAsset -> (String) injectAsset[0],
+                    Collectors.mapping(
+                        injectAsset -> (String) injectAsset[1], Collectors.toList())));
+
     return injectIds.stream()
         .flatMap(
             injectId -> {
               return AtomicTestingUtils.getTargetsWithResultsFromRaw(
                   expectationMap.getOrDefault(injectId, emptyList()),
+                  injectAssetMap.getOrDefault(injectId, emptyList()),
                   teamMap,
                   userMap,
                   assetMap,

@@ -313,8 +313,7 @@ public class InjectSearchService {
     }
   }
 
-  private Map<String, List<Object[]>> fetchRelatedTargets(
-      Set<String> injectIds, String targetType) {
+  public Map<String, List<Object[]>> fetchRelatedTargets(Set<String> injectIds, String targetType) {
     if (injectIds == null || injectIds.isEmpty()) {
       return new HashMap<>();
     }
