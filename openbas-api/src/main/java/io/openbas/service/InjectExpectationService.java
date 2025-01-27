@@ -56,7 +56,7 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findById(injectExpectationId);
   }
 
-  // UPDATE FROM UI
+  // -- UPDATE FROM UI --
 
   public InjectExpectation updateInjectExpectation(
       @NotBlank final String expectationId, @NotNull final ExpectationUpdateInput input) {
@@ -72,7 +72,7 @@ public class InjectExpectationService {
       result = input.getScore() >= injectExpectation.getExpectedScore() ? SUCCESS : FAILED;
       injectExpectation.getResults().clear();
       exists = Optional.empty();
-    } else if (DETECTION == injectExpectation.getType()) {
+    } else if (DETECTION.equals(injectExpectation.getType())) {
       if (input.getScore() >= injectExpectation.getExpectedScore()) {
         result = "Detected";
       } else if (input.getScore() > 0) {
@@ -80,7 +80,7 @@ public class InjectExpectationService {
       } else {
         result = "Not Detected";
       }
-    } else if (PREVENTION == injectExpectation.getType()) {
+    } else if (PREVENTION.equals(injectExpectation.getType())) {
       if (input.getScore() >= injectExpectation.getExpectedScore()) {
         result = "Prevented";
       } else if (input.getScore() > 0) {
@@ -150,6 +150,7 @@ public class InjectExpectationService {
           });
       injectExpectationRepository.saveAll(expectationAssets);
     } else if (isAssetExpectation) {
+      // Update InjectExpectations for Agents linked to this asset
       updateInjectExpectationAgent(input, updated, result);
     }
 
@@ -162,7 +163,6 @@ public class InjectExpectationService {
 
   private void updateInjectExpectationAgent(
       ExpectationUpdateInput input, InjectExpectation updated, String result) {
-    // Update InjectExpectations for Agents installed on this asset
     List<InjectExpectation> expectationAgents =
         this.expectationsForAgents(updated.getInject(), updated.getAsset(), updated.getType());
 
@@ -231,9 +231,9 @@ public class InjectExpectationService {
             assetExp.setUpdatedAt(updated.getUpdatedAt());
             deleteInjectExpectationResultAgent(sourceId, assetExp);
           });
-
       injectExpectationRepository.saveAll(expectationAssets);
     } else if (isAssetExpectation) {
+      // Delete InjectExpectations results for Agents installed on this asset
       deleteInjectExpectationResultAgent(sourceId, updated);
     }
 
@@ -246,7 +246,6 @@ public class InjectExpectationService {
   }
 
   private void deleteInjectExpectationResultAgent(String sourceId, InjectExpectation updated) {
-    // Update InjectExpectations for Agents installed on this asset
     List<InjectExpectation> expectationAgents =
         this.expectationsForAgents(updated.getInject(), updated.getAsset(), updated.getType());
 
@@ -377,7 +376,9 @@ public class InjectExpectationService {
         .build();
   }
 
-  // Update from collectors
+
+  // -- UPDATE FROM EXTERNAL SOURCE : COLLECTORS --
+
   public InjectExpectation updateInjectExpectation(
       @NotBlank String expectationId, @Valid @NotNull InjectExpectationUpdateInput input) {
     InjectExpectation injectExpectation =

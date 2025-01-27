@@ -610,7 +610,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       </Grid>
                     );
                   })}
-                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) || (injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length === 0))
+                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) ||
+                      (injectExpectation.inject_expectation_type === 'MANUAL'
+                        && injectExpectation.inject_expectation_results
+                        && injectExpectation.inject_expectation_results.length === 0))
+                  && (!parentTargetId || injectExpectation.inject_expectation_user)
                   && (
                     <Grid item xs={4}>
                       <Card classes={{ root: classes.resultCardDummy }}>
