@@ -102,9 +102,9 @@ public class ExecutionTraces implements Base {
   }
 
   public static ExecutionTraces getNewSuccessTrace(
-          String message, ExecutionTraceAction category, List<String> identifiers) {
+      String message, ExecutionTraceAction category, List<String> identifiers) {
     return new ExecutionTraces(
-            null, ExecutionTraceStatus.SUCCESS, identifiers, message, category, null);
+        null, ExecutionTraceStatus.SUCCESS, identifiers, message, category, null);
   }
 
   public static ExecutionTraces getNewInfoTrace(String message, ExecutionTraceAction action) {

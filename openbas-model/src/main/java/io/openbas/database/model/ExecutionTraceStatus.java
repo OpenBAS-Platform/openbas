@@ -1,6 +1,6 @@
 package io.openbas.database.model;
 
- public enum ExecutionTraceStatus {
+public enum ExecutionTraceStatus {
   SUCCESS,
   ERROR,
 
@@ -17,6 +17,4 @@ package io.openbas.database.model;
   // Other informations
   ASSET_INACTIVE,
   INFO,
- }
-
-
+}

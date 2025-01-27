@@ -35,7 +35,11 @@ public class InjectStatusExecution {
   }
 
   public InjectStatusExecution(
-          Instant time, ExecutionTraceStatus status, List<String> identifiers, String message, String category) {
+      Instant time,
+      ExecutionTraceStatus status,
+      List<String> identifiers,
+      String message,
+      String category) {
     this.status = status;
     this.identifiers = identifiers;
     this.message = message;
