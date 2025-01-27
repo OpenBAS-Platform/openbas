@@ -134,8 +134,8 @@ public class InjectExpectationService {
               updated.getInject(), updated.getAssetGroup(), updated.getType());
 
       expectationAssets.forEach(
-          assetExp -> {
-            assetExp
+          expectationAsset -> {
+            expectationAsset
                 .getResults()
                 .add(
                     buildInjectExpectationResult(
@@ -144,10 +144,13 @@ public class InjectExpectationService {
                         input.getSourceName(),
                         result,
                         input.getScore()));
-            assetExp.setScore(updated.getScore());
-            assetExp.setUpdatedAt(updated.getUpdatedAt());
-            updateInjectExpectationAgent(input, assetExp, result);
+
+            expectationAsset.setScore(updated.getScore());
+            expectationAsset.setUpdatedAt(updated.getUpdatedAt());
+
+            updateInjectExpectationAgent(input, expectationAsset, result);
           });
+
       injectExpectationRepository.saveAll(expectationAssets);
     } else if (isAssetExpectation) {
       // Update InjectExpectations for Agents linked to this asset
@@ -155,7 +158,7 @@ public class InjectExpectationService {
     }
 
     // If the expectation is type manual, We should update expectations for teams and players
-    if (MANUAL == updated.getType() && updated.getTeam() != null) {
+    if (MANUAL.equals(updated.getType()) && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
     return updated;
@@ -167,8 +170,8 @@ public class InjectExpectationService {
         this.expectationsForAgents(updated.getInject(), updated.getAsset(), updated.getType());
 
     expectationAgents.forEach(
-        agentExp -> {
-          agentExp
+        expectationAgent -> {
+          expectationAgent
               .getResults()
               .add(
                   buildInjectExpectationResult(
@@ -178,8 +181,8 @@ public class InjectExpectationService {
                       result,
                       input.getScore()));
 
-          agentExp.setScore(updated.getScore());
-          agentExp.setUpdatedAt(updated.getUpdatedAt());
+          expectationAgent.setScore(updated.getScore());
+          expectationAgent.setUpdatedAt(updated.getUpdatedAt());
         });
 
     injectExpectationRepository.saveAll(expectationAgents);
@@ -222,14 +225,14 @@ public class InjectExpectationService {
               updated.getInject(), updated.getAssetGroup(), updated.getType());
 
       expectationAssets.forEach(
-          assetExp -> {
-            assetExp.setResults(
-                assetExp.getResults().stream()
+          expectationAsset -> {
+            expectationAsset.setResults(
+                expectationAsset.getResults().stream()
                     .filter(r -> !sourceId.equals(r.getSourceId()))
                     .toList());
-            assetExp.setScore(updated.getScore());
-            assetExp.setUpdatedAt(updated.getUpdatedAt());
-            deleteInjectExpectationResultAgent(sourceId, assetExp);
+            expectationAsset.setScore(updated.getScore());
+            expectationAsset.setUpdatedAt(updated.getUpdatedAt());
+            deleteInjectExpectationResultAgent(sourceId, expectationAsset);
           });
       injectExpectationRepository.saveAll(expectationAssets);
     } else if (isAssetExpectation) {
@@ -250,13 +253,13 @@ public class InjectExpectationService {
         this.expectationsForAgents(updated.getInject(), updated.getAsset(), updated.getType());
 
     expectationAgents.forEach(
-        agentExp -> {
-          agentExp.setResults(
-              agentExp.getResults().stream()
+        expectationAgent -> {
+          expectationAgent.setResults(
+              expectationAgent.getResults().stream()
                   .filter(r -> !sourceId.equals(r.getSourceId()))
                   .toList());
-          agentExp.setScore(updated.getScore());
-          agentExp.setUpdatedAt(updated.getUpdatedAt());
+          expectationAgent.setScore(updated.getScore());
+          expectationAgent.setUpdatedAt(updated.getUpdatedAt());
         });
 
     injectExpectationRepository.saveAll(expectationAgents);
@@ -408,6 +411,7 @@ public class InjectExpectationService {
                         && e.getAgent() == null
                         && e.getAsset().getId().equals(finalInjectExpectation.getAsset().getId()))
             .toList();
+
     expectationAssets.forEach(
         (expectationAsset -> {
           List<InjectExpectation> expectationAgents =
@@ -451,7 +455,8 @@ public class InjectExpectationService {
     return injectExpectation;
   }
 
-  // Compute results for expectations
+  // -- COMPUTE RESULTS FROM INJECT EXPECTATIONS --
+
   public InjectExpectation computeExpectation(
       @NotNull final InjectExpectation expectation,
       @NotBlank final String sourceId,
@@ -514,12 +519,22 @@ public class InjectExpectationService {
     this.update(expectationAssetGroup);
   }
 
+  // -- FINAL UPDATE --
+
   public InjectExpectation update(@NotNull InjectExpectation injectExpectation) {
     injectExpectation.setUpdatedAt(now());
     Inject inject = injectExpectation.getInject();
     inject.setUpdatedAt(now());
     this.injectRepository.save(inject);
     return this.injectExpectationRepository.save(injectExpectation);
+  }
+
+  // -- FETCH INJECT EXPECTATIONS --
+
+  public List<InjectExpectation> expectationsNotFill() {
+    return fromIterable(this.injectExpectationRepository.findAll()).stream()
+        .filter(e -> e.getResults().stream().toList().isEmpty())
+        .toList();
   }
 
   public List<InjectExpectation> expectationsForAgents(
@@ -549,14 +564,6 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findAll(
         Specification.where(InjectExpectationSpecification.type(expectationType))
             .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds)));
-  }
-
-  // -- ALL --
-
-  public List<InjectExpectation> expectationsNotFill() {
-    return fromIterable(this.injectExpectationRepository.findAll()).stream()
-        .filter(e -> e.getResults().stream().toList().isEmpty())
-        .toList();
   }
 
   // -- PREVENTION --
