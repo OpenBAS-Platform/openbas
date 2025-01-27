@@ -11,7 +11,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_60__Add_ExecutionTraces_table extends BaseJavaMigration {
+public class V3_62__Add_ExecutionTraces_table extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -25,7 +25,7 @@ public class V3_60__Add_ExecutionTraces_table extends BaseJavaMigration {
                   execution_trace_id VARCHAR(255) NOT NULL CONSTRAINT execution_traces_pkey PRIMARY KEY,
                   execution_inject_status_id VARCHAR(255) NOT NULL,
                   execution_agent_id VARCHAR(255),
-                  execution_message TEXT,
+                  execution_message TEXT NOT NULL,
                   execution_action VARCHAR(255),
                   execution_status VARCHAR(255) NOT NULL,
                   execution_time TIMESTAMP,
@@ -99,19 +99,6 @@ public class V3_60__Add_ExecutionTraces_table extends BaseJavaMigration {
                       .replace("]", "}")
                   : null,
               java.sql.Types.OTHER);
-          //          statement.setArray(
-          //              8,
-          //              execution.has("execution_context_identifiers")
-          //                  ? connection
-          //                      .unwrap(Connection.class)
-          //                      .createArrayOf(
-          //                          "text",
-          //                          mapper
-          //                              .convertValue(
-          //                                  execution.get("execution_context_identifiers"),
-          // List.class)
-          //                              .toArray(new String[0]))
-          //                  : null);
           statement.addBatch();
         }
       }

@@ -2,6 +2,7 @@ package io.openbas.execution;
 
 import io.openbas.database.model.*;
 import io.openbas.database.model.Executor;
+import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.service.CalderaExecutorContextService;
@@ -11,7 +12,6 @@ import io.openbas.executors.openbas.service.OpenBASExecutorContextService;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.service.TaniumExecutorContextService;
 import io.openbas.rest.exception.DetailedException;
-import io.openbas.database.model.InjectStatus;
 import io.openbas.service.AssetGroupService;
 import jakarta.transaction.Transactional;
 import java.util.List;

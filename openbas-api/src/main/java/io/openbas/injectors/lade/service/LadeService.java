@@ -359,11 +359,9 @@ public class LadeService {
             if (!message.isEmpty() && !message.equals("null")) {
               ExecutionTraces trace;
               if (eventLevel.equals("error")) {
-                trace =
-                    ExecutionTraces.getNewErrorTrace(message, ExecutionTraceAction.COMPLETE);
+                trace = ExecutionTraces.getNewErrorTrace(message, ExecutionTraceAction.COMPLETE);
               } else {
-                trace =
-                    ExecutionTraces.getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE);
+                trace = ExecutionTraces.getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE);
               }
               ladeWorkflow.addTrace(trace);
             }

@@ -45,6 +45,7 @@ public class ExecutionTraces implements Base {
 
   @Column(name = "execution_message")
   @JsonProperty("execution_message")
+  @NotNull
   private String message;
 
   @Column(name = "execution_action")

@@ -16,57 +16,28 @@ import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class Executor {
 
   @Resource protected ObjectMapper mapper;
 
-  private ApplicationContext context;
+  private final ApplicationContext context;
 
-  private InjectStatusRepository injectStatusRepository;
+  private final InjectStatusRepository injectStatusRepository;
 
-  private InjectorRepository injectorRepository;
+  private final InjectorRepository injectorRepository;
 
-  private InjectRepository injectRepository;
+  private final InjectRepository injectRepository;
 
-  private QueueService queueService;
+  private final QueueService queueService;
 
-  private ExecutionExecutorService executionExecutorService;
-  @Autowired private InjectStatusService injectStatusService;
-
-  @Autowired
-  public void setQueueService(QueueService queueService) {
-    this.queueService = queueService;
-  }
-
-  @Autowired
-  public void setContext(ApplicationContext context) {
-    this.context = context;
-  }
-
-  @Autowired
-  public void setInjectorRepository(InjectorRepository injectorRepository) {
-    this.injectorRepository = injectorRepository;
-  }
-
-  @Autowired
-  public void setInjectStatusRepository(InjectStatusRepository injectStatusRepository) {
-    this.injectStatusRepository = injectStatusRepository;
-  }
-
-  @Autowired
-  public void setExecutionExecutorService(ExecutionExecutorService executionExecutorService) {
-    this.executionExecutorService = executionExecutorService;
-  }
-
-  @Autowired
-  public void setInjectRepository(InjectRepository injectRepository) {
-    this.injectRepository = injectRepository;
-  }
+  private final ExecutionExecutorService executionExecutorService;
+  private final InjectStatusService injectStatusService;
 
   private InjectStatus executeExternal(ExecutableInject executableInject, Inject inject) {
     InjectorContract injectorContract =

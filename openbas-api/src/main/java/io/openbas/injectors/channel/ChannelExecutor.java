@@ -127,8 +127,7 @@ public class ChannelExecutor extends Injector {
               });
         } else {
           execution.addTrace(
-              getNewInfoTrace(
-                  "Email disabled for this inject", ExecutionTraceAction.EXECUTION));
+              getNewInfoTrace("Email disabled for this inject", ExecutionTraceAction.EXECUTION));
         }
         List<Expectation> expectations = new ArrayList<>();
         if (!content.getExpectations().isEmpty()) {

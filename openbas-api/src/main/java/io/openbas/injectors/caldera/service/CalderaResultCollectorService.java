@@ -63,9 +63,8 @@ public class CalderaResultCollectorService implements Runnable {
                   "Cannot get result for linkID " + linkId + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
                   linksMap.get(linkId));
-                log.log(
-                        Level.INFO,
-                        "Cannot get result for linkID " + linkId + ", injection has failed");
+              log.log(
+                  Level.INFO, "Cannot get result for linkID " + linkId + ", injection has failed");
             }
 
             if (resultStatus.getPaw() == null
@@ -76,9 +75,8 @@ public class CalderaResultCollectorService implements Runnable {
                   "Cannot get result for linkID " + linkId + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
                   linksMap.get(linkId));
-                log.log(
-                        Level.INFO,
-                        "Cannot get result for linkID " + linkId + ", injection has failed");
+              log.log(
+                  Level.INFO, "Cannot get result for linkID " + linkId + ", injection has failed");
 
             } else if (resultStatus.getPaw() != null
                 && resultStatus.isComplete()
@@ -105,13 +103,13 @@ public class CalderaResultCollectorService implements Runnable {
                   "Timeout on linkID " + linkId + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
                   linksMap.get(linkId));
-                log.log(Level.INFO, "Timeout on linkID " + linkId + ", injection has failed");
+              log.log(Level.INFO, "Timeout on linkID " + linkId + ", injection has failed");
             }
           }
 
           Inject relatedInject = injectStatus.getInject();
-          if(injectStatusService.isAllInjectAssetsExecuted(relatedInject)){
-              injectStatusService.updateFinalInjectStatus(injectStatus, resultStatus.getFinish());
+          if (injectStatusService.isAllInjectAssetsExecuted(relatedInject)) {
+            injectStatusService.updateFinalInjectStatus(injectStatus, resultStatus.getFinish());
           }
 
           injectRepository.save(relatedInject);

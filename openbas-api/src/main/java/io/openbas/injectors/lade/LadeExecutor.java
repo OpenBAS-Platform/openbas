@@ -48,8 +48,7 @@ public class LadeExecutor extends Injector {
       }
       String message = "Lade " + ladeType + " sent with workflow (" + actionWorkflowId + ")";
       execution.addTrace(
-          getNewInfoTrace(
-              message, ExecutionTraceAction.EXECUTION, List.of(actionWorkflowId)));
+          getNewInfoTrace(message, ExecutionTraceAction.EXECUTION, List.of(actionWorkflowId)));
       return new ExecutionProcess(true);
     } catch (Exception e) {
       execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));

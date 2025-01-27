@@ -13,7 +13,6 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
 import io.openbas.rest.inject.service.InjectStatusService;
-import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

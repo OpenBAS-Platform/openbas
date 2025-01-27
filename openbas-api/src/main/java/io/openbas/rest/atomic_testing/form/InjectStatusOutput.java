@@ -39,5 +39,4 @@ public class InjectStatusOutput {
 
   @JsonProperty("tracking_end_date")
   private Instant trackingEndDate;
-
 }

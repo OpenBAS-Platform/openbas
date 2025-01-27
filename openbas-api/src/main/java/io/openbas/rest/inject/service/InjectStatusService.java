@@ -14,11 +14,10 @@ import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -137,19 +136,19 @@ public class InjectStatusService {
                   injectStatus.getTraces().stream()
                       .filter(t -> t.getAgent().getId().equals(agentId))
                       .toList()));
-
-      if (isAllInjectAssetsExecuted(inject)) {
-        updateFinalInjectStatus(injectStatus, now());
-      }
     } else {
       traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
     }
-
     injectStatus
         .getTraces()
         .add(
             new ExecutionTraces(
                 injectStatus, traceStatus, null, input.getMessage(), executionAction, agent));
+
+    if (executionAction.equals(ExecutionTraceAction.COMPLETE)
+        && isAllInjectAssetsExecuted(inject)) {
+      updateFinalInjectStatus(injectStatus, now());
+    }
     return injectRepository.save(inject);
   }
 
@@ -230,7 +229,7 @@ public class InjectStatusService {
 
   @Transactional
   public void initializeInjectStatus(
-          @NotNull Inject inject, @NotNull ExecutionStatus status, @Nullable ExecutionTraces trace) {
+      @NotNull Inject inject, @NotNull ExecutionStatus status, @Nullable ExecutionTraces trace) {
     InjectStatus injectStatus = getOrInitializeInjectStatus(inject);
 
     if (trace != null) {

@@ -76,13 +76,11 @@ public class OvhSmsExecutor extends Injector {
                             + " contains error ("
                             + callResult
                             + ")";
-                    execution.addTrace(
-                        getNewErrorTrace(message, ExecutionTraceAction.COMPLETE));
+                    execution.addTrace(getNewErrorTrace(message, ExecutionTraceAction.COMPLETE));
                   } else {
                     String message =
                         "Sms sent to " + email + " through " + phone + " (" + callResult + ")";
-                    execution.addTrace(
-                        getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE));
+                    execution.addTrace(getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE));
                   }
                 } catch (Exception e) {
                   execution.addTrace(
