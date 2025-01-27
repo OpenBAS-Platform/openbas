@@ -376,7 +376,6 @@ public class InjectExpectationService {
         .build();
   }
 
-
   // -- UPDATE FROM EXTERNAL SOURCE : COLLECTORS --
 
   public InjectExpectation updateInjectExpectation(
@@ -452,7 +451,6 @@ public class InjectExpectationService {
     return injectExpectation;
   }
 
-  // Compute Expectations
   // Compute results for expectations
   public InjectExpectation computeExpectation(
       @NotNull final InjectExpectation expectation,

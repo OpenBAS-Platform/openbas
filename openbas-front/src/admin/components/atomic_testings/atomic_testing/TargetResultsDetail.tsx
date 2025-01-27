@@ -610,26 +610,26 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       </Grid>
                     );
                   })}
-                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) ||
-                      (injectExpectation.inject_expectation_type === 'MANUAL'
-                        && injectExpectation.inject_expectation_results
-                        && injectExpectation.inject_expectation_results.length === 0))
-                  && (!parentTargetId || injectExpectation.inject_expectation_user)
-                  && (
-                    <Grid item xs={4}>
-                      <Card classes={{ root: classes.resultCardDummy }}>
-                        <CardActionArea
-                          classes={{ root: classes.area }}
-                          onClick={() => setSelectedExpectationForCreation({
-                            injectExpectation,
-                            sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
-                          })}
-                        >
-                          <AddBoxOutlined />
-                        </CardActionArea>
-                      </Card>
-                    </Grid>
-                  )}
+                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
+                    || (injectExpectation.inject_expectation_type === 'MANUAL'
+                      && injectExpectation.inject_expectation_results
+                      && injectExpectation.inject_expectation_results.length === 0))
+                    && (!parentTargetId || injectExpectation.inject_expectation_user)
+                    && (
+                      <Grid item xs={4}>
+                        <Card classes={{ root: classes.resultCardDummy }}>
+                          <CardActionArea
+                            classes={{ root: classes.area }}
+                            onClick={() => setSelectedExpectationForCreation({
+                              injectExpectation,
+                              sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
+                            })}
+                          >
+                            <AddBoxOutlined />
+                          </CardActionArea>
+                        </Card>
+                      </Grid>
+                    )}
                 </Grid>
                 <Divider style={{ marginTop: 20 }} />
               </div>
