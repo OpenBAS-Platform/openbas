@@ -371,6 +371,12 @@ public class ExerciseService {
     return getExerciseSimples(specificationCount, pageable, result);
   }
 
+  public boolean checkIfTagRulesApplies(
+      @NotNull final Exercise exercise, @NotNull final List<String> newTags) {
+    return tagRuleService.checkIfRulesApply(
+        exercise.getTags().stream().map(Tag::getId).toList(), newTags);
+  }
+
   private PageImpl<ExerciseSimple> getExerciseSimples(
       Specification<Exercise> specificationCount,
       Pageable pageable,
@@ -640,7 +646,7 @@ public class ExerciseService {
   }
 
   /**
-   * Update the simulation and each of the injects to add/remove default asset groups
+   * Update the simulation and each of the injects to add default asset groups
    *
    * @param exercise
    * @param currentTags list of the tags before the update
@@ -658,21 +664,13 @@ public class ExerciseService {
                   .map(Tag::getId)
                   .toList());
 
-      // Get asset groups from the TagRule of the removed tags
-      List<AssetGroup> defaultAssetGroupsToRemove =
-          tagRuleService.getAssetGroupsFromTagIds(
-              currentTags.stream()
-                  .filter(tag -> !exercise.getTags().contains(tag))
-                  .map(Tag::getId)
-                  .toList());
-
-      // Add/remove the default asset groups to/from the injects
-      exercise
-          .getInjects()
+      // Add the default asset groups to the injects
+      exercise.getInjects().stream()
+          .filter(injectService::canApplyAssetGroupToInject)
           .forEach(
               inject ->
                   injectService.applyDefaultAssetGroupsToInject(
-                      inject.getId(), defaultAssetGroupsToAdd, defaultAssetGroupsToRemove));
+                      inject.getId(), defaultAssetGroupsToAdd));
     }
     exercise.setUpdatedAt(now());
     return exerciseRepository.save(exercise);

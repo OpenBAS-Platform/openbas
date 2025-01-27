@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -40,6 +41,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class InjectServiceTest {
 
@@ -66,12 +68,18 @@ class InjectServiceTest {
 
   @Mock private InjectUtils injectUtils;
 
+  ObjectMapper mapper;
+
   @InjectMocks private InjectService injectService;
 
   @BeforeEach
   void setUp() {
+
     MockitoAnnotations.openMocks(this);
     when(methodSecurityExpressionHandler.getSecurityExpression()).thenReturn(securityExpression);
+
+    mapper = new ObjectMapper();
+    ReflectionTestUtils.setField(injectService, "mapper", mapper);
   }
 
   @Test
@@ -79,11 +87,11 @@ class InjectServiceTest {
     doReturn(Optional.empty()).when(injectRepository).findById(INJECT_ID);
     assertThrows(
         ElementNotFoundException.class,
-        () -> injectService.applyDefaultAssetGroupsToInject(INJECT_ID, List.of(), List.of()));
+        () -> injectService.applyDefaultAssetGroupsToInject(INJECT_ID, List.of()));
   }
 
   @Test
-  public void testApplyDefaultAssetGroupsToInject_WITH_add_and_remove() {
+  public void testApplyDefaultAssetGroupsToInject_WITH_default_assets_to_add() {
     AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
     AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
     AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
@@ -93,57 +101,14 @@ class InjectServiceTest {
     inject.setAssetGroups(List.of(assetGroup1, assetGroup2, assetGroup3));
     doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
 
-    injectService.applyDefaultAssetGroupsToInject(
-        INJECT_ID, List.of(assetGroup4), List.of(assetGroup3));
+    injectService.applyDefaultAssetGroupsToInject(INJECT_ID, List.of(assetGroup4));
 
     ArgumentCaptor<Inject> injectCaptor = ArgumentCaptor.forClass(Inject.class);
     verify(injectRepository).save(injectCaptor.capture());
     Inject capturedInject = injectCaptor.getValue();
     assertEquals(INJECT_ID, capturedInject.getId());
     assertEquals(
-        new HashSet<>(List.of(assetGroup1, assetGroup2, assetGroup4)),
-        new HashSet<>(capturedInject.getAssetGroups()));
-  }
-
-  @Test
-  public void testApplyDefaultAssetGroupsToInject_WITH_remove_all() {
-    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
-    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
-    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
-    Inject inject = new Inject();
-    inject.setId(INJECT_ID);
-    inject.setAssetGroups(List.of(assetGroup1, assetGroup2, assetGroup3));
-    doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
-
-    injectService.applyDefaultAssetGroupsToInject(
-        INJECT_ID, List.of(), List.of(assetGroup1, assetGroup2, assetGroup3));
-
-    ArgumentCaptor<Inject> injectCaptor = ArgumentCaptor.forClass(Inject.class);
-    verify(injectRepository).save(injectCaptor.capture());
-    Inject capturedInject = injectCaptor.getValue();
-    assertEquals(INJECT_ID, capturedInject.getId());
-    assertEquals(List.of(), capturedInject.getAssetGroups());
-  }
-
-  @Test
-  public void testApplyDefaultAssetGroupsToInject_WITH_add_all() {
-    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
-    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
-    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
-    Inject inject = new Inject();
-    inject.setId(INJECT_ID);
-    inject.setAssetGroups(List.of());
-    doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
-
-    injectService.applyDefaultAssetGroupsToInject(
-        INJECT_ID, List.of(assetGroup1, assetGroup2, assetGroup3), List.of());
-
-    ArgumentCaptor<Inject> injectCaptor = ArgumentCaptor.forClass(Inject.class);
-    verify(injectRepository).save(injectCaptor.capture());
-    Inject capturedInject = injectCaptor.getValue();
-    assertEquals(INJECT_ID, capturedInject.getId());
-    assertEquals(
-        new HashSet<>(List.of(assetGroup1, assetGroup2, assetGroup3)),
+        new HashSet<>(List.of(assetGroup1, assetGroup2, assetGroup3, assetGroup4)),
         new HashSet<>(capturedInject.getAssetGroups()));
   }
 
@@ -157,8 +122,7 @@ class InjectServiceTest {
     inject.setAssetGroups(List.of(assetGroup1, assetGroup2, assetGroup3));
     doReturn(Optional.of(inject)).when(injectRepository).findById(INJECT_ID);
 
-    injectService.applyDefaultAssetGroupsToInject(
-        INJECT_ID, List.of(assetGroup1), List.of(assetGroup1));
+    injectService.applyDefaultAssetGroupsToInject(INJECT_ID, List.of(assetGroup1));
 
     verify(injectRepository, never()).save(any());
   }
@@ -601,6 +565,30 @@ class InjectServiceTest {
 
     // Assert
     verify(securityExpression, times(0)).isSimulationPlanner("exercise1");
+  }
+
+  @DisplayName("Test canApplyAssetToInject with manual inject")
+  @Test
+  void testCanApplyAssetToInject_WITH_no_assetGroup() {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setContent(
+        "{\"manual\":true,\"fields\":[{\"key\":\"content\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"textarea\"}]}");
+    Inject inject = new Inject();
+    inject.setInjectorContract(injectorContract);
+
+    assertFalse(injectService.canApplyAssetGroupToInject(inject));
+  }
+
+  @DisplayName("Test canApplyAssetToInject with inject with assets")
+  @Test
+  void testCanApplyAssetGroupToInject_WITH_assets() {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setContent(
+        "{\"manual\":true,\"fields\":[{\"key\":\"assetgroups\",\"label\":\"Content\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"\",\"richText\":false,\"type\":\"asset-group\"}]}");
+    Inject inject = new Inject();
+    inject.setInjectorContract(injectorContract);
+
+    assertTrue(injectService.canApplyAssetGroupToInject(inject));
   }
 
   @Test

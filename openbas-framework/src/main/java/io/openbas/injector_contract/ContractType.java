@@ -4,35 +4,41 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum ContractType {
   @JsonProperty("text")
-  Text,
+  Text("text"),
   @JsonProperty("number")
-  Number,
+  Number("number"),
   @JsonProperty("tuple")
-  Tuple,
+  Tuple("tuple"),
   @JsonProperty("checkbox")
-  Checkbox,
+  Checkbox("checkbox"),
   @JsonProperty("textarea")
-  Textarea,
+  Textarea("textarea"),
   @JsonProperty("select")
-  Select,
+  Select("select"),
   @JsonProperty("choice")
-  Choice,
+  Choice("choice"),
   @JsonProperty("article")
-  Article,
+  Article("article"),
   @JsonProperty("challenge")
-  Challenge,
+  Challenge("challenge"),
   @JsonProperty("dependency-select")
-  DependencySelect,
+  DependencySelect("dependency-select"),
   @JsonProperty("attachment")
-  Attachment,
+  Attachment("attachment"),
   @JsonProperty("team")
-  Team,
+  Team("team"),
   @JsonProperty("expectation")
-  Expectation,
+  Expectation("expectation"),
   @JsonProperty("asset")
-  Asset,
+  Asset("asset"),
   @JsonProperty("asset-group")
-  AssetGroup,
+  AssetGroup("asset-group"),
   @JsonProperty("payload")
-  Payload,
+  Payload("payload");
+
+  public final String label;
+
+  ContractType(String label) {
+    this.label = label;
+  }
 }

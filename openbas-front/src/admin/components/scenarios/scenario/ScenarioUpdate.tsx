@@ -1,9 +1,14 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState } from 'react';
 
-import { updateScenario } from '../../../../actions/scenarios/scenario-actions';
+import { checkScenarioTagRules, updateScenario } from '../../../../actions/scenarios/scenario-actions';
+import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { Scenario, ScenarioInput } from '../../../../utils/api-types';
+import type {
+  CheckScenarioRulesOutput,
+  Scenario,
+  UpdateScenarioInput,
+} from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useScenarioPermissions from '../../../../utils/Scenario';
 import ScenarioForm from '../ScenarioForm';
@@ -23,6 +28,11 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const permissions = useScenarioPermissions(scenario.scenario_id);
+
+  // apply rule dialog
+  const [openApplyRule, setOpenApplyRule] = useState(false);
+  const handleOpenApplyRule = () => setOpenApplyRule(true);
+  const handleCloseApplyRule = () => setOpenApplyRule(false);
 
   // Scenario form
   const initialValues = (({
@@ -54,25 +64,58 @@ const ScenarioUpdate: FunctionComponent<Props> = ({
     scenario_mail_from: scenario_mail_from ?? '',
     scenario_mails_reply_to: scenario_mails_reply_to ?? [],
   }))(scenario);
-  const submitEdit = (data: ScenarioInput) => {
+
+  const [scenarioFormData, setScenarioFormData] = useState<UpdateScenarioInput>(initialValues);
+
+  const submitScenarioUpdate = (data: UpdateScenarioInput) => {
     dispatch(updateScenario(scenario.scenario_id, data));
     handleClose();
   };
 
+  const submitEdit = (data: UpdateScenarioInput) => {
+    setScenarioFormData(data);
+
+    // before updating the scenario we are checking if tag rules could apply
+    // -> if yes we ask the user to apply or not apply the rules at the update
+    checkScenarioTagRules(scenario.scenario_id, data.scenario_tags ?? []).then(
+      (result: { data: CheckScenarioRulesOutput }) => {
+        if (result.data.rules_found) {
+          handleOpenApplyRule();
+        } else {
+          submitScenarioUpdate(data);
+        }
+      },
+    );
+  };
+
+  const handleTagRuleChoice = (shouldApply: boolean) => {
+    scenarioFormData.apply_tag_rule = shouldApply;
+    submitScenarioUpdate(scenarioFormData);
+    handleCloseApplyRule();
+  };
+
   return (
-    <Drawer
-      open={open}
-      handleClose={handleClose}
-      title={t('Update the scenario')}
-    >
-      <ScenarioForm
-        initialValues={initialValues}
-        editing
-        disabled={permissions.readOnly}
-        onSubmit={submitEdit}
+    <>
+      <Drawer
+        open={open}
         handleClose={handleClose}
+        title={t('Update the scenario')}
+      >
+        <ScenarioForm
+          initialValues={initialValues}
+          editing
+          disabled={permissions.readOnly}
+          onSubmit={submitEdit}
+          handleClose={handleClose}
+        />
+      </Drawer>
+      <DialogApplyTagRule
+        open={openApplyRule}
+        handleClose={handleCloseApplyRule}
+        handleApplyRule={() => handleTagRuleChoice(true)}
+        handleDontApplyRule={() => handleTagRuleChoice(false)}
       />
-    </Drawer>
+    </>
   );
 };
 

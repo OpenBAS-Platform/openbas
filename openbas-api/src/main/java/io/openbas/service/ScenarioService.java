@@ -301,7 +301,7 @@ public class ScenarioService {
   }
 
   /**
-   * Update the scenario and each of the injects to add/remove default asset groups
+   * Update the scenario and each of the injects to add default asset groups
    *
    * @param scenario
    * @param currentTags list of the tags before the update
@@ -319,21 +319,13 @@ public class ScenarioService {
                   .map(Tag::getId)
                   .toList());
 
-      // Get asset groups from the TagRule of the removed tags
-      List<AssetGroup> defaultAssetGroupsToRemove =
-          tagRuleService.getAssetGroupsFromTagIds(
-              currentTags.stream()
-                  .filter(tag -> !scenario.getTags().contains(tag))
-                  .map(Tag::getId)
-                  .toList());
-
-      // Add/remove the default asset groups to/from the injects
-      scenario
-          .getInjects()
+      // Add the default asset groups to/from the injects
+      scenario.getInjects().stream()
+          .filter(injectService::canApplyAssetGroupToInject)
           .forEach(
               inject ->
                   injectService.applyDefaultAssetGroupsToInject(
-                      inject.getId(), defaultAssetGroupsToAdd, defaultAssetGroupsToRemove));
+                      inject.getId(), defaultAssetGroupsToAdd));
     }
     scenario.setUpdatedAt(now());
     return this.scenarioRepository.save(scenario);
@@ -589,6 +581,12 @@ public class ScenarioService {
       return scenarioRepository.save(scenario);
     }
     throw new ElementNotFoundException();
+  }
+
+  public boolean checkIfTagRulesApplies(
+      @NotNull final Scenario scenario, @NotNull final List<String> newTags) {
+    return tagRuleService.checkIfRulesApply(
+        scenario.getTags().stream().map(Tag::getId).toList(), newTags);
   }
 
   private void getListOfScenarioTeams(

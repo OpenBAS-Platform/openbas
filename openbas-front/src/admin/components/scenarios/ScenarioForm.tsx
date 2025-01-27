@@ -1,5 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, AlertTitle, Autocomplete, Button, Chip, Grid, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
+import {
+  Alert,
+  AlertTitle,
+  Autocomplete,
+  Button,
+  Chip,
+  Grid,
+  MenuItem,
+  TextField as MuiTextField,
+  Typography,
+} from '@mui/material';
 import { FunctionComponent, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -302,6 +312,7 @@ const ScenarioForm: FunctionComponent<Props> = ({
           {editing ? t('Update') : t('Create')}
         </Button>
       </div>
+
     </form>
   );
 };

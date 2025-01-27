@@ -208,7 +208,6 @@ class ScenarioServiceTest {
     setUpWithMockRepository();
     AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
     AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
-    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
     Tag tag1 = TagFixture.getTag("Tag1");
     Tag tag2 = TagFixture.getTag("Tag2");
     Tag tag3 = TagFixture.getTag("Tag3");
@@ -220,13 +219,11 @@ class ScenarioServiceTest {
     scenario.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
     List<AssetGroup> assetGroupsToAdd = List.of(assetGroup1, assetGroup2);
-    List<AssetGroup> assetGroupsToRemove = List.of(assetGroup3);
 
     when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag1.getId())))
         .thenReturn(assetGroupsToAdd);
-    when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag3.getId())))
-        .thenReturn(assetGroupsToRemove);
     when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
+    when(injectService.canApplyAssetGroupToInject(any())).thenReturn(true);
 
     scenarioService.updateScenario(scenario, currentTags, true);
 
@@ -235,17 +232,15 @@ class ScenarioServiceTest {
         .forEach(
             inject ->
                 verify(injectService)
-                    .applyDefaultAssetGroupsToInject(
-                        inject.getId(), assetGroupsToAdd, assetGroupsToRemove));
+                    .applyDefaultAssetGroupsToInject(inject.getId(), assetGroupsToAdd));
     verify(mockScenarioRepository).save(scenario);
   }
 
   @Test
-  public void testUpdateScenario_WITH_applyRule_false() {
+  public void testUpdateScenario_WITH_applyRule_true_and_manual_inject() {
     setUpWithMockRepository();
     AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
     AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
-    AssetGroup assetGroup3 = getAssetGroup("assetgroup3");
     Tag tag1 = TagFixture.getTag("Tag1");
     Tag tag2 = TagFixture.getTag("Tag2");
     Tag tag3 = TagFixture.getTag("Tag3");
@@ -257,17 +252,43 @@ class ScenarioServiceTest {
     scenario.setTags(Set.of(tag1, tag2));
     Set<Tag> currentTags = Set.of(tag2, tag3);
     List<AssetGroup> assetGroupsToAdd = List.of(assetGroup1, assetGroup2);
-    List<AssetGroup> assetGroupsToRemove = List.of(assetGroup3);
 
     when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag1.getId())))
         .thenReturn(assetGroupsToAdd);
-    when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag3.getId())))
-        .thenReturn(assetGroupsToRemove);
     when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
+    when(injectService.canApplyAssetGroupToInject(any())).thenReturn(false);
+
+    scenarioService.updateScenario(scenario, currentTags, true);
+
+    verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any());
+    verify(mockScenarioRepository).save(scenario);
+  }
+
+  @Test
+  public void testUpdateScenario_WITH_applyRule_false() {
+    setUpWithMockRepository();
+    AssetGroup assetGroup1 = getAssetGroup("assetgroup1");
+    AssetGroup assetGroup2 = getAssetGroup("assetgroup2");
+    Tag tag1 = TagFixture.getTag("Tag1");
+    Tag tag2 = TagFixture.getTag("Tag2");
+    Tag tag3 = TagFixture.getTag("Tag3");
+    Inject inject1 = new Inject();
+    inject1.setId("1");
+    Inject inject2 = new Inject();
+    inject1.setId("2");
+    Scenario scenario = ScenarioFixture.getScenario(null, Set.of(inject1, inject2));
+    scenario.setTags(Set.of(tag1, tag2));
+    Set<Tag> currentTags = Set.of(tag2, tag3);
+    List<AssetGroup> assetGroupsToAdd = List.of(assetGroup1, assetGroup2);
+
+    when(tagRuleService.getAssetGroupsFromTagIds(List.of(tag1.getId())))
+        .thenReturn(assetGroupsToAdd);
+    when(mockScenarioRepository.save(scenario)).thenReturn(scenario);
+    when(injectService.canApplyAssetGroupToInject(any())).thenReturn(true);
 
     scenarioService.updateScenario(scenario, currentTags, false);
 
-    verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any(), any());
+    verify(injectService, never()).applyDefaultAssetGroupsToInject(any(), any());
   }
 
   private AssetGroup getAssetGroup(String name) {
