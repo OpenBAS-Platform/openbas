@@ -201,7 +201,7 @@ public class InjectExpectationService {
           injectExpectation.getResults().stream()
               .filter(r -> !sourceId.equals(r.getSourceId()))
               .toList());
-      if (injectExpectation.getType() == InjectExpectation.EXPECTATION_TYPE.MANUAL) {
+      if (MANUAL.equals(injectExpectation.getType())) {
         injectExpectation.setScore(null);
       } else {
         List<Double> scores =
@@ -232,8 +232,10 @@ public class InjectExpectationService {
                     .toList());
             expectationAsset.setScore(updated.getScore());
             expectationAsset.setUpdatedAt(updated.getUpdatedAt());
+
             deleteInjectExpectationResultAgent(sourceId, expectationAsset);
           });
+
       injectExpectationRepository.saveAll(expectationAssets);
     } else if (isAssetExpectation) {
       // Delete InjectExpectations results for Agents installed on this asset
