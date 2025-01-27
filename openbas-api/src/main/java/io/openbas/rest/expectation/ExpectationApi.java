@@ -104,6 +104,9 @@ public class ExpectationApi extends RestBehavior {
     return injectExpectationService.detectionExpectationsNotFill(sourceId).stream().toList();
   }
 
+  @Operation(
+      summary = "Update Inject Expectation",
+      description = "Update Inject expectation from an external source, e.g., EDR collector.")
   @PutMapping(API_INJECTS_EXPECTATIONS + "/{expectationId}")
   @Transactional(rollbackOn = Exception.class)
   public InjectExpectation updateInjectExpectation(

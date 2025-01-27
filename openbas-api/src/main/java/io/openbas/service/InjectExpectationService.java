@@ -129,29 +129,7 @@ public class InjectExpectationService {
 
     if (isAssetGroupExpectation) {
       // Update InjectExpectations for Assets linked to this asset group
-      List<InjectExpectation> expectationAssets =
-          this.expectationsForAssets(
-              updated.getInject(), updated.getAssetGroup(), updated.getType());
-
-      expectationAssets.forEach(
-          expectationAsset -> {
-            expectationAsset
-                .getResults()
-                .add(
-                    buildInjectExpectationResult(
-                        input.getSourceId(),
-                        input.getSourceType(),
-                        input.getSourceName(),
-                        result,
-                        input.getScore()));
-
-            expectationAsset.setScore(updated.getScore());
-            expectationAsset.setUpdatedAt(updated.getUpdatedAt());
-
-            updateInjectExpectationAgent(input, expectationAsset, result);
-          });
-
-      injectExpectationRepository.saveAll(expectationAssets);
+      updateInjectExpectationAsset(input, updated, result);
     } else if (isAssetExpectation) {
       // Update InjectExpectations for Agents linked to this asset
       updateInjectExpectationAgent(input, updated, result);
@@ -162,6 +140,32 @@ public class InjectExpectationService {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
     return updated;
+  }
+
+  private void updateInjectExpectationAsset(
+      ExpectationUpdateInput input, InjectExpectation updated, String result) {
+    List<InjectExpectation> expectationAssets =
+        this.expectationsForAssets(updated.getInject(), updated.getAssetGroup(), updated.getType());
+
+    expectationAssets.forEach(
+        expectationAsset -> {
+          expectationAsset
+              .getResults()
+              .add(
+                  buildInjectExpectationResult(
+                      input.getSourceId(),
+                      input.getSourceType(),
+                      input.getSourceName(),
+                      result,
+                      input.getScore()));
+
+          expectationAsset.setScore(updated.getScore());
+          expectationAsset.setUpdatedAt(updated.getUpdatedAt());
+
+          updateInjectExpectationAgent(input, expectationAsset, result);
+        });
+
+    injectExpectationRepository.saveAll(expectationAssets);
   }
 
   private void updateInjectExpectationAgent(
@@ -187,6 +191,8 @@ public class InjectExpectationService {
 
     injectExpectationRepository.saveAll(expectationAgents);
   }
+
+  // -- DELETE RESULT FROM UI --
 
   public InjectExpectation deleteInjectExpectationResult(
       @NotBlank final String expectationId, @NotBlank final String sourceId) {
@@ -220,23 +226,7 @@ public class InjectExpectationService {
 
     if (isAssetGroupExpectation) {
       // Delete result InjectExpectations for Assets linked to this asset group
-      List<InjectExpectation> expectationAssets =
-          this.expectationsForAssets(
-              updated.getInject(), updated.getAssetGroup(), updated.getType());
-
-      expectationAssets.forEach(
-          expectationAsset -> {
-            expectationAsset.setResults(
-                expectationAsset.getResults().stream()
-                    .filter(r -> !sourceId.equals(r.getSourceId()))
-                    .toList());
-            expectationAsset.setScore(updated.getScore());
-            expectationAsset.setUpdatedAt(updated.getUpdatedAt());
-
-            deleteInjectExpectationResultAgent(sourceId, expectationAsset);
-          });
-
-      injectExpectationRepository.saveAll(expectationAssets);
+      deleteInjectExpectationResultAsset(sourceId, updated);
     } else if (isAssetExpectation) {
       // Delete InjectExpectations results for Agents installed on this asset
       deleteInjectExpectationResultAgent(sourceId, updated);
@@ -248,6 +238,25 @@ public class InjectExpectationService {
     }
 
     return updated;
+  }
+
+  private void deleteInjectExpectationResultAsset(String sourceId, InjectExpectation updated) {
+    List<InjectExpectation> expectationAssets =
+        this.expectationsForAssets(updated.getInject(), updated.getAssetGroup(), updated.getType());
+
+    expectationAssets.forEach(
+        expectationAsset -> {
+          expectationAsset.setResults(
+              expectationAsset.getResults().stream()
+                  .filter(r -> !sourceId.equals(r.getSourceId()))
+                  .toList());
+          expectationAsset.setScore(updated.getScore());
+          expectationAsset.setUpdatedAt(updated.getUpdatedAt());
+
+          deleteInjectExpectationResultAgent(sourceId, expectationAsset);
+        });
+
+    injectExpectationRepository.saveAll(expectationAssets);
   }
 
   private void deleteInjectExpectationResultAgent(String sourceId, InjectExpectation updated) {
@@ -266,6 +275,8 @@ public class InjectExpectationService {
 
     injectExpectationRepository.saveAll(expectationAgents);
   }
+
+  // -- COMMUN --
 
   private void computeExpectationsForTeamsAndPlayer(InjectExpectation updated, String result) {
     // If the updated expectation was a player expectation, We have to update the team expectation
@@ -402,8 +413,18 @@ public class InjectExpectationService {
             input.getMetadata());
 
     Inject inject = injectExpectation.getInject();
-
     // Compute potential expectations for asset
+    propagateUpdateToAssets(injectExpectation, inject, collector);
+    // Compute potential expectations for asset groups
+    propagateUpdateToAssetGroups(inject, collector);
+
+    // end of computing
+
+    return injectExpectation;
+  }
+
+  private void propagateUpdateToAssets(
+      InjectExpectation injectExpectation, Inject inject, Collector collector) {
     InjectExpectation finalInjectExpectation = injectExpectation;
     List<InjectExpectation> expectationAssets =
         inject.getExpectations().stream()
@@ -431,8 +452,9 @@ public class InjectExpectationService {
                 collector.getName());
           }
         }));
+  }
 
-    // Compute potential expectations for asset groups
+  private void propagateUpdateToAssetGroups(Inject inject, Collector collector) {
     List<InjectExpectation> expectationAssetGroups =
         inject.getExpectations().stream().filter(e -> e.getAssetGroup() != null).toList();
     expectationAssetGroups.forEach(
@@ -452,9 +474,6 @@ public class InjectExpectationService {
                 collector.getName());
           }
         }));
-    // end of computing
-
-    return injectExpectation;
   }
 
   // -- COMPUTE RESULTS FROM INJECT EXPECTATIONS --
