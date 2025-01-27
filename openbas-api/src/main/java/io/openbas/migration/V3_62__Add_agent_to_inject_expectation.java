@@ -13,7 +13,7 @@ public class V3_62__Add_agent_to_inject_expectation extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    // Add asset to inject expectation
+    // Add agent to inject expectation
     select.execute(
         """
         ALTER TABLE injects_expectations ADD COLUMN agent_id varchar(256) constraint fk_agent references agents on delete cascade;
