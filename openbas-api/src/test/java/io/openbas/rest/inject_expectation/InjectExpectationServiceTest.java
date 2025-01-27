@@ -141,10 +141,10 @@ class InjectExpectationServiceTest extends IntegrationTest {
         ExpectationFixture.createPreventionExpectationForAssetGroup(
             savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAsset =
-        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+        ExpectationFixture.createTechnicalDetectionExpectation(
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectationAsset =
-        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
+        ExpectationFixture.createTechnicalPreventionExpectation(
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --
@@ -230,10 +230,10 @@ class InjectExpectationServiceTest extends IntegrationTest {
         ExpectationFixture.createPreventionExpectationForAssetGroup(
             savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAsset =
-        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+        ExpectationFixture.createTechnicalDetectionExpectation(
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
     PreventionExpectation preventionExpectationAsset =
-        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
+        ExpectationFixture.createTechnicalPreventionExpectation(
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
 
     // -- EXECUTE --

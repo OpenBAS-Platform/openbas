@@ -134,7 +134,7 @@ public class ExpectationApiTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+          ExpectationFixture.createTechnicalDetectionExpectation(
               savedEndpoint, EXPIRATION_TIME_SIX_HOURS);
 
       injectExpectationService.buildAndSaveInjectExpectations(

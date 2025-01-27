@@ -23,30 +23,6 @@ public class ExpectationFixture {
         Collections.emptyList());
   }
 
-  public static PreventionExpectation createPreventionExpectationAssetForAssetGroup(
-      Asset asset, Long expirationTime) {
-    return PreventionExpectation.preventionExpectationForAsset(
-        SCORE,
-        "Prevention",
-        "Prevention Expectation",
-        asset,
-        true,
-        expirationTime,
-        Collections.emptyList());
-  }
-
-  public static PreventionExpectation createPreventionExpectationForAssetGroup(
-      AssetGroup assetGroup, Long expirationTime) {
-    return PreventionExpectation.preventionExpectationForAssetGroup(
-        SCORE,
-        "Prevention",
-        "Prevention Expectation",
-        assetGroup,
-        false,
-        expirationTime,
-        Collections.emptyList());
-  }
-
   public static DetectionExpectation createTechnicalDetectionExpectation(
       Asset asset, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
@@ -59,14 +35,14 @@ public class ExpectationFixture {
         Collections.emptyList());
   }
 
-  public static DetectionExpectation createDetectionExpectationAssetForAssetGroup(
-      Asset asset, Long expirationTime) {
-    return DetectionExpectation.detectionExpectationForAsset(
+  public static PreventionExpectation createPreventionExpectationForAssetGroup(
+      AssetGroup assetGroup, Long expirationTime) {
+    return PreventionExpectation.preventionExpectationForAssetGroup(
         SCORE,
-        "Detection",
-        "Detection Expectation",
-        asset,
-        true,
+        "Prevention",
+        "Prevention Expectation",
+        assetGroup,
+        false,
         expirationTime,
         Collections.emptyList());
   }

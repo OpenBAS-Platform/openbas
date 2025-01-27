@@ -109,7 +109,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+          ExpectationFixture.createTechnicalDetectionExpectation(
               savedEndpoint, EXPIRATION_TIME_1_s);
 
       injectExpectationService.buildAndSaveInjectExpectations(
@@ -200,7 +200,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+          ExpectationFixture.createTechnicalDetectionExpectation(
               savedEndpoint, EXPIRATION_TIME_1_s);
 
       injectExpectationService.buildAndSaveInjectExpectations(
@@ -313,7 +313,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+          ExpectationFixture.createTechnicalDetectionExpectation(
               savedEndpoint, EXPIRATION_TIME_1_s);
 
       injectExpectationService.buildAndSaveInjectExpectations(
@@ -429,7 +429,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
+          ExpectationFixture.createTechnicalDetectionExpectation(
               savedEndpoint, EXPIRATION_TIME_1_s);
 
       injectExpectationService.buildAndSaveInjectExpectations(
