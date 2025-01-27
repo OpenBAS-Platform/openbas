@@ -37,7 +37,7 @@ public class ExpectationApi extends RestBehavior {
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
-    return this.injectExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
+    return injectExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
   }
 
   @GetMapping(API_INJECTS_EXPECTATIONS)

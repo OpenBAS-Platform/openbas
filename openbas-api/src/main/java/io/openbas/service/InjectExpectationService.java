@@ -233,7 +233,7 @@ public class InjectExpectationService {
     }
 
     // If The expectation is type manual, We should update expectations for teams and players
-    if (updated.getType() == MANUAL && updated.getTeam() != null) {
+    if (MANUAL.equals(updated.getType()) && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, null);
     }
 

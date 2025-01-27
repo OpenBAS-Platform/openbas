@@ -69,7 +69,7 @@ public class ExpectationsExpirationManagerService {
                   expectationAsset.getInject(),
                   expectationAsset.getAsset(),
                   expectationAsset.getType());
-          // Every expectation agent are filled
+          // Every agent expectation is filled
           if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.injectExpectationService.computeExpectationAsset(
                 expectationAsset, expectationAgents, this.config.getId(), COLLECTOR, PRODUCT_NAME);
@@ -88,7 +88,7 @@ public class ExpectationsExpirationManagerService {
                   expectationAssetGroup.getInject(),
                   expectationAssetGroup.getAssetGroup(),
                   expectationAssetGroup.getType());
-          // Every expectation assets are filled
+          // Every asset expectation is filled
           if (expectationAssets.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.injectExpectationService.computeExpectationGroup(
                 expectationAssetGroup,
