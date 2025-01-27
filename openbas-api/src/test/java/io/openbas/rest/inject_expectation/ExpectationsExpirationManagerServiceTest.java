@@ -295,7 +295,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("The agent expectation are already filled")
+    @DisplayName("The agent expectations are already filled")
     @WithMockAdminUser
     void agentExpectationsAreAlreadyFilled() {
       // -- PREPARE --
@@ -319,7 +319,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
       injectExpectationService.buildAndSaveInjectExpectations(
           executableInject, List.of(detectionExpectation, detectionExpectationForAsset));
 
-      // Update one expectation from one agent with source collector-id
+      // Update agent expectations with source collector-id
       List<InjectExpectation> injectExpectations =
           List.of(
               injectExpectationRepository

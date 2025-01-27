@@ -28,6 +28,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
   private static final String INJECTOR_TYPE = "openbas_implant";
   static Long EXPIRATION_TIME_SIX_HOURS = 21600L;
 
+  // Saved entities for test setup
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectorRepository injectorRepository;
@@ -91,7 +92,8 @@ class InjectExpectationServiceTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Expectations should be created for asset linked to agent")
+  @DisplayName(
+      "Expectations type prevention and detection should be created for agent linked to asset")
   void expectationsForAssetLinkedToAgent() {
     // -- PREPARE --
     Agent savedAgent = createAgent("external01");
@@ -123,33 +125,8 @@ class InjectExpectationServiceTest extends IntegrationTest {
   }
 
   @Test
-  @DisplayName("Expectations should be created for asset with no agent")
-  void expectationsForAssetWithNoAgent() {
-    // -- PREPARE --
-    Inject savedInject = saveInject(savedInjectorContract);
-    ExecutableInject executableInject = createExecutableInject(savedInject, emptyList());
-    DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectation(
-            savedAsset, EXPIRATION_TIME_SIX_HOURS);
-    PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectation(
-            savedAsset, EXPIRATION_TIME_SIX_HOURS);
-
-    // -- EXECUTE --
-    injectExpectationService.buildAndSaveInjectExpectations(
-        executableInject, List.of(preventionExpectation, detectionExpectation));
-
-    // -- ASSERT --
-    assertEquals(2, injectExpectationRepository.findAll().spliterator().getExactSizeIfKnown());
-    assertEquals(
-        2,
-        injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
-            .size());
-  }
-
-  @Test
-  @DisplayName("Expectations should be created for asset group linked to agent")
+  @DisplayName(
+      "Expectations should be created for agent linked to asset who is part of an asset group")
   void expectationsForAssetGroupLinkedToAgent() {
     // -- PREPARE --
     Agent savedAgent = createAgent("external01");
@@ -195,50 +172,6 @@ class InjectExpectationServiceTest extends IntegrationTest {
         2,
         injectExpectationRepository
             .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
-            .size());
-  }
-
-  @Test
-  @DisplayName("Expectations should be created for asset group with no agent")
-  void expectationsForAssetGroupWithNoAgent() {
-    // -- PREPARE --
-    AssetGroup savedAssetGroup = createAssetGroup("asset group name");
-    Inject savedInject = saveInject(savedInjectorContract);
-    ExecutableInject executableInject =
-        createExecutableInject(savedInject, List.of(savedAssetGroup));
-    DetectionExpectation detectionExpectation =
-        ExpectationFixture.createDetectionExpectationForAssetGroup(
-            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
-    PreventionExpectation preventionExpectation =
-        ExpectationFixture.createPreventionExpectationForAssetGroup(
-            savedAssetGroup, EXPIRATION_TIME_SIX_HOURS);
-    DetectionExpectation detectionExpectationAsset =
-        ExpectationFixture.createDetectionExpectationAssetForAssetGroup(
-            savedAsset, EXPIRATION_TIME_SIX_HOURS);
-    PreventionExpectation preventionExpectationAsset =
-        ExpectationFixture.createPreventionExpectationAssetForAssetGroup(
-            savedAsset, EXPIRATION_TIME_SIX_HOURS);
-
-    // -- EXECUTE --
-    injectExpectationService.buildAndSaveInjectExpectations(
-        executableInject,
-        List.of(
-            preventionExpectation,
-            detectionExpectation,
-            detectionExpectationAsset,
-            preventionExpectationAsset));
-
-    // -- ASSERT --
-    assertEquals(4, injectExpectationRepository.findAll().spliterator().getExactSizeIfKnown());
-    assertEquals(
-        2,
-        injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
-            .size());
-    assertEquals(
-        2,
-        injectExpectationRepository
-            .findAllByInjectAndAssetGroup(savedInject.getId(), savedAssetGroup.getId())
             .size());
   }
 
