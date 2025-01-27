@@ -10,6 +10,7 @@ import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.repository.TagRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.ForbiddenException;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class TagRuleService {
+  private static final String OPEN_CTI_TAG_NAME = "opencti";
+
   private final TagRuleRepository tagRuleRepository;
   private final TagRepository tagRepository;
   private final AssetGroupRepository assetGroupRepository;
@@ -38,6 +41,13 @@ public class TagRuleService {
   }
 
   public TagRule createTagRule(@NotBlank final String tagName, final List<String> assetGroupIds) {
+    // we block creation of tagrule for the opencti tag as the only rule for this tag will be
+    // created by default
+    if (OPEN_CTI_TAG_NAME.equals(tagName)) {
+      throw new ForbiddenException(
+          "Creation of a rule is not allowed for the tag " + OPEN_CTI_TAG_NAME);
+    }
+
     // if the tag  or one of the asset group doesn't exist we exist throw a ElementNotFoundException
     TagRule tagRule = new TagRule();
     tagRule.setTag(getTag(tagName));
@@ -55,6 +65,12 @@ public class TagRuleService {
             .orElseThrow(
                 () -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
 
+    // we block update of the tag in the opencti tag rule
+    if (OPEN_CTI_TAG_NAME.equals(tagRule.getTag().getName())
+        && !OPEN_CTI_TAG_NAME.equals(tagName)) {
+      throw new ForbiddenException("Update of the tag " + OPEN_CTI_TAG_NAME + " is not allowed");
+    }
+
     tagRule.setTag(getTag(tagName));
 
     // if one of the asset groups doesn't exist throw a ResourceNotFoundException
@@ -69,9 +85,17 @@ public class TagRuleService {
 
   public void deleteTagRule(@NotBlank final String tagRuleId) {
     // verify that the TagRule exists
-    tagRuleRepository
-        .findById(tagRuleId)
-        .orElseThrow(() -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
+    TagRule tagRule =
+        tagRuleRepository
+            .findById(tagRuleId)
+            .orElseThrow(
+                () -> new ElementNotFoundException("TagRule not found with id: " + tagRuleId));
+    // we block deletion of tagrule for the opencti tag
+    if (OPEN_CTI_TAG_NAME.equals(tagRule.getTag().getName())) {
+      throw new ForbiddenException(
+          "Deletion of a rule of the tag " + OPEN_CTI_TAG_NAME + " is not allowed");
+    }
+
     tagRuleRepository.deleteById(tagRuleId);
   }
 
@@ -113,6 +137,26 @@ public class TagRuleService {
     return Stream.concat(inputAssetGroups.stream(), defaultAssetGroups.stream())
         .filter(assetGroup -> uniqueAssetGrousIds.add(assetGroup.getId()))
         .toList();
+  }
+
+  /**
+   * This method will verify based on the current list of tags and the new list of tags if some tags
+   * linked to TagRules have been added
+   *
+   * @param currentTags
+   * @param newTags
+   * @return
+   */
+  public boolean checkIfRulesApply(
+      @NotNull final List<String> currentTags, @NotNull final List<String> newTags) {
+    List<AssetGroup> assetGroupsToAdd =
+        getAssetGroupsFromTagIds(
+            newTags.stream().filter(tag -> !currentTags.contains(tag)).toList());
+    if (assetGroupsToAdd.size() > 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @VisibleForTesting
