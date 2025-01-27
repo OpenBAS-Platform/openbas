@@ -203,12 +203,12 @@ public class InjectsExecutionJob implements Job {
               LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
               // Executor logics
               ExecutableInject newExecutableInject = executableInject;
+              // Status
+              InjectStatus injectStatus =
+                  this.injectService.initializeInjectStatus(
+                      inject.getId(), ExecutionStatus.EXECUTING, null);
+              inject.setStatus(injectStatus);
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-                // Status
-                InjectStatus injectStatus =
-                    this.injectService.initializeInjectStatus(
-                        inject.getId(), ExecutionStatus.EXECUTING, null);
-                inject.setStatus(injectStatus);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
