@@ -71,6 +71,7 @@ class InjectServiceTest {
   ObjectMapper mapper;
 
   @InjectMocks private InjectService injectService;
+  @InjectMocks private InjectStatusService injectStatusService;
 
   @BeforeEach
   void setUp() {
@@ -607,7 +608,7 @@ class InjectServiceTest {
     when(injectUtils.getStatusPayloadFromInject(inject)).thenReturn(statusPayload);
     when(injectRepository.findById(injectId)).thenReturn(Optional.of(inject));
 
-    injectService.initializeInjectStatus(inject.getId(), executionStatus, null);
+    injectStatusService.initializeInjectStatus(inject, executionStatus, null);
 
     ArgumentCaptor<InjectStatus> statusCaptor = ArgumentCaptor.forClass(InjectStatus.class);
     verify(injectStatusRepository).save(statusCaptor.capture());
