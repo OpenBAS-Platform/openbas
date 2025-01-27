@@ -121,6 +121,12 @@ public class EmailService {
 
   private void storeMessageImap(Execution execution, MimeMessage mimeMessage)
       throws InterruptedException {
+    if (!imapEnabled) {
+      execution.addTrace(
+          getNewSuccessTrace(
+              "Mail successfully send (imap disabled)", ExecutionTraceAction.COMPLETE));
+      return;
+    }
     if (execution.isRuntime() && imapEnabled) {
       for (int i = 0; i < 3; i++) {
         try {
