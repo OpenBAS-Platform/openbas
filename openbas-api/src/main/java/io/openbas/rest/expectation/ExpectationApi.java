@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class ExpectationApi extends RestBehavior {
 
-  public static final String API_EXPECTATIONS = "/api/expectations";
-  public static final String API_INJECTS_EXPECTATIONS = "/api/injects/expectations";
+  public static final String EXPECTATIONS_URI = "/api/expectations";
+  public static final String INJECTS_EXPECTATIONS_URI = "/api/injects/expectations";
 
   private final InjectExpectationService injectExpectationService;
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping(API_EXPECTATIONS + "/{expectationId}")
+  @PutMapping(EXPECTATIONS_URI + "/{expectationId}")
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
       @Valid @RequestBody final ExpectationUpdateInput input) {
@@ -33,14 +33,14 @@ public class ExpectationApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @DeleteMapping(API_EXPECTATIONS + "/{expectationId}/{sourceId}")
+  @DeleteMapping(EXPECTATIONS_URI + "/{expectationId}/{sourceId}")
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
     return injectExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
   }
 
-  @GetMapping(API_INJECTS_EXPECTATIONS)
+  @GetMapping(INJECTS_EXPECTATIONS_URI)
   public List<InjectExpectation> getInjectExpectationsNotFilled() {
     return Stream.concat(
             injectExpectationService.manualExpectationsNotFill().stream(),
@@ -50,7 +50,7 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping(API_INJECTS_EXPECTATIONS + "/{sourceId}")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
@@ -65,7 +65,7 @@ public class ExpectationApi extends RestBehavior {
       summary = "Get Inject Expectations for a Specific Source",
       description =
           "Retrieves inject expectations of agents installed on an asset for a given source ID.")
-  @GetMapping(API_INJECTS_EXPECTATIONS + "/assets/{sourceId}")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/assets/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
@@ -74,7 +74,7 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping(API_INJECTS_EXPECTATIONS + "/prevention")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/prevention")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
     return injectExpectationService.preventionExpectationsNotFill().stream().toList();
   }
@@ -83,13 +83,13 @@ public class ExpectationApi extends RestBehavior {
       summary = "Get Inject Expectations for a Specific Source and type Prevention",
       description =
           "Retrieves inject expectations of agents installed on an asset for a given source ID and type Prevention.")
-  @GetMapping(API_INJECTS_EXPECTATIONS + "/prevention/{sourceId}")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/prevention/{sourceId}")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.preventionExpectationsNotFill(sourceId).stream().toList();
   }
 
-  @GetMapping(API_INJECTS_EXPECTATIONS + "/detection")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/detection")
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilled() {
     return injectExpectationService.detectionExpectationsNotFill().stream().toList();
   }
@@ -98,7 +98,7 @@ public class ExpectationApi extends RestBehavior {
       summary = "Get Inject Expectations for a Specific Source and type Detection",
       description =
           "Retrieves inject expectations of agents installed on an asset for a given source ID and type detection.")
-  @GetMapping(API_INJECTS_EXPECTATIONS + "/detection/{sourceId}")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/detection/{sourceId}")
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.detectionExpectationsNotFill(sourceId).stream().toList();
@@ -107,7 +107,7 @@ public class ExpectationApi extends RestBehavior {
   @Operation(
       summary = "Update Inject Expectation",
       description = "Update Inject expectation from an external source, e.g., EDR collector.")
-  @PutMapping(API_INJECTS_EXPECTATIONS + "/{expectationId}")
+  @PutMapping(INJECTS_EXPECTATIONS_URI + "/{expectationId}")
   @Transactional(rollbackOn = Exception.class)
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
