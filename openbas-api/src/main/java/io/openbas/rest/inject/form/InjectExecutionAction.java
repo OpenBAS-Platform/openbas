@@ -1,6 +1,6 @@
 package io.openbas.rest.inject.form;
 
-public enum InjectExecutionActionInput {
+public enum InjectExecutionAction {
   prerequisite_check,
   prerequisite_execution,
   cleanup_execution,

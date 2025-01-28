@@ -23,5 +23,5 @@ public class InjectExecutionInput {
   private int duration;
 
   @JsonProperty("execution_action")
-  private InjectExecutionActionInput action;
+  private InjectExecutionAction action;
 }

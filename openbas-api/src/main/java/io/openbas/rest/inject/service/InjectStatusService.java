@@ -8,7 +8,7 @@ import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.inject.form.InjectExecutionActionInput;
+import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
@@ -53,13 +53,13 @@ public class InjectStatusService {
     };
   }
 
-  private ExecutionTraceAction convertExecutionAction(InjectExecutionActionInput status) {
+  private ExecutionTraceAction convertExecutionAction(InjectExecutionAction status) {
     return switch (status) {
-      case InjectExecutionActionInput.prerequisite_check -> ExecutionTraceAction.PREREQUISITE_CHECK;
-      case InjectExecutionActionInput.prerequisite_execution ->
+      case InjectExecutionAction.prerequisite_check -> ExecutionTraceAction.PREREQUISITE_CHECK;
+      case InjectExecutionAction.prerequisite_execution ->
           ExecutionTraceAction.PREREQUISITE_EXECUTION;
-      case InjectExecutionActionInput.cleanup_execution -> ExecutionTraceAction.CLEANUP_EXECUTION;
-      case InjectExecutionActionInput.complete -> ExecutionTraceAction.COMPLETE;
+      case InjectExecutionAction.cleanup_execution -> ExecutionTraceAction.CLEANUP_EXECUTION;
+      case InjectExecutionAction.complete -> ExecutionTraceAction.COMPLETE;
       default -> ExecutionTraceAction.EXECUTION;
     };
   }
@@ -228,8 +228,9 @@ public class InjectStatusService {
   }
 
   @Transactional
-  public void initializeInjectStatus(
-      @NotNull Inject inject, @NotNull ExecutionStatus status, @Nullable ExecutionTraces trace) {
+  public InjectStatus initializeInjectStatus(
+      @NotNull String injectId, @NotNull ExecutionStatus status, @Nullable ExecutionTraces trace) {
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow();
     InjectStatus injectStatus = getOrInitializeInjectStatus(inject);
 
     if (trace != null) {
@@ -238,6 +239,6 @@ public class InjectStatusService {
     injectStatus.setName(status);
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
-    injectStatusRepository.save(injectStatus);
+    return injectStatusRepository.save(injectStatus);
   }
 }
