@@ -1,6 +1,7 @@
 package io.openbas.scheduler.jobs;
 
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -154,8 +155,8 @@ public class InjectsExecutionJob implements Job {
 
     // We are now checking if we depend on another inject and if it did not failed
     Optional<List<String>> errorMessages = Optional.empty();
-    if (executableInject.getExercise() != null) {
-      errorMessages = getErrorMessagesPreExecution(executableInject.getExercise().getId(), inject);
+    if (ofNullable(executableInject.getExerciseId()).isPresent()) {
+      errorMessages = getErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
     }
     if (errorMessages != null && errorMessages.isPresent()) {
       InjectStatus status = new InjectStatus();
