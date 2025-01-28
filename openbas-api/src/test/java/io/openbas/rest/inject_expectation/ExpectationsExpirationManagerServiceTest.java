@@ -23,6 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ExtendWith(MockitoExtension.class)
 public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
 
+  private static final String INJECTION_NAME = "AMSI Bypass - AMSI InitFailed";
+  private static final String INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0144";
+  private static final String INJECTOR_NAME = "OpenBAS Implant";
+  private static final String INJECTOR_TYPE = "openbas_implant";
+
   public static final long EXPIRATION_TIME_1_s = 1L;
   @Autowired private AssetGroupRepository assetGroupRepository;
   @Autowired private EndpointRepository endpointRepository;
@@ -46,12 +51,10 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
   @BeforeAll
   void beforeAll() {
     InjectorContract injectorContract =
-        InjectorContractFixture.createInjectorContract(
-            Map.of("en", "AMSI Bypass - AMSI InitFailed"), "{}");
+        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME), "{}");
     savedInjector =
         injectorRepository.save(
-            InjectorFixture.createInjector(
-                "49229430-b5b5-431f-ba5b-f36f599b0144", "OpenBAS Implant", "openbas_implant"));
+            InjectorFixture.createInjector(INJECTOR_ID, INJECTOR_NAME, INJECTOR_TYPE));
     injectorContract.setInjector(savedInjector);
     savedInjectorContract = injectorContractRepository.save(injectorContract);
 
@@ -68,7 +71,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
     savedInject =
         injectRepository.save(
             InjectFixture.createTechnicalInjectWithAssetGroup(
-                savedInjectorContract, "AMSI Bypass - AMSI InitFailed", savedAssetGroup));
+                savedInjectorContract, INJECTION_NAME, savedAssetGroup));
   }
 
   @AfterAll

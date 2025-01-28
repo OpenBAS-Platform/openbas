@@ -36,6 +36,10 @@ public class ExpectationApiTest extends IntegrationTest {
   private static final String EXPECTATIONS_URI = "/api/expectations/";
   private static final String INJECTS_EXPECTATIONS_URI = "/api/injects/expectations";
 
+  private static final String INJECTION_NAME = "AMSI Bypass - AMSI InitFailed";
+  private static final String INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0144";
+  private static final String INJECTOR_NAME = "OpenBAS Implant";
+  private static final String INJECTOR_TYPE = "openbas_implant";
   static Long EXPIRATION_TIME_SIX_HOURS = 21600L;
 
   @Autowired private MockMvc mvc;
@@ -62,12 +66,10 @@ public class ExpectationApiTest extends IntegrationTest {
   @BeforeAll
   void beforeAll() {
     InjectorContract injectorContract =
-        InjectorContractFixture.createInjectorContract(
-            Map.of("en", "AMSI Bypass - AMSI InitFailed"), "{}");
+        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME), "{}");
     savedInjector =
         injectorRepository.save(
-            InjectorFixture.createInjector(
-                "49229430-b5b5-431f-ba5b-f36f599b0144", "OpenBAS Implant", "openbas_implant"));
+            InjectorFixture.createInjector(INJECTOR_ID, INJECTOR_NAME, INJECTOR_TYPE));
     injectorContract.setInjector(savedInjector);
     savedInjectorContract = injectorContractRepository.save(injectorContract);
 
@@ -84,7 +86,7 @@ public class ExpectationApiTest extends IntegrationTest {
     savedInject =
         injectRepository.save(
             InjectFixture.createTechnicalInjectWithAssetGroup(
-                savedInjectorContract, "AMSI Bypass - AMSI InitFailed", savedAssetGroup));
+                savedInjectorContract, INJECTION_NAME, savedAssetGroup));
 
     // -- Collector --
     Collector collector = new Collector();
