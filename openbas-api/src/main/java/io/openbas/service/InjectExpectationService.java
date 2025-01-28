@@ -230,40 +230,37 @@ public class InjectExpectationService {
     return updated;
   }
 
-  private void deleteInjectExpectationResultAsset(String sourceId, InjectExpectation updated) {
-    List<InjectExpectation> expectationAssets =
-        this.expectationsForAssets(updated.getInject(), updated.getAssetGroup(), updated.getType());
+  private void deleteInjectExpectationResult(
+      String sourceId, InjectExpectation updated, boolean isAsset) {
+    List<InjectExpectation> expectations =
+        isAsset
+            ? this.expectationsForAssets(
+                updated.getInject(), updated.getAssetGroup(), updated.getType())
+            : this.expectationsForAgents(
+                updated.getInject(), updated.getAsset(), updated.getType());
 
-    expectationAssets.forEach(
-        expectationAsset -> {
-          expectationAsset.setResults(
-              expectationAsset.getResults().stream()
+    expectations.forEach(
+        expectation -> {
+          expectation.setResults(
+              expectation.getResults().stream()
                   .filter(r -> !sourceId.equals(r.getSourceId()))
                   .toList());
-          expectationAsset.setScore(updated.getScore());
-          expectationAsset.setUpdatedAt(updated.getUpdatedAt());
-
-          deleteInjectExpectationResultAgent(sourceId, expectationAsset);
+          expectation.setScore(updated.getScore());
+          expectation.setUpdatedAt(updated.getUpdatedAt());
+          if (isAsset) {
+            deleteInjectExpectationResultAgent(sourceId, expectation);
+          }
         });
 
-    injectExpectationRepository.saveAll(expectationAssets);
+    injectExpectationRepository.saveAll(expectations);
+  }
+
+  private void deleteInjectExpectationResultAsset(String sourceId, InjectExpectation updated) {
+    deleteInjectExpectationResult(sourceId, updated, true);
   }
 
   private void deleteInjectExpectationResultAgent(String sourceId, InjectExpectation updated) {
-    List<InjectExpectation> expectationAgents =
-        this.expectationsForAgents(updated.getInject(), updated.getAsset(), updated.getType());
-
-    expectationAgents.forEach(
-        expectationAgent -> {
-          expectationAgent.setResults(
-              expectationAgent.getResults().stream()
-                  .filter(r -> !sourceId.equals(r.getSourceId()))
-                  .toList());
-          expectationAgent.setScore(updated.getScore());
-          expectationAgent.setUpdatedAt(updated.getUpdatedAt());
-        });
-
-    injectExpectationRepository.saveAll(expectationAgents);
+    deleteInjectExpectationResult(sourceId, updated, false);
   }
 
   // -- COMMUN --
