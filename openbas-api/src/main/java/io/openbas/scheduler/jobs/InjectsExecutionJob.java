@@ -1,6 +1,7 @@
 package io.openbas.scheduler.jobs;
 
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -154,8 +155,8 @@ public class InjectsExecutionJob implements Job {
 
     // We are now checking if we depend on another inject and if it did not failed
     Optional<List<String>> errorMessages = Optional.empty();
-    if (executableInject.getExercise() != null) {
-      errorMessages = getErrorMessagesPreExecution(executableInject.getExercise().getId(), inject);
+    if (ofNullable(executableInject.getExerciseId()).isPresent()) {
+      errorMessages = getErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
     }
     if (errorMessages != null && errorMessages.isPresent()) {
       InjectStatus status = new InjectStatus();
@@ -186,11 +187,13 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 // Status
-                this.injectService.initializeInjectStatus(
-                    inject.getId(),
-                    ExecutionStatus.ERROR,
-                    InjectStatusExecution.traceError(
-                        "The inject is not ready to be executed (missing mandatory fields)"));
+                InjectStatus injectStatus =
+                    injectService.initializeInjectStatus(
+                        inject.getId(),
+                        ExecutionStatus.ERROR,
+                        InjectStatusExecution.traceError(
+                            "The inject is not ready to be executed (missing mandatory fields)"));
+                inject.setStatus(injectStatus);
                 return;
               }
 
@@ -201,21 +204,23 @@ public class InjectsExecutionJob implements Job {
               LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
               // Executor logics
               ExecutableInject newExecutableInject = executableInject;
+              // Status
+              InjectStatus injectStatus =
+                  this.injectService.initializeInjectStatus(
+                      inject.getId(), ExecutionStatus.EXECUTING, null);
+              inject.setStatus(injectStatus);
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-                // Status
-                this.injectService.initializeInjectStatus(
-                    inject.getId(), ExecutionStatus.EXECUTING, null);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
 
                 } catch (Exception e) {
-                  InjectStatus injectStatus =
+                  InjectStatus status =
                       inject
                           .getStatus()
                           .orElseThrow(() -> new IllegalArgumentException("Status should exists"));
-                  injectStatus.setName(ExecutionStatus.ERROR);
-                  injectStatusRepository.save(injectStatus);
+                  status.setName(ExecutionStatus.ERROR);
+                  injectStatusRepository.save(status);
                   return;
                 }
               }
@@ -225,11 +230,14 @@ public class InjectsExecutionJob implements Job {
                 executeInternal(newExecutableInject);
               }
             },
-            () ->
-                this.injectService.initializeInjectStatus(
-                    inject.getId(),
-                    ExecutionStatus.ERROR,
-                    InjectStatusExecution.traceError("Inject does not have a contract")));
+            () -> {
+              InjectStatus injectStatus =
+                  this.injectService.initializeInjectStatus(
+                      inject.getId(),
+                      ExecutionStatus.ERROR,
+                      InjectStatusExecution.traceError("Inject does not have a contract"));
+              inject.setStatus(injectStatus);
+            });
   }
 
   /**

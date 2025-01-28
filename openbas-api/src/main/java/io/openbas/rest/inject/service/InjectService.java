@@ -398,13 +398,14 @@ public class InjectService {
   }
 
   @Transactional
-  public void initializeInjectStatus(
+  public InjectStatus initializeInjectStatus(
       @NotNull final String injectId,
       @NotNull final ExecutionStatus status,
       @Nullable final InjectStatusExecution trace) {
 
     Inject inject = this.inject(injectId);
 
+    // re-fetch the injectstatus here to avoid the transactional issue at the deserialization
     InjectStatus injectStatus =
         inject
             .getStatus()
@@ -422,6 +423,7 @@ public class InjectService {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     injectStatusRepository.save(injectStatus);
+    return injectStatus;
   }
 
   /**

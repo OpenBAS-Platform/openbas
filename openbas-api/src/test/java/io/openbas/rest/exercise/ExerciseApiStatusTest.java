@@ -223,7 +223,7 @@ public class ExerciseApiStatusTest {
         assertEquals(
             1,
             injects.stream()
-                .filter((ij) -> SCHEDULED_EXERCISE.getId().equals(ij.getExercise().getId()))
+                .filter((ij) -> SCHEDULED_EXERCISE.getId().equals(ij.getExerciseId()))
                 .toList()
                 .size());
       }
