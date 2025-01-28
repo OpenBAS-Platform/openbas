@@ -33,7 +33,7 @@ const DialogApplyTagRule: FunctionComponent<DialogDeleteProps> = ({
       PaperProps={{ elevation: 1 }}
     >
       <DialogContent>
-        <DialogTitle>
+        <DialogTitle sx={{ paddingLeft: 0 }}>
           {t('ASSET RULE DETECTED')}
         </DialogTitle>
         <DialogContentText>
