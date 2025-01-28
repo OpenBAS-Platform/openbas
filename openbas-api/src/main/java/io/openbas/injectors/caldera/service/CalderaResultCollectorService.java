@@ -49,22 +49,22 @@ public class CalderaResultCollectorService implements Runnable {
     injectStatuses.forEach(
         (injectStatus -> {
           log.log(Level.INFO, "Found inject status: " + injectStatus.getId());
-          //          Instant finalExecutionTime = injectStatus.getTrackingSentDate();
           Map<String, Agent> linksMap = injectStatus.getStatusMapIdentifierAgent();
 
           log.log(Level.INFO, "Found links IDs: " + linksMap.keySet());
           ResultStatus resultStatus = new ResultStatus();
-          for (String linkId : linksMap.keySet()) {
+          for (Map.Entry<String, Agent> entry : linksMap.entrySet()) {
             try {
-              log.log(Level.INFO, "Trying to get result for " + linkId);
-              resultStatus = this.calderaService.results(linkId);
+              log.log(Level.INFO, "Trying to get result for " + entry.getKey());
+              resultStatus = this.calderaService.results(entry.getKey());
             } catch (Exception e) {
               injectStatus.addMayBePreventedTrace(
-                  "Cannot get result for linkID " + linkId + ", injection has failed",
+                  "Cannot get result for linkID " + entry.getKey() + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
-                  linksMap.get(linkId));
+                  entry.getValue());
               log.log(
-                  Level.INFO, "Cannot get result for linkID " + linkId + ", injection has failed");
+                  Level.INFO,
+                  "Cannot get result for linkID " + entry.getKey() + ", injection has failed");
             }
 
             if (resultStatus.getPaw() == null
@@ -72,27 +72,36 @@ public class CalderaResultCollectorService implements Runnable {
                     .getTrackingSentDate()
                     .isBefore(Instant.now().minus(EXPIRATION_TIME / 60, ChronoUnit.MINUTES))) {
               injectStatus.addMayBePreventedTrace(
-                  "Cannot get result for linkID " + linkId + ", injection has failed",
+                  "Cannot get result for linkID " + entry.getKey() + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
-                  linksMap.get(linkId));
+                  entry.getValue());
               log.log(
-                  Level.INFO, "Cannot get result for linkID " + linkId + ", injection has failed");
+                  Level.INFO,
+                  "Cannot get result for linkID " + entry.getKey() + ", injection has failed");
 
             } else if (resultStatus.getPaw() != null
                 && resultStatus.isComplete()
                 && resultStatus.isFail()) {
               injectStatus.addMayBePreventedTrace(
-                  "Failed result for linkID " + linkId + " (" + resultStatus.getContent() + ")",
+                  "Failed result for linkID "
+                      + entry.getKey()
+                      + " ("
+                      + resultStatus.getContent()
+                      + ")",
                   ExecutionTraceAction.COMPLETE,
-                  linksMap.get(linkId));
+                  entry.getValue());
 
             } else if (resultStatus.getPaw() != null
                 && resultStatus.isComplete()
                 && !resultStatus.isFail()) {
               injectStatus.addSuccess(
-                  "Success result for linkID " + linkId + " (" + resultStatus.getContent() + ")",
+                  "Success result for linkID "
+                      + entry.getKey()
+                      + " ("
+                      + resultStatus.getContent()
+                      + ")",
                   ExecutionTraceAction.COMPLETE,
-                  linksMap.get(linkId));
+                  entry.getValue());
 
             } else if (resultStatus.getPaw() != null
                 && !resultStatus.isComplete()
@@ -100,10 +109,10 @@ public class CalderaResultCollectorService implements Runnable {
                     .getTrackingSentDate()
                     .isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
               injectStatus.addMayBePreventedTrace(
-                  "Timeout on linkID " + linkId + ", injection has failed",
+                  "Timeout on linkID " + entry.getKey() + ", injection has failed",
                   ExecutionTraceAction.COMPLETE,
-                  linksMap.get(linkId));
-              log.log(Level.INFO, "Timeout on linkID " + linkId + ", injection has failed");
+                  entry.getValue());
+              log.log(Level.INFO, "Timeout on linkID " + entry.getKey() + ", injection has failed");
             }
           }
 

@@ -92,6 +92,7 @@ public class V3_62__Add_ExecutionTraces_table extends BaseJavaMigration {
           statement.setObject(
               8,
               execution.has("execution_context_identifiers")
+                      && !execution.get("execution_context_identifiers").isNull()
                   ? execution
                       .get("execution_context_identifiers")
                       .toString()

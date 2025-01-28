@@ -23,7 +23,7 @@ public class CalderaResultCollector {
   private final InjectRepository injectRepository;
   private final InjectStatusRepository injectStatusRepository;
   private final CalderaInjectorService calderaService;
-  private final InjectStatusService injectStatusSerive;
+  private final InjectStatusService injectStatusService;
 
   @PostConstruct
   public void init() {
@@ -34,7 +34,7 @@ public class CalderaResultCollector {
               this.injectRepository,
               this.injectStatusRepository,
               this.calderaService,
-              this.injectStatusSerive);
+              this.injectStatusService);
       this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
     }
   }

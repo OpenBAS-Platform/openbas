@@ -152,7 +152,7 @@ public class CalderaExecutor extends Injector {
                                     exploitResult.getCommand(),
                                     ExecutionTraceAction.EXECUTION,
                                     asset.getAgents().getFirst(),
-                                    null));
+                                    List.of()));
                             // Compute expectations
                             boolean isInGroup =
                                 assets.get(

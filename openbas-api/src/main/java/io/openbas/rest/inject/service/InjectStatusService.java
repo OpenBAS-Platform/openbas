@@ -121,7 +121,7 @@ public class InjectStatusService {
     injectStatus.getInject().setUpdatedAt(Instant.now());
   }
 
-  public Inject handleInjectExecutionCallbak(
+  public Inject handleInjectExecutionCallback(
       String injectId, String agentId, InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
