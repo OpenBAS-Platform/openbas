@@ -142,14 +142,18 @@ public class InjectExpectationService {
     return updated;
   }
 
-  private void updateInjectExpectationAsset(
-      ExpectationUpdateInput input, InjectExpectation updated, String result) {
-    List<InjectExpectation> expectationAssets =
-        this.expectationsForAssets(updated.getInject(), updated.getAssetGroup(), updated.getType());
+  private void updateInjectExpectation(
+      ExpectationUpdateInput input, InjectExpectation updated, String result, boolean isAsset) {
+    List<InjectExpectation> expectations =
+        isAsset
+            ? this.expectationsForAssets(
+                updated.getInject(), updated.getAssetGroup(), updated.getType())
+            : this.expectationsForAgents(
+                updated.getInject(), updated.getAsset(), updated.getType());
 
-    expectationAssets.forEach(
-        expectationAsset -> {
-          expectationAsset
+    expectations.forEach(
+        expectation -> {
+          expectation
               .getResults()
               .add(
                   buildInjectExpectationResult(
@@ -158,38 +162,24 @@ public class InjectExpectationService {
                       input.getSourceName(),
                       result,
                       input.getScore()));
-
-          expectationAsset.setScore(updated.getScore());
-          expectationAsset.setUpdatedAt(updated.getUpdatedAt());
-
-          updateInjectExpectationAgent(input, expectationAsset, result);
+          expectation.setScore(updated.getScore());
+          expectation.setUpdatedAt(updated.getUpdatedAt());
+          if (isAsset) {
+            updateInjectExpectationAgent(input, expectation, result);
+          }
         });
 
-    injectExpectationRepository.saveAll(expectationAssets);
+    injectExpectationRepository.saveAll(expectations);
+  }
+
+  private void updateInjectExpectationAsset(
+      ExpectationUpdateInput input, InjectExpectation updated, String result) {
+    updateInjectExpectation(input, updated, result, true);
   }
 
   private void updateInjectExpectationAgent(
       ExpectationUpdateInput input, InjectExpectation updated, String result) {
-    List<InjectExpectation> expectationAgents =
-        this.expectationsForAgents(updated.getInject(), updated.getAsset(), updated.getType());
-
-    expectationAgents.forEach(
-        expectationAgent -> {
-          expectationAgent
-              .getResults()
-              .add(
-                  buildInjectExpectationResult(
-                      input.getSourceId(),
-                      input.getSourceType(),
-                      input.getSourceName(),
-                      result,
-                      input.getScore()));
-
-          expectationAgent.setScore(updated.getScore());
-          expectationAgent.setUpdatedAt(updated.getUpdatedAt());
-        });
-
-    injectExpectationRepository.saveAll(expectationAgents);
+    updateInjectExpectation(input, updated, result, false);
   }
 
   // -- DELETE RESULT FROM UI --
