@@ -128,6 +128,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
         onClick={handleOpenTagCreation}
         edge="end"
         style={{ position: 'absolute', top: 30, right: 35 }}
+        disabled={disabled}
       >
         <AddOutlined />
       </IconButton>
