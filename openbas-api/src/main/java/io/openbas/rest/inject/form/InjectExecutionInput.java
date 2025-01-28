@@ -13,6 +13,7 @@ import lombok.Setter;
 @Getter
 public class InjectExecutionInput {
 
+  @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("execution_message")
   private String message;
 
