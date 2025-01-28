@@ -33,8 +33,8 @@ import org.springframework.test.web.servlet.MockMvc;
 public class ExpectationApiTest extends IntegrationTest {
 
   // API Endpoints
-  private static final String API_EXPECTATIONS = "/api/expectations/";
-  private static final String API_INJECTS_EXPECTATIONS = "/api/injects/expectations";
+  private static final String EXPECTATIONS_URI = "/api/expectations/";
+  private static final String INJECTS_EXPECTATIONS_URI = "/api/injects/expectations";
 
   static Long EXPIRATION_TIME_SIX_HOURS = 21600L;
 
@@ -148,7 +148,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       String response =
           mvc.perform(
-                  put(API_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+                  put(EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                       .content(asJsonString(expectationUpdateInput))
                       .contentType(MediaType.APPLICATION_JSON)
                       .accept(MediaType.APPLICATION_JSON))
@@ -201,7 +201,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       response =
           mvc.perform(
-                  put(API_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+                  put(EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                       .content(asJsonString(expectationUpdateInput))
                       .contentType(MediaType.APPLICATION_JSON)
                       .accept(MediaType.APPLICATION_JSON))
@@ -242,12 +242,13 @@ public class ExpectationApiTest extends IntegrationTest {
 
       // -- EXECUTE --
       mvc.perform(
-              delete(
-                  API_EXPECTATIONS
+              put(
+                  EXPECTATIONS_URI
                       + "/"
                       + injectExpectations.get(0).getId()
                       + "/"
-                      + expectationUpdateInput.getSourceId()))
+                      + expectationUpdateInput.getSourceId()
+                      + "/delete"))
           .andExpect(status().is2xxSuccessful());
 
       assertEquals(
@@ -317,7 +318,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       String response =
           mvc.perform(
-                  put(API_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+                  put(EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                       .content(asJsonString(expectationUpdateInput))
                       .contentType(MediaType.APPLICATION_JSON)
                       .accept(MediaType.APPLICATION_JSON))
@@ -356,7 +357,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       response =
           mvc.perform(
-                  put(API_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+                  put(EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                       .content(asJsonString(expectationUpdateInput))
                       .contentType(MediaType.APPLICATION_JSON)
                       .accept(MediaType.APPLICATION_JSON))
@@ -390,12 +391,13 @@ public class ExpectationApiTest extends IntegrationTest {
 
       // -- EXECUTE --
       mvc.perform(
-              delete(
-                  API_EXPECTATIONS
+              put(
+                  EXPECTATIONS_URI
                       + "/"
                       + injectExpectations.get(0).getId()
                       + "/"
-                      + expectationUpdateInput.getSourceId()))
+                      + expectationUpdateInput.getSourceId()
+                      + "/delete"))
           .andExpect(status().is2xxSuccessful());
 
       assertEquals(
@@ -474,7 +476,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       String response =
           mvc.perform(
-                  get(API_INJECTS_EXPECTATIONS + "/assets/" + savedCollector.getId())
+                  get(INJECTS_EXPECTATIONS_URI + "/assets/" + savedCollector.getId())
                       .accept(MediaType.APPLICATION_JSON))
               .andExpect(status().is2xxSuccessful())
               .andReturn()
@@ -512,7 +514,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       String response =
           mvc.perform(
-                  get(API_INJECTS_EXPECTATIONS + "/prevention/" + savedCollector.getId())
+                  get(INJECTS_EXPECTATIONS_URI + "/prevention/" + savedCollector.getId())
                       .accept(MediaType.APPLICATION_JSON))
               .andExpect(status().is2xxSuccessful())
               .andReturn()
@@ -548,7 +550,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       response =
           mvc.perform(
-                  get(API_INJECTS_EXPECTATIONS + "/prevention/" + savedCollector.getId())
+                  get(INJECTS_EXPECTATIONS_URI + "/prevention/" + savedCollector.getId())
                       .accept(MediaType.APPLICATION_JSON))
               .andExpect(status().is2xxSuccessful())
               .andReturn()
@@ -586,7 +588,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       String response =
           mvc.perform(
-                  get(API_INJECTS_EXPECTATIONS + "/detection/" + savedCollector.getId())
+                  get(INJECTS_EXPECTATIONS_URI + "/detection/" + savedCollector.getId())
                       .accept(MediaType.APPLICATION_JSON))
               .andExpect(status().is2xxSuccessful())
               .andReturn()
@@ -622,7 +624,7 @@ public class ExpectationApiTest extends IntegrationTest {
       // -- EXECUTE --
       response =
           mvc.perform(
-                  get(API_INJECTS_EXPECTATIONS + "/detection/" + savedCollector.getId())
+                  get(INJECTS_EXPECTATIONS_URI + "/detection/" + savedCollector.getId())
                       .accept(MediaType.APPLICATION_JSON))
               .andExpect(status().is2xxSuccessful())
               .andReturn()
@@ -670,7 +672,7 @@ public class ExpectationApiTest extends IntegrationTest {
 
       // -- EXECUTE --
       mvc.perform(
-              put(API_INJECTS_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+              put(INJECTS_EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                   .content(asJsonString(expectationUpdateInput))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
@@ -713,7 +715,7 @@ public class ExpectationApiTest extends IntegrationTest {
 
       // -- EXECUTE --
       mvc.perform(
-              put(API_INJECTS_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+              put(INJECTS_EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                   .content(asJsonString(expectationUpdateInput))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
@@ -782,7 +784,7 @@ public class ExpectationApiTest extends IntegrationTest {
 
       // -- EXECUTE --
       mvc.perform(
-              put(API_INJECTS_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+              put(INJECTS_EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                   .content(asJsonString(expectationUpdateInput))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
@@ -825,7 +827,7 @@ public class ExpectationApiTest extends IntegrationTest {
 
       // -- EXECUTE --
       mvc.perform(
-              put(API_INJECTS_EXPECTATIONS + "/" + injectExpectations.get(0).getId())
+              put(INJECTS_EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                   .content(asJsonString(expectationUpdateInput))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))

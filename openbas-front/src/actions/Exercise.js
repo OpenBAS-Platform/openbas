@@ -81,8 +81,9 @@ export const updateInjectExpectation = (injectExpectationId, data) => dispatch =
   data,
 )(dispatch);
 
-export const deleteInjectExpectationResult = (injectExpectationId, sourceId) => dispatch => delReferential(
-  `/api/expectations/${injectExpectationId}/${sourceId}`, 'injectexpectations', injectExpectationId,
+export const deleteInjectExpectationResult = (injectExpectationId, sourceId) => dispatch => putReferential(
+  schema.injectexpectation,
+  `/api/expectations/${injectExpectationId}/${sourceId}/delete`,
 )(dispatch);
 
 export const deleteExercise = exerciseId => dispatch => delReferential(

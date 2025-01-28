@@ -33,7 +33,7 @@ public class ExpectationApi extends RestBehavior {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @DeleteMapping(EXPECTATIONS_URI + "/{expectationId}/{sourceId}")
+  @PutMapping(EXPECTATIONS_URI + "/{expectationId}/{sourceId}/delete")
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
