@@ -1,6 +1,5 @@
 import { ExpandLessOutlined, ExpandMoreOutlined } from '@mui/icons-material';
 import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { useLocation } from 'react-router';
 
@@ -10,18 +9,6 @@ import { LeftMenuItemWithHref } from './leftmenu-model';
 import SubMenu from './MenuItemSub';
 import { LeftMenuHelpers, LeftMenuState } from './useLeftMenu';
 
-const useStyles = makeStyles(() => ({
-  menuItem: {
-    paddingRight: 2,
-    height: 35,
-  },
-  menuItemText: {
-    padding: '1px 0 0 15px',
-    fontWeight: 500,
-    fontSize: 14,
-  },
-}));
-
 interface Props {
   item: LeftMenuItemWithHref;
   state: LeftMenuState;
@@ -30,7 +17,6 @@ interface Props {
 
 const MenuItemGroup: React.FC<Props> = ({ item, state, helpers }) => {
   // Standard hooks
-  const classes = useStyles();
   const { t } = useFormatter();
   const location = useLocation();
   const { dimension } = useDimensions();
@@ -40,6 +26,7 @@ const MenuItemGroup: React.FC<Props> = ({ item, state, helpers }) => {
   const { handleSelectedMenuOpen, handleSelectedMenuClose, handleSelectedMenuToggle, handleGoToPage } = helpers;
 
   const isCurrentTab = location.pathname === item.path;
+
   return (
     <>
       <MenuItem
@@ -49,21 +36,35 @@ const MenuItemGroup: React.FC<Props> = ({ item, state, helpers }) => {
         aria-label={t(item.label)}
         selected={isCurrentTab}
         dense
-        classes={{ root: classes.menuItem }}
-        onClick={() => (isMobile || navOpen ? handleSelectedMenuToggle(item.href) : handleGoToPage(item.path))}
+        sx={{
+          paddingRight: '2px',
+          height: 35,
+        }}
+        onClick={() =>
+          isMobile || navOpen
+            ? handleSelectedMenuToggle(item.href)
+            : handleGoToPage(item.path)}
         onMouseEnter={() => !navOpen && handleSelectedMenuOpen(item.href)}
         onMouseLeave={() => !navOpen && handleSelectedMenuClose()}
       >
-        <ListItemIcon style={{ minWidth: 20 }}>
-          {item.icon()}
-        </ListItemIcon>
+        <ListItemIcon style={{ minWidth: 20 }}>{item.icon()}</ListItemIcon>
         {navOpen && (
           <>
             <ListItemText
-              classes={{ primary: classes.menuItemText }}
               primary={t(item.label)}
+              slotProps={{
+                primary: {
+                  padding: '1px 0 0 15px',
+                  fontWeight: 500,
+                  fontSize: 14,
+                },
+              }}
             />
-            {selectedMenu === item.href ? <ExpandLessOutlined /> : <ExpandMoreOutlined />}
+            {selectedMenu === item.href ? (
+              <ExpandLessOutlined />
+            ) : (
+              <ExpandMoreOutlined />
+            )}
           </>
         )}
       </MenuItem>

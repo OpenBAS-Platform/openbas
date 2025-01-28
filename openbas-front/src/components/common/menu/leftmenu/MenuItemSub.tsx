@@ -1,5 +1,4 @@
 import { Collapse, ListItemIcon, ListItemText, MenuItem, MenuList, Popover } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import { Link, useLocation } from 'react-router';
 
@@ -7,22 +6,6 @@ import { useFormatter } from '../../../i18n';
 import { LeftMenuSubItem } from './leftmenu-model';
 import StyledTooltip from './StyledTooltip';
 import { LeftMenuHelpers, LeftMenuState } from './useLeftMenu';
-
-const useStyles = makeStyles(() => ({
-  menuSubItem: {
-    paddingLeft: 20,
-  },
-  menuSubItemText: {
-    padding: '1px 0 0 10px',
-    fontWeight: 500,
-    fontSize: 12,
-  },
-  menuItemText: {
-    padding: '1px 0 0 15px',
-    fontWeight: 500,
-    fontSize: 14,
-  },
-}));
 
 interface Props {
   menu: string;
@@ -39,7 +22,6 @@ const MenuItemSub: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
   const location = useLocation();
 
   const { navOpen, selectedMenu, anchors } = state;
@@ -55,7 +37,7 @@ const MenuItemSub: FunctionComponent<Props> = ({
         to={link}
         selected={exact ? isCurrentTab : location.pathname.includes(link)}
         dense
-        classes={{ root: navOpen ? classes.menuSubItem : undefined }}
+        sx={{ paddingLeft: navOpen ? '20px' : undefined }}
         onClick={!navOpen ? handleSelectedMenuClose : undefined}
       >
         {icon && (
@@ -64,8 +46,14 @@ const MenuItemSub: FunctionComponent<Props> = ({
           </ListItemIcon>
         )}
         <ListItemText
-          classes={{ primary: navOpen ? classes.menuSubItemText : classes.menuItemText }}
           primary={t(label)}
+          slotProps={{
+            primary: {
+              padding: navOpen ? '1px 0 0 10px' : '1px 0 0 15px',
+              fontWeight: 500,
+              fontSize: navOpen ? 12 : 14,
+            },
+          }}
         />
       </MenuItem>
     );

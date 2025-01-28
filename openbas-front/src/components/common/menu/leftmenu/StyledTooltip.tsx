@@ -1,19 +1,24 @@
 import { Tooltip, tooltipClasses } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
+import React, { FunctionComponent } from 'react';
 
-const StyledTooltip = styled(({ className, ...props }: { className?: string } & React.ComponentProps<typeof Tooltip>) => (
-  <Tooltip {...props} arrow classes={{ popper: className }} />
-))(() => {
+const StyledTooltip: FunctionComponent<React.ComponentProps<typeof Tooltip>> = (props) => {
   const theme = useTheme();
 
-  return {
-    [`& .${tooltipClasses.arrow}`]: {
-      color: theme.palette.common.black,
-    },
-    [`& .${tooltipClasses.tooltip}`]: {
-      backgroundColor: theme.palette.common.black,
-    },
-  };
-});
+  return (
+    <Tooltip
+      {...props}
+      arrow
+      sx={{
+        [`& .${tooltipClasses.arrow}`]: {
+          color: theme.palette.common.black,
+        },
+        [`& .${tooltipClasses.tooltip}`]: {
+          backgroundColor: theme.palette.common.black,
+        },
+      }}
+    />
+  );
+};
 
 export default StyledTooltip;

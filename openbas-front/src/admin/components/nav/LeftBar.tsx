@@ -89,7 +89,7 @@ const LeftBar = () => {
           subItems: [
             { link: '/admin/settings', label: 'Parameters', exact: true },
             { link: '/admin/settings/security', label: 'Security' },
-              { link: '/admin/settings/asset_rules', label: 'Customization' },
+            { link: '/admin/settings/asset_rules', label: 'Customization' },
             { link: '/admin/settings/taxonomies', label: 'Taxonomies' },
             { link: '/admin/settings/data_ingestion', label: 'Data ingestion' },
           ],

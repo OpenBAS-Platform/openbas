@@ -1,23 +1,10 @@
 import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import React from 'react';
 import { Link, useLocation } from 'react-router';
 
 import { useFormatter } from '../../../i18n';
 import { LeftMenuItem } from './leftmenu-model';
 import StyledTooltip from './StyledTooltip';
-
-const useStyles = makeStyles(() => ({
-  menuItem: {
-    paddingRight: 2,
-    height: 35,
-  },
-  menuItemText: {
-    padding: '1px 0 0 15px',
-    fontWeight: 500,
-    fontSize: 14,
-  },
-}));
 
 interface Props {
   navOpen: boolean;
@@ -26,7 +13,6 @@ interface Props {
 
 const MenuItemSingle: React.FC<Props> = ({ navOpen, item }) => {
   // Standard hooks
-  const classes = useStyles();
   const { t } = useFormatter();
   const location = useLocation();
 
@@ -39,15 +25,24 @@ const MenuItemSingle: React.FC<Props> = ({ navOpen, item }) => {
         to={item.path}
         selected={isCurrentTab}
         dense
-        classes={{ root: classes.menuItem }}
+        sx={{
+          paddingRight: '2px',
+          height: 35,
+        }}
       >
         <ListItemIcon style={{ minWidth: 20 }}>
           {item.icon()}
         </ListItemIcon>
         {navOpen && (
           <ListItemText
-            classes={{ primary: classes.menuItemText }}
             primary={t(item.label)}
+            slotProps={{
+              primary: {
+                padding: '1px 0 0 15px',
+                fontWeight: 500,
+                fontSize: 14,
+              },
+            }}
           />
         )}
       </MenuItem>

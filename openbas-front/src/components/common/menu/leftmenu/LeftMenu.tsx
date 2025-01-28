@@ -1,5 +1,5 @@
 import { Divider, Drawer, MenuList, Toolbar } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/styles';
 import * as React from 'react';
 import { FunctionComponent } from 'react';
 
@@ -13,19 +13,10 @@ import MenuItemSingle from './MenuItemSingle';
 import MenuItemToggle from './MenuItemToggle';
 import useLeftMenu from './useLeftMenu';
 
-const useStyles = makeStyles((theme: Theme) => ({
-  drawerPaper: {
-    minHeight: '100vh',
-    backgroundColor: theme.palette.background.nav,
-    overflowX: 'hidden',
-  },
-}));
-
 const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
   entries = [],
 }) => {
   // Standard hooks
-  const classes = useStyles();
   const theme = useTheme<Theme>();
   const { settings } = useAuth();
   const { bannerHeightNumber } = computeBannerSettings(settings);
@@ -35,7 +26,6 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
   return (
     <Drawer
       variant="permanent"
-      classes={{ paper: classes.drawerPaper }}
       sx={{
         'width': state.navOpen ? 180 : 55,
         'transition': theme.transitions.create('width', {
@@ -44,6 +34,9 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
         }),
         '& .MuiDrawer-paper': {
           width: state.navOpen ? 180 : 55,
+          minHeight: '100vh',
+          backgroundColor: theme.palette.background.nav,
+          overflowX: 'hidden',
         },
       }}
     >
@@ -52,23 +45,21 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
         return (
           <React.Fragment key={idxList}>
             {idxList !== 0 && <Divider />}
-            <MenuList component="nav" style={{ marginTop: bannerHeightNumber }}>
-              {(entry.userRight ?? true) && entry.items.map((item) => {
+            <MenuList component="nav" sx={{ marginTop: bannerHeightNumber }}>
+              {(entry.userRight ?? true)
+              && entry.items.map((item) => {
                 if (hasHref(item)) {
                   return (
-                    <React.Fragment key={item.label}>
-                      <MenuItemGroup
-                        item={item}
-                        state={state}
-                        helpers={helpers}
-                      />
-                    </React.Fragment>
+                    <MenuItemGroup
+                      key={item.label}
+                      item={item}
+                      state={state}
+                      helpers={helpers}
+                    />
                   );
                 }
                 return (
-                  <React.Fragment key={item.label}>
-                    <MenuItemSingle item={item} navOpen={state.navOpen} />
-                  </React.Fragment>
+                  <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
                 );
               })}
             </MenuList>
@@ -76,7 +67,10 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
         );
       })}
       <div style={{ marginTop: 'auto' }}>
-        <MenuList component="nav" style={{ marginBottom: bannerHeightNumber }}>
+        <MenuList
+          component="nav"
+          sx={{ marginBottom: bannerHeightNumber }}
+        >
           <MenuItemLogo
             navOpen={state.navOpen}
             onClick={() => window.open('https://filigran.io/', '_blank')}
