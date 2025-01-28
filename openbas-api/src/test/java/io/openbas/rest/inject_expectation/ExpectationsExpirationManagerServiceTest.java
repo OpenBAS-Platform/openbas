@@ -47,9 +47,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
   void beforeAll() {
     InjectorContract injectorContract =
         InjectorContractFixture.createInjectorContract(
-            "84b3b140-6b7d-47d9-9b61-8fa05882fc7e",
-            Map.of("en", "AMSI Bypass - AMSI InitFailed"),
-            "{}");
+            Map.of("en", "AMSI Bypass - AMSI InitFailed"), "{}");
     savedInjector =
         injectorRepository.save(
             InjectorFixture.createInjector(

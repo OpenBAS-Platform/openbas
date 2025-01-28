@@ -45,8 +45,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
   @BeforeAll
   void beforeAll() {
     InjectorContract injectorContract =
-        InjectorContractFixture.createInjectorContract(
-            INJECTOR_ID, Map.of("en", INJECTION_NAME), "{}");
+        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME), "{}");
     savedInjector =
         injectorRepository.save(
             InjectorFixture.createInjector(INJECTOR_ID, INJECTOR_NAME, INJECTOR_TYPE));

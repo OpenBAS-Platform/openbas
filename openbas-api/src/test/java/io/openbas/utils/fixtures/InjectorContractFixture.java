@@ -49,9 +49,9 @@ public class InjectorContractFixture {
   }
 
   public static InjectorContract createInjectorContract(
-      String id, Map<String, String> labels, String content) {
+      Map<String, String> labels, String content) {
     InjectorContract injectorContract = new InjectorContract();
-    injectorContract.setId(id);
+    injectorContract.setId(UUID.randomUUID().toString());
     injectorContract.setLabels(labels);
     injectorContract.setContent(content);
     injectorContract.setAtomicTesting(true);
