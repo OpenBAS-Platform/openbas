@@ -1,5 +1,7 @@
 package io.openbas.execution;
 
+import static java.util.Optional.ofNullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.openbas.database.model.*;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public class ExecutableInject {
   private final boolean runtime;
   private final int documentSize;
   private final List<Team> teams;
-  private final Exercise exercise;
+  private final String exerciseId;
   private final List<Asset> assets;
   private final List<AssetGroup> assetGroups;
   private final List<ExecutionContext> users;
@@ -32,7 +34,7 @@ public class ExecutableInject {
       List<AssetGroup> assetGroups,
       List<ExecutionContext> users) {
     this.injection = injection;
-    this.exercise = injection.getExercise();
+    this.exerciseId = ofNullable(injection.getExercise()).map(Exercise::getId).orElse(null);
     this.runtime = runtime;
     this.direct = direct;
     this.users = users;
