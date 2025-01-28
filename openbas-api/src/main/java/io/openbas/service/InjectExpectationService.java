@@ -442,7 +442,7 @@ public class InjectExpectationService {
                   expectationAsset.getInject(),
                   expectationAsset.getAsset(),
                   expectationAsset.getType());
-          // Every expectation assets are filled
+          // Every agent expectation is filled
           if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.computeExpectationAsset(
                 expectationAsset,
@@ -464,7 +464,7 @@ public class InjectExpectationService {
                   expectationAssetGroup.getInject(),
                   expectationAssetGroup.getAssetGroup(),
                   expectationAssetGroup.getType());
-          // Every expectation assets are filled
+          // Every asset expectation is filled
           if (expectationAssetsByAssetGroup.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.computeExpectationGroup(
                 expectationAssetGroup,
