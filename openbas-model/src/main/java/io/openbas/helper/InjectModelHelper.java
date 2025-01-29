@@ -75,31 +75,33 @@ public class InjectModelHelper {
       Instant source, int speed, Long dependsDuration, Exercise exercise) {
     // Compute origin execution date
     long duration = ofNullable(dependsDuration).orElse(0L) / speed;
-    Instant dependingStart = source;
-    Instant standardExecutionDate = dependingStart.plusSeconds(duration);
+    Instant standardExecutionDate = source.plusSeconds(duration);
     // Compute execution dates with previous terminated pauses
+    Instant afterPausesExecutionDate = standardExecutionDate;
+    List<Pause> sortedPauses = exercise.getPauses();
+    sortedPauses.sort(
+        (pause0, pause1) ->
+            pause0.getDate().equals(pause1.getDate())
+                ? 0
+                : pause0.getDate().isBefore(pause1.getDate()) ? -1 : 1);
     long previousPauseDelay = 0L;
-    if (exercise != null) {
-      previousPauseDelay =
-          exercise.getPauses().stream()
-              .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
-              .mapToLong(pause -> pause.getDuration().orElse(0L))
-              .sum();
+    for (Pause pause : sortedPauses) {
+      if (pause.getDate().isAfter(afterPausesExecutionDate)) {
+        break;
+      }
+      previousPauseDelay += pause.getDuration().orElse(0L);
+      afterPausesExecutionDate = standardExecutionDate.plusSeconds(previousPauseDelay);
     }
-    Instant afterPausesExecutionDate = standardExecutionDate.plusSeconds(previousPauseDelay);
+
     // Add current pause duration in date computation if needed
-    long currentPauseDelay = 0L;
-    if (exercise != null) {
-      currentPauseDelay =
-          exercise
-              .getCurrentPause()
-              .map(
-                  last ->
-                      last.isBefore(afterPausesExecutionDate)
-                          ? between(last, now()).getSeconds()
-                          : 0L)
-              .orElse(0L);
-    }
+    long currentPauseDelay;
+    Instant finalAfterPausesExecutionDate = afterPausesExecutionDate;
+    currentPauseDelay =
+        exercise
+            .getCurrentPause()
+            .filter(pauseTime -> pauseTime.isBefore(finalAfterPausesExecutionDate))
+            .map(pauseTime -> between(pauseTime, now()).getSeconds())
+            .orElse(0L);
     long globalPauseDelay = previousPauseDelay + currentPauseDelay;
     long minuteAlignModulo = globalPauseDelay % 60;
     long alignedPauseDelay =
