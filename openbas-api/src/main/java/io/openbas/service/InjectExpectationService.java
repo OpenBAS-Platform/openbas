@@ -770,8 +770,8 @@ public class InjectExpectationService {
           for (Agent agent : agents) {
             injectExpectationsAgent.add(cloneInjectExpectationForAgent(agent, injectExpectation));
           }
+          injectExpectation.setSignatures(Collections.emptyList());
         }
-
         injectExpectations.addAll(injectExpectationsAgent);
         injectExpectationRepository.saveAll(injectExpectations);
       }
