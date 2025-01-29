@@ -1,5 +1,7 @@
 package io.openbas.rest.inject_expectation;
 
+import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_ID;
+import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_NAME;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
 
   private static final String INJECTION_NAME = "AMSI Bypass - AMSI InitFailed";
-  private static final String INJECTOR_ID = "49229430-b5b5-431f-ba5b-f36f599b0144";
-  private static final String INJECTOR_NAME = "OpenBAS Implant";
   private static final String INJECTOR_TYPE = "openbas_implant";
 
   public static final long EXPIRATION_TIME_1_s = 1L;
@@ -54,7 +54,8 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
         InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME), "{}");
     savedInjector =
         injectorRepository.save(
-            InjectorFixture.createInjector(INJECTOR_ID, INJECTOR_NAME, INJECTOR_TYPE));
+            InjectorFixture.createInjector(
+                OPENBAS_INJECTOR_ID, OPENBAS_INJECTOR_NAME, INJECTOR_TYPE));
     injectorContract.setInjector(savedInjector);
     savedInjectorContract = injectorContractRepository.save(injectorContract);
 
