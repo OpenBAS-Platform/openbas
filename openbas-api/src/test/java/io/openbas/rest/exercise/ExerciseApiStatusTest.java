@@ -362,31 +362,31 @@ public class ExerciseApiStatusTest {
 
         // --EXECUTE--
         String response =
-                mvc.perform(
-                                put(EXERCISE_URI + "/" + RUNNING_EXERCISE.getId() + "/status")
-                                        .content(asJsonString(input))
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().is2xxSuccessful())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+            mvc.perform(
+                    put(EXERCISE_URI + "/" + RUNNING_EXERCISE.getId() + "/status")
+                        .content(asJsonString(input))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         List<ExecutableInject> injects = injectHelper.getInjectsToRun();
 
         // --ASSERT--
         Optional<Exercise> exercise =
-                exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
+            exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
         if (exercise.isPresent()) {
           Exercise responseExercise = exercise.get();
           Optional<Instant> pauseOpt = responseExercise.getCurrentPause();
           pauseOpt.ifPresent(
-                  instant ->
-                          assertEquals(instant.truncatedTo(MINUTES), mockInstant.truncatedTo(MINUTES)));
+              instant ->
+                  assertEquals(instant.truncatedTo(MINUTES), mockInstant.truncatedTo(MINUTES)));
         }
         assertEquals(
-                Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.RUNNING.name()),
-                JsonPath.read(response, "$.exercise_next_possible_status"));
+            Arrays.asList(ExerciseStatus.CANCELED.name(), ExerciseStatus.RUNNING.name()),
+            JsonPath.read(response, "$.exercise_next_possible_status"));
         assertEquals(0, injects.size());
       }
     }
@@ -414,30 +414,30 @@ public class ExerciseApiStatusTest {
 
         // --EXECUTE--
         String response =
-                mvc.perform(
-                                put(EXERCISE_URI + "/" + exercise.getId() + "/status")
-                                        .content(asJsonString(input))
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().is2xxSuccessful())
-                        .andReturn()
-                        .getResponse()
-                        .getContentAsString();
+            mvc.perform(
+                    put(EXERCISE_URI + "/" + exercise.getId() + "/status")
+                        .content(asJsonString(input))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
         // --ASSERT--
 
         Optional<Exercise> exerciseOpt =
-                exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
+            exerciseRepository.findById(JsonPath.read(response, "$.exercise_id"));
         if (exerciseOpt.isPresent()) {
           Exercise responseExercise = exerciseOpt.get();
           Optional<Instant> endOpt = responseExercise.getEnd();
           endOpt.ifPresent(
-                  instant ->
-                          assertEquals(instant.truncatedTo(MINUTES), mockInstant.truncatedTo(MINUTES)));
+              instant ->
+                  assertEquals(instant.truncatedTo(MINUTES), mockInstant.truncatedTo(MINUTES)));
         }
         assertEquals(
-                List.of(ExerciseStatus.SCHEDULED.name()),
-                JsonPath.read(response, "$.exercise_next_possible_status"));
+            List.of(ExerciseStatus.SCHEDULED.name()),
+            JsonPath.read(response, "$.exercise_next_possible_status"));
         exerciseRepository.delete(exercise);
       }
     }
