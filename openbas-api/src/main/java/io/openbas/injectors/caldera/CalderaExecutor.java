@@ -76,7 +76,7 @@ public class CalderaExecutor extends Injector {
       execution.addTrace(
           getNewErrorTrace(
               "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)",
-              ExecutionTraceAction.PROCESS_FINISH));
+              ExecutionTraceAction.COMPLETE));
     }
 
     List<String> asyncIds = new ArrayList<>();
@@ -293,7 +293,7 @@ public class CalderaExecutor extends Injector {
             () ->
                 execution.addTrace(
                     getNewErrorTrace(
-                        "Inject does not have a contract", ExecutionTraceAction.PROCESS_FINISH)));
+                        "Inject does not have a contract", ExecutionTraceAction.COMPLETE)));
 
     if (asyncIds.isEmpty()) {
       throw new UnsupportedOperationException(

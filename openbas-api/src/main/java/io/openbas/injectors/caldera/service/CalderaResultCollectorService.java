@@ -23,18 +23,15 @@ public class CalderaResultCollectorService implements Runnable {
   private final int EXPIRATION_TIME = 900;
 
   private final InjectRepository injectRepository;
-  private final InjectStatusRepository injectStatusRepository;
   private final CalderaInjectorService calderaService;
   private final InjectStatusService injectStatusService;
 
   @Autowired
   public CalderaResultCollectorService(
       InjectRepository injectRepository,
-      InjectStatusRepository injectStatusRepository,
       CalderaInjectorService calderaService,
       InjectStatusService injectStatusService) {
     this.injectRepository = injectRepository;
-    this.injectStatusRepository = injectStatusRepository;
     this.calderaService = calderaService;
     this.injectStatusService = injectStatusService;
   }
@@ -44,7 +41,7 @@ public class CalderaResultCollectorService implements Runnable {
   public void run() {
     // Retrieve Caldera inject not done
     List<InjectStatus> injectStatuses =
-        this.injectStatusRepository.pendingForInjectType(CalderaContract.TYPE);
+        this.injectStatusService.findPendingInjectStatusByType(CalderaContract.TYPE);
     // For each one ask for traces and status
     injectStatuses.forEach(
         (injectStatus -> {

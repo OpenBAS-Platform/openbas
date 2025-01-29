@@ -237,7 +237,7 @@ public class OpenBASImplantExecutor extends Injector {
       execution.addTrace(
           getNewErrorTrace(
               "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)",
-              ExecutionTraceAction.PROCESS_FINISH));
+              ExecutionTraceAction.COMPLETE));
     }
 
     // Compute expectations

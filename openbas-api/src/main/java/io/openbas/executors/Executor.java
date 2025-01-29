@@ -61,7 +61,7 @@ public class Executor {
     } catch (Exception e) {
       status.setName(ExecutionStatus.ERROR);
       status.setTrackingEndDate(Instant.now());
-      status.addErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH);
+      status.addErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE);
     } finally {
       return injectStatusRepository.save(status);
     }

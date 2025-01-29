@@ -30,7 +30,7 @@ public class OpenCTIExecutor extends Injector {
     try {
       openCTIService.createCase(execution, name, description, attachments);
     } catch (Exception e) {
-      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
   }
 
@@ -39,7 +39,7 @@ public class OpenCTIExecutor extends Injector {
     try {
       openCTIService.createReport(execution, name, description, attachments);
     } catch (Exception e) {
-      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
   }
 

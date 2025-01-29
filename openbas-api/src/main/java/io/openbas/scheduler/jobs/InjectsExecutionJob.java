@@ -104,15 +104,15 @@ public class InjectsExecutionJob implements Job {
         .ifPresent(
             injectorContract -> {
               Injection source = executableInject.getInjection();
-              Inject executingInject = injectRepository.findById(source.getId()).orElseThrow();
               try {
+                Inject executingInject = injectRepository.findById(source.getId()).orElseThrow();
                 String jsonInject = mapper.writeValueAsString(executableInject);
                 queueService.publish(injectorContract.getInjector().getType(), jsonInject);
                 InjectStatus injectRunningStatus = executingInject.getStatus().orElseThrow();
                 injectRunningStatus.setName(ExecutionStatus.PENDING);
                 injectStatusRepository.save(injectRunningStatus);
               } catch (Exception e) {
-                injectStatusService.failInjectStatus(executingInject, e.getMessage());
+                injectStatusService.failInjectStatus(source.getId(), e.getMessage());
               }
             });
   }
@@ -152,11 +152,12 @@ public class InjectsExecutionJob implements Job {
       errorMessages = getErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
     }
     if (errorMessages != null && errorMessages.isPresent()) {
-      InjectStatus finalStatus = injectStatusService.failInjectStatus(inject, null);
+      InjectStatus finalStatus = injectStatusService.failInjectStatus(inject.getId(), null);
       errorMessages
           .get()
           .forEach(
-              errorMsg -> finalStatus.addErrorTrace(errorMsg, ExecutionTraceAction.PROCESS_FINISH));
+              errorMsg ->
+                  finalStatus.addErrorTrace(errorMsg, ExecutionTraceAction.COMPLETE));
       injectStatusRepository.save(finalStatus);
     } else {
       setInjectStatusAndExecuteInject(executableInject, inject);
@@ -170,7 +171,8 @@ public class InjectsExecutionJob implements Job {
             injectorContract -> {
               if (!inject.isReady()) {
                 injectStatusService.failInjectStatus(
-                    inject, "The inject is not ready to be executed (missing mandatory fields)");
+                    inject.getId(),
+                    "The inject is not ready to be executed (missing mandatory fields)");
                 return;
               }
 
@@ -192,7 +194,7 @@ public class InjectsExecutionJob implements Job {
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
 
                 } catch (Exception e) {
-                  injectStatusService.failInjectStatus(inject, e.getMessage());
+                  injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
                   return;
                 }
               }
@@ -202,7 +204,9 @@ public class InjectsExecutionJob implements Job {
                 executeInternal(newExecutableInject);
               }
             },
-            () -> injectStatusService.failInjectStatus(inject, "Inject does not have a contract"));
+            () ->
+                injectStatusService.failInjectStatus(
+                    inject.getId(), "Inject does not have a contract"));
   }
 
   /**

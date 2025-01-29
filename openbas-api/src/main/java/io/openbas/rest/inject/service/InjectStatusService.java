@@ -17,7 +17,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +27,10 @@ public class InjectStatusService {
   private final AgentRepository agentRepository;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
+
+  public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
+    return this.injectStatusRepository.pendingForInjectType(injectType);
+  }
 
   @Transactional(rollbackOn = Exception.class)
   public Inject updateInjectStatus(String injectId, InjectUpdateStatusInput input) {
@@ -64,11 +67,11 @@ public class InjectStatusService {
     };
   }
 
-  private Set<Agent> getCompleteTraceAgents(Inject inject) {
+  private int getCompleteTrace(Inject inject) {
     return inject.getStatus().map(InjectStatus::getTraces).orElse(Collections.emptyList()).stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
-        .map(ExecutionTraces::getAgent)
-        .collect(Collectors.toSet());
+        .toList()
+        .size();
   }
 
   private int calculateTotalAssets(Inject inject) {
@@ -87,35 +90,20 @@ public class InjectStatusService {
   }
 
   public boolean isAllInjectAssetsExecuted(Inject inject) {
-    Set<Agent> completeTraceUniqueAgent = getCompleteTraceAgents(inject);
+    int totalCompleteTrace = getCompleteTrace(inject);
     int totalAssetCount = calculateTotalAssets(inject);
-    return totalAssetCount == completeTraceUniqueAgent.size();
+    return totalAssetCount == totalCompleteTrace;
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus, Instant finishTime) {
-    ExecutionTraceStatus processFinishTraceStatus =
-        injectStatus.getTraces().stream()
-            .filter(t -> ExecutionTraceAction.PROCESS_FINISH.equals(t.getAction()))
-            .map(ExecutionTraces::getStatus)
-            .findFirst()
-            .orElse(null);
-
-    ExecutionStatus finalStatus;
-    if (processFinishTraceStatus != null) {
-      finalStatus =
-          processFinishTraceStatus.equals(ExecutionTraceStatus.SUCCESS)
-              ? ExecutionStatus.SUCCESS
-              : ExecutionStatus.ERROR;
-    } else {
-      finalStatus =
-          computeStatus(
-              injectStatus.getTraces().stream()
-                  .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
-                  .toList());
-    }
+    ExecutionStatus finalStatus =
+        computeStatus(
+            injectStatus.getTraces().stream()
+                .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
+                .toList());
 
     injectStatus.addTrace(
-        ExecutionTraceStatus.INFO, "Process finish", ExecutionTraceAction.PROCESS_FINISH, null);
+        ExecutionTraceStatus.INFO, "Process finished", ExecutionTraceAction.COMPLETE, null);
     injectStatus.setTrackingEndDate(finishTime == null ? Instant.now() : finishTime);
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
@@ -166,17 +154,20 @@ public class InjectStatusService {
       }
     }
 
-    if (successCount > 0 && errorCount == 0 && maybePreventedCount == 0 & partialCount == 0) {
+    if (successCount > 0 && errorCount == 0 && maybePreventedCount == 0 && partialCount == 0) {
       executionStatus = ExecutionStatus.SUCCESS;
     } else if (errorCount > 0
         && successCount == 0
-        && maybePreventedCount == 0 & partialCount == 0) {
+        && maybePreventedCount == 0
+        && partialCount == 0) {
       executionStatus = ExecutionStatus.ERROR;
     } else if (maybePreventedCount > 0
         && successCount == 0
-        && errorCount == 0 & partialCount == 0) {
+        && errorCount == 0
+        && partialCount == 0) {
       executionStatus = ExecutionStatus.MAYBE_PREVENTED;
-    } else if (partialCount > 0 && errorCount == 0 & maybePreventedCount == 0 || successCount > 0) {
+    } else if (partialCount > 0 && errorCount == 0 && maybePreventedCount == 0
+        || successCount > 0) {
       executionStatus = ExecutionStatus.PARTIAL;
     } else {
       executionStatus = ExecutionStatus.MAYBE_PARTIAL_PREVENTED;
@@ -216,10 +207,11 @@ public class InjectStatusService {
             });
   }
 
-  public InjectStatus failInjectStatus(Inject inject, @Nullable String message) {
+  public InjectStatus failInjectStatus(@NotNull String injectId, @Nullable String message) {
+    Inject inject = this.injectRepository.findById(injectId).orElseThrow();
     InjectStatus injectStatus = getOrInitializeInjectStatus(inject);
     if (message != null) {
-      injectStatus.addErrorTrace(message, ExecutionTraceAction.PROCESS_FINISH);
+      injectStatus.addErrorTrace(message, ExecutionTraceAction.COMPLETE);
     }
     injectStatus.setName(ExecutionStatus.ERROR);
     injectStatus.setTrackingEndDate(Instant.now());

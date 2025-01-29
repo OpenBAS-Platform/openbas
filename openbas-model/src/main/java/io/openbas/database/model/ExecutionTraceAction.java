@@ -8,5 +8,4 @@ public enum ExecutionTraceAction {
 
   CLEANUP_EXECUTION,
   COMPLETE, // when inject of one asset is finish, or of one user
-  PROCESS_FINISH // inject is completely done
 }

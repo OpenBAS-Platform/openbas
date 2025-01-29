@@ -46,7 +46,7 @@ public class EmailExecutor extends Injector {
       emailService.sendEmail(
           execution, users, from, replyTos, inReplyTo, subject, message, attachments);
     } catch (Exception e) {
-      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
   }
 

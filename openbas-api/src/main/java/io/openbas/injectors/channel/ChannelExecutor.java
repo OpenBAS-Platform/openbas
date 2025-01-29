@@ -154,7 +154,7 @@ public class ChannelExecutor extends Injector {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
-      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
     return new ExecutionProcess(false);
   }

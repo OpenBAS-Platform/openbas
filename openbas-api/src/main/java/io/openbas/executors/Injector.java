@@ -60,7 +60,7 @@ public abstract class Injector {
       ExecutionProcess executionProcess = process(execution, executableInject);
       execution.setAsync(executionProcess.isAsync());
     } catch (Exception e) {
-      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     } finally {
       execution.stop();
     }

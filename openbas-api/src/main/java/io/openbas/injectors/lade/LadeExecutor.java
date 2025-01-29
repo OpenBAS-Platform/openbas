@@ -51,7 +51,7 @@ public class LadeExecutor extends Injector {
           getNewInfoTrace(message, ExecutionTraceAction.EXECUTION, List.of(actionWorkflowId)));
       return new ExecutionProcess(true);
     } catch (Exception e) {
-      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
       return new ExecutionProcess(false);
     }
   }

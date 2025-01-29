@@ -39,7 +39,7 @@ public class MastodonExecutor extends Injector {
       String message = "Mastodon status sent (" + callResult + ")";
       execution.addTrace(getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE));
     } catch (Exception e) {
-      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.PROCESS_FINISH));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
     return new ExecutionProcess(false);
   }
