@@ -31,8 +31,8 @@ public class ExerciseTest {
   public void GivenAnExercise_CurrentPauseFromRawQueryIsCorrectlyPersisted() {
     Instant expectedCurrentPauseTime = Instant.parse("2012-11-21T04:05:00Z");
     ExerciseComposer.Composer wrapper =
-        exerciseComposer
-            .forExercise(ExerciseFixture.createDefaultAttackExercise(exerciseStartTime));
+        exerciseComposer.forExercise(
+            ExerciseFixture.createDefaultAttackExercise(exerciseStartTime));
     wrapper.get().setCurrentPause(expectedCurrentPauseTime); // current pause at T+5 minutes
 
     Exercise expected = wrapper.persist().get();
