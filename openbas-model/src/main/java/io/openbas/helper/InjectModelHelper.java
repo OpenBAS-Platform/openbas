@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,12 +79,15 @@ public class InjectModelHelper {
     Instant standardExecutionDate = source.plusSeconds(duration);
     // Compute execution dates with previous terminated pauses
     Instant afterPausesExecutionDate = standardExecutionDate;
-    List<Pause> sortedPauses = exercise.getPauses();
-    sortedPauses.sort(
-        (pause0, pause1) ->
-            pause0.getDate().equals(pause1.getDate())
-                ? 0
-                : pause0.getDate().isBefore(pause1.getDate()) ? -1 : 1);
+    List<Pause> sortedPauses =
+        new ArrayList<>(
+            exercise.getPauses().stream()
+                .sorted(
+                    (pause0, pause1) ->
+                        pause0.getDate().equals(pause1.getDate())
+                            ? 0
+                            : pause0.getDate().isBefore(pause1.getDate()) ? -1 : 1)
+                .toList());
     long previousPauseDelay = 0L;
     for (Pause pause : sortedPauses) {
       if (pause.getDate().isAfter(afterPausesExecutionDate)) {
