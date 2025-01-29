@@ -40,55 +40,47 @@ public class InjectModelHelper {
 
     try {
       injectContractFields =
-          (ArrayNode)
-              mapper
-                  .readValue(injectorContract.getContent(), ObjectNode.class)
-                  .get(CONTACT_CONTENT_FIELDS);
+              (ArrayNode)
+                      mapper
+                              .readValue(injectorContract.getContent(), ObjectNode.class)
+                              .get(CONTACT_CONTENT_FIELDS);
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Error parsing injector contract content", e);
     }
 
     ObjectNode contractContent = injectorContract.getConvertedContent();
-    List<JsonNode> contractMandatoryFields =
-        StreamSupport.stream(contractContent.get(CONTACT_CONTENT_FIELDS).spliterator(), false)
-            .filter(
-                field -> {
-                  String key = field.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
-                  boolean isMandatory = field.get(CONTACT_ELEMENT_CONTENT_MANDATORY).asBoolean();
-                  boolean isMandatoryGroup =
-                      field.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS)
-                          && field.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS).asBoolean();
-                  return key.equals(CONTACT_ELEMENT_CONTENT_KEY_ASSETS)
-                      || isMandatory
-                      || isMandatoryGroup;
-                })
-            .toList();
+    List<JsonNode> contractFields =
+            StreamSupport.stream(contractContent.get(CONTACT_CONTENT_FIELDS).spliterator(), false).toList();
 
     boolean isReady = true;
-    for (JsonNode jsonField : contractMandatoryFields) {
-      String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
+    for (JsonNode jsonField : contractFields) {
 
-      switch (key) {
-        case CONTACT_ELEMENT_CONTENT_KEY_TEAMS -> {
-          if (teams.isEmpty() && !allTeams) {
+      String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
+      if( jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY).asBoolean()
+        || (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS)
+              && jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS).asBoolean())) {
+        isReady = isFieldSet(allTeams, teams, assets, assetGroups, jsonField,content,injectContractFields);
+      }
+
+      if(jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL)){
+        String mandatoryConditionalFieldKey = jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL).asText();
+        Optional<JsonNode> mandatoryConditionalField = contractFields.stream().filter(jsonNode -> mandatoryConditionalFieldKey.equals(jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText())).findFirst();
+        if(mandatoryConditionalField.isPresent()) {
+          if(isFieldSet(allTeams, teams, assets, assetGroups, mandatoryConditionalField.get(),content,injectContractFields)
+                  && !isFieldSet(allTeams, teams, assets, assetGroups, jsonField,content,injectContractFields)){
             isReady = false;
+
           }
-        }
-        case CONTACT_ELEMENT_CONTENT_KEY_ASSETS -> {
-          if (assets.isEmpty() && assetGroups.isEmpty()) {
-            isReady = false;
-          }
-        }
-        default -> {
-          if (isTextOrTextarea(jsonField) && !isFieldValid(content, injectContractFields, key)) {
-            isReady = false;
-          }
+        } else {
+          isReady = false;
         }
       }
       if (!isReady) {
         break;
       }
+
     }
+
     return isReady;
   }
 
@@ -177,5 +169,41 @@ public class InjectModelHelper {
       return status.orElseThrow().getTrackingSentDate();
     }
     return null;
+  }
+
+  public static boolean isFieldSet(final boolean allTeams,
+                                   @NotNull final List<String> teams,
+                                   @NotNull final List<String> assets,
+                                   @NotNull final List<String> assetGroups,
+                                   @NotNull final JsonNode jsonField,
+                                   @NotNull final ObjectNode content,
+  @NotNull final ArrayNode injectContractFields){
+    boolean isReady = true;
+    String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
+    switch (key) {
+      case CONTACT_ELEMENT_CONTENT_KEY_TEAMS -> {
+        if (teams.isEmpty() && !allTeams) {
+          isReady = false;
+        }
+      }
+      case CONTACT_ELEMENT_CONTENT_KEY_ASSETS -> {
+        if (assets.isEmpty() && assetGroups.isEmpty()) {
+          isReady = false;
+        }
+      }
+      case CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS -> {
+        if (content.get(CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS) == null
+                || content.get(CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS).isEmpty()) {
+          isReady = false;
+        }
+      }
+      default -> {
+        if (isTextOrTextarea(jsonField) && !isFieldValid(content, injectContractFields, key)) {
+          isReady = false;
+        }
+      }
+
+    }
+    return isReady;
   }
 }

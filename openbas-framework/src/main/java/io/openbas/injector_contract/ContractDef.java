@@ -43,6 +43,13 @@ public class ContractDef {
     return this;
   }
 
+  public ContractDef conditional(ContractElement element, ContractElement conditionalElement) {
+    element.setMandatoryConditionField(conditionalElement.getKey());
+    element.setMandatory(false);
+    this.fields.add(element);
+    return this;
+  }
+
   public List<ContractElement> build() {
     return this.fields;
   }

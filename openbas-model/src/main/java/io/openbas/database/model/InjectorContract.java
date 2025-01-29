@@ -167,9 +167,12 @@ public class InjectorContract implements Base {
   public static final String CONTACT_ELEMENT_CONTENT_KEY = "key";
   public static final String CONTACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
   public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
+  public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL = "mandatoryConditionField";
+
 
   public static final String CONTACT_ELEMENT_CONTENT_KEY_ASSETS = "assets";
   public static final String CONTACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
+  public static final String CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS= "expectations";
 
   public static final String DEFAULT_VALUE_FIELD = "defaultValue";
 }
