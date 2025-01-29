@@ -809,6 +809,14 @@ public class InjectImportService {
               Arrays.stream(ruleAttribute.getColumns().split("\\+"))
                   .map(column -> getValueAsString(row, column))
                   .collect(Collectors.joining());
+
+          // Given that richText fields are editable using CKEditor which expects HTML,
+          // we're converting return line into <br>.
+          // TODO : convert properly the whole cell into HTML including formatting (bold, ...)
+          if (mapFieldByKey.get(ruleAttribute.getName()).get("richText") != null
+              && mapFieldByKey.get(ruleAttribute.getName()).get("richText").asBoolean()) {
+            columnValue = columnValue.replaceAll("\n", "<br>");
+          }
         }
         if (columnValue.isBlank()) {
           inject.getContent().put(ruleAttribute.getDefaultValue(), columnValue);
