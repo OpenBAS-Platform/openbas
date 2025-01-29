@@ -23,6 +23,7 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
     private final List<DocumentComposer.Composer> documentComposers = new ArrayList<>();
     private final List<VariableComposer.Composer> variableComposers = new ArrayList<>();
+    private final List<PauseComposer.Composer> pauseComposers = new ArrayList<>();
 
     public Composer(Exercise exercise) {
       this.exercise = exercise;
@@ -39,6 +40,7 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
     public Composer withInject(InjectComposer.Composer injectComposer) {
       injectComposers.add(injectComposer);
       List<Inject> injects = exercise.getInjects();
+      injectComposer.get().setExercise(exercise);
       injects.add(injectComposer.get());
       this.exercise.setInjects(injects);
       return this;
@@ -113,6 +115,14 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       return this;
     }
 
+    public Composer withPause(PauseComposer.Composer pauseComposer) {
+      this.pauseComposers.add(pauseComposer);
+      List<Pause> tempPauses = this.exercise.getPauses();
+      tempPauses.add(pauseComposer.get());
+      this.exercise.setPauses(tempPauses);
+      return this;
+    }
+
     public Composer withId(String id) {
       this.exercise.setId(id);
       return this;
@@ -128,6 +138,7 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       this.tagComposers.forEach(TagComposer.Composer::persist);
       this.documentComposers.forEach(DocumentComposer.Composer::persist);
       this.variableComposers.forEach(VariableComposer.Composer::persist);
+      this.pauseComposers.forEach(PauseComposer.Composer::persist);
       exerciseRepository.save(exercise);
       return this;
     }
@@ -143,6 +154,7 @@ public class ExerciseComposer extends ComposerBase<Exercise> {
       this.teamComposers.forEach(TeamComposer.Composer::delete);
       this.categoryComposers.forEach(LessonsCategoryComposer.Composer::delete);
       this.articleComposers.forEach(ArticleComposer.Composer::delete);
+      this.pauseComposers.forEach(PauseComposer.Composer::delete);
       return this;
     }
 
