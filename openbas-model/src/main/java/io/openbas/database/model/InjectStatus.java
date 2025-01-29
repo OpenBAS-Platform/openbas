@@ -51,7 +51,7 @@ public class InjectStatus extends BaseInjectStatus {
   }
 
   public void addTrace(ExecutionTraces trace) {
-    this.traces.add(trace);
+    this.getTraces().add(trace);
     trace.setInjectStatus(this);
   }
 

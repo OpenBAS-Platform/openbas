@@ -1,7 +1,6 @@
 package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.converter.InjectStatusExecutionConverter;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,10 +41,13 @@ public class InjectTestStatus extends BaseInjectStatus implements Base {
         .orElse(null);
   }
 
-  @Column(name = "status_executions")
-  @Convert(converter = InjectStatusExecutionConverter.class)
+  @OneToMany(
+      mappedBy = "injectTestStatus",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.EAGER)
   @JsonProperty("status_traces")
-  private List<InjectStatusExecution> traces = new ArrayList<>();
+  private List<ExecutionTraces> traces = new ArrayList<>();
 
   @CreationTimestamp
   @Column(name = "status_created_at")
@@ -57,25 +59,18 @@ public class InjectTestStatus extends BaseInjectStatus implements Base {
   @JsonProperty("inject_test_status_updated_at")
   private Instant testUpdateDate;
 
-  private static List<InjectStatusExecution> convertTraces(List<ExecutionTraces> traces) {
-    List<InjectStatusExecution> result = new ArrayList<>();
-    for (ExecutionTraces trace : traces) {
-      InjectStatusExecution injectStatusExecution =
-          new InjectStatusExecution(
-              trace.getTime(),
-              trace.getStatus(),
-              trace.getIdentifiers(),
-              trace.getMessage(),
-              trace.getAction().toString());
-      result.add(injectStatusExecution);
-    }
-    return result;
-  }
-
   public static InjectTestStatus fromExecutionTest(Execution execution) {
     InjectTestStatus injectTestStatus = new InjectTestStatus();
     injectTestStatus.setTrackingSentDate(Instant.now());
-    injectTestStatus.getTraces().addAll(convertTraces(execution.getTraces()));
+    injectTestStatus.getTraces().addAll(execution.getTraces());
+    if (!execution.getTraces().isEmpty()) {
+      List<ExecutionTraces> traces =
+          execution.getTraces().stream()
+              .peek(t -> t.setInjectTestStatus(injectTestStatus))
+              .toList();
+      injectTestStatus.getTraces().addAll(traces);
+    }
+
     int numberOfError =
         (int)
             execution.getTraces().stream()
