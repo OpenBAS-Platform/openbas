@@ -155,9 +155,7 @@ public class InjectsExecutionJob implements Job {
       InjectStatus finalStatus = injectStatusService.failInjectStatus(inject.getId(), null);
       errorMessages
           .get()
-          .forEach(
-              errorMsg ->
-                  finalStatus.addErrorTrace(errorMsg, ExecutionTraceAction.COMPLETE));
+          .forEach(errorMsg -> finalStatus.addErrorTrace(errorMsg, ExecutionTraceAction.COMPLETE));
       injectStatusRepository.save(finalStatus);
     } else {
       setInjectStatusAndExecuteInject(executableInject, inject);

@@ -3,7 +3,6 @@ package io.openbas.injectors.caldera.service;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.injectors.caldera.CalderaContract;
 import io.openbas.injectors.caldera.model.ResultStatus;
 import io.openbas.rest.inject.service.InjectStatusService;
