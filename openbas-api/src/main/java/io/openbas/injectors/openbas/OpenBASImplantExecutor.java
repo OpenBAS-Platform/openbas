@@ -10,7 +10,6 @@ import static io.openbas.model.expectation.PreventionExpectation.preventionExpec
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
@@ -22,7 +21,6 @@ import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
@@ -36,7 +34,6 @@ import org.springframework.stereotype.Component;
 public class OpenBASImplantExecutor extends Injector {
 
   private final AssetGroupService assetGroupService;
-  private final InjectRepository injectRepository;
   private final InjectExpectationService injectExpectationService;
   private final InjectService injectService;
 
@@ -205,10 +202,7 @@ public class OpenBASImplantExecutor extends Injector {
   @Override
   public ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception {
-    Inject inject =
-        this.injectRepository
-            .findById(injection.getInjection().getInject().getId())
-            .orElseThrow(() -> new EntityNotFoundException("Inject not found"));
+    Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
     Map<Endpoint, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
 
     // Check assets target
