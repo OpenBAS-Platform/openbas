@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -72,7 +73,6 @@ public class InjectExpectation implements Base {
   @JsonProperty("inject_expectation_description")
   private String description;
 
-  @Setter
   @Type(JsonType.class)
   @Column(name = "inject_expectation_signatures")
   @JsonProperty("inject_expectation_signatures")
@@ -102,7 +102,7 @@ public class InjectExpectation implements Base {
     if (this.getScore() >= this.getExpectedScore()) {
       return EXPECTATION_STATUS.SUCCESS;
     }
-    if (this.getScore() == 0) {
+    if (0.0 == this.getScore()) {
       return EXPECTATION_STATUS.FAILED;
     }
     return EXPECTATION_STATUS.PARTIAL;
@@ -185,6 +185,14 @@ public class InjectExpectation implements Base {
 
   @Setter
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "agent_id")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @JsonProperty("inject_expectation_agent")
+  @Schema(type = "string")
+  private Agent agent;
+
+  @Setter
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "asset_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_asset")
@@ -241,6 +249,22 @@ public class InjectExpectation implements Base {
     this.type = EXPECTATION_TYPE.DETECTION;
     this.asset = asset;
     this.assetGroup = assetGroup;
+  }
+
+  public void setSignatures(List<InjectExpectationSignature> injectExpectationSignatures) {
+    this.signatures =
+        injectExpectationSignatures.stream()
+            .map(
+                signature -> {
+                  if (EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME.equals(signature.getType())
+                      && this.agent != null) {
+                    return new InjectExpectationSignature(
+                        EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
+                        signature.getValue() + "-agent-" + this.agent.getId());
+                  }
+                  return signature;
+                })
+            .toList();
   }
 
   public boolean isUserHasAccess(User user) {

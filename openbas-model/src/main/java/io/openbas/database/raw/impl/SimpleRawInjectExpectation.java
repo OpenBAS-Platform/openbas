@@ -18,6 +18,7 @@ public class SimpleRawInjectExpectation implements RawInjectExpectation {
   private String user_id;
   private String user_firstname;
   private String user_lastname;
+  private String agent_id;
   private String asset_id;
   private String asset_name;
   private String asset_type;

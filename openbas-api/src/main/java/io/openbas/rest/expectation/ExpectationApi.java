@@ -1,14 +1,11 @@
 package io.openbas.rest.expectation;
 
-import io.openbas.database.model.Collector;
-import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
-import io.openbas.database.repository.CollectorRepository;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
-import io.openbas.service.ExerciseExpectationService;
 import io.openbas.service.InjectExpectationService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -16,50 +13,34 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 public class ExpectationApi extends RestBehavior {
 
-  private ExerciseExpectationService exerciseExpectationService;
-  private InjectExpectationService injectExpectationService;
-  private CollectorRepository collectorRepository;
+  public static final String EXPECTATIONS_URI = "/api/expectations";
+  public static final String INJECTS_EXPECTATIONS_URI = "/api/injects/expectations";
 
-  @Autowired
-  public void setExerciseExpectationService(
-      final ExerciseExpectationService exerciseExpectationService) {
-    this.exerciseExpectationService = exerciseExpectationService;
-  }
-
-  @Autowired
-  public void setInjectExpectationService(final InjectExpectationService injectExpectationService) {
-    this.injectExpectationService = injectExpectationService;
-  }
-
-  @Autowired
-  public void setCollectorRepository(CollectorRepository collectorRepository) {
-    this.collectorRepository = collectorRepository;
-  }
+  private final InjectExpectationService injectExpectationService;
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping("/api/expectations/{expectationId}")
+  @PutMapping(EXPECTATIONS_URI + "/{expectationId}")
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
       @Valid @RequestBody final ExpectationUpdateInput input) {
-    return this.exerciseExpectationService.updateInjectExpectation(expectationId, input);
+    return injectExpectationService.updateInjectExpectation(expectationId, input);
   }
 
   @Transactional(rollbackOn = Exception.class)
-  @PutMapping("/api/expectations/{expectationId}/{sourceId}/delete")
+  @PutMapping(EXPECTATIONS_URI + "/{expectationId}/{sourceId}/delete")
   public InjectExpectation deleteInjectExpectationResult(
       @PathVariable @NotBlank final String expectationId,
       @PathVariable @NotBlank final String sourceId) {
-    return this.exerciseExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
+    return injectExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
   }
 
-  @GetMapping("/api/injects/expectations")
+  @GetMapping(INJECTS_EXPECTATIONS_URI)
   public List<InjectExpectation> getInjectExpectationsNotFilled() {
     return Stream.concat(
             injectExpectationService.manualExpectationsNotFill().stream(),
@@ -69,7 +50,7 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping("/api/injects/expectations/{sourceId}")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
@@ -80,7 +61,11 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping("/api/injects/expectations/assets/{sourceId}")
+  @Operation(
+      summary = "Get Inject Expectations for a Specific Source",
+      description =
+          "Retrieves inject expectations of agents installed on an asset for a given source ID.")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/assets/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
       @PathVariable String sourceId) {
     return Stream.concat(
@@ -89,69 +74,44 @@ public class ExpectationApi extends RestBehavior {
         .toList();
   }
 
-  @GetMapping("/api/injects/expectations/prevention")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/prevention")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilled() {
     return injectExpectationService.preventionExpectationsNotFill().stream().toList();
   }
 
-  @GetMapping("/api/injects/expectations/prevention/{sourceId}")
+  @Operation(
+      summary = "Get Inject Expectations for a Specific Source and type Prevention",
+      description =
+          "Retrieves inject expectations of agents installed on an asset for a given source ID and type Prevention.")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/prevention/{sourceId}")
   public List<InjectExpectation> getInjectPreventionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.preventionExpectationsNotFill(sourceId).stream().toList();
   }
 
-  @GetMapping("/api/injects/expectations/detection")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/detection")
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilled() {
     return injectExpectationService.detectionExpectationsNotFill().stream().toList();
   }
 
-  @GetMapping("/api/injects/expectations/detection/{sourceId}")
+  @Operation(
+      summary = "Get Inject Expectations for a Specific Source and type Detection",
+      description =
+          "Retrieves inject expectations of agents installed on an asset for a given source ID and type detection.")
+  @GetMapping(INJECTS_EXPECTATIONS_URI + "/detection/{sourceId}")
   public List<InjectExpectation> getInjectDetectionExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
     return injectExpectationService.detectionExpectationsNotFill(sourceId).stream().toList();
   }
 
-  @PutMapping("/api/injects/expectations/{expectationId}")
+  @Operation(
+      summary = "Update Inject Expectation",
+      description = "Update Inject expectation from an external source, e.g., EDR collector.")
+  @PutMapping(INJECTS_EXPECTATIONS_URI + "/{expectationId}")
   @Transactional(rollbackOn = Exception.class)
   public InjectExpectation updateInjectExpectation(
       @PathVariable @NotBlank final String expectationId,
       @Valid @RequestBody @NotNull InjectExpectationUpdateInput input) {
-    InjectExpectation injectExpectation =
-        this.injectExpectationService.findInjectExpectation(expectationId).orElseThrow();
-    Collector collector = this.collectorRepository.findById(input.getCollectorId()).orElseThrow();
-    injectExpectation =
-        this.injectExpectationService.computeExpectation(
-            injectExpectation,
-            collector.getId(),
-            "collector",
-            collector.getName(),
-            input.getResult(),
-            input.getIsSuccess(),
-            input.getMetadata());
-
-    // Compute potential expectations for asset groups
-    Inject inject = injectExpectation.getInject();
-    List<InjectExpectation> expectationAssetGroups =
-        inject.getExpectations().stream().filter(e -> e.getAssetGroup() != null).toList();
-    expectationAssetGroups.forEach(
-        (expectationAssetGroup -> {
-          List<InjectExpectation> expectationAssets =
-              this.injectExpectationService.expectationsForAssets(
-                  expectationAssetGroup.getInject(),
-                  expectationAssetGroup.getAssetGroup(),
-                  expectationAssetGroup.getType());
-          // Every expectation assets are filled
-          if (expectationAssets.stream().noneMatch(e -> e.getResults().isEmpty())) {
-            this.injectExpectationService.computeExpectationGroup(
-                expectationAssetGroup,
-                expectationAssets,
-                collector.getId(),
-                "collector",
-                collector.getName());
-          }
-        }));
-    // end of computing
-
-    return injectExpectation;
+    return injectExpectationService.updateInjectExpectation(expectationId, input);
   }
 }

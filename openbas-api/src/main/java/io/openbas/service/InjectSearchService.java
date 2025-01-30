@@ -8,7 +8,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.AssetGroupRepository;
@@ -20,6 +19,7 @@ import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectMapper;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -313,8 +313,7 @@ public class InjectSearchService {
     }
   }
 
-  private Map<String, List<Object[]>> fetchRelatedTargets(
-      Set<String> injectIds, String targetType) {
+  public Map<String, List<Object[]>> fetchRelatedTargets(Set<String> injectIds, String targetType) {
     if (injectIds == null || injectIds.isEmpty()) {
       return new HashMap<>();
     }

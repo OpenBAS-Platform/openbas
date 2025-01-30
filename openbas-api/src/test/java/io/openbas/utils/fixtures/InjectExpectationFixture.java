@@ -4,6 +4,8 @@ import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.Team;
+import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
+import java.util.Map;
 
 public class InjectExpectationFixture {
 
@@ -63,5 +65,15 @@ public class InjectExpectationFixture {
     injectExpectation.setExercise(exercise);
     injectExpectation.setName(expectationName);
     return injectExpectation;
+  }
+
+  public static InjectExpectationUpdateInput getInjectExpectationUpdateInput(
+      String collectorId, String result, boolean isSuccess) {
+    return InjectExpectationUpdateInput.builder()
+        .collectorId(collectorId)
+        .result(result)
+        .isSuccess(isSuccess)
+        .metadata(Map.of("alertId", "alertId"))
+        .build();
   }
 }

@@ -1,6 +1,5 @@
 package io.openbas.utils;
 
-import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.raw.*;
@@ -17,6 +16,7 @@ public class AtomicTestingUtils {
   // -- TARGETS WITH RESULTS --
   public static List<InjectTargetWithResult> getTargetsWithResultsFromRaw(
       List<RawInjectExpectation> expectations,
+      List<String> injectAssets,
       Map<String, RawTeam> rawTeamMap,
       Map<String, RawUser> rawUserMap,
       Map<String, RawAsset> rawAssetMap,
@@ -31,22 +31,23 @@ public class AtomicTestingUtils {
     List<RawInjectExpectation> playerExpectations = new ArrayList<>();
     List<RawInjectExpectation> assetExpectations = new ArrayList<>();
     List<RawInjectExpectation> assetGroupExpectations = new ArrayList<>();
-    List<String> injectAssetIds = new ArrayList<>();
 
     // Loop through the expectations to separate them by target
     expectations.forEach(
         expectation -> {
-          if (expectation.getTeam_id() != null && expectation.getTeam_id() != null) {
+          if (expectation.getTeam_id() != null) {
             if (expectation.getUser_id() != null) {
               playerExpectations.add(expectation);
             } else {
               teamExpectations.add(expectation);
             }
           }
-          if (expectation.getAsset_id() != null && expectation.getAsset_id() != null) {
+          if (expectation.getAsset_id() != null && expectation.getAgent_id() == null) {
             assetExpectations.add(expectation);
           }
-          if (expectation.getAsset_group_id() != null && expectation.getAsset_group_id() != null) {
+          if (expectation.getAsset_group_id() != null
+              && expectation.getAsset_id() == null
+              && expectation.getAgent_id() == null) {
             assetGroupExpectations.add(expectation);
           }
         });
@@ -106,29 +107,31 @@ public class AtomicTestingUtils {
 
     // Check if each asset defined in an inject has an expectation. If not, create a result with
     // default expectations
-    if (rawAssetMap != null) {
-      rawAssetMap.forEach(
-          (assetId, asset) -> {
-            // Check if there are no expectations matching the current asset
-            boolean noMatchingExpectations =
-                assetExpectations.stream()
-                    .noneMatch(exp -> exp.getAsset_id().equals(asset.getAsset_id()));
+    if (!injectAssets.isEmpty() && rawAssetMap != null) {
+      rawAssetMap.entrySet().stream()
+          .filter(entry -> injectAssets.contains(entry.getKey()))
+          .forEach(
+              entry -> {
+                RawAsset asset = entry.getValue();
+                // Check if there are no expectations matching the current asset
+                boolean noMatchingExpectations =
+                    assetExpectations.stream()
+                        .noneMatch(exp -> exp.getAsset_id().equals(asset.getAsset_id()));
 
-            if (noMatchingExpectations) {
-              InjectTargetWithResult target =
-                  new InjectTargetWithResult(
-                      TargetType.ASSETS,
-                      asset.getAsset_id(),
-                      asset.getAsset_name(),
-                      defaultExpectationResultsByTypes,
-                      Objects.equals(asset.getAsset_type(), ENDPOINT)
-                          ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
-                          : null);
+                if (noMatchingExpectations) {
+                  InjectTargetWithResult target =
+                      new InjectTargetWithResult(
+                          TargetType.ASSETS,
+                          asset.getAsset_id(),
+                          asset.getAsset_name(),
+                          defaultExpectationResultsByTypes,
+                          Objects.equals(asset.getAsset_type(), ENDPOINT)
+                              ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
+                              : null);
 
-              targets.add(target);
-              injectAssetIds.add(assetId);
-            }
-          });
+                  targets.add(target);
+                }
+              });
     }
 
     // Check if each asset group defined in an inject has an expectation. If not, create a result
@@ -358,10 +361,10 @@ public class AtomicTestingUtils {
               .toList());
     }
 
-    // Compare the assets directly linked to the inject {injectAssetIds} to retain only the results
+    // Compare the assets directly linked to inject {injectAssetIds} to retain only the results
     // from these assets
     assetsToRefine.removeAll(
-        assetsToRemove.stream().filter(asset -> !injectAssetIds.contains(asset.getId())).toList());
+        assetsToRemove.stream().filter(asset -> !injectAssets.contains(asset.getId())).toList());
 
     targets.addAll(assetsToRefine);
     return sortResults(targets);

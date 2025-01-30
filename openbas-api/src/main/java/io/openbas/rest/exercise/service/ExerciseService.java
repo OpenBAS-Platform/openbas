@@ -14,7 +14,6 @@ import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import io.openbas.atomic_testing.TargetType;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;
@@ -37,6 +36,7 @@ import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
+import io.openbas.utils.TargetType;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

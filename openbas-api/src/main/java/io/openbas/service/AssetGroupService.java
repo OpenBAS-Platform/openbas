@@ -14,9 +14,7 @@ import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.specification.EndpointSpecification;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -125,7 +123,7 @@ public class AssetGroupService {
     Specification<Endpoint> specification2 = EndpointSpecification.findEndpointsForInjection();
     List<Asset> assets =
         this.endpointService.endpoints(specification.and(specification2)).stream()
-            .map(endpoint -> (Asset) endpoint)
+            .map(Asset.class::cast)
             .distinct()
             .toList();
     assetGroup.setDynamicAssets(assets);
@@ -142,14 +140,20 @@ public class AssetGroupService {
         .collect(
             Collectors.toMap(
                 RawAssetGroup::getAsset_group_id,
-                assetGroup -> {
-                  Specification<Endpoint> specification =
-                      computeFilterGroupJpa(assetGroup.getAssetGroupDynamicFilter());
-                  Specification<Endpoint> specification2 =
-                      EndpointSpecification.findEndpointsForInjection();
-                  return this.endpointService.endpoints(specification.and(specification2)).stream()
-                      .distinct()
-                      .toList();
-                }));
+                assetGroup ->
+                    Optional.of(assetGroup.getAssetGroupDynamicFilter())
+                        .filter(filterGroup -> !isEmptyFilterGroup(filterGroup))
+                        .map(
+                            filter -> {
+                              Specification<Endpoint> specification = computeFilterGroupJpa(filter);
+                              Specification<Endpoint> specification2 =
+                                  EndpointSpecification.findEndpointsForInjection();
+                              return this.endpointService
+                                  .endpoints(specification.and(specification2))
+                                  .stream()
+                                  .distinct()
+                                  .toList();
+                            })
+                        .orElse(Collections.emptyList())));
   }
 }

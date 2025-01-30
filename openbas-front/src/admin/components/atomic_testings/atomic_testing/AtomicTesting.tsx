@@ -71,9 +71,7 @@ const AtomicTesting = () => {
   // Handles
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult) => {
     setSelectedTarget(target);
-    if (currentParent) {
-      setCurrentParentTarget(currentParent);
-    }
+    setCurrentParentTarget(currentParent);
   };
 
   if (!injectResultOverviewOutput) {
@@ -266,7 +264,11 @@ const AtomicTesting = () => {
             <List>
               {sortedTargets.map(target => (
                 <div key={target?.id} style={{ marginBottom: 15 }}>
-                  <TargetListItem onClick={() => handleTargetClick(target)} target={target} selected={selectedTarget?.id === target.id} />
+                  <TargetListItem
+                    onClick={() => handleTargetClick(target, undefined)}
+                    target={target}
+                    selected={selectedTarget?.id === target.id && currentParentTarget?.id === undefined}
+                  />
                   <List component="div" disablePadding>
                     {target?.children?.map(child => (
                       <TargetListItem
