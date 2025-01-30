@@ -40,6 +40,8 @@ import InjectorContract from './InjectorContract';
 import InjectPopover from './InjectPopover';
 import InjectsListButtons from './InjectsListButtons';
 import UpdateInject from './UpdateInject';
+import {InjectHelper} from "../../../../actions/injects/inject-helper";
+import {useHelper} from "../../../../store";
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -347,9 +349,7 @@ const Injects: FunctionComponent<Props> = ({
     handleToggleSelectAll,
     onToggleEntity,
     numberOfSelectedElements,
-  } = useEntityToggle<{
-    inject_id: string;
-  }>('inject', injects, queryableHelpers.paginationHelpers.getTotalElements());
+  } = useEntityToggle<InjectOutputType>('inject', injects, queryableHelpers.paginationHelpers.getTotalElements());
   const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
@@ -393,18 +393,24 @@ const Injects: FunctionComponent<Props> = ({
     return onToggleEntity(currentEntity, event);
   };
 
-  const injectsToProcess = selectAll
-    ? []
-    : injects.filter(
-        (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
-      );
+  const injectIdsToProcess= (selectAll: boolean) => {
+    return selectAll
+        ? []
+        : Object.keys(selectedElements).filter(k => !Object.keys(deSelectedElements).includes(k))
+  }
+  const injectsToProcess = Object.values(selectedElements).filter(
+      (inject: InjectOutputType) => injectIdsToProcess(selectAll).includes(inject.inject_id)
+  );
 
-  const injectsToIgnore = selectAll
-    ? injects.filter((inject: InjectOutputType) => R.keys(deSelectedElements).includes(inject.inject_id))
-    : injects.filter(
-        (inject: InjectOutputType) => !R.keys(selectedElements).includes(inject.inject_id) && R.keys(deSelectedElements).includes(inject.inject_id),
-      );
+  const injectIdsToIgnore =  (selectAll: boolean) => {
+    return selectAll
+        ? Object.keys(deSelectedElements)
+        : Object.keys(deSelectedElements).filter(k => !Object.keys(selectedElements).includes(k))
+  }
 
+  const injectsToIgnore = Object.values(deSelectedElements).filter(
+      (inject: InjectOutputType) => injectIdsToIgnore(selectAll).includes(inject.inject_id),
+  );
   const massUpdateInjects = async (actions: {
     field: string;
     type: string;
@@ -478,8 +484,7 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const selectedInjects = () => {
-    const selectedInjectIds = Object.keys(selectedElements);
-    return injects.filter(inject => selectedInjectIds.includes(inject.inject_id));
+    return Object.values(selectedElements);
   };
 
   const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);

@@ -17,7 +17,7 @@ export interface UseEntityToggle<T> {
   setSelectedElements: (selectedElements: Record<string, T>) => void;
 }
 
-const useEntityToggle = <T extends Record<string, string>>(
+const useEntityToggle = <T extends Record<string, any>>(
   prefix: string,
   knownElements: T[],
   totalNumberOfElements?: number,
@@ -39,7 +39,7 @@ const useEntityToggle = <T extends Record<string, string>>(
       event.preventDefault();
     }
     if (Array.isArray(entity)) {
-      const currentIds = R.values(selectedElements).map((n: Record<string, string>) => n[`${prefix}_id`]);
+      const currentIds = R.values(selectedElements).map((n: Record<string, any>) => n[`${prefix}_id`]);
       const givenIds = entity.map(n => n[`${prefix}_id`]);
       const addedIds = givenIds.filter(n => !currentIds.includes(n));
       let newSelectedElements = {
@@ -81,15 +81,7 @@ const useEntityToggle = <T extends Record<string, string>>(
     }
   };
   const handleToggleSelectAll = () => {
-    // select all element when we toggle AWAY FROM selectAll
-    if (!selectAll) {
-      setSelectedElements(knownElements.reduce((map: { [key: string]: T }, element) => {
-        map[element[`${prefix}_id`]] = element;
-        return map;
-      }, {}));
-    } else {
-      setSelectedElements({});
-    }
+    setSelectedElements({});
     setDeSelectedElements({});
     setSelectAll(!selectAll);
   };
