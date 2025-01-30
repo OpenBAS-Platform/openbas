@@ -69,7 +69,7 @@ public class CalderaExecutor extends Injector {
             : CalderaInjectContent.getDefaultObfuscator();
     Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
 
-    Map<Endpoint, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
     // Execute inject for all assets
     if (assets.isEmpty()) {
       execution.addTrace(
@@ -230,7 +230,10 @@ public class CalderaExecutor extends Injector {
                             execution.addTrace(
                                 getNewInfoTrace(
                                     "Caldera executed the ability on agent"
-                                        + asset.getAgents().getFirst().getExecutedByUser()
+                                        + ((Endpoint) asset)
+                                            .getAgents()
+                                            .getFirst()
+                                            .getExecutedByUser()
                                         + " using "
                                         + executionEndpoint.getAgents().getFirst().getProcessName()
                                         + " (paw: "
@@ -242,29 +245,35 @@ public class CalderaExecutor extends Injector {
                                         + exploitResult.getLinkId()
                                         + ")",
                                     ExecutionTraceAction.EXECUTION,
-                                    asset.getAgents().getFirst(),
+                                    ((Endpoint) asset).getAgents().getFirst(),
                                     List.of(exploitResult.getLinkId())));
                           } else {
                             execution.addTrace(
                                 getNewErrorTrace(
                                     "Caldera failed to execute the ability on agent"
-                                        + asset.getAgents().getFirst().getExecutedByUser()
+                                        + ((Endpoint) asset)
+                                            .getAgents()
+                                            .getFirst()
+                                            .getExecutedByUser()
                                         + " ("
                                         + result
                                         + ")",
                                     ExecutionTraceAction.COMPLETE,
-                                    asset.getAgents().getFirst()));
+                                    ((Endpoint) asset).getAgents().getFirst()));
                           }
                         } else {
                           execution.addTrace(
                               getNewErrorTrace(
                                   "Caldera failed to execute ability on agent "
-                                      + asset.getAgents().getFirst().getExecutedByUser()
+                                      + ((Endpoint) asset)
+                                          .getAgents()
+                                          .getFirst()
+                                          .getExecutedByUser()
                                       + "(platform is not compatible:"
                                       + executionEndpoint.getPlatform().name()
                                       + ")",
                                   ExecutionTraceAction.COMPLETE,
-                                  asset.getAgents().getFirst()));
+                                  ((Endpoint) asset).getAgents().getFirst()));
                         }
                       } else {
                         execution.addTrace(
@@ -273,18 +282,18 @@ public class CalderaExecutor extends Injector {
                                     + asset.getName()
                                     + " (temporary injector not spawned correctly)",
                                 ExecutionTraceAction.COMPLETE,
-                                asset.getAgents().getFirst()));
+                                ((Endpoint) asset).getAgents().getFirst()));
                       }
                     } catch (Exception e) {
                       execution.addTrace(
                           getNewErrorTrace(
                               "Caldera failed to execute the ability on agent"
-                                  + asset.getAgents().getFirst().getExecutedByUser()
+                                  + ((Endpoint) asset).getAgents().getFirst().getExecutedByUser()
                                   + " ("
                                   + e.getMessage()
                                   + ")",
                               ExecutionTraceAction.COMPLETE,
-                              asset.getAgents().getFirst()));
+                              ((Endpoint) asset).getAgents().getFirst()));
                       log.severe(Arrays.toString(e.getStackTrace()));
                     }
                   });

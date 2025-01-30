@@ -90,13 +90,13 @@ public class InjectService {
     }
   }
 
-  public Map<Endpoint, Boolean> resolveAllAssetsToExecute(@NotNull final Inject inject) {
-    Map<Endpoint, Boolean> assets = new HashMap<>();
+  public Map<Asset, Boolean> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    Map<Asset, Boolean> assets = new HashMap<>();
     inject
         .getAssets()
         .forEach(
             (asset -> {
-              assets.put((Endpoint) asset, false);
+              assets.put(asset, false);
             }));
     inject
         .getAssetGroups()
@@ -107,7 +107,7 @@ public class InjectService {
               // Verify asset validity
               assetsFromGroup.forEach(
                   (asset) -> {
-                    assets.put((Endpoint) asset, true);
+                    assets.put(asset, true);
                   });
             }));
     return assets;

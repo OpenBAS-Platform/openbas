@@ -203,7 +203,7 @@ public class OpenBASImplantExecutor extends Injector {
   public ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception {
     Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
-    Map<Endpoint, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
 
     // Check assets target
     if (assets.isEmpty()) {

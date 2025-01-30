@@ -77,7 +77,7 @@ public class InjectStatusService {
 
   public boolean isAllInjectAssetsExecuted(Inject inject) {
     int totalCompleteTrace = getCompleteTrace(inject);
-    Map<Endpoint, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
     return assets.size() == totalCompleteTrace;
   }
 
@@ -95,32 +95,42 @@ public class InjectStatusService {
     injectStatus.getInject().setUpdatedAt(Instant.now());
   }
 
-  public Inject handleInjectExecutionCallback(
-      String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-    Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
-    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
-
+  public ExecutionTraces createExecutionTrace(
+      InjectStatus injectStatus, InjectExecutionInput input, Agent agent) {
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
-    ExecutionTraceStatus traceStatus;
-    if (executionAction.equals(ExecutionTraceAction.COMPLETE)) {
-      traceStatus =
+    ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
+    return new ExecutionTraces(
+        injectStatus, traceStatus, null, input.getMessage(), executionAction, agent);
+  }
+
+  private void computeExecutionTraceStatusIfNeeded(
+      InjectStatus injectStatus, ExecutionTraces executionTraces, String agentId) {
+    if (agentId != null && executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)) {
+      ExecutionTraceStatus traceStatus =
           convertExecutionStatus(
               computeStatus(
                   injectStatus.getTraces().stream()
                       .filter(t -> t.getAgent().getId().equals(agentId))
                       .toList()));
-    } else {
-      traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
+      executionTraces.setStatus(traceStatus);
     }
-    injectStatus
-        .getTraces()
-        .add(
-            new ExecutionTraces(
-                injectStatus, traceStatus, null, input.getMessage(), executionAction, agent));
+  }
 
-    if (executionAction.equals(ExecutionTraceAction.COMPLETE)
-        && isAllInjectAssetsExecuted(inject)) {
+  public Inject handleInjectExecutionCallback(
+      String injectId, String agentId, InjectExecutionInput input) {
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    Agent agent =
+        agentId == null
+            ? null
+            : agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
+    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
+
+    ExecutionTraces executionTraces = createExecutionTrace(injectStatus, input, agent);
+    computeExecutionTraceStatusIfNeeded(injectStatus, executionTraces, agentId);
+    injectStatus.addTrace(executionTraces);
+
+    if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
+        && (agentId == null || isAllInjectAssetsExecuted(inject))) {
       updateFinalInjectStatus(injectStatus, now());
     }
     return injectRepository.save(inject);
