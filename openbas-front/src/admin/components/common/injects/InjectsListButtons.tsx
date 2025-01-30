@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 interface Props {
-  selectedInjects: Inject[] | InjectOutputType[];
+  selectedInjects: InjectOutputType[];
   setViewMode?: (mode: string) => void;
   availableButtons: string[];
   onImportedInjects?: () => void;

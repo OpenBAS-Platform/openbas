@@ -258,15 +258,6 @@ const Injects: FunctionComponent<Props> = ({
   // Injects
   // scoped to page
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
-  const dispatch = useAppDispatch();
-  useDataLoader(
-    () => {
-      dispatch(fetchExerciseInjects(exerciseOrScenarioId));
-    }
-  );
-  const { allInjects } : { allInjects: { [key: string]: Inject } } = useHelper((helper: InjectHelper) => ({
-    allInjects: helper.getInjectsMap()
-  }));
   // Bulk loading indcator for tests and delete
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
@@ -492,7 +483,7 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const selectedInjects = () => {
-    return selectAll ? Object.values(allInjects).filter(i => !injectIdsToIgnore(selectAll).includes(i.inject_id)) : Object.values(selectedElements);
+    return Object.values(selectedElements);
   };
 
   const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
