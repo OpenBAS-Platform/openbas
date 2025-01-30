@@ -129,6 +129,7 @@ public class CalderaExecutor extends Injector {
                       entry -> {
                         Endpoint endpointAgent = entry.getKey();
                         boolean isInGroup = entry.getValue();
+                        List<io.openbas.database.model.Agent> executionAgents = new ArrayList<>();
 
                         endpointAgent.getAgents().stream()
                             .forEach(
@@ -154,6 +155,7 @@ public class CalderaExecutor extends Injector {
                                               this.calderaService.exploitResult(
                                                   executionAgent.getExternalReference(), contract);
                                           asyncIds.add(exploitResult.getLinkId());
+                                          executionAgents.add(executionAgent);
                                           execution.addTrace(
                                               traceInfo(
                                                   EXECUTION_TYPE_COMMAND,
@@ -205,7 +207,12 @@ public class CalderaExecutor extends Injector {
                                 });
 
                         computeExpectationsForAssetAndAgents(
-                            expectations, content, endpointAgent, isInGroup, injectorContract);
+                            expectations,
+                            content,
+                            endpointAgent,
+                            isInGroup,
+                            executionAgents,
+                            injectorContract);
                       });
             },
             () -> execution.addTrace(traceError("Inject does not have a contract")));
@@ -351,7 +358,7 @@ public class CalderaExecutor extends Injector {
   }
 
   private List<InjectExpectationSignature> computeSignatures(
-      InjectorContract injectorContract, io.openbas.database.model.Agent executionAgent) {
+      InjectorContract injectorContract, String processName) {
     List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
     if (injectorContract.getPayload() != null) {
       switch (injectorContract.getPayload().getTypeEnum()) {
@@ -359,7 +366,7 @@ public class CalderaExecutor extends Injector {
           injectExpectationSignatures.add(
               InjectExpectationSignature.builder()
                   .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                  .value(executionAgent.getProcessName())
+                  .value(processName)
                   .build());
           break;
         case PayloadType.EXECUTABLE:
@@ -398,7 +405,7 @@ public class CalderaExecutor extends Injector {
       injectExpectationSignatures.add(
           InjectExpectationSignature.builder()
               .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-              .value(executionAgent.getProcessName())
+              .value(processName)
               .build());
     }
 
@@ -411,6 +418,7 @@ public class CalderaExecutor extends Injector {
       @NotNull final CalderaInjectContent content,
       @NotNull final Endpoint endpoint,
       final boolean expectationGroup,
+      final List<io.openbas.database.model.Agent> executedAgents,
       final InjectorContract injectorContract) {
 
     if (!content.getExpectations().isEmpty()) {
@@ -431,14 +439,15 @@ public class CalderaExecutor extends Injector {
 
                           yield Stream.concat(
                               Stream.of(preventionExpectation),
-                              endpoint.getAgents().stream()
+                              executedAgents.stream()
                                   .map(
                                       agent ->
                                           preventionExpectationForAgent(
-                                              agent,
+                                              agent.getParent(),
                                               endpoint,
                                               preventionExpectation,
-                                              computeSignatures(injectorContract, agent))));
+                                              computeSignatures(
+                                                  injectorContract, agent.getProcessName()))));
                         } // expectationGroup usefully in front-end
                         case DETECTION -> {
                           DetectionExpectation detectionExpectation =
@@ -451,14 +460,15 @@ public class CalderaExecutor extends Injector {
                                   expectation.getExpirationTime());
                           yield Stream.concat(
                               Stream.of(detectionExpectation),
-                              endpoint.getAgents().stream()
+                              executedAgents.stream()
                                   .map(
                                       agent ->
                                           detectionExpectationForAgent(
-                                              agent,
+                                              agent.getParent(),
                                               endpoint,
                                               detectionExpectation,
-                                              computeSignatures(injectorContract, agent))));
+                                              computeSignatures(
+                                                  injectorContract, agent.getProcessName()))));
                         }
                         case MANUAL -> {
                           ManualExpectation manualExpectation =
@@ -471,12 +481,11 @@ public class CalderaExecutor extends Injector {
                                   expectationGroup);
                           yield Stream.concat(
                               Stream.of(manualExpectation),
-                              endpoint.getAgents().stream()
-                                  .filter(agent -> agent.isActive())
+                              executedAgents.stream()
                                   .map(
                                       agent ->
                                           manualExpectationForAgent(
-                                              agent, endpoint, manualExpectation)));
+                                              agent.getParent(), endpoint, manualExpectation)));
                         }
                         default -> Stream.of();
                       })
