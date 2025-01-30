@@ -33,17 +33,11 @@ public class DetectionExpectation implements Expectation {
     return DETECTION;
   }
 
-  public static List<DetectionExpectation> detectionExpectationsForAgents(
-      @NotNull Endpoint endpoint, @NotNull DetectionExpectation endpointExpectation) {
-    return endpoint.getAgents().stream()
-        .map(agent -> detectionExpectationForAgent(agent, endpoint, endpointExpectation))
-        .toList();
-  }
-
   private static DetectionExpectation detectionExpectationForAgent(
       @NotNull Agent agent,
       @NotNull Asset asset,
-      @NotNull DetectionExpectation endpointExpectation) {
+      @NotNull DetectionExpectation endpointExpectation,
+      List<InjectExpectationSignature> injectExpectationSignatures) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
     detectionExpectation.setScore(
         Objects.requireNonNullElse(endpointExpectation.getScore(), 100.0));
@@ -52,8 +46,7 @@ public class DetectionExpectation implements Expectation {
     detectionExpectation.setAgent(agent);
     detectionExpectation.setAsset(asset);
     detectionExpectation.setExpirationTime(endpointExpectation.getExpirationTime());
-    detectionExpectation.setInjectExpectationSignatures(
-        endpointExpectation.getInjectExpectationSignatures());
+    detectionExpectation.setInjectExpectationSignatures(injectExpectationSignatures);
     return detectionExpectation;
   }
 

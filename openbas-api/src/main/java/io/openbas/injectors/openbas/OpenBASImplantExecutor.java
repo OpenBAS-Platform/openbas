@@ -81,10 +81,23 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectationGroup,
                                   expectation.getExpirationTime());
 
-                          endpoint.getAgents().stream().map(agent->preventionExpectationForAgent(agent, endpoint, preventionExpectation, injectExpectationSignatures)).toList();
-                          yield Stream.of(
-                              preventionExpectation,
-                              preventionExpectationsForAgents(endpoint, preventionExpectation, injectExpectationSignatures));
+                          List<PreventionExpectation> agentExpectations =
+                              endpoint.getAgents().stream()
+                                  .map(
+                                      agent ->
+                                          preventionExpectationForAgent(
+                                              agent,
+                                              endpoint,
+                                              preventionExpectation,
+                                              injectExpectationSignatures.add(
+                                                  createSignature(
+                                                      EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
+                                                      "obas-implant-"
+                                                          + agent.getInject().getId()
+                                                          + "-agent-"
+                                                          + agent.getId()))))
+                                  .toList();
+                          yield Stream.of(preventionExpectation, agentExpectations);
                         } // expectationGroup usefully in front-end
                         case DETECTION -> {
                           DetectionExpectation detectionExpectation =
@@ -96,9 +109,23 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectationGroup,
                                   expectation.getExpirationTime(),
                                   injectExpectationSignatures);
-                          yield Stream.of(
-                              detectionExpectation,
-                              detectionExpectationsForAgents(endpoint, detectionExpectation));
+                          List<DetectionExpectation> agentExpectations =
+                              endpoint.getAgents().stream()
+                                  .map(
+                                      agent ->
+                                          detectionExpectationForAgent(
+                                              agent,
+                                              endpoint,
+                                              detectionExpectation,
+                                              injectExpectationSignatures.add(
+                                                  createSignature(
+                                                      EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
+                                                      "obas-implant-"
+                                                          + agent.getInject().getId()
+                                                          + "-agent-"
+                                                          + agent.getId()))))
+                                  .toList();
+                          yield Stream.of(detectionExpectation, agentExpectations);
                         }
                         case MANUAL -> {
                           ManualExpectation manualExpectation =
@@ -109,9 +136,14 @@ public class OpenBASImplantExecutor extends Injector {
                                   endpoint,
                                   expectation.getExpirationTime(),
                                   expectationGroup);
-                          yield Stream.of(
-                              manualExpectation,
-                              manualExpectationsForAgents(endpoint, manualExpectation));
+                          List<ManualExpectation> agentExpectations =
+                              endpoint.getAgents().stream()
+                                  .map(
+                                      agent ->
+                                          manualExpectationForAgent(
+                                              agent, endpoint, manualExpectation))
+                                  .toList();
+                          yield Stream.of(manualExpectation, agentExpectations);
                         }
                         default -> Stream.of();
                       })
@@ -286,8 +318,7 @@ public class OpenBASImplantExecutor extends Injector {
     return new ExecutionProcess(true);
   }
 
-  private List<InjectExpectationSignature> spawnSignatures(
-      Payload payload) {
+  private List<InjectExpectationSignature> spawnSignatures(Payload payload) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
     List<String> knownPayloadTypes =
         Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");

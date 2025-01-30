@@ -2,14 +2,10 @@ package io.openbas.model.expectation;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 
-import io.openbas.database.model.Agent;
-import io.openbas.database.model.Asset;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.*;
 import io.openbas.model.Expectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import lombok.Getter;
@@ -40,13 +36,6 @@ public class ManualExpectation implements Expectation {
     this.description = expectation.getDescription();
     this.expectationGroup = expectation.isExpectationGroup();
     this.expirationTime = expectation.getExpirationTime();
-  }
-
-  public static List<ManualExpectation> manualExpectationsForAgents(
-      @NotNull Endpoint endpoint, @NotNull ManualExpectation endpointExpectation) {
-    return endpoint.getAgents().stream()
-        .map(agent -> manualExpectationForAgent(agent, endpoint, endpointExpectation))
-        .toList();
   }
 
   private static ManualExpectation manualExpectationForAgent(

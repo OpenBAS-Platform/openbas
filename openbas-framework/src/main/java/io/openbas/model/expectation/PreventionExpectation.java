@@ -1,7 +1,6 @@
 package io.openbas.model.expectation;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
-import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
 
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
