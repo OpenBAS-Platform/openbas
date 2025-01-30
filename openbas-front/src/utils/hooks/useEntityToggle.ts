@@ -17,6 +17,9 @@ export interface UseEntityToggle<T> {
   setSelectedElements: (selectedElements: Record<string, T>) => void;
 }
 
+// we don't know the type of every value in an object type passed here
+// nor is it relevant.
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const useEntityToggle = <T extends Record<string, any>>(
   prefix: string,
   knownElements: T[],

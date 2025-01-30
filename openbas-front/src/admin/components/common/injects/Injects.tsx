@@ -40,8 +40,6 @@ import InjectorContract from './InjectorContract';
 import InjectPopover from './InjectPopover';
 import InjectsListButtons from './InjectsListButtons';
 import UpdateInject from './UpdateInject';
-import {InjectHelper} from "../../../../actions/injects/inject-helper";
-import {useHelper} from "../../../../store";
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -393,24 +391,18 @@ const Injects: FunctionComponent<Props> = ({
     return onToggleEntity(currentEntity, event);
   };
 
-  const injectIdsToProcess= (selectAll: boolean) => {
+  const injectIdsToProcess = (selectAll: boolean) => {
     return selectAll
-        ? []
-        : Object.keys(selectedElements).filter(k => !Object.keys(deSelectedElements).includes(k))
-  }
-  const injectsToProcess = Object.values(selectedElements).filter(
-      (inject: InjectOutputType) => injectIdsToProcess(selectAll).includes(inject.inject_id)
-  );
+      ? []
+      : Object.keys(selectedElements).filter(k => !Object.keys(deSelectedElements).includes(k));
+  };
 
-  const injectIdsToIgnore =  (selectAll: boolean) => {
+  const injectIdsToIgnore = (selectAll: boolean) => {
     return selectAll
-        ? Object.keys(deSelectedElements)
-        : Object.keys(deSelectedElements).filter(k => !Object.keys(selectedElements).includes(k))
-  }
+      ? Object.keys(deSelectedElements)
+      : Object.keys(deSelectedElements).filter(k => !Object.keys(selectedElements).includes(k));
+  };
 
-  const injectsToIgnore = Object.values(deSelectedElements).filter(
-      (inject: InjectOutputType) => injectIdsToIgnore(selectAll).includes(inject.inject_id),
-  );
   const massUpdateInjects = async (actions: {
     field: string;
     type: string;
@@ -428,8 +420,8 @@ const Injects: FunctionComponent<Props> = ({
     }
     await injectContext.onBulkUpdateInject({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
-      inject_ids_to_process: selectAll ? undefined : injectsToProcess.map((inject: InjectOutputType) => inject.inject_id),
-      inject_ids_to_ignore: injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id),
+      inject_ids_to_process: selectAll ? undefined : injectIdsToProcess(selectAll),
+      inject_ids_to_ignore: injectIdsToIgnore(selectAll),
       simulation_or_scenario_id: exerciseOrScenarioId,
       update_operations: operationsToPerform,
     })
@@ -440,8 +432,8 @@ const Injects: FunctionComponent<Props> = ({
 
   const bulkDeleteInjects = () => {
     setIsBulkLoading(true);
-    const deleteIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
-    const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
+    const deleteIds = injectIdsToProcess(selectAll);
+    const ignoreIds = injectIdsToIgnore(selectAll);
     injectContext.onBulkDeleteInjects({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : deleteIds,
@@ -461,8 +453,8 @@ const Injects: FunctionComponent<Props> = ({
 
   const massTestInjects = () => {
     setIsBulkLoading(true);
-    const testIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
-    const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
+    const testIds = injectIdsToProcess(selectAll);
+    const ignoreIds = injectIdsToIgnore(selectAll);
     injectContext.bulkTestInjects({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : testIds,
