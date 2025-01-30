@@ -2,12 +2,9 @@ package io.openbas.injectors.caldera;
 
 import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.database.model.InjectStatusExecution.*;
-import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
-import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
-import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
-import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAssetGroup;
-import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAsset;
-import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
+import static io.openbas.model.expectation.DetectionExpectation.*;
+import static io.openbas.model.expectation.ManualExpectation.*;
+import static io.openbas.model.expectation.PreventionExpectation.*;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -220,9 +217,7 @@ public class CalderaExecutor extends Injector {
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
     assetGroups.forEach(
-        (assetGroup ->
-            computeExpectationsForAssetGroup(
-                expectations, content, assetGroup, new ArrayList<>())));
+        (assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
 
     String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
     execution.addTrace(traceInfo(message, asyncIds));
@@ -412,7 +407,7 @@ public class CalderaExecutor extends Injector {
 
   /** In case of direct endpoint, we have an individual expectation for the endpoint */
   private void computeExpectationsForAssetAndAgents(
-      @NotNull final List<Expectation> expectations,
+      final List<Expectation> expectations,
       @NotNull final CalderaInjectContent content,
       @NotNull final Endpoint endpoint,
       final boolean expectationGroup,
@@ -424,35 +419,65 @@ public class CalderaExecutor extends Injector {
               .flatMap(
                   (expectation) ->
                       switch (expectation.getType()) {
-                        case PREVENTION ->
-                            Stream.of(
-                                preventionExpectationForAsset(
-                                    expectation.getScore(),
-                                    expectation.getName(),
-                                    expectation.getDescription(),
-                                    endpoint,
-                                    expectationGroup,
-                                    expectation
-                                        .getExpirationTime())); // expectationGroup usefully in
-                        // front-end
-                        case DETECTION ->
-                            Stream.of(
-                                detectionExpectationForAsset(
-                                    expectation.getScore(),
-                                    expectation.getName(),
-                                    expectation.getDescription(),
-                                    endpoint,
-                                    expectationGroup,
-                                    expectation.getExpirationTime()));
-                        case MANUAL ->
-                            Stream.of(
-                                manualExpectationForAsset(
-                                    expectation.getScore(),
-                                    expectation.getName(),
-                                    expectation.getDescription(),
-                                    endpoint,
-                                    expectation.getExpirationTime(),
-                                    expectationGroup));
+                        case PREVENTION -> {
+                          PreventionExpectation preventionExpectation =
+                              preventionExpectationForAsset(
+                                  expectation.getScore(),
+                                  expectation.getName(),
+                                  expectation.getDescription(),
+                                  endpoint,
+                                  expectationGroup,
+                                  expectation.getExpirationTime());
+
+                          yield Stream.concat(
+                              Stream.of(preventionExpectation),
+                              endpoint.getAgents().stream()
+                                  .map(
+                                      agent ->
+                                          preventionExpectationForAgent(
+                                              agent,
+                                              endpoint,
+                                              preventionExpectation,
+                                              computeSignatures(injectorContract, agent))));
+                        } // expectationGroup usefully in front-end
+                        case DETECTION -> {
+                          DetectionExpectation detectionExpectation =
+                              detectionExpectationForAsset(
+                                  expectation.getScore(),
+                                  expectation.getName(),
+                                  expectation.getDescription(),
+                                  endpoint,
+                                  expectationGroup,
+                                  expectation.getExpirationTime());
+                          yield Stream.concat(
+                              Stream.of(detectionExpectation),
+                              endpoint.getAgents().stream()
+                                  .map(
+                                      agent ->
+                                          detectionExpectationForAgent(
+                                              agent,
+                                              endpoint,
+                                              detectionExpectation,
+                                              computeSignatures(injectorContract, agent))));
+                        }
+                        case MANUAL -> {
+                          ManualExpectation manualExpectation =
+                              manualExpectationForAsset(
+                                  expectation.getScore(),
+                                  expectation.getName(),
+                                  expectation.getDescription(),
+                                  endpoint,
+                                  expectation.getExpirationTime(),
+                                  expectationGroup);
+                          yield Stream.concat(
+                              Stream.of(manualExpectation),
+                              endpoint.getAgents().stream()
+                                  .filter(agent -> agent.isActive())
+                                  .map(
+                                      agent ->
+                                          manualExpectationForAgent(
+                                              agent, endpoint, manualExpectation)));
+                        }
                         default -> Stream.of();
                       })
               .toList());
@@ -466,8 +491,7 @@ public class CalderaExecutor extends Injector {
   private void computeExpectationsForAssetGroup(
       @NotNull final List<Expectation> expectations,
       @NotNull final CalderaInjectContent content,
-      @NotNull final AssetGroup assetGroup,
-      final List<InjectExpectationSignature> injectExpectationSignatures) {
+      @NotNull final AssetGroup assetGroup) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
           content.getExpectations().stream()
