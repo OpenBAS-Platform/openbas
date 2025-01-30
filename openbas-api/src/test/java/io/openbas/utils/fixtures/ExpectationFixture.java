@@ -14,25 +14,13 @@ public class ExpectationFixture {
   public static PreventionExpectation createTechnicalPreventionExpectation(
       Endpoint endpoint, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAsset(
-        SCORE,
-        "Prevention",
-        "Prevention Expectation",
-        endpoint,
-        false,
-        expirationTime,
-        Collections.emptyList());
+        SCORE, "Prevention", "Prevention Expectation", endpoint, false, expirationTime);
   }
 
   public static DetectionExpectation createTechnicalDetectionExpectation(
       Endpoint endpoint, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
-        SCORE,
-        "Detection",
-        "Detection Expectation",
-        endpoint,
-        false,
-        expirationTime,
-        Collections.emptyList());
+        SCORE, "Detection", "Detection Expectation", endpoint, false, expirationTime);
   }
 
   public static PreventionExpectation createPreventionExpectationForAssetGroup(

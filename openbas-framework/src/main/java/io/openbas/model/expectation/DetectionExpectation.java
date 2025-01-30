@@ -33,7 +33,7 @@ public class DetectionExpectation implements Expectation {
     return DETECTION;
   }
 
-  private static DetectionExpectation detectionExpectationForAgent(
+  public static DetectionExpectation detectionExpectationForAgent(
       @NotNull Agent agent,
       @NotNull Asset asset,
       @NotNull DetectionExpectation endpointExpectation,
@@ -56,8 +56,7 @@ public class DetectionExpectation implements Expectation {
       final String description,
       @NotNull final Endpoint endpoint,
       final boolean expectationGroup,
-      final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      final Long expirationTime) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
     detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     detectionExpectation.setName(name);
@@ -65,7 +64,6 @@ public class DetectionExpectation implements Expectation {
     detectionExpectation.setAsset(endpoint);
     detectionExpectation.setExpectationGroup(expectationGroup);
     detectionExpectation.setExpirationTime(expirationTime);
-    detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
     return detectionExpectation;
   }
 
@@ -75,8 +73,7 @@ public class DetectionExpectation implements Expectation {
       final String description,
       @NotNull final AssetGroup assetGroup,
       final boolean expectationGroup,
-      final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      final Long expirationTime) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
     detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     detectionExpectation.setName(name);
@@ -84,7 +81,6 @@ public class DetectionExpectation implements Expectation {
     detectionExpectation.setAssetGroup(assetGroup);
     detectionExpectation.setExpectationGroup(expectationGroup);
     detectionExpectation.setExpirationTime(expirationTime);
-    detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
     return detectionExpectation;
   }
 }

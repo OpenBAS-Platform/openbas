@@ -74,8 +74,7 @@ public class PreventionExpectation implements Expectation {
       final String description,
       @NotNull final AssetGroup assetGroup,
       final boolean expectationGroup,
-      @NotNull final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      @NotNull final Long expirationTime) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
     preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     preventionExpectation.setName(name);
@@ -83,7 +82,6 @@ public class PreventionExpectation implements Expectation {
     preventionExpectation.setAssetGroup(assetGroup);
     preventionExpectation.setExpectationGroup(expectationGroup);
     preventionExpectation.setExpirationTime(expirationTime);
-    preventionExpectation.setInjectExpectationSignatures(expectationSignatures);
     return preventionExpectation;
   }
 }

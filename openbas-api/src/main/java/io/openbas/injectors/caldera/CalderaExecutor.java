@@ -431,14 +431,15 @@ public class CalderaExecutor extends Injector {
                   (expectation) ->
                       switch (expectation.getType()) {
                         case PREVENTION ->
-                            preventionExpectationForAsset(
-                                expectation.getScore(),
-                                expectation.getName(),
-                                expectation.getDescription(),
-                                endpoint,
-                                expectationGroup,
-                                expectation.getExpirationTime(),
-                                injectExpectationSignatures); // expectationGroup usefully in
+                            Stream.of(
+                                preventionExpectationForAsset(
+                                    expectation.getScore(),
+                                    expectation.getName(),
+                                    expectation.getDescription(),
+                                    endpoint,
+                                    expectationGroup,
+                                    expectation
+                                        .getExpirationTime())); // expectationGroup usefully in
                         // front-end
                         case DETECTION ->
                             Stream.of(
@@ -448,8 +449,7 @@ public class CalderaExecutor extends Injector {
                                     expectation.getDescription(),
                                     endpoint,
                                     expectationGroup,
-                                    expectation.getExpirationTime(),
-                                    injectExpectationSignatures));
+                                    expectation.getExpirationTime()));
                         case MANUAL ->
                             Stream.of(
                                 manualExpectationForAsset(
@@ -503,8 +503,7 @@ public class CalderaExecutor extends Injector {
                                     expectation.getDescription(),
                                     assetGroup,
                                     expectation.isExpectationGroup(),
-                                    expectation.getExpirationTime(),
-                                    injectExpectationSignatures));
+                                    expectation.getExpirationTime()));
                           }
                           yield Stream.of();
                         }
@@ -531,8 +530,7 @@ public class CalderaExecutor extends Injector {
                                     expectation.getDescription(),
                                     assetGroup,
                                     expectation.isExpectationGroup(),
-                                    expectation.getExpirationTime(),
-                                    injectExpectationSignatures));
+                                    expectation.getExpirationTime()));
                           }
                           yield Stream.of();
                         }

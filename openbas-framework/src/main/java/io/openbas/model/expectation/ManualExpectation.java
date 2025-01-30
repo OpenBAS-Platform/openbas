@@ -38,7 +38,7 @@ public class ManualExpectation implements Expectation {
     this.expirationTime = expectation.getExpirationTime();
   }
 
-  private static ManualExpectation manualExpectationForAgent(
+  public static ManualExpectation manualExpectationForAgent(
       @NotNull Agent agent, @NotNull Asset asset, @NotNull ManualExpectation endpointExpectation) {
     ManualExpectation manualExpectation = new ManualExpectation();
     manualExpectation.setScore(Objects.requireNonNullElse(endpointExpectation.getScore(), 100.0));
