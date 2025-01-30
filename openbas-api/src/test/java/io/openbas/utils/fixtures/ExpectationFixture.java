@@ -5,7 +5,6 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
-import java.util.Collections;
 
 public class ExpectationFixture {
 
@@ -26,25 +25,13 @@ public class ExpectationFixture {
   public static PreventionExpectation createPreventionExpectationForAssetGroup(
       AssetGroup assetGroup, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAssetGroup(
-        SCORE,
-        "Prevention",
-        "Prevention Expectation",
-        assetGroup,
-        false,
-        expirationTime,
-        Collections.emptyList());
+        SCORE, "Prevention", "Prevention Expectation", assetGroup, false, expirationTime);
   }
 
   public static DetectionExpectation createDetectionExpectationForAssetGroup(
       AssetGroup assetGroup, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAssetGroup(
-        SCORE,
-        "Detection",
-        "Detection Expectation",
-        assetGroup,
-        false,
-        expirationTime,
-        Collections.emptyList());
+        SCORE, "Detection", "Detection Expectation", assetGroup, false, expirationTime);
   }
 
   public static ExpectationUpdateInput getExpectationUpdateInput(String sourceId, Double score) {
