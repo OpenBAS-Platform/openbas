@@ -156,8 +156,7 @@ public class OpenBASImplantExecutor extends Injector {
   private void computeExpectationsForAssetGroup(
       @NotNull final List<Expectation> expectations,
       @NotNull final OpenBASImplantInjectContent content,
-      @NotNull final AssetGroup assetGroup,
-      final List<InjectExpectationSignature> injectExpectationSignatures) {
+      @NotNull final AssetGroup assetGroup) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
           content.getExpectations().stream()
@@ -303,9 +302,7 @@ public class OpenBASImplantExecutor extends Injector {
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
     assetGroups.forEach(
-        (assetGroup ->
-            computeExpectationsForAssetGroup(
-                expectations, content, assetGroup, new ArrayList<>())));
+        (assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
 
     injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
 
