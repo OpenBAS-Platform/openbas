@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import jakarta.validation.constraints.NotNull;
@@ -55,21 +56,25 @@ public class InjectModelHelper {
     boolean isReady = true;
     for (JsonNode jsonField : contractFields) {
 
+      //if field is mandatory or if field is asset, check if the field is set
       String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
       if( jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY).asBoolean()
         || (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS)
-              && jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS).asBoolean())) {
+              && jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS).asBoolean()
+      ||  CONTACT_ELEMENT_CONTENT_KEY_ASSETS.equals(key))) {
         isReady = isFieldSet(allTeams, teams, assets, assetGroups, jsonField,content,injectContractFields);
       }
 
+      //if field is mandatory conditional, if the conditional field is set check if the current field is set
       if(jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL)){
         String mandatoryConditionalFieldKey = jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL).asText();
-        Optional<JsonNode> mandatoryConditionalField = contractFields.stream().filter(jsonNode -> mandatoryConditionalFieldKey.equals(jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText())).findFirst();
+        Optional<JsonNode> mandatoryConditionalField =
+                contractFields.stream()
+                .filter(jsonNode -> mandatoryConditionalFieldKey.equals(jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText())).findFirst();
         if(mandatoryConditionalField.isPresent()) {
           if(isFieldSet(allTeams, teams, assets, assetGroups, mandatoryConditionalField.get(),content,injectContractFields)
                   && !isFieldSet(allTeams, teams, assets, assetGroups, jsonField,content,injectContractFields)){
             isReady = false;
-
           }
         } else {
           isReady = false;
@@ -78,7 +83,6 @@ public class InjectModelHelper {
       if (!isReady) {
         break;
       }
-
     }
 
     return isReady;
@@ -88,6 +92,11 @@ public class InjectModelHelper {
     String type = jsonField.get("type").asText();
     return "text".equals(type) || "textarea".equals(type);
   }
+
+  private static boolean isArrayField(JsonNode jsonField) {
+    return JsonNodeType.ARRAY.equals(jsonField.getNodeType());
+  }
+
 
   private static boolean isFieldValid(
       ObjectNode content, ArrayNode injectContractFields, String key) {
@@ -178,32 +187,31 @@ public class InjectModelHelper {
                                    @NotNull final JsonNode jsonField,
                                    @NotNull final ObjectNode content,
   @NotNull final ArrayNode injectContractFields){
-    boolean isReady = true;
+    boolean isSet = true;
     String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
     switch (key) {
       case CONTACT_ELEMENT_CONTENT_KEY_TEAMS -> {
         if (teams.isEmpty() && !allTeams) {
-          isReady = false;
+          isSet = false;
         }
       }
       case CONTACT_ELEMENT_CONTENT_KEY_ASSETS -> {
         if (assets.isEmpty() && assetGroups.isEmpty()) {
-          isReady = false;
-        }
-      }
-      case CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS -> {
-        if (content.get(CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS) == null
-                || content.get(CONTACT_ELEMENT_CONTENT_KEY_EXPECTATIONS).isEmpty()) {
-          isReady = false;
+          isSet = false;
         }
       }
       default -> {
         if (isTextOrTextarea(jsonField) && !isFieldValid(content, injectContractFields, key)) {
-          isReady = false;
+          isSet = false;
+        } else if(content.get(key) == null
+                || (content.get(key).isArray() && content.get(key).isEmpty())
+                || (content.get(key).isObject() && content.get(key).isEmpty())
+                || (content.get(key).isTextual() && content.get(key).asText().isEmpty()) ) {
+          isSet = false;
         }
-      }
 
+      }
     }
-    return isReady;
+    return isSet;
   }
 }
