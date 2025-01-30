@@ -11,7 +11,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_62__Add_ExecutionTraces_table extends BaseJavaMigration {
+public class V3_63__Add_ExecutionTraces_table extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
