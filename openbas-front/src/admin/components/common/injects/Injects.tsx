@@ -40,6 +40,12 @@ import InjectorContract from './InjectorContract';
 import InjectPopover from './InjectPopover';
 import InjectsListButtons from './InjectsListButtons';
 import UpdateInject from './UpdateInject';
+import useDataLoader from "../../../../utils/hooks/useDataLoader";
+import {useAppDispatch} from "../../../../utils/hooks";
+import {fetchVariablesForExercise} from "../../../../actions/variables/variable-actions";
+import {fetchExerciseInjects} from "../../../../actions/Inject";
+import {InjectHelper} from "../../../../actions/injects/inject-helper";
+import {useHelper} from "../../../../store";
 
 const useStyles = makeStyles(() => ({
   disabled: {
@@ -250,7 +256,17 @@ const Injects: FunctionComponent<Props> = ({
   }));
 
   // Injects
+  // scoped to page
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
+  const dispatch = useAppDispatch();
+  useDataLoader(
+    () => {
+      dispatch(fetchExerciseInjects(exerciseOrScenarioId));
+    }
+  );
+  const { allInjects } : { allInjects: { [key: string]: Inject } } = useHelper((helper: InjectHelper) => ({
+    allInjects: helper.getInjectsMap()
+  }));
   // Bulk loading indcator for tests and delete
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
   const [selectedInjectId, setSelectedInjectId] = useState<string | null>(null);
@@ -476,7 +492,7 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const selectedInjects = () => {
-    return Object.values(selectedElements);
+    return selectAll ? Object.values(allInjects).filter(i => !injectIdsToIgnore(selectAll).includes(i.inject_id)) : Object.values(selectedElements);
   };
 
   const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
