@@ -7,7 +7,6 @@ import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
-import io.openbas.execution.ExecutableInject;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
