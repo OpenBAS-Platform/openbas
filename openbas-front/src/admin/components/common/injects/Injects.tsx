@@ -349,7 +349,7 @@ const Injects: FunctionComponent<Props> = ({
     numberOfSelectedElements,
   } = useEntityToggle<{
     inject_id: string;
-  }>('inject', injects.length, queryableHelpers.paginationHelpers.getTotalElements());
+  }>('inject', injects, queryableHelpers.paginationHelpers.getTotalElements());
   const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
