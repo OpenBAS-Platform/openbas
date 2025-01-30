@@ -181,11 +181,12 @@ public class InjectsExecutionJob implements Job {
               LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
               // Executor logics
               ExecutableInject newExecutableInject = executableInject;
+
+              InjectStatus injectStatus =
+                  injectStatusService.initializeInjectStatus(
+                      inject.getId(), ExecutionStatus.EXECUTING, null);
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
                 // Status
-                InjectStatus injectStatus =
-                    injectStatusService.initializeInjectStatus(
-                        inject.getId(), ExecutionStatus.EXECUTING, null);
                 inject.setStatus(injectStatus);
                 try {
                   newExecutableInject =

@@ -34,10 +34,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -91,6 +88,29 @@ public class InjectService {
     if (!CollectionUtils.isEmpty(injects)) {
       injectRepository.deleteAll(injects);
     }
+  }
+
+  public Map<Endpoint, Boolean> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    Map<Endpoint, Boolean> assets = new HashMap<>();
+    inject
+        .getAssets()
+        .forEach(
+            (asset -> {
+              assets.put((Endpoint) asset, false);
+            }));
+    inject
+        .getAssetGroups()
+        .forEach(
+            (assetGroup -> {
+              List<Asset> assetsFromGroup =
+                  this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+              // Verify asset validity
+              assetsFromGroup.forEach(
+                  (asset) -> {
+                    assets.put((Endpoint) asset, true);
+                  });
+            }));
+    return assets;
   }
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {

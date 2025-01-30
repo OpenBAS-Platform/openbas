@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.PayloadCommandBlock;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.caldera.client.model.Ability;
@@ -29,6 +28,7 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import io.openbas.service.InjectExpectationService;
@@ -55,7 +55,7 @@ public class CalderaExecutor extends Injector {
   private final EndpointService endpointService;
   private final AssetGroupService assetGroupService;
   private final InjectExpectationService injectExpectationService;
-  private final InjectRepository injectRepository;
+  private final InjectService injectService;
 
   @Override
   @Transactional
@@ -67,10 +67,9 @@ public class CalderaExecutor extends Injector {
         content.getObfuscator() != null
             ? content.getObfuscator()
             : CalderaInjectContent.getDefaultObfuscator();
-    Inject inject =
-        this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
+    Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
 
-    Map<Endpoint, Boolean> assets = this.resolveAllAssets(injection);
+    Map<Endpoint, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
     // Execute inject for all assets
     if (assets.isEmpty()) {
       execution.addTrace(
@@ -151,7 +150,7 @@ public class CalderaExecutor extends Injector {
                                 getNewInfoTrace(
                                     exploitResult.getCommand(),
                                     ExecutionTraceAction.EXECUTION,
-                                    asset.getAgents().getFirst(),
+                                    ((Endpoint) asset).getAgents().getFirst(),
                                     List.of()));
                             // Compute expectations
                             boolean isInGroup =
@@ -342,29 +341,6 @@ public class CalderaExecutor extends Injector {
   }
 
   // -- PRIVATE --
-
-  private Map<Endpoint, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
-    Map<Endpoint, Boolean> assets = new HashMap<>();
-    inject
-        .getAssets()
-        .forEach(
-            (asset -> {
-              assets.put((Endpoint) Hibernate.unproxy(asset), false);
-            }));
-    inject
-        .getAssetGroups()
-        .forEach(
-            (assetGroup -> {
-              List<Asset> assetsFromGroup =
-                  this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-              // Verify asset validity
-              assetsFromGroup.forEach(
-                  (asset) -> {
-                    assets.put((Endpoint) Hibernate.unproxy(asset), true);
-                  });
-            }));
-    return assets;
-  }
 
   private Endpoint findAndRegisterAssetForExecution(
       @NotNull final Inject inject, @NotNull final Asset asset) throws InterruptedException {

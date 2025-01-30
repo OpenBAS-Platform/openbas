@@ -7,6 +7,7 @@ import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.execution.ExecutableInject;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
@@ -27,6 +28,7 @@ public class InjectStatusService {
   private final AgentRepository agentRepository;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
+  private final InjectService injectService;
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
@@ -74,25 +76,10 @@ public class InjectStatusService {
         .size();
   }
 
-  private int calculateTotalAssets(Inject inject) {
-    int assetCount = Optional.ofNullable(inject.getAssets()).map(List::size).orElse(0);
-    int groupAssetCount =
-        Optional.ofNullable(inject.getAssetGroups())
-            .map(
-                groups ->
-                    groups.stream()
-                        .mapToInt(
-                            group ->
-                                Optional.ofNullable(group.getAssets()).map(List::size).orElse(0))
-                        .sum())
-            .orElse(0);
-    return assetCount + groupAssetCount;
-  }
-
   public boolean isAllInjectAssetsExecuted(Inject inject) {
     int totalCompleteTrace = getCompleteTrace(inject);
-    int totalAssetCount = calculateTotalAssets(inject);
-    return totalAssetCount == totalCompleteTrace;
+    Map<Endpoint, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    return assets.size() == totalCompleteTrace;
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus, Instant finishTime) {
@@ -226,6 +213,7 @@ public class InjectStatusService {
     InjectStatus injectStatus = getOrInitializeInjectStatus(inject);
 
     if (trace != null) {
+      trace.setInjectStatus(injectStatus);
       injectStatus.addTrace(trace);
     }
     injectStatus.setName(status);

@@ -19,6 +19,7 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,29 +38,7 @@ public class OpenBASImplantExecutor extends Injector {
   private final AssetGroupService assetGroupService;
   private final InjectRepository injectRepository;
   private final InjectExpectationService injectExpectationService;
-
-  private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
-    Map<Asset, Boolean> assets = new HashMap<>();
-    inject
-        .getAssets()
-        .forEach(
-            (asset -> {
-              assets.put(asset, false);
-            }));
-    inject
-        .getAssetGroups()
-        .forEach(
-            (assetGroup -> {
-              List<Asset> assetsFromGroup =
-                  this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-              // Verify asset validity
-              assetsFromGroup.forEach(
-                  (asset) -> {
-                    assets.put(asset, true);
-                  });
-            }));
-    return assets;
-  }
+  private final InjectService injectService;
 
   /** In case of direct asset, we have an individual expectation for the asset */
   private void computeExpectationsForAsset(
@@ -230,7 +209,7 @@ public class OpenBASImplantExecutor extends Injector {
         this.injectRepository
             .findById(injection.getInjection().getInject().getId())
             .orElseThrow(() -> new EntityNotFoundException("Inject not found"));
-    Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
+    Map<Endpoint, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
 
     // Check assets target
     if (assets.isEmpty()) {
