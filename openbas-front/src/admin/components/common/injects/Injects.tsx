@@ -250,6 +250,7 @@ const Injects: FunctionComponent<Props> = ({
   }));
 
   // Injects
+  // scoped to page
   const [injects, setInjects] = useState<InjectOutputType[]>([]);
   // Bulk loading indcator for tests and delete
   const [isBulkLoading, setIsBulkLoading] = useState<boolean>(false);
@@ -347,9 +348,7 @@ const Injects: FunctionComponent<Props> = ({
     handleToggleSelectAll,
     onToggleEntity,
     numberOfSelectedElements,
-  } = useEntityToggle<{
-    inject_id: string;
-  }>('inject', injects.length, queryableHelpers.paginationHelpers.getTotalElements());
+  } = useEntityToggle<InjectOutputType>('inject', injects, queryableHelpers.paginationHelpers.getTotalElements());
   const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
@@ -393,17 +392,17 @@ const Injects: FunctionComponent<Props> = ({
     return onToggleEntity(currentEntity, event);
   };
 
-  const injectsToProcess = selectAll
-    ? []
-    : injects.filter(
-        (inject: InjectOutputType) => R.keys(selectedElements).includes(inject.inject_id) && !R.keys(deSelectedElements).includes(inject.inject_id),
-      );
+  const injectIdsToProcess = (selectAll: boolean) => {
+    return selectAll
+      ? []
+      : Object.keys(selectedElements).filter(k => !Object.keys(deSelectedElements).includes(k));
+  };
 
-  const injectsToIgnore = selectAll
-    ? injects.filter((inject: InjectOutputType) => R.keys(deSelectedElements).includes(inject.inject_id))
-    : injects.filter(
-        (inject: InjectOutputType) => !R.keys(selectedElements).includes(inject.inject_id) && R.keys(deSelectedElements).includes(inject.inject_id),
-      );
+  const injectIdsToIgnore = (selectAll: boolean) => {
+    return selectAll
+      ? Object.keys(deSelectedElements)
+      : Object.keys(deSelectedElements).filter(k => !Object.keys(selectedElements).includes(k));
+  };
 
   const massUpdateInjects = async (actions: {
     field: string;
@@ -422,8 +421,8 @@ const Injects: FunctionComponent<Props> = ({
     }
     await injectContext.onBulkUpdateInject({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
-      inject_ids_to_process: selectAll ? undefined : injectsToProcess.map((inject: InjectOutputType) => inject.inject_id),
-      inject_ids_to_ignore: injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id),
+      inject_ids_to_process: selectAll ? undefined : injectIdsToProcess(selectAll),
+      inject_ids_to_ignore: injectIdsToIgnore(selectAll),
       simulation_or_scenario_id: exerciseOrScenarioId,
       update_operations: operationsToPerform,
     })
@@ -434,8 +433,8 @@ const Injects: FunctionComponent<Props> = ({
 
   const bulkDeleteInjects = () => {
     setIsBulkLoading(true);
-    const deleteIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
-    const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
+    const deleteIds = injectIdsToProcess(selectAll);
+    const ignoreIds = injectIdsToIgnore(selectAll);
     injectContext.onBulkDeleteInjects({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : deleteIds,
@@ -455,8 +454,8 @@ const Injects: FunctionComponent<Props> = ({
 
   const massTestInjects = () => {
     setIsBulkLoading(true);
-    const testIds = injectsToProcess.map((inject: InjectOutputType) => inject.inject_id);
-    const ignoreIds = injectsToIgnore.map((inject: InjectOutputType) => inject.inject_id);
+    const testIds = injectIdsToProcess(selectAll);
+    const ignoreIds = injectIdsToIgnore(selectAll);
     injectContext.bulkTestInjects({
       search_pagination_input: selectAll ? searchPaginationInput : undefined,
       inject_ids_to_process: selectAll ? undefined : testIds,
@@ -478,8 +477,7 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const selectedInjects = () => {
-    const selectedInjectIds = Object.keys(selectedElements);
-    return injects.filter(inject => selectedInjectIds.includes(inject.inject_id));
+    return Object.values(selectedElements);
   };
 
   const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
