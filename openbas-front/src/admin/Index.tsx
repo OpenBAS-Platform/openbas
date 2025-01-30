@@ -35,7 +35,6 @@ const IndexComponents = lazy(() => import('./components/components/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const IndexAgents = lazy(() => import('./components/agents/Agents'));
 const Payloads = lazy(() => import('./components/payloads/Payloads'));
-const Mitigations = lazy(() => import('./components/mitigations/Mitigations'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
 
 const useStyles = makeStyles<Theme>(theme => ({
@@ -105,7 +104,6 @@ const Index = () => {
               <Route path="teams/*" element={errorWrapper(Teams)()} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />
               <Route path="payloads" element={errorWrapper(Payloads)()} />
-              <Route path="mitigations" element={errorWrapper(Mitigations)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
               <Route

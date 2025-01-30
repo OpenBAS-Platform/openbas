@@ -3,8 +3,8 @@ import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import { Link, useLocation } from 'react-router';
 
-import { useFormatter } from '../i18n';
-import type { Theme } from '../Theme';
+import { useFormatter } from '../../i18n';
+import type { Theme } from '../../Theme';
 
 const useStyles = makeStyles<Theme>(theme => ({
   button: {
