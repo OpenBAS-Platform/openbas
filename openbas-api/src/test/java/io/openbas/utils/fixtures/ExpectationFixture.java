@@ -1,7 +1,7 @@
 package io.openbas.utils.fixtures;
 
-import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
+import io.openbas.database.model.Endpoint;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
@@ -12,24 +12,24 @@ public class ExpectationFixture {
   static Double SCORE = 100.0;
 
   public static PreventionExpectation createTechnicalPreventionExpectation(
-      Asset asset, Long expirationTime) {
+      Endpoint endpoint, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAsset(
         SCORE,
         "Prevention",
         "Prevention Expectation",
-        asset,
+        endpoint,
         false,
         expirationTime,
         Collections.emptyList());
   }
 
   public static DetectionExpectation createTechnicalDetectionExpectation(
-      Asset asset, Long expirationTime) {
+      Endpoint endpoint, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
         SCORE,
         "Detection",
         "Detection Expectation",
-        asset,
+        endpoint,
         false,
         expirationTime,
         Collections.emptyList());

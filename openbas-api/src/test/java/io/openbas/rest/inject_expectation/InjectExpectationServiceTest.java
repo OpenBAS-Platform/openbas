@@ -40,7 +40,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
 
   private static Injector savedInjector;
   private static InjectorContract savedInjectorContract;
-  private static Asset savedAsset;
+  private static Endpoint savedAsset;
 
   @BeforeAll
   void beforeAll() {

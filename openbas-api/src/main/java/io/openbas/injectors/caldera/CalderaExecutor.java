@@ -417,11 +417,11 @@ public class CalderaExecutor extends Injector {
     return endpointForExecution;
   }
 
-  /** In case of direct asset, we have an individual expectation for the asset */
+  /** In case of direct endpoint, we have an individual expectation for the endpoint */
   private void computeExpectationsForAsset(
       @NotNull final List<Expectation> expectations,
       @NotNull final CalderaInjectContent content,
-      @NotNull final Asset asset,
+      @NotNull final Endpoint endpoint,
       final boolean expectationGroup,
       final List<InjectExpectationSignature> injectExpectationSignatures) {
     if (!content.getExpectations().isEmpty()) {
@@ -431,15 +431,14 @@ public class CalderaExecutor extends Injector {
                   (expectation) ->
                       switch (expectation.getType()) {
                         case PREVENTION ->
-                            Stream.of(
-                                preventionExpectationForAsset(
-                                    expectation.getScore(),
-                                    expectation.getName(),
-                                    expectation.getDescription(),
-                                    asset,
-                                    expectationGroup,
-                                    expectation.getExpirationTime(),
-                                    injectExpectationSignatures)); // expectationGroup usefully in
+                            preventionExpectationForAsset(
+                                expectation.getScore(),
+                                expectation.getName(),
+                                expectation.getDescription(),
+                                endpoint,
+                                expectationGroup,
+                                expectation.getExpirationTime(),
+                                injectExpectationSignatures); // expectationGroup usefully in
                         // front-end
                         case DETECTION ->
                             Stream.of(
@@ -447,7 +446,7 @@ public class CalderaExecutor extends Injector {
                                     expectation.getScore(),
                                     expectation.getName(),
                                     expectation.getDescription(),
-                                    asset,
+                                    endpoint,
                                     expectationGroup,
                                     expectation.getExpirationTime(),
                                     injectExpectationSignatures));
@@ -457,7 +456,7 @@ public class CalderaExecutor extends Injector {
                                     expectation.getScore(),
                                     expectation.getName(),
                                     expectation.getDescription(),
-                                    asset,
+                                    endpoint,
                                     expectation.getExpirationTime(),
                                     expectationGroup));
                         default -> Stream.of();
