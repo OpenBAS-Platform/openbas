@@ -63,6 +63,7 @@ public class OpenBASImplantExecutor extends Injector {
       @NotNull final List<Expectation> expectations,
       @NotNull final OpenBASImplantInjectContent content,
       @NotNull final Endpoint endpoint,
+      @NotNull final String injectId,
       final boolean expectationGroup) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
@@ -94,7 +95,7 @@ public class OpenBASImplantExecutor extends Injector {
                                                   createSignature(
                                                       EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
                                                       "obas-implant-"
-                                                          + agent.getInject().getId()
+                                                          + injectId
                                                           + "-agent-"
                                                           + agent.getId())))));
                         } // expectationGroup usefully in front-end
@@ -121,7 +122,7 @@ public class OpenBASImplantExecutor extends Injector {
                                                   createSignature(
                                                       EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
                                                       "obas-implant-"
-                                                          + agent.getInject().getId()
+                                                          + injectId
                                                           + "-agent-"
                                                           + agent.getId())))));
                         }
@@ -297,7 +298,8 @@ public class OpenBASImplantExecutor extends Injector {
                     + (payload.getCleanupCommand() != null ? 1 : 0)
                     + payload.getNumberOfActions());
           }
-          computeExpectationsForAssetAndAgents(expectations, content, endpoint, isInGroup);
+          computeExpectationsForAssetAndAgents(
+              expectations, content, endpoint, inject.getId(), isInGroup);
         });
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();

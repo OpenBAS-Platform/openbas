@@ -1,14 +1,35 @@
 package io.openbas.utils.fixtures;
 
+import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.InjectExpectationSignature;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
+import java.util.List;
 
 public class ExpectationFixture {
 
   static Double SCORE = 100.0;
+
+  public static PreventionExpectation createTechnicalPreventionExpectation(
+      Agent agent,
+      Endpoint endpoint,
+      PreventionExpectation preventionExpectation,
+      List<InjectExpectationSignature> signatures) {
+    return PreventionExpectation.preventionExpectationForAgent(
+        agent, endpoint, preventionExpectation, signatures);
+  }
+
+  public static DetectionExpectation createTechnicalDetectionExpectation(
+      Agent agent,
+      Endpoint endpoint,
+      DetectionExpectation detectionExpectation,
+      List<InjectExpectationSignature> signatures) {
+    return DetectionExpectation.detectionExpectationForAgent(
+        agent, endpoint, detectionExpectation, signatures);
+  }
 
   public static PreventionExpectation createTechnicalPreventionExpectation(
       Endpoint endpoint, Long expirationTime) {
