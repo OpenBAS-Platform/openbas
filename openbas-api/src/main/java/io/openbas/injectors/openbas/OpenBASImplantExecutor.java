@@ -79,11 +79,12 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getDescription(),
                                   endpoint,
                                   expectationGroup,
-                                  expectation.getExpirationTime(),
-                                  injectExpectationSignatures);
+                                  expectation.getExpirationTime());
+
+                          endpoint.getAgents().stream().map(agent->preventionExpectationForAgent(agent, endpoint, preventionExpectation, injectExpectationSignatures)).toList();
                           yield Stream.of(
                               preventionExpectation,
-                              preventionExpectationsForAgents(endpoint, preventionExpectation));
+                              preventionExpectationsForAgents(endpoint, preventionExpectation, injectExpectationSignatures));
                         } // expectationGroup usefully in front-end
                         case DETECTION -> {
                           DetectionExpectation detectionExpectation =
@@ -253,7 +254,7 @@ public class OpenBASImplantExecutor extends Injector {
 
     List<Expectation> expectations = new ArrayList<>();
     endpoints.forEach(
-        (asset, isInGroup) -> {
+        (endpoint, isInGroup) -> {
           Optional<InjectorContract> contract = inject.getInjectorContract();
           List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
 
@@ -264,14 +265,14 @@ public class OpenBASImplantExecutor extends Injector {
                   String.format("No payload for inject %s was found, skipping", inject.getId()));
               return;
             }
-            injectExpectationSignatures = spawnSignatures(inject, payload);
+            injectExpectationSignatures = spawnSignatures(payload);
             execution.setExpectedCount(
                 payload.getPrerequisites().size()
                     + (payload.getCleanupCommand() != null ? 1 : 0)
                     + payload.getNumberOfActions());
           }
           computeExpectationsForAssetAndAgents(
-              expectations, content, asset, isInGroup, injectExpectationSignatures);
+              expectations, content, endpoint, isInGroup, injectExpectationSignatures);
         });
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
@@ -285,17 +286,11 @@ public class OpenBASImplantExecutor extends Injector {
     return new ExecutionProcess(true);
   }
 
-  private List<InjectExpectationSignature> spawnSignatures(Inject inject, Payload payload) {
+  private List<InjectExpectationSignature> spawnSignatures(
+      Payload payload) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
     List<String> knownPayloadTypes =
         Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
-
-    /*
-     * Always add the "Parent process" signature type for the OpenBAS Implant Executor
-     */
-    signatures.add(
-        createSignature(
-            EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME, "obas-implant-" + inject.getId()));
 
     if (!knownPayloadTypes.contains(payload.getType())) {
       throw new UnsupportedOperationException(

@@ -1,6 +1,7 @@
 package io.openbas.model.expectation;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
+import static io.openbas.database.model.InjectExpectationSignature.EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME;
 
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -21,7 +22,7 @@ public class PreventionExpectation implements Expectation {
   private String name;
   private String description;
   private Agent agent;
-  private Endpoint endpoint;
+  private Asset asset;
   private AssetGroup assetGroup;
   private boolean expectationGroup;
   private Long expirationTime;
@@ -34,27 +35,20 @@ public class PreventionExpectation implements Expectation {
     return PREVENTION;
   }
 
-  public static List<PreventionExpectation> preventionExpectationsForAgents(
-      @NotNull Endpoint endpoint, @NotNull PreventionExpectation endpointExpectation) {
-    return endpoint.getAgents().stream()
-        .map(agent -> preventionExpectationForAgent(agent, endpoint, endpointExpectation))
-        .toList();
-  }
-
-  private static PreventionExpectation preventionExpectationForAgent(
+  public static PreventionExpectation preventionExpectationForAgent(
       @NotNull Agent agent,
-      @NotNull Endpoint endpoint,
-      @NotNull PreventionExpectation endpointExpectation) {
+      @NotNull Asset asset,
+      @NotNull PreventionExpectation endpointExpectation,
+      List<InjectExpectationSignature> injectExpectationSignatures) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
     preventionExpectation.setScore(
         Objects.requireNonNullElse(endpointExpectation.getScore(), 100.0));
     preventionExpectation.setName(endpointExpectation.getName());
     preventionExpectation.setDescription(endpointExpectation.getDescription());
     preventionExpectation.setAgent(agent);
-    preventionExpectation.setEndpoint(endpoint);
+    preventionExpectation.setAsset(asset);
     preventionExpectation.setExpirationTime(endpointExpectation.getExpirationTime());
-    preventionExpectation.setInjectExpectationSignatures(
-        endpointExpectation.getInjectExpectationSignatures());
+    preventionExpectation.setInjectExpectationSignatures(injectExpectationSignatures);
     return preventionExpectation;
   }
 
@@ -62,18 +56,16 @@ public class PreventionExpectation implements Expectation {
       @Nullable final Double score,
       @NotBlank final String name,
       final String description,
-      @NotNull final Endpoint endpoint,
+      @NotNull final Asset asset,
       final boolean expectationGroup,
-      final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      final Long expirationTime) {
     PreventionExpectation endpointExpectation = new PreventionExpectation();
     endpointExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     endpointExpectation.setName(name);
     endpointExpectation.setDescription(description);
-    endpointExpectation.setEndpoint(endpoint);
+    endpointExpectation.setAsset(asset);
     endpointExpectation.setExpectationGroup(expectationGroup);
     endpointExpectation.setExpirationTime(expirationTime);
-    endpointExpectation.setInjectExpectationSignatures(expectationSignatures);
     return endpointExpectation;
   }
 
