@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.RuleAttribute;
 import io.openbas.service.utils.InjectImportUtils;
 import io.openbas.utils.mockMapper.MockMapperUtils;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -54,26 +55,28 @@ public class InjectImportServiceTest {
   @Test
   void testGetDateAsString() throws Exception {
     // -- PREPARE --
-    cell.setCellValue(Date.from(LocalDateTime.of(2025, 1, 1, 12, 0).toInstant(ZoneOffset.UTC)));
+    Date date = Date.from(LocalDateTime.of(2025, 1, 1, 12, 0).toInstant(ZoneOffset.UTC));
+    cell.setCellValue(date);
     // -- EXECUTE --
     String result = InjectImportUtils.getDateAsStringFromCell(row, "A", null);
 
     // -- ASSERT --
     assertNotNull(result);
-    assertEquals("Wed Jan 01 13:00:00 CET 2025", result);
+    assertEquals(date.toString(), result);
   }
 
   @DisplayName("Test get a date cell as string with a specific time pattern")
   @Test
   void testGetDateAsStringWithTimePattern() throws Exception {
     // -- PREPARE --
-    cell.setCellValue(Date.from(LocalDateTime.of(2025, 1, 2, 12, 0).toInstant(ZoneOffset.UTC)));
+    Date date = Date.from(LocalDateTime.of(2025, 1, 2, 12, 0).toInstant(ZoneOffset.UTC));
+    cell.setCellValue(date);
     // -- EXECUTE --
     String result = InjectImportUtils.getDateAsStringFromCell(row, "A", "DD/MM/YY HH:mm:ss");
 
     // -- ASSERT --
     assertNotNull(result);
-    assertEquals("02/01/25 13:00:00", result);
+    assertEquals(new SimpleDateFormat("dd/MM/yy HH:mm:ss").format(date), result);
   }
 
   @DisplayName("Test get a date cell as string when no column specified")
