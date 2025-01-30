@@ -12,7 +12,6 @@ import { exportData } from '../../../../utils/Environment';
 import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
 import { InjectContext, ViewModeContext } from '../Context';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
-import {Inject} from "../../../../utils/api-types";
 
 const useStyles = makeStyles(() => ({
   container: {

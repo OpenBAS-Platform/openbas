@@ -84,9 +84,9 @@ const useEntityToggle = <T extends Record<string, any>>(
     }
   };
   const handleToggleSelectAll = () => {
+    setSelectAll(!selectAll);
     setSelectedElements({});
     setDeSelectedElements({});
-    setSelectAll(!selectAll);
   };
   const handleClearSelectedElements = () => {
     setSelectAll(false);

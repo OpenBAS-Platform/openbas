@@ -40,12 +40,6 @@ import InjectorContract from './InjectorContract';
 import InjectPopover from './InjectPopover';
 import InjectsListButtons from './InjectsListButtons';
 import UpdateInject from './UpdateInject';
-import useDataLoader from "../../../../utils/hooks/useDataLoader";
-import {useAppDispatch} from "../../../../utils/hooks";
-import {fetchVariablesForExercise} from "../../../../actions/variables/variable-actions";
-import {fetchExerciseInjects} from "../../../../actions/Inject";
-import {InjectHelper} from "../../../../actions/injects/inject-helper";
-import {useHelper} from "../../../../store";
 
 const useStyles = makeStyles(() => ({
   disabled: {
