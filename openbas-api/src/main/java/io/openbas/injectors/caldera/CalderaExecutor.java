@@ -124,12 +124,13 @@ public class CalderaExecutor extends Injector {
                 contract = injectorContract.getId();
               }
 
+              // Loop each endpoint and each agent installed on the endpoints
               endpoints.entrySet().stream()
                   .forEach(
                       entry -> {
                         Endpoint endpointAgent = entry.getKey();
                         boolean isInGroup = entry.getValue();
-                        List<io.openbas.database.model.Agent> executionAgents = new ArrayList<>();
+                        List<io.openbas.database.model.Agent> executedAgents = new ArrayList<>();
 
                         endpointAgent.getAgents().stream()
                             .forEach(
@@ -155,7 +156,7 @@ public class CalderaExecutor extends Injector {
                                               this.calderaService.exploitResult(
                                                   executionAgent.getExternalReference(), contract);
                                           asyncIds.add(exploitResult.getLinkId());
-                                          executionAgents.add(executionAgent);
+                                          executedAgents.add(executionAgent);
                                           execution.addTrace(
                                               traceInfo(
                                                   EXECUTION_TYPE_COMMAND,
@@ -211,7 +212,7 @@ public class CalderaExecutor extends Injector {
                             content,
                             endpointAgent,
                             isInGroup,
-                            executionAgents,
+                            executedAgents,
                             injectorContract);
                       });
             },
@@ -295,7 +296,7 @@ public class CalderaExecutor extends Injector {
     if (!assetEndpoint.getType().equals("Endpoint")) {
       log.log(
           Level.SEVERE,
-          "Caldera failed to execute ability on the assetEndpoint because type is not supported: "
+          "Caldera failed to execute ability on the asset because type is not supported: "
               + assetEndpoint.getType());
       return null;
     }
