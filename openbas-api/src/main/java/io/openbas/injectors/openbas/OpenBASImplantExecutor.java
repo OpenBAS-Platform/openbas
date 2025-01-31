@@ -78,7 +78,7 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getName(),
                                   expectation.getDescription(),
                                   endpoint,
-                                  expectationGroup,
+                                  expectationGroup, // expectationGroup usefully in front-end
                                   expectation.getExpirationTime());
 
                           yield Stream.concat(
@@ -98,7 +98,7 @@ public class OpenBASImplantExecutor extends Injector {
                                                           + injectId
                                                           + "-agent-"
                                                           + agent.getId())))));
-                        } // expectationGroup usefully in front-end
+                        }
                         case DETECTION -> {
                           DetectionExpectation detectionExpectation =
                               detectionExpectationForAsset(
