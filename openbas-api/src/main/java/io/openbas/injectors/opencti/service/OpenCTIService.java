@@ -1,10 +1,11 @@
 package io.openbas.injectors.opencti.service;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
 
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
+import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
 import java.io.IOException;
 import java.time.Instant;
@@ -52,10 +53,11 @@ public class OpenCTIService {
           classicHttpResponse -> {
             if (classicHttpResponse.getCode() == HttpStatus.SC_OK) {
               String body = EntityUtils.toString(classicHttpResponse.getEntity());
-              execution.addTrace(traceSuccess("Case created (" + body + ")"));
+              execution.addTrace(
+                  getNewSuccessTrace("Case created (" + body + ")", ExecutionTraceAction.COMPLETE));
               return true;
             } else {
-              execution.addTrace(traceError("Fail to POST"));
+              execution.addTrace(getNewErrorTrace("Fail to POST", ExecutionTraceAction.COMPLETE));
               return false;
             }
           });
@@ -89,10 +91,12 @@ public class OpenCTIService {
           classicHttpResponse -> {
             if (classicHttpResponse.getCode() == HttpStatus.SC_OK) {
               String body = EntityUtils.toString(classicHttpResponse.getEntity());
-              execution.addTrace(traceSuccess("Report created (" + body + ")"));
+              execution.addTrace(
+                  getNewSuccessTrace(
+                      "Report created (" + body + ")", ExecutionTraceAction.COMPLETE));
               return true;
             } else {
-              execution.addTrace(traceError("Fail to POST"));
+              execution.addTrace(getNewErrorTrace("Fail to POST", ExecutionTraceAction.COMPLETE));
               return false;
             }
           });

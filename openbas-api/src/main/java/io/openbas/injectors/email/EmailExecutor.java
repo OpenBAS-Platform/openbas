@@ -1,6 +1,6 @@
 package io.openbas.injectors.email;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.injectors.email.EmailContract.EMAIL_GLOBAL;
 
 import io.openbas.config.OpenBASConfig;
@@ -46,7 +46,7 @@ public class EmailExecutor extends Injector {
       emailService.sendEmail(
           execution, users, from, replyTos, inReplyTo, subject, message, attachments);
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
   }
 
@@ -74,7 +74,7 @@ public class EmailExecutor extends Injector {
                 message,
                 attachments);
           } catch (Exception e) {
-            execution.addTrace(traceError(e.getMessage()));
+            execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
           }
         });
   }

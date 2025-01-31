@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.*;
+import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.execution.ExecutableInject;
@@ -30,6 +31,7 @@ import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.ExecutableInjectService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.AssetService;
 import io.openbas.service.InjectSearchService;
@@ -41,8 +43,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -87,6 +87,7 @@ public class InjectApi extends RestBehavior {
   private final InjectSearchService injectSearchService;
   private final InjectDuplicateService injectDuplicateService;
   private final TagRuleService tagRuleService;
+  private final InjectStatusService injectStatusService;
 
   // -- INJECTS --
 
@@ -102,10 +103,6 @@ public class InjectApi extends RestBehavior {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
     injectStatus.setName(ExecutionStatus.PENDING);
-    injectStatus.setTrackingAckDate(Instant.now());
-    injectStatus.setTrackingTotalCount(input.getTrackingTotalCount());
-    injectStatus.setTrackingTotalSuccess(0);
-    injectStatus.setTrackingTotalError(0);
     return injectRepository.save(inject);
   }
 
@@ -123,59 +120,7 @@ public class InjectApi extends RestBehavior {
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
-
-    InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
-    ExecutionTraceStatus executionStatus = ExecutionTraceStatus.valueOf(input.getStatus());
-    InjectStatusExecution execution = new InjectStatusExecution();
-    Instant trackingEndDate = now();
-    execution.setTime(trackingEndDate);
-    execution.setStatus(executionStatus);
-    execution.setMessage(input.getMessage());
-    execution.setIdentifiers(input.getIdentifiers());
-    injectStatus.getTraces().add(execution);
-    if (ExecutionTraceStatus.SUCCESS.equals(executionStatus)) {
-      injectStatus.setTrackingTotalSuccess(injectStatus.getTrackingTotalSuccess() + 1);
-    } else {
-      injectStatus.setTrackingTotalError(injectStatus.getTrackingTotalError() + 1);
-    }
-
-    int currentTotal =
-        injectStatus.getTrackingTotalError() + injectStatus.getTrackingTotalSuccess();
-    if (injectStatus.getTrackingTotalCount() >= currentTotal) {
-      injectStatus.setTrackingEndDate(trackingEndDate);
-      injectStatus.setTrackingTotalExecutionTime(
-          Duration.between(injectStatus.getTrackingSentDate(), trackingEndDate).getSeconds());
-
-      long successCounter = 0;
-      long errorCounter = 0;
-      long maybePreventedCounter = 0;
-      for (InjectStatusExecution injectStatusExecution : injectStatus.getTraces()) {
-        ExecutionTraceStatus status = injectStatusExecution.getStatus();
-        if (status == ExecutionTraceStatus.SUCCESS || status == ExecutionTraceStatus.WARNING) {
-          successCounter++;
-        } else if (status == ExecutionTraceStatus.ERROR
-            || status == ExecutionTraceStatus.COMMAND_NOT_FOUND) {
-          errorCounter++;
-        } else if (status == ExecutionTraceStatus.MAYBE_PREVENTED
-            || status == ExecutionTraceStatus.COMMAND_CANNOT_BE_EXECUTED) {
-          maybePreventedCounter++;
-        }
-      }
-
-      if (successCounter >= injectStatus.getTrackingTotalCount()) {
-        injectStatus.setName(ExecutionStatus.SUCCESS);
-      } else if (successCounter > 0) {
-        injectStatus.setName(ExecutionStatus.PARTIAL);
-      } else if (errorCounter >= injectStatus.getTrackingTotalCount()) {
-        injectStatus.setName(ExecutionStatus.ERROR);
-      } else if (maybePreventedCounter >= injectStatus.getTrackingTotalCount()) {
-        injectStatus.setName(ExecutionStatus.MAYBE_PREVENTED);
-      } else {
-        injectStatus.setName(ExecutionStatus.MAYBE_PARTIAL_PREVENTED);
-      }
-    }
-    return injectRepository.save(inject);
+    return injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
   @GetMapping(INJECT_URI + "/{injectId}/executable-payload")
@@ -475,7 +420,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable String exerciseId,
       @PathVariable String injectId,
       @Valid @RequestBody InjectUpdateStatusInput input) {
-    return injectService.updateInjectStatus(injectId, input);
+    return injectStatusService.updateInjectStatus(injectId, input);
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}/teams")
