@@ -52,7 +52,7 @@ public class ManualContract extends Contractor {
     List<ContractElement> instance =
         contractBuilder()
             .mandatory(textareaField("content", "Content"))
-            .conditional(teams, expectations)
+            .mandatoryConditional(teams, expectations)
             .optional(expectations)
             .build();
     return List.of(
