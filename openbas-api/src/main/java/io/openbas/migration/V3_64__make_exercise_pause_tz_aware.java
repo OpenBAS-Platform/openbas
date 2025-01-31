@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_62__make_exercise_pause_tz_aware extends BaseJavaMigration {
+public class V3_64__make_exercise_pause_tz_aware extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
