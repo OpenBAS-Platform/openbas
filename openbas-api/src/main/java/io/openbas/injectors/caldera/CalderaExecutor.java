@@ -125,14 +125,16 @@ public class CalderaExecutor extends Injector {
               }
 
               // Loop each endpoint and each agent installed on the endpoints
-              endpoints.entrySet().stream()
+              endpoints
+                  .entrySet()
                   .forEach(
                       entry -> {
                         Endpoint endpointAgent = entry.getKey();
                         boolean isInGroup = entry.getValue();
                         List<io.openbas.database.model.Agent> executedAgents = new ArrayList<>();
 
-                        endpointAgent.getAgents().stream()
+                        endpointAgent
+                            .getAgents()
                             .forEach(
                                 agent -> {
                                   try {
