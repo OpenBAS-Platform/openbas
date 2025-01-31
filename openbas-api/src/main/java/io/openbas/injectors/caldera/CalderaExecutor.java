@@ -2,6 +2,7 @@ package io.openbas.injectors.caldera;
 
 import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.database.model.InjectStatusExecution.*;
+import static io.openbas.executors.caldera.service.CalderaExecutorService.CALDERA_EXECUTOR_TYPE;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
@@ -133,8 +134,13 @@ public class CalderaExecutor extends Injector {
                         boolean isInGroup = entry.getValue();
                         List<io.openbas.database.model.Agent> executedAgents = new ArrayList<>();
 
-                        endpointAgent
-                            .getAgents()
+                        endpointAgent.getAgents().stream()
+                            .filter(
+                                agent ->
+                                    agent.getExecutor() != null
+                                        && CALDERA_EXECUTOR_TYPE.equals(
+                                            agent.getExecutor().getType()))
+                            .filter(agent -> agent.getParent() == null && agent.getInject() == null)
                             .forEach(
                                 agent -> {
                                   try {
