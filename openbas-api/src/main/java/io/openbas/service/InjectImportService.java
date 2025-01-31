@@ -14,6 +14,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.scenario.response.ImportMessage;
 import io.openbas.rest.scenario.response.ImportPostSummary;
 import io.openbas.rest.scenario.response.ImportTestSummary;
+import io.openbas.service.utils.InjectImportUtils;
 import io.openbas.utils.InjectUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +40,6 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
@@ -492,7 +492,9 @@ public class InjectImportService {
                   Matcher matcher =
                       mapPatternByInjectImport
                           .get(injectImporter.getId())
-                          .matcher(getValueAsString(row, importMapper.getInjectTypeColumn()));
+                          .matcher(
+                              InjectImportUtils.getValueAsString(
+                                  row, importMapper.getInjectTypeColumn()));
                   return matcher.find();
                 })
             .toList();
@@ -565,7 +567,7 @@ public class InjectImportService {
     if (triggerTimeRuleAttribute.getColumns() != null) {
       dateAsString =
           Arrays.stream(triggerTimeRuleAttribute.getColumns().split("\\+"))
-              .map(column -> getDateAsStringFromCell(row, column, timePattern))
+              .map(column -> InjectImportUtils.getDateAsStringFromCell(row, column, timePattern))
               .collect(Collectors.joining());
     }
     if (dateAsString.isBlank()) {
@@ -584,7 +586,7 @@ public class InjectImportService {
     injectTime.setUnformattedDate(dateAsString);
     injectTime.setLinkedInject(inject);
 
-    Temporal dateTime = getInjectDate(injectTime, timePattern);
+    Temporal dateTime = InjectImportUtils.getInjectDate(injectTime, timePattern);
 
     if (dateTime == null) {
       injectTime.setRelativeDay(relativeDays);
@@ -758,7 +760,7 @@ public class InjectImportService {
       if (valueCell == null) {
         setter.accept(ruleAttribute.getDefaultValue());
       } else {
-        String cellValue = getValueAsString(row, ruleAttribute.getColumns());
+        String cellValue = InjectImportUtils.getValueAsString(row, ruleAttribute.getColumns());
         setter.accept(cellValue.isBlank() ? ruleAttribute.getDefaultValue() : cellValue);
       }
     }
@@ -806,9 +808,8 @@ public class InjectImportService {
         String columnValue = Strings.EMPTY;
         if (ruleAttribute.getColumns() != null) {
           columnValue =
-              Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                  .map(column -> getValueAsString(row, column))
-                  .collect(Collectors.joining());
+              InjectImportUtils.extractAndConvertStringColumnValue(
+                  row, ruleAttribute, mapFieldByKey);
         }
         if (columnValue.isBlank()) {
           inject.getContent().put(ruleAttribute.getDefaultValue(), columnValue);
@@ -830,7 +831,7 @@ public class InjectImportService {
           columnValues =
               Arrays.stream(
                       Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                          .map(column -> getValueAsString(row, column))
+                          .map(column -> InjectImportUtils.getValueAsString(row, column))
                           .collect(Collectors.joining(","))
                           .split(","))
                   .toList();
@@ -908,7 +909,7 @@ public class InjectImportService {
                                   == CellType.NUMERIC)) {
                 Double columnValueExpectation =
                     columns.stream()
-                        .map(column -> getValueAsDouble(row, column))
+                        .map(column -> InjectImportUtils.getValueAsDouble(row, column))
                         .reduce(0.0, Double::sum);
                 expectation.get().setExpectedScore(columnValueExpectation.doubleValue());
               } else {
@@ -939,7 +940,7 @@ public class InjectImportService {
             if (ruleAttribute.getColumns() != null) {
               String columnValueExpectation =
                   Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                      .map(column -> getValueAsString(row, column))
+                      .map(column -> InjectImportUtils.getValueAsString(row, column))
                       .collect(Collectors.joining());
               expectation
                   .get()
@@ -954,7 +955,7 @@ public class InjectImportService {
             if (ruleAttribute.getColumns() != null) {
               String columnValueExpectation =
                   Arrays.stream(ruleAttribute.getColumns().split("\\+"))
-                      .map(column -> getValueAsString(row, column))
+                      .map(column -> InjectImportUtils.getValueAsString(row, column))
                       .collect(Collectors.joining());
               expectation
                   .get()
@@ -973,36 +974,6 @@ public class InjectImportService {
         throw new UnsupportedOperationException();
     }
     return emptyList();
-  }
-
-  private Temporal getInjectDate(InjectTime injectTime, String timePattern) {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
-    if (timePattern != null && !timePattern.isEmpty()) {
-      dateTimeFormatter = DateTimeFormatter.ofPattern(timePattern);
-      try {
-        return LocalDateTime.parse(injectTime.getUnformattedDate(), dateTimeFormatter);
-      } catch (DateTimeParseException firstException) {
-        try {
-          return LocalTime.parse(injectTime.getUnformattedDate(), dateTimeFormatter);
-        } catch (DateTimeParseException exception) {
-          // This is a "probably" a relative date
-        }
-      }
-    } else {
-      try {
-        return LocalDateTime.parse(injectTime.getUnformattedDate(), dateTimeFormatter);
-      } catch (DateTimeParseException firstException) {
-        // The date is not in ISO_DATE_TIME. Trying just the ISO_TIME
-        dateTimeFormatter = DateTimeFormatter.ISO_TIME;
-        try {
-          return LocalDateTime.parse(injectTime.getUnformattedDate(), dateTimeFormatter);
-        } catch (DateTimeParseException secondException) {
-          // Neither ISO_DATE_TIME nor ISO_TIME
-        }
-      }
-    }
-    injectTime.setFormatter(dateTimeFormatter);
-    return null;
   }
 
   private List<ImportMessage> updateInjectDates(Map<Integer, InjectTime> mapInstantByRowIndex) {
@@ -1194,51 +1165,5 @@ public class InjectImportService {
                               injectTime.getDate().getEpochSecond()
                                   - earliestInstant.getEpochSecond());
                     }));
-  }
-
-  private String getDateAsStringFromCell(Row row, String cellColumn, String timePattern) {
-    if (cellColumn != null
-        && !cellColumn.isBlank()
-        && row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
-      Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
-      if (cell.getCellType() == CellType.STRING) {
-        return cell.getStringCellValue();
-      } else if (cell.getCellType() == CellType.NUMERIC) {
-        if (timePattern == null || timePattern.isEmpty()) {
-          return cell.getDateCellValue().toString();
-        } else {
-          return DateFormatUtils.format(cell.getDateCellValue(), timePattern);
-        }
-      }
-    }
-    return "";
-  }
-
-  private String getValueAsString(Row row, String cellColumn) {
-    if (cellColumn != null
-        && !cellColumn.isBlank()
-        && row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
-      Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
-      if (cell.getCellType() == CellType.STRING) {
-        return cell.getStringCellValue();
-      } else if (cell.getCellType() == CellType.NUMERIC) {
-        return Double.valueOf(cell.getNumericCellValue()).toString();
-      }
-    }
-    return "";
-  }
-
-  private Double getValueAsDouble(Row row, String cellColumn) {
-    if (cellColumn != null
-        && !cellColumn.isBlank()
-        && row.getCell(CellReference.convertColStringToIndex(cellColumn)) != null) {
-      Cell cell = row.getCell(CellReference.convertColStringToIndex(cellColumn));
-      if (cell.getCellType() == CellType.STRING) {
-        return Double.valueOf(cell.getStringCellValue());
-      } else if (cell.getCellType() == CellType.NUMERIC) {
-        return cell.getNumericCellValue();
-      }
-    }
-    return 0.0;
   }
 }
