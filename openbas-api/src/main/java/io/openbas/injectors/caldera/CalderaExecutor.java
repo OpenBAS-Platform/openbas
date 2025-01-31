@@ -1,7 +1,8 @@
 package io.openbas.injectors.caldera;
 
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
 import static io.openbas.database.model.InjectExpectationSignature.*;
-import static io.openbas.database.model.InjectStatusExecution.*;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
@@ -15,7 +16,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.database.model.PayloadCommandBlock;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.caldera.client.model.Ability;
@@ -28,6 +28,7 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import io.openbas.service.InjectExpectationService;
@@ -54,7 +55,7 @@ public class CalderaExecutor extends Injector {
   private final EndpointService endpointService;
   private final AssetGroupService assetGroupService;
   private final InjectExpectationService injectExpectationService;
-  private final InjectRepository injectRepository;
+  private final InjectService injectService;
 
   @Override
   @Transactional
@@ -66,15 +67,15 @@ public class CalderaExecutor extends Injector {
         content.getObfuscator() != null
             ? content.getObfuscator()
             : CalderaInjectContent.getDefaultObfuscator();
-    Inject inject =
-        this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
+    Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
 
-    Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
+    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
     // Execute inject for all assets
     if (assets.isEmpty()) {
       execution.addTrace(
-          traceError(
-              "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
+          getNewErrorTrace(
+              "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)",
+              ExecutionTraceAction.COMPLETE));
     }
 
     List<String> asyncIds = new ArrayList<>();
@@ -146,7 +147,11 @@ public class CalderaExecutor extends Injector {
                                     contract);
                             asyncIds.add(exploitResult.getLinkId());
                             execution.addTrace(
-                                traceInfo(EXECUTION_TYPE_COMMAND, exploitResult.getCommand()));
+                                getNewInfoTrace(
+                                    exploitResult.getCommand(),
+                                    ExecutionTraceAction.EXECUTION,
+                                    ((Endpoint) asset).getAgents().getFirst(),
+                                    List.of()));
                             // Compute expectations
                             boolean isInGroup =
                                 assets.get(
@@ -223,9 +228,12 @@ public class CalderaExecutor extends Injector {
                                 isInGroup,
                                 injectExpectationSignatures);
                             execution.addTrace(
-                                traceInfo(
-                                    "Caldera executed the ability on asset "
-                                        + asset.getName()
+                                getNewInfoTrace(
+                                    "Caldera executed the ability on agent"
+                                        + ((Endpoint) asset)
+                                            .getAgents()
+                                            .getFirst()
+                                            .getExecutedByUser()
                                         + " using "
                                         + executionEndpoint.getAgents().getFirst().getProcessName()
                                         + " (paw: "
@@ -235,45 +243,65 @@ public class CalderaExecutor extends Injector {
                                             .getExternalReference()
                                         + ", linkID: "
                                         + exploitResult.getLinkId()
-                                        + ")"));
+                                        + ")",
+                                    ExecutionTraceAction.EXECUTION,
+                                    ((Endpoint) asset).getAgents().getFirst(),
+                                    List.of(exploitResult.getLinkId())));
                           } else {
                             execution.addTrace(
-                                traceError(
-                                    "Caldera failed to execute the ability on asset "
-                                        + asset.getName()
+                                getNewErrorTrace(
+                                    "Caldera failed to execute the ability on agent"
+                                        + ((Endpoint) asset)
+                                            .getAgents()
+                                            .getFirst()
+                                            .getExecutedByUser()
                                         + " ("
                                         + result
-                                        + ")"));
+                                        + ")",
+                                    ExecutionTraceAction.COMPLETE,
+                                    ((Endpoint) asset).getAgents().getFirst()));
                           }
                         } else {
                           execution.addTrace(
-                              traceError(
-                                  "Caldera failed to execute ability on asset "
-                                      + asset.getName()
-                                      + " (platform is not compatible: "
+                              getNewErrorTrace(
+                                  "Caldera failed to execute ability on agent "
+                                      + ((Endpoint) asset)
+                                          .getAgents()
+                                          .getFirst()
+                                          .getExecutedByUser()
+                                      + "(platform is not compatible:"
                                       + executionEndpoint.getPlatform().name()
-                                      + ")"));
+                                      + ")",
+                                  ExecutionTraceAction.COMPLETE,
+                                  ((Endpoint) asset).getAgents().getFirst()));
                         }
                       } else {
                         execution.addTrace(
-                            traceError(
-                                "Caldera failed to execute the ability on asset "
+                            getNewErrorTrace(
+                                "Caldera failed to execute the ability on agent"
                                     + asset.getName()
-                                    + " (temporary injector not spawned correctly)"));
+                                    + " (temporary injector not spawned correctly)",
+                                ExecutionTraceAction.COMPLETE,
+                                ((Endpoint) asset).getAgents().getFirst()));
                       }
                     } catch (Exception e) {
                       execution.addTrace(
-                          traceError(
-                              "Caldera failed to execute the ability on asset "
-                                  + asset.getName()
+                          getNewErrorTrace(
+                              "Caldera failed to execute the ability on agent"
+                                  + ((Endpoint) asset).getAgents().getFirst().getExecutedByUser()
                                   + " ("
                                   + e.getMessage()
-                                  + ")"));
+                                  + ")",
+                              ExecutionTraceAction.COMPLETE,
+                              ((Endpoint) asset).getAgents().getFirst()));
                       log.severe(Arrays.toString(e.getStackTrace()));
                     }
                   });
             },
-            () -> execution.addTrace(traceError("Inject does not have a contract")));
+            () ->
+                execution.addTrace(
+                    getNewErrorTrace(
+                        "Inject does not have a contract", ExecutionTraceAction.COMPLETE)));
 
     if (asyncIds.isEmpty()) {
       throw new UnsupportedOperationException(
@@ -287,7 +315,7 @@ public class CalderaExecutor extends Injector {
                 expectations, content, assetGroup, new ArrayList<>())));
 
     String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
-    execution.addTrace(traceInfo(message, asyncIds));
+    execution.addTrace(getNewInfoTrace(message, ExecutionTraceAction.EXECUTION, asyncIds));
     injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
     return new ExecutionProcess(true);
   }
@@ -322,29 +350,6 @@ public class CalderaExecutor extends Injector {
   }
 
   // -- PRIVATE --
-
-  private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
-    Map<Asset, Boolean> assets = new HashMap<>();
-    inject
-        .getAssets()
-        .forEach(
-            (asset -> {
-              assets.put(asset, false);
-            }));
-    inject
-        .getAssetGroups()
-        .forEach(
-            (assetGroup -> {
-              List<Asset> assetsFromGroup =
-                  this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-              // Verify asset validity
-              assetsFromGroup.forEach(
-                  (asset) -> {
-                    assets.put(asset, true);
-                  });
-            }));
-    return assets;
-  }
 
   private Endpoint findAndRegisterAssetForExecution(
       @NotNull final Inject inject, @NotNull final Asset asset) throws InterruptedException {

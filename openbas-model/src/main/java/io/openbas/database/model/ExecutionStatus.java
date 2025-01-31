@@ -1,13 +1,16 @@
 package io.openbas.database.model;
 
 public enum ExecutionStatus {
+  // Inject Status
   SUCCESS,
   ERROR,
   MAYBE_PREVENTED,
+  PARTIAL,
+  MAYBE_PARTIAL_PREVENTED,
+
+  // Inject Execution Progress
   DRAFT,
   QUEUING,
   EXECUTING,
   PENDING,
-  PARTIAL,
-  MAYBE_PARTIAL_PREVENTED,
 }

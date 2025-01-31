@@ -4,7 +4,7 @@ import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
-import io.openbas.database.model.InjectStatusExecution;
+import io.openbas.database.model.ExecutionTraces;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,26 +32,11 @@ public class InjectStatusOutput {
 
   @Builder.Default
   @JsonProperty("status_traces")
-  private List<InjectStatusExecution> traces = new ArrayList<>();
+  private List<ExecutionTraces> traces = new ArrayList<>();
 
   @JsonProperty("tracking_sent_date")
   private Instant trackingSentDate;
 
-  @JsonProperty("tracking_ack_date")
-  private Instant trackingAckDate;
-
   @JsonProperty("tracking_end_date")
   private Instant trackingEndDate;
-
-  @JsonProperty("tracking_total_execution_time")
-  private Long trackingTotalExecutionTime;
-
-  @JsonProperty("tracking_total_count")
-  private int trackingTotalCount;
-
-  @JsonProperty("tracking_total_error")
-  private Integer trackingTotalError;
-
-  @JsonProperty("tracking_total_success")
-  private Integer trackingTotalSuccess;
 }

@@ -1,7 +1,8 @@
 package io.openbas.injectors.channel;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 
@@ -79,7 +80,7 @@ public class ChannelExecutor extends Injector {
         String articleNames =
             articles.stream().map(Article::getName).collect(Collectors.joining(","));
         String publishedMessage = "Articles (" + articleNames + ") marked as published";
-        execution.addTrace(traceSuccess(publishedMessage));
+        execution.addTrace(getNewSuccessTrace(publishedMessage, ExecutionTraceAction.COMPLETE));
         Exercise exercise = injection.getInjection().getExercise();
         // Send the publication message.
         if (content.isEmailing()) {
@@ -120,11 +121,13 @@ public class ChannelExecutor extends Injector {
                       message,
                       attachments);
                 } catch (Exception e) {
-                  execution.addTrace(traceError(e.getMessage()));
+                  execution.addTrace(
+                      getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
                 }
               });
         } else {
-          execution.addTrace(traceSuccess("Email disabled for this inject"));
+          execution.addTrace(
+              getNewInfoTrace("Email disabled for this inject", ExecutionTraceAction.EXECUTION));
         }
         List<Expectation> expectations = new ArrayList<>();
         if (!content.getExpectations().isEmpty()) {
@@ -151,7 +154,7 @@ public class ChannelExecutor extends Injector {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
     return new ExecutionProcess(false);
   }
