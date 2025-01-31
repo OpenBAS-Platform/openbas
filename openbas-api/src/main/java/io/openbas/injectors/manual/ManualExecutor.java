@@ -1,9 +1,9 @@
 package io.openbas.injectors.manual;
 
-import static io.openbas.database.model.InjectStatusExecution.*;
-
 import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Execution;
+import io.openbas.database.model.ExecutionTraceAction;
+import io.openbas.database.model.ExecutionTraces;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.manual.model.ManualContent;
@@ -43,7 +43,9 @@ public class ManualExecutor extends Injector {
             .toList();
 
     injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
-    execution.addTrace(traceSuccess("Manual inject execution"));
+    execution.addTrace(
+        ExecutionTraces.getNewSuccessTrace(
+            "Manual inject execution", ExecutionTraceAction.COMPLETE));
     return new ExecutionProcess(false);
   }
 }
