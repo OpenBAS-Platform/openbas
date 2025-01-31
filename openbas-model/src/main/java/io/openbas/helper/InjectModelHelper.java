@@ -111,10 +111,6 @@ public class InjectModelHelper {
     return "text".equals(type) || "textarea".equals(type);
   }
 
-  private static boolean isArrayField(JsonNode jsonField) {
-    return JsonNodeType.ARRAY.equals(jsonField.getNodeType());
-  }
-
   private static boolean isFieldValid(
       ObjectNode content, ArrayNode injectContractFields, String key) {
     JsonNode fieldValue = content.get(key);
