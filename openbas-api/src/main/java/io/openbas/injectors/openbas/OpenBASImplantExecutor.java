@@ -84,6 +84,9 @@ public class OpenBASImplantExecutor extends Injector {
                           yield Stream.concat(
                               Stream.of(preventionExpectation),
                               endpoint.getAgents().stream()
+                                  .filter(
+                                      agent ->
+                                          agent.getParent() == null && agent.getInject() == null)
                                   .filter(agent -> agent.isActive())
                                   .map(
                                       agent ->
@@ -111,6 +114,9 @@ public class OpenBASImplantExecutor extends Injector {
                           yield Stream.concat(
                               Stream.of(detectionExpectation),
                               endpoint.getAgents().stream()
+                                  .filter(
+                                      agent ->
+                                          agent.getParent() == null && agent.getInject() == null)
                                   .filter(agent -> agent.isActive())
                                   .map(
                                       agent ->
@@ -138,6 +144,9 @@ public class OpenBASImplantExecutor extends Injector {
                           yield Stream.concat(
                               Stream.of(manualExpectation),
                               endpoint.getAgents().stream()
+                                  .filter(
+                                      agent ->
+                                          agent.getParent() == null && agent.getInject() == null)
                                   .filter(agent -> agent.isActive())
                                   .map(
                                       agent ->
