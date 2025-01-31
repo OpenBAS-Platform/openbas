@@ -17,9 +17,12 @@ export interface UseEntityToggle<T> {
   setSelectedElements: (selectedElements: Record<string, T>) => void;
 }
 
-const useEntityToggle = <T extends Record<string, string>>(
+// we don't know the type of every value in an object type passed here
+// nor is it relevant.
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const useEntityToggle = <T extends Record<string, any>>(
   prefix: string,
-  numberOfElements: number,
+  knownElements: T[],
   totalNumberOfElements?: number,
 ): UseEntityToggle<T> => {
   const [selectedElements, setSelectedElements] = useState<Record<string, T>>(
@@ -39,7 +42,7 @@ const useEntityToggle = <T extends Record<string, string>>(
       event.preventDefault();
     }
     if (Array.isArray(entity)) {
-      const currentIds = R.values(selectedElements).map((n: Record<string, string>) => n[`${prefix}_id`]);
+      const currentIds = R.values(selectedElements).map((n: Record<string, any>) => n[`${prefix}_id`]);
       const givenIds = entity.map(n => n[`${prefix}_id`]);
       const addedIds = givenIds.filter(n => !currentIds.includes(n));
       let newSelectedElements = {
@@ -94,7 +97,7 @@ const useEntityToggle = <T extends Record<string, string>>(
   if (selectAll) {
     numberOfSelectedElements = selectAll
       ? (totalNumberOfElements ?? 0) - Object.keys(deSelectedElements).length
-      : (numberOfElements ?? 0) - Object.keys(deSelectedElements).length;
+      : (knownElements.length ?? 0) - Object.keys(deSelectedElements).length;
   }
   return {
     onToggleEntity,

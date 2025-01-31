@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Log
 public class ExpectationsExpirationManagerService {
 
+  public static final String COLLECTOR = "collector";
   private final InjectExpectationService injectExpectationService;
   private final ExpectationsExpirationManagerConfig config;
 
@@ -26,6 +27,7 @@ public class ExpectationsExpirationManagerService {
   public void computeExpectations() {
     List<InjectExpectation> expectations = this.injectExpectationService.expectationsNotFill();
     if (!expectations.isEmpty()) {
+      this.computeExpectationsForAgents(expectations);
       this.computeExpectationsForAssets(expectations);
       this.computeExpectationsForAssetGroups(expectations);
       this.computeExpectations(expectations);
@@ -33,30 +35,46 @@ public class ExpectationsExpirationManagerService {
   }
 
   // -- PRIVATE --
-
   private void computeExpectations(@NotNull final List<InjectExpectation> expectations) {
-    List<InjectExpectation> expectationAssets = expectations.stream().toList();
-    expectationAssets.forEach(
-        (expectation) -> {
+    expectations.forEach(
+        expectation -> {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
             this.injectExpectationService.computeExpectation(
-                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
+                expectation, this.config.getId(), COLLECTOR, PRODUCT_NAME, result, false, null);
+          }
+        });
+  }
+
+  private void computeExpectationsForAgents(@NotNull final List<InjectExpectation> expectations) {
+    List<InjectExpectation> expectationAgents =
+        expectations.stream().filter(e -> e.getAgent() != null).toList();
+    expectationAgents.forEach(
+        expectation -> {
+          if (isExpired(expectation)) {
+            String result = computeFailedMessage(expectation.getType());
+            this.injectExpectationService.computeExpectation(
+                expectation, this.config.getId(), COLLECTOR, PRODUCT_NAME, result, false, null);
           }
         });
   }
 
   private void computeExpectationsForAssets(@NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssets =
-        expectations.stream().filter(e -> e.getAsset() != null).toList();
+        expectations.stream().filter(e -> e.getAsset() != null && e.getAgent() == null).toList();
     expectationAssets.forEach(
-        (expectation) -> {
-          if (isExpired(expectation)) {
-            String result = computeFailedMessage(expectation.getType());
-            this.injectExpectationService.computeExpectation(
-                expectation, this.config.getId(), "collector", PRODUCT_NAME, result, false, null);
+        (expectationAsset -> {
+          List<InjectExpectation> expectationAgents =
+              this.injectExpectationService.expectationsForAgents(
+                  expectationAsset.getInject(),
+                  expectationAsset.getAsset(),
+                  expectationAsset.getType());
+          // Every agent expectation is filled
+          if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {
+            this.injectExpectationService.computeExpectationAsset(
+                expectationAsset, expectationAgents, this.config.getId(), COLLECTOR, PRODUCT_NAME);
           }
-        });
+        }));
   }
 
   private void computeExpectationsForAssetGroups(
@@ -70,13 +88,13 @@ public class ExpectationsExpirationManagerService {
                   expectationAssetGroup.getInject(),
                   expectationAssetGroup.getAssetGroup(),
                   expectationAssetGroup.getType());
-          // Every expectation assets are filled
+          // Every asset expectation is filled
           if (expectationAssets.stream().noneMatch(e -> e.getResults().isEmpty())) {
             this.injectExpectationService.computeExpectationGroup(
                 expectationAssetGroup,
                 expectationAssets,
                 this.config.getId(),
-                "collector",
+                COLLECTOR,
                 PRODUCT_NAME);
           }
         }));

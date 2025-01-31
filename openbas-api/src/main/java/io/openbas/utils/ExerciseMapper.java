@@ -2,7 +2,6 @@ package io.openbas.utils;
 
 import static java.util.Collections.emptyList;
 
-import io.openbas.atomic_testing.TargetType;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;

@@ -1,10 +1,11 @@
 package io.openbas.injectors.mastodon.service;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.DataAttachment;
 import io.openbas.database.model.Execution;
+import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.injectors.mastodon.config.MastodonConfig;
 import jakarta.annotation.Resource;
 import java.io.IOException;
@@ -89,12 +90,17 @@ public class MastodonService {
                       return true;
                     } else {
                       execution.addTrace(
-                          traceError("Cannot upload attachment " + attachment.name()));
+                          getNewErrorTrace(
+                              "Cannot upload attachment " + attachment.name(),
+                              ExecutionTraceAction.COMPLETE));
                       return false;
                     }
                   });
             } catch (IOException e) {
-              execution.addTrace(traceError("Cannot upload attachment " + attachment.name()));
+              execution.addTrace(
+                  getNewErrorTrace(
+                      "Cannot upload attachment " + attachment.name(),
+                      ExecutionTraceAction.COMPLETE));
             }
           });
       Thread.sleep(3000);

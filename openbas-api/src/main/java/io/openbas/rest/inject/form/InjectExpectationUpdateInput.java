@@ -3,8 +3,11 @@ package io.openbas.rest.inject.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
-import lombok.Data;
+import lombok.*;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 public class InjectExpectationUpdateInput {
   @NotNull

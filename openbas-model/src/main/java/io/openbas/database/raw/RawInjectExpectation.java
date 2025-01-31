@@ -12,6 +12,8 @@ public interface RawInjectExpectation {
 
   String getUser_id();
 
+  String getAgent_id();
+
   String getAsset_id();
 
   String getAsset_group_id();

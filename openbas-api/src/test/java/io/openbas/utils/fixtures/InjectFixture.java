@@ -22,6 +22,28 @@ public class InjectFixture {
     return inject;
   }
 
+  public static Inject createTechnicalInject(
+      InjectorContract injectorContract, String title, Asset asset) {
+    Inject inject = new Inject();
+    inject.setTitle(title);
+    inject.setInjectorContract(injectorContract);
+    inject.setAssets(List.of(asset));
+    inject.setEnabled(true);
+    inject.setDependsDuration(0L);
+    return inject;
+  }
+
+  public static Inject createTechnicalInjectWithAssetGroup(
+      InjectorContract injectorContract, String title, AssetGroup assetGroup) {
+    Inject inject = new Inject();
+    inject.setTitle(title);
+    inject.setInjectorContract(injectorContract);
+    inject.setAssetGroups(List.of(assetGroup));
+    inject.setEnabled(true);
+    inject.setDependsDuration(0L);
+    return inject;
+  }
+
   public static Inject getInjectWithoutContract() {
     Inject inject = createInjectWithTitle(INJECT_EMAIL_NAME);
     inject.setEnabled(true);

@@ -1,7 +1,7 @@
 package io.openbas.injectors.openbas;
 
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.database.model.InjectExpectationSignature.*;
-import static io.openbas.database.model.InjectStatusExecution.traceError;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAsset;
 import static io.openbas.model.expectation.DetectionExpectation.detectionExpectationForAssetGroup;
 import static io.openbas.model.expectation.ManualExpectation.manualExpectationForAsset;
@@ -10,7 +10,6 @@ import static io.openbas.model.expectation.PreventionExpectation.preventionExpec
 import static io.openbas.model.expectation.PreventionExpectation.preventionExpectationForAssetGroup;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Injector;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
@@ -19,6 +18,7 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
@@ -34,31 +34,8 @@ import org.springframework.stereotype.Component;
 public class OpenBASImplantExecutor extends Injector {
 
   private final AssetGroupService assetGroupService;
-  private final InjectRepository injectRepository;
   private final InjectExpectationService injectExpectationService;
-
-  private Map<Asset, Boolean> resolveAllAssets(@NotNull final ExecutableInject inject) {
-    Map<Asset, Boolean> assets = new HashMap<>();
-    inject
-        .getAssets()
-        .forEach(
-            (asset -> {
-              assets.put(asset, false);
-            }));
-    inject
-        .getAssetGroups()
-        .forEach(
-            (assetGroup -> {
-              List<Asset> assetsFromGroup =
-                  this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-              // Verify asset validity
-              assetsFromGroup.forEach(
-                  (asset) -> {
-                    assets.put(asset, true);
-                  });
-            }));
-    return assets;
-  }
+  private final InjectService injectService;
 
   /** In case of direct asset, we have an individual expectation for the asset */
   private void computeExpectationsForAsset(
@@ -225,15 +202,15 @@ public class OpenBASImplantExecutor extends Injector {
   @Override
   public ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception {
-    Inject inject =
-        this.injectRepository.findById(injection.getInjection().getInject().getId()).orElseThrow();
-    Map<Asset, Boolean> assets = this.resolveAllAssets(injection);
+    Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
+    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
 
     // Check assets target
     if (assets.isEmpty()) {
       execution.addTrace(
-          traceError(
-              "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)"));
+          getNewErrorTrace(
+              "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)",
+              ExecutionTraceAction.COMPLETE));
     }
 
     // Compute expectations
@@ -254,10 +231,6 @@ public class OpenBASImplantExecutor extends Injector {
               return;
             }
             injectExpectationSignatures = spawnSignatures(inject, payload);
-            execution.setExpectedCount(
-                payload.getPrerequisites().size()
-                    + (payload.getCleanupCommand() != null ? 1 : 0)
-                    + payload.getNumberOfActions());
           }
           computeExpectationsForAsset(
               expectations, content, asset, isInGroup, injectExpectationSignatures);

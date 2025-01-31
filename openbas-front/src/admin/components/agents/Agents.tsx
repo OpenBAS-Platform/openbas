@@ -76,7 +76,6 @@ const Executors = () => {
   const windowsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Windows'));
   const linuxExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Linux'));
   const macOsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('MacOS'));
-  const browserExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.some(n => ['Chrome', 'Firefox', 'Edge', 'Safari'].includes(n)));
 
   // Selection
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
@@ -255,7 +254,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         .
       </Alert>
       <Grid container={true} spacing={3}>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={4}>
           <Card classes={{ root: classes.card }} variant="outlined">
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsExecutors)} disabled={windowsExecutors.length === 0}>
               <CardContent className={classes.content}>
@@ -293,7 +292,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             </CardActionArea>
           </Card>
         </Grid>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={4}>
           <Card classes={{ root: classes.card }} variant="outlined">
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxExecutors)} disabled={linuxExecutors.length === 0}>
               <CardContent className={classes.content}>
@@ -331,7 +330,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             </CardActionArea>
           </Card>
         </Grid>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={4}>
           <Card classes={{ root: classes.card }} variant="outlined">
             <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsExecutors)} disabled={macOsExecutors.length === 0}>
               <CardContent className={classes.content}>
@@ -355,44 +354,6 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 </Typography>
                 <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {macOsExecutors.map((executor: Executor) => {
-                    return (
-                      <img
-                        key={executor.executor_id}
-                        src={`/api/images/executors/${executor.executor_type}`}
-                        alt={executor.executor_type}
-                        style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
-                      />
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-        <Grid item={true} xs={3}>
-          <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('browser', browserExecutors)} disabled={browserExecutors.length === 0}>
-              <CardContent className={classes.content}>
-                <div className={classes.icon}>
-                  <PlatformIcon platform="Browser" />
-                </div>
-                <Typography
-                  variant="h6"
-                  style={{
-                    fontSize: 15,
-                    margin: '20px 0 40px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: browserExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
-                  }}
-                >
-                  <DownloadingOutlined style={{ marginRight: 10 }} />
-                  {' '}
-                  {t('Install Browser Agent')}
-                </Typography>
-                <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {browserExecutors.map((executor: Executor) => {
                     return (
                       <img
                         key={executor.executor_id}

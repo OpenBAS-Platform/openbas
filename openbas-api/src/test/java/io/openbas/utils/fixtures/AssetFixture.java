@@ -5,12 +5,12 @@ import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
 
 public class AssetFixture {
-  public static Asset createDefaultAsset(@NotNull final String id) {
+
+  public static Asset createDefaultAsset(@NotNull final String name) {
     Asset asset = new Asset();
-    asset.setId(id);
     asset.setCreatedAt(Instant.now());
     asset.setUpdatedAt(Instant.now());
-    asset.setName("asset name");
+    asset.setName(name);
     asset.setDescription("asset description");
     return asset;
   }

@@ -1,7 +1,7 @@
 package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.atomic_testing.TargetType;
+import io.openbas.utils.TargetType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;

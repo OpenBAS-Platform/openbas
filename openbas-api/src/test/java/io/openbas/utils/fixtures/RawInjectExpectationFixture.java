@@ -44,6 +44,11 @@ public class RawInjectExpectationFixture {
     }
 
     @Override
+    public String getAgent_id() {
+      return "";
+    }
+
+    @Override
     public String getAsset_id() {
       return assetId;
     }

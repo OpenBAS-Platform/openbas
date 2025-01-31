@@ -1,7 +1,7 @@
 package io.openbas.injectors.challenge;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
@@ -77,7 +77,7 @@ public class ChallengeExecutor extends Injector {
         String challengeNames =
             challenges.stream().map(Challenge::getName).collect(Collectors.joining(","));
         String publishedMessage = "Challenges (" + challengeNames + ") marked as published";
-        execution.addTrace(traceSuccess(publishedMessage));
+        execution.addTrace(getNewSuccessTrace(publishedMessage, ExecutionTraceAction.COMPLETE));
         // Send the publication message.
         Exercise exercise = injection.getInjection().getExercise();
         String from = exercise.getFrom();
@@ -117,7 +117,7 @@ public class ChallengeExecutor extends Injector {
                     message,
                     attachments);
               } catch (Exception e) {
-                execution.addTrace(traceError(e.getMessage()));
+                execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
               }
             });
         // Return expectations
@@ -147,7 +147,7 @@ public class ChallengeExecutor extends Injector {
         throw new UnsupportedOperationException("Unknown contract " + contract);
       }
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
     return new ExecutionProcess(false);
   }

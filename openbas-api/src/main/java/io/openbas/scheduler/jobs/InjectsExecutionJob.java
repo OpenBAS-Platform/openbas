@@ -7,16 +7,15 @@ import static java.util.stream.Collectors.groupingBy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
+import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
-import io.openbas.rest.inject.service.InjectService;
-import io.openbas.utils.InjectUtils;
+import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import java.time.Instant;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +43,6 @@ public class InjectsExecutionJob implements Job {
   private final ApplicationContext context;
   private final InjectHelper injectHelper;
   private final InjectRepository injectRepository;
-  private final InjectService injectService;
   private final InjectorRepository injectorRepository;
   private final InjectStatusRepository injectStatusRepository;
   private final ExerciseRepository exerciseRepository;
@@ -52,7 +50,7 @@ public class InjectsExecutionJob implements Job {
   private final ExecutionExecutorService executionExecutorService;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final InjectExpectationRepository injectExpectationRepository;
-  private final InjectUtils injectUtils;
+  private final InjectStatusService injectStatusService;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
       List.of(
@@ -106,20 +104,15 @@ public class InjectsExecutionJob implements Job {
         .ifPresent(
             injectorContract -> {
               Injection source = executableInject.getInjection();
-              Inject executingInject = null;
-              InjectStatus injectRunningStatus = null;
-              executingInject = injectRepository.findById(source.getId()).orElseThrow();
-              injectRunningStatus = executingInject.getStatus().orElseThrow();
               try {
+                Inject executingInject = injectRepository.findById(source.getId()).orElseThrow();
                 String jsonInject = mapper.writeValueAsString(executableInject);
                 queueService.publish(injectorContract.getInjector().getType(), jsonInject);
-              } catch (Exception e) {
-                injectRunningStatus
-                    .getTraces()
-                    .add(InjectStatusExecution.traceError(e.getMessage()));
+                InjectStatus injectRunningStatus = executingInject.getStatus().orElseThrow();
+                injectRunningStatus.setName(ExecutionStatus.PENDING);
                 injectStatusRepository.save(injectRunningStatus);
-                executingInject.setUpdatedAt(now());
-                injectRepository.save(executingInject);
+              } catch (Exception e) {
+                injectStatusService.failInjectStatus(source.getId(), e.getMessage());
               }
             });
   }
@@ -141,8 +134,8 @@ public class InjectsExecutionJob implements Job {
               // Injection status is filled after complete execution
               // Report inject execution
               Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
-              InjectStatus completeStatus = InjectStatus.fromExecution(execution, executedInject);
-              injectStatusRepository.save(completeStatus);
+              InjectStatus completeStatus =
+                  injectStatusService.fromExecution(execution, executedInject);
               executedInject.setUpdatedAt(now());
               executedInject.setStatus(completeStatus);
               injectRepository.save(executedInject);
@@ -159,21 +152,10 @@ public class InjectsExecutionJob implements Job {
       errorMessages = getErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
     }
     if (errorMessages != null && errorMessages.isPresent()) {
-      InjectStatus status = new InjectStatus();
-      if (inject.getStatus().isEmpty()) {
-        status.setInject(inject);
-      } else {
-        status = inject.getStatus().get();
-      }
-
-      InjectStatus finalStatus = status;
+      InjectStatus finalStatus = injectStatusService.failInjectStatus(inject.getId(), null);
       errorMessages
           .get()
-          .forEach(
-              errorMsg -> finalStatus.getTraces().add(InjectStatusExecution.traceError(errorMsg)));
-      finalStatus.setName(ExecutionStatus.ERROR);
-      finalStatus.setTrackingSentDate(Instant.now());
-      finalStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
+          .forEach(errorMsg -> finalStatus.addErrorTrace(errorMsg, ExecutionTraceAction.COMPLETE));
       injectStatusRepository.save(finalStatus);
     } else {
       setInjectStatusAndExecuteInject(executableInject, inject);
@@ -186,14 +168,9 @@ public class InjectsExecutionJob implements Job {
         .ifPresentOrElse(
             injectorContract -> {
               if (!inject.isReady()) {
-                // Status
-                InjectStatus injectStatus =
-                    injectService.initializeInjectStatus(
-                        inject.getId(),
-                        ExecutionStatus.ERROR,
-                        InjectStatusExecution.traceError(
-                            "The inject is not ready to be executed (missing mandatory fields)"));
-                inject.setStatus(injectStatus);
+                injectStatusService.failInjectStatus(
+                    inject.getId(),
+                    "The inject is not ready to be executed (missing mandatory fields)");
                 return;
               }
 
@@ -204,23 +181,19 @@ public class InjectsExecutionJob implements Job {
               LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
               // Executor logics
               ExecutableInject newExecutableInject = executableInject;
-              // Status
+
               InjectStatus injectStatus =
-                  this.injectService.initializeInjectStatus(
+                  injectStatusService.initializeInjectStatus(
                       inject.getId(), ExecutionStatus.EXECUTING, null);
-              inject.setStatus(injectStatus);
               if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
+                // Status
+                inject.setStatus(injectStatus);
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
 
                 } catch (Exception e) {
-                  InjectStatus status =
-                      inject
-                          .getStatus()
-                          .orElseThrow(() -> new IllegalArgumentException("Status should exists"));
-                  status.setName(ExecutionStatus.ERROR);
-                  injectStatusRepository.save(status);
+                  injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
                   return;
                 }
               }
@@ -230,14 +203,9 @@ public class InjectsExecutionJob implements Job {
                 executeInternal(newExecutableInject);
               }
             },
-            () -> {
-              InjectStatus injectStatus =
-                  this.injectService.initializeInjectStatus(
-                      inject.getId(),
-                      ExecutionStatus.ERROR,
-                      InjectStatusExecution.traceError("Inject does not have a contract"));
-              inject.setStatus(injectStatus);
-            });
+            () ->
+                injectStatusService.failInjectStatus(
+                    inject.getId(), "Inject does not have a contract"));
   }
 
   /**

@@ -11,9 +11,12 @@ import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
+@Log
 @RequiredArgsConstructor
 @Service
 public class PayloadCreationService {
@@ -55,8 +58,12 @@ public class PayloadCreationService {
         fileDropPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        fileDropPayload.setFileDropFile(
-            documentRepository.findById(input.getFileDropFile()).orElseThrow());
+        Optional<Document> document = documentRepository.findById(input.getFileDropFile());
+        if (document.isPresent()) {
+          fileDropPayload.setFileDropFile(document.get());
+        } else {
+          log.info("Document not found: " + input.getFileDropFile());
+        }
         fileDropPayload = payloadRepository.save(fileDropPayload);
         this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
         return fileDropPayload;

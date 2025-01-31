@@ -2,8 +2,9 @@ package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,6 +41,14 @@ public class InjectTestStatus extends BaseInjectStatus implements Base {
         .orElse(null);
   }
 
+  @OneToMany(
+      mappedBy = "injectTestStatus",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.EAGER)
+  @JsonProperty("status_traces")
+  private List<ExecutionTraces> traces = new ArrayList<>();
+
   @CreationTimestamp
   @Column(name = "status_created_at")
   @JsonProperty("inject_test_status_created_at")
@@ -54,7 +63,14 @@ public class InjectTestStatus extends BaseInjectStatus implements Base {
     InjectTestStatus injectTestStatus = new InjectTestStatus();
     injectTestStatus.setTrackingSentDate(Instant.now());
     injectTestStatus.getTraces().addAll(execution.getTraces());
-    int numberOfElements = execution.getTraces().size();
+    if (!execution.getTraces().isEmpty()) {
+      List<ExecutionTraces> traces =
+          execution.getTraces().stream()
+              .peek(t -> t.setInjectTestStatus(injectTestStatus))
+              .toList();
+      injectTestStatus.getTraces().addAll(traces);
+    }
+
     int numberOfError =
         (int)
             execution.getTraces().stream()
@@ -65,20 +81,12 @@ public class InjectTestStatus extends BaseInjectStatus implements Base {
             execution.getTraces().stream()
                 .filter(ex -> ExecutionTraceStatus.SUCCESS.equals(ex.getStatus()))
                 .count();
-    injectTestStatus.setTrackingTotalError(numberOfError);
-    injectTestStatus.setTrackingTotalSuccess(numberOfSuccess);
-    injectTestStatus.setTrackingTotalCount(
-        execution.getExpectedCount() != null ? execution.getExpectedCount() : numberOfElements);
     ExecutionStatus globalStatus =
         numberOfSuccess > 0 ? ExecutionStatus.SUCCESS : ExecutionStatus.ERROR;
     ExecutionStatus finalStatus =
         numberOfError > 0 && numberOfSuccess > 0 ? ExecutionStatus.PARTIAL : globalStatus;
     injectTestStatus.setName(execution.isAsync() ? ExecutionStatus.PENDING : finalStatus);
     injectTestStatus.setTrackingEndDate(Instant.now());
-    injectTestStatus.setTrackingTotalExecutionTime(
-        Duration.between(
-                injectTestStatus.getTrackingSentDate(), injectTestStatus.getTrackingEndDate())
-            .getSeconds());
     return injectTestStatus;
   }
 }

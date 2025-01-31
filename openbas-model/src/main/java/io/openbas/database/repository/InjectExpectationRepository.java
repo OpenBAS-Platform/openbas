@@ -101,27 +101,24 @@ public interface InjectExpectationRepository
 
   @Query(
       value =
-          "select i from InjectExpectation i where i.inject.id = :injectId and i.asset.id = :assetId")
+          "select i from InjectExpectation i where i.inject.id = :injectId and i.agent.id = :agentId")
+  List<InjectExpectation> findAllByInjectAndAgent(
+      @Param("injectId") @NotBlank final String injectId,
+      @Param("agentId") @NotBlank final String agentId);
+
+  @Query(
+      value =
+          "select i from InjectExpectation i where i.inject.id = :injectId and i.asset.id = :assetId and i.agent is null")
   List<InjectExpectation> findAllByInjectAndAsset(
       @Param("injectId") @NotBlank final String injectId,
       @Param("assetId") @NotBlank final String assetId);
 
   @Query(
       value =
-          "select i from InjectExpectation i where i.inject.id = :injectId and i.assetGroup.id = :assetGroupId")
+          "select i from InjectExpectation i where i.inject.id = :injectId and i.assetGroup.id = :assetGroupId and i.asset is null and i.agent is null")
   List<InjectExpectation> findAllByInjectAndAssetGroup(
       @Param("injectId") @NotBlank final String injectId,
       @Param("assetGroupId") @NotBlank final String assetGroupId);
-
-  @Query(
-      value =
-          "SELECT "
-              + "team_id, asset_id, asset_group_id, inject_expectation_type, "
-              + "inject_expectation_score, inject_expectation_group, inject_expectation_expected_score, inject_expectation_id, exercise_id "
-              + "FROM injects_expectations i "
-              + "where i.inject_expectation_id IN :ids ;",
-      nativeQuery = true)
-  List<RawInjectExpectation> rawByIds(@Param("ids") final List<String> ids);
 
   @Query(
       value =
@@ -130,6 +127,7 @@ public interface InjectExpectationRepository
               + "i.inject_id AS inject_id, "
               + "i.exercise_id AS exercise_id, "
               + "i.team_id AS team_id, "
+              + "i.agent_id AS agent_id, "
               + "i.asset_id AS asset_id, "
               + "i.asset_group_id AS asset_group_id, "
               + "i.inject_expectation_type AS inject_expectation_type, "
@@ -149,6 +147,7 @@ public interface InjectExpectationRepository
               + "i.inject_id AS inject_id, "
               + "i.exercise_id AS exercise_id, "
               + "i.team_id AS team_id, "
+              + "i.agent_id AS agent_id, "
               + "i.asset_id AS asset_id, "
               + "i.asset_group_id AS asset_group_id, "
               + "i.inject_expectation_type AS inject_expectation_type, "
@@ -158,9 +157,10 @@ public interface InjectExpectationRepository
               + "i.inject_expectation_group AS inject_expectation_group "
               + "FROM injects_expectations i "
               + "WHERE i.inject_id IN (:injectIds) "
-              + "AND i.user_id is null ;",
+              + "AND i.user_id is null "
+              + "AND i.agent_id is null ;",
       nativeQuery = true)
-  // We don't include expectations for players, only for the team, if applicable
+  // We don't include expectations for players, only for the team, neither for agents, if applicable
   List<RawInjectExpectation> rawForComputeGlobalByInjectIds(
       @Param("injectIds") Set<String> injectIds);
 
@@ -171,6 +171,7 @@ public interface InjectExpectationRepository
               + "i.inject_id AS inject_id, "
               + "i.exercise_id AS exercise_id, "
               + "i.team_id AS team_id, "
+              + "i.agent_id AS agent_id, "
               + "i.asset_id AS asset_id, "
               + "i.asset_group_id AS asset_group_id, "
               + "i.inject_expectation_type AS inject_expectation_type, "
@@ -180,7 +181,8 @@ public interface InjectExpectationRepository
               + "i.inject_expectation_group AS inject_expectation_group "
               + "FROM injects_expectations i "
               + "WHERE i.exercise_id IN (:exerciseIds) "
-              + "AND i.user_id is null ;",
+              + "AND i.user_id is null "
+              + "AND i.agent_id is null ;",
       nativeQuery = true)
   // We don't include expectations for players, only for the team, if applicable
   List<RawInjectExpectation> rawForComputeGlobalByExerciseIds(

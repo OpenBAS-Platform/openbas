@@ -17,8 +17,6 @@ public class AttackPatternCreateInput {
   @JsonProperty("attack_pattern_stix_id")
   private String stixId = "attack-pattern--" + UUID.randomUUID();
 
-  ;
-
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("attack_pattern_name")
   private String name;

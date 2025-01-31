@@ -1,7 +1,7 @@
 package io.openbas.injectors.mastodon;
 
-import static io.openbas.database.model.InjectStatusExecution.traceError;
-import static io.openbas.database.model.InjectStatusExecution.traceSuccess;
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
+import static io.openbas.database.model.ExecutionTraces.getNewSuccessTrace;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
@@ -37,9 +37,9 @@ public class MastodonExecutor extends Injector {
     try {
       String callResult = mastodonService.sendStatus(execution, token, status, attachments);
       String message = "Mastodon status sent (" + callResult + ")";
-      execution.addTrace(traceSuccess(message));
+      execution.addTrace(getNewSuccessTrace(message, ExecutionTraceAction.COMPLETE));
     } catch (Exception e) {
-      execution.addTrace(traceError(e.getMessage()));
+      execution.addTrace(getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE));
     }
     return new ExecutionProcess(false);
   }
