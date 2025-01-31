@@ -5948,14 +5948,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-playwright@npm:2.1.0":
-  version: 2.1.0
-  resolution: "eslint-plugin-playwright@npm:2.1.0"
+"eslint-plugin-playwright@npm:2.2.0":
+  version: 2.2.0
+  resolution: "eslint-plugin-playwright@npm:2.2.0"
   dependencies:
     globals: "npm:^13.23.0"
   peerDependencies:
     eslint: ">=8.40.0"
-  checksum: 10c0/2a400886cc91e60d6173a4d839ce3e866d4b1c3462a1b682adec17e35229f7cd6d10a877c2b2bcc724f654262cda80e93f2a8d2c3fbe881df54ad5c184052128
+  checksum: 10c0/508b817ff71ae9c9dbd07a40b11b5f81804b3a143e45d9397aa98a72dcde99527e473808117dbd5bbf6ef82666a76635e830f654a4628c1576628ed1ed512ee2
   languageName: node
   linkType: hard
 
@@ -9437,7 +9437,7 @@ __metadata:
     eslint-plugin-i18next: "npm:6.1.1"
     eslint-plugin-import: "npm:2.31.0"
     eslint-plugin-import-newlines: "npm:1.4.0"
-    eslint-plugin-playwright: "npm:2.1.0"
+    eslint-plugin-playwright: "npm:2.2.0"
     eslint-plugin-react: "npm:7.37.2"
     eslint-plugin-react-refresh: "npm:0.4.16"
     eslint-plugin-simple-import-sort: "npm:12.1.1"
