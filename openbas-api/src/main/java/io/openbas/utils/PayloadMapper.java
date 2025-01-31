@@ -124,12 +124,14 @@ public class PayloadMapper {
 
   private void handleExecutableType(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder, Executable payloadExecutable) {
-    builder.executableFile(payloadExecutable.getExecutableFile());
+    builder.executableFile(
+                new StatusPayloadDocument(payloadExecutable.getExecutableFile()));
   }
 
   private void handleFileDropType(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder, FileDrop payloadFileDrop) {
-    builder.fileDropFile(payloadFileDrop.getFileDropFile());
+    builder.fileDropFile(
+                new StatusPayloadDocument(payloadFileDrop.getFileDropFile()));
   }
 
   private void handleDnsResolutionType(
