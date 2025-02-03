@@ -111,10 +111,11 @@ public class OpenBASImplantExecutor extends Injector {
                               getPreventionExpectationStream(
                                   asset, inject, payloadType, preventionExpectation);
 
+                          // If any expectation for agent is created then we create also expectation
+                          // for asset
                           if (preventionExpectationStream.findAny().isPresent()) {
                             yield Stream.concat(
-                                Stream.of(preventionExpectation),
-                                preventionExpectationStream);
+                                Stream.of(preventionExpectation), preventionExpectationStream);
                           }
                           yield Stream.empty();
                         }
@@ -133,10 +134,11 @@ public class OpenBASImplantExecutor extends Injector {
                               getDetectionExpectationStream(
                                   asset, inject, payloadType, detectionExpectation);
 
+                          // If any expectation for agent is created then we create also expectation
+                          // for asset
                           if (detectionExpectationStream.findAny().isPresent()) {
                             yield Stream.concat(
-                                Stream.of(detectionExpectation),
-                                detectionExpectationStream);
+                                Stream.of(detectionExpectation), detectionExpectationStream);
                           }
                           yield Stream.empty();
                         }
@@ -154,10 +156,11 @@ public class OpenBASImplantExecutor extends Injector {
                           Stream<ManualExpectation> manualExpectationStream =
                               getManualExpectationStream(asset, inject, manualExpectation);
 
+                          // If any expectation for agent is created then we create also expectation
+                          // for asset
                           if (manualExpectationStream.findAny().isPresent()) {
                             yield Stream.concat(
-                                Stream.of(manualExpectation),
-                                manualExpectationStream);
+                                Stream.of(manualExpectation), manualExpectationStream);
                           }
                           yield Stream.empty();
                         }
