@@ -71,22 +71,22 @@ public class InjectModelHelper {
       // if field is mandatory conditional, if the conditional field is set check if the current
       // field is set
       if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL)) {
-        String mandatoryConditionalFieldKey =
+        String mandatoryOnConditionFieldKey =
             jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL).asText();
-        Optional<JsonNode> mandatoryConditionalField =
+        Optional<JsonNode> mandatoryOnConditionField =
             contractFields.stream()
                 .filter(
                     jsonNode ->
-                        mandatoryConditionalFieldKey.equals(
+                        mandatoryOnConditionFieldKey.equals(
                             jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText()))
                 .findFirst();
-        if (mandatoryConditionalField.isPresent()) {
+        if (mandatoryOnConditionField.isPresent()) {
           if (isFieldSet(
                   allTeams,
                   teams,
                   assets,
                   assetGroups,
-                  mandatoryConditionalField.get(),
+                  mandatoryOnConditionField.get(),
                   content,
                   injectContractFields)
               && !isFieldSet(

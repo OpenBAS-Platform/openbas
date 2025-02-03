@@ -50,7 +50,7 @@ public class ContractDef {
    * @param conditionalElement if this field is set the element will be mandatory
    * @return
    */
-  public ContractDef mandatoryConditional(
+  public ContractDef mandatoryOnCondition(
       ContractElement element, ContractElement conditionalElement) {
     element.setMandatoryConditionField(conditionalElement.getKey());
     element.setMandatory(false);
