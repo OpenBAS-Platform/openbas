@@ -88,7 +88,7 @@ public class OpenBASImplantExecutor extends Injector {
       @NotNull final Asset asset,
       final boolean expectationGroup,
       final String injectId,
-      String payloadType) {
+      final String payloadType) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
           content.getExpectations().stream()
