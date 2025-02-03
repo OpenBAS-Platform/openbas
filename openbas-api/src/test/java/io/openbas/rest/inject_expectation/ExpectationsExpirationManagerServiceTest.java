@@ -111,7 +111,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createTechnicalDetectionExpectation(
+          ExpectationFixture.createTechnicalDetectionExpectationForAsset(
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(
@@ -213,7 +213,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createTechnicalDetectionExpectation(
+          ExpectationFixture.createTechnicalDetectionExpectationForAsset(
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(
@@ -337,7 +337,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createTechnicalDetectionExpectation(
+          ExpectationFixture.createTechnicalDetectionExpectationForAsset(
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(
@@ -464,7 +464,7 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
           ExpectationFixture.createDetectionExpectationForAssetGroup(
               savedAssetGroup, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationForAsset =
-          ExpectationFixture.createTechnicalDetectionExpectation(
+          ExpectationFixture.createTechnicalDetectionExpectationForAsset(
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(

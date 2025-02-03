@@ -34,18 +34,20 @@ public class DetectionExpectation implements Expectation {
   }
 
   public static DetectionExpectation detectionExpectationForAgent(
-      @NotNull Agent agent,
-      @NotNull Asset asset,
-      @NotNull DetectionExpectation endpointExpectation,
+      @Nullable final Double score,
+      @NotBlank final String name,
+      final String description,
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      final Long expirationTime,
       List<InjectExpectationSignature> injectExpectationSignatures) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
-    detectionExpectation.setScore(
-        Objects.requireNonNullElse(endpointExpectation.getScore(), 100.0));
-    detectionExpectation.setName(endpointExpectation.getName());
-    detectionExpectation.setDescription(endpointExpectation.getDescription());
+    detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
+    detectionExpectation.setName(name);
+    detectionExpectation.setDescription(description);
     detectionExpectation.setAgent(agent);
     detectionExpectation.setAsset(asset);
-    detectionExpectation.setExpirationTime(endpointExpectation.getExpirationTime());
+    detectionExpectation.setExpirationTime(expirationTime);
     detectionExpectation.setInjectExpectationSignatures(injectExpectationSignatures);
     return detectionExpectation;
   }

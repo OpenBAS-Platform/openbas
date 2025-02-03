@@ -11,30 +11,24 @@ public class ExpectationFixture {
   static Double SCORE = 100.0;
 
   public static PreventionExpectation createTechnicalPreventionExpectation(
-      Agent agent,
-      Asset asset,
-      PreventionExpectation preventionExpectation,
-      List<InjectExpectationSignature> signatures) {
+      Agent agent, Asset asset, Long expirationTime, List<InjectExpectationSignature> signatures) {
     return PreventionExpectation.preventionExpectationForAgent(
-        agent, asset, preventionExpectation, signatures);
+        SCORE, "Prevention", "Prevention Expectation", agent, asset, expirationTime, signatures);
   }
 
   public static DetectionExpectation createTechnicalDetectionExpectation(
-      Agent agent,
-      Asset asset,
-      DetectionExpectation detectionExpectation,
-      List<InjectExpectationSignature> signatures) {
+      Agent agent, Asset asset, Long expirationTime, List<InjectExpectationSignature> signatures) {
     return DetectionExpectation.detectionExpectationForAgent(
-        agent, asset, detectionExpectation, signatures);
+        SCORE, "Detection", "Detection Expectation", agent, asset, expirationTime, signatures);
   }
 
-  public static PreventionExpectation createTechnicalPreventionExpectation(
+  public static PreventionExpectation createTechnicalPreventionExpectationForAsset(
       Asset asset, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAsset(
         SCORE, "Prevention", "Prevention Expectation", asset, false, expirationTime);
   }
 
-  public static DetectionExpectation createTechnicalDetectionExpectation(
+  public static DetectionExpectation createTechnicalDetectionExpectationForAsset(
       Asset asset, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
         SCORE, "Detection", "Detection Expectation", asset, false, expirationTime);

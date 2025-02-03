@@ -385,11 +385,15 @@ public class CalderaExecutor extends Injector {
                                 expectationGroup, // expectationGroup usefully in front-end
                                 expectation.getExpirationTime());
 
+                        // We propagate the asset expectation to agents
                         PreventionExpectation preventionExpectationAgent =
                             preventionExpectationForAgent(
+                                expectation.getScore(),
+                                expectation.getName(),
+                                expectation.getDescription(),
                                 agentParent,
                                 agentParent.getAsset(),
-                                preventionExpectation,
+                                expectation.getExpirationTime(),
                                 computeSignatures(payload, executionAgent.getProcessName()));
 
                         yield Stream.of(preventionExpectation, preventionExpectationAgent);
@@ -404,11 +408,15 @@ public class CalderaExecutor extends Injector {
                                 expectationGroup,
                                 expectation.getExpirationTime());
 
+                        // We propagate the asset expectation to agents
                         DetectionExpectation detectionExpectationAgent =
                             detectionExpectationForAgent(
+                                expectation.getScore(),
+                                expectation.getName(),
+                                expectation.getDescription(),
                                 agentParent,
                                 agentParent.getAsset(),
-                                detectionExpectation,
+                                expectation.getExpirationTime(),
                                 computeSignatures(payload, executionAgent.getProcessName()));
 
                         yield Stream.of(detectionExpectation, detectionExpectationAgent);
@@ -423,9 +431,15 @@ public class CalderaExecutor extends Injector {
                                 expectation.getExpirationTime(),
                                 expectationGroup);
 
+                        // We propagate the asset expectation to agents
                         ManualExpectation manualExpectationAgent =
                             manualExpectationForAgent(
-                                agentParent, agentParent.getAsset(), manualExpectation);
+                                expectation.getScore(),
+                                expectation.getName(),
+                                expectation.getDescription(),
+                                agentParent,
+                                agentParent.getAsset(),
+                                expectation.getExpirationTime());
 
                         yield Stream.of(manualExpectation, manualExpectationAgent);
                       }

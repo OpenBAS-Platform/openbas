@@ -38,18 +38,20 @@ public class PreventionExpectation implements Expectation {
   }
 
   public static PreventionExpectation preventionExpectationForAgent(
+      @Nullable final Double score,
+      @NotBlank final String name,
+      final String description,
       @NotNull Agent agent,
-      @NotNull Asset asset,
-      @NotNull PreventionExpectation endpointExpectation,
-      List<InjectExpectationSignature> injectExpectationSignatures) {
+      @NotNull final Asset asset,
+      final Long expirationTime,
+      final List<InjectExpectationSignature> injectExpectationSignatures) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
-    preventionExpectation.setScore(
-        Objects.requireNonNullElse(endpointExpectation.getScore(), 100.0));
-    preventionExpectation.setName(endpointExpectation.getName());
-    preventionExpectation.setDescription(endpointExpectation.getDescription());
+    preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
+    preventionExpectation.setName(name);
+    preventionExpectation.setDescription(description);
     preventionExpectation.setAgent(agent);
     preventionExpectation.setAsset(asset);
-    preventionExpectation.setExpirationTime(endpointExpectation.getExpirationTime());
+    preventionExpectation.setExpirationTime(expirationTime);
     preventionExpectation.setInjectExpectationSignatures(injectExpectationSignatures);
     return preventionExpectation;
   }

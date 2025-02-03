@@ -107,6 +107,7 @@ public class OpenBASImplantExecutor extends Injector {
 
                           yield Stream.concat(
                               Stream.of(preventionExpectation),
+                              // We propagate the asset expectation to agents
                               getPreventionExpectationStream(
                                   asset, injectId, payloadType, preventionExpectation));
                         }
@@ -122,6 +123,7 @@ public class OpenBASImplantExecutor extends Injector {
 
                           yield Stream.concat(
                               Stream.of(detectionExpectation),
+                              // We propagate the asset expectation to agents
                               getDetectionExpectationStream(
                                   asset, injectId, payloadType, detectionExpectation));
                         }
@@ -137,6 +139,7 @@ public class OpenBASImplantExecutor extends Injector {
 
                           yield Stream.concat(
                               Stream.of(manualExpectation),
+                              // We propagate the asset expectation to agents
                               getManualExpectationStream(asset, manualExpectation));
                         }
                         default -> Stream.of();
@@ -148,7 +151,15 @@ public class OpenBASImplantExecutor extends Injector {
   private Stream<ManualExpectation> getManualExpectationStream(
       Asset asset, ManualExpectation manualExpectation) {
     return getActiveAgents(asset).stream()
-        .map(agent -> manualExpectationForAgent(agent, asset, manualExpectation));
+        .map(
+            agent ->
+                manualExpectationForAgent(
+                    manualExpectation.getScore(),
+                    manualExpectation.getName(),
+                    manualExpectation.getDescription(),
+                    agent,
+                    asset,
+                    manualExpectation.getExpirationTime()));
   }
 
   private Stream<DetectionExpectation> getDetectionExpectationStream(
@@ -157,9 +168,12 @@ public class OpenBASImplantExecutor extends Injector {
         .map(
             agent ->
                 detectionExpectationForAgent(
+                    detectionExpectation.getScore(),
+                    detectionExpectation.getName(),
+                    detectionExpectation.getDescription(),
                     agent,
                     asset,
-                    detectionExpectation,
+                    detectionExpectation.getExpirationTime(),
                     computeSignatures(injectId, agent.getId(), payloadType)));
   }
 
@@ -172,9 +186,12 @@ public class OpenBASImplantExecutor extends Injector {
         .map(
             agent ->
                 preventionExpectationForAgent(
+                    preventionExpectation.getScore(),
+                    preventionExpectation.getName(),
+                    preventionExpectation.getDescription(),
                     agent,
                     asset,
-                    preventionExpectation,
+                    preventionExpectation.getExpirationTime(),
                     computeSignatures(injectId, agent.getId(), payloadType)));
   }
 

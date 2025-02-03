@@ -41,14 +41,19 @@ public class ManualExpectation implements Expectation {
   }
 
   public static ManualExpectation manualExpectationForAgent(
-      @NotNull Agent agent, @NotNull Asset asset, @NotNull ManualExpectation endpointExpectation) {
+      @Nullable final Double score,
+      @NotBlank final String name,
+      final String description,
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      final Long expirationTime) {
     ManualExpectation manualExpectation = new ManualExpectation();
-    manualExpectation.setScore(Objects.requireNonNullElse(endpointExpectation.getScore(), 100.0));
-    manualExpectation.setName(endpointExpectation.getName());
-    manualExpectation.setDescription(endpointExpectation.getDescription());
+    manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
+    manualExpectation.setName(name);
+    manualExpectation.setDescription(description);
     manualExpectation.setAgent(agent);
     manualExpectation.setAsset(asset);
-    manualExpectation.setExpirationTime(endpointExpectation.getExpirationTime());
+    manualExpectation.setExpirationTime(expirationTime);
     return manualExpectation;
   }
 
