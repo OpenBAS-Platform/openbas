@@ -106,6 +106,7 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectationGroup, // expectationGroup usefully in front-end
                                   expectation.getExpirationTime());
 
+                          // We propagate the asset expectation to agents
                           Stream<PreventionExpectation> preventionExpectationStream =
                               getPreventionExpectationStream(
                                   asset, inject, payloadType, preventionExpectation);
@@ -113,7 +114,6 @@ public class OpenBASImplantExecutor extends Injector {
                           if (preventionExpectationStream.findAny().isPresent()) {
                             yield Stream.concat(
                                 Stream.of(preventionExpectation),
-                                // We propagate the asset expectation to agents
                                 preventionExpectationStream);
                           }
                           yield Stream.empty();
@@ -128,6 +128,7 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectationGroup,
                                   expectation.getExpirationTime());
 
+                          // We propagate the asset expectation to agents
                           Stream<DetectionExpectation> detectionExpectationStream =
                               getDetectionExpectationStream(
                                   asset, inject, payloadType, detectionExpectation);
@@ -135,7 +136,6 @@ public class OpenBASImplantExecutor extends Injector {
                           if (detectionExpectationStream.findAny().isPresent()) {
                             yield Stream.concat(
                                 Stream.of(detectionExpectation),
-                                // We propagate the asset expectation to agents
                                 detectionExpectationStream);
                           }
                           yield Stream.empty();
@@ -150,13 +150,13 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getExpirationTime(),
                                   expectationGroup);
 
+                          // We propagate the asset expectation to agents
                           Stream<ManualExpectation> manualExpectationStream =
                               getManualExpectationStream(asset, inject, manualExpectation);
 
                           if (manualExpectationStream.findAny().isPresent()) {
                             yield Stream.concat(
                                 Stream.of(manualExpectation),
-                                // We propagate the asset expectation to agents
                                 manualExpectationStream);
                           }
                           yield Stream.empty();
@@ -215,12 +215,12 @@ public class OpenBASImplantExecutor extends Injector {
     return ((Endpoint) asset)
         .getAgents().stream()
             .filter(agent -> agent.getParent() == null && agent.getInject() == null)
-            .filter(agent -> hasNoInvalidTraces(inject, agent))
+            .filter(agent -> hasOnlyValidTraces(inject, agent))
             .filter(Agent::isActive)
             .toList();
   }
 
-  private static boolean hasNoInvalidTraces(Inject inject, Agent agent) {
+  private static boolean hasOnlyValidTraces(Inject inject, Agent agent) {
     return inject.getStatus().get().getTraces().stream()
         .noneMatch(
             trace ->
