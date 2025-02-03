@@ -34,223 +34,6 @@ public class OpenBASImplantExecutor extends Injector {
   private final InjectExpectationService injectExpectationService;
   private final InjectService injectService;
 
-  /** In case of direct asset, we have an individual expectation for the asset */
-  private void computeExpectationsForAssetAndAgents(
-      @NotNull final List<Expectation> expectations,
-      @NotNull final OpenBASImplantInjectContent content,
-      @NotNull final Asset asset,
-      final boolean expectationGroup,
-      final String injectId) {
-    if (!content.getExpectations().isEmpty()) {
-      expectations.addAll(
-          content.getExpectations().stream()
-              .flatMap(
-                  (expectation) ->
-                      switch (expectation.getType()) {
-                        case PREVENTION -> {
-                          PreventionExpectation preventionExpectation =
-                              preventionExpectationForAsset(
-                                  expectation.getScore(),
-                                  expectation.getName(),
-                                  expectation.getDescription(),
-                                  asset,
-                                  expectationGroup, // expectationGroup usefully in front-end
-                                  expectation.getExpirationTime());
-
-                          yield Stream.concat(
-                              Stream.of(preventionExpectation),
-                              ((Endpoint) asset)
-                                  .getAgents().stream()
-                                      .filter(
-                                          agent ->
-                                              agent.getParent() == null
-                                                  && agent.getInject() == null)
-                                      .filter(agent -> agent.isActive())
-                                      .map(
-                                          agent ->
-                                              preventionExpectationForAgent(
-                                                  agent,
-                                                  asset,
-                                                  preventionExpectation,
-                                                  List.of(
-                                                      createSignature(
-                                                          EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
-                                                          "obas-implant-"
-                                                              + injectId
-                                                              + "-agent-"
-                                                              + agent.getId())))));
-                        }
-                        case DETECTION -> {
-                          DetectionExpectation detectionExpectation =
-                              detectionExpectationForAsset(
-                                  expectation.getScore(),
-                                  expectation.getName(),
-                                  expectation.getDescription(),
-                                  asset,
-                                  expectationGroup,
-                                  expectation.getExpirationTime());
-                          yield Stream.concat(
-                              Stream.of(detectionExpectation),
-                              ((Endpoint) asset)
-                                  .getAgents().stream()
-                                      .filter(
-                                          agent ->
-                                              agent.getParent() == null
-                                                  && agent.getInject() == null)
-                                      .filter(agent -> agent.isActive())
-                                      .map(
-                                          agent ->
-                                              detectionExpectationForAgent(
-                                                  agent,
-                                                  asset,
-                                                  detectionExpectation,
-                                                  List.of(
-                                                      createSignature(
-                                                          EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
-                                                          "obas-implant-"
-                                                              + injectId
-                                                              + "-agent-"
-                                                              + agent.getId())))));
-                        }
-                        case MANUAL -> {
-                          ManualExpectation manualExpectation =
-                              manualExpectationForAsset(
-                                  expectation.getScore(),
-                                  expectation.getName(),
-                                  expectation.getDescription(),
-                                  asset,
-                                  expectation.getExpirationTime(),
-                                  expectationGroup);
-                          yield Stream.concat(
-                              Stream.of(manualExpectation),
-                              ((Endpoint) asset)
-                                  .getAgents().stream()
-                                      .filter(
-                                          agent ->
-                                              agent.getParent() == null
-                                                  && agent.getInject() == null)
-                                      .filter(agent -> agent.isActive())
-                                      .map(
-                                          agent ->
-                                              manualExpectationForAgent(
-                                                  agent, asset, manualExpectation)));
-                        }
-                        default -> Stream.of();
-                      })
-              .toList());
-    }
-  }
-
-  /**
-   * In case of asset group if expectation group -> we have an expectation for the group and one for
-   * each asset if not expectation group -> we have an individual expectation for each asset
-   */
-  private void computeExpectationsForAssetGroup(
-      @NotNull final List<Expectation> expectations,
-      @NotNull final OpenBASImplantInjectContent content,
-      @NotNull final AssetGroup assetGroup) {
-    if (!content.getExpectations().isEmpty()) {
-      expectations.addAll(
-          content.getExpectations().stream()
-              .flatMap(
-                  (expectation) ->
-                      switch (expectation.getType()) {
-                        case PREVENTION -> {
-                          // Verify that at least one asset in the group has been executed
-                          List<Asset> assets =
-                              this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-                          if (assets.stream()
-                              .anyMatch(
-                                  (asset) ->
-                                      expectations.stream()
-                                          .filter(
-                                              e ->
-                                                  InjectExpectation.EXPECTATION_TYPE.PREVENTION
-                                                      == e.type())
-                                          .anyMatch(
-                                              (e) ->
-                                                  ((PreventionExpectation) e).getAsset() != null
-                                                      && ((PreventionExpectation) e)
-                                                          .getAsset()
-                                                          .getId()
-                                                          .equals(asset.getId())))) {
-                            yield Stream.of(
-                                preventionExpectationForAssetGroup(
-                                    expectation.getScore(),
-                                    expectation.getName(),
-                                    expectation.getDescription(),
-                                    assetGroup,
-                                    expectation.isExpectationGroup(),
-                                    expectation.getExpirationTime()));
-                          }
-                          yield Stream.of();
-                        }
-                        case DETECTION -> {
-                          // Verify that at least one asset in the group has been executed
-                          List<Asset> assets =
-                              this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-                          if (assets.stream()
-                              .anyMatch(
-                                  (asset) ->
-                                      expectations.stream()
-                                          .filter(
-                                              e ->
-                                                  InjectExpectation.EXPECTATION_TYPE.DETECTION
-                                                      == e.type())
-                                          .anyMatch(
-                                              (e) ->
-                                                  ((DetectionExpectation) e).getAsset() != null
-                                                      && ((DetectionExpectation) e)
-                                                          .getAsset()
-                                                          .getId()
-                                                          .equals(asset.getId())))) {
-                            yield Stream.of(
-                                detectionExpectationForAssetGroup(
-                                    expectation.getScore(),
-                                    expectation.getName(),
-                                    expectation.getDescription(),
-                                    assetGroup,
-                                    expectation.isExpectationGroup(),
-                                    expectation.getExpirationTime()));
-                          }
-                          yield Stream.of();
-                        }
-                        case MANUAL -> {
-                          // Verify that at least one asset in the group has been executed
-                          List<Asset> assets =
-                              this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-                          if (assets.stream()
-                              .anyMatch(
-                                  (asset) ->
-                                      expectations.stream()
-                                          .filter(
-                                              e ->
-                                                  InjectExpectation.EXPECTATION_TYPE.MANUAL
-                                                      == e.type())
-                                          .anyMatch(
-                                              (e) ->
-                                                  ((ManualExpectation) e).getAsset() != null
-                                                      && ((ManualExpectation) e)
-                                                          .getAsset()
-                                                          .getId()
-                                                          .equals(asset.getId())))) {
-                            yield Stream.of(
-                                manualExpectationForAssetGroup(
-                                    expectation.getScore(),
-                                    expectation.getName(),
-                                    expectation.getDescription(),
-                                    assetGroup,
-                                    expectation.getExpirationTime(),
-                                    expectation.isExpectationGroup()));
-                          }
-                          yield Stream.of();
-                        }
-                        default -> Stream.of();
-                      })
-              .toList());
-    }
-  }
-
   @Override
   public ExecutionProcess process(Execution execution, ExecutableInject injection)
       throws Exception {
@@ -273,7 +56,7 @@ public class OpenBASImplantExecutor extends Injector {
     assets.forEach(
         (asset, isInGroup) -> {
           Optional<InjectorContract> contract = inject.getInjectorContract();
-
+          String payloadType = "";
           if (contract.isPresent()) {
             Payload payload = contract.get().getPayload();
             if (payload == null) {
@@ -281,9 +64,10 @@ public class OpenBASImplantExecutor extends Injector {
                   String.format("No payload for inject %s was found, skipping", inject.getId()));
               return;
             }
+            payloadType = payload.getType();
           }
           computeExpectationsForAssetAndAgents(
-              expectations, content, asset, isInGroup, inject.getId());
+              expectations, content, asset, isInGroup, inject.getId(), payloadType);
         });
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
@@ -295,8 +79,249 @@ public class OpenBASImplantExecutor extends Injector {
     return new ExecutionProcess(true);
   }
 
+  // -- PRIVATE --
+
+  /** In case of direct asset, we have an individual expectation for the asset */
+  private void computeExpectationsForAssetAndAgents(
+      @NotNull final List<Expectation> expectations,
+      @NotNull final OpenBASImplantInjectContent content,
+      @NotNull final Asset asset,
+      final boolean expectationGroup,
+      final String injectId,
+      String payloadType) {
+    if (!content.getExpectations().isEmpty()) {
+      expectations.addAll(
+          content.getExpectations().stream()
+              .flatMap(
+                  expectation ->
+                      switch (expectation.getType()) {
+                        case PREVENTION -> {
+                          PreventionExpectation preventionExpectation =
+                              preventionExpectationForAsset(
+                                  expectation.getScore(),
+                                  expectation.getName(),
+                                  expectation.getDescription(),
+                                  asset,
+                                  expectationGroup, // expectationGroup usefully in front-end
+                                  expectation.getExpirationTime());
+
+                          yield Stream.concat(
+                              Stream.of(preventionExpectation),
+                              getPreventionExpectationStream(
+                                  asset, injectId, payloadType, preventionExpectation));
+                        }
+                        case DETECTION -> {
+                          DetectionExpectation detectionExpectation =
+                              detectionExpectationForAsset(
+                                  expectation.getScore(),
+                                  expectation.getName(),
+                                  expectation.getDescription(),
+                                  asset,
+                                  expectationGroup,
+                                  expectation.getExpirationTime());
+
+                          yield Stream.concat(
+                              Stream.of(detectionExpectation),
+                              getDetectionExpectationStream(
+                                  asset, injectId, payloadType, detectionExpectation));
+                        }
+                        case MANUAL -> {
+                          ManualExpectation manualExpectation =
+                              manualExpectationForAsset(
+                                  expectation.getScore(),
+                                  expectation.getName(),
+                                  expectation.getDescription(),
+                                  asset,
+                                  expectation.getExpirationTime(),
+                                  expectationGroup);
+
+                          yield Stream.concat(
+                              Stream.of(manualExpectation),
+                              getManualExpectationStream(asset, manualExpectation));
+                        }
+                        default -> Stream.of();
+                      })
+              .toList());
+    }
+  }
+
+  private Stream<ManualExpectation> getManualExpectationStream(
+      Asset asset, ManualExpectation manualExpectation) {
+    return getActiveAgents(asset).stream()
+        .map(agent -> manualExpectationForAgent(agent, asset, manualExpectation));
+  }
+
+  private Stream<DetectionExpectation> getDetectionExpectationStream(
+      Asset asset, String injectId, String payloadType, DetectionExpectation detectionExpectation) {
+    return getActiveAgents(asset).stream()
+        .map(
+            agent ->
+                detectionExpectationForAgent(
+                    agent,
+                    asset,
+                    detectionExpectation,
+                    computeSignatures(injectId, agent.getId(), payloadType)));
+  }
+
+  private Stream<PreventionExpectation> getPreventionExpectationStream(
+      Asset asset,
+      String injectId,
+      String payloadType,
+      PreventionExpectation preventionExpectation) {
+    return getActiveAgents(asset).stream()
+        .map(
+            agent ->
+                preventionExpectationForAgent(
+                    agent,
+                    asset,
+                    preventionExpectation,
+                    computeSignatures(injectId, agent.getId(), payloadType)));
+  }
+
+  private List<Agent> getActiveAgents(Asset asset) {
+    return ((Endpoint) asset)
+        .getAgents().stream()
+            .filter(agent -> agent.getParent() == null && agent.getInject() == null)
+            .filter(Agent::isActive)
+            .toList();
+  }
+
+  /**
+   * In case of asset group if expectation group -> we have an expectation for the group and one for
+   * each asset if not expectation group -> we have an individual expectation for each asset
+   */
+  private void computeExpectationsForAssetGroup(
+      @NotNull final List<Expectation> expectations,
+      @NotNull final OpenBASImplantInjectContent content,
+      @NotNull final AssetGroup assetGroup) {
+    if (!content.getExpectations().isEmpty()) {
+      expectations.addAll(
+          content.getExpectations().stream()
+              .flatMap(
+                  expectation ->
+                      switch (expectation.getType()) {
+                        case PREVENTION -> {
+                          // Verify that at least one asset in the group has been executed
+                          List<Asset> assets =
+                              this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+                          if (assets.stream()
+                              .anyMatch(
+                                  asset ->
+                                      expectations.stream()
+                                          .filter(
+                                              prevExpectation ->
+                                                  InjectExpectation.EXPECTATION_TYPE.PREVENTION
+                                                      == prevExpectation.type())
+                                          .anyMatch(
+                                              prevExpectation ->
+                                                  ((PreventionExpectation) prevExpectation)
+                                                              .getAsset()
+                                                          != null
+                                                      && ((PreventionExpectation) prevExpectation)
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
+                            yield Stream.of(
+                                preventionExpectationForAssetGroup(
+                                    expectation.getScore(),
+                                    expectation.getName(),
+                                    expectation.getDescription(),
+                                    assetGroup,
+                                    expectation.isExpectationGroup(),
+                                    expectation.getExpirationTime()));
+                          }
+                          yield Stream.of();
+                        }
+                        case DETECTION -> {
+                          // Verify that at least one asset in the group has been executed
+                          List<Asset> assets =
+                              this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+                          if (assets.stream()
+                              .anyMatch(
+                                  asset ->
+                                      expectations.stream()
+                                          .filter(
+                                              detExpectation ->
+                                                  InjectExpectation.EXPECTATION_TYPE.DETECTION
+                                                      == detExpectation.type())
+                                          .anyMatch(
+                                              detExpectation ->
+                                                  ((DetectionExpectation) detExpectation).getAsset()
+                                                          != null
+                                                      && ((DetectionExpectation) detExpectation)
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
+                            yield Stream.of(
+                                detectionExpectationForAssetGroup(
+                                    expectation.getScore(),
+                                    expectation.getName(),
+                                    expectation.getDescription(),
+                                    assetGroup,
+                                    expectation.isExpectationGroup(),
+                                    expectation.getExpirationTime()));
+                          }
+                          yield Stream.of();
+                        }
+                        case MANUAL -> {
+                          // Verify that at least one asset in the group has been executed
+                          List<Asset> assets =
+                              this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+                          if (assets.stream()
+                              .anyMatch(
+                                  asset ->
+                                      expectations.stream()
+                                          .filter(
+                                              manExpectation ->
+                                                  InjectExpectation.EXPECTATION_TYPE.MANUAL
+                                                      == manExpectation.type())
+                                          .anyMatch(
+                                              manExpectation ->
+                                                  ((ManualExpectation) manExpectation).getAsset()
+                                                          != null
+                                                      && ((ManualExpectation) manExpectation)
+                                                          .getAsset()
+                                                          .getId()
+                                                          .equals(asset.getId())))) {
+                            yield Stream.of(
+                                manualExpectationForAssetGroup(
+                                    expectation.getScore(),
+                                    expectation.getName(),
+                                    expectation.getDescription(),
+                                    assetGroup,
+                                    expectation.getExpirationTime(),
+                                    expectation.isExpectationGroup()));
+                          }
+                          yield Stream.of();
+                        }
+                        default -> Stream.of();
+                      })
+              .toList());
+    }
+  }
+
+  private static List<InjectExpectationSignature> computeSignatures(
+      String injectId, String agentId, String payloadType) {
+    List<InjectExpectationSignature> signatures = new ArrayList<>();
+    List<String> knownPayloadTypes =
+        Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
+
+    /*
+     * Always add the "Parent process" signature type for the OpenBAS Implant Executor
+     */
+    signatures.add(
+        createSignature(
+            EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
+            "obas-implant-" + injectId + "-agent-" + agentId));
+
+    if (!knownPayloadTypes.contains(payloadType)) {
+      throw new UnsupportedOperationException("Payload type " + payloadType + " is not supported");
+    }
+    return signatures;
+  }
+
   private static InjectExpectationSignature createSignature(
       String signatureType, String signatureValue) {
-    return InjectExpectationSignature.builder().type(signatureType).value(signatureValue).build();
+    return builder().type(signatureType).value(signatureValue).build();
   }
 }

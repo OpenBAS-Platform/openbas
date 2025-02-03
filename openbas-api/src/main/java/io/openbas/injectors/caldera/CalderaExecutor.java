@@ -46,7 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Log
 public class CalderaExecutor extends Injector {
 
-  private final int RETRY_NUMBER = 20;
+  private static final String CALDERA_FAILED_TO_EXECUTE_THE_ABILITY_ON_AGENT =
+      "Caldera failed to execute the ability on agent";
+  private static final int RETRY_NUMBER = 20;
 
   private final CalderaInjectorService calderaService;
   private final EndpointService endpointService;
@@ -189,7 +191,7 @@ public class CalderaExecutor extends Injector {
                           } else {
                             execution.addTrace(
                                 getNewErrorTrace(
-                                    "Caldera failed to execute the ability on agent"
+                                    CALDERA_FAILED_TO_EXECUTE_THE_ABILITY_ON_AGENT
                                         + ((Endpoint) asset)
                                             .getAgents()
                                             .getFirst()
@@ -217,7 +219,7 @@ public class CalderaExecutor extends Injector {
                       } else {
                         execution.addTrace(
                             getNewErrorTrace(
-                                "Caldera failed to execute the ability on agent"
+                                CALDERA_FAILED_TO_EXECUTE_THE_ABILITY_ON_AGENT
                                     + asset.getName()
                                     + " (temporary injector not spawned correctly)",
                                 ExecutionTraceAction.COMPLETE,
@@ -226,7 +228,7 @@ public class CalderaExecutor extends Injector {
                     } catch (Exception e) {
                       execution.addTrace(
                           getNewErrorTrace(
-                              "Caldera failed to execute the ability on agent"
+                              CALDERA_FAILED_TO_EXECUTE_THE_ABILITY_ON_AGENT
                                   + ((Endpoint) asset).getAgents().getFirst().getExecutedByUser()
                                   + " ("
                                   + e.getMessage()
@@ -255,61 +257,6 @@ public class CalderaExecutor extends Injector {
     execution.addTrace(getNewInfoTrace(message, ExecutionTraceAction.EXECUTION, asyncIds));
     injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
     return new ExecutionProcess(true);
-  }
-
-  private List<InjectExpectationSignature> computeSignatures(
-      InjectorContract injectorContract, String processName) {
-    List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
-    if (injectorContract.getPayload() != null) {
-      switch (injectorContract.getPayload().getTypeEnum()) {
-        case PayloadType.COMMAND:
-          injectExpectationSignatures.add(
-              InjectExpectationSignature.builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                  .value(processName)
-                  .build());
-          break;
-        case PayloadType.EXECUTABLE:
-          Executable payloadExecutable =
-              (Executable) Hibernate.unproxy(injectorContract.getPayload());
-          injectExpectationSignatures.add(
-              InjectExpectationSignature.builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                  .value(payloadExecutable.getExecutableFile().getName())
-                  .build());
-          // TODO File hash
-          break;
-        case PayloadType.FILE_DROP:
-          FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(injectorContract.getPayload());
-          injectExpectationSignatures.add(
-              InjectExpectationSignature.builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                  .value(payloadFileDrop.getFileDropFile().getName())
-                  .build());
-          // TODO File hash
-          break;
-        case PayloadType.DNS_RESOLUTION:
-          DnsResolution payloadDnsResolution =
-              (DnsResolution) Hibernate.unproxy(injectorContract.getPayload());
-          injectExpectationSignatures.add(
-              InjectExpectationSignature.builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME)
-                  .value(payloadDnsResolution.getHostname().split("\\r?\\n")[0])
-                  .build());
-          break;
-        default:
-          throw new UnsupportedOperationException(
-              "Payload type " + injectorContract.getPayload().getType() + " is not supported");
-      }
-    } else {
-      injectExpectationSignatures.add(
-          InjectExpectationSignature.builder()
-              .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-              .value(processName)
-              .build());
-    }
-
-    return injectExpectationSignatures;
   }
 
   @Override
@@ -435,7 +382,7 @@ public class CalderaExecutor extends Injector {
                                   expectation.getName(),
                                   expectation.getDescription(),
                                   asset,
-                                  expectationGroup,
+                                  expectationGroup, // expectationGroup usefully in front-end
                                   expectation.getExpirationTime());
 
                           PreventionExpectation preventionExpectationAgent =
@@ -447,7 +394,7 @@ public class CalderaExecutor extends Injector {
                                       injectorContract, executionAgent.getProcessName()));
 
                           yield Stream.of(preventionExpectation, preventionExpectationAgent);
-                        } // expectationGroup usefully in front-end
+                        }
                         case DETECTION -> {
                           DetectionExpectation detectionExpectation =
                               detectionExpectationForAsset(
@@ -589,5 +536,60 @@ public class CalderaExecutor extends Injector {
                       })
               .toList());
     }
+  }
+
+  private List<InjectExpectationSignature> computeSignatures(
+      InjectorContract injectorContract, String processName) {
+    List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
+    if (injectorContract.getPayload() != null) {
+      switch (injectorContract.getPayload().getTypeEnum()) {
+        case PayloadType.COMMAND:
+          injectExpectationSignatures.add(
+              InjectExpectationSignature.builder()
+                  .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
+                  .value(processName)
+                  .build());
+          break;
+        case PayloadType.EXECUTABLE:
+          Executable payloadExecutable =
+              (Executable) Hibernate.unproxy(injectorContract.getPayload());
+          injectExpectationSignatures.add(
+              InjectExpectationSignature.builder()
+                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
+                  .value(payloadExecutable.getExecutableFile().getName())
+                  .build());
+          // TODO File hash
+          break;
+        case PayloadType.FILE_DROP:
+          FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(injectorContract.getPayload());
+          injectExpectationSignatures.add(
+              InjectExpectationSignature.builder()
+                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
+                  .value(payloadFileDrop.getFileDropFile().getName())
+                  .build());
+          // TODO File hash
+          break;
+        case PayloadType.DNS_RESOLUTION:
+          DnsResolution payloadDnsResolution =
+              (DnsResolution) Hibernate.unproxy(injectorContract.getPayload());
+          injectExpectationSignatures.add(
+              InjectExpectationSignature.builder()
+                  .type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME)
+                  .value(payloadDnsResolution.getHostname().split("\\r?\\n")[0])
+                  .build());
+          break;
+        default:
+          throw new UnsupportedOperationException(
+              "Payload type " + injectorContract.getPayload().getType() + " is not supported");
+      }
+    } else {
+      injectExpectationSignatures.add(
+          InjectExpectationSignature.builder()
+              .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
+              .value(processName)
+              .build());
+    }
+
+    return injectExpectationSignatures;
   }
 }
