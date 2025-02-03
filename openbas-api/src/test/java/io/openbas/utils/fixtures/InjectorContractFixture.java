@@ -33,6 +33,12 @@ public class InjectorContractFixture {
     return injectorContract;
   }
 
+  public static InjectorContract createDefaultInjectorContract() {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setId(UUID.randomUUID().toString());
+    return injectorContract;
+  }
+
   public static InjectorContract createPayloadInjectorContract(
       Injector injector, Payload payloadCommand) throws JsonProcessingException {
     return createPayloadInjectorContractInternal(injector, payloadCommand, List.of());

@@ -49,6 +49,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private ObjectiveComposer objectiveComposer;
   @Autowired private DocumentComposer documentComposer;
   @Autowired private TagComposer tagComposer;
+  @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private ChallengeService challengeService;
   @Resource protected ObjectMapper mapper;
 
@@ -102,10 +103,16 @@ public class ExerciseApiExportTest extends IntegrationTest {
             injectComposer
                 .forInject(InjectFixture.getInjectWithoutContract())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Inject tag")))
-                .withChallenge(
-                    challengeComposer
-                        .forChallenge(ChallengeFixture.createDefaultChallenge())
-                        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
+                .withInjectorContract(
+                    injectorContractComposer
+                        .forInjectorContract(
+                            InjectorContractFixture.createDefaultInjectorContract())
+                        .withChallenge(
+                            challengeComposer
+                                .forChallenge(ChallengeFixture.createDefaultChallenge())
+                                .withTag(
+                                    tagComposer.forTag(
+                                        TagFixture.getTagWithText("Challenge tag"))))))
         .withDocument(
             documentComposer
                 .forDocument(DocumentFixture.getDocumentTxt(FileFixture.getPlainTextFileContent()))
@@ -576,7 +583,6 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @WithMockAdminUser
   public void given_documents_are_provided_exported_archive_contains_the_documents()
       throws Exception {
-    ObjectMapper objectMapper = mapper.copy();
     Exercise ex = getExercise();
     byte[] response =
         mvc.perform(
