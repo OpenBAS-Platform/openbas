@@ -160,7 +160,7 @@ public class CalderaExecutor extends Injector {
                                         .getParent()
                                         .getAsset());
 
-                            computeExpectationsForAsset(
+                            computeExpectationsForAssetAndAgents(
                                 expectations,
                                 content,
                                 executionEndpoint.getAgents().getFirst(),
@@ -361,7 +361,7 @@ public class CalderaExecutor extends Injector {
   }
 
   /** In case of direct asset, we have an individual expectation for the asset */
-  private void computeExpectationsForAsset(
+  private void computeExpectationsForAssetAndAgents(
       @NotNull final List<Expectation> expectations,
       @NotNull final CalderaInjectContent content,
       @NotNull final io.openbas.database.model.Agent executionAgent,
