@@ -225,8 +225,8 @@ public class OpenBASImplantExecutor extends Injector {
         .noneMatch(
             trace ->
                 trace.getAgent().equals(agent.getId())
-                    && (trace.getStatus().equals(ExecutionTraceStatus.ERROR)
-                        || trace.getStatus().equals(ExecutionTraceStatus.ASSET_INACTIVE)));
+                    && (ExecutionTraceStatus.ERROR.equals(trace.getStatus())
+                        || ExecutionTraceStatus.ASSET_INACTIVE.equals(trace.getStatus())));
   }
 
   /**
