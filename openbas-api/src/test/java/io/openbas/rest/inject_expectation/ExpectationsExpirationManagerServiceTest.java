@@ -115,10 +115,10 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
       DetectionExpectation detectionExpectationAgent1 =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent1, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent1, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
 
       injectExpectationService.buildAndSaveInjectExpectations(
           executableInject,
@@ -217,10 +217,10 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
       DetectionExpectation detectionExpectationAgent1 =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent1, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent1, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
 
       injectExpectationService.buildAndSaveInjectExpectations(
           executableInject,
@@ -341,10 +341,10 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
       DetectionExpectation detectionExpectationAgent1 =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent1, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent1, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
 
       injectExpectationService.buildAndSaveInjectExpectations(
           executableInject,
@@ -468,10 +468,10 @@ public class ExpectationsExpirationManagerServiceTest extends IntegrationTest {
               savedEndpoint, EXPIRATION_TIME_1_s);
       DetectionExpectation detectionExpectationAgent =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
       DetectionExpectation detectionExpectationAgent1 =
           ExpectationFixture.createTechnicalDetectionExpectation(
-              savedAgent1, savedEndpoint, detectionExpectation, emptyList());
+              savedAgent1, savedEndpoint, EXPIRATION_TIME_1_s, emptyList());
 
       injectExpectationService.buildAndSaveInjectExpectations(
           executableInject,

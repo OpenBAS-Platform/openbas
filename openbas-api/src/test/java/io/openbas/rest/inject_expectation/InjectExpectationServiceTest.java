@@ -107,10 +107,10 @@ class InjectExpectationServiceTest extends IntegrationTest {
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAgent =
         ExpectationFixture.createTechnicalDetectionExpectation(
-            savedAgent, savedAsset, detectionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     PreventionExpectation preventionExpectationAgent =
         ExpectationFixture.createTechnicalPreventionExpectation(
-            savedAgent, savedAsset, preventionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -159,10 +159,10 @@ class InjectExpectationServiceTest extends IntegrationTest {
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAgent =
         ExpectationFixture.createTechnicalDetectionExpectation(
-            savedAgent, savedAsset, detectionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     PreventionExpectation preventionExpectationAgent =
         ExpectationFixture.createTechnicalPreventionExpectation(
-            savedAgent, savedAsset, preventionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -210,16 +210,16 @@ class InjectExpectationServiceTest extends IntegrationTest {
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAgent =
         ExpectationFixture.createTechnicalDetectionExpectation(
-            savedAgent, savedAsset, detectionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     PreventionExpectation preventionExpectationAgent =
         ExpectationFixture.createTechnicalPreventionExpectation(
-            savedAgent, savedAsset, preventionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     DetectionExpectation detectionExpectationAgent1 =
         ExpectationFixture.createTechnicalDetectionExpectation(
-            savedAgent1, savedAsset, detectionExpectation, emptyList());
+            savedAgent1, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     PreventionExpectation preventionExpectationAgent1 =
         ExpectationFixture.createTechnicalPreventionExpectation(
-            savedAgent1, savedAsset, preventionExpectation, emptyList());
+            savedAgent1, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
@@ -275,16 +275,16 @@ class InjectExpectationServiceTest extends IntegrationTest {
             savedAsset, EXPIRATION_TIME_SIX_HOURS);
     DetectionExpectation detectionExpectationAgent =
         ExpectationFixture.createTechnicalDetectionExpectation(
-            savedAgent, savedAsset, detectionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     PreventionExpectation preventionExpectationAgent =
         ExpectationFixture.createTechnicalPreventionExpectation(
-            savedAgent, savedAsset, preventionExpectation, emptyList());
+            savedAgent, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     DetectionExpectation detectionExpectationAgent1 =
         ExpectationFixture.createTechnicalDetectionExpectation(
-            savedAgent1, savedAsset, detectionExpectation, emptyList());
+            savedAgent1, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
     PreventionExpectation preventionExpectationAgent1 =
         ExpectationFixture.createTechnicalPreventionExpectation(
-            savedAgent1, savedAsset, preventionExpectation, emptyList());
+            savedAgent1, savedAsset, EXPIRATION_TIME_SIX_HOURS, emptyList());
 
     // -- EXECUTE --
     injectExpectationService.buildAndSaveInjectExpectations(
