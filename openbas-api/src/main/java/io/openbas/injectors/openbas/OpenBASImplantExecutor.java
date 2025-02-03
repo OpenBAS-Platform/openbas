@@ -20,6 +20,7 @@ import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -107,15 +108,16 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getExpirationTime());
 
                           // We propagate the asset expectation to agents
-                          Stream<PreventionExpectation> preventionExpectationStream =
-                              getPreventionExpectationStream(
+                          List<PreventionExpectation> preventionExpectationList =
+                              getPreventionExpectationList(
                                   asset, inject, payloadType, preventionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
-                          if (preventionExpectationStream.findAny().isPresent()) {
+                          if (!preventionExpectationList.isEmpty()) {
                             yield Stream.concat(
-                                Stream.of(preventionExpectation), preventionExpectationStream);
+                                Stream.of(preventionExpectation),
+                                preventionExpectationList.stream());
                           }
                           yield Stream.empty();
                         }
@@ -130,15 +132,15 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getExpirationTime());
 
                           // We propagate the asset expectation to agents
-                          Stream<DetectionExpectation> detectionExpectationStream =
-                              getDetectionExpectationStream(
+                          List<DetectionExpectation> detectionExpectationList =
+                              getDetectionExpectationList(
                                   asset, inject, payloadType, detectionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
-                          if (detectionExpectationStream.findAny().isPresent()) {
+                          if (!detectionExpectationList.isEmpty()) {
                             yield Stream.concat(
-                                Stream.of(detectionExpectation), detectionExpectationStream);
+                                Stream.of(detectionExpectation), detectionExpectationList.stream());
                           }
                           yield Stream.empty();
                         }
@@ -153,14 +155,14 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectationGroup);
 
                           // We propagate the asset expectation to agents
-                          Stream<ManualExpectation> manualExpectationStream =
-                              getManualExpectationStream(asset, inject, manualExpectation);
+                          List<ManualExpectation> manualExpectationList =
+                              getManualExpectationList(asset, inject, manualExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
-                          if (manualExpectationStream.findAny().isPresent()) {
+                          if (!manualExpectationList.isEmpty()) {
                             yield Stream.concat(
-                                Stream.of(manualExpectation), manualExpectationStream);
+                                Stream.of(manualExpectation), manualExpectationList.stream());
                           }
                           yield Stream.empty();
                         }
@@ -170,7 +172,7 @@ public class OpenBASImplantExecutor extends Injector {
     }
   }
 
-  private Stream<ManualExpectation> getManualExpectationStream(
+  private List<ManualExpectation> getManualExpectationList(
       Asset asset, Inject inject, ManualExpectation manualExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
@@ -181,10 +183,11 @@ public class OpenBASImplantExecutor extends Injector {
                     manualExpectation.getDescription(),
                     agent,
                     asset,
-                    manualExpectation.getExpirationTime()));
+                    manualExpectation.getExpirationTime()))
+        .collect(Collectors.toList());
   }
 
-  private Stream<DetectionExpectation> getDetectionExpectationStream(
+  private List<DetectionExpectation> getDetectionExpectationList(
       Asset asset, Inject inject, String payloadType, DetectionExpectation detectionExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
@@ -196,10 +199,11 @@ public class OpenBASImplantExecutor extends Injector {
                     agent,
                     asset,
                     detectionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), payloadType)));
+                    computeSignatures(inject.getId(), agent.getId(), payloadType)))
+        .collect(Collectors.toList());
   }
 
-  private Stream<PreventionExpectation> getPreventionExpectationStream(
+  private List<PreventionExpectation> getPreventionExpectationList(
       Asset asset, Inject inject, String payloadType, PreventionExpectation preventionExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
@@ -211,7 +215,8 @@ public class OpenBASImplantExecutor extends Injector {
                     agent,
                     asset,
                     preventionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), payloadType)));
+                    computeSignatures(inject.getId(), agent.getId(), payloadType)))
+        .collect(Collectors.toList());
   }
 
   private List<Agent> getActiveAgents(Asset asset, Inject inject) {
