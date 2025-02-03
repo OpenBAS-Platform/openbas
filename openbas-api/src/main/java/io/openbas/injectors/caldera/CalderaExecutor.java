@@ -165,7 +165,7 @@ public class CalderaExecutor extends Injector {
                                 content,
                                 executionEndpoint.getAgents().getFirst(),
                                 isInGroup,
-                                injectorContract);
+                                injectorContract.getPayload());
 
                             execution.addTrace(
                                 getNewInfoTrace(
@@ -366,7 +366,7 @@ public class CalderaExecutor extends Injector {
       @NotNull final CalderaInjectContent content,
       @NotNull final io.openbas.database.model.Agent executionAgent,
       final boolean expectationGroup,
-      final InjectorContract injectorContract) {
+      final Payload payload) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
           content.getExpectations().stream()
@@ -390,9 +390,7 @@ public class CalderaExecutor extends Injector {
                                 agentParent,
                                 agentParent.getAsset(),
                                 preventionExpectation,
-                                computeSignatures(
-                                    injectorContract.getPayload(),
-                                    executionAgent.getProcessName()));
+                                computeSignatures(payload, executionAgent.getProcessName()));
 
                         yield Stream.of(preventionExpectation, preventionExpectationAgent);
                       }
@@ -411,9 +409,7 @@ public class CalderaExecutor extends Injector {
                                 agentParent,
                                 agentParent.getAsset(),
                                 detectionExpectation,
-                                computeSignatures(
-                                    injectorContract.getPayload(),
-                                    executionAgent.getProcessName()));
+                                computeSignatures(payload, executionAgent.getProcessName()));
 
                         yield Stream.of(detectionExpectation, detectionExpectationAgent);
                       }
