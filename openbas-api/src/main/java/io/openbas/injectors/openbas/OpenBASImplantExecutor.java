@@ -20,7 +20,6 @@ import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -184,7 +183,7 @@ public class OpenBASImplantExecutor extends Injector {
                     agent,
                     asset,
                     manualExpectation.getExpirationTime()))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private List<DetectionExpectation> getDetectionExpectationList(
@@ -200,7 +199,7 @@ public class OpenBASImplantExecutor extends Injector {
                     asset,
                     detectionExpectation.getExpirationTime(),
                     computeSignatures(inject.getId(), agent.getId(), payloadType)))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private List<PreventionExpectation> getPreventionExpectationList(
@@ -216,7 +215,7 @@ public class OpenBASImplantExecutor extends Injector {
                     asset,
                     preventionExpectation.getExpirationTime(),
                     computeSignatures(inject.getId(), agent.getId(), payloadType)))
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private List<Agent> getActiveAgents(Asset asset, Inject inject) {
@@ -229,12 +228,20 @@ public class OpenBASImplantExecutor extends Injector {
   }
 
   private static boolean hasOnlyValidTraces(Inject inject, Agent agent) {
-    return inject.getStatus().get().getTraces().stream()
-        .noneMatch(
-            trace ->
-                trace.getAgent().equals(agent.getId())
-                    && (ExecutionTraceStatus.ERROR.equals(trace.getStatus())
-                        || ExecutionTraceStatus.ASSET_INACTIVE.equals(trace.getStatus())));
+    return inject
+        .getStatus()
+        .map(InjectStatus::getTraces)
+        .map(
+            traces ->
+                traces.stream()
+                    .noneMatch(
+                        trace ->
+                            trace.getAgent() != null
+                                && trace.getAgent().getId().equals(agent.getId())
+                                && (ExecutionTraceStatus.ERROR.equals(trace.getStatus())
+                                    || ExecutionTraceStatus.ASSET_INACTIVE.equals(
+                                        trace.getStatus()))))
+        .orElse(true); // If there are no traces, return true by default
   }
 
   /**
