@@ -1,6 +1,5 @@
 package io.openbas.injectors.manual;
 
-import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Execution;
 import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.database.model.ExecutionTraces;
@@ -11,7 +10,6 @@ import io.openbas.model.ExecutionProcess;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.service.InjectExpectationService;
-import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ManualExecutor extends Injector {
 
-  @Resource private OpenBASConfig openBASConfig;
   private final InjectExpectationService injectExpectationService;
 
   @Override
