@@ -58,6 +58,13 @@ public class InjectFixture {
     return inject;
   }
 
+  public static Inject getDefaultInjectWithDuration(long duration) {
+    Inject inject = createInjectWithDefaultTitle();
+    inject.setEnabled(true);
+    inject.setDependsDuration(duration);
+    return inject;
+  }
+
   public static Inject getInjectForEmailContract(InjectorContract injectorContract) {
     return createInject(injectorContract, INJECT_EMAIL_NAME);
   }
