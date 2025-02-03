@@ -42,9 +42,13 @@ public interface EndpointRepository
   @Query("select count(distinct e) from Endpoint e where e.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
-  @Query(
+  /* For some agents (e.g. Caldera), we have the behavior that secondary agents are created to run the implants, so with this query we only get the first level of the agent and not the secondary ones*/ @Query(
       value =
-          "select asset.* from assets asset left join agents agent on asset.asset_id = agent.agent_asset where agent.agent_parent is null AND agent.agent_inject is null AND asset.asset_id = :endpointId",
+          "select asset.* from assets asset "
+              + "left join agents agent on asset.asset_id = agent.agent_asset "
+              + "where agent.agent_parent is null "
+              + "AND agent.agent_inject is null "
+              + "AND asset.asset_id = :endpointId",
       nativeQuery = true)
-  Optional<Endpoint> findByEndpointIdWithAgents(@NotBlank String endpointId);
+  Optional<Endpoint> findByEndpointIdWithFirstLevelOfAgents(@NotBlank String endpointId);
 }
