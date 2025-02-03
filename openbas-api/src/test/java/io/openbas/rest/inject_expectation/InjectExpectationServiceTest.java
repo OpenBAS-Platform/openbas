@@ -40,7 +40,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
 
   private static Injector savedInjector;
   private static InjectorContract savedInjectorContract;
-  private static Endpoint savedAsset;
+  private static Asset savedAsset;
 
   @BeforeAll
   void beforeAll() {
@@ -53,7 +53,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
     injectorContract.setInjector(savedInjector);
 
     savedInjectorContract = injectorContractRepository.save(injectorContract);
-    savedAsset = assetRepository.save(EndpointFixture.createEndpoint());
+    savedAsset = assetRepository.save(AssetFixture.createDefaultAsset("asset name"));
   }
 
   @AfterAll

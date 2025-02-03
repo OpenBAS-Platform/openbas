@@ -1,9 +1,6 @@
 package io.openbas.utils.fixtures;
 
-import io.openbas.database.model.Agent;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.InjectExpectationSignature;
+import io.openbas.database.model.*;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
@@ -15,32 +12,32 @@ public class ExpectationFixture {
 
   public static PreventionExpectation createTechnicalPreventionExpectation(
       Agent agent,
-      Endpoint endpoint,
+      Asset asset,
       PreventionExpectation preventionExpectation,
       List<InjectExpectationSignature> signatures) {
     return PreventionExpectation.preventionExpectationForAgent(
-        agent, endpoint, preventionExpectation, signatures);
+        agent, asset, preventionExpectation, signatures);
   }
 
   public static DetectionExpectation createTechnicalDetectionExpectation(
       Agent agent,
-      Endpoint endpoint,
+      Asset asset,
       DetectionExpectation detectionExpectation,
       List<InjectExpectationSignature> signatures) {
     return DetectionExpectation.detectionExpectationForAgent(
-        agent, endpoint, detectionExpectation, signatures);
+        agent, asset, detectionExpectation, signatures);
   }
 
   public static PreventionExpectation createTechnicalPreventionExpectation(
-      Endpoint endpoint, Long expirationTime) {
+      Asset asset, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAsset(
-        SCORE, "Prevention", "Prevention Expectation", endpoint, false, expirationTime);
+        SCORE, "Prevention", "Prevention Expectation", asset, false, expirationTime);
   }
 
   public static DetectionExpectation createTechnicalDetectionExpectation(
-      Endpoint endpoint, Long expirationTime) {
+      Asset asset, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
-        SCORE, "Detection", "Detection Expectation", endpoint, false, expirationTime);
+        SCORE, "Detection", "Detection Expectation", asset, false, expirationTime);
   }
 
   public static PreventionExpectation createPreventionExpectationForAssetGroup(
