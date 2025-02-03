@@ -63,7 +63,7 @@ const AtomicTesting = () => {
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
   useEffect(() => {
-    setSelectedTarget(selectedTarget || currentParentTarget || injectResultOverviewOutput?.inject_targets[0]);
+    setSelectedTarget(selectedTarget || currentParentTarget || injectResultOverviewOutput?.inject_targets? injectResultOverviewOutput?.inject_targets[0] : undefined);
   }, [injectResultOverviewOutput]);
 
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
