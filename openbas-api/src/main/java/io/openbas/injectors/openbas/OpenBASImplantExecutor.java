@@ -106,11 +106,17 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectationGroup, // expectationGroup usefully in front-end
                                   expectation.getExpirationTime());
 
-                          yield Stream.concat(
-                              Stream.of(preventionExpectation),
-                              // We propagate the asset expectation to agents
+                          Stream<PreventionExpectation> preventionExpectationStream =
                               getPreventionExpectationStream(
-                                  asset, inject, payloadType, preventionExpectation));
+                                  asset, inject, payloadType, preventionExpectation);
+
+                          if (preventionExpectationStream.findAny().isPresent()) {
+                            yield Stream.concat(
+                                Stream.of(preventionExpectation),
+                                // We propagate the asset expectation to agents
+                                preventionExpectationStream);
+                          }
+                          yield Stream.empty();
                         }
                         case DETECTION -> {
                           DetectionExpectation detectionExpectation =
@@ -122,11 +128,17 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectationGroup,
                                   expectation.getExpirationTime());
 
-                          yield Stream.concat(
-                              Stream.of(detectionExpectation),
-                              // We propagate the asset expectation to agents
+                          Stream<DetectionExpectation> detectionExpectationStream =
                               getDetectionExpectationStream(
-                                  asset, inject.getId(), payloadType, detectionExpectation));
+                                  asset, inject, payloadType, detectionExpectation);
+
+                          if (detectionExpectationStream.findAny().isPresent()) {
+                            yield Stream.concat(
+                                Stream.of(detectionExpectation),
+                                // We propagate the asset expectation to agents
+                                detectionExpectationStream);
+                          }
+                          yield Stream.empty();
                         }
                         case MANUAL -> {
                           ManualExpectation manualExpectation =
@@ -138,10 +150,16 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getExpirationTime(),
                                   expectationGroup);
 
-                          yield Stream.concat(
-                              Stream.of(manualExpectation),
-                              // We propagate the asset expectation to agents
-                              getManualExpectationStream(asset, inject, manualExpectation));
+                          Stream<ManualExpectation> manualExpectationStream =
+                              getManualExpectationStream(asset, inject, manualExpectation);
+
+                          if (manualExpectationStream.findAny().isPresent()) {
+                            yield Stream.concat(
+                                Stream.of(manualExpectation),
+                                // We propagate the asset expectation to agents
+                                manualExpectationStream);
+                          }
+                          yield Stream.empty();
                         }
                         default -> Stream.of();
                       })
