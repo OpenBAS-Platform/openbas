@@ -97,6 +97,14 @@ public class InjectApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
+  @PostMapping(INJECT_URI + "/export")
+  public void injectsExport(
+      @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput) {
+    List<String> targetIds = injectExportRequestInput.getTargetsIds();
+    List<Inject> injects = injectRepository.findAllById(targetIds);
+  }
+
+  @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/reception/{injectId}")
   public Inject injectExecutionReception(
       @PathVariable String injectId, @Valid @RequestBody InjectReceptionInput input) {

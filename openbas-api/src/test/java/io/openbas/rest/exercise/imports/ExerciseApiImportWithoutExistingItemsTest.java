@@ -62,6 +62,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
   @Autowired private LessonsQuestionRepository lessonsQuestionRepository;
   @Autowired private LessonsCategoryComposer lessonsCategoryComposer;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private ExportService exportService;
   @Autowired private EntityManager entityManager;
   @Autowired private ChallengeService challengeService;
@@ -123,10 +124,16 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
             injectComposer
                 .forInject(InjectFixture.getDefaultInject())
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Inject tag")))
-                .withChallenge(
-                    challengeComposer
-                        .forChallenge(ChallengeFixture.createDefaultChallenge())
-                        .withTag(tagComposer.forTag(TagFixture.getTagWithText("Challenge tag")))))
+                .withInjectorContract(
+                    injectorContractComposer
+                        .forInjectorContract(
+                            InjectorContractFixture.createDefaultInjectorContract())
+                        .withChallenge(
+                            challengeComposer
+                                .forChallenge(ChallengeFixture.createDefaultChallenge())
+                                .withTag(
+                                    tagComposer.forTag(
+                                        TagFixture.getTagWithText("Challenge tag"))))))
         .withDocument(
             documentComposer
                 .forDocument(DocumentFixture.getDocumentTxt(FileFixture.getPlainTextFileContent()))
