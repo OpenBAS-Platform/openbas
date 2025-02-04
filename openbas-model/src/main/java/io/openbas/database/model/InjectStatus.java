@@ -17,7 +17,6 @@ import org.hibernate.annotations.Type;
 @Table(name = "injects_statuses")
 public class InjectStatus extends BaseInjectStatus {
 
-  // commands lines tracking
   @Type(JsonType.class)
   @Column(name = "status_payload_output", columnDefinition = "json")
   @JsonProperty("status_payload_output")

@@ -282,10 +282,10 @@ public class CalderaExecutor extends Injector {
                 statusPayload.setPayloadCommandBlocks(
                     Collections.singletonList(payloadCommandBlock));
               });
-      statusPayload.setExternalId(externalId);
       statusPayload.setName(ability.getName());
       statusPayload.setType(COMMAND_TYPE);
       statusPayload.setDescription(ability.getDescription());
+      statusPayload.setExternalId(externalId);
     }
 
     return statusPayload;
