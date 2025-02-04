@@ -13,10 +13,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,7 +68,7 @@ public class EmailService {
       recipients.add(new InternetAddress(userContext.getUser().getEmail()));
     }
     mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
-    this.sendEmailWithRetry(mimeMessage);
+    this.sendEmailWithRetry(execution, mimeMessage);
     String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
     List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
     execution.addTrace(traceSuccess("Mail sent to " + emails, userIds));
@@ -96,9 +98,9 @@ public class EmailService {
     if (mustBeEncrypted) {
       MimeMessage encMessage =
           getEncryptedMimeMessage(userContext, from, replyTos, subject, email, mimeMessage);
-      this.sendEmailWithRetry(encMessage);
+      this.sendEmailWithRetry(execution, encMessage);
     } else {
-      this.sendEmailWithRetry(mimeMessage);
+      this.sendEmailWithRetry(execution, mimeMessage);
     }
     List<String> userIds = List.of(userContext.getUser().getId());
     execution.addTrace(traceSuccess("Mail sent to " + email, userIds));
@@ -123,11 +125,11 @@ public class EmailService {
           execution.addTrace(traceSuccess("Mail successfully stored in IMAP"));
           return;
         } catch (Exception e) {
-          execution.addTrace(traceInfo("Fail to store mail in IMAP" + e.getMessage()));
+          execution.addTrace(traceInfo("Failed to store mail in IMAP" + e.getMessage()));
           Thread.sleep(2000);
         }
       }
-      execution.addTrace(traceError("Fail to store mail in IMAP after 3 attempts"));
+      execution.addTrace(traceError("Failed to store mail in IMAP after 3 attempts"));
     }
   }
 
@@ -210,17 +212,18 @@ public class EmailService {
     return encMessage;
   }
 
-  private void sendEmailWithRetry(MimeMessage mimeMessage) throws Exception {
+  private void sendEmailWithRetry(Execution execution, MimeMessage mimeMessage) throws InterruptedException {
     for (int i = 0; i < 3; i++) {
       try {
         emailSender.send(mimeMessage);
-        break;
+        execution.addTrace(traceSuccess("Mail successfully sent"));
+        return;
       } catch (Exception e) {
-        if (i == 2) {
-          throw e;
-        }
+        execution.addTrace(traceInfo("Failed to send mail" + e.getMessage()));
         Thread.sleep(2000);
       }
     }
+    execution.addTrace(traceError("Failed to send mail after 3 attempts"));
   }
+
 }
