@@ -19,6 +19,7 @@ public class DetectionExpectation implements Expectation {
   private Double score;
   private String name;
   private String description;
+  private Agent agent;
   private Asset asset;
   private AssetGroup assetGroup;
   private boolean expectationGroup;
@@ -32,14 +33,32 @@ public class DetectionExpectation implements Expectation {
     return DETECTION;
   }
 
+  public static DetectionExpectation detectionExpectationForAgent(
+      @Nullable final Double score,
+      @NotBlank final String name,
+      final String description,
+      @NotNull final Agent agent,
+      @NotNull final Asset asset,
+      final Long expirationTime,
+      List<InjectExpectationSignature> injectExpectationSignatures) {
+    DetectionExpectation detectionExpectation = new DetectionExpectation();
+    detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
+    detectionExpectation.setName(name);
+    detectionExpectation.setDescription(description);
+    detectionExpectation.setAgent(agent);
+    detectionExpectation.setAsset(asset);
+    detectionExpectation.setExpirationTime(expirationTime);
+    detectionExpectation.setInjectExpectationSignatures(injectExpectationSignatures);
+    return detectionExpectation;
+  }
+
   public static DetectionExpectation detectionExpectationForAsset(
       @Nullable final Double score,
       @NotBlank final String name,
       final String description,
       @NotNull final Asset asset,
       final boolean expectationGroup,
-      final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      final Long expirationTime) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
     detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     detectionExpectation.setName(name);
@@ -47,7 +66,6 @@ public class DetectionExpectation implements Expectation {
     detectionExpectation.setAsset(asset);
     detectionExpectation.setExpectationGroup(expectationGroup);
     detectionExpectation.setExpirationTime(expirationTime);
-    detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
     return detectionExpectation;
   }
 
@@ -57,8 +75,7 @@ public class DetectionExpectation implements Expectation {
       final String description,
       @NotNull final AssetGroup assetGroup,
       final boolean expectationGroup,
-      final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      final Long expirationTime) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
     detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     detectionExpectation.setName(name);
@@ -66,7 +83,6 @@ public class DetectionExpectation implements Expectation {
     detectionExpectation.setAssetGroup(assetGroup);
     detectionExpectation.setExpectationGroup(expectationGroup);
     detectionExpectation.setExpirationTime(expirationTime);
-    detectionExpectation.setInjectExpectationSignatures(expectationSignatures);
     return detectionExpectation;
   }
 }

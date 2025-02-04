@@ -2,6 +2,7 @@ package io.openbas.model.expectation;
 
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.PREVENTION;
 
+import io.openbas.database.model.Agent;
 import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -22,6 +23,7 @@ public class PreventionExpectation implements Expectation {
   private Double score;
   private String name;
   private String description;
+  private Agent agent;
   private Asset asset;
   private AssetGroup assetGroup;
   private boolean expectationGroup;
@@ -35,14 +37,32 @@ public class PreventionExpectation implements Expectation {
     return PREVENTION;
   }
 
+  public static PreventionExpectation preventionExpectationForAgent(
+      @Nullable final Double score,
+      @NotBlank final String name,
+      final String description,
+      @NotNull Agent agent,
+      @NotNull final Asset asset,
+      final Long expirationTime,
+      final List<InjectExpectationSignature> injectExpectationSignatures) {
+    PreventionExpectation preventionExpectation = new PreventionExpectation();
+    preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
+    preventionExpectation.setName(name);
+    preventionExpectation.setDescription(description);
+    preventionExpectation.setAgent(agent);
+    preventionExpectation.setAsset(asset);
+    preventionExpectation.setExpirationTime(expirationTime);
+    preventionExpectation.setInjectExpectationSignatures(injectExpectationSignatures);
+    return preventionExpectation;
+  }
+
   public static PreventionExpectation preventionExpectationForAsset(
       @Nullable final Double score,
       @NotBlank final String name,
       final String description,
       @NotNull final Asset asset,
       final boolean expectationGroup,
-      final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      final Long expirationTime) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
     preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     preventionExpectation.setName(name);
@@ -50,7 +70,6 @@ public class PreventionExpectation implements Expectation {
     preventionExpectation.setAsset(asset);
     preventionExpectation.setExpectationGroup(expectationGroup);
     preventionExpectation.setExpirationTime(expirationTime);
-    preventionExpectation.setInjectExpectationSignatures(expectationSignatures);
     return preventionExpectation;
   }
 
@@ -60,8 +79,7 @@ public class PreventionExpectation implements Expectation {
       final String description,
       @NotNull final AssetGroup assetGroup,
       final boolean expectationGroup,
-      @NotNull final Long expirationTime,
-      final List<InjectExpectationSignature> expectationSignatures) {
+      @NotNull final Long expirationTime) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
     preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
     preventionExpectation.setName(name);
@@ -69,7 +87,6 @@ public class PreventionExpectation implements Expectation {
     preventionExpectation.setAssetGroup(assetGroup);
     preventionExpectation.setExpectationGroup(expectationGroup);
     preventionExpectation.setExpirationTime(expirationTime);
-    preventionExpectation.setInjectExpectationSignatures(expectationSignatures);
     return preventionExpectation;
   }
 }

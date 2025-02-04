@@ -191,7 +191,6 @@ public class InjectsExecutionJob implements Job {
                 try {
                   newExecutableInject =
                       this.executionExecutorService.launchExecutorContext(executableInject, inject);
-
                 } catch (Exception e) {
                   injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
                   return;
