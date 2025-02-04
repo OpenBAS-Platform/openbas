@@ -5,16 +5,20 @@ import { FunctionComponent, useState } from 'react';
 import { bulkTestInjects } from '../../../actions/injects/inject-action';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
-import type { InjectTestStatus } from '../../../utils/api-types';
+import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
 
 interface Props {
+  searchPaginationInput: SearchPaginationInput;
+  exerciseOrScenarioId: string;
   injectIds: string[] | undefined;
   onTest?: (result: InjectTestStatus[]) => void;
 }
 
 const ImportUploaderMapper: FunctionComponent<Props> = ({
+  searchPaginationInput,
   injectIds,
+  exerciseOrScenarioId,
   onTest,
 }) => {
   // Standard hooks
@@ -32,10 +36,11 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
 
   const handleSubmitAllTest = () => {
     bulkTestInjects({
-      inject_ids_to_process: injectIds!,
+      search_pagination_input: searchPaginationInput,
+      simulation_or_scenario_id: exerciseOrScenarioId,
     }!).then((result: { data: InjectTestStatus[] }) => {
       onTest?.(result.data);
-      MESSAGING$.notifySuccess(t('{testNumber} test(s) sent', { testNumber: injectIds?.length }));
+      MESSAGING$.notifySuccess(t('Test(s) sent'));
       return result;
     });
     handleCloseAllTest();

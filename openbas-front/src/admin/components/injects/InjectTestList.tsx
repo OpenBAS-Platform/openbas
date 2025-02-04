@@ -117,7 +117,12 @@ const InjectTestList: FunctionComponent<Props> = ({
         searchPaginationInput={searchPaginationInput}
         setContent={setTests}
       >
-        <InjectTestReplayAll injectIds={tests?.map((test: InjectTestStatus) => test.inject_id!)} onTest={result => setTests(result)} />
+        <InjectTestReplayAll
+          searchPaginationInput={searchPaginationInput}
+          exerciseOrScenarioId={exerciseOrScenarioId}
+          injectIds={tests?.map((test: InjectTestStatus) => test.inject_id!)}
+          onTest={result => setTests(result)}
+        />
       </PaginationComponent>
       <List style={{ marginTop: 40 }}>
         <ListItem

@@ -267,7 +267,7 @@ const i18n = {
       'Add target teams in this inject':
         'Ajouter des équipes cibles dans ce stimuli',
       'Modify target teams in this inject':
-          'Modifier les équipes cibles dans ce stimuli',
+        'Modifier les équipes cibles dans ce stimuli',
       'Targeted teams': 'Equipes ciblées',
       'Test the inject': 'Tester le stimuli',
       'All teams': 'Toutes les équipes',
@@ -1404,7 +1404,7 @@ const i18n = {
       'Inject test has been sent, you can view test logs details on {itsDedicatedPage}.': 'Le test du stimuli a été envoyé, vous pouvez visualiser les logs de test sur {itsDedicatedPage}.',
       'its dedicated page': 'sa page dédiée',
       'Test for inject {injectTitle} has been sent': 'Le test pour le stimuli {injectTitle} a été envoyé',
-      '{testNumber} test(s) sent': '{testNumber} test(s) envoyé(s)',
+      'Test(s) sent': 'Test(s) envoyé(s)',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Valeur indiquant que l\'injecteur s\'applique à toutes les équipes. Il est possible d\'utiliser une expression régulière.',
       'Fit view': 'Ajuster la vue',
       'Increase time interval': 'Augmenter l\'intervalle de temps',
@@ -1518,6 +1518,7 @@ const i18n = {
       'You will not be able to change this setting later.':
         '你后续将无法更改此设定.',
       'Search these results': '搜索这些结果',
+      'Test(s) sent': '發送嘅測試',
       'Stop': '停止',
       'Name': '名称',
       'Subtitle': '小标题',
@@ -1714,7 +1715,7 @@ const i18n = {
       'Add target teams in this inject':
         '在这个注入里添加目标团队',
       'Modify target teams in this inject':
-          '在此注入中修改目标团队',
+        '在此注入中修改目标团队',
       'Targeted teams': '目标团队',
       'Test the inject': '测试注入',
       'All teams': '所有团队',
@@ -2991,7 +2992,7 @@ const i18n = {
         'Do you want to test these {count} injects?',
       'Inject test has been sent, you can view test logs details on {itsDedicatedPage}.': 'Inject test has been sent, you can view test logs details on {itsDedicatedPage}.',
       'its dedicated page': 'its dedicated page',
-      '{testNumber} test(s) sent': '{testNumber} test(s) sent',
+      'Test(s) sent': 'Test(s) sent',
       'Test for {injectTitle} has been sent': 'Test for {injectTitle} has been sent',
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
