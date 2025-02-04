@@ -23,6 +23,15 @@ public class V3_65__Update_Inject_Status_status_payload extends BaseJavaMigratio
             + "    '{payload_type}', 'null'::jsonb) "
             + "WHERE status_payload_output IS NOT NULL;";
 
+    String updatePayloadCommandBlocks =
+        "UPDATE injects_statuses "
+            + "SET status_payload_output = jsonb_set("
+            + "    status_payload_output::jsonb,"
+            + "    '{payload_command_blocks}',"
+            + "    '[]'::jsonb)"
+            + "WHERE status_payload_output->'payload_command_blocks' IS NULL;";
+
     statement.executeUpdate(addParamsToStatusPayload);
+    statement.executeUpdate(updatePayloadCommandBlocks);
   }
 }

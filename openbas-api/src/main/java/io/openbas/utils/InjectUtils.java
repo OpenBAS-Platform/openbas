@@ -5,6 +5,7 @@ import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
 import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
 import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
 import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
+import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -92,7 +93,7 @@ public class InjectUtils {
             null,
             null,
             null,
-            null,
+            emptyList(),
             null);
       } else if (injectorContract.getPayload() != null
           && FILE_DROP_TYPE.equals(injectorContract.getPayload().getType())) {
@@ -114,7 +115,7 @@ public class InjectUtils {
             null,
             null,
             null,
-            null,
+            emptyList(),
             null);
       } else if (injectorContract.getPayload() != null
           && DNS_RESOLUTION_TYPE.equals(injectorContract.getPayload().getType())) {
@@ -136,7 +137,7 @@ public class InjectUtils {
             null,
             null,
             null,
-            null,
+            emptyList(),
             null);
       } else if (injectorContract.getPayload() != null
           && NETWORK_TRAFFIC_TYPE.equals(injectorContract.getPayload().getType())) {
@@ -158,7 +159,7 @@ public class InjectUtils {
             null,
             null,
             null,
-            null,
+            emptyList(),
             null);
       } else {
         try {
