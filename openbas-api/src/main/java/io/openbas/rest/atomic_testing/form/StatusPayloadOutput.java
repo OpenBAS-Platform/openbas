@@ -34,23 +34,23 @@ public class StatusPayloadOutput {
   private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
 
   @JsonProperty("payload_attack_patterns")
-  private List<AttackPatternSimple> attackPatterns = new ArrayList<>();
+  private List<AttackPatternSimple> attackPatterns;
 
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
   @JsonProperty("payload_command_blocks")
   @Singular
-  private List<PayloadCommandBlock> payloadCommandBlocks = new ArrayList<>();
+  private List<PayloadCommandBlock> payloadCommandBlocks;
 
   @JsonProperty("payload_arguments")
-  private List<PayloadArgument> arguments = new ArrayList<>();
+  private List<PayloadArgument> arguments;
 
   @JsonProperty("payload_obfuscator")
   private String obfuscator;
 
   @JsonProperty("payload_prerequisites")
-  private List<PayloadPrerequisite> prerequisites = new ArrayList<>();
+  private List<PayloadPrerequisite> prerequisites;
 
   @JsonProperty("payload_external_id")
   private String externalId;
