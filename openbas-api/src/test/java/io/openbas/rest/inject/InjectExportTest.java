@@ -147,8 +147,8 @@ public class InjectExportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("When all target injects found, returned zip file contains correct json")
-      public void whenAllTargetInjectsFound_returnedZipFileContainsCorrectJson() throws Exception {
+      @DisplayName("Returned zip file contains correct json")
+      public void returnedZipFileContainsCorrectJson() throws Exception {
         byte[] response = doImport();
 
         String actualJson =
@@ -162,8 +162,8 @@ public class InjectExportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("When all target injects found, returned zip file contains document file")
-      public void whenAllTargetInjectsFound_returnedZipFileContainsDocumentFile() throws Exception {
+      @DisplayName("Returned zip file contains document file")
+      public void returnedZipFileContainsDocumentFile() throws Exception {
         byte[] response = doImport();
 
         List<Document> docs = documentComposer.generatedItems;
