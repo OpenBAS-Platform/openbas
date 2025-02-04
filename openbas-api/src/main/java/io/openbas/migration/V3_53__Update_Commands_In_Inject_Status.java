@@ -1,5 +1,7 @@
 package io.openbas.migration;
 
+import static io.openbas.database.model.Command.COMMAND_TYPE;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.PayloadCommandBlock;
@@ -56,6 +58,9 @@ public class V3_53__Update_Commands_In_Inject_Status extends BaseJavaMigration {
         String externalId = jsonNode.get("external_id").asText();
         StatusPayload statusPayload =
             new StatusPayload(
+                null,
+                null,
+                COMMAND_TYPE,
                 null,
                 null,
                 null,

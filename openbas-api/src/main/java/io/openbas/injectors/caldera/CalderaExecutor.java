@@ -1,5 +1,6 @@
 package io.openbas.injectors.caldera;
 
+import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
 import static io.openbas.database.model.InjectExpectationSignature.*;
@@ -282,6 +283,9 @@ public class CalderaExecutor extends Injector {
                     Collections.singletonList(payloadCommandBlock));
               });
       statusPayload.setExternalId(externalId);
+      statusPayload.setName(ability.getName());
+      statusPayload.setType(COMMAND_TYPE);
+      statusPayload.setDescription(ability.getDescription());
     }
 
     return statusPayload;

@@ -123,7 +123,7 @@ public class PayloadMapper {
                       .externalId(statusPayload.getExternalId())
                       .cleanupExecutor(statusPayload.getCleanupExecutor())
                       .payloadCommandBlocks(statusPayload.getPayloadCommandBlocks())
-                      .type(statusPayload.getPayloadCommandBlocks().isEmpty() ? null : COMMAND_TYPE)
+                      .type(statusPayload.getType())
                       .hostname(statusPayload.getHostname())
                       .ipSrc(statusPayload.getIpSrc())
                       .ipDst(statusPayload.getIpDst())
@@ -132,6 +132,11 @@ public class PayloadMapper {
                       .protocol(statusPayload.getProtocol())
                       .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
                       .executableArch(injectorContract.getArch())
+                      .name(statusPayload.getName())
+                      .type(statusPayload.getType())
+                      .collectorType(statusPayload.getType())
+                      .description(statusPayload.getDescription())
+                      .platforms(injectorContract.getPlatforms())
                       .build();
 
             } catch (NoSuchBeanDefinitionException e) {
@@ -163,19 +168,12 @@ public class PayloadMapper {
                 .portDst(statusPayload.getPortDst())
                 .protocol(statusPayload.getProtocol())
                 .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
-                .executableArch(injectorContract.getArch());
-
-            if (payload != null) {
-              statusPayloadOutputBuilder
-                  .name(payload.getName())
-                  .type(payload.getType())
-                  .collectorType(payload.getCollectorType())
-                  .description(payload.getDescription())
-                  .platforms(payload.getPlatforms());
-            } else {
-              statusPayloadOutputBuilder.type(
-                  statusPayload.getPayloadCommandBlocks().isEmpty() ? null : COMMAND_TYPE);
-            }
+                .executableArch(injectorContract.getArch())
+                .name(statusPayload.getName())
+                .type(statusPayload.getType())
+                .collectorType(statusPayload.getType())
+                .description(statusPayload.getDescription())
+                .platforms(injectorContract.getPlatforms());
           }
           result = statusPayloadOutputBuilder.build();
         }

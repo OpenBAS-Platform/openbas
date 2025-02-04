@@ -55,6 +55,9 @@ public class InjectUtils {
           payloadCommandBlock.setCleanupCommand(List.of(payloadCommand.getCleanupCommand()));
         }
         return new StatusPayload(
+            payload.getName(),
+            payload.getDescription(),
+            COMMAND_TYPE,
             null,
             null,
             null,
@@ -75,6 +78,9 @@ public class InjectUtils {
         Payload payload = injectorContract.getPayload();
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
         return new StatusPayload(
+            payload.getName(),
+            payload.getDescription(),
+            EXECUTABLE_TYPE,
             null,
             null,
             null,
@@ -94,6 +100,9 @@ public class InjectUtils {
         Payload payload = injectorContract.getPayload();
         FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
         return new StatusPayload(
+            payload.getName(),
+            payload.getDescription(),
+            FILE_DROP_TYPE,
             null,
             null,
             null,
@@ -113,6 +122,9 @@ public class InjectUtils {
         Payload payload = injectorContract.getPayload();
         DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
         return new StatusPayload(
+            payload.getName(),
+            payload.getDescription(),
+            DNS_RESOLUTION_TYPE,
             null,
             null,
             null,
@@ -132,6 +144,9 @@ public class InjectUtils {
         Payload payload = injectorContract.getPayload();
         NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
         return new StatusPayload(
+            payload.getName(),
+            payload.getDescription(),
+            NETWORK_TRAFFIC_TYPE,
             payloadNetworkTraffic.getProtocol(),
             payloadNetworkTraffic.getPortDst(),
             payloadNetworkTraffic.getPortSrc(),

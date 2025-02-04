@@ -12,6 +12,15 @@ import lombok.Singular;
 @Setter
 public class StatusPayload {
 
+  @JsonProperty("payload_name")
+  private String name;
+
+  @JsonProperty("payload_description")
+  private String description;
+
+  @JsonProperty("payload_type")
+  private String type;
+
   @JsonProperty("payload_cleanup_executor")
   private String cleanupExecutor;
 
@@ -60,6 +69,9 @@ public class StatusPayload {
   public StatusPayload() {}
 
   public StatusPayload(
+      String name,
+      String description,
+      String type,
       String protocol,
       Integer portDst,
       Integer portSrc,
@@ -73,6 +85,9 @@ public class StatusPayload {
       List<PayloadArgument> arguments,
       List<PayloadCommandBlock> payloadCommandBlocks,
       String cleanupExecutor) {
+    this.name = name;
+    this.description = description;
+    this.type = type;
     this.protocol = protocol;
     this.portDst = portDst;
     this.portSrc = portSrc;

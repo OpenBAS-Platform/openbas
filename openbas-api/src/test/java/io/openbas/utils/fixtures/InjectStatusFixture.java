@@ -1,5 +1,7 @@
 package io.openbas.utils.fixtures;
 
+import static io.openbas.database.model.Command.COMMAND_TYPE;
+
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.model.PayloadCommandBlock;
@@ -15,6 +17,9 @@ public class InjectStatusFixture {
     injectStatus.setName(ExecutionStatus.SUCCESS);
     injectStatus.setPayloadOutput(
         new StatusPayload(
+            null,
+            null,
+            COMMAND_TYPE,
             null,
             null,
             null,
