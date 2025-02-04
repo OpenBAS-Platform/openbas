@@ -1,4 +1,4 @@
-package io.openbas.config;
+package io.openbas.rabbitmq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

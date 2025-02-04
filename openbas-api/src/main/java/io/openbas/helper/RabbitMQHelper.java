@@ -1,6 +1,6 @@
 package io.openbas.helper;
 
-import io.openbas.config.RabbitmqConfig;
+import io.openbas.rabbitmq.RabbitmqConfig;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;

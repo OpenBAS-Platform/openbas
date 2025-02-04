@@ -1,4 +1,4 @@
-package io.openbas.rest.injector.response;
+package io.openbas.rabbitmq.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,15 +6,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class InjectorRegistration {
+public class QueueRegistration {
 
   @JsonProperty("connection")
-  private InjectorConnection connection;
+  private QueueConnection connection;
 
   @JsonProperty("listen")
   private String listen;
 
-  public InjectorRegistration(InjectorConnection connection, String listen) {
+  public QueueRegistration(QueueConnection connection, String listen) {
     this.connection = connection;
     this.listen = listen;
   }

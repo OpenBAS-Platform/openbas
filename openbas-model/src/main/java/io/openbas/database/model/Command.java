@@ -37,6 +37,10 @@ public class Command extends Payload {
 
   public Command() {}
 
+  public Command(Integer version) {
+    this.version = version;
+  }
+
   public Command(String id, String type, String name) {
     super(id, type, name);
   }

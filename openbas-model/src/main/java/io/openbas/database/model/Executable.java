@@ -30,6 +30,10 @@ public class Executable extends Payload {
 
   public Executable() {}
 
+  public Executable(Integer version) {
+    this.version = version;
+  }
+
   public Executable(String id, String type, String name) {
     super(id, type, name);
   }

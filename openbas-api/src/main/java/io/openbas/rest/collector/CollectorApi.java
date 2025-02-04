@@ -1,10 +1,11 @@
 package io.openbas.rest.collector;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
+import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Collector;
+import io.openbas.database.model.SecurityPlatform;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
@@ -25,8 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class CollectorApi extends RestBehavior {
-
-  @Resource private OpenBASConfig openBASConfig;
 
   private CollectorRepository collectorRepository;
 
@@ -89,7 +88,7 @@ public class CollectorApi extends RestBehavior {
         collector.getName(),
         collector.getPeriod(),
         input.getLastExecution(),
-        collector.getSecurityPlatform() != null ? collector.getSecurityPlatform().getId() : null);
+        ofNullable(collector.getSecurityPlatform()).map(SecurityPlatform::getId).orElse(null));
   }
 
   @Secured(ROLE_ADMIN)
@@ -130,15 +129,13 @@ public class CollectorApi extends RestBehavior {
         // save the injector
         Collector newCollector = new Collector();
         newCollector.setId(input.getId());
-        newCollector.setExternal(true);
-        newCollector.setName(input.getName());
-        newCollector.setType(input.getType());
-        newCollector.setPeriod(input.getPeriod());
-        if (input.getSecurityPlatform() != null) {
-          newCollector.setSecurityPlatform(
-              securityPlatformRepository.findById(input.getSecurityPlatform()).orElseThrow());
-        }
-        return collectorRepository.save(newCollector);
+        return updateCollector(
+            newCollector,
+            input.getType(),
+            input.getName(),
+            input.getPeriod(),
+            null,
+            input.getSecurityPlatform());
       }
     } catch (Exception e) {
       throw new RuntimeException(e);

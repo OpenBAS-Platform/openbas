@@ -4,13 +4,13 @@ import static io.openbas.database.model.ExecutionStatus.EXECUTING;
 import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Injector;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
+import io.openbas.rabbitmq.QueueService;
 import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.annotation.Resource;
 import java.io.IOException;

@@ -1,15 +1,18 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
 import { useFormatter } from '../../../components/i18n';
 import ItemCopy from '../../../components/ItemCopy';
 import ItemTags from '../../../components/ItemTags';
+import Loader from '../../../components/Loader';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { AttackPattern, Command, DnsResolution, Executable, FileDrop, Payload as PayloadType, PayloadArgument, PayloadPrerequisite } from '../../../utils/api-types';
+import { AttackPattern, Command, DnsResolution, Executable, FileDrop, Payload, Payload as PayloadType, PayloadArgument, PayloadPrerequisite } from '../../../utils/api-types';
 import { emptyFilled } from '../../../utils/String';
+import PayloadComponentVersion from './PayloadComponentVersion';
 
 const useStyles = makeStyles()(() => ({
   chip: {
@@ -32,6 +35,8 @@ const PayloadComponent: FunctionComponent<Props> = ({
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme();
+  const [payload, setPayload] = useState<Payload | null>(selectedPayload);
 
   const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
     attackPatternsMap: helper.getAttackPatternsMap(),
@@ -54,6 +59,10 @@ const PayloadComponent: FunctionComponent<Props> = ({
     }
   };
 
+  if (!payload) {
+    return <Loader />;
+  }
+
   return (
     <Grid container spacing={3}>
       <Grid item xs={12} style={{ paddingTop: 10 }}>
@@ -62,15 +71,20 @@ const PayloadComponent: FunctionComponent<Props> = ({
           gutterBottom
           style={{ marginTop: 20 }}
         >
-          {selectedPayload?.payload_name}
+          {payload?.payload_name}
         </Typography>
-
+        {payload.payload_version
+        && (
+          <div style={{ marginTop: theme.spacing(2), width: '100px' }}>
+            <PayloadComponentVersion payload={selectedPayload} onChange={setPayload} />
+          </div>
+        )}
         <Typography
           variant="body2"
           gutterBottom
           style={{ marginTop: 20 }}
         >
-          {emptyFilled(selectedPayload?.payload_description)}
+          {emptyFilled(payload?.payload_description)}
         </Typography>
       </Grid>
 
@@ -82,12 +96,12 @@ const PayloadComponent: FunctionComponent<Props> = ({
         >
           {t('Platforms')}
         </Typography>
-        {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
+        {(payload?.payload_platforms ?? []).length === 0 ? (
           <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
-        ) : selectedPayload?.payload_platforms?.map(
+        ) : payload?.payload_platforms?.map(
           platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
         )}
-        {(selectedPayload?.payload_execution_arch) && (
+        {(payload?.payload_execution_arch) && (
           <>
             <Typography
               variant="h3"
@@ -96,7 +110,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
             >
               {t('Architecture')}
             </Typography>
-            {t(selectedPayload?.payload_execution_arch)}
+            {t(payload?.payload_execution_arch)}
           </>
         )}
         <Typography
@@ -108,7 +122,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
         </Typography>
         <ItemTags
           variant="reduced-view"
-          tags={selectedPayload?.payload_tags}
+          tags={payload?.payload_tags}
         />
       </Grid>
       <Grid item xs={6} style={{ paddingTop: 10 }}>
@@ -119,7 +133,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
         >
           {t('Attack patterns')}
         </Typography>
-        {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap[attackPatternId]).map((attackPattern: AttackPattern) => (
+        {payload?.payload_attack_patterns && payload?.payload_attack_patterns.length === 0 ? '-' : payload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap[attackPatternId]).map((attackPattern: AttackPattern) => (
           <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
             <Chip
               variant="outlined"
@@ -136,7 +150,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
         >
           {t('External ID')}
         </Typography>
-        {emptyFilled(selectedPayload?.payload_external_id)}
+        {emptyFilled(payload?.payload_external_id)}
       </Grid>
       <Grid item xs={12} style={{ paddingTop: 10 }}>
         <Typography
@@ -146,8 +160,8 @@ const PayloadComponent: FunctionComponent<Props> = ({
         >
           {t('Command executor')}
         </Typography>
-        {selectedPayload?.payload_type === 'Command' && selectedPayload.command_executor && (
-          <>{selectedPayload.command_executor}</>
+        {payload?.payload_type === 'Command' && payload.command_executor && (
+          <>{payload.command_executor}</>
         )}
         <Typography
           variant="h3"
@@ -157,7 +171,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
           {t('Attack command')}
         </Typography>
         <pre>
-          <ItemCopy content={getAttackCommand(selectedPayload)} />
+          <ItemCopy content={getAttackCommand(payload)} />
         </pre>
         <Typography
           variant="h3"
@@ -167,7 +181,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
           {t('Arguments')}
         </Typography>
         {
-          !selectedPayload?.payload_arguments?.length ? '-'
+          !payload?.payload_arguments?.length ? '-'
             : (
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 650 }}>
@@ -179,7 +193,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {selectedPayload?.payload_arguments?.map((argument: PayloadArgument) => {
+                      {payload?.payload_arguments?.map((argument: PayloadArgument) => {
                         return (
                           <>
                             <TableRow
@@ -214,7 +228,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
           {t('Prerequisites')}
         </Typography>
         {
-          selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
+          payload?.payload_prerequisites && payload?.payload_prerequisites.length === 0 ? '-'
             : (
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 650, justifyContent: 'center' }}>
@@ -226,7 +240,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
+                      {payload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
                         return (
                           <>
                             <TableRow
@@ -265,7 +279,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
         >
           {t('Cleanup executor')}
         </Typography>
-        {emptyFilled(selectedPayload?.payload_cleanup_executor)}
+        {emptyFilled(payload?.payload_cleanup_executor)}
         <Typography
           variant="h3"
           gutterBottom
@@ -273,8 +287,8 @@ const PayloadComponent: FunctionComponent<Props> = ({
         >
           {t('Cleanup command')}
         </Typography>
-        {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
-          ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
+        {payload?.payload_cleanup_command && payload?.payload_cleanup_command.length > 0
+          ? <pre><ItemCopy content={payload?.payload_cleanup_command} /></pre> : '-'}
 
       </Grid>
     </Grid>

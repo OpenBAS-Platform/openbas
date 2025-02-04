@@ -55,6 +55,10 @@ public class NetworkTraffic extends Payload {
 
   public NetworkTraffic() {}
 
+  public NetworkTraffic(Integer version) {
+    this.version = version;
+  }
+
   public NetworkTraffic(String id, String type, String name) {
     super(id, type, name);
   }

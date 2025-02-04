@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 import io.openbas.config.OpenBASConfig;
-import io.openbas.config.RabbitmqConfig;
+import io.openbas.rabbitmq.RabbitmqConfig;
 import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.utils.mockUser.WithMockAdminUser;

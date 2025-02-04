@@ -1,7 +1,5 @@
 package io.openbas.rest.injector;
 
-import static io.openbas.asset.QueueService.EXCHANGE_KEY;
-import static io.openbas.asset.QueueService.ROUTING_KEY;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.InjectorSpecification.byName;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -11,22 +9,19 @@ import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
+import io.openbas.rabbitmq.QueueService;
+import io.openbas.rabbitmq.RabbitmqConfig;
+import io.openbas.rabbitmq.response.QueueRegistration;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
-import io.openbas.rest.injector.response.InjectorConnection;
-import io.openbas.rest.injector.response.InjectorRegistration;
 import io.openbas.rest.injector_contract.form.InjectorContractInput;
 import io.openbas.service.FileService;
 import io.openbas.utils.FilterUtilsJpa;
@@ -76,6 +71,8 @@ public class InjectorApi extends RestBehavior {
 
   private FileService fileService;
 
+  private QueueService queueService;
+
   @Autowired
   public void setFileService(FileService fileService) {
     this.fileService = fileService;
@@ -94,6 +91,11 @@ public class InjectorApi extends RestBehavior {
   @Autowired
   public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
     this.injectorContractRepository = injectorContractRepository;
+  }
+
+  @Autowired
+  public void setQueueService(QueueService queueService) {
+    this.queueService = queueService;
   }
 
   @GetMapping("/api/injectors")
@@ -227,33 +229,22 @@ public class InjectorApi extends RestBehavior {
       produces = {MediaType.APPLICATION_JSON_VALUE},
       consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional(rollbackOn = Exception.class)
-  public InjectorRegistration registerInjector(
+  public QueueRegistration registerInjector(
       @Valid @RequestPart("input") InjectorCreateInput input,
       @RequestPart("icon") Optional<MultipartFile> file) {
-    ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost(rabbitmqConfig.getHostname());
-    factory.setPort(rabbitmqConfig.getPort());
-    factory.setUsername(rabbitmqConfig.getUser());
-    factory.setPassword(rabbitmqConfig.getPass());
-    factory.setVirtualHost(rabbitmqConfig.getVhost());
-    // Declare queueing
-    Connection connection = null;
+    String queuePrefix = "_injector_" + input.getType();
+    String routingPrefix = input.getType();
+    return this.queueService.createQueue(
+        queuePrefix, routingPrefix, () -> registerInjectorCallback(input, file));
+  }
+
+  private void registerInjectorCallback(InjectorCreateInput input, Optional<MultipartFile> file) {
     try {
       // Upload icon
       if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
         fileService.uploadFile(
             FileService.INJECTORS_IMAGES_BASE_PATH + input.getType() + ".png", file.get());
       }
-      connection = factory.newConnection();
-      Channel channel = connection.createChannel();
-      String queueName = rabbitmqConfig.getPrefix() + "_injector_" + input.getType();
-      Map<String, Object> queueOptions = new HashMap<>();
-      queueOptions.put("x-queue-type", rabbitmqConfig.getQueueType());
-      channel.queueDeclare(queueName, true, false, false, queueOptions);
-      String routingKey = rabbitmqConfig.getPrefix() + ROUTING_KEY + input.getType();
-      String exchangeKey = rabbitmqConfig.getPrefix() + EXCHANGE_KEY;
-      channel.exchangeDeclare(exchangeKey, "direct", true);
-      channel.queueBind(queueName, exchangeKey, routingKey);
       // We need to support upsert for registration
       Injector injector = injectorRepository.findById(input.getId()).orElse(null);
       if (injector == null) {
@@ -296,26 +287,8 @@ public class InjectorApi extends RestBehavior {
                 .toList();
         injectorContractRepository.saveAll(injectorContracts);
       }
-      InjectorConnection conn =
-          new InjectorConnection(
-              rabbitmqConfig.getHostname(),
-              rabbitmqConfig.getVhost(),
-              rabbitmqConfig.isSsl(),
-              rabbitmqConfig.getPort(),
-              rabbitmqConfig.getUser(),
-              rabbitmqConfig.getPass());
-      return new InjectorRegistration(conn, queueName);
     } catch (Exception e) {
       throw new RuntimeException(e);
-    } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (IOException e) {
-          log.severe(
-              "Unable to close RabbitMQ connection. You should worry as this could impact performance");
-        }
-      }
     }
   }
 

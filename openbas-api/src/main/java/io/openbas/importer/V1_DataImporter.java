@@ -22,7 +22,7 @@ import io.openbas.injectors.channel.model.ChannelContent;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.form.InjectDependencyInput;
 import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.service.PayloadCreationService;
+import io.openbas.rest.payload.service.PayloadCrudService;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
 import io.openbas.service.ScenarioService;
@@ -67,7 +67,7 @@ public class V1_DataImporter implements Importer {
   private final LessonsQuestionRepository lessonsQuestionRepository;
   private final VariableRepository variableRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
-  private final PayloadCreationService payloadCreationService;
+  private final PayloadCrudService payloadCrudService;
 
   // endregion
 
@@ -983,7 +983,7 @@ public class V1_DataImporter implements Importer {
 
   private String importPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
-    Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
+    Payload payload = this.payloadCrudService.createPayload(payloadCreateInput);
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
     if (injectorContractFromPayload.isPresent()) {

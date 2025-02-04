@@ -7,7 +7,6 @@ import static java.util.Optional.ofNullable;
 
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
-import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
@@ -16,6 +15,7 @@ import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
+import io.openbas.rabbitmq.RabbitmqConfig;
 import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.*;
 import io.openbas.rest.settings.response.OAuthProvider;

@@ -31,6 +31,10 @@ public class DnsResolution extends Payload {
 
   public DnsResolution() {}
 
+  public DnsResolution(Integer version) {
+    this.version = version;
+  }
+
   public DnsResolution(String id, String type, String name) {
     super(id, type, name);
   }

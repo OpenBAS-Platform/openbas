@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.Singular;
 
 @Getter
 @Setter
@@ -25,7 +24,6 @@ public class StatusPayload {
   private String cleanupExecutor;
 
   @JsonProperty("payload_command_blocks")
-  @Singular
   private List<PayloadCommandBlock> payloadCommandBlocks = new ArrayList<>();
 
   @JsonProperty("payload_arguments")

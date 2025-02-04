@@ -81,6 +81,11 @@ public class Payload implements Base {
   @NotBlank
   private String id;
 
+  @Column(name = "payload_version")
+  @JsonProperty("payload_version")
+  @Setter(NONE)
+  protected Integer version;
+
   @Column(name = "payload_type", insertable = false, updatable = false)
   @JsonProperty("payload_type")
   @Setter(NONE)

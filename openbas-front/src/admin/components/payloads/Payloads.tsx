@@ -6,7 +6,7 @@ import { fetchCollectors } from '../../../actions/Collector';
 import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
 import { fetchDocuments } from '../../../actions/Document';
 import type { DocumentHelper } from '../../../actions/helper';
-import { searchPayloads } from '../../../actions/Payload';
+import { searchPayloads } from '../../../actions/payloads/Payload-action';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';
@@ -46,7 +46,6 @@ const useStyles = makeStyles()(() => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     paddingRight: 10,
-    boxSizing: 'content-box',
   },
   chip: {
     fontSize: 12,
@@ -88,7 +87,10 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '10%',
   },
   payload_tags: {
-    width: '20%',
+    width: '10%',
+  },
+  payload_version: {
+    width: '10%',
   },
   payload_source: {
     width: '10%',
@@ -187,6 +189,12 @@ const Payloads = () => {
           tags={payload.payload_tags}
         />
       ),
+    },
+    {
+      field: 'payload_version',
+      label: 'Version',
+      isSortable: false,
+      value: (payload: Payload) => payload.payload_version,
     },
     {
       field: 'payload_source',

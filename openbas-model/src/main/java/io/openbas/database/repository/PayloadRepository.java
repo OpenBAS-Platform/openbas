@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Payload;
 import jakarta.validation.constraints.NotNull;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -21,6 +22,10 @@ public interface PayloadRepository
   List<Payload> findByType(@Param("types") final List<String> types);
 
   Optional<Payload> findByExternalId(@NotNull String externalId);
+
+  List<Payload> findByExternalIdIn(Collection<String> externalIds);
+
+  Optional<Payload> findByExternalIdAndVersion(@NotNull String externalId, @NotNull Integer version);
 
   @Query(
       value = "SELECT payload_external_id FROM payloads WHERE payload_collector = :collectorId",
