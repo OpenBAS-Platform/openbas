@@ -43,29 +43,31 @@ public class PayloadMapper {
           statusPayloadOutputBuilder.obfuscator(obfuscator);
         }
 
+        Optional<InjectStatus> injectStatus = inject.get().getStatus();
         Payload payload = injectorContract.getPayload();
         StatusPayload statusPayload = null;
 
-        if(payload == null) {
-          // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
-          Injector executor = context.getBean(injectorContract.getInjector().getType(), Injector.class);
-          statusPayload = executor.getPayloadOutput(injectorContract.getId());
-        }
-
-        Optional<InjectStatus> injectStatus = inject.get().getStatus();
         if (injectStatus.isEmpty()) {
+
+          if(payload == null) {
+            // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
+            Injector executor = context.getBean(injectorContract.getInjector().getType(), Injector.class);
+            statusPayload = executor.getPayloadOutput(injectorContract.getId());
+          }
+
           statusPayloadOutputBuilder
               .arguments(statusPayload.getArguments())
               .prerequisites(statusPayload.getPrerequisites())
               .externalId(statusPayload.getExternalId())
               .cleanupExecutor(statusPayload.getCleanupExecutor())
-              .name(payload.getName()) // todo
+              .name(payload.getName())
               .type(payload.getType())
               .collectorType(payload.getCollectorType())
               .description(payload.getDescription())
               .platforms(payload.getPlatforms())
               .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
               .executableArch(injectorContract.getArch());
+
           if (COMMAND_TYPE.equals(payload.getType())) {
             Command payloadCommand = (Command) Hibernate.unproxy(payload);
             List<String> cleanupCommands = new ArrayList<>();
