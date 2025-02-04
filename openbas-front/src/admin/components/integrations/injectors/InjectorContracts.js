@@ -1,9 +1,9 @@
 import { SmartButtonOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
@@ -14,7 +14,7 @@ import { useHelper } from '../../../../store';
 import CreateInjectorContract from './injector_contracts/CreateInjectorContract';
 import InjectorContractPopover from './injector_contracts/InjectorContractPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     marginTop: 20,
   },
@@ -96,7 +96,7 @@ const inlineStyles = {
 
 const InjectorContracts = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { injectorId } = useParams();
   const { t, tPick, nsdt } = useFormatter();
   const { injector, attackPatternsMap, killChainPhasesMap } = useHelper(helper => ({

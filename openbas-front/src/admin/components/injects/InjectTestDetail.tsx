@@ -1,17 +1,16 @@
 import { Card, CardContent, CardHeader, Grid, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import type { Theme } from '../../../components/Theme';
 import type { InjectTestStatus } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   paper: {
     position: 'relative',
     padding: 20,
@@ -50,7 +49,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
   handleClose,
   test,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   return (

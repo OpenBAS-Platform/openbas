@@ -1,7 +1,7 @@
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { CSSProperties, useMemo, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
 import { searchTagRules } from '../../../../actions/tag_rules/tagrule-actions';
@@ -20,7 +20,7 @@ import { TagRuleOutput } from '../../../../utils/api-types';
 import TagRuleCreate from './TagRuleCreate';
 import TagRulePopover from './TagRulePopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -48,7 +48,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const TagRules = () => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
     userAdmin: helper.getMe()?.user_admin ?? false,

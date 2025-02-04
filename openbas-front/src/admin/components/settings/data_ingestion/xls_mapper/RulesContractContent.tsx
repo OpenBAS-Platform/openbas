@@ -16,12 +16,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import { CogOutline, InformationOutline } from 'mdi-material-ui';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import type { ContractElement, InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
 import { directFetchInjectorContract } from '../../../../../actions/InjectorContracts';
@@ -30,7 +29,7 @@ import InjectContractComponent from '../../../../../components/InjectContractCom
 import RegexComponent from '../../../../../components/RegexComponent';
 import type { ImportMapperAddInput } from '../../../../../utils/api-types';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   rulesArray: {
     gap: '10px',
     width: '100%',
@@ -66,7 +65,7 @@ const RulesContractContent: React.FC<Props> = ({
   remove,
 }) => {
   const { t, tPick } = useFormatter();
-  const classes = useStyles();
+  const { classes, cx } = useStyles();
 
   // Fetching data
 
@@ -178,7 +177,7 @@ const RulesContractContent: React.FC<Props> = ({
         key={field.id}
         variant="outlined"
         style={{ width: '100%', marginBottom: '10px' }}
-        className={classNames({
+        className={cx({
           [classes.red]: !!errors.import_mapper_inject_importers?.[index],
         })}
       >
@@ -386,7 +385,6 @@ const RulesContractContent: React.FC<Props> = ({
           <Button color="error" variant="contained" onClick={handleClickOpenAlertDelete}>{t('Delete')}</Button>
         </AccordionActions>
       </Accordion>
-
       <Dialog
         open={openAlertDelete}
         onClose={handleCloseAlertDelete}

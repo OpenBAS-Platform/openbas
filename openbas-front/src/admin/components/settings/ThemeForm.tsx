@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField as MuiTextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import ColorPickerField from '../../../components/ColorPickerField';
@@ -15,7 +15,7 @@ interface Props {
   initialValues?: ThemeInput;
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   field: {
     marginBottom: 20,
   },
@@ -36,7 +36,7 @@ const ThemeForm: React.FC<Props> = ({
   },
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const {

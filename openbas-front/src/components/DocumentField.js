@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import { FileOutline } from 'mdi-material-ui';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addDocument, fetchDocuments } from '../actions/Document';
 import { storeHelper } from '../actions/Schema';
@@ -78,5 +78,5 @@ const select = (state) => {
 export default R.compose(
   connect(select, { fetchDocuments, addDocument }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(DocumentField);

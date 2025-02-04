@@ -1,14 +1,13 @@
 import { Close } from '@mui/icons-material';
 import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { computeBannerSettings } from '../../public/components/systembanners/utils';
 import useAuth from '../../utils/hooks/useAuth';
-import type { Theme } from '../Theme';
 
-const useStyles = makeStyles<Theme>((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   drawerPaperHalf: {
     minHeight: '100vh',
     width: '50%',
@@ -72,7 +71,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
   const { settings } = useAuth();
   const { bannerHeightNumber } = computeBannerSettings(settings);
 
-  const classes = useStyles({ variant });
+  const { classes } = useStyles();
   let component;
   if (children) {
     if (typeof children === 'function') {

@@ -1,12 +1,12 @@
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import type { ExpectationResultsByType, InjectResultOutput } from '../../../../utils/api-types';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   inline: {
     display: 'flex',
     alignItems: 'center',
@@ -22,7 +22,7 @@ interface Props {
 const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
   const { t } = useFormatter();
   let tooltipLabel: string = '';
-  const classes = useStyles();
+  const { classes } = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
       SUCCESS: 'rgb(107, 235, 112)',

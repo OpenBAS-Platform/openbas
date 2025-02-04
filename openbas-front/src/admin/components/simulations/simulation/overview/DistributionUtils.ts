@@ -1,6 +1,6 @@
+import { Theme } from '@mui/material';
 import * as R from 'ramda';
 
-import type { Theme } from '../../../../../components/Theme';
 import type { Organization, Team } from '../../../../../utils/api-types';
 import { colors } from '../../../../../utils/Charts';
 

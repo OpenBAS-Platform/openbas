@@ -1,15 +1,14 @@
 import { InfoOutlined } from '@mui/icons-material';
 import { FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { FunctionComponent } from 'react';
 import { Control, Controller } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../../components/i18n';
-import type { Theme } from '../../../../../../components/Theme';
 import { ExpectationInputForm } from '../Expectation';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   marginTop_2: {
     marginTop: theme.spacing(2),
   },
@@ -30,7 +29,7 @@ const ExpectationGroupField: FunctionComponent<Props> = ({
   isTechnicalExpectation,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   return (
     <Controller

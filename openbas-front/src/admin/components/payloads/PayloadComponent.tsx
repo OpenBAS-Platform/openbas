@@ -1,6 +1,6 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
 import { useFormatter } from '../../../components/i18n';
@@ -11,7 +11,7 @@ import { useHelper } from '../../../store';
 import { AttackPattern, Command, DnsResolution, Executable, FileDrop, Payload as PayloadType, PayloadArgument, PayloadPrerequisite } from '../../../utils/api-types';
 import { emptyFilled } from '../../../utils/String';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     fontSize: 12,
     height: 25,
@@ -30,7 +30,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
   selectedPayload,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({

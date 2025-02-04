@@ -1,8 +1,8 @@
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { createMapper } from '../../../../../actions/mapper/mapper-actions';
 import Drawer from '../../../../../components/common/Drawer';
@@ -10,7 +10,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import type { ImportMapperAddInput, RawPaginationImportMapper } from '../../../../../utils/api-types';
 import MapperForm from './MapperForm';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
@@ -23,7 +23,7 @@ interface Props {
 }
 
 const XlsMapperCreation: React.FC<Props> = ({ onCreate }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [open, setOpen] = useState(false);

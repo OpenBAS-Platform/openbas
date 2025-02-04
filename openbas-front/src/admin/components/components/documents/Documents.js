@@ -1,10 +1,10 @@
 import { DescriptionOutlined, RowingOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
@@ -21,7 +21,7 @@ import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -83,7 +83,7 @@ const inlineStyles = {
 
 const Documents = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useFormatter();

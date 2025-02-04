@@ -1,8 +1,8 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
@@ -28,7 +28,7 @@ import AssetStatus from '../AssetStatus';
 import AgentPrivilege from './AgentPrivilege';
 import EndpointPopover from './EndpointPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -78,7 +78,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Endpoints = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const { settings } = useAuth();

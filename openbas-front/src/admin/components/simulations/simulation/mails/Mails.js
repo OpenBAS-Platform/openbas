@@ -1,9 +1,9 @@
 import { BarChartOutlined, KeyboardArrowRight, ReorderOutlined } from '@mui/icons-material';
 import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import { useFormatter } from '../../../../../components/i18n';
@@ -24,7 +24,7 @@ import MailDistributionByTeam from './MailDistributionByTeam';
 import MailDistributionOverTimeChart from './MailDistributionOverTimeChart';
 import MailDistributionOverTimeLine from './MailDistributionOverTimeLine';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -180,7 +180,7 @@ const inlineStyles = {
 
 const Mails = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { t, fndt } = useFormatter();
   const [viewMode, setViewMode] = useState('list');

@@ -1,14 +1,14 @@
 import { CancelOutlined, PauseOutlined, PlayArrowOutlined, RestartAltOutlined } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { updateExerciseStatus } from '../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { Exercise, Exercise as ExerciseType } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
@@ -17,7 +17,7 @@ import { truncate } from '../../../../utils/String';
 import ExercisePopover, { ExerciseActionPopover } from './ExercisePopover';
 import ExerciseStatus from './ExerciseStatus';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   title: {
     float: 'left',
     marginRight: 10,
@@ -188,8 +188,8 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
 
 const ExerciseHeader = () => {
   // Standard hooks
-  const theme = useTheme<Theme>();
-  const classes = useStyles();
+  const theme = useTheme();
+  const { classes } = useStyles();
   const navigate = useNavigate();
 
   const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };

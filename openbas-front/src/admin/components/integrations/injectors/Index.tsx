@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles';
 import { lazy } from 'react';
 import { Route, Routes, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjector } from '../../../../actions/Injectors';
 import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
@@ -15,7 +15,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import InjectorHeader from './InjectorHeader';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     flexGrow: 1,
   },
@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
 const InjectorContracts = lazy(() => import('./InjectorContracts'));
 
 const Index = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { injectorId } = useParams() as { injectorId: InjectorType['injector_id'] };

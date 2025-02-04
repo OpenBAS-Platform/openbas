@@ -1,21 +1,20 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { addPlayer } from '../../../../actions/User';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import type { PlayerInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { Option } from '../../../../utils/Option';
 import type { PlayerInputForm, UserStore } from './Player';
 import PlayerForm from './PlayerForm';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   text: {
     fontSize: theme.typography.h2.fontSize,
     color: theme.palette.primary.main,
@@ -33,7 +32,7 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
   onCreate,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 

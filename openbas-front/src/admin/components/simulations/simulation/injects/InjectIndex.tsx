@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectResultOverviewOutput } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { fetchExercise } from '../../../../../actions/Exercise';
@@ -24,7 +24,7 @@ import { InjectResultOverviewOutputContext } from '../../../atomic_testings/Inje
 import { PermissionsContext, PermissionsContextType } from '../../../common/Context';
 import InjectHeader from '../../../injects/InjectHeader';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   item: {
     height: 30,
     fontSize: 13,
@@ -42,7 +42,7 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   // Context
   const permissionsContext: PermissionsContextType = {

@@ -1,8 +1,8 @@
 import { ChevronRightOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
@@ -18,7 +18,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ChannelIcon from './ChannelIcon';
 import CreateChannel from './CreateChannel';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   parameters: {
     marginTop: -10,
     display: 'flex',
@@ -100,7 +100,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Channels = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   // Filter and sort hook

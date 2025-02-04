@@ -1,16 +1,16 @@
 import { AccountCircleOutlined } from '@mui/icons-material';
 import { AppBar, IconButton, Menu, MenuItem, MenuProps, Toolbar } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 import * as React from 'react';
 import { Link, useNavigate } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
-import type { Theme } from '../../../components/Theme';
 import { useAppDispatch } from '../../../utils/hooks';
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   appBar: {
     width: '100%',
     zIndex: theme.zIndex.drawer + 1,
@@ -35,8 +35,8 @@ const useStyles = makeStyles<Theme>(theme => ({
 }));
 
 const TopBar: React.FC = () => {
-  const theme = useTheme<Theme>();
-  const classes = useStyles();
+  const theme = useTheme();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);

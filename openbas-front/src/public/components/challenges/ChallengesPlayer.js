@@ -30,12 +30,13 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useEffect, useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
@@ -52,7 +53,7 @@ import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 import { usePermissions } from '../../../utils/Exercise';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     position: 'relative',
     flexGrow: 1,
@@ -156,7 +157,7 @@ const inlineStyles = {
 
 const ChallengesPlayer = () => {
   const theme = useTheme();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
   const [currentChallengeEntry, setCurrentChallengeEntry] = useState(null);

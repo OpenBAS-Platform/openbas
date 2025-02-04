@@ -1,15 +1,15 @@
 import { PlayArrowOutlined, Stop } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { useEffect } from 'react';
 import * as React from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { Exercise, Scenario } from '../../../../utils/api-types';
 import { parseCron, ParsedCron } from '../../../../utils/Cron';
@@ -19,7 +19,7 @@ import { truncate } from '../../../../utils/String';
 import ScenarioPopover from './ScenarioPopover';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   title: {
     float: 'left',
     marginRight: 10,
@@ -75,8 +75,8 @@ const ScenarioHeader = ({
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   // Fetching data

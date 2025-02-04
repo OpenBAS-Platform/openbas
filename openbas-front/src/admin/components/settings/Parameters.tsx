@@ -1,5 +1,5 @@
 import { Button, Grid, List, ListItem, ListItemText, Paper, Switch, TextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 
 import {
   fetchPlatformParameters,
@@ -21,7 +21,7 @@ import EnterpriseEditionButton from '../common/entreprise_edition/EnterpriseEdit
 import ParametersForm from './ParametersForm';
 import ThemeForm from './ThemeForm';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: '0 0 60px 0',
   },
@@ -39,7 +39,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Parameters = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({

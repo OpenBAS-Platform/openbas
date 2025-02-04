@@ -1,16 +1,14 @@
 import { Box } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import { Fragment, FunctionComponent, useEffect } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
-import type { Theme } from '../../../Theme';
 import { convertOperatorToIcon } from './FilterUtils';
 import useRetrieveOptions from './useRetrieveOptions';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   mode: {
     display: 'inline-block',
     height: '100%',
@@ -48,7 +46,7 @@ const FilterChipValues: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t, fldt } = useFormatter();
-  const classes = useStyles();
+  const { classes, cx } = useStyles();
 
   const { options, searchOptions } = useRetrieveOptions();
 
@@ -80,7 +78,7 @@ const FilterChipValues: FunctionComponent<Props> = ({
     return (
       <>
         <strong
-          className={classNames({ [classes.label]: !!handleOpen })}
+          className={cx({ [classes.label]: !!handleOpen })}
           onClick={handleOpen}
         >
           {t(filter.key)}
@@ -109,19 +107,21 @@ const FilterChipValues: FunctionComponent<Props> = ({
   }
 
   return (
-    <span className={classes.container}>
-      <strong
-        className={classNames({ [classes.label]: !!handleOpen })}
-        onClick={handleOpen}
-      >
-        {t(filter.key)}
-        {convertOperatorToIcon(t, filter.operator)}
-      </strong>
-      {' '}
-      <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
-        {toValues(options)}
-      </Box>
-    </span>
+    (
+      <span className={classes.container}>
+        <strong
+          className={cx({ [classes.label]: !!handleOpen })}
+          onClick={handleOpen}
+        >
+          {t(filter.key)}
+          {convertOperatorToIcon(t, filter.operator)}
+        </strong>
+        {' '}
+        <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+          {toValues(options)}
+        </Box>
+      </span>
+    )
   );
 };
 

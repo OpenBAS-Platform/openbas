@@ -1,5 +1,4 @@
-import { Theme } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { a11yDark, coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -11,7 +10,7 @@ interface CodeBlockProps {
 }
 
 const CodeBlock: FunctionComponent<CodeBlockProps> = ({ language, code, maxHeight }) => {
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   return (
     <SyntaxHighlighter
       language={language}

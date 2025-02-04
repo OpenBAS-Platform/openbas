@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
@@ -7,7 +7,6 @@ import { fetchExerciseCommunications } from '../../../../../actions/Communicatio
 import type { CommunicationHelper } from '../../../../../actions/communications/communication-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { Communication, Exercise } from '../../../../../utils/api-types';
 import { areaChartOptions } from '../../../../../utils/Charts';
@@ -24,7 +23,7 @@ const MailDistributionOverTimeChart: FunctionComponent<Props> = ({
   // Standard hooks
   const { t, nsdt } = useFormatter();
   const dispatch = useAppDispatch();
-  const theme: Theme = useTheme();
+  const theme = useTheme();
 
   // Fetching data
   const { communications } = useHelper((helper: CommunicationHelper) => ({

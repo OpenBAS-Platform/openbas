@@ -1,7 +1,7 @@
 import { CastForEducationOutlined, DnsOutlined, LanOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchAssetGroups } from '../../../../../../actions/asset_groups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../../../actions/asset_groups/assetgroup-helper';
@@ -27,7 +27,7 @@ import ManualExpectations from '../expectations/ManualExpectations';
 import TechnicalExpectationAsset from '../expectations/TechnicalExpectationAsset';
 import TechnicalExpectationAssetGroup from '../expectations/TechnicalExpectationAssetGroup';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   item: {
     height: 40,
   },
@@ -56,7 +56,7 @@ const TeamOrAssetLine: FunctionComponent<Props> = ({
   expectations,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
   // Fetching data

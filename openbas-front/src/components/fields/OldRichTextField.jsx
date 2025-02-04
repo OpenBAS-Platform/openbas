@@ -1,14 +1,13 @@
 import { FormHelperText, InputLabel } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import { Field } from 'react-final-form';
+import { makeStyles } from 'tss-react/mui';
 
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import CKEditor from '../CKEditor';
 import { useFormatter } from '../i18n';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles()(theme => ({
   errorColor: {
     color: theme.palette.error.main,
   },
@@ -25,47 +24,49 @@ const RichTextFieldBase = ({
   context,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes, cx } = useStyles();
   return (
-    <div style={{ ...style, position: 'relative' }}>
-      <InputLabel
-        variant="standard"
-        shrink={true}
-        disabled={disabled}
-        className={classNames({
-          [classes.errorColor]: touched && invalid,
-        })}
-      >
-        {label}
-      </InputLabel>
-      <CKEditor
-        data={value}
-        onChange={(event, editor) => {
-          onChange(editor.getData());
-        }}
-        onBlur={event => onBlur(event)}
-        disabled={disabled}
-      />
-      {touched && invalid
-      && (
-        <FormHelperText error>
-          {(error && t(error)) || (submitError && t(submitError))}
-        </FormHelperText>
-      )}
-      {askAi && (
-        <TextFieldAskAI
-          currentValue={value ?? ''}
-          setFieldValue={(val) => {
-            onChange(val);
-          }}
-          format="html"
-          variant="ckeditor"
+    (
+      <div style={{ ...style, position: 'relative' }}>
+        <InputLabel
+          variant="standard"
+          shrink={true}
           disabled={disabled}
-          inInject={inInject}
-          context={context}
+          className={cx({
+            [classes.errorColor]: touched && invalid,
+          })}
+        >
+          {label}
+        </InputLabel>
+        <CKEditor
+          data={value}
+          onChange={(event, editor) => {
+            onChange(editor.getData());
+          }}
+          onBlur={event => onBlur(event)}
+          disabled={disabled}
         />
-      )}
-    </div>
+        {touched && invalid
+        && (
+          <FormHelperText error>
+            {(error && t(error)) || (submitError && t(submitError))}
+          </FormHelperText>
+        )}
+        {askAi && (
+          <TextFieldAskAI
+            currentValue={value ?? ''}
+            setFieldValue={(val) => {
+              onChange(val);
+            }}
+            format="html"
+            variant="ckeditor"
+            disabled={disabled}
+            inInject={inInject}
+            context={context}
+          />
+        )}
+      </div>
+    )
   );
 };
 

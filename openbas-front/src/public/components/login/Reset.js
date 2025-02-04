@@ -1,14 +1,14 @@
 import { Button, Paper } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+import { makeStyles } from 'tss-react/mui';
 
 import { askReset, resetPassword, validateResetToken } from '../../../actions/Application';
 import OldTextField from '../../../components/fields/OldTextField';
 import { useFormatter } from '../../../components/i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     textAlign: 'center',
     margin: '0 auto',
@@ -30,7 +30,7 @@ const STEP_ASK_RESET = 'ask';
 const STEP_VALIDATE_TOKEN = 'validate';
 const STEP_RESET_PASSWORD = 'reset';
 const Reset = ({ onCancel }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, locale } = useFormatter();
   const dispatch = useDispatch();
   const [step, setStep] = useState(STEP_ASK_RESET);

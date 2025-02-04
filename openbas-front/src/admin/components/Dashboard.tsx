@@ -1,8 +1,9 @@
 import { ComputerOutlined, HubOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
 import { Grid, Paper, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchStatistics } from '../../actions/Application';
 import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
@@ -12,7 +13,6 @@ import { initSorting, type Page } from '../../components/common/queryable/Page';
 import Empty from '../../components/Empty';
 import { useFormatter } from '../../components/i18n';
 import Loader from '../../components/Loader';
-import type { Theme } from '../../components/Theme';
 import { useHelper } from '../../store';
 import { AttackPattern, ExerciseSimple, type InjectExpectationResultsByAttackPattern, PlatformStatistic } from '../../utils/api-types';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
@@ -26,7 +26,7 @@ import ExerciseList from './simulations/ExerciseList';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     height: '100%',
     minHeight: '100%',
@@ -61,8 +61,8 @@ const useStyles = makeStyles(() => ({
 
 const Dashboard = () => {
   // Standard hooks
-  const theme: Theme = useTheme();
-  const classes = useStyles();
+  const theme = useTheme();
+  const { classes } = useStyles();
   const { t, fld, n } = useFormatter();
   const dispatch = useAppDispatch();
 

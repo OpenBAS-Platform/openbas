@@ -1,7 +1,7 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useEffect } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchChannels } from '../../../../actions/channels/channel-action';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
@@ -12,7 +12,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import ChannelIcon from './ChannelIcon';
 import type { ChannelOption } from './ChannelOption';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -38,7 +38,7 @@ interface ChannelTransformed {
 }
 
 const ChannelsFilter: React.FC<Props> = (props) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   useEffect(() => {

@@ -1,7 +1,8 @@
 import { Autocomplete as MuiAutocomplete, Box, TextField } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { CSSProperties, FunctionComponent } from 'react';
 import { FieldErrors } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import type { SecurityPlatformHelper } from '../../actions/assets/asset-helper';
 import { fetchSecurityPlatforms } from '../../actions/assets/securityPlatform-actions';
@@ -9,9 +10,8 @@ import { useHelper } from '../../store';
 import type { SecurityPlatform } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
-import type { Theme } from '../Theme';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -59,8 +59,8 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
   editing,
 }) => {
   // Standard hooks
-  const theme = useTheme<Theme>();
-  const classes = useStyles();
+  const theme = useTheme();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
   // Fetching data

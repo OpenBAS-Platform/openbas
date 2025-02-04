@@ -1,8 +1,8 @@
 import { ChevronRightOutlined, SchoolOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { UserHelper } from '../../../../actions/helper';
 import { searchLessonsTemplates } from '../../../../actions/Lessons';
@@ -16,7 +16,7 @@ import { useHelper } from '../../../../store';
 import type { LessonsTemplate, SearchPaginationInput } from '../../../../utils/api-types';
 import CreateLessonsTemplate from './CreateLessonsTemplate';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     paddingLeft: 17,
     textTransform: 'uppercase',
@@ -51,7 +51,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const LessonsTemplates = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   // Fetching data
   const { userAdmin } = useHelper((helper: UserHelper) => {

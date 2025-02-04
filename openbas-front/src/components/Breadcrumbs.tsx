@@ -1,7 +1,7 @@
 import { Breadcrumbs as MUIBreadcrumbs, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { truncate } from '../utils/String';
 
@@ -19,9 +19,7 @@ interface BreadcrumbsProps {
   elements: BreadcrumbsElement[];
 }
 
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   breadcrumbsList: {
     marginTop: -5,
     marginBottom: 15,
@@ -36,7 +34,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Breadcrumbs: FunctionComponent<BreadcrumbsProps> = ({ elements, variant }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   let className = classes.breadcrumbsStandard;
   if (variant === 'list') {
     className = classes.breadcrumbsList;

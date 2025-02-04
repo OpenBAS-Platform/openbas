@@ -1,11 +1,11 @@
 import { Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { useHelper } from '../../../../store';
 import ChannelPopover from './ChannelPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     width: '100%',
   },
@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ChannelHeader = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { channelId } = useParams();
   const { channel, userAdmin } = useHelper(helper => ({
     channel: helper.getChannel(channelId),

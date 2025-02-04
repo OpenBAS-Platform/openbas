@@ -14,15 +14,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 */
 
 import { Alert, AlertTitle } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import EnterpriseEditionButton from './EnterpriseEditionButton';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   alert: {
     width: '100%',
     marginBottom: 20,
@@ -32,7 +31,7 @@ const useStyles = makeStyles<Theme>(theme => ({
 }));
 
 const EnterpriseEdition = ({ message }: { message?: string; feature?: string }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   return (
     <>

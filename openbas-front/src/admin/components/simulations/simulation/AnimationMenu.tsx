@@ -1,14 +1,14 @@
 import { FactCheckOutlined, MailOutlined, NoteAltOutlined, TheatersOutlined } from '@mui/icons-material';
 import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router';
+import { CSSObject } from 'tss-react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import type { Exercise } from '../../../../utils/api-types';
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   drawer: {
     minHeight: '100vh',
     width: 200,
@@ -16,7 +16,7 @@ const useStyles = makeStyles<Theme>(theme => ({
     overflow: 'auto',
     padding: 0,
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: theme.mixins.toolbar as CSSObject,
   item: {
     paddingTop: 10,
     paddingBottom: 10,
@@ -29,7 +29,7 @@ interface Props {
 
 const AnimationMenu: React.FC<Props> = ({ exerciseId }) => {
   const location = useLocation();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   return (

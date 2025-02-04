@@ -1,14 +1,14 @@
 import { RouteOutlined } from '@mui/icons-material';
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useEffect } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 const KillChainPhasesFilter = (props) => {
   const { fullWidth, filterKey, helpers } = props;
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const killChainPhases = useHelper(helper => helper.getKillChainPhases());
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { ControlPointOutlined } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { addAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
@@ -13,7 +13,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import type { UserStore } from '../../teams/players/Player';
 import AssetGroupForm from './AssetGroupForm';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   text: {
     fontSize: theme.typography.h2.fontSize,
     color: theme.palette.primary.main,
@@ -31,7 +31,7 @@ const AssetGroupCreation: FunctionComponent<Props> = ({
   onCreate,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const [open, setOpen] = useState(false);
   const { t } = useFormatter();
 

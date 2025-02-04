@@ -1,5 +1,5 @@
 import { ListItemIcon, MenuItem, Tooltip } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
 
 import logoFiligranDark from '../../../../static/images/logo_filigran_dark.png';
@@ -7,7 +7,6 @@ import logoFiligranLight from '../../../../static/images/logo_filigran_light.png
 import logoFiligranTextDark from '../../../../static/images/logo_filigran_text_dark.png';
 import logoFiligranTextLight from '../../../../static/images/logo_filigran_text_light.png';
 import { fileUri } from '../../../../utils/Environment';
-import type { Theme } from '../../../Theme';
 
 interface Props {
   navOpen: boolean;
@@ -19,7 +18,7 @@ const MenuItemLogo: React.FC<Props> = ({
   onClick,
 }) => {
   // Standard hooks
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { palette } = theme;
   const isDarkMode = palette.mode === 'dark';
 

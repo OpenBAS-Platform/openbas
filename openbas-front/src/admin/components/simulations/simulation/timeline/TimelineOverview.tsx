@@ -9,9 +9,9 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
@@ -41,7 +41,7 @@ import teamContextForExercise from '../teams/teamContextForExercise';
 import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     width: '100%',
     margin: '-12px 0 50px 0',
@@ -81,7 +81,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const TimelineOverview = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { t, fndt } = useFormatter();

@@ -17,7 +17,6 @@
     "@mui/icons-material": "6.4.1",
     "@mui/lab": "6.0.0-beta.24",
     "@mui/material": "6.4.1",
-    "@mui/styles": "6.4.1",
     "@mui/system": "6.4.1",
     "@mui/utils": "6.4.1",
     "@mui/x-date-pickers": "7.24.0",
@@ -71,6 +70,7 @@
     "remark-parse": "11.0.0",
     "rxjs": "7.8.1",
     "seamless-immutable": "7.1.4",
+    "tss-react": "4.9.15",
     "usehooks-ts": "3.1.0",
     "uuid": "11.0.3",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
@@ -123,6 +123,9 @@
     "typescript-eslint": "8.22.0",
     "vite": "6.0.9",
     "vitest": "2.1.1"
+  },
+  "resolutions": {
+    "@types/react": "18.3.18"
   },
   "engines": {
     "node": ">= 22.11.0"

@@ -11,9 +11,10 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import Chart from 'react-apexcharts';
+import { makeStyles } from 'tss-react/mui';
 
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
@@ -21,7 +22,7 @@ import { areaChartOptions } from '../../../../utils/Charts';
 import CreateObjective from '../CreateObjective';
 import ObjectivePopover from '../ObjectivePopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     position: 'relative',
     padding: 0,
@@ -43,7 +44,7 @@ const LessonsObjectives = ({
   setSelectedObjective,
   isReport,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
   const sortedObjectives = R.sortWith(

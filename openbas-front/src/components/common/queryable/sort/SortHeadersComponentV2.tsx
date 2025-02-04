@@ -1,12 +1,12 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../i18n';
 import { Header } from '../../SortHeadersList';
 import { SortHelpers } from './SortHelpers';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   sortableHeaderItem: {
     display: 'flex',
     fontSize: 12,
@@ -44,7 +44,7 @@ const SortHeadersComponentV2: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const sortComponent = (asc: boolean) => {
     return asc ? (<ArrowDropUpOutlined />) : (<ArrowDropDownOutlined />);

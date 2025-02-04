@@ -1,6 +1,6 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
@@ -16,7 +16,7 @@ import InjectTestDetail from './InjectTestDetail';
 import InjectTestPopover from './InjectTestPopover';
 import InjectTestReplayAll from './InjectTestReplayAll';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   bodyItems: {
     display: 'flex',
     alignItems: 'center',
@@ -68,7 +68,7 @@ const InjectTestList: FunctionComponent<Props> = ({
   statusId,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, fldt } = useFormatter();
 
   const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);

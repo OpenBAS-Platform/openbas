@@ -1,10 +1,11 @@
 import { EditOutlined, ExpandMoreOutlined, RateReviewOutlined } from '@mui/icons-material';
 import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, CardHeader, IconButton, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { addLog, fetchLogs } from '../../../../../actions/Log';
 import { fetchExerciseObjectives } from '../../../../../actions/Objective';
@@ -18,7 +19,7 @@ import AnimationMenu from '../AnimationMenu';
 import LogForm from './LogForm';
 import LogPopover from './LogPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   card: {
     width: '100%',
     height: '100%',
@@ -33,7 +34,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Logs = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();

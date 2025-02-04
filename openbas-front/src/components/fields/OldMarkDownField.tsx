@@ -5,7 +5,6 @@ import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
 
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import { useFormatter } from '../i18n';
-import type { Theme } from '../Theme';
 
 interface Props {
   label: string;
@@ -29,7 +28,7 @@ const MarkDownFieldBase: React.FC<Props> = ({
   inArticle,
 }) => {
   const { t } = useFormatter();
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   return (
     <div
       style={{ ...style, position: 'relative' }}

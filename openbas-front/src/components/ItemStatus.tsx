@@ -1,12 +1,10 @@
 import { Chip, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from './i18n';
 
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     fontSize: 12,
     height: 25,
@@ -98,7 +96,7 @@ const ItemStatus: FunctionComponent<ItemStatusProps> = ({
   isInject = false,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const style = variant === 'inList' ? classes.chipInList : classes.chip;
   const classStyle = computeStatusStyle(status);
   let finalLabel = label;

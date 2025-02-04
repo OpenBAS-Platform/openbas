@@ -1,11 +1,11 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Button, Grid, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import arrayMutators from 'final-form-arrays';
 import { useState } from 'react';
 import { Form } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { useDispatch } from 'react-redux';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
@@ -21,7 +21,7 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import DocumentPopover from '../documents/DocumentPopover';
 import DocumentType from '../documents/DocumentType';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -97,7 +97,7 @@ const inlineStyles = {
 };
 
 const ChallengeForm = (props) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useDispatch();
   const { onSubmit, handleClose, initialValues, editing, documentsIds } = props;

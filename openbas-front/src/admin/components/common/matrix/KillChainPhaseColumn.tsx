@@ -1,11 +1,11 @@
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
-import type { Theme } from '../../../../components/Theme';
 import type { AttackPattern, InjectExpectationResultsByAttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import AttackPatternBox from './AttackPatternBox';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   column: {
     display: 'flex',
     flexDirection: 'column',
@@ -29,8 +29,8 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   dummy,
 }) => {
   // Standard hooks
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   // Attack Pattern
   const sortAttackPattern = (attackPattern1: AttackPattern, attackPattern2: AttackPattern) => {
     if (attackPattern1.attack_pattern_name < attackPattern2.attack_pattern_name) {

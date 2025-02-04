@@ -1,9 +1,9 @@
 import { DomainOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties } from 'react';
 import { CSVLink } from 'react-csv';
 import { useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { OrganizationHelper, TagHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
@@ -11,7 +11,6 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
-import type { Theme } from '../../../components/Theme';
 import { useHelper } from '../../../store';
 import type { Organization } from '../../../utils/api-types';
 import { exportData } from '../../../utils/Environment';
@@ -23,7 +22,7 @@ import TagsFilter from '../common/filters/TagsFilter';
 import CreateOrganization from './organizations/CreateOrganization';
 import OrganizationPopover from './organizations/OrganizationPopover';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   parameters: {
     marginTop: -10,
     display: 'flex',
@@ -95,7 +94,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Organizations = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Fetching data

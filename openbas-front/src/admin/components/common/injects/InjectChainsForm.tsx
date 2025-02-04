@@ -14,11 +14,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { Value } from 'classnames';
 import { FormApi } from 'final-form';
 import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { ConditionElement, ConditionType, Content, ConvertedContentType, Dependency, InjectOutputType } from '../../../../actions/injects/Inject';
 import type { Element } from '../../../../components/common/chips/ClickableChip';
@@ -28,7 +28,7 @@ import { useFormatter } from '../../../../components/i18n';
 import type { Inject, InjectDependency, InjectDependencyCondition, InjectOutput } from '../../../../utils/api-types';
 import { capitalize } from '../../../../utils/String';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -50,7 +50,7 @@ interface Props {
 }
 
 const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // List of parents

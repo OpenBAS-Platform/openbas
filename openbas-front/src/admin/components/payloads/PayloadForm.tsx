@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Button, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FormEvent, FunctionComponent } from 'react';
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import AttackPatternField from '../../../components/AttackPatternField';
@@ -15,7 +15,7 @@ import PlatformField from '../../../components/PlatformField';
 import type { PayloadCreateInput } from '../../../utils/api-types';
 import type { Option } from '../../../utils/Option';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   errorColor: {
     color: '#f44336',
   },
@@ -61,7 +61,7 @@ const PayloadForm: FunctionComponent<Props> = ({
     payload_prerequisites: [],
   },
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const payloadPrerequisiteZodObject = z.object({

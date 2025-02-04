@@ -1,10 +1,8 @@
 import { AddCircleOutline } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, memo } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
-import type { Theme } from '../Theme';
-
-const useStyles = makeStyles<Theme>(() => ({
+const useStyles = makeStyles()(() => ({
   node: {
     'border': '2px dashed rgba(255, 255, 255, 0.12)',
     'borderLeft': '2px solid rgba(255, 255, 255, 0.3)',
@@ -49,7 +47,7 @@ interface Props {
  * @constructor
  */
 const NodePhantomComponent: FunctionComponent<Props> = (props) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   return (
     <>

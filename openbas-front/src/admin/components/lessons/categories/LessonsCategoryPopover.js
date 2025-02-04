@@ -1,8 +1,8 @@
 import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { forwardRef, useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { LessonContext } from '../../common/Context';
@@ -13,7 +13,7 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   button: {
     float: 'left',
     margin: '-15px 0 0 5px',
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
 
 const LessonsCategoryPopover = ({ lessonsCategory }) => {
   // utils
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   // states
   const [openDelete, setOpenDelete] = useState(false);

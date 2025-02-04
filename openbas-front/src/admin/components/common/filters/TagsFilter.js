@@ -1,12 +1,12 @@
 import { LabelOutlined } from '@mui/icons-material';
 import { Autocomplete, Box, Chip, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const TagsFilter = (props) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const tags = useHelper(helper => helper.getTags());
   const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;

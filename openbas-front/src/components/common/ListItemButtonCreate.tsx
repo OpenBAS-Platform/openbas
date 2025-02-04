@@ -1,11 +1,9 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
-import type { Theme } from '../Theme';
-
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   text: {
     fontSize: 15,
     color: theme.palette.primary.main,
@@ -23,7 +21,7 @@ const ListItemButtonCreate: FunctionComponent<Props> = ({
   onClick,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   return (
     <ListItemButton

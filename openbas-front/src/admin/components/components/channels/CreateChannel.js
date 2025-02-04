@@ -1,10 +1,10 @@
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addChannel } from '../../../../actions/channels/channel-action';
 import Drawer from '../../../../components/common/Drawer';
@@ -76,5 +76,5 @@ CreateChannel.propTypes = {
 export default R.compose(
   connect(null, { addChannel }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreateChannel);

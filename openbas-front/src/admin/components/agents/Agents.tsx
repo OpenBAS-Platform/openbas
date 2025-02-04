@@ -1,10 +1,11 @@
 import { ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
 import { Alert, Button, Card, CardActionArea, CardContent, Dialog, DialogContent, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { Bash, DownloadCircleOutline, Powershell } from 'mdi-material-ui';
 import * as R from 'ramda';
 import * as React from 'react';
 import { useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../actions/Executor';
 import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
@@ -14,7 +15,6 @@ import Breadcrumbs from '../../../components/Breadcrumbs';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
 import PlatformIcon from '../../../components/PlatformIcon';
-import type { Theme } from '../../../components/Theme';
 import { useHelper } from '../../../store';
 import type { Executor } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -23,7 +23,7 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import { copyToClipboard, download } from '../../../utils/utils';
 import ExecutorDocumentationLink from './ExecutorDocumentationLink';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   card: {
     overflow: 'hidden',
     height: 250,
@@ -44,14 +44,14 @@ const useStyles = makeStyles(() => ({
 
 const Executors = () => {
   // Standard hooks
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { t } = useFormatter();
   const [platform, setPlatform] = useState<null | string>(null);
   const [selectedExecutors, setSelectedExecutors] = useState<null | Executor[]>(null);
   const [activeTab, setActiveTab] = useState<null | string>(null);
   const [agentFolder, setAgentFolder] = useState<null | string>(null);
   const [arch, setArch] = useState<string>('x86_64');
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
   // Fetching data

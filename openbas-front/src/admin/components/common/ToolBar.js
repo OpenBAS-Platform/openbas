@@ -25,12 +25,12 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { withStyles, withTheme } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component, forwardRef } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { fetchAssetGroups } from '../../../actions/asset_groups/assetgroup-action';
 import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
@@ -157,6 +157,11 @@ const styles = theme => ({
   },
   autoCompleteIndicator: {
     display: 'none',
+  },
+  numberOfSelectedElements: {
+    padding: '2px 5px 2px 5px',
+    marginRight: 5,
+    backgroundColor: theme.palette.background.accent,
   },
 });
 
@@ -504,7 +509,6 @@ class ToolBar extends Component {
       classes,
       numberOfSelectedElements,
       handleClearSelectedElements,
-      theme,
       variant,
     } = this.props;
     const { actionsInputs, navOpen } = this.state;
@@ -549,13 +553,7 @@ class ToolBar extends Component {
               color="inherit"
               variant="subtitle1"
             >
-              <span
-                style={{
-                  padding: '2px 5px 2px 5px',
-                  marginRight: 5,
-                  backgroundColor: theme.palette.background.accent,
-                }}
-              >
+              <span className={classes.numberOfSelectedElements}>
                 {numberOfSelectedElements}
               </span>
               {' '}
@@ -735,7 +733,6 @@ class ToolBar extends Component {
 
 ToolBar.propTypes = {
   classes: PropTypes.object,
-  theme: PropTypes.object,
   t: PropTypes.func,
   numberOfSelectedElements: PropTypes.number,
   selectedElements: PropTypes.object,
@@ -771,6 +768,5 @@ const select = (state, ownProps) => {
 export default R.compose(
   connect(select, { fetchEndpoints, fetchAssetGroups }),
   inject18n,
-  withTheme,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(ToolBar);

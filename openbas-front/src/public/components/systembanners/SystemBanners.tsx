@@ -1,15 +1,14 @@
 import { ReportProblem } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../components/i18n';
-import type { Theme } from '../../../components/Theme';
 import { isEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 
 export const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
 
 /* eslint-disable */
 /* Avoid auto-lint removal using --fix with false positive finding of: */
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
   banner: {
     position: 'fixed',
     zIndex: 2000,
@@ -55,7 +54,7 @@ const SystemBanners = (settings: {
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const bannerLevel = settings.settings.platform_banner_by_level;
   let numberOfElements = 0;
   if (settings.settings.platform_banner_by_level !== undefined) {

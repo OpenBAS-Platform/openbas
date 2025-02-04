@@ -1,13 +1,13 @@
 import { Chip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import colorStyles from '../../../../../../components/Color';
 import { useFormatter } from '../../../../../../components/i18n';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chipInList: {
     height: 20,
     borderRadius: 4,
@@ -30,7 +30,7 @@ const ResultChip: FunctionComponent<Props> = ({
   expectation,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const result = !R.isEmpty(expectation.inject_expectation_results);

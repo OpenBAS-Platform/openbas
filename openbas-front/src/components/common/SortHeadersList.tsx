@@ -1,12 +1,12 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { CSSProperties, FunctionComponent, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -42,7 +42,7 @@ const SortHeadersList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortAsc, setSortAsc] = useState(true);

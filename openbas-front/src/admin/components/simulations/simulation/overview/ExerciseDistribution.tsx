@@ -1,6 +1,7 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
@@ -8,7 +9,6 @@ import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
-import type { Theme } from '../../../../../components/Theme';
 import arrowDark from '../../../../../static/images/misc/arrow_dark.png';
 import arrowLight from '../../../../../static/images/misc/arrow_light.png';
 import { useHelper } from '../../../../../store';
@@ -25,7 +25,7 @@ import ExerciseDistributionScoreOverTimeByInjectorContract from './ExerciseDistr
 import ExerciseDistributionScoreOverTimeByTeam from './ExerciseDistributionScoreOverTimeByTeam';
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from './ExerciseDistributionScoreOverTimeByTeamInPercentage';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
@@ -44,9 +44,9 @@ const ExerciseDistribution: FunctionComponent<Props> = ({
   isReport = false,
 }) => {
   // Standard hooks
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 

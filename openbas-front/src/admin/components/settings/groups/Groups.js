@@ -1,8 +1,8 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercises } from '../../../../actions/Exercise';
 import { searchGroups } from '../../../../actions/Group';
@@ -19,7 +19,7 @@ import SecurityMenu from '../SecurityMenu';
 import CreateGroup from './CreateGroup';
 import GroupPopover from './GroupPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
@@ -77,7 +77,7 @@ const inlineStyles = {
 
 const Groups = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
   useDataLoader(() => {

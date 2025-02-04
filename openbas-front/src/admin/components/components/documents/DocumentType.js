@@ -1,8 +1,8 @@
 import { Chip } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import { compose } from 'ramda';
 import { Component } from 'react';
+import { withStyles } from 'tss-react/mui';
 
 import inject18n from '../../../../components/i18n';
 import { hexToRGB, stringToColour } from '../../../../utils/Colors';
@@ -65,4 +65,4 @@ DocumentType.propTypes = {
   disabled: PropTypes.bool,
 };
 
-export default compose(inject18n, withStyles(styles))(DocumentType);
+export default compose(inject18n, Component => withStyles(Component, styles))(DocumentType);

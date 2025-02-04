@@ -1,8 +1,8 @@
 import { Chip, Tooltip } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
+import { withStyles } from 'tss-react/mui';
 
 import inject18n from '../../../../components/i18n';
 
@@ -50,4 +50,4 @@ InjectorContract.propTypes = {
   deleted: PropTypes.bool,
 };
 
-export default R.compose(inject18n, withStyles(styles))(InjectorContract);
+export default R.compose(inject18n, Component => withStyles(Component, styles))(InjectorContract);

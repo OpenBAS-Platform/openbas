@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Chip, Grid, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { updateInjectExpectation } from '../../../../../../actions/Exercise';
@@ -11,7 +12,6 @@ import { fetchTeams } from '../../../../../../actions/teams/team-actions';
 import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import { fetchUsers } from '../../../../../../actions/User';
 import { useFormatter } from '../../../../../../components/i18n';
-import type { Theme } from '../../../../../../components/Theme';
 import { useHelper } from '../../../../../../store';
 import type { Team, User } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
@@ -20,7 +20,7 @@ import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../.
 import { zodImplement } from '../../../../../../utils/Zod';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   marginTop_2: {
     marginTop: theme.spacing(2),
   },
@@ -48,9 +48,9 @@ interface FormProps {
 }
 
 const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, onUpdate, withSummary = true }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { teamsMap, usersMap }: {
     teamsMap: Record<string, Team>;
     usersMap: Record<string, User>;

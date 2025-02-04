@@ -1,8 +1,8 @@
 import { FlagOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { Component } from 'react';
+import { withStyles } from 'tss-react/mui';
 
 import { countryOptions } from '../utils/Option';
 import Autocomplete from './Autocomplete';
@@ -55,4 +55,4 @@ class CountryField extends Component {
 /**
  * @deprecated The component use old form libnary react-final-form
  */
-export default R.compose(inject18n, withStyles(styles))(CountryField);
+export default R.compose(inject18n, Component => withStyles(Component, styles))(CountryField);

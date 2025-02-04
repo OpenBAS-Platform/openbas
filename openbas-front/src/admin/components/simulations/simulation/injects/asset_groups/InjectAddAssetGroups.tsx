@@ -1,14 +1,13 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../../components/i18n';
-import type { Theme } from '../../../../../../components/Theme';
 import AssetGroupDialogAdding from '../../../../assets/asset_groups/AssetGroupDialogAdding';
 import { PermissionsContext } from '../../../../common/Context';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     paddingLeft: 10,
     height: 50,
@@ -30,7 +29,7 @@ const InjectAddAssetGroups: FunctionComponent<Props> = ({
   onSubmit,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
 

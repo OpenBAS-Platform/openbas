@@ -1,8 +1,8 @@
 import { Add, GroupsOutlined } from '@mui/icons-material';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -16,7 +16,7 @@ import type { Team, TeamOutput } from '../../../../utils/api-types';
 import { TeamContext } from '../../common/Context';
 import CreateTeam from './CreateTeam';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   createButton: {
     float: 'left',
     marginTop: -15,
@@ -32,7 +32,7 @@ const UpdateTeams: React.FC<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { searchTeams, onReplaceTeam } = useContext(TeamContext);
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);

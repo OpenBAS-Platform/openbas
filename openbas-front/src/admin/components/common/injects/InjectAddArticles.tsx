@@ -12,9 +12,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { FullArticleStore } from '../../../../actions/channels/Article';
 import type { ArticlesHelper } from '../../../../actions/channels/article-helper';
@@ -23,7 +23,6 @@ import type { ChannelsHelper } from '../../../../actions/channels/channel-helper
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import { Article } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -33,7 +32,7 @@ import ChannelIcon from '../../components/channels/ChannelIcon';
 import CreateArticle from '../articles/CreateArticle';
 import { PermissionsContext } from '../Context';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   box: {
     width: '100%',
     minHeight: '100%',
@@ -66,7 +65,7 @@ const InjectAddArticles: FunctionComponent<Props> = ({
   injectArticlesIds,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);

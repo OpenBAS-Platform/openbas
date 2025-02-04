@@ -1,20 +1,18 @@
 import { Tooltip } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { Handle, Node, NodeProps, OnConnect, Position, XYPosition } from '@xyflow/react';
 import moment from 'moment';
 import { memo } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { InjectOutputType, InjectStore } from '../../actions/injects/Inject';
 import InjectIcon from '../../admin/components/common/injects/InjectIcon';
 import InjectPopover from '../../admin/components/common/injects/InjectPopover';
 import { isNotEmptyField } from '../../utils/utils';
 import { useFormatter } from '../i18n';
-import type { Theme } from '../Theme';
 
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   node: {
     position: 'relative',
     border:
@@ -110,8 +108,8 @@ export type NodeInject = Node<{
  * @constructor
  */
 const NodeInjectComponent = ({ data }: NodeProps<NodeInject>) => {
-  const classes = useStyles();
-  const theme: Theme = useTheme();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const { ft, fld } = useFormatter();
 
   /**

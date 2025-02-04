@@ -1,9 +1,9 @@
 import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, PopoverProps } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
 import { useNavigate } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { deleteChannel, updateChannel } from '../../../../actions/channels/channel-action';
 import Transition from '../../../../components/common/Transition';
@@ -12,7 +12,7 @@ import type { Channel, ChannelUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ChannelForm from './ChannelForm';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   button: {
     float: 'left',
     margin: '-10px 0 0 5px',
@@ -27,7 +27,7 @@ const ChannelPopover: React.FC<Props> = ({ channel }) => {
   const [anchorEl, setAnchorEl] = useState<PopoverProps['anchorEl']>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

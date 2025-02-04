@@ -1,5 +1,5 @@
 import { PaletteMode, Tooltip } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent } from 'react';
 
 import browserDark from '../static/images/platforms/browser-dark.png';
@@ -16,7 +16,6 @@ import unknownDark from '../static/images/platforms/unknown-dark.png';
 import unknownLight from '../static/images/platforms/unknown-light.png';
 import windowsDark from '../static/images/platforms/windows-dark.png';
 import windowsLight from '../static/images/platforms/windows-light.png';
-import type { Theme } from './Theme';
 
 interface PlatformIconProps {
   platform: string;
@@ -37,9 +36,8 @@ const platformIcons: Record<PlatformIconProps['platform'], Record<PaletteMode, s
 };
 
 const renderIcon = (platform: string, width: number | undefined = 40, borderRadius: number | undefined = 0, marginRight: number | undefined = 0) => {
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { mode } = theme.palette;
-  // @ts-expect-error Need a proper enum
   const src = platformIcons[platform]?.[mode] || platformIcons.Unknown[mode];
   return <img style={{ width, borderRadius, marginRight }} src={src} alt={platform} />;
 };

@@ -1,9 +1,10 @@
 import { CastOutlined, CheckCircleOutlineOutlined, HistoryToggleOffOutlined, PersonOutlined } from '@mui/icons-material';
 import { Grid, LinearProgress, linearProgressClasses, List, ListItem, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
-import { makeStyles, styled } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchComcheck, fetchComcheckStatuses } from '../../../../../actions/Comcheck';
 import { fetchOrganizations } from '../../../../../actions/Organization';
@@ -19,7 +20,7 @@ import TagsFilter from '../../../common/filters/TagsFilter';
 import ComcheckState from './ComcheckState';
 import ComcheckStatusState from './ComcheckStatusState';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles()(theme => ({
   parameters: {
     padding: '20px 15px 0 15px',
     float: 'left',
@@ -193,7 +194,7 @@ const iconStatus = (status) => {
 
 const Comcheck = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const [currentDate, setCurrentDate] = useState(new Date());
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { Grid, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import { useFormatter } from '../../../../components/i18n';
@@ -13,7 +13,7 @@ import ScenarioVariables from './variables/ScenarioVariables';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   gridContainer: {
     marginBottom: 20,
   },
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
 
 const ScenarioDefinition = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   // Fetching data

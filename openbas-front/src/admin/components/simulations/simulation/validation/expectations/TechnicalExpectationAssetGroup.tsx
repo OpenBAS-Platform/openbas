@@ -1,7 +1,7 @@
 import { DnsOutlined } from '@mui/icons-material';
 import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { EndpointHelper } from '../../../../../../actions/assets/asset-helper';
 import type { Contract } from '../../../../../../actions/contract/contract';
@@ -13,7 +13,7 @@ import ExpectationLine from './ExpectationLine';
 import groupedByAsset from './ExpectationUtils';
 import TechnicalExpectationAsset from './TechnicalExpectationAsset';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   item: {
     height: 40,
   },
@@ -40,7 +40,7 @@ const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
   assetGroup,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   // Fetching data
   const {

@@ -1,7 +1,7 @@
 import { KeyboardArrowRight } from '@mui/icons-material';
 import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
@@ -23,7 +23,7 @@ import { isNotEmptyField } from '../../../../utils/utils';
 import CreateInjectDetails from './CreateInjectDetails';
 import InjectIcon from './InjectIcon';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -83,7 +83,7 @@ interface Props {
 
 const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = false, handleClose, isAtomic = false, presetValues, ...props }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const drawerRef = useRef(null);
   const { t, tPick } = useFormatter();
 

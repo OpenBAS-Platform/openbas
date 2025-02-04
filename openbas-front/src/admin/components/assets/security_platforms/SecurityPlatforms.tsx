@@ -1,7 +1,8 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
 import type { UserHelper } from '../../../../actions/helper';
@@ -12,14 +13,13 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { SearchPaginationInput, SecurityPlatform } from '../../../../utils/api-types';
 import { isNotEmptyField } from '../../../../utils/utils';
 import SecurityPlatformCreation from './SecurityPlatformCreation';
 import SecurityPlatformPopover from './SecurityPlatformPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -61,8 +61,8 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const SecurityPlatforms = () => {
   // Standard hooks
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const { t } = useFormatter();
 
   // Query param

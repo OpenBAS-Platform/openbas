@@ -12,9 +12,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../../../actions/Document';
 import Transition from '../../../../components/common/Transition';
@@ -29,7 +29,7 @@ import CreateDocument from '../../components/documents/CreateDocument';
 import { PermissionsContext } from '../Context';
 import TagsFilter from '../filters/TagsFilter';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles()(theme => ({
   box: {
     width: '100%',
     minHeight: '100%',
@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
 const ArticleAddDocuments = (props) => {
   const { handleAddDocuments, articleDocumentsIds, channelType } = props;
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 

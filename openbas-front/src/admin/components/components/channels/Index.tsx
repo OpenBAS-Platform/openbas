@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles';
 import { lazy } from 'react';
 import { Route, Routes, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchChannel } from '../../../../actions/channels/channel-action';
 import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
@@ -13,7 +13,7 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import ChannelHeader from './ChannelHeader';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     flexGrow: 1,
   },
@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
 const Channel = lazy(() => import('./Channel'));
 
 const Index = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { channelId } = useParams() as { channelId: ChannelType['channel_id'] };
   const { channel } = useHelper((helper: ChannelsHelper) => ({

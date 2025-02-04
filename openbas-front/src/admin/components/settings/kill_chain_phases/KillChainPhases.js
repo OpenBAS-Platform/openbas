@@ -1,7 +1,7 @@
 import { RouteOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchKillChainPhases } from '../../../../actions/KillChainPhase';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -13,7 +13,7 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateKillChainPhase from './CreateKillChainPhase';
 import KillChainPhasePopover from './KillChainPhasePopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
@@ -65,7 +65,7 @@ const inlineStyles = {
 
 const KillChainPhases = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
 
   // Headers

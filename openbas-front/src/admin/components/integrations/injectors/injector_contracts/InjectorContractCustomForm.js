@@ -1,5 +1,5 @@
 import { Button, Grid, Switch, TextField as MUITextField, Typography } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { useState } from 'react';

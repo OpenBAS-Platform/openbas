@@ -1,13 +1,12 @@
 import { Paper } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import ItemNumberDifference from '../../../../components/ItemNumberDifference';
-import type { Theme } from '../../../../components/Theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   title: {
     textTransform: 'uppercase',
     fontSize: theme.typography.h4.fontSize,
@@ -49,7 +48,7 @@ const PaperMetric: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const component = React.cloneElement(icon as React.ReactElement, { color: 'primary', style: { fontSize: 35, marginTop: 15 } });
   return (
     <Paper variant="outlined" className={classes.container}>

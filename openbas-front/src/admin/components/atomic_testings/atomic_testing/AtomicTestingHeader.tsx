@@ -1,8 +1,8 @@
 import { PlayArrowOutlined, SettingsOutlined } from '@mui/icons-material';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import {
   launchAtomicTesting,
@@ -17,7 +17,7 @@ import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextTyp
 import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   title: {
     float: 'left',
     marginRight: 10,
@@ -31,7 +31,7 @@ const useStyles = makeStyles(() => ({
 const AtomicTestingHeader = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const navigate = useNavigate();
 
   const { injectResultOverviewOutput, updateInjectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);

@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent, useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 
@@ -6,7 +6,6 @@ import { fetchScenarioStatistic } from '../../../../actions/scenarios/scenario-a
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import type { Theme } from '../../../../components/Theme';
 import { GlobalScoreBySimulationEndDate, ScenarioStatistic } from '../../../../utils/api-types';
 import { CustomTooltipFunction, CustomTooltipOptions, verticalBarsChartOptions } from '../../../../utils/Charts';
 
@@ -66,8 +65,7 @@ const customTooltip = (simulationEndDateLabel: string): CustomTooltipFunction =>
   };
 };
 
-function getXFormatter() {
-  const { fsd } = useFormatter();
+function getXFormatter(fsd: (date: string) => string) {
   return (rawData: string) => {
     if (!rawData) {
       return rawData;
@@ -85,8 +83,8 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
   scenarioId,
 }) => {
   // Standard hooks
-  const { t } = useFormatter();
-  const theme: Theme = useTheme();
+  const { fsd, t } = useFormatter();
+  const theme = useTheme();
 
   const simulationEndDateLabel = t('Simulation end date');
 
@@ -126,7 +124,7 @@ const ScenarioDistributionByExercise: FunctionComponent<Props> = ({
         <Chart
           options={verticalBarsChartOptions(
             theme,
-            getXFormatter(),
+            getXFormatter(fsd),
             getYFormatter(),
             false,
             false,

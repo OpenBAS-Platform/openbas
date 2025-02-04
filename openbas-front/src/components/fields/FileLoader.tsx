@@ -1,8 +1,8 @@
 import { AttachmentOutlined, ControlPointOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, useEffect, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
 import type { DocumentHelper } from '../../actions/helper';
@@ -14,10 +14,9 @@ import useDataLoader from '../../utils/hooks/useDataLoader';
 import ButtonPopover, { PopoverEntry } from '../common/ButtonPopover';
 import { useFormatter } from '../i18n';
 import ItemTags from '../ItemTags';
-import type { Theme } from '../Theme';
 import FileTransferDialog from './FileTransferDialog';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   bodyItem: {
     height: '100%',
     fontSize: 13,
@@ -99,7 +98,7 @@ const FileLoader: React.FC<Props> = ({
   InputLabelProps,
   error,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 

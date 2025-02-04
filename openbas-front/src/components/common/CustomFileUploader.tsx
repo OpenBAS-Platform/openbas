@@ -1,9 +1,7 @@
 import { Box, Button, InputLabel } from '@mui/material';
-import { Theme } from '@mui/material/styles/createTheme';
-import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { FieldError, FieldErrors, FieldErrorsImpl, Merge } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import { truncate } from '../../utils/String';
 import { useFormatter } from '../i18n';
@@ -18,12 +16,12 @@ interface CustomFileUploadProps {
   sizeLimit?: number; // in bytes
 }
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   box: {
     'width': '100%',
     'marginTop': '0.2rem',
     'paddingBottom': '0.35rem',
-    'borderBottom': `0.1rem solid ${theme.palette.grey['400']}`,
+    'borderBottom': `0.1rem solid ${theme.palette.grey[500]}`,
     'cursor': 'default',
     '&:hover': {
       borderBottom: '0.1rem solid white',
@@ -61,7 +59,7 @@ const CustomFileUploader: FunctionComponent<CustomFileUploadProps> = ({
   errors,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes, cx } = useStyles();
   const [fileNameForDisplay, setFileNameForDisplay] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [errorText, setErrorText] = useState<string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>>('');
@@ -108,38 +106,40 @@ const CustomFileUploader: FunctionComponent<CustomFileUploadProps> = ({
   };
 
   return (
-    <div className={classes.div}>
-      <InputLabel shrink={true} variant="standard">
-        {label ? t(label) : t('Associated file')}
-      </InputLabel>
-      <Box
-        className={classNames({
-          [classes.box]: true,
-          [classes.boxError]: !!errorText,
-        })}
-      >
-        <Button
-          component="label"
-          variant="contained"
-          onChange={onChange}
-          className={classes.button}
+    (
+      <div className={classes.div}>
+        <InputLabel shrink={true} variant="standard">
+          {label ? t(label) : t('Associated file')}
+        </InputLabel>
+        <Box
+          className={cx({
+            [classes.box]: true,
+            [classes.boxError]: !!errorText,
+          })}
         >
-          {t('Select your file')}
-          <VisuallyHiddenInput type="file" accept={acceptMimeTypes} />
-        </Button>
-        <span
-          title={fileNameForDisplay || t('No file selected.')}
-          className={classes.span}
-        >
-          {fileNameForDisplay || t('No file selected.')}
-        </span>
-      </Box>
-      {!!errorText && (
-        <div>
-          <span className={classes.error}>{t(errorText)}</span>
-        </div>
-      )}
-    </div>
+          <Button
+            component="label"
+            variant="contained"
+            onChange={onChange}
+            className={classes.button}
+          >
+            {t('Select your file')}
+            <VisuallyHiddenInput type="file" accept={acceptMimeTypes} />
+          </Button>
+          <span
+            title={fileNameForDisplay || t('No file selected.')}
+            className={classes.span}
+          >
+            {fileNameForDisplay || t('No file selected.')}
+          </span>
+        </Box>
+        {!!errorText && (
+          <div>
+            <span className={classes.error}>{t(errorText)}</span>
+          </div>
+        )}
+      </div>
+    )
   );
 };
 

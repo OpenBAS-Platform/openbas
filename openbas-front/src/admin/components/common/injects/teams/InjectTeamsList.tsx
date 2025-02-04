@@ -1,17 +1,16 @@
 import { GroupsOutlined } from '@mui/icons-material';
 import { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useContext, useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { findTeams } from '../../../../../actions/teams/team-actions';
 import ItemTags from '../../../../../components/ItemTags';
-import type { Theme } from '../../../../../components/Theme';
 import type { TeamOutput } from '../../../../../utils/api-types';
 import TeamPopover from '../../../components/teams/TeamPopover';
 import { PermissionsContext, TeamContext } from '../../Context';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     paddingLeft: 10,
     height: 50,
@@ -35,7 +34,7 @@ const InjectTeamsList: FunctionComponent<Props> = ({
   handleRemoveTeam,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { permissions } = useContext(PermissionsContext);
   const { computeTeamUsersEnabled } = useContext(TeamContext);
 

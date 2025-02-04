@@ -1,10 +1,10 @@
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addMitigation } from '../../../actions/Mitigation';
 import Drawer from '../../../components/common/Drawer';
@@ -87,5 +87,5 @@ CreateMitigation.propTypes = {
 export default R.compose(
   connect(null, { addMitigation }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreateMitigation);

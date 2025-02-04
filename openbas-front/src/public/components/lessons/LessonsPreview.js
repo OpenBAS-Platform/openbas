@@ -1,8 +1,9 @@
 import { Button, Grid, Paper, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import Empty from '../../../components/Empty';
 import OldTextField from '../../../components/fields/OldTextField';
@@ -10,7 +11,7 @@ import SliderField from '../../../components/fields/SliderField';
 import { useFormatter } from '../../../components/i18n';
 import Loader from '../../../components/Loader';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     position: 'relative',
     flexGrow: 1,
@@ -40,7 +41,7 @@ const LessonsPreview = (props) => {
   } = props;
 
   const theme = useTheme();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const validate = (values) => {

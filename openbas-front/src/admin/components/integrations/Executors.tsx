@@ -1,19 +1,18 @@
 import { Card, CardContent, Chip, Grid, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../actions/Executor';
 import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import SearchFilter from '../../../components/SearchFilter';
-import type { Theme } from '../../../components/Theme';
 import { useHelper } from '../../../store';
 import type { Executor } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   parameters: {
     marginTop: -3,
   },
@@ -46,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const Executors = () => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
   // Filter and sort hook

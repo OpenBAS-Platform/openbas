@@ -1,6 +1,5 @@
 import { enUS, esES, frFR, Localization, zhCN } from '@mui/material/locale';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { ThemeOptions } from '@mui/material/styles/createTheme';
 import { ReactNode, useEffect, useState } from 'react';
 import * as React from 'react';
 
@@ -56,7 +55,7 @@ const AppThemeProvider: React.FC<Props> = ({
       dark?.primary_color,
       dark?.secondary_color,
       dark?.accent_color,
-    ) as ThemeOptions,
+    ),
     muiLocale,
   );
   if (theme === 'light') {
@@ -70,7 +69,7 @@ const AppThemeProvider: React.FC<Props> = ({
         light?.primary_color,
         light?.secondary_color,
         light?.accent_color,
-      ) as ThemeOptions,
+      ),
       muiLocale,
     );
   }

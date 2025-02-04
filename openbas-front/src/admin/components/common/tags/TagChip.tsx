@@ -1,11 +1,11 @@
 import { Chip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { TagHelper } from '../../../../actions/helper';
 import { useHelper } from '../../../../store';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   tag: {
     marginLeft: 5,
   },
@@ -23,7 +23,7 @@ const TagChip: FunctionComponent<Props> = ({
   deleteTag,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const tag = useHelper((helper: TagHelper) => helper.getTag(tagId));
 
   if (!tag) {

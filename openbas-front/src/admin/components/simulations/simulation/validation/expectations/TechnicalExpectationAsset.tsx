@@ -1,20 +1,19 @@
 import { KeyboardArrowRightOutlined } from '@mui/icons-material';
 import { Alert, Button, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { Contract } from '../../../../../../actions/contract/contract';
 import Drawer from '../../../../../../components/common/Drawer';
 import { useFormatter } from '../../../../../../components/i18n';
-import type { Theme } from '../../../../../../components/Theme';
 import type { InjectExpectationResult } from '../../../../../../utils/api-types';
 import { truncate } from '../../../../../../utils/String';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import { typeIcon } from '../../../../common/injects/expectations/ExpectationUtils';
 import ExpectationLine from './ExpectationLine';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   buttons: {
     display: 'flex',
     placeContent: 'space-between',
@@ -41,7 +40,7 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
   injectContract,
   gap,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [open, setOpen] = useState(false);

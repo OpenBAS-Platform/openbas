@@ -8,9 +8,9 @@ import {
   VisibilityOutlined,
 } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useContext } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
@@ -18,7 +18,7 @@ import { useFormatter } from '../../../../components/i18n';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { ChallengeContext } from '../Context';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   flag: {
     fontSize: 12,
     float: 'left',
@@ -47,7 +47,7 @@ const useStyles = makeStyles(() => ({
 
 const ContextualChallenges = ({ challenges, linkToInjects }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Context

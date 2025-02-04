@@ -1,7 +1,7 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, ListItemButton, ListItemIcon, ListItemText, Slide } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { forwardRef, useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
@@ -13,7 +13,7 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles()(theme => ({
   text: {
     fontSize: 15,
     color: theme.palette.primary.main,
@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
 
 const CreateLessonsCategory = (props) => {
   const { onCreate, inline } = props;
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const [open, setOpen] = useState(false);
 

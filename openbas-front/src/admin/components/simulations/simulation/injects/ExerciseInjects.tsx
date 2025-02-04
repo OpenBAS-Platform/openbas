@@ -1,8 +1,8 @@
 import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
 import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
@@ -27,7 +27,7 @@ import ExerciseDistributionScoreOverTimeByTeam from '../overview/ExerciseDistrib
 import ExerciseDistributionScoreOverTimeByTeamInPercentage from '../overview/ExerciseDistributionScoreOverTimeByTeamInPercentage';
 import teamContextForExercise from '../teams/teamContextForExercise';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
@@ -39,7 +39,7 @@ const useStyles = makeStyles(() => ({
 const ExerciseInjects: FunctionComponent = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const availableButtons = ['chain', 'list', 'distribution'];
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };

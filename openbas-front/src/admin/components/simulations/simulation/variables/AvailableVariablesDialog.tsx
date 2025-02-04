@@ -1,10 +1,10 @@
 import { CopyAllOutlined } from '@mui/icons-material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Alert, Button, Dialog, DialogActions, DialogContent, List, ListItem, ListItemButton, ListItemText, Tab } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { Contract } from '../../../../../actions/contract/contract';
 import type { UserHelper } from '../../../../../actions/helper';
@@ -61,7 +61,7 @@ const VariableChildItem: FunctionComponent<VariableChildItemProps> = ({
   );
 };
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   button: {
     textTransform: 'none',
     height: 18,
@@ -83,7 +83,7 @@ interface AvailableVariablesDialogProps {
 const AvailableVariablesDialog: FunctionComponent<
   AvailableVariablesDialogProps
 > = ({ open, handleClose, variables, injectorContract, uriVariable }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const [tab, setTab] = useState('1');
 

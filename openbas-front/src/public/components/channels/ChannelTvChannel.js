@@ -1,7 +1,8 @@
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Grid, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
+import { makeStyles } from 'tss-react/mui';
 
 import Empty from '../../../components/Empty';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
@@ -9,7 +10,7 @@ import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: '0 auto',
     width: 1200,
@@ -31,7 +32,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ChannelTvChannel = ({ channelReader }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const theme = useTheme();
   const { t, fldt } = useFormatter();
   const [userId] = useQueryParameter(['user']);

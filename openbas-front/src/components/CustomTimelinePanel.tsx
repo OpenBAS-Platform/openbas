@@ -1,16 +1,16 @@
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { type BackgroundProps, Panel, type ReactFlowState, useStore, Viewport } from '@xyflow/react';
 import moment from 'moment-timezone';
 import { CSSProperties, memo, useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 import { shallow } from 'zustand/shallow';
 
 import { useFormatter } from './i18n';
-import type { Theme } from './Theme';
 
 const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
 
 // @ts-expect-error pointer events is important and is mandatory
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   panel: {
     pointerEvents: 'none !important',
     width: '100%',
@@ -50,8 +50,8 @@ function BackgroundComponent({
   viewportData,
   startDate = undefined,
 }: Props) {
-  const theme: Theme = useTheme();
-  const classes = useStyles();
+  const theme = useTheme();
+  const { classes } = useStyles();
   const { ft, fld, vnsdt } = useFormatter();
 
   const { transform } = useStore(selector, shallow);

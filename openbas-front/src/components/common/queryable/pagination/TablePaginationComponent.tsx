@@ -1,12 +1,12 @@
 import { TablePagination, ToggleButtonGroup } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import ExportButton, { ExportProps } from '../../ExportButton';
 import { PaginationHelpers } from './PaginationHelpers';
 import { ROWS_PER_PAGE_OPTIONS } from './usPaginationState';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'flex',
     alignItems: 'center',
@@ -29,7 +29,7 @@ const TablePaginationComponent = <T extends object>({
   children,
 }: Props<T>) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const handleChangePage = (
     _event: React.MouseEvent<HTMLButtonElement> | null,

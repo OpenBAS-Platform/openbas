@@ -1,10 +1,8 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { type BackgroundProps, type ReactFlowState, useStore } from '@xyflow/react';
 import cc from 'classcat';
 import { CSSProperties, memo, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
-
-import type { Theme } from './Theme';
 
 interface Props extends BackgroundProps {
   minutesPerGap: number;
@@ -30,7 +28,7 @@ function BackgroundComponent({
   style,
   className,
 }: Props) {
-  const theme: Theme = useTheme();
+  const theme = useTheme();
   const ref = useRef<SVGSVGElement>(null);
   const { transform, patternId } = useStore(selector, shallow);
 

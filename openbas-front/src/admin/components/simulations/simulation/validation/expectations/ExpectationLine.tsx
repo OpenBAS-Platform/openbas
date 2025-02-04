@@ -1,12 +1,11 @@
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, ReactElement } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
-import type { Theme } from '../../../../../../components/Theme';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import ResultChip from './ResultChip';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     height: 40,
   },
@@ -42,7 +41,7 @@ const ExpectationLine: FunctionComponent<Props> = ({
   gap,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   return (
     <>

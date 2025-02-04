@@ -1,10 +1,9 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import type { Team } from '../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../utils/Charts';
 
@@ -21,7 +20,7 @@ const InjectsDistribution: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
 
   return (
     <>

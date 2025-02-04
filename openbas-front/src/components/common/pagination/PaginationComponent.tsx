@@ -1,7 +1,7 @@
 import { Button, Chip, TablePagination, ToggleButtonGroup } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../admin/components/common/filters/MitreFilter';
 import mitreAttack from '../../../static/images/misc/attack.png';
@@ -14,7 +14,7 @@ import { FilterHelpers } from '../queryable/filter/FilterHelpers';
 import { isEmptyFilter } from '../queryable/filter/FilterUtils';
 import type { Page } from '../queryable/Page';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'flex',
     alignItems: 'center',
@@ -70,7 +70,7 @@ const PaginationComponent = <T extends object>({
   children,
 }: Props<T>) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Pagination

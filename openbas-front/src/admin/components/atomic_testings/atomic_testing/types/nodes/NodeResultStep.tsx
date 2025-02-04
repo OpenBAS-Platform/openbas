@@ -1,14 +1,12 @@
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 import { memo } from 'react';
-
-import type { Theme } from '../../../../../../components/Theme';
+import { makeStyles } from 'tss-react/mui';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   node: {
     position: 'relative',
     border:
@@ -72,7 +70,7 @@ export type NodeResultStep = Node<{
 >;
 
 const NodeResultStepComponent = ({ data }: NodeProps<NodeResultStep>) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   return (
     <div className={classes.node} style={{ backgroundColor: data.background, color: data.color }}>
       <div className={classes.icon}>

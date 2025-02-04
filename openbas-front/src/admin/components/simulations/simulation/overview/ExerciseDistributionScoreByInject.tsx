@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
@@ -6,7 +6,6 @@ import Chart from 'react-apexcharts';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { Exercise, Inject, InjectExpectation } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
@@ -20,7 +19,7 @@ const ExerciseDistributionScoreByInject: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const theme: Theme = useTheme();
+  const theme = useTheme();
 
   // Fetching data
   const { injectsMap, injectExpectations } = useHelper((helper: InjectHelper) => ({

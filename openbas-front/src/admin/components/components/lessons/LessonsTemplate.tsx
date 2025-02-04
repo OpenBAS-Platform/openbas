@@ -1,7 +1,7 @@
 import { HelpOutlined } from '@mui/icons-material';
 import { Grid, List, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { UserHelper } from '../../../../actions/helper';
 import { fetchLessonsTemplateCategories, fetchLessonsTemplateQuestions } from '../../../../actions/Lessons';
@@ -16,7 +16,7 @@ import LessonsTemplateCategoryPopover from './categories/LessonsTemplateCategory
 import CreateLessonsTemplateQuestion from './categories/questions/CreateLessonsTemplateQuestion';
 import LessonsTemplateQuestionPopover from './categories/questions/LessonsTemplateQuestionPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'flex',
     alignItems: 'center',
@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
 const LessonsTemplate = () => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { lessonsTemplateId } = useParams() as { lessonsTemplateId: string };
 

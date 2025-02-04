@@ -1,6 +1,6 @@
 import { Grid, List, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import Empty from '../../../../../components/Empty';
@@ -12,7 +12,7 @@ import { useHelper } from '../../../../../store';
 import type { EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
 import AgentList from './AgentList';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     padding: 20,
   },
@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
 
 const Endpoint = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
   const { t } = useFormatter();
 

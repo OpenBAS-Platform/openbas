@@ -1,14 +1,14 @@
 import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined } from '@mui/icons-material';
 import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { logout } from '../../../actions/Application';
 import { useFormatter } from '../../../components/i18n';
 import SearchInput from '../../../components/SearchFilter';
-import type { Theme } from '../../../components/Theme';
 import { computeBannerSettings } from '../../../public/components/systembanners/utils';
 import obasDark from '../../../static/images/xtm/obas_dark.png';
 import obasLight from '../../../static/images/xtm/obas_light.png';
@@ -22,7 +22,7 @@ import { MESSAGING$ } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useAuth from '../../../utils/hooks/useAuth';
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   appBar: {
     width: '100%',
     zIndex: theme.zIndex.drawer + 1,
@@ -95,10 +95,10 @@ const useStyles = makeStyles<Theme>(theme => ({
 
 const TopBar: React.FC = () => {
   // Standard hooks
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const { settings } = useAuth();
   const { bannerHeightNumber } = computeBannerSettings(settings);
@@ -188,7 +188,6 @@ const TopBar: React.FC = () => {
             <Tooltip title={t('Install simulation agents')}>
               <IconButton
                 size="medium"
-                classes={{ root: classes.button }}
                 aria-haspopup="true"
                 component={Link}
                 to="/admin/agents"
@@ -200,7 +199,6 @@ const TopBar: React.FC = () => {
             <IconButton
               color="inherit"
               size="medium"
-              classes={{ root: classes.button }}
               aria-owns={xtmOpen.open ? 'menu-appbar' : undefined}
               aria-haspopup="true"
               id="xtm-menu-button"

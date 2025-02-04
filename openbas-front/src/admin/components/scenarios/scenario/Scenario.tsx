@@ -1,10 +1,11 @@
 import { PlayArrowOutlined } from '@mui/icons-material';
 import { Avatar, Button, Chip, Grid, Paper, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import * as React from 'react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { searchScenarioExercises } from '../../../../actions/scenarios/scenario-actions';
@@ -20,7 +21,6 @@ import ItemMainFocus from '../../../../components/ItemMainFocus';
 import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type { Theme } from '../../../../components/Theme';
 import octiDark from '../../../../static/images/xtm/octi_dark.png';
 import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
@@ -32,7 +32,7 @@ import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     fontSize: 12,
     height: 25,
@@ -55,8 +55,8 @@ const useStyles = makeStyles(() => ({
 
 const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiateSimulationAndStart: React.Dispatch<React.SetStateAction<boolean>> }) => {
   // Standard hooks
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const { t } = useFormatter();
   const { scenarioId } = useParams() as { scenarioId: ScenarioType['scenario_id'] };
   // Fetching data

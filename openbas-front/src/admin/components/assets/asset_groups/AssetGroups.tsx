@@ -1,8 +1,8 @@
 import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { CSSProperties, Fragment, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
@@ -25,7 +25,7 @@ import AssetGroupCreation from './AssetGroupCreation';
 import AssetGroupManagement from './AssetGroupManagement';
 import AssetGroupPopover from './AssetGroupPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -129,7 +129,7 @@ const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => s
 
 const AssetGroups = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroup['asset_group_id'] | undefined>(undefined);

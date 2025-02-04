@@ -1,17 +1,16 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
 import { truncate } from '../../../../../utils/String';
 import type { ExpectationInput } from './Expectation';
 import ExpectationPopover from './ExpectationPopover';
 import { isAutomatic, typeIcon } from './ExpectationUtils';
 import InjectAddExpectation from './InjectAddExpectation';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     paddingLeft: 10,
     height: 50,
@@ -37,7 +36,7 @@ const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
   handleExpectations,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [expectations, setExpectations] = useState(expectationDatas ?? []);

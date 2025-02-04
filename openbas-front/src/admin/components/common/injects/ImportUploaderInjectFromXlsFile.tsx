@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import CustomFileUploader from '../../../../components/common/CustomFileUploader';
@@ -10,7 +10,7 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { zodImplement } from '../../../../utils/Zod';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -39,7 +39,7 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const [loading, setLoading] = useState(false);
 

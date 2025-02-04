@@ -1,6 +1,6 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchPlatformParameters, updatePlatformPolicies } from '../../../../actions/Application';
 import type { LoggedHelper } from '../../../../actions/helper';
@@ -13,7 +13,7 @@ import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import SecurityMenu from '../SecurityMenu';
 import PolicyForm from './PolicyForm';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
@@ -28,7 +28,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Policies: FunctionComponent = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({

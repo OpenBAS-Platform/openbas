@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles';
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { errorWrapper } from '../../../components/Error';
 import Loader from '../../../components/Loader';
@@ -10,14 +10,14 @@ const Players = lazy(() => import('./Players'));
 const Teams = lazy(() => import('./Teams'));
 const Organizations = lazy(() => import('./Organizations'));
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     flexGrow: 1,
   },
 }));
 
 const Index = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   return (
     <div className={classes.root}>
       <Suspense fallback={<Loader />}>
