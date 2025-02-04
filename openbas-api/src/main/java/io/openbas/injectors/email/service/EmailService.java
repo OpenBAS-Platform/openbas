@@ -13,12 +13,10 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -212,7 +210,8 @@ public class EmailService {
     return encMessage;
   }
 
-  private void sendEmailWithRetry(Execution execution, MimeMessage mimeMessage) throws InterruptedException {
+  private void sendEmailWithRetry(Execution execution, MimeMessage mimeMessage)
+      throws InterruptedException {
     for (int i = 0; i < 3; i++) {
       try {
         emailSender.send(mimeMessage);
@@ -225,5 +224,4 @@ public class EmailService {
     }
     execution.addTrace(traceError("Failed to send mail after 3 attempts"));
   }
-
 }
