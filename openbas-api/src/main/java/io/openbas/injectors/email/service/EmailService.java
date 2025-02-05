@@ -69,7 +69,7 @@ public class EmailService {
       recipients.add(new InternetAddress(userContext.getUser().getEmail()));
     }
     mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
-    this.sendEmailWithRetry(mimeMessage);
+    this.sendEmailWithRetry(execution, mimeMessage);
     String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
     List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
     execution.addTrace(
@@ -100,9 +100,9 @@ public class EmailService {
     if (mustBeEncrypted) {
       MimeMessage encMessage =
           getEncryptedMimeMessage(userContext, from, replyTos, subject, email, mimeMessage);
-      this.sendEmailWithRetry(encMessage);
+      this.sendEmailWithRetry(execution, encMessage);
     } else {
-      this.sendEmailWithRetry(mimeMessage);
+      this.sendEmailWithRetry(execution, mimeMessage);
     }
     List<String> userIds = List.of(userContext.getUser().getId());
     execution.addTrace(
@@ -227,17 +227,19 @@ public class EmailService {
     return encMessage;
   }
 
-  private void sendEmailWithRetry(MimeMessage mimeMessage) throws Exception {
+  private void sendEmailWithRetry(Execution execution, MimeMessage mimeMessage)
+      throws InterruptedException {
     for (int i = 0; i < 3; i++) {
       try {
         emailSender.send(mimeMessage);
-        break;
+        return;
       } catch (Exception e) {
-        if (i == 2) {
-          throw e;
-        }
+        execution.addTrace(
+            getNewInfoTrace(
+                "Failed to send mail" + e.getMessage(), ExecutionTraceAction.EXECUTION));
         Thread.sleep(2000);
       }
     }
+    throw new InterruptedException("Failed to send mail after 3 attempts");
   }
 }
