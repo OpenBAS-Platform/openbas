@@ -123,15 +123,16 @@ public class RestBehavior {
         @ApiResponse(
             responseCode = "404",
             description = "Resource not found",
-            content = @Content(schema = @Schema(implementation = ValidationErrorBag.class))),
+            content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
       })
-  public ValidationErrorBag handleAccessDeniedExceptions() {
+  public ResponseEntity<ErrorMessage> handleAccessDeniedExceptions() {
     // When the user does not have the appropriate access rights, return 404 Not Found.
     // This response indicates that the resource does not exist, preventing any information
     // disclosure
     // about the resource and reducing the risk of brute force attacks by not confirming its
     // existence
-    return new ValidationErrorBag(HttpStatus.NOT_FOUND.value(), "NOT_FOUND");
+    return new ResponseEntity<>(
+        new ErrorMessage(HttpStatus.NOT_FOUND.getReasonPhrase()), HttpStatus.NOT_FOUND);
   }
 
   @ResponseStatus(HttpStatus.CONFLICT)
@@ -141,7 +142,7 @@ public class RestBehavior {
         @ApiResponse(
             responseCode = "409",
             description = "Conflict",
-            content = @Content(schema = @Schema(implementation = ValidationErrorBag.class))),
+            content = @Content(schema = @Schema(implementation = ViolationErrorBag.class))),
       })
   public ViolationErrorBag handleIntegrityException(DataIntegrityViolationException e) {
     ViolationErrorBag errorBag = new ViolationErrorBag();
@@ -163,7 +164,7 @@ public class RestBehavior {
         @ApiResponse(
             responseCode = "404",
             description = "Resource not found",
-            content = @Content(schema = @Schema(implementation = ValidationErrorBag.class))),
+            content = @Content(schema = @Schema(implementation = ResponseEntity.class))),
       })
   public ResponseEntity<ErrorMessage> handleElementNotFoundException(ElementNotFoundException ex) {
     ErrorMessage message = new ErrorMessage("Element not found: " + ex.getMessage());
