@@ -830,6 +830,7 @@ const i18n = {
       // Assets
       'Agents Privileges': 'Privilèges des agents',
       'Endpoints': 'Endpoints',
+      'Endpoint': 'Endpoint',
       'Endpoint Information': 'Informations sur endpoint',
       'asset': 'actif',
       'Rules': 'Règles',
@@ -2258,6 +2259,7 @@ const i18n = {
       // Assets
       'Agents Privileges': '代理权限',
       'Endpoints': '终端',
+      'Endpoint': '端点',
       'Endpoint Information': '终端信息',
       'Rules': '规则',
       'Rule': '规则',
