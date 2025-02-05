@@ -24,7 +24,7 @@ public class MockMapperUtils {
     return importMapper;
   }
 
-  private static InjectImporter createInjectImporter() {
+  public static InjectImporter createInjectImporter() {
     InjectImporter injectImporter = new InjectImporter();
     injectImporter.setId(UUID.randomUUID().toString());
     injectImporter.setImportTypeValue("Test");
@@ -37,7 +37,7 @@ public class MockMapperUtils {
     return injectImporter;
   }
 
-  private static RuleAttribute createRuleAttribute() {
+  public static RuleAttribute createRuleAttribute() {
     RuleAttribute ruleAttribute = new RuleAttribute();
     ruleAttribute.setColumns("Test");
     ruleAttribute.setName("Test");
