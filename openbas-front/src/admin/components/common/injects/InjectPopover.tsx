@@ -13,7 +13,7 @@ import DialogTest from '../../../../components/common/DialogTest';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectStatus, InjectTestStatus } from '../../../../utils/api-types';
+import type { Inject, InjectStatus, InjectTestStatusOutput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { InjectContext, PermissionsContext } from '../Context';
@@ -124,7 +124,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const handleCloseTest = () => setOpenTest(false);
 
   const submitTest = () => {
-    testInject(inject.inject_id).then((result: { data: InjectTestStatus }) => {
+    testInject(inject.inject_id).then((result: { data: InjectTestStatusOutput }) => {
       if (isExercise) {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
           itsDedicatedPage: <Link to={`/admin/simulations/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link>,

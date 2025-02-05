@@ -3,10 +3,7 @@ package io.openbas.service;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import io.openbas.database.model.Execution;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectTestStatus;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectTestStatusRepository;
 import io.openbas.database.repository.UserRepository;
@@ -16,6 +13,8 @@ import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.executors.Injector;
 import io.openbas.rest.exception.BadRequestException;
+import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import io.openbas.utils.InjectMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -39,13 +38,14 @@ public class InjectTestStatusService {
   private final InjectRepository injectRepository;
   private final ExecutionContextService executionContextService;
   private final InjectTestStatusRepository injectTestStatusRepository;
+  private final InjectMapper injectMapper;
 
   @Autowired
   public void setContext(ApplicationContext context) {
     this.context = context;
   }
 
-  public InjectTestStatus testInject(String injectId) {
+  public InjectTestStatusOutput testInject(String injectId) {
     Inject inject =
         this.injectRepository
             .findById(injectId)
@@ -60,7 +60,8 @@ public class InjectTestStatusService {
             .findById(currentUser().getId())
             .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    return testInject(inject, user);
+    InjectTestStatus injectStatus = testInject(inject, user);
+    return injectMapper.toInjectTestStatusOutput(injectStatus);
   }
 
   /**
@@ -69,7 +70,8 @@ public class InjectTestStatusService {
    * @param searchSpecifications the criteria to search injects to test
    * @return the list of inject test status
    */
-  public List<InjectTestStatus> bulkTestInjects(final Specification<Inject> searchSpecifications) {
+  public List<InjectTestStatusOutput> bulkTestInjects(
+      final Specification<Inject> searchSpecifications) {
     List<Inject> searchResult = this.injectRepository.findAll(searchSpecifications);
     if (searchResult.isEmpty()) {
       throw new BadRequestException("No inject ID is testable");
@@ -81,33 +83,36 @@ public class InjectTestStatusService {
 
     List<InjectTestStatus> results = new ArrayList<>();
     searchResult.forEach(inject -> results.add(testInject(inject, user)));
-    return results;
+    return results.stream().map(injectMapper::toInjectTestStatusOutput).toList();
   }
 
-  public Page<InjectTestStatus> findAllInjectTestsByExerciseId(
+  public Page<InjectTestStatusOutput> findAllInjectTestsByExerciseId(
       String exerciseId, SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<InjectTestStatus> specification, Pageable pageable) ->
-            injectTestStatusRepository.findAll(
-                InjectTestSpecification.findInjectTestInExercise(exerciseId).and(specification),
-                pageable),
-        searchPaginationInput,
-        InjectTestStatus.class);
+            (Specification<InjectTestStatus> specification, Pageable pageable) ->
+                injectTestStatusRepository.findAll(
+                    InjectTestSpecification.findInjectTestInExercise(exerciseId).and(specification),
+                    pageable),
+            searchPaginationInput,
+            InjectTestStatus.class)
+        .map(injectMapper::toInjectTestStatusOutput);
   }
 
-  public Page<InjectTestStatus> findAllInjectTestsByScenarioId(
+  public Page<InjectTestStatusOutput> findAllInjectTestsByScenarioId(
       String scenarioId, SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<InjectTestStatus> specification, Pageable pageable) ->
-            injectTestStatusRepository.findAll(
-                InjectTestSpecification.findInjectTestInScenario(scenarioId).and(specification),
-                pageable),
-        searchPaginationInput,
-        InjectTestStatus.class);
+            (Specification<InjectTestStatus> specification, Pageable pageable) ->
+                injectTestStatusRepository.findAll(
+                    InjectTestSpecification.findInjectTestInScenario(scenarioId).and(specification),
+                    pageable),
+            searchPaginationInput,
+            InjectTestStatus.class)
+        .map(injectMapper::toInjectTestStatusOutput);
   }
 
-  public InjectTestStatus findInjectTestStatusById(String testId) {
-    return injectTestStatusRepository.findById(testId).orElseThrow();
+  public InjectTestStatusOutput findInjectTestStatusById(String testId) {
+    return injectMapper.toInjectTestStatusOutput(
+        injectTestStatusRepository.findById(testId).orElseThrow());
   }
 
   // -- PRIVATE --

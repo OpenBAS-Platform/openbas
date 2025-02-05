@@ -8,18 +8,18 @@ import { testInject } from '../../../actions/injects/inject-action';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
-import type { InjectTestStatus } from '../../../utils/api-types';
+import type { InjectTestStatusOutput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
 import { PermissionsContext } from '../common/Context';
 
 interface Props {
-  injectTestStatus: InjectTestStatus;
-  onTest?: (result: InjectTestStatus) => void;
+  injectTest: InjectTestStatusOutput;
+  onTest?: (result: InjectTestStatusOutput) => void;
   onDelete?: (result: string) => void;
 }
 
 const InjectTestPopover: FunctionComponent<Props> = ({
-  injectTestStatus,
+  injectTest,
   onDelete,
   onTest,
 }) => {
@@ -43,10 +43,11 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    deleteInjectTest(injectTestStatus.status_id);
-    if (onDelete) {
-      onDelete(injectTestStatus.status_id!);
-    }
+    deleteInjectTest(injectTest.status_id).then(() => {
+      if (onDelete) {
+        onDelete(injectTest.status_id!);
+      }
+    });
     handleCloseDelete();
   };
 
@@ -60,9 +61,9 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   };
 
   const submitTest = () => {
-    testInject(injectTestStatus.inject_id!).then((result: { data: InjectTestStatus }) => {
+    testInject(injectTest.inject_id!).then((result: { data: InjectTestStatusOutput }) => {
       onTest?.(result.data);
-      MESSAGING$.notifySuccess(t(`Test for inject ${injectTestStatus.inject_title} has been sent`));
+      MESSAGING$.notifySuccess(t(`Test for inject ${injectTest.inject_title} has been sent`));
       return result;
     });
     handleCloseTest();

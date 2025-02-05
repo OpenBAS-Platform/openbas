@@ -70,6 +70,8 @@ const computeStatusStyle = (status: string | undefined | null) => {
   switch (status) {
     case 'ERROR':
       return inlineStyles.red;
+    case 'ASSET_INACTIVE':
+      return inlineStyles.red;
     case 'MAYBE_PREVENTED':
       return inlineStyles.purple;
     case 'MAYBE_PARTIAL_PREVENTED':

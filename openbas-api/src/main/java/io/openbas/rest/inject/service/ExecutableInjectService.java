@@ -130,14 +130,20 @@ public class ExecutableInjectService {
         injectService.convertInjectContent(inject, OpenBASImplantInjectContent.class);
     String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "plain-text";
 
+    Command payloadToExecute = new Command();
+    payloadToExecute.setType(contract.getPayload().getType());
+
     // prerequisite
+    List<PayloadPrerequisite> prerequisiteList = new ArrayList<>();
     contract
         .getPayload()
         .getPrerequisites()
         .forEach(
             prerequisite -> {
+              PayloadPrerequisite payload = new PayloadPrerequisite();
+              payload.setExecutor(prerequisite.getExecutor());
               if (hasText(prerequisite.getCheckCommand())) {
-                prerequisite.setCheckCommand(
+                payload.setCheckCommand(
                     processAndEncodeCommand(
                         prerequisite.getCheckCommand(),
                         prerequisite.getExecutor(),
@@ -146,7 +152,7 @@ public class ExecutableInjectService {
                         obfuscator));
               }
               if (hasText(prerequisite.getGetCommand())) {
-                prerequisite.setGetCommand(
+                payload.setGetCommand(
                     processAndEncodeCommand(
                         prerequisite.getGetCommand(),
                         prerequisite.getExecutor(),
@@ -154,34 +160,35 @@ public class ExecutableInjectService {
                         inject.getContent(),
                         obfuscator));
               }
+              prerequisiteList.add(payload);
             });
+    payloadToExecute.setPrerequisites(prerequisiteList);
 
     // cleanup
     if (contract.getPayload().getCleanupCommand() != null) {
-      contract
-          .getPayload()
-          .setCleanupCommand(
-              processAndEncodeCommand(
-                  contract.getPayload().getCleanupCommand(),
-                  contract.getPayload().getCleanupExecutor(),
-                  contract.getPayload().getArguments(),
-                  inject.getContent(),
-                  obfuscator));
+      payloadToExecute.setCleanupExecutor(contract.getPayload().getCleanupExecutor());
+      payloadToExecute.setCleanupCommand(
+          processAndEncodeCommand(
+              contract.getPayload().getCleanupCommand(),
+              contract.getPayload().getCleanupExecutor(),
+              contract.getPayload().getArguments(),
+              inject.getContent(),
+              obfuscator));
     }
 
     // Command
     if (contract.getPayload().getTypeEnum().equals(PayloadType.COMMAND)) {
       Command payloadCommand = (Command) contract.getPayload();
-      payloadCommand.setContent(
+      payloadToExecute.setExecutor(payloadCommand.getExecutor());
+      payloadToExecute.setContent(
           processAndEncodeCommand(
               payloadCommand.getContent(),
               payloadCommand.getExecutor(),
               contract.getPayload().getArguments(),
               inject.getContent(),
               obfuscator));
-      return payloadCommand;
     }
 
-    return contract.getPayload();
+    return payloadToExecute;
   }
 }

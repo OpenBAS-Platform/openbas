@@ -4,10 +4,10 @@ import static io.openbas.database.specification.InjectSpecification.testable;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
+import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.telemetry.Tracing;
@@ -32,13 +32,13 @@ public class InjectTestStatusApi extends RestBehavior {
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping("/api/injects/{injectId}/test")
-  public InjectTestStatus testInject(@PathVariable @NotBlank String injectId) {
+  public InjectTestStatusOutput testInject(@PathVariable @NotBlank String injectId) {
     return injectTestStatusService.testInject(injectId);
   }
 
   @Transactional(rollbackFor = Exception.class)
   @GetMapping("/api/injects/test/{testId}")
-  public InjectTestStatus findInjectTestStatus(@PathVariable @NotBlank String testId) {
+  public InjectTestStatusOutput findInjectTestStatus(@PathVariable @NotBlank String testId) {
     return injectTestStatusService.findInjectTestStatusById(testId);
   }
 
@@ -55,7 +55,7 @@ public class InjectTestStatusApi extends RestBehavior {
   @PostMapping("/api/injects/test")
   @LogExecutionTime
   @Tracing(name = "Bulk tests of injects", layer = "api", operation = "PUT")
-  public List<InjectTestStatus> bulkTestInject(
+  public List<InjectTestStatusOutput> bulkTestInject(
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs

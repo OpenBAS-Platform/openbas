@@ -1,6 +1,7 @@
 package io.openbas.database.model;
 
 public enum ExecutionTraceAction {
+  START,
   PREREQUISITE_CHECK,
   PREREQUISITE_EXECUTION,
 

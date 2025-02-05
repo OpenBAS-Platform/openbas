@@ -124,11 +124,15 @@ public class InjectApi extends RestBehavior {
     return injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
-  @GetMapping(INJECT_URI + "/{injectId}/executable-payload")
+  @GetMapping(INJECT_URI + "/{injectId}/{agentId}/executable-payload")
   @Tracing(name = "Get payload ready to be executed", layer = "api", operation = "GET")
-  public Payload getExecutablePayloadInject(@PathVariable @NotBlank final String injectId)
+  public Payload getExecutablePayloadInject(
+      @PathVariable @NotBlank final String injectId, @PathVariable @NotBlank final String agentId)
       throws Exception {
-    return executableInjectService.getExecutablePayloadInject(injectId);
+    Payload payloadToExecute = executableInjectService.getExecutablePayloadInject(injectId);
+    injectStatusService.addStartImplantExecutionTraceByInject(
+        injectId, agentId, "Implant is up and start execution");
+    return payloadToExecute;
   }
 
   // -- EXERCISES --

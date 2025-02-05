@@ -286,6 +286,11 @@ const TimelineOverview = () => {
                                 }}
                               >
                                 {fndt(inject.inject_status?.tracking_sent_date)}
+                                {' '}
+                                {
+                                  inject.inject_status?.tracking_sent_date && inject.inject_status.tracking_end_date
+                                  && ((new Date(inject.inject_status.tracking_end_date).getTime() - new Date(inject.inject_status.tracking_sent_date).getTime()) / 1000).toFixed(2)
+                                }
                                 {t('s')}
                               </div>
                             </div>

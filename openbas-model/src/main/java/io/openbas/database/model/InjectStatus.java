@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -35,6 +36,7 @@ public class InjectStatus extends BaseInjectStatus {
     return this.getTraces().stream().flatMap(ex -> ex.getIdentifiers().stream()).toList();
   }
 
+  @JsonIgnore
   public Map<String, Agent> getStatusMapIdentifierAgent() {
     Map<String, Agent> info = new HashMap<>();
     this.getTraces()
@@ -55,26 +57,22 @@ public class InjectStatus extends BaseInjectStatus {
 
   public void addTrace(
       ExecutionTraceStatus status, String message, ExecutionTraceAction action, Agent agent) {
-    ExecutionTraces newTrace = new ExecutionTraces(this, status, List.of(), message, action, agent);
+    ExecutionTraces newTrace =
+        new ExecutionTraces(this, status, List.of(), message, action, agent, null);
     this.getTraces().add(newTrace);
   }
 
   public void addMayBePreventedTrace(String message, ExecutionTraceAction action, Agent agent) {
     ExecutionTraces newTrace =
         new ExecutionTraces(
-            this, ExecutionTraceStatus.MAYBE_PREVENTED, List.of(), message, action, agent);
-    this.getTraces().add(newTrace);
-  }
-
-  public void addSuccess(String message, ExecutionTraceAction action, Agent agent) {
-    ExecutionTraces newTrace =
-        new ExecutionTraces(this, ExecutionTraceStatus.SUCCESS, List.of(), message, action, agent);
+            this, ExecutionTraceStatus.MAYBE_PREVENTED, List.of(), message, action, agent, null);
     this.getTraces().add(newTrace);
   }
 
   public void addErrorTrace(String message, ExecutionTraceAction action) {
     ExecutionTraces newTrace =
-        new ExecutionTraces(this, ExecutionTraceStatus.ERROR, List.of(), message, action, null);
+        new ExecutionTraces(
+            this, ExecutionTraceStatus.ERROR, List.of(), message, action, null, null);
     this.getTraces().add(newTrace);
   }
 

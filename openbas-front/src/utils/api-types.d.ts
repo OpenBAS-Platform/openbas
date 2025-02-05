@@ -52,6 +52,20 @@ export interface AgentOutput {
   agent_privilege?: "admin" | "standard";
 }
 
+export interface AgentStatusOutput {
+  agent_executor_name?: string;
+  agent_executor_type?: string;
+  agent_id: string;
+  agent_name?: string;
+  agent_status_name?: string;
+  agent_traces?: ExecutionTracesOutput[];
+  asset_id: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
+}
+
 export interface AiGenericTextInput {
   ai_content: string;
   ai_format?: string;
@@ -423,22 +437,18 @@ export interface ChannelUpdateLogoInput {
 }
 
 export interface CheckExerciseRulesInput {
-  /** List of tag that will be applied to the simulation */
   new_tags?: string[];
 }
 
 export interface CheckExerciseRulesOutput {
-  /** Are there rules that can be applied? */
   rules_found: boolean;
 }
 
 export interface CheckScenarioRulesInput {
-  /** List of tag that will be applied to the scenario */
   new_tags?: string[];
 }
 
 export interface CheckScenarioRulesOutput {
-  /** Are there rules that can be applied? */
   rules_found: boolean;
 }
 
@@ -807,7 +817,13 @@ export interface Executable {
 
 export interface ExecutionTraces {
   agent?: string;
-  execution_action?: "PREREQUISITE_CHECK" | "PREREQUISITE_EXECUTION" | "EXECUTION" | "CLEANUP_EXECUTION" | "COMPLETE";
+  execution_action?:
+    | "START"
+    | "PREREQUISITE_CHECK"
+    | "PREREQUISITE_EXECUTION"
+    | "EXECUTION"
+    | "CLEANUP_EXECUTION"
+    | "COMPLETE";
   execution_context_identifiers?: string[];
   /** @format date-time */
   execution_created_at: string;
@@ -831,6 +847,30 @@ export interface ExecutionTraces {
   injectStatus?: string;
   injectTestStatus?: string;
   listened?: boolean;
+}
+
+export interface ExecutionTracesOutput {
+  execution_action:
+    | "START"
+    | "PREREQUISITE_CHECK"
+    | "PREREQUISITE_EXECUTION"
+    | "EXECUTION"
+    | "CLEANUP_EXECUTION"
+    | "COMPLETE";
+  execution_message: string;
+  execution_status:
+    | "SUCCESS"
+    | "ERROR"
+    | "MAYBE_PREVENTED"
+    | "COMMAND_NOT_FOUND"
+    | "COMMAND_CANNOT_BE_EXECUTED"
+    | "WARNING"
+    | "PARTIAL"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "ASSET_INACTIVE"
+    | "INFO";
+  /** @format date-time */
+  execution_time: string;
 }
 
 export interface Executor {
@@ -1591,7 +1631,6 @@ export interface InjectResultOverviewOutput {
 
 export interface InjectStatus {
   listened?: boolean;
-  statusMapIdentifierAgent?: Record<string, Agent>;
   status_id?: string;
   status_name:
     | "SUCCESS"
@@ -1614,8 +1653,9 @@ export interface InjectStatus {
 /** status */
 export interface InjectStatusOutput {
   status_id: string;
+  status_main_traces?: ExecutionTracesOutput[];
   status_name?: string;
-  status_traces?: ExecutionTraces[];
+  status_traces_by_agent?: AgentStatusOutput[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
@@ -1644,28 +1684,14 @@ export interface InjectTeamsInput {
   inject_teams?: string[];
 }
 
-export interface InjectTestStatus {
-  inject_id?: string;
-  /** @format date-time */
-  inject_test_status_created_at?: string;
-  /** @format date-time */
-  inject_test_status_updated_at?: string;
-  inject_title?: string;
+export interface InjectTestStatusOutput {
+  inject_id: string;
+  inject_title: string;
   inject_type?: string;
-  injector_contract?: InjectorContract;
-  listened?: boolean;
-  status_id?: string;
-  status_name:
-    | "SUCCESS"
-    | "ERROR"
-    | "MAYBE_PREVENTED"
-    | "PARTIAL"
-    | "MAYBE_PARTIAL_PREVENTED"
-    | "DRAFT"
-    | "QUEUING"
-    | "EXECUTING"
-    | "PENDING";
-  status_traces?: ExecutionTraces[];
+  status_id: string;
+  status_main_traces?: ExecutionTracesOutput[];
+  status_name?: string;
+  status_traces_by_agent?: AgentStatusOutput[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
@@ -2375,8 +2401,8 @@ export interface PageInjectResultOutput {
   totalPages?: number;
 }
 
-export interface PageInjectTestStatus {
-  content?: InjectTestStatus[];
+export interface PageInjectTestStatusOutput {
+  content?: InjectTestStatusOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

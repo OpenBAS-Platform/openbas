@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -16,31 +15,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "injects_tests_statuses")
 public class InjectTestStatus extends BaseInjectStatus implements Base {
-
-  @JsonProperty("inject_id")
-  public String getInjectId() {
-    return inject.getId();
-  }
-
-  @JsonProperty("inject_title")
-  public String getInjectTitle() {
-    return inject.getTitle();
-  }
-
-  @JsonProperty("injector_contract")
-  public Optional<InjectorContract> getInjectContract() {
-    return inject.getInjectorContract();
-  }
-
-  @JsonProperty("inject_type")
-  private String getType() {
-    return inject
-        .getInjectorContract()
-        .map(InjectorContract::getInjector)
-        .map(Injector::getType)
-        .orElse(null);
-  }
-
   @OneToMany(
       mappedBy = "injectTestStatus",
       cascade = CascadeType.ALL,

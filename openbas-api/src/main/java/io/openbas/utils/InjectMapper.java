@@ -2,10 +2,9 @@ package io.openbas.utils;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -97,21 +96,90 @@ public class InjectMapper {
   }
 
   // -- STATUS to STATUSIMPLE --
+  private <T extends InjectStatusOutput> T buildInjectStatusOutput(
+      T output, BaseInjectStatus status, List<ExecutionTraces> executionTraces) {
+    output.setId(status.getId());
+    output.setName(Optional.ofNullable(status.getName()).map(ExecutionStatus::name).orElse(null));
+    output.setTraces(
+        toExecutionTracesOutput(
+            executionTraces.stream().filter(trace -> trace.getAgent() == null).toList()));
+    output.setTracesByAgent(
+        groupTracesByAgent(
+            executionTraces.stream().filter(trace -> trace.getAgent() != null).toList()));
+    output.setTrackingSentDate(status.getTrackingSentDate());
+    output.setTrackingEndDate(status.getTrackingEndDate());
+    return output;
+  }
+
   public InjectStatusOutput toInjectStatusOutput(Optional<InjectStatus> injectStatus) {
     return injectStatus
         .map(
             status ->
-                InjectStatusOutput.builder()
-                    .id(status.getId())
-                    .name(
-                        Optional.ofNullable(status.getName())
-                            .map(ExecutionStatus::name)
-                            .orElse(null))
-                    .traces(status.getTraces())
-                    .trackingSentDate(status.getTrackingSentDate())
-                    .trackingEndDate(status.getTrackingEndDate())
+                buildInjectStatusOutput(
+                    InjectStatusOutput.builder().build(), status, status.getTraces()))
+        .orElse(null);
+  }
+
+  public InjectTestStatusOutput toInjectTestStatusOutput(InjectTestStatus injectTestStatus) {
+    InjectTestStatusOutput output = InjectTestStatusOutput.builder().build();
+    buildInjectStatusOutput(output, injectTestStatus, injectTestStatus.getTraces());
+
+    output.setInjectId(injectTestStatus.getInject().getId());
+    output.setInjectType(
+        injectTestStatus
+            .getInject()
+            .getInjectorContract()
+            .map(InjectorContract::getInjector)
+            .map(Injector::getType)
+            .orElse(null));
+    output.setInjectTitle(injectTestStatus.getInject().getTitle());
+
+    return output;
+  }
+
+  public List<ExecutionTracesOutput> toExecutionTracesOutput(List<ExecutionTraces> traces) {
+    return traces.stream()
+        .map(
+            trace ->
+                ExecutionTracesOutput.builder()
+                    .status(trace.getStatus())
+                    .time(trace.getTime())
+                    .message(trace.getMessage())
+                    .action(trace.getAction())
                     .build())
-        .orElseGet(() -> InjectStatusOutput.builder().build());
+        .toList();
+  }
+
+  private List<AgentStatusOutput> groupTracesByAgent(List<ExecutionTraces> traces) {
+    return traces.stream()
+        .collect(Collectors.groupingBy(ExecutionTraces::getAgent))
+        .entrySet()
+        .stream()
+        .map(
+            entry -> {
+              ExecutionTraces finalTrace =
+                  entry.getValue().stream()
+                      .filter(t -> t.getAction() == ExecutionTraceAction.COMPLETE)
+                      .findFirst()
+                      .orElse(null);
+              return AgentStatusOutput.builder()
+                  .assetId(entry.getKey().getAsset().getId())
+                  .agentId(entry.getKey().getId())
+                  .agentExecutorName(entry.getKey().getExecutor().getName())
+                  .agentExecutorType(entry.getKey().getExecutor().getType())
+                  .agentName(entry.getKey().getExecutedByUser())
+                  .statusName(finalTrace != null ? String.valueOf(finalTrace.getStatus()) : null)
+                  .trackingEndDate(finalTrace != null ? finalTrace.getTime() : null)
+                  .trackingSentDate(
+                      entry.getValue().stream()
+                          .filter(t -> t.getAction() == ExecutionTraceAction.START)
+                          .findFirst()
+                          .map(ExecutionTraces::getTime)
+                          .orElse(null))
+                  .agentTraces(toExecutionTracesOutput(entry.getValue()))
+                  .build();
+            })
+        .toList();
   }
 
   // -- EXPECTATIONS to EXPECTATIONSIMPLE
