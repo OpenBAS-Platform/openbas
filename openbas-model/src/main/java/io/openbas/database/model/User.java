@@ -125,14 +125,14 @@ public class User implements Base {
   @Column(name = "user_created_at")
   @JsonProperty("user_created_at")
   @NotNull
-  @Schema(description = "Creation date of the user")
+  @Schema(description = "Creation date of the user", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant createdAt = now();
 
   @Setter
   @Column(name = "user_updated_at")
   @JsonProperty("user_updated_at")
   @NotNull
-  @Schema(description = "Update date of the user")
+  @Schema(description = "Update date of the user", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant updatedAt = now();
 
   @Setter
@@ -141,7 +141,7 @@ public class User implements Base {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("user_organization")
   @Queryable(dynamicValues = true, filterable = true, sortable = true, path = "organization.id")
-  @Schema(description = "Organization of the user", type = "string")
+  @Schema(description = "Organization ID of the user", type = "string")
   private Organization organization;
 
   @Setter
@@ -173,7 +173,7 @@ public class User implements Base {
       inverseJoinColumns = @JoinColumn(name = "group_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("user_groups")
-  @Schema(description = "Groups of the user")
+  @Schema(description = "Group IDs of the user")
   private List<Group> groups = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -185,7 +185,7 @@ public class User implements Base {
       inverseJoinColumns = @JoinColumn(name = "team_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("user_teams")
-  @Schema(description = "Teams of the user")
+  @Schema(description = "Team IDs of the user")
   private List<Team> teams = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -198,7 +198,7 @@ public class User implements Base {
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("user_tags")
   @Queryable(dynamicValues = true, filterable = true, sortable = true, path = "tags.id")
-  @Schema(description = "Tags of the user")
+  @Schema(description = "Tag IDs of the user")
   private Set<Tag> tags = new HashSet<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -210,7 +210,7 @@ public class User implements Base {
       inverseJoinColumns = @JoinColumn(name = "communication_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("user_communications")
-  @Schema(description = "Communications of the user")
+  @Schema(description = "Communication IDs of the user")
   private List<Communication> communications = new ArrayList<>();
 
   @Setter
@@ -276,7 +276,7 @@ public class User implements Base {
   }
 
   @JsonProperty("user_last_comcheck")
-  @Schema(description = "Last communication of ther user")
+  @Schema(description = "Last communication date of the user")
   public Optional<Instant> getLastComcheck() {
     return getComcheckStatuses().stream()
         .filter(comcheckStatus -> comcheckStatus.getReceiveDate().isPresent())
