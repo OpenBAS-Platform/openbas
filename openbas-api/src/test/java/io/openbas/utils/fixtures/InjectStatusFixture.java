@@ -14,7 +14,7 @@ public class InjectStatusFixture {
   public static InjectStatus createDefaultInjectStatus() {
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(ExecutionStatus.SUCCESS);
+    injectStatus.setName(ExecutionStatus.PENDING);
     injectStatus.setPayloadOutput(
         new StatusPayload(
             null,

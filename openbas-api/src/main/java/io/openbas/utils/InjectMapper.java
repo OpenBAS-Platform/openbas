@@ -115,9 +115,9 @@ public class InjectMapper {
     return injectStatus
         .map(
             status ->
-                buildInjectStatusOutput(
+                this.<InjectStatusOutput>buildInjectStatusOutput(
                     InjectStatusOutput.builder().build(), status, status.getTraces()))
-        .orElse(null);
+        .orElseGet(() -> InjectStatusOutput.builder().build());
   }
 
   public InjectTestStatusOutput toInjectTestStatusOutput(InjectTestStatus injectTestStatus) {

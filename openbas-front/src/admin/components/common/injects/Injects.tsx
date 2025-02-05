@@ -24,7 +24,7 @@ import type {
   FilterGroup,
   Inject,
   InjectBulkUpdateOperation,
-  InjectTestStatus,
+  InjectTestStatusOutput,
   Team,
   Variable,
 } from '../../../../utils/api-types';
@@ -461,7 +461,7 @@ const Injects: FunctionComponent<Props> = ({
       inject_ids_to_process: selectAll ? undefined : testIds,
       inject_ids_to_ignore: ignoreIds,
       simulation_or_scenario_id: exerciseOrScenarioId,
-    }).then((result: { uri: string; data: InjectTestStatus[] }) => {
+    }).then((result: { uri: string; data: InjectTestStatusOutput[] }) => {
       if (numberOfSelectedElements === 1) {
         MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
           itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link>,

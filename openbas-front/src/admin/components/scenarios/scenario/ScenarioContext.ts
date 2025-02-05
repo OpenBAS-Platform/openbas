@@ -22,7 +22,7 @@ import type {
   InjectBulkProcessingInput,
   InjectBulkUpdateInputs,
   InjectsImportInput,
-  InjectTestStatus,
+  InjectTestStatusOutput,
   Scenario,
   SearchPaginationInput,
 } from '../../../../utils/api-types';
@@ -67,7 +67,7 @@ const injectContextForScenario = (scenario: Scenario) => {
     onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
       return bulkDeleteInjectsSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
-    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatus[] }> {
+    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatusOutput[] }> {
       return bulkTestInjects(param).then(result => ({
         uri: `/admin/scenarios/${scenario.scenario_id}/tests`,
         data: result.data,
