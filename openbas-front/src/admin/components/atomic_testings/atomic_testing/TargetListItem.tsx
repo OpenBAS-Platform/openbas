@@ -17,7 +17,6 @@ const useStyles = makeStyles()(() => ({
     textOverflow: 'ellipsis',
   },
   dividerL: {
-    content: '',
     position: 'absolute',
     backgroundColor: 'rgba(105, 103, 103, 0.45)',
     width: '2px',
