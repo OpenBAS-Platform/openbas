@@ -1,12 +1,11 @@
 import { Button } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import { Link, useLocation } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../i18n';
-import type { Theme } from '../../Theme';
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   button: {
     marginRight: theme.spacing(2),
     padding: '0 5px 0 5px',
@@ -31,7 +30,7 @@ const TopMenu: FunctionComponent<{ entries: TopMenuEntry[]; contextual?: boolean
 }) => {
   // Standard hooks
   const location = useLocation();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const buttons = () => (

@@ -14,10 +14,10 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { UserHelper } from '../../../../../../actions/helper';
 import { fetchUsers } from '../../../../../../actions/User';
@@ -26,7 +26,6 @@ import Drawer from '../../../../../../components/common/Drawer';
 import ExpandableText from '../../../../../../components/common/ExpendableText';
 import Paper from '../../../../../../components/common/Paper';
 import { useFormatter } from '../../../../../../components/i18n';
-import type { Theme } from '../../../../../../components/Theme';
 import { useHelper } from '../../../../../../store';
 import type { Inject, User } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
@@ -35,7 +34,7 @@ import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../.
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     height: 40,
   },
@@ -84,7 +83,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
   inject,
   expectations,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [selectedItem, setSelectedItem] = useState<string | null>(null);

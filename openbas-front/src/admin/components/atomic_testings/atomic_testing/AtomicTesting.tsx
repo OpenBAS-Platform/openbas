@@ -1,6 +1,6 @@
 import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useContext, useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../../../actions/Document';
 import { DocumentHelper } from '../../../../actions/helper';
@@ -23,7 +23,7 @@ import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextTyp
 import TargetListItem from './TargetListItem';
 import TargetResultsDetail from './TargetResultsDetail';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     fontSize: 12,
     height: 25,
@@ -46,7 +46,7 @@ const useStyles = makeStyles(() => ({
 
 const AtomicTesting = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t, tPick, fldt } = useFormatter();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();

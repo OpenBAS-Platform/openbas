@@ -1,10 +1,10 @@
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { Fab, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addDocument, fetchDocument } from '../../../../actions/Document';
 import Dialog from '../../../../components/common/Dialog';
@@ -130,5 +130,5 @@ CreateDocument.propTypes = {
 export default R.compose(
   connect(null, { addDocument, fetchDocument }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreateDocument);

@@ -1,8 +1,8 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { findEndpoints } from '../../../../actions/assets/endpoint-actions';
 import ListLoader from '../../../../components/common/loader/ListLoader';
@@ -10,7 +10,7 @@ import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { EndpointOutput, EndpointOverviewOutput } from '../../../../utils/api-types';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   item: {
     height: 50,
   },
@@ -59,7 +59,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   actions,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const component = (endpoint: EndpointOutput) => {
     return React.cloneElement(actions as React.ReactElement, { endpoint });

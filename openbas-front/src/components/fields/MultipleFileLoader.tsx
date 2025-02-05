@@ -1,7 +1,7 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
 import { PermissionsContext } from '../../admin/components/common/Context';
@@ -9,10 +9,9 @@ import type { RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 import { useFormatter } from '../i18n';
-import type { Theme } from '../Theme';
 import FileTransferDialog from './FileTransferDialog';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     paddingLeft: 10,
     height: 50,
@@ -36,7 +35,7 @@ const MultipleFileLoader: FunctionComponent<Props> = ({
   initialDocumentIds,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);

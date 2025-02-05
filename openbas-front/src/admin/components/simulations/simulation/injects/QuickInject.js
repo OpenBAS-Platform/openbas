@@ -25,7 +25,6 @@ import {
   Switch,
   Typography,
 } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import arrayMutators from 'final-form-arrays';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
@@ -33,6 +32,7 @@ import { Component, forwardRef } from 'react';
 import { Form } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../../../../actions/Document';
 import { addInjectForExercise } from '../../../../../actions/Inject';
@@ -1447,8 +1447,6 @@ QuickInject.propTypes = {
   handleClose: PropTypes.func,
   injectorContract: PropTypes.object,
   fetchDocuments: PropTypes.func,
-  exercisesMap: PropTypes.object,
-  tagsMap: PropTypes.object,
 };
 
 const select = (state, ownProps) => {
@@ -1471,5 +1469,5 @@ export default R.compose(
     addInject: addInjectForExercise,
   }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(QuickInject);

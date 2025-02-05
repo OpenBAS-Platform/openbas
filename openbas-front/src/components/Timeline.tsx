@@ -1,7 +1,8 @@
 import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { Fragment, FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { InjectStore } from '../actions/injects/Inject';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
@@ -11,9 +12,8 @@ import { truncate } from '../utils/String';
 import { splitDuration } from '../utils/Time';
 import { isNotEmptyField } from '../utils/utils';
 import { useFormatter } from './i18n';
-import type { Theme } from './Theme';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     marginTop: 60,
     paddingRight: 40,
@@ -93,8 +93,8 @@ interface Props {
 
 const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) => {
   // Standard hooks
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const { t } = useFormatter();
 
   // Retrieve data

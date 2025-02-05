@@ -1,8 +1,8 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 import { interval } from 'rxjs';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectResultOverviewOutput } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -21,7 +21,7 @@ import teamContextForAtomicTesting from './context/TeamContextForAtomicTesting';
 
 const interval$ = interval(FIVE_SECONDS);
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   item: {
     height: 30,
     fontSize: 13,
@@ -37,7 +37,7 @@ const AtomicTesting = lazy(() => import('./AtomicTesting'));
 const AtomicTestingDetail = lazy(() => import('./AtomicTestingDetail'));
 
 const Index = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const location = useLocation();
   let tabValue = location.pathname;

@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField as MuiTextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import type { SecurityPlatformHelper } from '../../../../../../actions/assets/asset-helper';
@@ -12,7 +12,6 @@ import ExpandableText from '../../../../../../components/common/ExpendableText';
 import SecurityPlatformField from '../../../../../../components/fields/SecurityPlatformField';
 import { useFormatter } from '../../../../../../components/i18n';
 import ItemResult from '../../../../../../components/ItemResult';
-import type { Theme } from '../../../../../../components/Theme';
 import { useHelper } from '../../../../../../store';
 import type { InjectExpectationResult, SecurityPlatform } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
@@ -20,7 +19,7 @@ import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { zodImplement } from '../../../../../../utils/Zod';
 import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   marginTop_2: {
     marginTop: theme.spacing(2),
   },
@@ -40,7 +39,7 @@ interface FormProps {
 }
 
 const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps> = ({ expectation, result, sourceIds = [], onUpdate }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { securityPlatformsMap }: { securityPlatformsMap: Record<string, SecurityPlatform> } = useHelper((helper: SecurityPlatformHelper) => ({

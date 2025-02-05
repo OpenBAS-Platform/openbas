@@ -1,7 +1,7 @@
 import { ControlPointOutlined, GroupsOutlined } from '@mui/icons-material';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -11,12 +11,11 @@ import SelectList, { SelectListElements } from '../../../../components/common/Se
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
-import type { Theme } from '../../../../components/Theme';
 import type { TeamOutput } from '../../../../utils/api-types';
 import CreateTeam from '../../components/teams/CreateTeam';
 import { PermissionsContext, TeamContext } from '../Context';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     paddingLeft: 10,
     height: 50,
@@ -39,7 +38,7 @@ const InjectAddTeams: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { permissions } = useContext(PermissionsContext);
   const { searchTeams } = useContext(TeamContext);
 

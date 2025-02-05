@@ -1,13 +1,13 @@
 import { Grid, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { FunctionComponent, useContext } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import ItemStatus from '../../../../components/ItemStatus';
 import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     position: 'relative',
     padding: 20,
@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const AtomicTestingDetail: FunctionComponent<Props> = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Fetching data

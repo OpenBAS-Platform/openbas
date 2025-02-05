@@ -1,14 +1,14 @@
 import { RouteOutlined, StyleOutlined } from '@mui/icons-material';
 import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { LockPattern } from 'mdi-material-ui';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router';
+import { CSSObject } from 'tss-react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../components/i18n';
-import type { Theme } from '../../../components/Theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   drawer: {
     minHeight: '100vh',
     width: 200,
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 0,
     backgroundColor: theme.palette.background.nav,
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: theme.mixins.toolbar as CSSObject,
   item: {
     paddingTop: 10,
     paddingBottom: 10,
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const DefinitionMenu: React.FC = () => {
   const location = useLocation();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   return (
     <Drawer

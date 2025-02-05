@@ -1,14 +1,12 @@
 import { Box, Chip, SelectChangeEvent, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import { FunctionComponent, useRef, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../i18n';
-import type { Theme } from '../../Theme';
 import convertOperatorToIcon from './ChipUtils';
 import ClickableChipPopover from './ClickableChipPopover';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   mode: {
     display: 'inline-block',
     height: '100%',
@@ -64,7 +62,7 @@ const ClickableChip: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes, cx } = useStyles();
 
   const chipRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(!pristine);
@@ -113,7 +111,7 @@ const ClickableChip: FunctionComponent<Props> = ({
         let or = <></>;
         if (idx > 0) {
           or = (
-            <div className={classNames({
+            <div className={cx({
               [classes.mode]: !isTooltip,
               [classes.modeTooltip]: isTooltip,
             })}

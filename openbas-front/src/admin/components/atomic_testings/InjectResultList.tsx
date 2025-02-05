@@ -1,8 +1,8 @@
 import { HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -21,7 +21,7 @@ import InjectorContract from '../common/injects/InjectorContract';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -82,7 +82,7 @@ const InjectResultList: FunctionComponent<Props> = ({
   searchPaginationInput,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
 
   const [loading, setLoading] = useState<boolean>(true);

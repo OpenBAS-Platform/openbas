@@ -1,6 +1,6 @@
 import { Button, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useEffect } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { InjectorContractHelper } from '../../../../actions/injector_contracts/injector-contract-helper';
@@ -9,7 +9,6 @@ import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases
 import { FilterHelpers } from '../../../../components/common/queryable/filter/FilterHelpers';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { AttackPattern, KillChainPhase } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -20,7 +19,7 @@ interface InjectorContractLight {
   injector_contract_attack_patterns_external_id?: string[];
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   container: {
     display: 'flex',
     gap: 10,
@@ -56,7 +55,7 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   onClick,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Attack Pattern
@@ -147,7 +146,7 @@ const MitreFilter: FunctionComponent<MitreFilterProps> = ({
   onClick,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
   // Fetching data

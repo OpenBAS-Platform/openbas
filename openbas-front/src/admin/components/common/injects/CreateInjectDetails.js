@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined, HighlightOffOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, IconButton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { useFormatter } from '../../../../components/i18n';
@@ -15,7 +15,7 @@ import InjectDefinition from './form/InjectDefinition';
 import InjectForm from './form/InjectForm';
 import InjectIcon from './InjectIcon';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles()(theme => ({
   injectorContract: {
     marginTop: 30,
     width: '100%',
@@ -77,7 +77,7 @@ const CreateInjectDetails = ({
   ...props
 }) => {
   const { t, tPick } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(false);
   const [defaultValues, setDefaultValues] = useState({});

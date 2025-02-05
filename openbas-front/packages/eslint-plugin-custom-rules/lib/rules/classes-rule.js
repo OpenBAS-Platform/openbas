@@ -22,17 +22,6 @@ module.exports = {
             });
           }
         }
-        if (node.init && node.init.callee && node.init.callee.name === "useStyles") {
-          if (node.id.name !== "classes") {
-            context.report({
-              node: node,
-              message: "useStyles must be declared as classes",
-              fix(fixer) {
-                return fixer.replaceText(node.id, "classes")
-              },
-            });
-          }
-        }
       },
       ArrowFunctionExpression(node) {
         if (node.parent.callee && node.parent.callee.name === "makeStyles") {

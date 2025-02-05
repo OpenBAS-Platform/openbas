@@ -1,8 +1,8 @@
 import { PersonOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
@@ -24,7 +24,7 @@ import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -66,7 +66,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Players = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 

@@ -1,18 +1,17 @@
 import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, TextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, SyntheticEvent } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../components/i18n';
 import ScaleBar from '../../../../../components/scalebar/ScaleBar';
-import type { Theme } from '../../../../../components/Theme';
 import { splitDuration } from '../../../../../utils/Time';
 import { ExpectationInput, ExpectationInputForm } from './Expectation';
 import { formProps, infoMessage } from './ExpectationFormUtils';
 import { isTechnicalExpectation } from './ExpectationUtils';
 import ExpectationGroupField from './field/ExpectationGroupField';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   marginTop_2: {
     marginTop: theme.spacing(2),
   },
@@ -51,7 +50,7 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
   initialValues,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const expirationTime = splitDuration(initialValues.expectation_expiration_time || 0);
   const formInitialValues: ExpectationInputForm = {

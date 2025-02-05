@@ -1,8 +1,8 @@
 import { DescriptionOutlined } from '@mui/icons-material';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { DocumentHelper, UserHelper } from '../../actions/helper';
 import TagsFilter from '../../admin/components/common/filters/TagsFilter';
@@ -14,9 +14,8 @@ import Transition from '../common/Transition';
 import { useFormatter } from '../i18n';
 import ItemTags from '../ItemTags';
 import SearchFilter from '../SearchFilter';
-import type { Theme } from '../Theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   box: {
     width: '100%',
     minHeight: '100%',
@@ -58,7 +57,7 @@ const FileTransferDialog: React.FC<Props> = ({
   initialDocumentIds = [],
   onSubmitAddDocuments,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [keyword, setKeyword] = useState<string>('');

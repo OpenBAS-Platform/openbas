@@ -1,13 +1,12 @@
 import { Search } from '@mui/icons-material';
 import { InputAdornment, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { debounce } from '../utils/utils';
 import { useFormatter } from './i18n';
-import type { Theme } from './Theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   searchRoot: {
     borderRadius: 4,
     padding: '0 10px 0 10px',
@@ -80,7 +79,7 @@ const SearchInput: React.FC<Props> = ({
   placeholder,
   debounceMs,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const { t } = useFormatter();
 

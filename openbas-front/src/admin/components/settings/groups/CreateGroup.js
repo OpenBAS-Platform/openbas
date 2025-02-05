@@ -1,10 +1,10 @@
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addGroup } from '../../../../actions/Group';
 import Drawer from '../../../../components/common/Drawer';
@@ -85,5 +85,5 @@ const select = state => ({
 export default R.compose(
   connect(select, { addGroup }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreateGroup);

@@ -1,8 +1,8 @@
 import { AddOutlined, LabelOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useState } from 'react';
 import { FieldErrors } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import type { TagHelper, UserHelper } from '../../actions/helper';
 import { addTag } from '../../actions/Tag';
@@ -12,7 +12,7 @@ import type { Tag } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import { useFormatter } from '../i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -50,7 +50,7 @@ const TagFieldSingle: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   // Fetching data
   const { tags, userAdmin }: { tags: [Tag]; userAdmin: boolean } = useHelper((helper: TagHelper & UserHelper) => ({

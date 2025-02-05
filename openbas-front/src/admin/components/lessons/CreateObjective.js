@@ -1,9 +1,9 @@
 import { Add } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
+import { withStyles } from 'tss-react/mui';
 
 import Transition from '../../../components/common/Transition';
 import inject18n from '../../../components/i18n';
@@ -88,5 +88,5 @@ CreateObjective.propTypes = {
 
 export default R.compose(
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreateObjective);

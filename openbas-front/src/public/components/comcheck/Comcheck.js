@@ -1,15 +1,16 @@
 import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { AppBar, Paper, Toolbar } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     textAlign: 'center',
     margin: '0 auto',
@@ -37,7 +38,7 @@ const useStyles = makeStyles(() => ({
 
 const Comcheck = () => {
   const theme = useTheme();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { fldt, t } = useFormatter();
   const { statusId } = useParams();

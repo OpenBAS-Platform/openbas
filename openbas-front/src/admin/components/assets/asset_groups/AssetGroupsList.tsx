@@ -1,8 +1,8 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import * as React from 'react';
 import { CSSProperties, FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { findAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import ListLoader from '../../../../components/common/loader/ListLoader';
@@ -10,7 +10,7 @@ import { Header } from '../../../../components/common/SortHeadersList';
 import ItemTags from '../../../../components/ItemTags';
 import type { AssetGroupOutput } from '../../../../utils/api-types';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   item: {
     height: 50,
   },
@@ -43,7 +43,7 @@ const AssetGroupsList: FunctionComponent<Props> = ({
   actions,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const component = (assetGroup: AssetGroupOutput) => {
     return React.cloneElement(actions as React.ReactElement, { assetGroup });

@@ -1,8 +1,8 @@
 import { Chip } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
+import { withStyles } from 'tss-react/mui';
 
 import inject18n from '../../../../../components/i18n';
 
@@ -99,4 +99,4 @@ ComcheckState.propTypes = {
   state: PropTypes.string,
 };
 
-export default R.compose(inject18n, withStyles(styles))(ComcheckState);
+export default R.compose(inject18n, Component => withStyles(Component, styles))(ComcheckState);

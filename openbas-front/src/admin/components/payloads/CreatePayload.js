@@ -1,11 +1,11 @@
 import { Add, DnsOutlined } from '@mui/icons-material';
 import { Fab, List, ListItemButton, ListItemIcon, ListItemText, Step, StepLabel, Stepper } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addPayload } from '../../../actions/Payload';
 import Drawer from '../../../components/common/Drawer';
@@ -179,5 +179,5 @@ CreatePayload.propTypes = {
 export default R.compose(
   connect(null, { addPayload }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreatePayload);

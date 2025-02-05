@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
@@ -9,7 +9,7 @@ import type { AttackPattern, InjectExpectationResultsByAttackPattern, KillChainP
 import KillChainPhaseColumn from './KillChainPhaseColumn';
 import MitreMatrixDummy from './MitreMatrixDummy';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     width: '100%',
     display: 'flex',
@@ -30,7 +30,7 @@ const MitreMatrix: FunctionComponent<Props> = ({
   injectResults,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   // Fetching data
   const { attackPatternMap, killChainPhaseMap }: {
     attackPatternMap: Record<string, AttackPattern>;

@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
@@ -6,7 +6,6 @@ import Chart from 'react-apexcharts';
 import type { InjectStore } from '../../../../../actions/injects/Inject';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
 import type { Inject } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
 
@@ -19,7 +18,7 @@ const InjectOverTimeLine: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
-  const theme: Theme = useTheme();
+  const theme = useTheme();
 
   let cumulation = 0;
   const injectsOverTime = R.pipe(

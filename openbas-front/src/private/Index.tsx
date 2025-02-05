@@ -1,14 +1,14 @@
-import { makeStyles } from '@mui/styles';
 import { Route, Routes } from 'react-router';
+import { CSSObject } from 'tss-react';
+import { makeStyles } from 'tss-react/mui';
 
 import { errorWrapper } from '../components/Error';
 import NotFound from '../components/NotFound';
-import type { Theme } from '../components/Theme';
 import useDataLoader from '../utils/hooks/useDataLoader';
 import Dashboard from './components/Dashboard';
 import TopBar from './components/nav/TopBar';
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   root: {
     minWidth: 1280,
     height: '100%',
@@ -20,11 +20,11 @@ const useStyles = makeStyles<Theme>(theme => ({
     padding: '24px 24px 24px 204px',
     minWidth: 0,
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: theme.mixins.toolbar as CSSObject,
 }));
 
 const Index = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   useDataLoader();
   return (
     <div className={classes.root}>

@@ -1,13 +1,13 @@
 import { DevicesOtherOutlined, Groups3Outlined, HorizontalRule } from '@mui/icons-material';
 import { Chip, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { TargetSimple } from '../utils/api-types';
 import { getLabelOfRemainingItems, getRemainingItemsCount, getVisibleItems, truncate } from '../utils/String';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   inline: {
     display: 'inline-block',
   },
@@ -30,7 +30,7 @@ const ItemTargets: FunctionComponent<Props> = ({
   variant,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   let truncateLimit = 15;
   if (variant === 'reduced-view') {
     truncateLimit = 6;

@@ -1,16 +1,15 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import Dialog from '../../../../../components/common/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
 import { PermissionsContext } from '../../Context';
 import type { ExpectationInput, ExpectationInputForm } from './Expectation';
 import ExpectationFormCreate from './ExpectationFormCreate';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   item: {
     paddingLeft: 10,
     height: 50,
@@ -32,7 +31,7 @@ const InjectAddExpectation: FunctionComponent<InjectAddExpectationProps> = ({
   handleAddExpectation,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
 

@@ -1,8 +1,8 @@
 import { AddOutlined, RouteOutlined } from '@mui/icons-material';
 import { Autocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPatternHelper } from '../actions/attack_patterns/attackpattern-helper';
 import { addAttackPattern } from '../actions/AttackPattern';
@@ -15,7 +15,7 @@ import { useAppDispatch } from '../utils/hooks';
 import { Option } from '../utils/Option';
 import { useFormatter } from './i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -46,7 +46,7 @@ const AttackPatternField: FunctionComponent<Props> = ({
   onChange,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 

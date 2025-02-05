@@ -1,8 +1,9 @@
 import { Chip, Slide, Tooltip } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { forwardRef } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useHelper } from '../store';
 import { hexToRGB } from '../utils/Colors';
@@ -14,7 +15,7 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   inline: {
     display: 'inline',
     alignItems: 'center',
@@ -38,7 +39,7 @@ const ItemTags = (props) => {
   const { tags, variant, limit = 2 } = props;
   const { t } = useFormatter();
   const theme = useTheme();
-  const classes = useStyles();
+  const { classes } = useStyles();
   let style = classes.tag;
   let truncateLimit = 15;
 

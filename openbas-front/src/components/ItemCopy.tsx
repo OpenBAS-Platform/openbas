@@ -1,15 +1,12 @@
 import { ContentCopyOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { truncate } from '../utils/String';
 import { copyToClipboard } from '../utils/utils';
 import { useFormatter } from './i18n';
-import type { Theme } from './Theme';
 
-// Deprecated - https://mui.com/system/styles/basics/
-// Do not use it for new code.
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   containerInline: {
     position: 'relative',
     padding: '2px 25px 2px 5px',
@@ -56,7 +53,7 @@ const ItemCopy: FunctionComponent<ItemCopyProps> = ({
   limit = null,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   return (
     <div
       className={

@@ -1,14 +1,16 @@
 import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
 import { Link, useLocation } from 'react-router';
+import { CSSObject } from 'tss-react';
+import { makeStyles } from 'tss-react/mui';
 
 import { isNotEmptyField } from '../../../utils/utils';
 import { useFormatter } from '../../i18n';
-import type { Theme } from '../../Theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
+// TODO jss-to-tss-react codemod: Unable to handle style definition reliably. Unsupported arrow function syntax.
+// Unexpected value type of MemberExpression.
+const useStyles = makeStyles()(theme => ({
   drawer: {
     minHeight: '100vh',
     width: 200,
@@ -17,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 0,
     backgroundColor: theme.palette.background.nav,
   },
-  toolbar: theme.mixins.toolbar,
+  toolbar: theme.mixins.toolbar as CSSObject,
   item: {
     paddingTop: 10,
     paddingBottom: 10,
@@ -36,7 +38,7 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({
 }) => {
   // Standard hooks
   const location = useLocation();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   return (
     <Drawer

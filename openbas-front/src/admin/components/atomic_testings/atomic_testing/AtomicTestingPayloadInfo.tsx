@@ -1,8 +1,8 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { FunctionComponent, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchAtomicTestingPayload } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../components/i18n';
@@ -12,7 +12,7 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import { AttackPatternSimple, PayloadArgument, PayloadCommandBlock, PayloadPrerequisite, StatusPayloadOutput } from '../../../../utils/api-types';
 import { emptyFilled } from '../../../../utils/String';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     position: 'relative',
     padding: 20,
@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const { injectId } = useParams();
   const [payloadOutput, setPayloadOutput] = useState<StatusPayloadOutput>();

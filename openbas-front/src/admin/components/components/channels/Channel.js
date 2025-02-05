@@ -1,8 +1,8 @@
 import { Grid, Paper, Skeleton, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { updateChannel, updateChannelLogos } from '../../../../actions/channels/channel-action';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -15,7 +15,7 @@ import ChannelOverviewNewspaper from './ChannelOverviewNewspaper';
 import ChannelOverviewTvChannel from './ChannelOverviewTvChannel';
 import ChannelParametersForm from './ChannelParametersForm';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     flexGrow: 1,
     paddingBottom: 40,
@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Channel = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { channelId } = useParams();
   const dispatch = useDispatch();
   const { t } = useFormatter();

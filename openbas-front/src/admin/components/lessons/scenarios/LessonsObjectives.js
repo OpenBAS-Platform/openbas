@@ -10,15 +10,15 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
+import { makeStyles } from 'tss-react/mui';
 
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import CreateObjective from '../CreateObjective';
 import ObjectivePopover from '../ObjectivePopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     position: 'relative',
     height: '250px',
@@ -32,7 +32,7 @@ const LessonsObjectives = ({
   setSelectedObjective,
   isReport,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const sortedObjectives = R.sortWith(
     [R.ascend(R.prop('objective_priority'))],

@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TableViewOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { InformationOutline } from 'mdi-material-ui';
 import moment from 'moment-timezone';
 import { FunctionComponent, SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { searchMappers } from '../../../../actions/mapper/mapper-actions';
@@ -16,7 +16,7 @@ import type { ImportMapper, ImportMessage, ImportTestSummary, InjectsImportInput
 import { zodImplement } from '../../../../utils/Zod';
 import { InjectContext } from '../Context';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -61,7 +61,7 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   // TimeZone
   const timezones = moment.tz.names();

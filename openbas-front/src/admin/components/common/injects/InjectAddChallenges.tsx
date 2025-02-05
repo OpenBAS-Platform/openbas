@@ -13,16 +13,15 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { FunctionComponent, useContext, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchChallenges } from '../../../../actions/Challenge';
 import type { ChallengeHelper } from '../../../../actions/helper';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { Challenge } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -33,7 +32,7 @@ import CreateChallenge from '../../components/challenges/CreateChallenge';
 import { PermissionsContext } from '../Context';
 import TagsFilter from '../filters/TagsFilter';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   box: {
     width: '100%',
     minHeight: '100%',
@@ -64,7 +63,7 @@ const InjectAddChallenges: FunctionComponent<Props> = ({
   injectChallengesIds,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);

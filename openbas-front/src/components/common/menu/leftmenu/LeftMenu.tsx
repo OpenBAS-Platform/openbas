@@ -1,11 +1,10 @@
 import { Divider, Drawer, MenuList, Toolbar } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import { FunctionComponent } from 'react';
 
 import { computeBannerSettings } from '../../../../public/components/systembanners/utils';
 import useAuth from '../../../../utils/hooks/useAuth';
-import type { Theme } from '../../../Theme';
 import { hasHref, LeftMenuEntries } from './leftmenu-model';
 import MenuItemGroup from './MenuItemGroup';
 import MenuItemLogo from './MenuItemLogo';
@@ -17,7 +16,7 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
   entries = [],
 }) => {
   // Standard hooks
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { settings } = useAuth();
   const { bannerHeightNumber } = computeBannerSettings(settings);
 

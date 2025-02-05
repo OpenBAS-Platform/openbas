@@ -1,8 +1,8 @@
 import { GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
@@ -20,7 +20,7 @@ import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
@@ -70,7 +70,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const Teams = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
 
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);

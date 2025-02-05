@@ -1,12 +1,12 @@
 import { Chip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { Exercise } from '../../../../utils/api-types';
 import { inlineStylesColors } from '../../../../utils/Colors';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     marginTop: 2,
     fontSize: 14,
@@ -39,7 +39,7 @@ const ExerciseStatus: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const style = variant === 'list' ? classes.chipInList : classes.chip;
   switch (exerciseStatus) {
     case 'SCHEDULED':

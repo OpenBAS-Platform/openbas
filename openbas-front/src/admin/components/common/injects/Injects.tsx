@@ -1,9 +1,9 @@
 import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
@@ -41,7 +41,7 @@ import InjectPopover from './InjectPopover';
 import InjectsListButtons from './InjectsListButtons';
 import UpdateInject from './UpdateInject';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   disabled: {
     opacity: 0.38,
     pointerEvents: 'none',
@@ -124,7 +124,7 @@ const Injects: FunctionComponent<Props> = ({
   teamsUsers,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, tPick } = useFormatter();
   const injectContext = useContext(InjectContext);
   const viewModeContext = useContext(ViewModeContext);

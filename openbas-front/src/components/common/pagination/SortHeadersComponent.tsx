@@ -1,11 +1,11 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   sortableHeaderItem: {
     display: 'flex',
     fontSize: 12,
@@ -57,7 +57,7 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const [sortBy, setSortBy] = useState(searchPaginationInput.sorts?.[0].property ?? '');
   const [sortAsc, setSortAsc] = useState(defaultSortAsc);

@@ -1,7 +1,7 @@
 import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { TagHelper } from '../../../../actions/helper';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
@@ -13,7 +13,7 @@ import useExportToXLS from '../../../../utils/hooks/useExportToXLS';
 import { InjectContext, ViewModeContext } from '../Context';
 import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'flex',
     justifyContent: 'flex-end',
@@ -38,7 +38,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
   isAtLeastOneValidInject,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
 

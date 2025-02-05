@@ -1,7 +1,7 @@
 import { LabelOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -13,7 +13,7 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
@@ -51,7 +51,7 @@ const inlineStyles = {
 
 const Tags = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Headers

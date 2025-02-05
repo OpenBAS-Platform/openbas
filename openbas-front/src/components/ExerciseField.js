@@ -1,14 +1,14 @@
 import { Kayaking } from '@mui/icons-material';
 import { Box } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercises } from '../actions/Exercise';
 import { useHelper } from '../store';
 import useDataLoader from '../utils/hooks/useDataLoader';
 import Autocomplete from './Autocomplete';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
  * @deprecated The component use old form libnary react-final-form
  */
 const ExerciseField = (props) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const exercises = useHelper(helper => helper.getExercises());
   useDataLoader(() => {

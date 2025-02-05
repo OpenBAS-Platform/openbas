@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
@@ -7,7 +7,6 @@ import { fetchExerciseInjects } from '../../../../../actions/Inject';
 import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { Exercise, Inject } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
@@ -24,7 +23,7 @@ const MailDistributionByInject: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const theme: Theme = useTheme();
+  const theme = useTheme();
 
   // Fetching data
   const { injects } = useHelper((helper: InjectHelper) => ({

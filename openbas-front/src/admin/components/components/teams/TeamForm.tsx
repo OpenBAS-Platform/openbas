@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useContext } from 'react';
 import { Form } from 'react-final-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { TeamInputForm } from '../../../../actions/teams/Team';
@@ -10,11 +10,10 @@ import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import OrganizationField from '../../../../components/OrganizationField';
 import TagField from '../../../../components/TagField';
-import type { Theme } from '../../../../components/Theme';
 import { schemaValidator } from '../../../../utils/Zod';
 import { TeamContext, TeamContextType } from '../../common/Context';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   container: {
     display: 'flex',
     gap: theme.spacing(2),
@@ -35,7 +34,7 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
   initialValues,
   handleClose,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const { onCreateTeam } = useContext<TeamContextType>(TeamContext);
   const teamFormSchemaValidation = z.object({

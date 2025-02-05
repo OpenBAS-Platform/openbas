@@ -1,7 +1,8 @@
 import { Chip, CircularProgress, Tooltip } from '@mui/material';
-import { useTheme, withStyles } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as PropTypes from 'prop-types';
 import { compose } from 'ramda';
+import { withStyles } from 'tss-react/mui';
 
 import inject18n from './i18n';
 
@@ -129,4 +130,4 @@ ItemBoolean.propTypes = {
   reverse: PropTypes.bool,
 };
 
-export default compose(inject18n, withStyles(styles))(ItemBoolean);
+export default compose(inject18n, Component => withStyles(Component, styles))(ItemBoolean);

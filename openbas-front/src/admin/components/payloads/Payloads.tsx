@@ -1,6 +1,6 @@
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, useMemo, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchCollectors } from '../../../actions/Collector';
 import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
@@ -29,7 +29,7 @@ import CreatePayload from './CreatePayload';
 import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -124,7 +124,7 @@ const fromPayloadStatusToChipColor = (payloadStatus: string) => {
 
 const Payloads = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
   const dispatch = useAppDispatch();
 

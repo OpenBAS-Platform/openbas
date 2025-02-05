@@ -1,9 +1,9 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
 import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { CSSProperties, useContext, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
 import { fetchOrganizations } from '../../../../actions/Organization';
@@ -13,7 +13,6 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { Organization, Team } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -25,7 +24,7 @@ import type { UserStore } from '../../teams/players/Player';
 import PlayerPopover from '../../teams/players/PlayerPopover';
 import TeamAddPlayers from './TeamAddPlayers';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   header: {
     backgroundColor: theme.palette.background.nav,
     padding: '20px 20px 20px 60px',
@@ -164,7 +163,7 @@ type UserStoreExtended = UserStore & {
 
 const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const [keyword, setKeyword] = useState('');

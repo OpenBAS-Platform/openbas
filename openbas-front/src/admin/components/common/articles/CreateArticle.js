@@ -1,14 +1,14 @@
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useContext } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { ArticleContext } from '../Context';
 import ArticleForm from './ArticleForm';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles()(theme => ({
   createButton: {
     float: 'left',
     marginTop: -15,
@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
 
 const CreateArticle = (props) => {
   const { onCreate, inline, openCreate, handleOpenCreate, handleCloseCreate } = props;
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Context

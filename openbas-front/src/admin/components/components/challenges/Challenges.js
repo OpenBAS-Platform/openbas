@@ -1,9 +1,9 @@
 import { RowingOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchChallenges } from '../../../../actions/Challenge';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -19,7 +19,7 @@ import TagsFilter from '../../common/filters/TagsFilter';
 import ChallengePopover from './ChallengePopover';
 import CreateChallenge from './CreateChallenge';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   parameters: {
     marginTop: -10,
     display: 'flex',
@@ -136,7 +136,7 @@ const inlineStyles = {
 
 const Challenges = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
 

@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { useFormatter } from '../../../../components/i18n';
@@ -16,7 +16,7 @@ import { PermissionsContext } from '../Context';
 import InjectDefinition from './form/InjectDefinition';
 import InjectForm from './form/InjectForm';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles()(theme => ({
   details: {
     marginTop: 20,
   },
@@ -58,7 +58,7 @@ const UpdateInjectDetails = ({
   ...props
 }) => {
   const { t, tPick } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { permissions } = useContext(PermissionsContext);
   const [openDetails, setOpenDetails] = useState(true);
   const [injectDetailsState, setInjectDetailsState] = useState({});

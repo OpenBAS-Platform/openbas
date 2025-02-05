@@ -1,4 +1,5 @@
-import { useTheme } from '@mui/styles';
+import { Theme } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent, SyntheticEvent, useState } from 'react';
 import Markdown from 'react-markdown';
 import type { PluggableList } from 'react-markdown/lib';
@@ -9,7 +10,6 @@ import remarkParse from 'remark-parse';
 import { truncate } from '../utils/String';
 import ExternalLinkPopover from './ExternalLinkPopover';
 import FieldOrEmpty from './FieldOrEmpty';
-import type { Theme } from './Theme';
 
 export const MarkDownComponents = (
   theme: Theme,
@@ -72,7 +72,7 @@ const MarkdownDisplay: FunctionComponent<
   removeLineBreaks,
   remarkPlugins,
 }) => {
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const [displayExternalLink, setDisplayExternalLink] = useState(false);
   const [externalLink, setExternalLink] = useState<string | URL | undefined>(
     undefined,

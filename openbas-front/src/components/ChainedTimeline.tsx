@@ -1,6 +1,6 @@
 import { CropFree, UnfoldLess, UnfoldMore } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import {
   Connection,
   ConnectionLineType,
@@ -21,6 +21,7 @@ import {
 import moment from 'moment-timezone';
 import { FunctionComponent, useEffect, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
 import type { EndpointHelper } from '../actions/assets/asset-helper';
@@ -39,9 +40,8 @@ import { useFormatter } from './i18n';
 import nodeTypes from './nodes';
 import { NodeInject } from './nodes/NodeInject';
 import NodePhantom from './nodes/NodePhantom';
-import type { Theme } from './Theme';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     marginTop: 30,
     paddingRight: 40,
@@ -82,8 +82,8 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   onUpdate,
   onDelete }) => {
   // Standard hooks
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeInject>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [draggingOnGoing, setDraggingOnGoing] = useState<boolean>(false);

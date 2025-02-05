@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, AlertTitle, Autocomplete, Button, Chip, TextField as MuiTextField, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { useFormatter } from '../../../../components/i18n';
 import { zodImplement } from '../../../../utils/Zod';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   buttons: {
     display: 'flex',
     justifyContent: 'end',
@@ -46,7 +46,7 @@ const EmailParametersForm: React.FC<Props> = ({
   disabled,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const [inputValue, setInputValue] = useState('');
 

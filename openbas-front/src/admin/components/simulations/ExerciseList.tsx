@@ -1,9 +1,9 @@
 import { HubOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercisesGlobalScores } from '../../../actions/exercises/exercise-action';
 import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
@@ -18,7 +18,7 @@ import type { ExercisesGlobalScoresOutput, ExerciseSimple, ExpectationResultsByT
 import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTestingResult';
 import ExerciseStatus from './simulation/ExerciseStatus';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
   },
@@ -104,7 +104,7 @@ const ExerciseList: FunctionComponent<Props> = ({
   isGlobalScoreAsync = false,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const inlineStyles = getInlineStyles(variant);
   const { nsdt, vnsdt } = useFormatter();
 

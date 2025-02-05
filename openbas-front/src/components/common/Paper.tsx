@@ -1,13 +1,13 @@
 import { Paper as PaperMui } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 interface PaperProps {
   children: React.ReactElement;
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     padding: 20,
     marginBottom: 30,
@@ -16,7 +16,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Paper: FunctionComponent<PaperProps> = ({ children }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   return (
     <PaperMui variant="outlined" className={classes.paper}>

@@ -1,9 +1,9 @@
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
@@ -19,7 +19,7 @@ const ButtonCreate: FunctionComponent<Props> = ({
   onClick,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   return (
     <Fab

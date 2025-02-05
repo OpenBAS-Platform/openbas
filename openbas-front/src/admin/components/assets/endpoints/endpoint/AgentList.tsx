@@ -1,7 +1,7 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../../../actions/Executor';
 import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
@@ -14,7 +14,7 @@ import AssetStatus from '../../AssetStatus';
 import AgentDeploymentMode from '../AgentDeploymentMode';
 import AgentPrivilege from '../AgentPrivilege';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -65,7 +65,7 @@ interface Props {
 }
 
 const AgentList: FunctionComponent<Props> = ({ agents }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
   // Fetching data

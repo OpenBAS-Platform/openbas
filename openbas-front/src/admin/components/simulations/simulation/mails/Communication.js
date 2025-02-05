@@ -1,16 +1,17 @@
 import { AttachFileRounded, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, IconButton } from '@mui/material';
 import { lightBlue } from '@mui/material/colors';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import purify from 'dompurify';
 import parse from 'html-react-parser';
 import { useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../../components/i18n';
 import TruncatedText from '../../../../../components/TruncatedText';
 import { resolveUserNames, truncate } from '../../../../../utils/String';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   card: {
     margin: '0 0 20px 0',
   },
@@ -25,7 +26,7 @@ const Communication = (props) => {
   const [expand, setExpand] = useState(false);
   const expandContent = () => setExpand(!expand);
   const theme = useTheme();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
   const limit = 200;
   let isHtml = false;

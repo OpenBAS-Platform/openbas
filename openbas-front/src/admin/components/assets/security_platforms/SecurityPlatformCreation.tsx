@@ -1,7 +1,7 @@
 import { ControlPointOutlined } from '@mui/icons-material';
-import { ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { addSecurityPlatform } from '../../../../actions/assets/securityPlatform-actions';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
@@ -12,7 +12,7 @@ import type { SecurityPlatform, SecurityPlatformInput } from '../../../../utils/
 import { useAppDispatch } from '../../../../utils/hooks';
 import SecurityPlatformForm from './SecurityPlatformForm';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   text: {
     fontSize: theme.typography.h2.fontSize,
     color: theme.palette.primary.main,
@@ -30,7 +30,7 @@ const SecurityPlatformCreation: FunctionComponent<Props> = ({
   onCreate,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const [open, setOpen] = useState(false);
   const { t } = useFormatter();
 

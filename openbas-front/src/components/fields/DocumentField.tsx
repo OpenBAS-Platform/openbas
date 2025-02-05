@@ -1,8 +1,8 @@
 import { Autocomplete as MuiAutocomplete, Box, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FileOutline } from 'mdi-material-ui';
 import { CSSProperties, FunctionComponent } from 'react';
 import { FieldErrors } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
 import type { DocumentHelper } from '../../actions/helper';
@@ -11,7 +11,7 @@ import type { Document } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -45,7 +45,7 @@ const DocumentField: FunctionComponent<Props> = ({
   style,
   extensions = [],
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   // Fetching data
   const { documents }: { documents: [Document] } = useHelper((helper: DocumentHelper) => ({

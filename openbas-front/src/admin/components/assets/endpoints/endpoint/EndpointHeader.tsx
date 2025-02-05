@@ -1,6 +1,6 @@
 import { Tooltip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useNavigate, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import type { UserHelper } from '../../../../../actions/helper';
@@ -9,7 +9,7 @@ import type { EndpointOverviewOutput as EndpointType } from '../../../../../util
 import { truncate } from '../../../../../utils/String';
 import EndpointPopover from '../EndpointPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   title: {
     float: 'left',
   },
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
 
 const EndpointHeader = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const navigate = useNavigate();
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
 

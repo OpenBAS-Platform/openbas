@@ -1,8 +1,8 @@
 import { Button } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChannel } from '../../../actions/channels/channel-action';
@@ -16,7 +16,7 @@ import ChannelMicroblogging from './ChannelMicroblogging';
 import ChannelNewspaper from './ChannelNewspaper';
 import ChannelTvChannel from './ChannelTvChannel';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     position: 'relative',
     flexGrow: 1,
@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ChannelPlayer = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
   const [userId, articleId] = useQueryParameter(['user', 'article']);

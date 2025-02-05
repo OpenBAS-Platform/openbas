@@ -1,6 +1,6 @@
 import { Kayaking } from '@mui/icons-material';
 import { Box } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchScenarios } from '../actions/scenarios/scenario-actions';
 import { useHelper } from '../store';
@@ -8,7 +8,7 @@ import { useAppDispatch } from '../utils/hooks';
 import useDataLoader from '../utils/hooks/useDataLoader';
 import Autocomplete from './Autocomplete';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
 
 const ScenarioField = (props) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   // Fetching data
   const scenarios = useHelper(helper => helper.getScenarios());

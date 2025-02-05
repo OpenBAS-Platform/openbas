@@ -18,9 +18,9 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useContext, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
@@ -32,7 +32,7 @@ import ObjectiveEvaluations from '../ObjectiveEvaluations';
 import LessonsCategories from './LessonsCategories';
 import LessonsObjectives from './LessonsObjectives';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   paper: {
     position: 'relative',
     padding: 0,
@@ -84,7 +84,7 @@ const Lessons: React.FC<Props> = ({
   lessonsTemplates,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
 

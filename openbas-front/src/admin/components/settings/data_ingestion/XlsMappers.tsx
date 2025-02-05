@@ -1,7 +1,7 @@
 import { TableViewOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchMappers } from '../../../../actions/mapper/mapper-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -17,7 +17,7 @@ import ImportUploaderMapper from './ImportUploaderMapper';
 import XlsMapperCreation from './xls_mapper/XlsMapperCreation';
 import XlsMapperPopover from './XlsMapperPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     padding: '0 200px 50px 0',
   },
@@ -53,7 +53,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 const XlsMappers = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Headers

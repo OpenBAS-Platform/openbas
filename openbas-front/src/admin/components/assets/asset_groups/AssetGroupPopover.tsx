@@ -1,7 +1,7 @@
 import { MoreVert } from '@mui/icons-material';
 import { Drawer as MuiDrawer, IconButton, Menu, MenuItem } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { deleteAssetGroup, updateAssetGroup, updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import Dialog from '../../../../components/common/Dialog';
@@ -15,7 +15,7 @@ import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
 import AssetGroupForm from './AssetGroupForm';
 import AssetGroupManagement from './AssetGroupManagement';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   drawerPaper: {
     minHeight: '100vh',
     width: '50%',
@@ -46,7 +46,7 @@ const AssetGroupPopover: FunctionComponent<Props> = ({
 
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
 

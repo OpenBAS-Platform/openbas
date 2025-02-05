@@ -1,8 +1,8 @@
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { Controller } from 'react-hook-form';
+import { withStyles } from 'tss-react/mui';
 
 import TagField from '../../../../../components/fields/TagField';
 import TextField from '../../../../../components/fields/TextField';
@@ -146,4 +146,4 @@ InjectForm.propTypes = {
   t: PropTypes.func,
 };
 
-export default R.compose(inject18n, withStyles(styles))(InjectForm);
+export default R.compose(inject18n, Component => withStyles(Component, styles))(InjectForm);

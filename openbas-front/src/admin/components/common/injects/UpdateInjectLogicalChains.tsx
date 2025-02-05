@@ -1,20 +1,19 @@
 import { HelpOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import arrayMutators from 'final-form-arrays';
 import * as React from 'react';
 import { Form } from 'react-final-form';
+import { makeStyles } from 'tss-react/mui';
 
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { Inject, InjectDependency } from '../../../../utils/api-types';
 import InjectChainsForm from './InjectChainsForm';
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   injectorContract: {
     margin: '10px 0 20px 0',
     width: '100%',
@@ -39,7 +38,7 @@ interface Props {
 
 const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
   const { t, tPick } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const { injectsMap } = useHelper((helper: InjectHelper) => ({
     injectsMap: helper.getInjectsMap(),

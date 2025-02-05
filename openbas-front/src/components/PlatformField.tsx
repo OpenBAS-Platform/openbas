@@ -1,13 +1,13 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
 import { FieldError } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import type { Option } from '../utils/Option';
 import { useFormatter } from './i18n';
 import PlatformIcon from './PlatformIcon';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   icon: {
     paddingTop: 4,
     display: 'inline-block',
@@ -36,7 +36,7 @@ const PlatformField: FunctionComponent<Props> = ({
   error,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const platformsOptions: Option[] = [

@@ -1,11 +1,11 @@
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../i18n';
-import type { Theme } from '../Theme';
 import { Scale } from './Tick';
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   scaleBar: {
     position: 'relative',
   },
@@ -57,8 +57,8 @@ const ScaleBar: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const scale: Scale = {
     min: {
       value: 0,

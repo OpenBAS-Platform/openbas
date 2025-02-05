@@ -1,7 +1,7 @@
 import { CloseRounded } from '@mui/icons-material';
 import { IconButton, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import type { AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
@@ -9,7 +9,6 @@ import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import type { UserHelper } from '../../../../actions/helper';
 import SearchFilter from '../../../../components/SearchFilter';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import type { AssetGroup, Endpoint } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -20,7 +19,7 @@ import EndpointPopover from '../endpoints/EndpointPopover';
 import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList';
 import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   // Drawer Header
   header: {
     backgroundColor: theme.palette.background.nav,
@@ -64,7 +63,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   onRemoveEndpointFromAssetGroup,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
   // Fetching data
@@ -125,7 +124,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         endpointIds={sortedAsset.map(e => e.asset_id)}
         actions={userAdmin
           ? (
-        // @ts-expect-error: Endpoint property handle by EndpointsList
+              // @ts-expect-error: Endpoint property handle by EndpointsList
               <EndpointPopover
                 inline
                 assetGroupId={assetGroup?.asset_group_id}

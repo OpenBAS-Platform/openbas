@@ -1,10 +1,10 @@
 import { Add } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, Fab, Slide } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component, forwardRef } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addOrganization } from '../../../../actions/Organization';
 import inject18n from '../../../../components/i18n';
@@ -89,5 +89,5 @@ CreateOrganization.propTypes = {
 export default R.compose(
   connect(null, { addOrganization }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreateOrganization);

@@ -7,11 +7,10 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Theme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useContext, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
@@ -19,7 +18,7 @@ import type { VariableInput } from '../../../../utils/api-types';
 import { VariableContext } from '../../common/Context';
 import VariableForm from './VariableForm';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   createButton: {
     float: 'left',
     marginTop: -15,
@@ -39,7 +38,7 @@ const CreateVariable: React.FC<Props> = ({
   inline,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   // Context

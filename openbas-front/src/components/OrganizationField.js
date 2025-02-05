@@ -1,9 +1,9 @@
 import { DomainOutlined } from '@mui/icons-material';
 import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addOrganization, fetchOrganizations } from '../actions/Organization';
 import { storeHelper } from '../actions/Schema';
@@ -123,5 +123,5 @@ const select = (state) => {
 export default R.compose(
   connect(select, { fetchOrganizations, addOrganization }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(OrganizationField);

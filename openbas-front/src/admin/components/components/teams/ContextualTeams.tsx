@@ -1,8 +1,8 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import ItemTags from '../../../../components/ItemTags';
 import type { Team } from '../../../../utils/api-types';
@@ -11,7 +11,7 @@ import { PermissionsContext, TeamContext } from '../../common/Context';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -128,7 +128,7 @@ interface TeamStoreExtended extends Team {
 
 const ContextualTeams: FunctionComponent<Props> = ({ teams }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const { computeTeamUsersEnabled } = useContext(TeamContext);
   const { permissions } = useContext(PermissionsContext);

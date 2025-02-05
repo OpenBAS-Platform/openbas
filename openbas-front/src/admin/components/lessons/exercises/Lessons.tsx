@@ -23,14 +23,13 @@ import {
   Radio,
   RadioGroup,
   Switch,
-  Theme,
   Typography,
   useTheme,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
@@ -44,7 +43,7 @@ import AnswersByQuestionDialog from './AnswersByQuestionDialog';
 import LessonsCategories from './LessonsCategories';
 import LessonsObjectives from './LessonsObjectives';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   metric: {
     position: 'relative',
     padding: 20,
@@ -123,7 +122,7 @@ const Lessons: React.FC<Props> = ({
   usersMap,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
 

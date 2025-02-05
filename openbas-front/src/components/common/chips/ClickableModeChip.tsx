@@ -1,11 +1,9 @@
-import { makeStyles } from '@mui/styles';
-import classNames from 'classnames';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../i18n';
-import type { Theme } from '../../Theme';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   mode: {
     borderRadius: 4,
     fontFamily: 'Consolas, monaco, monospace',
@@ -33,7 +31,7 @@ const ClickableModeChip: FunctionComponent<Props> = ({
   mode,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes, cx } = useStyles();
   const { t } = useFormatter();
 
   if (!mode) {
@@ -41,15 +39,17 @@ const ClickableModeChip: FunctionComponent<Props> = ({
   }
 
   return (
-    <div
-      onClick={onClick}
-      className={classNames({
-        [classes.mode]: true,
-        [classes.hasClickEvent]: !!onClick,
-      })}
-    >
-      {t(mode.toUpperCase())}
-    </div>
+    (
+      <div
+        onClick={onClick}
+        className={cx({
+          [classes.mode]: true,
+          [classes.hasClickEvent]: !!onClick,
+        })}
+      >
+        {t(mode.toUpperCase())}
+      </div>
+    )
   );
 };
 

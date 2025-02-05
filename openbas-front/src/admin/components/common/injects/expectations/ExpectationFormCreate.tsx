@@ -1,12 +1,11 @@
 import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, TextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, SyntheticEvent, useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 
 import type { LoggedHelper } from '../../../../../actions/helper';
 import { useFormatter } from '../../../../../components/i18n';
 import ScaleBar from '../../../../../components/scalebar/ScaleBar';
-import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { PlatformSettings } from '../../../../../utils/api-types';
 import { splitDuration } from '../../../../../utils/Time';
@@ -16,7 +15,7 @@ import { isTechnicalExpectation } from './ExpectationUtils';
 import ExpectationGroupField from './field/ExpectationGroupField';
 import useExpectationExpirationTime from './useExpectationExpirationTime';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   marginTop_2: {
     marginTop: theme.spacing(2),
   },
@@ -55,7 +54,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
   handleClose,
 }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
     settings: helper.getPlatformSettings(),

@@ -1,7 +1,8 @@
 import { Card, CardHeader, Grid, Skeleton, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
+import { makeStyles } from 'tss-react/mui';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     flexGrow: 1,
     paddingBottom: 50,
@@ -13,7 +14,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ChannelOverviewTvChannel = ({ channel }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const logo = isDark ? channel.logoDark : channel.logoLight;

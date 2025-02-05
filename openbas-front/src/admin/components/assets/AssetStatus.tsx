@@ -1,10 +1,10 @@
 import { Chip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../components/i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     fontSize: 20,
     fontWeight: 800,
@@ -40,7 +40,7 @@ interface Props {
 
 const AssetStatus: React.FC<Props> = ({ variant, status }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const style = variant === 'list' ? classes.chipInList : classes.chip;
 
   switch (status) {

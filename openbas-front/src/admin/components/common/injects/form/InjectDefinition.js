@@ -20,11 +20,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { fetchChallenges } from '../../../../../actions/Challenge.js';
 import { fetchChannels } from '../../../../../actions/channels/channel-action.js';
@@ -1033,5 +1033,5 @@ export default R.compose(
     fetchChallenges,
   }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(InjectDefinition);

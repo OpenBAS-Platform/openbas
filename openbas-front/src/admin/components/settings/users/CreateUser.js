@@ -1,10 +1,10 @@
 import { Add } from '@mui/icons-material';
 import { Fab, Slide } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component, forwardRef } from 'react';
 import { connect } from 'react-redux';
+import { withStyles } from 'tss-react/mui';
 
 import { addUser } from '../../../../actions/User';
 import Drawer from '../../../../components/common/Drawer';
@@ -97,5 +97,5 @@ CreateUser.propTypes = {
 export default R.compose(
   connect(null, { addUser }),
   inject18n,
-  withStyles(styles),
+  Component => withStyles(Component, styles),
 )(CreateUser);

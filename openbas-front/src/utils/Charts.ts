@@ -1,7 +1,6 @@
+import { Theme } from '@mui/material';
 import * as C from '@mui/material/colors';
 import { ApexOptions } from 'apexcharts';
-
-import type { Theme } from '../components/Theme';
 
 type Temp = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800;
 

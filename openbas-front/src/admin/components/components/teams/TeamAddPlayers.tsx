@@ -15,10 +15,10 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
 import { fetchPlayers } from '../../../../actions/User';
@@ -37,7 +37,7 @@ import TagsFilter from '../../common/filters/TagsFilter';
 import CreatePlayer from '../../teams/players/CreatePlayer';
 import type { UserStore } from '../../teams/players/Player';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
@@ -67,7 +67,7 @@ type UserStoreExtended = UserStore & {
 const TeamAddPlayers: React.FC<Props> = ({ addedUsersIds, teamId }) => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [usersIds, setUsersIds] = useState<UserStore['user_id'][]>([]);

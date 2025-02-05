@@ -1,10 +1,10 @@
 import { Chip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chipInList: {
     fontSize: 12,
     lineHeight: '12px',
@@ -26,7 +26,7 @@ const ChipInList: FunctionComponent<Props> = ({
   style,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   return (

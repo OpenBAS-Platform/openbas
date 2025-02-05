@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Add } from '@mui/icons-material';
 import { Button, IconButton, TextField, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import * as React from 'react';
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { useFormatter } from '../../../../../components/i18n';
@@ -14,7 +14,7 @@ import { zodImplement } from '../../../../../utils/Zod';
 import RulesContractContent from './RulesContractContent';
 import XlsMapperTestDialog from './XlsMapperTestDialog';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   importerStyle: {
     display: 'flex',
     alignItems: 'center',
@@ -43,7 +43,7 @@ const MapperForm: React.FC<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const ruleAttributeZodObject = z.object({
     rule_attribute_name: z.string().min(1, { message: t('Should not be empty') }),

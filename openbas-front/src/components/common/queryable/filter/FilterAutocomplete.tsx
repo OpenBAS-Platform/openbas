@@ -1,7 +1,7 @@
 import { FilterListOffOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, IconButton, TextField, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { Filter, FilterGroup } from '../../../../utils/api-types';
 import { Option } from '../../../../utils/Option';
@@ -9,7 +9,7 @@ import { useFormatter } from '../../../i18n';
 import { FilterHelpers } from './FilterHelpers';
 import { buildEmptyFilter } from './FilterUtils';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     display: 'flex',
     gap: 10,
@@ -34,7 +34,7 @@ const FilterAutocomplete: FunctionComponent<Props> = ({
   style,
 }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [inputValue, setInputValue] = useState('');

@@ -21,17 +21,17 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import { Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
 import { FunctionComponent, useContext, useEffect, useState } from 'react';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
-import type { Theme } from '../../../../components/Theme';
 import { type InjectExpectation, InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -54,7 +54,7 @@ interface Steptarget {
   key?: string;
 }
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles()(theme => ({
   container: {
     margin: '20px 0 0 0',
     overflow: 'hidden',
@@ -120,9 +120,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   target,
   parentTargetId,
 }) => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { nsdt, t } = useFormatter();
   const [anchorEls, setAnchorEls] = useState<Record<string, Element | null>>({});
   const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<{ injectExpectation: InjectExpectationsStore; sourceIds: string[] } | null>(null);

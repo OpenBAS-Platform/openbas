@@ -1,15 +1,15 @@
 import { Button, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
-import type { Theme } from '../../../../components/Theme';
 import type { AttackPattern, ExpectationResultsByType, InjectExpectationResultsByAttackPattern, InjectExpectationResultsByType } from '../../../../utils/api-types';
 import { hexToRGB } from '../../../../utils/Colors';
 import AtomicTestingResult from '../../atomic_testings/atomic_testing/AtomicTestingResult';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()(theme => ({
   button: {
     whiteSpace: 'nowrap',
     width: '100%',
@@ -52,8 +52,8 @@ const AttackPatternBox: FunctionComponent<AttackPatternBoxProps> = ({
   dummy,
 }) => {
   // Standard hooks
-  const classes = useStyles();
-  const theme = useTheme<Theme>();
+  const { classes } = useStyles();
+  const theme = useTheme();
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const results: InjectExpectationResultsByType[] = injectResult?.inject_expectation_results ?? [];

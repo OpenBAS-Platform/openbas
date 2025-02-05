@@ -1,8 +1,8 @@
 import { CheckCircleOutlined, PersonOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchOrganizations } from '../../../../actions/Organization';
 import { searchUsers } from '../../../../actions/User';
@@ -18,7 +18,7 @@ import SecurityMenu from '../SecurityMenu';
 import CreateUser from './CreateUser';
 import UserPopover from './UserPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
@@ -69,7 +69,7 @@ const inlineStyles = {
 
 const Users = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
   const { tagsMap, organizationsMap } = useHelper(helper => ({

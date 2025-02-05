@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
@@ -9,7 +9,6 @@ import type { UserHelper } from '../../../../../actions/helper';
 import { fetchPlayers } from '../../../../../actions/User';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
 import { useHelper } from '../../../../../store';
 import type { Communication, Exercise, User } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
@@ -27,7 +26,7 @@ const MailDistributionByPlayer: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const theme: Theme = useTheme();
+  const theme = useTheme();
 
   // Fetching data
   const { communications, usersMap } = useHelper((helper: CommunicationHelper & UserHelper) => ({

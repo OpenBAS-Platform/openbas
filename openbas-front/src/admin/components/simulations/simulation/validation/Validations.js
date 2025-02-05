@@ -1,9 +1,9 @@
 import { List, ListItem, ListItemIcon, ListItemText, Slide } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { forwardRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseInjectExpectations } from '../../../../../actions/Exercise';
 import { fetchExerciseInjects } from '../../../../../actions/Inject';
@@ -24,7 +24,7 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   item: {
     height: 40,
   },
@@ -36,7 +36,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const Validations = () => {
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const [tags, setTags] = useState([]);

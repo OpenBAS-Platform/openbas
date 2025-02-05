@@ -1,7 +1,7 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { LockPattern } from 'mdi-material-ui';
 import { useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchAttackPatterns } from '../../../../actions/AttackPattern';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
@@ -14,7 +14,7 @@ import TaxonomiesMenu from '../TaxonomiesMenu';
 import AttackPatternPopover from './AttackPatternPopover';
 import CreateAttackPattern from './CreateAttackPattern';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: 0,
     padding: '0 200px 50px 0',
@@ -62,7 +62,7 @@ const inlineStyles = {
 
 const AttackPatterns = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
   const { killChainPhasesMap } = useHelper(helper => ({
     killChainPhasesMap: helper.getKillChainPhasesMap(),

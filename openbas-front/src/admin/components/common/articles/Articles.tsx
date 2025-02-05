@@ -1,10 +1,10 @@
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, NewspaperOutlined, ShareOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { green, orange } from '@mui/material/colors';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { Fragment, FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { FullArticleStore } from '../../../../actions/channels/Article';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
@@ -27,7 +27,7 @@ import { ArticleContext, PermissionsContext } from '../Context';
 import ArticlePopover from './ArticlePopover';
 import CreateArticle from './CreateArticle';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   channel: {
     fontSize: 12,
     float: 'left',
@@ -56,7 +56,7 @@ interface Props {
 
 const Articles: FunctionComponent<Props> = ({ articles }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
 

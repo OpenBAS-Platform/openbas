@@ -1,13 +1,13 @@
 import { Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import type { UserHelper } from '../../../../actions/helper';
 import type { LessonsTemplatesHelper } from '../../../../actions/lessons/lesson-helper';
 import { useHelper } from '../../../../store';
 import LessonsTemplatePopover from './LessonsTemplatePopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   containerTitle: {
     display: 'flex',
     alignItems: 'center',
@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
 
 const LessonsTemplateHeader = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   const { lessonsTemplateId } = useParams() as { lessonsTemplateId: string };
   const { lessonsTemplate, userAdmin } = useHelper((helper: LessonsTemplatesHelper & UserHelper) => ({

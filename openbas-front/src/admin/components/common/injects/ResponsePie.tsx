@@ -1,12 +1,11 @@
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, Button, Grid2 as Grid } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { Box, Button, Grid2 as Grid, Theme } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';
 import { Link } from 'react-router';
 
 import { useFormatter } from '../../../../components/i18n';
-import type { Theme } from '../../../../components/Theme';
 import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
 import { donutChartOptions } from '../../../../utils/Charts';
 
@@ -49,7 +48,7 @@ const ResponsePie: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
 
   const prevention = expectationResultsByTypes?.find(e => e.type === 'PREVENTION');
   const detection = expectationResultsByTypes?.find(e => e.type === 'DETECTION');

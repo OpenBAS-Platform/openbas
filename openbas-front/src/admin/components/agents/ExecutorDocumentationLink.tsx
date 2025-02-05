@@ -1,12 +1,12 @@
 import { ArticleOutlined } from '@mui/icons-material';
 import { Chip, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../components/i18n';
 import type { Executor } from '../../../utils/api-types';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     height: 30,
     fontSize: 12,
@@ -24,7 +24,7 @@ const ExecutorDocumentationLink: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
 
   if (!executor.executor_doc) {
     return null;

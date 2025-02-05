@@ -1,10 +1,10 @@
 import { Chip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chip: {
     fontSize: 20,
     borderRadius: 4,
@@ -38,7 +38,7 @@ interface Props {
 
 const AgentDeploymentMode: React.FC<Props> = ({ variant, mode }) => {
   const { t } = useFormatter();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const style = variant === 'list' ? classes.chipInList : classes.chip;
 
   switch (mode) {

@@ -1,7 +1,7 @@
 import { DynamicFormOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { searchMitigations } from '../../../actions/Mitigation';
 import Breadcrumbs from '../../../components/Breadcrumbs';
@@ -13,7 +13,7 @@ import { useHelper } from '../../../store';
 import CreateMitigation from './CreateMitigation';
 import MitigationPopover from './MitigationPopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: 0,
   },
@@ -95,7 +95,7 @@ const inlineStyles = {
 
 const Mitigations = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
   const { attackPatternsMap, killChainPhasesMap } = useHelper(helper => ({
     attackPatternsMap: helper.getAttackPatternsMap(),

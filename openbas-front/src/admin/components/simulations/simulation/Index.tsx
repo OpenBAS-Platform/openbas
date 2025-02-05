@@ -1,7 +1,7 @@
 import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercise } from '../../../../actions/Exercise';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
@@ -34,7 +34,7 @@ const Logs = lazy(() => import('./logs/Logs'));
 const Chat = lazy(() => import('./chat/Chat'));
 const Validations = lazy(() => import('./validation/Validations'));
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   scheduling: {
     display: 'flex',
     margin: '-35px 8px 0 0',
@@ -48,7 +48,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
 }) => {
   const { t, fldt } = useFormatter();
   const location = useLocation();
-  const classes = useStyles();
+  const { classes } = useStyles();
   const permissionsContext: PermissionsContextType = {
     permissions: usePermissions(exercise.exercise_id),
   };

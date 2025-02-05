@@ -1,14 +1,14 @@
 import { AttachMoneyOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { CSSProperties, FunctionComponent, useContext } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import type { Variable } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { PermissionsContext, VariableContext } from '../../common/Context';
 import VariablePopover from './VariablePopover';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
@@ -91,7 +91,7 @@ interface Props {
 
 const Variables: FunctionComponent<Props> = ({ variables }) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   // Context
   const { onEditVariable, onDeleteVariable } = useContext(VariableContext);
   const { permissions } = useContext(PermissionsContext);

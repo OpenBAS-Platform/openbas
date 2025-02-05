@@ -1,10 +1,10 @@
 import { ReplyOutlined } from '@mui/icons-material';
 import { Button, Dialog, DialogContent, DialogTitle, Grid, Paper, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectCommunications } from '../../../../../actions/Communication';
 import { executeInject, fetchExerciseInjects } from '../../../../../actions/Inject';
@@ -19,7 +19,7 @@ import AnimationMenu from '../AnimationMenu';
 import Communication from './Communication';
 import CommunicationForm from './CommunicationForm';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   container: {
     margin: '0 0 50px 0',
     padding: '0 200px 0 0',
@@ -34,7 +34,7 @@ const useStyles = makeStyles(() => ({
 
 const Inject = () => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const dispatch = useDispatch();
   const [reply, setReply] = useState(null);
   const { t, fndt, fldt } = useFormatter();

@@ -1,8 +1,9 @@
+import { ThemeOptions } from '@mui/material';
+
 import LogoCollapsed from '../static/images/logo_light.png';
 import LogoText from '../static/images/logo_text_light.png';
 import { hexToRGB } from '../utils/Colors';
 import { fileUri } from '../utils/Environment';
-import type { ExtendedThemeOptions } from './Theme';
 
 const EE_COLOR = '#0c7e69';
 
@@ -22,7 +23,7 @@ const ThemeLight = (
   primary: string | null = null,
   secondary: string | null = null,
   accent: string | null = null,
-): ExtendedThemeOptions => ({
+): ThemeOptions => ({
   logo: logo || fileUri(LogoText),
   logo_collapsed: logo_collapsed || fileUri(LogoCollapsed),
   borderRadius: 4,

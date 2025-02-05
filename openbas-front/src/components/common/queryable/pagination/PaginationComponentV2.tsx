@@ -1,7 +1,7 @@
 import { Box, Button, Chip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
@@ -19,7 +19,7 @@ import { QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
 import TablePaginationComponentV2 from './TablePaginationComponentV2';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   topbar: {
     display: 'flex',
     alignItems: 'center',
@@ -65,7 +65,7 @@ const PaginationComponentV2 = <T extends object>({
   reloadContentCount = 0,
 }: Props<T>) => {
   // Standard hooks
-  const classes = useStyles();
+  const { classes } = useStyles();
   const { t } = useFormatter();
 
   const [properties, setProperties] = useState<PropertySchemaDTO[]>([]);

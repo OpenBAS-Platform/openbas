@@ -1,7 +1,7 @@
 import { CircularProgress } from '@mui/material';
-import { withStyles } from '@mui/styles';
 import * as PropTypes from 'prop-types';
 import { Component } from 'react';
+import { withStyles } from 'tss-react/mui';
 
 const styles = () => ({
   container: {
@@ -100,4 +100,4 @@ Loader.propTypes = {
   size: PropTypes.string,
 };
 
-export default withStyles(styles)(Loader);
+export default withStyles(Loader, styles);

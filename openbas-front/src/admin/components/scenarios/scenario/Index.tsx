@@ -1,9 +1,10 @@
 import { UpdateOutlined } from '@mui/icons-material';
 import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
-import { makeStyles, useTheme } from '@mui/styles';
+import { useTheme } from '@mui/material/styles';
 import cronstrue from 'cronstrue';
 import { FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
@@ -12,7 +13,6 @@ import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
-import type { Theme } from '../../../../components/Theme';
 import { useHelper } from '../../../../store';
 import { Scenario } from '../../../../utils/api-types';
 import { parseCron, ParsedCron } from '../../../../utils/Cron';
@@ -32,7 +32,7 @@ const Lessons = lazy(() => import('./lessons/ScenarioLessons'));
 // eslint-disable-next-line no-underscore-dangle
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   scheduling: {
     display: 'flex',
     margin: '-35px 8px 0 0',
@@ -46,8 +46,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({
 }) => {
   const { t, ft, locale, fld } = useFormatter();
   const location = useLocation();
-  const theme = useTheme<Theme>();
-  const classes = useStyles();
+  const theme = useTheme();
+  const { classes } = useStyles();
   const permissionsContext: PermissionsContextType = {
     permissions: useScenarioPermissions(scenario.scenario_id),
   };
