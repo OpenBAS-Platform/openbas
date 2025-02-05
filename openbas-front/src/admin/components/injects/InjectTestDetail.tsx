@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, Paper, Theme, Typography } from '@mui/material';
-import { useTheme } from '@mui/styles';
+import { Card, CardContent, CardHeader, Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { FunctionComponent } from 'react';
 
 import Drawer from '../../../components/common/Drawer';
@@ -20,7 +20,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
   handleClose,
   test,
 }) => {
-  const theme = useTheme<Theme>();
+  const theme = useTheme();
   const { t } = useFormatter();
 
   return (
