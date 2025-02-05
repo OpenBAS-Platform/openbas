@@ -19,7 +19,7 @@ import lombok.extern.jackson.Jacksonized;
 public class TagRuleInput {
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("tag_name")
-  @Schema(description = "Name of the tag rule")
+  @Schema(description = "Name of the tag")
   private String tagName;
 
   @JsonProperty("asset_groups")

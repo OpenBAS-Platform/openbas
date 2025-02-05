@@ -57,7 +57,7 @@ public class TagApi extends RestBehavior {
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "All the existing corresponding to the search criteria")
+            description = "All the existing tags corresponding to the search criteria")
       })
   @Operation(description = "Search tags corresponding to the criteria", summary = "Search tags")
   @PostMapping("/api/tags/search")
@@ -96,7 +96,7 @@ public class TagApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping("/api/tags/upsert")
   @Transactional(rollbackOn = Exception.class)
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The created tag")})
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The upserted tag")})
   @Operation(description = "Upsert a tag", summary = "Upsert tag")
   public Tag upsertTag(@Valid @RequestBody TagCreateInput input) {
     Optional<Tag> tag = tagRepository.findByName(input.getName());
@@ -123,8 +123,8 @@ public class TagApi extends RestBehavior {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of tags corresponding")})
   @Operation(
-      description = "Get a list of tag IDs and label corresponding to the text search",
-      summary = "Search tag by text")
+      description = "Get a list of tag IDs and labels corresponding to the text search",
+      summary = "Search tags by text")
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) @Schema(description = "Search text")
           final String searchText) {
@@ -139,8 +139,8 @@ public class TagApi extends RestBehavior {
   @ApiResponses(
       value = {@ApiResponse(responseCode = "200", description = "The list of tags corresponding")})
   @Operation(
-      description = "Get a list of tag IDs and label corresponding to a list of IDs",
-      summary = "Search tag by ids")
+      description = "Get a list of tag IDs and labels corresponding to a list of IDs",
+      summary = "Search tags by ids")
   public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
     return fromIterable(this.tagRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))

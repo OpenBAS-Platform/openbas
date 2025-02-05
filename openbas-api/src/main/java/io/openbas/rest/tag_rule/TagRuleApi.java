@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(
     name = "Tag rules management",
     description =
-        "Endpoints to manage TagRules. TagRules are used to automatically add tags to element depending on rules")
+        "Endpoints to manage TagRules. TagRules are used to automatically add tags to elements depending on rules")
 public class TagRuleApi extends RestBehavior {
 
   public static final String TAG_RULE_URI = "/api/tag-rules";
@@ -45,7 +45,7 @@ public class TagRuleApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(TagRuleApi.TAG_RULE_URI + "/{tagRuleId}")
   @Operation(description = "Get TagRule by Id", summary = "Get TagRule")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The tag rule")})
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The TagRule")})
   public TagRuleOutput findTagRule(
       @PathVariable @NotBlank @Schema(description = "ID of the tag rule") final String tagRuleId) {
     return tagRuleService.findById(tagRuleId).map(tagRuleMapper::toTagRuleOutput).orElse(null);
@@ -55,7 +55,7 @@ public class TagRuleApi extends RestBehavior {
   @GetMapping(TagRuleApi.TAG_RULE_URI)
   @Operation(description = "Get All TagRules", summary = "Get TagRules")
   @ApiResponses(
-      value = {@ApiResponse(responseCode = "200", description = "The list of all tag rules")})
+      value = {@ApiResponse(responseCode = "200", description = "The list of all TagRules")})
   public List<TagRuleOutput> tags() {
     return tagRuleService.findAll().stream().map(tagRuleMapper::toTagRuleOutput).toList();
   }
@@ -98,7 +98,7 @@ public class TagRuleApi extends RestBehavior {
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "TagRule updated"),
-        @ApiResponse(responseCode = "404", description = "TagRule, Tag  or Asset Group not found")
+        @ApiResponse(responseCode = "404", description = "TagRule, Tag or Asset Group not found")
       })
   public TagRuleOutput updateTagRule(
       @PathVariable @NotBlank @Schema(description = "ID of the tag rule") final String tagRuleId,
@@ -110,13 +110,13 @@ public class TagRuleApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(TagRuleApi.TAG_RULE_URI + "/search")
   @Operation(
-      description = "Search TagRule corresponding to search criteria",
-      summary = "Search TagRule")
+      description = "Search TagRules corresponding to search criteria",
+      summary = "Search TagRules")
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "The list of all tag rules corresponding to the search criteria")
+            description = "The list of all TagRules corresponding to the search criteria")
       })
   public Page<TagRuleOutput> searchTagRules(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
