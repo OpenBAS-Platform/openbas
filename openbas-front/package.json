@@ -27,7 +27,6 @@
     "axios": "1.7.9",
     "ckeditor5": "44.1.0",
     "classcat": "5.0.5",
-    "classnames": "2.5.1",
     "cronstrue": "2.54.0",
     "d3-hierarchy": "3.1.2",
     "date-fns": "4.1.0",
