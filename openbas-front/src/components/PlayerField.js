@@ -101,7 +101,7 @@ class PlayerField extends Component {
           renderOption={(props, option) => (
             <Box component="li" {...props} key={option.id}>
               <div className={classes.icon}>
-                <PersonOutlined />
+                <PersonOutlined color="primary" />
               </div>
               <div className={classes.text}>{option.label}</div>
             </Box>
