@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import nl.michelbijnen.jsonapi.parser.JsonApiConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
@@ -98,10 +99,12 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/export")
-  public void injectsExport(
+  public String injectsExport(
       @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput) {
     List<String> targetIds = injectExportRequestInput.getTargetsIds();
     List<Inject> injects = injectRepository.findAllById(targetIds);
+
+    return JsonApiConverter.convert(injects);
   }
 
   @Secured(ROLE_ADMIN)

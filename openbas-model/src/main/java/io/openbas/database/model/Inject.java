@@ -26,6 +26,10 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
+import nl.michelbijnen.jsonapi.annotation.JsonApiId;
+import nl.michelbijnen.jsonapi.annotation.JsonApiObject;
+import nl.michelbijnen.jsonapi.annotation.JsonApiProperty;
+import nl.michelbijnen.jsonapi.annotation.JsonApiRelation;
 import org.hibernate.annotations.UuidGenerator;
 
 @Setter
@@ -33,6 +37,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Table(name = "injects")
 @EntityListeners(ModelBaseListener.class)
 @Log
+@JsonApiObject("inject")
 public class Inject implements Base, Injection {
 
   public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
@@ -54,6 +59,7 @@ public class Inject implements Base, Injection {
   @UuidGenerator
   @JsonProperty("inject_id")
   @NotBlank
+  @JsonApiId
   private String id;
 
   @Getter
@@ -61,16 +67,19 @@ public class Inject implements Base, Injection {
   @Column(name = "inject_title")
   @JsonProperty("inject_title")
   @NotBlank
+  @JsonApiProperty
   private String title;
 
   @Getter
   @Column(name = "inject_description")
   @JsonProperty("inject_description")
+  @JsonApiProperty
   private String description;
 
   @Getter
   @Column(name = "inject_country")
   @JsonProperty("inject_country")
+  @JsonApiProperty
   private String country;
 
   @Getter
@@ -149,6 +158,7 @@ public class Inject implements Base, Injection {
   @JoinColumn(name = "inject_injector_contract")
   @JsonProperty("inject_injector_contract")
   @Queryable(filterable = true, dynamicValues = true, path = "injectorContract.injector.id")
+  @JsonApiRelation("injector_contract")
   private InjectorContract injectorContract;
 
   @Getter
@@ -157,6 +167,7 @@ public class Inject implements Base, Injection {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_user")
   @Schema(type = "string")
+  @JsonApiRelation("user")
   private User user;
 
   // CascadeType.ALL is required here because inject status are embedded

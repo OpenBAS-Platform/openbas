@@ -22,6 +22,9 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
+import nl.michelbijnen.jsonapi.annotation.JsonApiId;
+import nl.michelbijnen.jsonapi.annotation.JsonApiObject;
+import nl.michelbijnen.jsonapi.annotation.JsonApiProperty;
 import org.hibernate.annotations.Type;
 
 @Getter
@@ -29,12 +32,14 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "injectors_contracts")
 @EntityListeners(ModelBaseListener.class)
+@JsonApiObject("injector_contract")
 public class InjectorContract implements Base {
 
   @Id
   @Column(name = "injector_contract_id")
   @JsonProperty("injector_contract_id")
   @NotBlank
+  @JsonApiId
   private String id;
 
   @Column(name = "injector_contract_labels")
@@ -50,6 +55,7 @@ public class InjectorContract implements Base {
   @Column(name = "injector_contract_content")
   @JsonProperty("injector_contract_content")
   @NotBlank
+  @JsonApiProperty
   private String content;
 
   @Column(name = "injector_contract_content", insertable = false, updatable = false)

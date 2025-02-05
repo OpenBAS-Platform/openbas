@@ -24,6 +24,7 @@
         <apache-poi.version>5.4.0</apache-poi.version>
         <opentelemetry.version>1.46.0</opentelemetry.version>
         <opentelemetry-semconv.version>1.27.0-alpha</opentelemetry-semconv.version>
+        <elide.version>7.1.4</elide.version>
     </properties>
 
     <profiles>
@@ -211,6 +212,29 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp</artifactId>
         </dependency>
+        <dependency>
+            <groupId>nl.michelbijnen.jsonapi</groupId>
+            <artifactId>json-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.yahoo.elide</groupId>-->
+<!--            <artifactId>elide-spring-boot-starter</artifactId>-->
+<!--            <version>${elide.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    &lt;!&ndash; vulnerable &ndash;&gt;-->
+<!--                    <groupId>com.yahoo.elide</groupId>-->
+<!--                    <artifactId>elide-graphql</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    &lt;!&ndash; vulnerable &ndash;&gt;-->
+<!--                    <groupId>com.yahoo.elide</groupId>-->
+<!--                    <artifactId>elide-datastore-aggregation</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+
         <!-- TEST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

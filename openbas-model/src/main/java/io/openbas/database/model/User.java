@@ -22,6 +22,8 @@ import java.time.Instant;
 import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
+import nl.michelbijnen.jsonapi.annotation.JsonApiId;
+import nl.michelbijnen.jsonapi.annotation.JsonApiObject;
 import org.hibernate.annotations.UuidGenerator;
 
 @Getter
@@ -33,6 +35,7 @@ import org.hibernate.annotations.UuidGenerator;
       name = "Player.tags-organization",
       attributeNodes = {@NamedAttributeNode("tags"), @NamedAttributeNode("organization")})
 })
+@JsonApiObject("user")
 public class User implements Base {
 
   public static final String ADMIN_UUID = "89206193-dbfb-4513-a186-d72c037dda4c";
@@ -50,6 +53,7 @@ public class User implements Base {
   @UuidGenerator
   @JsonProperty("user_id")
   @NotBlank
+  @JsonApiId
   private String id;
 
   @Setter

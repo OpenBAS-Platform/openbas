@@ -68,5 +68,17 @@
             <version>2.2.28</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yahoo.elide</groupId>
+            <artifactId>elide-core</artifactId>
+            <version>7.1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>nl.michelbijnen.jsonapi</groupId>
+            <artifactId>json-api</artifactId>
+            <version>1.5.6</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

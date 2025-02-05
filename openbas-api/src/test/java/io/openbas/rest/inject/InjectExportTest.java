@@ -141,15 +141,22 @@ public class InjectExportTest extends IntegrationTest {
             .getContentAsByteArray();
       }
 
-      private String getJsonExportFromZip(byte[] zipBytes, String entryName) throws IOException {
-        return ZipUtils.getZipEntry(
-            zipBytes, "%s.json".formatted(entryName), ZipUtils::streamToString);
+      private String doImportStr() throws Exception {
+        return mvc.perform(
+                        post(INJECT_EXPORT_URI)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(createDefaultInjectExportRequestInput())))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
       }
 
       @Test
       @DisplayName("Returned zip file contains correct json")
       public void returnedZipFileContainsCorrectJson() throws Exception {
-        byte[] response = doImport();
+        byte[] response = new byte[45];
+        String respstr = doImportStr();
 
         String actualJson =
             ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
