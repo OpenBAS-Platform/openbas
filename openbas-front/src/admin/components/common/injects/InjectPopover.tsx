@@ -1,5 +1,5 @@
 import { MoreVert } from '@mui/icons-material';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem, Table, TableBody, TableCell, TableRow } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
 import { FunctionComponent, useContext, useState } from 'react';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -13,7 +13,7 @@ import DialogTest from '../../../../components/common/DialogTest';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectStatus, InjectStatusExecution, InjectTestStatus } from '../../../../utils/api-types';
+import type { Inject, InjectStatus, InjectTestStatus } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { InjectContext, PermissionsContext } from '../Context';
@@ -72,9 +72,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openEnable, setOpenEnable] = useState(false);
   const [openDisable, setOpenDisable] = useState(false);
   const [openDone, setOpenDone] = useState(false);
-  const [openResult, setOpenResult] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
-  const [injectResult, setInjectResult] = useState<InjectStatus | null>(null);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] !== undefined);
@@ -117,11 +115,6 @@ const InjectPopover: FunctionComponent<Props> = ({
       onDelete?.(inject.inject_id);
       handleCloseDelete();
     });
-  };
-
-  const handleCloseResult = () => {
-    setOpenResult(false);
-    setInjectResult(null);
   };
 
   const handleOpenTest = () => {
@@ -396,67 +389,6 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
           <Button color="secondary" onClick={submitTrigger}>
             {t('Trigger')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={openResult}
-        TransitionComponent={Transition}
-        onClose={handleCloseResult}
-        fullWidth
-        maxWidth="md"
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogContent>
-          {/* TODO: selectable={false} */}
-          <Table size="small">
-            {/* TODO: displayRowCheckbox={false} */}
-            <TableBody>
-              {injectResult && Object.entries(injectResult).map(
-                ([key, value]) => {
-                  if (key === 'status_traces') {
-                    return (
-                      <TableRow key={key}>
-                        <TableCell>{key}</TableCell>
-                        <TableCell>
-                          {/* TODO: selectable={false} */}
-                          <Table size="small" key={key}>
-                            {/* TODO: displayRowCheckbox={false} */}
-                            <TableBody>
-                              <>
-                                {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
-                                  .map((trace: InjectStatusExecution) => (
-                                    <TableRow key={trace.execution_category}>
-                                      <TableCell>
-                                        {trace.execution_message}
-                                      </TableCell>
-                                      <TableCell>
-                                        {trace.execution_status}
-                                      </TableCell>
-                                      <TableCell>{trace.execution_time}</TableCell>
-                                    </TableRow>
-                                  ))}
-                              </>
-                            </TableBody>
-                          </Table>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  }
-                  return (
-                    <TableRow key={key}>
-                      <TableCell>{key}</TableCell>
-                      <TableCell>{value}</TableCell>
-                    </TableRow>
-                  );
-                },
-              )}
-            </TableBody>
-          </Table>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseResult}>
-            {t('Close')}
           </Button>
         </DialogActions>
       </Dialog>

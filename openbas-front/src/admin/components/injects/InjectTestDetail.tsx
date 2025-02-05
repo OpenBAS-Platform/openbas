@@ -109,37 +109,9 @@ const InjectTestDetail: FunctionComponent<Props> = ({
                       {test.tracking_sent_date}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
-                      {t('Tracking Ack Date')}
-                      :
-                      {test.tracking_ack_date}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
                       {t('Tracking End Date')}
                       :
                       {test.tracking_end_date}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {t('Tracking Total Execution')}
-                      {t('Time')}
-                      :
-                      {test.tracking_total_execution_time}
-                      {' '}
-                      {t('ms')}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {t('Tracking Total Count')}
-                      :
-                      {test.tracking_total_count}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {t('Tracking Total Error')}
-                      :
-                      {test.tracking_total_error}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                      {t('Tracking Total Success')}
-                      :
-                      {test.tracking_total_success}
                     </Typography>
                   </>
                 ) : (

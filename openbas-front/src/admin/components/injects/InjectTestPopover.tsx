@@ -62,7 +62,7 @@ const InjectTestPopover: FunctionComponent<Props> = ({
   const submitTest = () => {
     testInject(injectTestStatus.inject_id!).then((result: { data: InjectTestStatus }) => {
       onTest?.(result.data);
-      MESSAGING$.notifySuccess(t('Test for inject {injectTitle} has been sent', { injectTitle: injectTestStatus.inject_title }));
+      MESSAGING$.notifySuccess(t(`Test for inject ${injectTestStatus.inject_title} has been sent`));
       return result;
     });
     handleCloseTest();

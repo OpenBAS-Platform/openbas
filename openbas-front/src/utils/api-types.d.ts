@@ -423,18 +423,22 @@ export interface ChannelUpdateLogoInput {
 }
 
 export interface CheckExerciseRulesInput {
+  /** List of tag that will be applied to the simulation */
   new_tags?: string[];
 }
 
 export interface CheckExerciseRulesOutput {
+  /** Are there rules that can be applied? */
   rules_found: boolean;
 }
 
 export interface CheckScenarioRulesInput {
+  /** List of tag that will be applied to the scenario */
   new_tags?: string[];
 }
 
 export interface CheckScenarioRulesOutput {
+  /** Are there rules that can be applied? */
   rules_found: boolean;
 }
 
@@ -801,6 +805,34 @@ export interface Executable {
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
+export interface ExecutionTraces {
+  agent?: string;
+  execution_action?: "PREREQUISITE_CHECK" | "PREREQUISITE_EXECUTION" | "EXECUTION" | "CLEANUP_EXECUTION" | "COMPLETE";
+  execution_context_identifiers?: string[];
+  /** @format date-time */
+  execution_created_at: string;
+  execution_message: string;
+  execution_status?:
+    | "SUCCESS"
+    | "ERROR"
+    | "MAYBE_PREVENTED"
+    | "COMMAND_NOT_FOUND"
+    | "COMMAND_CANNOT_BE_EXECUTED"
+    | "WARNING"
+    | "PARTIAL"
+    | "MAYBE_PARTIAL_PREVENTED"
+    | "ASSET_INACTIVE"
+    | "INFO";
+  /** @format date-time */
+  execution_time?: string;
+  execution_trace_id: string;
+  /** @format date-time */
+  execution_updated_at: string;
+  injectStatus?: string;
+  injectTestStatus?: string;
+  listened?: boolean;
+}
+
 export interface Executor {
   /** @format date-time */
   executor_created_at: string;
@@ -890,6 +922,7 @@ export interface Exercise {
   exercise_users?: string[];
   /** @format int64 */
   exercise_users_number?: number;
+  exercise_variables?: string[];
   listened?: boolean;
 }
 
@@ -1338,14 +1371,23 @@ export interface InjectDocumentInput {
 }
 
 export interface InjectExecutionInput {
-  execution_context_identifiers?: string[];
+  execution_action?:
+    | "prerequisite_check"
+    | "prerequisite_execution"
+    | "cleanup_execution"
+    | "command_execution"
+    | "dns_resolution"
+    | "file_execution"
+    | "file_drop"
+    | "complete";
   /** @format int32 */
   execution_duration?: number;
-  execution_message?: string;
+  execution_message: string;
   execution_status: string;
 }
 
 export interface InjectExpectation {
+  inject_expectation_agent?: string;
   inject_expectation_article?: string;
   inject_expectation_asset?: string;
   inject_expectation_asset_group?: string;
@@ -1549,73 +1591,35 @@ export interface InjectResultOverviewOutput {
 
 export interface InjectStatus {
   listened?: boolean;
+  statusMapIdentifierAgent?: Record<string, Agent>;
   status_id?: string;
   status_name:
     | "SUCCESS"
     | "ERROR"
     | "MAYBE_PREVENTED"
+    | "PARTIAL"
+    | "MAYBE_PARTIAL_PREVENTED"
     | "DRAFT"
     | "QUEUING"
     | "EXECUTING"
-    | "PENDING"
-    | "PARTIAL"
-    | "MAYBE_PARTIAL_PREVENTED";
+    | "PENDING";
   status_payload_output?: StatusPayload;
-  status_traces?: InjectStatusExecution[];
-  /** @format date-time */
-  tracking_ack_date?: string;
+  status_traces?: ExecutionTraces[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
   tracking_sent_date?: string;
-  /** @format int32 */
-  tracking_total_count?: number;
-  /** @format int32 */
-  tracking_total_error?: number;
-  /** @format int64 */
-  tracking_total_execution_time?: number;
-  /** @format int32 */
-  tracking_total_success?: number;
-}
-
-export interface InjectStatusExecution {
-  execution_category?: string;
-  execution_context_identifiers?: string[];
-  /** @format int32 */
-  execution_duration?: number;
-  execution_message?: string;
-  execution_status?:
-    | "SUCCESS"
-    | "ERROR"
-    | "MAYBE_PREVENTED"
-    | "INFO"
-    | "COMMAND_NOT_FOUND"
-    | "COMMAND_CANNOT_BE_EXECUTED"
-    | "WARNING"
-    | "ASSET_INACTIVE";
-  /** @format date-time */
-  execution_time?: string;
 }
 
 /** status */
 export interface InjectStatusOutput {
   status_id: string;
   status_name?: string;
-  status_traces?: InjectStatusExecution[];
-  /** @format date-time */
-  tracking_ack_date?: string;
+  status_traces?: ExecutionTraces[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
   tracking_sent_date?: string;
-  /** @format int32 */
-  tracking_total_count?: number;
-  /** @format int32 */
-  tracking_total_error?: number;
-  /** @format int64 */
-  tracking_total_execution_time?: number;
-  /** @format int32 */
-  tracking_total_success?: number;
 }
 
 /** Status */
@@ -1633,7 +1637,7 @@ export interface InjectTargetWithResult {
   id: string;
   name?: string;
   platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  targetType?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -1655,27 +1659,17 @@ export interface InjectTestStatus {
     | "SUCCESS"
     | "ERROR"
     | "MAYBE_PREVENTED"
+    | "PARTIAL"
+    | "MAYBE_PARTIAL_PREVENTED"
     | "DRAFT"
     | "QUEUING"
     | "EXECUTING"
-    | "PENDING"
-    | "PARTIAL"
-    | "MAYBE_PARTIAL_PREVENTED";
-  status_traces?: InjectStatusExecution[];
-  /** @format date-time */
-  tracking_ack_date?: string;
+    | "PENDING";
+  status_traces?: ExecutionTraces[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
   tracking_sent_date?: string;
-  /** @format int32 */
-  tracking_total_count?: number;
-  /** @format int32 */
-  tracking_total_error?: number;
-  /** @format int64 */
-  tracking_total_execution_time?: number;
-  /** @format int32 */
-  tracking_total_success?: number;
 }
 
 export interface InjectUpdateActivationInput {
@@ -3306,8 +3300,11 @@ export interface StatusPayload {
   payload_arguments?: PayloadArgument[];
   payload_cleanup_executor?: string;
   payload_command_blocks?: PayloadCommandBlock[];
+  payload_description?: string;
   payload_external_id?: string;
+  payload_name?: string;
   payload_prerequisites?: PayloadPrerequisite[];
+  payload_type?: string;
 }
 
 export interface StatusPayloadOutput {
@@ -3369,7 +3366,7 @@ export interface TagUpdateInput {
 export interface TargetSimple {
   target_id: string;
   target_name?: string;
-  target_type?: "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  target_type?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface Team {
