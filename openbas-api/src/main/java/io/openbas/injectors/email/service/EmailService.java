@@ -13,10 +13,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -222,6 +224,5 @@ public class EmailService {
       }
     }
     throw new InterruptedException("Failed to send mail after 3 attempts");
-    //   execution.addTrace(traceError("Failed to send mail after 3 attempts"));
   }
 }
