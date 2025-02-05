@@ -1,10 +1,9 @@
-import { Card, CardContent, CardHeader, Paper, Typography } from '@mui/material';
+import { Card, CardContent, CardHeader, Paper, Theme, Typography } from '@mui/material';
 import { useTheme } from '@mui/styles';
 import { FunctionComponent } from 'react';
 
 import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';
-import type { Theme } from '../../../components/Theme';
 import { InjectTestStatusOutput } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 import InjectIcon from '../common/injects/InjectIcon';
