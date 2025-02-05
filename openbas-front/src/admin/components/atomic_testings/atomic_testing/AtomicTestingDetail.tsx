@@ -52,37 +52,9 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
                     {injectResultOverviewOutput.inject_status?.tracking_sent_date}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {t('Tracking Ack Date')}
-                    :
-                    {injectResultOverviewOutput.inject_status?.tracking_ack_date}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
                     {t('Tracking End Date')}
                     :
                     {injectResultOverviewOutput.inject_status?.tracking_end_date}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Execution')}
-                    {t('Time')}
-                    :
-                    {injectResultOverviewOutput.inject_status?.tracking_total_execution_time}
-                    {' '}
-                    {t('ms')}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Count')}
-                    :
-                    {injectResultOverviewOutput.inject_status?.tracking_total_count}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Error')}
-                    :
-                    {injectResultOverviewOutput.inject_status?.tracking_total_error}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {t('Tracking Total Success')}
-                    :
-                    {injectResultOverviewOutput.inject_status?.tracking_total_success}
                   </Typography>
                 </>
               ) : (
