@@ -35,7 +35,7 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
       inject_ids_to_process: injectIds!,
     }!).then((result: { data: InjectTestStatus[] }) => {
       onTest?.(result.data);
-      MESSAGING$.notifySuccess(t('{testNumber} test(s) sent', { testNumber: injectIds?.length }));
+      MESSAGING$.notifySuccess(t(`${injectIds?.length} test(s) sent`));
       return result;
     });
     handleCloseAllTest();

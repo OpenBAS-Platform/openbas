@@ -13,7 +13,7 @@ import DialogTest from '../../../../components/common/DialogTest';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectStatus, InjectStatusExecution, InjectTestStatus } from '../../../../utils/api-types';
+import type { ExecutionTraces, Inject, InjectStatus, InjectTestStatus } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { InjectContext, PermissionsContext } from '../Context';
@@ -424,9 +424,9 @@ const InjectPopover: FunctionComponent<Props> = ({
                             {/* TODO: displayRowCheckbox={false} */}
                             <TableBody>
                               <>
-                                {value?.filter((trace: InjectStatusExecution) => !!trace.execution_message)
-                                  .map((trace: InjectStatusExecution) => (
-                                    <TableRow key={trace.execution_category}>
+                                {value?.filter((trace: ExecutionTraces) => !!trace.execution_message)
+                                  .map((trace: ExecutionTraces) => (
+                                    <TableRow key={trace.execution_trace_id}>
                                       <TableCell>
                                         {trace.execution_message}
                                       </TableCell>
