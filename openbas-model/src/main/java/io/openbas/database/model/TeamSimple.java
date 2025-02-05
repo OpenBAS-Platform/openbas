@@ -35,31 +35,31 @@ public class TeamSimple {
   private String description;
 
   @JsonProperty("team_created_at")
-  @Schema(description = "Creation date of the team")
+  @Schema(description = "Creation date of the team", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant createdAt = now();
 
   @JsonProperty("team_updated_at")
-  @Schema(description = "Update date of the team")
+  @Schema(description = "Update date of the team", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant updatedAt = now();
 
   @JsonProperty("team_tags")
-  @Schema(description = "List of tags of the team")
+  @Schema(description = "List of tag IDs of the team")
   private Set<String> tags;
 
   @JsonProperty("team_organization")
-  @Schema(description = "Organization of the team")
+  @Schema(description = "Organization ID of the team")
   private String organization;
 
   @JsonProperty("team_users")
-  @Schema(description = "List of users of the team")
+  @Schema(description = "List of user IDs of the team")
   private Set<String> users;
 
   @JsonProperty("team_exercises")
-  @Schema(description = "List of exercises of the team")
+  @Schema(description = "List of simulation IDs of the team")
   private Set<String> exercises;
 
   @JsonProperty("team_scenarios")
-  @Schema(description = "List of scenarios of the team")
+  @Schema(description = "List of scenario IDs of the team")
   private Set<String> scenarios;
 
   @JsonProperty("team_contextual")
@@ -69,7 +69,7 @@ public class TeamSimple {
   private Boolean contextual;
 
   @JsonProperty("team_exercises_users")
-  @Schema(description = "List of 3-tuple linking simulations and users to this team")
+  @Schema(description = "List of 3-tuple linking simulation IDs and user IDs to this team ID")
   private Set<ExerciseTeamUser> exerciseTeamUsers = new HashSet<>();
 
   @JsonProperty("team_users_number")
@@ -80,7 +80,7 @@ public class TeamSimple {
 
   // region transient
   @JsonProperty("team_exercise_injects")
-  @Schema(description = "List of injects from all simulations of the team")
+  @Schema(description = "List of inject IDs from all simulations of the team")
   private Set<String> exercisesInjects;
 
   @JsonProperty("team_exercise_injects_number")
@@ -90,7 +90,7 @@ public class TeamSimple {
   }
 
   @JsonProperty("team_scenario_injects")
-  @Schema(description = "List of injects from all scenarios of the team")
+  @Schema(description = "List of inject IDs from all scenarios of the team")
   Set<String> scenariosInjects = new HashSet<>();
 
   @JsonProperty("team_scenario_injects_number")
@@ -102,7 +102,7 @@ public class TeamSimple {
   @JsonIgnore private List<InjectExpectation> injectExpectations = new ArrayList<>();
 
   @JsonProperty("team_inject_expectations")
-  @Schema(description = "List of expectations id linked to this team")
+  @Schema(description = "List of expectation ids linked to this team")
   private Set<String> getInjectExpectationsAsStringList() {
     return getInjectExpectations().stream()
         .map(InjectExpectation::getId)

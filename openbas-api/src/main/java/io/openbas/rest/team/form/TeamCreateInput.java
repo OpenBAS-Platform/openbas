@@ -1,33 +1,13 @@
 package io.openbas.rest.team.form;
 
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class TeamCreateInput {
-
-  @NotBlank(message = MANDATORY_MESSAGE)
-  @JsonProperty("team_name")
-  @Schema(description = "Name of the team")
-  private String name;
-
-  @JsonProperty("team_description")
-  @Schema(description = "Description of the team")
-  private String description;
-
-  @JsonProperty("team_organization")
-  @Schema(description = "Organization of the team")
-  private String organizationId;
-
-  @JsonProperty("team_tags")
-  @Schema(description = "Id of the tags linked to the team")
-  private List<String> tagIds = new ArrayList<>();
+public class TeamCreateInput extends TeamBaseInput {
 
   @JsonProperty("team_exercises")
   @Schema(description = "Id of the simulations linked to the team")

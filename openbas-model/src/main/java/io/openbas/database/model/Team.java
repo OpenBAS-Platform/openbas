@@ -58,14 +58,14 @@ public class Team implements Base {
   @Column(name = "team_created_at")
   @JsonProperty("team_created_at")
   @NotNull
-  @Schema(description = "Creation date of the team")
+  @Schema(description = "Creation date of the team", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant createdAt = now();
 
   @Queryable(sortable = true)
   @Column(name = "team_updated_at")
   @JsonProperty("team_updated_at")
   @NotNull
-  @Schema(description = "Update date of the team")
+  @Schema(description = "Update date of the team", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant updatedAt = now();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -77,7 +77,7 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("team_tags")
-  @Schema(description = "ID of the tags of the team")
+  @Schema(description = "IDs of the tags of the team")
   private Set<Tag> tags = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -95,7 +95,7 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "user_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_users")
-  @Schema(description = "ID of the users of the team")
+  @Schema(description = "IDs of the users of the team")
   private List<User> users = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -106,7 +106,7 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_exercises")
-  @Schema(description = "ID of the simulations linked to the team")
+  @Schema(description = "IDs of the simulations linked to the team")
   private List<Exercise> exercises = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -117,7 +117,7 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "scenario_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_scenarios")
-  @Schema(description = "ID of the scenarios linked to the team")
+  @Schema(description = "IDs of the scenarios linked to the team")
   private List<Scenario> scenarios = new ArrayList<>();
 
   @Column(name = "team_contextual")
@@ -135,7 +135,7 @@ public class Team implements Base {
       orphanRemoval = true)
   @JsonProperty("team_exercises_users")
   @JsonSerialize(using = MultiModelDeserializer.class)
-  @Schema(description = "List of 3-tuple linking simulations and users to this team")
+  @Schema(description = "List of 3-tuple linking simulation IDs and user IDs to this team ID")
   private List<ExerciseTeamUser> exerciseTeamUsers = new ArrayList<>();
 
   @JsonProperty("team_users_number")
@@ -148,7 +148,7 @@ public class Team implements Base {
   @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("team_exercise_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
-  @Schema(description = "List of injects from all simulations of the team")
+  @Schema(description = "List of inject IDs from all simulations of the team")
   public List<Inject> getExercisesInjects() {
     Predicate<Inject> selectedInject =
         inject -> inject.isAllTeams() || inject.getTeams().contains(this);
@@ -167,7 +167,7 @@ public class Team implements Base {
   @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("team_scenario_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
-  @Schema(description = "List of injects from all scenarios of the team")
+  @Schema(description = "List of inject IDs from all scenarios of the team")
   public List<Inject> getScenariosInjects() {
     Predicate<Inject> selectedInject =
         inject -> inject.isAllTeams() || inject.getTeams().contains(this);
