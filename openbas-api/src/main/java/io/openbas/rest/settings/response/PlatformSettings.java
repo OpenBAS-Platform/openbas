@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class PlatformSettings {
   private String platformLang;
 
   @JsonProperty("platform_enterprise_edition")
-  @Schema(description = "'true' if the platform has enterprise edition activated")
+  @Schema(description = "'true' if the platform has Enterprise Edition activated")
   private String platformEnterpriseEdition;
 
   @JsonProperty("platform_whitemark")
@@ -72,11 +73,11 @@ public class PlatformSettings {
   private Boolean authLocalEnable;
 
   @JsonProperty("map_tile_server_light")
-  @Schema(description = "Url to the server containing the map tile with light theme")
+  @Schema(description = "URL of the server containing the map tile with light theme")
   private String mapTileServerLight;
 
   @JsonProperty("map_tile_server_dark")
-  @Schema(description = "Url to the server containing the map tile with dark theme")
+  @Schema(description = "URL of the server containing the map tile with dark theme")
   private String mapTileServerDark;
 
   @JsonProperty("xtm_opencti_enable")
@@ -92,15 +93,15 @@ public class PlatformSettings {
   private String platformVersion;
 
   @JsonProperty("postgre_version")
-  @Schema(description = "Current version of the PGSQL")
+  @Schema(description = "Current version of the PostgreSQL")
   private String postgreVersion;
 
   @JsonProperty("java_version")
-  @Schema(description = "Current version of the Java")
+  @Schema(description = "Current version of Java")
   private String javaVersion;
 
   @JsonProperty("rabbitmq_version")
-  @Schema(description = "Current version of the RabbitMQ")
+  @Schema(description = "Current version of RabbitMQ")
   private String rabbitMQVersion;
 
   @JsonProperty("platform_ai_enabled")
@@ -112,15 +113,21 @@ public class PlatformSettings {
   private Boolean aiHasToken;
 
   @JsonProperty("platform_ai_type")
-  @Schema(description = "Type of AI")
+  @Schema(
+      description = "Type of AI (mistralai or openai)",
+      externalDocs =
+          @ExternalDocumentation(
+              description = "How to configure AI service",
+              url =
+                  "https://docs.openbas.io/latest/deployment/configuration/?h=ai+type#ai-service"))
   private String aiType;
 
   @JsonProperty("platform_ai_model")
-  @Schema(description = "Model chosen of AI")
+  @Schema(description = "Chosen model of AI")
   private String aiModel;
 
   @JsonProperty("executor_caldera_enable")
-  @Schema(description = "True if the Caldera Executor is enabled")
+  @Schema(description = "'true' if the Caldera Executor is enabled")
   private Boolean executorCalderaEnable;
 
   @JsonProperty("executor_caldera_public_url")
@@ -128,17 +135,17 @@ public class PlatformSettings {
   private String executorCalderaPublicUrl;
 
   @JsonProperty("executor_tanium_enable")
-  @Schema(description = "True if the Tanium Executor is enabled")
+  @Schema(description = "'true' if the Tanium Executor is enabled")
   private Boolean executorTaniumEnable;
 
   // THEME
 
   @JsonProperty("platform_light_theme")
-  @Schema(description = "Description of the light theme")
+  @Schema(description = "Definition of the light theme")
   private ThemeInput themeLight;
 
   @JsonProperty("platform_dark_theme")
-  @Schema(description = "Description of the dark theme")
+  @Schema(description = "Definition of the dark theme")
   private ThemeInput themeDark;
 
   // POLICIES
@@ -203,10 +210,10 @@ public class PlatformSettings {
 
   // EMAIL CONFIG
   @JsonProperty("default_mailer")
-  @Schema(description = "Mail to use by default")
+  @Schema(description = "Sender mail to use by default for injects")
   private String defaultMailer;
 
   @JsonProperty("default_reply_to")
-  @Schema(description = "Reply to to use by default")
+  @Schema(description = "Reply to mail to use by default for injects")
   private String defaultReplyTo;
 }

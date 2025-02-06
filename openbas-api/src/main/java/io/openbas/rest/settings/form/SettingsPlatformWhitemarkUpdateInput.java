@@ -13,6 +13,6 @@ import lombok.Setter;
 public class SettingsPlatformWhitemarkUpdateInput {
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("platform_whitemark")
-  @Schema(description = "The whitepark of the platform")
+  @Schema(description = "The whitemark of the platform")
   private String platformWhitemark;
 }
