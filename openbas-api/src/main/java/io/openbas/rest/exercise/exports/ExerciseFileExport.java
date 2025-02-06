@@ -20,10 +20,6 @@ import lombok.Setter;
 @Setter
 @JsonInclude(NON_NULL)
 public class ExerciseFileExport extends FileExportBase {
-
-  @JsonProperty("export_version")
-  private int version = 1;
-
   @JsonProperty("exercise_information")
   private final Exercise exercise;
 

@@ -1,6 +1,7 @@
 package io.openbas.rest.inject;
 
 import static io.openbas.rest.inject.InjectApi.INJECT_URI;
+import static io.openbas.utils.fixtures.FileFixture.WELL_KNOWN_FILES;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,9 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.Challenge;
-import io.openbas.database.model.Document;
-import io.openbas.database.model.Inject;
+import io.openbas.database.model.*;
 import io.openbas.export.Mixins;
 import io.openbas.rest.inject.form.InjectExportRequestInput;
 import io.openbas.rest.inject.form.InjectExportTarget;
@@ -19,7 +18,6 @@ import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,7 +37,11 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private DocumentComposer documentComposer;
   @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private ChallengeComposer challengeComposer;
+  @Autowired private ArticleComposer articleComposer;
+  @Autowired private ChannelComposer channelComposer;
   @Autowired private TagComposer tagComposer;
+  @Autowired private UserComposer userComposer;
+  @Autowired private TeamComposer teamComposer;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;
 
@@ -49,14 +51,18 @@ public class InjectExportTest extends IntegrationTest {
     documentComposer.reset();
     injectorContractComposer.reset();
     challengeComposer.reset();
+    articleComposer.reset();
+    channelComposer.reset();
+    teamComposer.reset();
+    userComposer.reset();
     tagComposer.reset();
   }
 
   @Nested
-  @DisplayName("Without authorisation")
-  public class WithoutAuthorisation {
+  @DisplayName("When unauthenticated")
+  public class WhenUnauthenticated {
     @Test
-    @DisplayName("When lacking authorisation, return UNAUTHORISED")
+    @DisplayName("Return UNAUTHORISED")
     public void whenLackingAuthorisation_returnUnauthorised() throws Exception {
       mvc.perform(post(INJECT_URI + "/export").contentType(MediaType.APPLICATION_JSON))
           .andExpect(status().isUnauthorized());
@@ -87,10 +93,29 @@ public class InjectExportTest extends IntegrationTest {
                   injectorContractComposer
                       .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
                       .withChallenge(
-                          challengeComposer.forChallenge(
-                              ChallengeFixture.createDefaultChallenge()))),
-          injectComposer.forInject(InjectFixture.getDefaultInject()),
-          injectComposer.forInject(InjectFixture.getDefaultInject()));
+                          challengeComposer
+                              .forChallenge(ChallengeFixture.createDefaultChallenge())
+                              .withDocument(
+                                  documentComposer
+                                      .forDocument(
+                                          DocumentFixture.getDocument(
+                                              FileFixture.getPngFileContent()))
+                                      .withInMemoryFile(FileFixture.getPngFileContent())
+                                      .withTag(
+                                          tagComposer.forTag(
+                                              TagFixture.getTagWithText("Document tag")))))),
+          injectComposer
+              .forInject(InjectFixture.getDefaultInject())
+              .withTag(tagComposer.forTag(TagFixture.getTagWithText("Other challenge inject tag")))
+              .withDocument(
+                  documentComposer.forDocument(
+                      DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))),
+          injectComposer
+              .forInject(InjectFixture.getDefaultInject())
+              .withTeam(
+                  teamComposer
+                      .forTeam(TeamFixture.getDefaultTeam())
+                      .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()))));
     }
 
     private List<InjectExportTarget> createDefaultInjectTargets() {
@@ -144,8 +169,8 @@ public class InjectExportTest extends IntegrationTest {
     }
 
     @Nested
-    @DisplayName("When all injects are found")
-    public class WhenAllInjectsAreFound {
+    @DisplayName("With default export options")
+    public class WithDefaultExportOptions {
       private byte[] doExport() throws Exception {
         return mvc.perform(
                 post(INJECT_EXPORT_URI)
@@ -155,11 +180,6 @@ public class InjectExportTest extends IntegrationTest {
             .andReturn()
             .getResponse()
             .getContentAsByteArray();
-      }
-
-      private String getJsonExportFromZip(byte[] zipBytes, String entryName) throws IOException {
-        return ZipUtils.getZipEntry(
-            zipBytes, "%s.json".formatted(entryName), ZipUtils::streamToString);
       }
 
       @Test
@@ -199,15 +219,92 @@ public class InjectExportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Returned zip file contains document file")
-      public void returnedZipFileContainsDocumentFile() throws Exception {
+      @DisplayName("Returned zip file contains json with correct articles")
+      public void returnedZipFileContainsJsonWithCorrectArticles() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        ObjectMapper objectMapper = mapper.copy();
+        objectMapper.addMixIn(Article.class, Mixins.Article.class);
+        String articleJson = objectMapper.writeValueAsString(articleComposer.generatedItems);
+
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_articles")
+            .isEqualTo(articleJson);
+      }
+
+      @Test
+      @DisplayName("Returned zip file contains json with correct channels")
+      public void returnedZipFileContainsJsonWithCorrectChannels() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        ObjectMapper objectMapper = mapper.copy();
+        objectMapper.addMixIn(Channel.class, Mixins.Channel.class);
+        String channelJson = objectMapper.writeValueAsString(channelComposer.generatedItems);
+
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_channels")
+            .isEqualTo(channelJson);
+      }
+
+      @Test
+      @DisplayName("Returned zip file contains json with correct documents")
+      public void returnedZipFileContainsJsonWithCorrectDocuments() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        ObjectMapper objectMapper = mapper.copy();
+        objectMapper.addMixIn(Document.class, Mixins.Document.class);
+        String documentJson = objectMapper.writeValueAsString(documentComposer.generatedItems);
+
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_documents")
+            .isEqualTo(documentJson);
+      }
+
+      @Test
+      @DisplayName("Returned zip file contains json with correct teams")
+      public void returnedZipFileContainsJsonWithCorrectTeams() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("inject_teams").isEqualTo("[]");
+      }
+
+      @Test
+      @DisplayName("Returned zip file contains json with correct users")
+      public void returnedZipFileContainsJsonWithCorrectUsers() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("inject_users").isAbsent();
+      }
+
+      @Test
+      @DisplayName("Returned zip file contains document files")
+      public void returnedZipFileContainsDocumentFiles() throws Exception {
         byte[] response = doExport();
 
         List<Document> docs = documentComposer.generatedItems;
 
         for (Document document : docs) {
           try (ByteArrayInputStream fis =
-              new ByteArrayInputStream(FileFixture.getPlainTextFileContent().getContentBytes())) {
+              new ByteArrayInputStream(
+                  WELL_KNOWN_FILES.get(document.getTarget()).getContentBytes())) {
             byte[] docFromZip =
                 ZipUtils.getZipEntry(response, document.getTarget(), ZipUtils::streamToBytes);
             byte[] docFromDisk = fis.readAllBytes();
@@ -215,6 +312,89 @@ public class InjectExportTest extends IntegrationTest {
             Assertions.assertArrayEquals(docFromZip, docFromDisk);
           }
         }
+      }
+    }
+
+    @Nested
+    @DisplayName("With embedded teams and not users options")
+    public class WithEmbeddedTeamsExportOption {
+      private byte[] doExport() throws Exception {
+        return mvc.perform(
+                post(INJECT_EXPORT_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .queryParam("isWithTeams", "true")
+                    .content(mapper.writeValueAsString(createDefaultInjectExportRequestInput())))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+      }
+
+      @Test
+      @DisplayName("Returned teams are correct")
+      public void returnedTeamsAreCorrect() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        ObjectMapper objectMapper = mapper.copy();
+        objectMapper.addMixIn(Team.class, Mixins.EmptyTeam.class);
+        String teamJson = objectMapper.writeValueAsString(teamComposer.generatedItems);
+
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_teams")
+            .isEqualTo(teamJson);
+      }
+
+      @Test
+      @DisplayName("Users are absent")
+      public void usersAreAbsent() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("inject_users").isAbsent();
+      }
+    }
+
+    @Nested
+    @DisplayName("With embedded users and not teams options")
+    public class WithEmbeddedUsersAndNotTeamsExportOption {
+      private byte[] doExport() throws Exception {
+        return mvc.perform(
+                post(INJECT_EXPORT_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .queryParam("isWithPlayers", "true")
+                    .content(mapper.writeValueAsString(createDefaultInjectExportRequestInput())))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+      }
+
+      @Test
+      @DisplayName("Returned teams are empty")
+      public void returnedTeamsAreCorrect() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("inject_teams").isEqualTo("[]");
+      }
+
+      @Test
+      @DisplayName("Returned users are empty")
+      public void returnedUsersAreEmpty() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("inject_users").isEqualTo("[]");
       }
     }
   }

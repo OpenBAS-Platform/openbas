@@ -1,18 +1,23 @@
 package io.openbas.export;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
+import io.openbas.rest.inject.exports.InjectsFileExport;
 import io.openbas.service.ChallengeService;
 import lombok.Getter;
 
 @Getter
 public class FileExportBase {
+  @JsonProperty("export_version")
+  private int version = 1;
+
   protected int exportOptionsMask = ExportOptions.mask(false, false, false);
-  ;
+
   public final ObjectMapper objectMapper;
   protected final ChallengeService challengeService;
 
@@ -46,6 +51,7 @@ public class FileExportBase {
     // disable users if not requested; note negation
     if (!ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)) {
       this.objectMapper.addMixIn(ExerciseFileExport.class, Mixins.ExerciseFileExport.class);
+      this.objectMapper.addMixIn(InjectsFileExport.class, Mixins.InjectsFileExport.class);
     }
 
     if (ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)) {

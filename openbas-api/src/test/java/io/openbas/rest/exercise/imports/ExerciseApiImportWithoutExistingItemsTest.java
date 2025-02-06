@@ -136,7 +136,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
                                         TagFixture.getTagWithText("Challenge tag"))))))
         .withDocument(
             documentComposer
-                .forDocument(DocumentFixture.getDocumentTxt(FileFixture.getPlainTextFileContent()))
+                .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Document tag")))
                 .withInMemoryFile(FileFixture.getPlainTextFileContent()))
         .withObjective(objectiveComposer.forObjective(ObjectiveFixture.getDefaultObjective()))

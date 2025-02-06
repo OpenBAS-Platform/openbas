@@ -2,6 +2,7 @@ package io.openbas.utils.fixtures.composers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InjectComposer extends ComposerBase<Inject> {
   @Autowired private InjectRepository injectRepository;
+  @Autowired private InjectDocumentRepository injectDocumentRepository;
 
   public class Composer extends InnerComposerBase<Inject> {
     private final Inject inject;
@@ -20,6 +22,8 @@ public class InjectComposer extends ComposerBase<Inject> {
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
     private final List<EndpointComposer.Composer> endpointComposers = new ArrayList<>();
     private Optional<InjectStatusComposer.Composer> injectStatusComposers = Optional.empty();
+    private final List<DocumentComposer.Composer> documentComposers = new ArrayList<>();
+    private final List<TeamComposer.Composer> teamComposers = new ArrayList<>();
 
     public Composer(Inject inject) {
       this.inject = inject;
@@ -37,6 +41,25 @@ public class InjectComposer extends ComposerBase<Inject> {
         InjectorContractComposer.Composer injectorContractComposer) {
       this.injectorContractComposer = Optional.of(injectorContractComposer);
       this.inject.setInjectorContract(injectorContractComposer.get());
+      return this;
+    }
+
+    public Composer withDocument(DocumentComposer.Composer documentComposer) {
+      this.documentComposers.add(documentComposer);
+      List<InjectDocument> tempDocs = this.inject.getDocuments();
+      InjectDocument newDoc = new InjectDocument();
+      newDoc.setDocument(documentComposer.get());
+      newDoc.setInject(this.inject);
+      tempDocs.add(newDoc);
+      this.inject.setDocuments(tempDocs);
+      return this;
+    }
+
+    public Composer withTeam(TeamComposer.Composer teamComposer) {
+      this.teamComposers.add(teamComposer);
+      List<Team> tempTeams = this.inject.getTeams();
+      tempTeams.add(teamComposer.get());
+      this.inject.setTeams(tempTeams);
       return this;
     }
 
@@ -65,21 +88,26 @@ public class InjectComposer extends ComposerBase<Inject> {
       endpointComposers.forEach(EndpointComposer.Composer::persist);
       injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
+      teamComposers.forEach(TeamComposer.Composer::persist);
       this.injectorContractComposer.ifPresent(
           composer -> {
             composer.persist();
             this.inject.setContent(composer.getInjectContent());
           });
       injectRepository.save(inject);
+      injectDocumentRepository.saveAll(inject.getDocuments());
       return this;
     }
 
     @Override
     public Composer delete() {
+      injectDocumentRepository.deleteAll(inject.getDocuments());
       injectRepository.delete(inject);
+      documentComposers.forEach(DocumentComposer.Composer::delete);
       tagComposers.forEach(TagComposer.Composer::delete);
       endpointComposers.forEach(EndpointComposer.Composer::delete);
       injectStatusComposers.ifPresent(InjectStatusComposer.Composer::delete);
+      teamComposers.forEach(TeamComposer.Composer::delete);
       injectorContractComposer.ifPresent(InjectorContractComposer.Composer::delete);
       return this;
     }

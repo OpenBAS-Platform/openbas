@@ -27,6 +27,9 @@ public class Mixins {
   @JsonIgnoreProperties(value = {"exercise_users", "exercise_organizations"})
   public static class ExerciseFileExport {}
 
+  @JsonIgnoreProperties(value = {"inject_users", "inject_organizations"})
+  public static class InjectsFileExport {}
+
   @JsonIncludeProperties(
       value = {
         "exercise_id",

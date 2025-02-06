@@ -1,11 +1,14 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openbas.service.ImportService.EXPORT_ENTRY_EXERCISE;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.DocumentRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.inject.exports.InjectsFileExport;
 import io.openbas.service.ChallengeService;
@@ -13,7 +16,10 @@ import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -65,27 +71,26 @@ public class InjectExportService {
             .writeValueAsBytes(importExport));
     zipExport.closeEntry();
     // Add the actual files for the documents
-    //        importExport.getAllDocumentIds().stream()
-    //                .distinct()
-    //                .forEach(
-    //                        docId -> {
-    //                            Document doc =
-    //
-    // documentRepository.findById(docId).orElseThrow(ElementNotFoundException::new);
-    //                            Optional<InputStream> docStream = fileService.getFile(doc);
-    //                            if (docStream.isPresent()) {
-    //                                try {
-    //                                    ZipEntry zipDoc = new ZipEntry(doc.getTarget());
-    //                                    zipDoc.setComment(EXPORT_ENTRY_ATTACHMENT);
-    //                                    byte[] data = docStream.get().readAllBytes();
-    //                                    zipExport.putNextEntry(zipDoc);
-    //                                    zipExport.write(data);
-    //                                    zipExport.closeEntry();
-    //                                } catch (IOException e) {
-    //                                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
-    //                                }
-    //                            }
-    //                        });
+    importExport.getAllDocumentIds().stream()
+        .distinct()
+        .forEach(
+            docId -> {
+              Document doc =
+                  documentRepository.findById(docId).orElseThrow(ElementNotFoundException::new);
+              Optional<InputStream> docStream = fileService.getFile(doc);
+              if (docStream.isPresent()) {
+                try {
+                  ZipEntry zipDoc = new ZipEntry(doc.getTarget());
+                  zipDoc.setComment(EXPORT_ENTRY_ATTACHMENT);
+                  byte[] data = docStream.get().readAllBytes();
+                  zipExport.putNextEntry(zipDoc);
+                  zipExport.write(data);
+                  zipExport.closeEntry();
+                } catch (IOException e) {
+                  LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+              }
+            });
     zipExport.finish();
     zipExport.close();
 
