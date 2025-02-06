@@ -22,6 +22,11 @@ const renderAutocomplete = ({
         clearOnBlur={false}
         clearOnEscape={false}
         disableClearable
+        slotProps={{
+          paper: {
+            elevation: 2,
+          },
+        }}
         onInputChange={(_event, value) => {
           if (others.freeSolo) {
             onChange(value);
