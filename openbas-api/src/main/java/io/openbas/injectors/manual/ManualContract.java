@@ -3,7 +3,10 @@ package io.openbas.injectors.manual;
 import static io.openbas.helper.SupportedLanguage.en;
 import static io.openbas.helper.SupportedLanguage.fr;
 import static io.openbas.injector_contract.Contract.manualContract;
+import static io.openbas.injector_contract.ContractCardinality.Multiple;
 import static io.openbas.injector_contract.ContractDef.contractBuilder;
+import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
+import static io.openbas.injector_contract.fields.ContractTeam.teamField;
 import static io.openbas.injector_contract.fields.ContractTextArea.textareaField;
 
 import io.openbas.database.model.Endpoint;
@@ -24,6 +27,35 @@ public class ManualContract extends Contractor {
 
   public static final String MANUAL_DEFAULT = "d02e9132-b9d0-4daa-b3b1-4b9871f8472c";
 
+  private final List<Contract> contracts;
+
+  private final ContractConfig config;
+
+  public ManualContract() {
+
+    ContractElement teams = teamField("teams", "Teams", Multiple);
+    ContractElement expectations = expectationsField("expectations", "Expectations");
+
+    Map<SupportedLanguage, String> label = Map.of(en, "Manual", fr, "Manuel");
+    config = new ContractConfig(TYPE, label, "#009688", "#009688", "/img/manual.png", isExpose());
+
+    List<ContractElement> instance =
+        contractBuilder()
+            .mandatory(textareaField("content", "Content"))
+            .mandatoryOnCondition(teams, expectations)
+            .optional(expectations)
+            .build();
+    contracts =
+        List.of(
+            manualContract(
+                config,
+                MANUAL_DEFAULT,
+                Map.of(en, "Manual", fr, "Manuel"),
+                instance,
+                List.of(Endpoint.PLATFORM_TYPE.Internal),
+                false));
+  }
+
   @Override
   public boolean isExpose() {
     return true;
@@ -36,23 +68,12 @@ public class ManualContract extends Contractor {
 
   @Override
   public ContractConfig getConfig() {
-    Map<SupportedLanguage, String> label = Map.of(en, "Manual", fr, "Manuel");
-    return new ContractConfig(TYPE, label, "#009688", "#009688", "/img/manual.png", isExpose());
+    return config;
   }
 
   @Override
   public List<Contract> contracts() {
-    ContractConfig contractConfig = getConfig();
-    List<ContractElement> instance =
-        contractBuilder().mandatory(textareaField("content", "Content")).build();
-    return List.of(
-        manualContract(
-            contractConfig,
-            MANUAL_DEFAULT,
-            Map.of(en, "Manual", fr, "Manuel"),
-            instance,
-            List.of(Endpoint.PLATFORM_TYPE.Internal),
-            false));
+    return contracts;
   }
 
   @Override
