@@ -61,7 +61,7 @@ public class InjectExportTest extends IntegrationTest {
 
     // delete the test files from the minio service
     for (String fileName : WELL_KNOWN_FILES.keySet()) {
-        fileService.deleteFile(fileName);
+      fileService.deleteFile(fileName);
     }
   }
 
