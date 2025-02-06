@@ -26,31 +26,31 @@ import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.rest.inject.service.ExecutableInjectService;
-import io.openbas.rest.inject.service.InjectDuplicateService;
-import io.openbas.rest.inject.service.InjectService;
-import io.openbas.rest.inject.service.InjectStatusService;
-import io.openbas.service.AssetGroupService;
-import io.openbas.service.AssetService;
-import io.openbas.service.InjectSearchService;
-import io.openbas.service.ScenarioService;
-import io.openbas.service.TagRuleService;
+import io.openbas.rest.inject.service.*;
+import io.openbas.service.*;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +89,8 @@ public class InjectApi extends RestBehavior {
   private final TagRuleService tagRuleService;
   private final InjectStatusService injectStatusService;
   private final ExecutableInjectService executableInjectService;
+  private final ChallengeService challengeService;
+  private final InjectExportService injectExportService;
 
   // -- INJECTS --
 
@@ -100,9 +102,24 @@ public class InjectApi extends RestBehavior {
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/export")
   public void injectsExport(
-      @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput) {
+      @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput,
+      @RequestParam(required = false) final boolean isWithTeams,
+      @RequestParam(required = false) final boolean isWithPlayers,
+      @RequestParam(required = false) final boolean isWithVariableValues,
+      HttpServletResponse response) throws IOException {
     List<String> targetIds = injectExportRequestInput.getTargetsIds();
     List<Inject> injects = injectRepository.findAllById(targetIds);
+
+    int exportOptionsMask = ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues);
+    byte[] zippedExport = injectExportService.exportExerciseToZip(injects, exportOptionsMask);
+    String zipName = injectExportService.getZipFileName(exportOptionsMask);
+
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
+    response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
+    response.setStatus(HttpServletResponse.SC_OK);
+    ServletOutputStream outputStream = response.getOutputStream();
+    outputStream.write(zippedExport);
+    outputStream.close();
   }
 
   @Secured(ROLE_ADMIN)

@@ -10,10 +10,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
-import io.openbas.rest.exercise.exports.ExerciseExportMixins;
 import io.openbas.rest.inject.form.InjectExportRequestInput;
 import io.openbas.rest.inject.form.InjectExportTarget;
 import io.openbas.utils.ZipUtils;
+import io.openbas.export.Mixins;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
@@ -130,7 +130,7 @@ public class InjectExportTest extends IntegrationTest {
     @Nested
     @DisplayName("When all injects are found")
     public class WhenAllInjectsAreFound {
-      private byte[] doImport() throws Exception {
+      private byte[] doExport() throws Exception {
         return mvc.perform(
                 post(INJECT_EXPORT_URI)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -149,22 +149,22 @@ public class InjectExportTest extends IntegrationTest {
       @Test
       @DisplayName("Returned zip file contains correct json")
       public void returnedZipFileContainsCorrectJson() throws Exception {
-        byte[] response = doImport();
+        byte[] response = doExport();
 
         String actualJson =
             ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
 
         ObjectMapper objectMapper = mapper.copy();
-        objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
+        objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
         String injectJson = objectMapper.writeValueAsString(injectComposer.generatedItems);
 
-        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("injects").isEqualTo(injectJson);
+        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("inject_information").isEqualTo(injectJson);
       }
 
       @Test
       @DisplayName("Returned zip file contains document file")
       public void returnedZipFileContainsDocumentFile() throws Exception {
-        byte[] response = doImport();
+        byte[] response = doExport();
 
         List<Document> docs = documentComposer.generatedItems;
 

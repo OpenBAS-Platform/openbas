@@ -30,7 +30,6 @@ public class ExportService {
   private static final Logger LOGGER = Logger.getLogger(ExportService.class.getName());
   @Resource protected ObjectMapper mapper;
   @Resource private DocumentRepository documentRepository;
-  @Resource private VariableService variableService;
   @Resource private ChallengeService challengeService;
   @Resource private FileService fileService;
 
