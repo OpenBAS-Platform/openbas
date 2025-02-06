@@ -39,13 +39,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
@@ -106,9 +104,17 @@ public class InjectApi extends RestBehavior {
       @RequestParam(required = false) final boolean isWithTeams,
       @RequestParam(required = false) final boolean isWithPlayers,
       @RequestParam(required = false) final boolean isWithVariableValues,
-      HttpServletResponse response) throws IOException {
+      HttpServletResponse response)
+      throws IOException {
     List<String> targetIds = injectExportRequestInput.getTargetsIds();
     List<Inject> injects = injectRepository.findAllById(targetIds);
+
+    List<String> foundIds = injects.stream().map(Inject::getId).toList();
+    List<String> missedIds = targetIds.stream().filter(id -> !foundIds.contains(id)).toList();
+
+    if (!missedIds.isEmpty()) {
+      throw new ElementNotFoundException(String.join(", ", missedIds));
+    }
 
     int exportOptionsMask = ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues);
     byte[] zippedExport = injectExportService.exportExerciseToZip(injects, exportOptionsMask);

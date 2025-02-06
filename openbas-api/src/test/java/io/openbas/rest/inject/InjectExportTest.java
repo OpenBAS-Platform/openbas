@@ -8,12 +8,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Challenge;
 import io.openbas.database.model.Document;
 import io.openbas.database.model.Inject;
+import io.openbas.export.Mixins;
 import io.openbas.rest.inject.form.InjectExportRequestInput;
 import io.openbas.rest.inject.form.InjectExportTarget;
 import io.openbas.utils.ZipUtils;
-import io.openbas.export.Mixins;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
@@ -22,10 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,6 +42,15 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private TagComposer tagComposer;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;
+
+  @BeforeEach
+  public void setup() {
+    injectComposer.reset();
+    documentComposer.reset();
+    injectorContractComposer.reset();
+    challengeComposer.reset();
+    tagComposer.reset();
+  }
 
   @Nested
   @DisplayName("Without authorisation")
@@ -74,7 +81,14 @@ public class InjectExportTest extends IntegrationTest {
                               .withTag(
                                   tagComposer.forTag(
                                       TagFixture.getTagWithText("Challenge inject tag"))))),
-          injectComposer.forInject(InjectFixture.getDefaultInject()),
+          injectComposer
+              .forInject(InjectFixture.getDefaultInject())
+              .withInjectorContract(
+                  injectorContractComposer
+                      .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                      .withChallenge(
+                          challengeComposer.forChallenge(
+                              ChallengeFixture.createDefaultChallenge()))),
           injectComposer.forInject(InjectFixture.getDefaultInject()),
           injectComposer.forInject(InjectFixture.getDefaultInject()));
     }
@@ -124,7 +138,9 @@ public class InjectExportTest extends IntegrationTest {
               .getResponse()
               .getContentAsString();
 
-      Assertions.assertEquals("yo this broke", responseBody);
+      assertThatJson(responseBody)
+          .node("message")
+          .isEqualTo("Element not found: %s".formatted(extra_target.getId()));
     }
 
     @Nested
@@ -147,8 +163,8 @@ public class InjectExportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Returned zip file contains correct json")
-      public void returnedZipFileContainsCorrectJson() throws Exception {
+      @DisplayName("Returned zip file contains json with correct injects")
+      public void returnedZipFileContainsJsonWithCorrectInjects() throws Exception {
         byte[] response = doExport();
 
         String actualJson =
@@ -158,7 +174,28 @@ public class InjectExportTest extends IntegrationTest {
         objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
         String injectJson = objectMapper.writeValueAsString(injectComposer.generatedItems);
 
-        assertThatJson(actualJson).when(IGNORING_ARRAY_ORDER).node("inject_information").isEqualTo(injectJson);
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_information")
+            .isEqualTo(injectJson);
+      }
+
+      @Test
+      @DisplayName("Returned zip file contains json with correct challenges")
+      public void returnedZipFileContainsJsonWithCorrectChallenges() throws Exception {
+        byte[] response = doExport();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        ObjectMapper objectMapper = mapper.copy();
+        objectMapper.addMixIn(Challenge.class, Mixins.Challenge.class);
+        String challengeJson = objectMapper.writeValueAsString(challengeComposer.generatedItems);
+
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_challenges")
+            .isEqualTo(challengeJson);
       }
 
       @Test

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.export.FileExportBase;
 import io.openbas.service.ChallengeService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -94,22 +93,8 @@ public class InjectsFileExport extends FileExportBase {
 
   @JsonProperty("inject_challenges")
   private List<Challenge> getChallenges() {
-    return injects.stream()
-        .flatMap(
-            inject ->
-                inject.getExercise() != null
-                    ? StreamSupport.stream(
-                        this.challengeService
-                            .getExerciseChallenges(inject.getExercise().getId())
-                            .spliterator(),
-                        false)
-                    : inject.getScenario() != null
-                        ? StreamSupport.stream(
-                            this.challengeService
-                                .getScenarioChallenges(inject.getScenario())
-                                .spliterator(),
-                            false)
-                        : Stream.of())
+    return StreamSupport.stream(
+            this.challengeService.getInjectsChallenges(injects).spliterator(), false)
         .toList();
   }
 
@@ -126,6 +111,6 @@ public class InjectsFileExport extends FileExportBase {
 
   @Override
   public InjectsFileExport withOptions(int exportOptionsMask) {
-      return (InjectsFileExport) super.withOptions(exportOptionsMask);
+    return (InjectsFileExport) super.withOptions(exportOptionsMask);
   }
 }

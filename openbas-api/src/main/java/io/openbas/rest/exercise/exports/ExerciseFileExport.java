@@ -239,14 +239,15 @@ public class ExerciseFileExport extends FileExportBase {
     return documentIds;
   }
 
-  private ExerciseFileExport(Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
+  private ExerciseFileExport(
+      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
     super(objectMapper, challengeService);
     this.exercise = exercise;
   }
 
   public static ExerciseFileExport fromExercise(
-          Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
-      return new ExerciseFileExport(exercise, objectMapper, challengeService);
+      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
+    return new ExerciseFileExport(exercise, objectMapper, challengeService);
   }
 
   @Override

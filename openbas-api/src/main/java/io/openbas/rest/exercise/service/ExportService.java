@@ -13,7 +13,6 @@ import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.FileService;
-import io.openbas.service.VariableService;
 import jakarta.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
