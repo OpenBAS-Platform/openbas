@@ -84,11 +84,11 @@ public class InjectApi extends RestBehavior {
   private final ExecutionContextService executionContextService;
   private final ScenarioService scenarioService;
   private final InjectService injectService;
-  private final ExecutableInjectService executableInjectService;
   private final InjectSearchService injectSearchService;
   private final InjectDuplicateService injectDuplicateService;
   private final TagRuleService tagRuleService;
   private final InjectStatusService injectStatusService;
+  private final ExecutableInjectService executableInjectService;
 
   // -- INJECTS --
 
@@ -125,14 +125,15 @@ public class InjectApi extends RestBehavior {
   }
 
   @GetMapping(INJECT_URI + "/{injectId}/{agentId}/executable-payload")
+  @Operation(
+      summary = "Get the payload ready to be executed",
+      description =
+          "This endpoint is invoked by implants to retrieve a payload command that's pre-configured and ready for execution.")
   @Tracing(name = "Get payload ready to be executed", layer = "api", operation = "GET")
   public Payload getExecutablePayloadInject(
       @PathVariable @NotBlank final String injectId, @PathVariable @NotBlank final String agentId)
       throws Exception {
-    Payload payloadToExecute = executableInjectService.getExecutablePayloadInject(injectId);
-    injectStatusService.addStartImplantExecutionTraceByInject(
-        injectId, agentId, "Implant is up and start execution");
-    return payloadToExecute;
+    return executableInjectService.getExecutablePayloadAndUpdateInjectStatus(injectId, agentId);
   }
 
   // -- EXERCISES --

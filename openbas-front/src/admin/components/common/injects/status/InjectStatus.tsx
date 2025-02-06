@@ -37,7 +37,7 @@ const InjectStatus = ({ injectStatus = null, endpointsMap = new Map() }: Props) 
           {injectStatus.status_name
           && (
             <ItemStatus
-              isInject={true}
+              isInject
               status={injectStatus.status_name}
               label={t(injectStatus.status_name)}
             />

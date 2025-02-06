@@ -99,7 +99,7 @@ public class InjectMapper {
   private <T extends InjectStatusOutput> T buildInjectStatusOutput(
       T output, BaseInjectStatus status, List<ExecutionTraces> executionTraces) {
     output.setId(status.getId());
-    output.setName(Optional.ofNullable(status.getName()).map(ExecutionStatus::name).orElse(null));
+    output.setName(String.valueOf(status.getName()));
     output.setTraces(
         toExecutionTracesOutput(
             executionTraces.stream().filter(trace -> trace.getAgent() == null).toList()));
@@ -162,12 +162,13 @@ public class InjectMapper {
                       .filter(t -> t.getAction() == ExecutionTraceAction.COMPLETE)
                       .findFirst()
                       .orElse(null);
+              Agent agent = entry.getKey();
               return AgentStatusOutput.builder()
-                  .assetId(entry.getKey().getAsset().getId())
-                  .agentId(entry.getKey().getId())
-                  .agentExecutorName(entry.getKey().getExecutor().getName())
-                  .agentExecutorType(entry.getKey().getExecutor().getType())
-                  .agentName(entry.getKey().getExecutedByUser())
+                  .assetId(agent.getAsset().getId())
+                  .agentId(agent.getId())
+                  .agentExecutorName(agent.getExecutor().getName())
+                  .agentExecutorType(agent.getExecutor().getType())
+                  .agentName(agent.getExecutedByUser())
                   .statusName(finalTrace != null ? String.valueOf(finalTrace.getStatus()) : null)
                   .trackingEndDate(finalTrace != null ? finalTrace.getTime() : null)
                   .trackingSentDate(

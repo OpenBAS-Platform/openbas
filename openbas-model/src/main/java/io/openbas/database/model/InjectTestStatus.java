@@ -14,7 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Entity
 @Table(name = "injects_tests_statuses")
-public class InjectTestStatus extends BaseInjectStatus implements Base {
+public class InjectTestStatus extends BaseInjectStatus {
   @OneToMany(
       mappedBy = "injectTestStatus",
       cascade = CascadeType.ALL,

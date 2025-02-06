@@ -127,7 +127,7 @@ public class CalderaExecutor extends Injector {
               }
               assets.forEach(
                   (asset, aBoolean) -> {
-                    if (!((Endpoint) asset).getActive()) {
+                    if (!(asset instanceof Endpoint) || !((Endpoint) asset).getActive()) {
                       return;
                     }
                     try {
@@ -160,7 +160,7 @@ public class CalderaExecutor extends Injector {
                                     exploitResult.getCommand(),
                                     ExecutionTraceAction.EXECUTION,
                                     ((Endpoint) asset).getAgents().getFirst(),
-                                    List.of()));
+                                    List.of(exploitResult.getLinkId())));
                             // Compute expectations
                             boolean isInGroup =
                                 assets.get(

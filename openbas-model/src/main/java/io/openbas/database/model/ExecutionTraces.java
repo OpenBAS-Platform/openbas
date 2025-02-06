@@ -85,7 +85,7 @@ public class ExecutionTraces implements Base {
   private Instant updateDate = now();
 
   public List<String> getIdentifiers() {
-    return List.of(identifiers);
+    return identifiers == null ? List.of() : List.of(identifiers);
   }
 
   @Override

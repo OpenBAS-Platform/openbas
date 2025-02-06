@@ -165,7 +165,6 @@ const InjectTestList: FunctionComponent<Props> = ({
               >
                 <ListItemIcon>
                   <InjectIcon
-                    isPayload={false}
                     type={test.inject_type}
                     variant="list"
                   />

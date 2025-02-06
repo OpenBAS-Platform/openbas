@@ -4,7 +4,6 @@ import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -20,8 +19,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutableInjectService {
 
-  private final InjectRepository injectRepository;
   private final InjectService injectService;
+  private final InjectStatusService injectStatusService;
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
   private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
 
@@ -121,15 +120,27 @@ public class ExecutableInjectService {
     return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }
 
-  public Payload getExecutablePayloadInject(String injectId) throws Exception {
-    Inject inject =
-        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+  public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
+      throws Exception {
+    Payload payloadToExecute = getExecutablePayloadInject(injectId);
+    this.injectStatusService.addStartImplantExecutionTraceByInject(
+        injectId, agentId, "Implant is up and starting execution");
+    return payloadToExecute;
+  }
+
+  private Payload getExecutablePayloadInject(String injectId) throws Exception {
+    Inject inject = injectService.inject(injectId);
     InjectorContract contract =
-        inject.getInjectorContract().orElseThrow(ElementNotFoundException::new);
+        inject
+            .getInjectorContract()
+            .orElseThrow(() -> new ElementNotFoundException("Inject contract not found"));
     OpenBASImplantInjectContent content =
         injectService.convertInjectContent(inject, OpenBASImplantInjectContent.class);
     String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "plain-text";
 
+    if (contract.getPayload() == null) {
+      throw new ElementNotFoundException("Payload not found");
+    }
     Command payloadToExecute = new Command();
     payloadToExecute.setType(contract.getPayload().getType());
 

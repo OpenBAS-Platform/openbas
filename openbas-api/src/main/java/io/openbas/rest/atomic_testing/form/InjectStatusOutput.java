@@ -9,12 +9,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Setter
-@Getter
+@Data
 @SuperBuilder
 public class InjectStatusOutput {
 
