@@ -89,6 +89,7 @@ public class InjectComposer extends ComposerBase<Inject> {
       injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
       teamComposers.forEach(TeamComposer.Composer::persist);
+      documentComposers.forEach(DocumentComposer.Composer::persist);
       this.injectorContractComposer.ifPresent(
           composer -> {
             composer.persist();
@@ -109,6 +110,7 @@ public class InjectComposer extends ComposerBase<Inject> {
       injectStatusComposers.ifPresent(InjectStatusComposer.Composer::delete);
       teamComposers.forEach(TeamComposer.Composer::delete);
       injectorContractComposer.ifPresent(InjectorContractComposer.Composer::delete);
+      documentComposers.forEach(DocumentComposer.Composer::delete);
       return this;
     }
 

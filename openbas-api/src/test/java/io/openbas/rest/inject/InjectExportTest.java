@@ -301,9 +301,7 @@ public class InjectExportTest extends IntegrationTest {
       public void returnedZipFileContainsDocumentFiles() throws Exception {
         byte[] response = doExport();
 
-        List<Document> docs = documentComposer.generatedItems;
-
-        for (Document document : docs) {
+        for (Document document : documentComposer.generatedItems) {
           try (ByteArrayInputStream fis =
               new ByteArrayInputStream(
                   WELL_KNOWN_FILES.get(document.getTarget()).getContentBytes())) {
