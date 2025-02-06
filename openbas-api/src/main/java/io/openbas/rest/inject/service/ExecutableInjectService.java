@@ -7,6 +7,7 @@ import io.openbas.database.model.*;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.payload.service.PayloadService;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -21,6 +22,7 @@ public class ExecutableInjectService {
 
   private final InjectService injectService;
   private final InjectStatusService injectStatusService;
+  private final PayloadService payloadService;
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
   private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
 
@@ -141,8 +143,7 @@ public class ExecutableInjectService {
     if (contract.getPayload() == null) {
       throw new ElementNotFoundException("Payload not found");
     }
-    Command payloadToExecute = new Command();
-    payloadToExecute.setType(contract.getPayload().getType());
+    Payload payloadToExecute = payloadService.generateDuplicatedPayload(contract.getPayload());
 
     // prerequisite
     List<PayloadPrerequisite> prerequisiteList = new ArrayList<>();
@@ -189,15 +190,16 @@ public class ExecutableInjectService {
 
     // Command
     if (contract.getPayload().getTypeEnum().equals(PayloadType.COMMAND)) {
-      Command payloadCommand = (Command) contract.getPayload();
-      payloadToExecute.setExecutor(payloadCommand.getExecutor());
-      payloadToExecute.setContent(
+      Command payloadCommand = (Command) payloadToExecute;
+      payloadCommand.setExecutor(((Command) contract.getPayload()).getExecutor());
+      payloadCommand.setContent(
           processAndEncodeCommand(
               payloadCommand.getContent(),
               payloadCommand.getExecutor(),
               contract.getPayload().getArguments(),
               inject.getContent(),
               obfuscator));
+      return payloadCommand;
     }
 
     return payloadToExecute;
