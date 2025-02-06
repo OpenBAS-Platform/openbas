@@ -111,7 +111,7 @@
     "eslint-plugin-react": "7.37.4",
     "eslint-plugin-react-refresh": "0.4.18",
     "eslint-plugin-simple-import-sort": "12.1.1",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "fs-extra": "11.3.0",
     "globals": "15.14.0",
     "jsdom": "25.0.1",
