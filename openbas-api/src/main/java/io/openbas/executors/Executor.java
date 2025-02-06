@@ -1,6 +1,5 @@
 package io.openbas.executors;
 
-import static io.openbas.database.model.ExecutionStatus.ERROR;
 import static io.openbas.database.model.ExecutionStatus.EXECUTING;
 import static io.openbas.utils.InjectionUtils.isInInjectableRange;
 
@@ -8,13 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Injector;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.rest.inject.service.InjectStatusService;
 import jakarta.annotation.Resource;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -31,26 +31,21 @@ public class Executor {
 
   private final InjectorRepository injectorRepository;
 
-  private final InjectRepository injectRepository;
-
   private final QueueService queueService;
 
   private final ExecutionExecutorService executionExecutorService;
   private final InjectStatusService injectStatusService;
 
-  private InjectStatus executeExternal(ExecutableInject executableInject, Injector injector) {
+  private InjectStatus executeExternal(ExecutableInject executableInject, Injector injector)
+      throws IOException, TimeoutException {
     Inject inject = executableInject.getInjection().getInject();
-    try {
-      String jsonInject = mapper.writeValueAsString(executableInject);
-      queueService.publish(injector.getType(), jsonInject);
-      InjectStatus injectStatus = this.injectStatusRepository.findByInject(inject).orElseThrow();
-      injectStatus.addInfoTrace(
-          "The inject has been published and is now waiting to be consumed.",
-          ExecutionTraceAction.EXECUTION);
-      return this.injectStatusRepository.save(injectStatus);
-    } catch (Exception e) {
-      return injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
-    }
+    String jsonInject = mapper.writeValueAsString(executableInject);
+    InjectStatus injectStatus = this.injectStatusRepository.findByInject(inject).orElseThrow();
+    queueService.publish(injector.getType(), jsonInject);
+    injectStatus.addInfoTrace(
+        "The inject has been published and is now waiting to be consumed.",
+        ExecutionTraceAction.EXECUTION);
+    return this.injectStatusRepository.save(injectStatus);
   }
 
   private InjectStatus executeInternal(ExecutableInject executableInject, Injector injector) {
@@ -66,7 +61,8 @@ public class Executor {
     return injectStatusRepository.save(completeStatus);
   }
 
-  public InjectStatus execute(ExecutableInject executableInject) {
+  public InjectStatus execute(ExecutableInject executableInject)
+      throws IOException, TimeoutException {
     Inject inject = executableInject.getInjection().getInject();
     InjectorContract injectorContract =
         inject
@@ -85,15 +81,9 @@ public class Executor {
                             + injectorContract.getInjector().getType()));
 
     // Status
-    InjectStatus injectStatus =
-        this.injectStatusService.initializeInjectStatus(inject.getId(), EXECUTING);
+    this.injectStatusService.initializeInjectStatus(inject.getId(), EXECUTING);
     if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-      try {
-        this.executionExecutorService.launchExecutorContext(inject);
-      } catch (Exception e) {
-        injectStatus.setName(ERROR);
-        return injectStatusRepository.save(injectStatus);
-      }
+      this.executionExecutorService.launchExecutorContext(inject);
     }
     if (injector.isExternal()) {
       return executeExternal(executableInject, injector);
@@ -102,7 +92,8 @@ public class Executor {
     }
   }
 
-  public InjectStatus directExecute(ExecutableInject executableInject) {
+  public InjectStatus directExecute(ExecutableInject executableInject)
+      throws IOException, TimeoutException {
     boolean isScheduledInject = !executableInject.isDirect();
     // If empty content, inject must be rejected
     Inject inject = executableInject.getInjection().getInject();

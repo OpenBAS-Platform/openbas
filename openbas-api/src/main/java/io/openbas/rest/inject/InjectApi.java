@@ -44,6 +44,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -383,7 +384,12 @@ public class InjectApi extends RestBehavior {
             savedInject.getAssetGroups(),
             userInjectContexts);
     file.ifPresent(injection::addDirectAttachment);
-    return executor.directExecute(injection);
+    try {
+      return executor.directExecute(injection);
+    } catch (Exception e) {
+      log.log(Level.WARNING, e.getMessage(), e);
+      return injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+    }
   }
 
   @Transactional(rollbackFor = Exception.class)

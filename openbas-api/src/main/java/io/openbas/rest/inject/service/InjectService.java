@@ -90,8 +90,8 @@ public class InjectService {
   }
 
   public Map<Asset, Boolean> resolveAllAssetsToExecute(@NotNull final Inject inject) {
-    Map<Asset, Boolean> assets = new HashMap<>();
-    inject.getAssets().forEach((asset -> assets.put(asset, false)));
+    Map<Asset, Boolean> assets =
+        inject.getAssets().stream().collect(Collectors.toMap(asset -> asset, asset -> false));
     inject
         .getAssetGroups()
         .forEach(
