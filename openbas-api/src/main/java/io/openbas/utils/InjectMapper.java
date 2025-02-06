@@ -99,7 +99,7 @@ public class InjectMapper {
   private <T extends InjectStatusOutput> T buildInjectStatusOutput(
       T output, BaseInjectStatus status, List<ExecutionTraces> executionTraces) {
     output.setId(status.getId());
-    output.setName(String.valueOf(status.getName()));
+    output.setName(status.getName().name());
     output.setTraces(
         toExecutionTracesOutput(
             executionTraces.stream().filter(trace -> trace.getAgent() == null).toList()));
@@ -169,7 +169,7 @@ public class InjectMapper {
                   .agentExecutorName(agent.getExecutor().getName())
                   .agentExecutorType(agent.getExecutor().getType())
                   .agentName(agent.getExecutedByUser())
-                  .statusName(finalTrace != null ? String.valueOf(finalTrace.getStatus()) : null)
+                  .statusName(finalTrace != null ? finalTrace.getStatus().name() : null)
                   .trackingEndDate(finalTrace != null ? finalTrace.getTime() : null)
                   .trackingSentDate(
                       entry.getValue().stream()
