@@ -13,6 +13,7 @@ import io.openbas.database.model.*;
 import io.openbas.export.Mixins;
 import io.openbas.rest.inject.form.InjectExportRequestInput;
 import io.openbas.rest.inject.form.InjectExportTarget;
+import io.openbas.service.FileService;
 import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
@@ -44,9 +45,10 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private TeamComposer teamComposer;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;
+  @Autowired private FileService fileService;
 
   @BeforeEach
-  public void setup() {
+  public void setup() throws Exception {
     injectComposer.reset();
     documentComposer.reset();
     injectorContractComposer.reset();
@@ -56,6 +58,11 @@ public class InjectExportTest extends IntegrationTest {
     teamComposer.reset();
     userComposer.reset();
     tagComposer.reset();
+
+    // delete the test files from the minio service
+    for (String fileName : WELL_KNOWN_FILES.keySet()) {
+        fileService.deleteFile(fileName);
+    }
   }
 
   @Nested
