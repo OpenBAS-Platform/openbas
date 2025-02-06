@@ -382,13 +382,7 @@ public class AtomicTestingUtils {
                 new InjectTargetWithResult(
                     TargetType.PLAYER,
                     userEntry.getKey(),
-                    StringUtils.getName(
-                        rawUserMap
-                            .get(userEntry.getValue().get(0).getUser_id())
-                            .getUser_firstname(),
-                        rawUserMap
-                            .get(userEntry.getValue().get(0).getUser_id())
-                            .getUser_lastname()),
+                    rawUserMap.get(userEntry.getValue().get(0).getUser_id()).computeName(),
                     getExpectationResultByTypesFromRaw(userEntry.getValue()),
                     null))
         .toList();

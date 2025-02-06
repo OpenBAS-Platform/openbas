@@ -26,4 +26,12 @@ public interface RawUser {
   List<String> getUser_groups();
 
   List<String> getUser_teams();
+
+  default String computeName() {
+    if (this.getUser_firstname() != null && this.getUser_lastname() != null) {
+      return this.getUser_firstname() + " " + this.getUser_lastname();
+    } else {
+      return this.getUser_email();
+    }
+  }
 }
