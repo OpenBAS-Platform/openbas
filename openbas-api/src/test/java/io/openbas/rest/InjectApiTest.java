@@ -11,7 +11,6 @@ import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Executor;
@@ -39,7 +37,6 @@ import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.ServletException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -507,18 +504,17 @@ class InjectApiTest extends IntegrationTest {
         new MockMultipartFile(
             "input", null, "application/json", objectMapper.writeValueAsString(input).getBytes());
 
-    // -- ASSERT
-    Exception exception =
-        assertThrows(
-            ServletException.class,
-            () ->
-                mvc.perform(
-                    multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject").file(inputJson)));
+    // -- EXECUTION --
+    String response =
+        mvc.perform(multipart(EXERCISE_URI + "/" + EXERCISE.getId() + "/inject").file(inputJson))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
-    String expectedMessage = "Inject is empty";
-    String actualMessage = exception.getMessage();
-
-    assertTrue(actualMessage.contains(expectedMessage));
+    // -- ASSERT --
+    assertNotNull(response);
+    assertTrue(JsonPath.read(response, "$.status_traces").toString().contains("Inject is empty"));
   }
 
   // -- BULK DELETE --
@@ -639,6 +635,7 @@ class InjectApiTest extends IntegrationTest {
   @WithMockPlannerUser
   @DisplayName("Retrieving executable payloads injects")
   class RetrievingExecutablePayloadInject {
+
     @DisplayName("Get encoded command payload with arguments")
     @Test
     void getExecutablePayloadInjectWithArguments() throws Exception {

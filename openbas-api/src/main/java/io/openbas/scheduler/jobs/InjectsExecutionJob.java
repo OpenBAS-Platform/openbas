@@ -5,20 +5,24 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.asset.QueueService;
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectStatus;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.InjectDependenciesRepository;
+import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.execution.ExecutableInject;
-import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.helper.InjectHelper;
 import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
 import jakarta.annotation.Resource;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -26,8 +30,6 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -40,17 +42,13 @@ public class InjectsExecutionJob implements Job {
 
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
-  private final ApplicationContext context;
   private final InjectHelper injectHelper;
-  private final InjectRepository injectRepository;
-  private final InjectorRepository injectorRepository;
   private final InjectStatusRepository injectStatusRepository;
   private final ExerciseRepository exerciseRepository;
-  private final QueueService queueService;
-  private final ExecutionExecutorService executionExecutorService;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectStatusService injectStatusService;
+  private final io.openbas.executors.Executor executor;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
       List.of(
@@ -63,13 +61,6 @@ public class InjectsExecutionJob implements Job {
       List.of(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
 
   @Resource protected ObjectMapper mapper;
-
-  @PersistenceContext private EntityManager entityManager;
-
-  @Autowired
-  public void setEntityManager(EntityManager entityManager) {
-    this.entityManager = entityManager;
-  }
 
   public void handleAutoStartExercises() {
     List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
@@ -97,114 +88,20 @@ public class InjectsExecutionJob implements Job {
             .toList());
   }
 
-  private void executeExternal(ExecutableInject executableInject) {
-    Inject inject = executableInject.getInjection().getInject();
-    inject
-        .getInjectorContract()
-        .ifPresent(
-            injectorContract -> {
-              Injection source = executableInject.getInjection();
-              try {
-                Inject executingInject = injectRepository.findById(source.getId()).orElseThrow();
-                String jsonInject = mapper.writeValueAsString(executableInject);
-                queueService.publish(injectorContract.getInjector().getType(), jsonInject);
-                InjectStatus injectRunningStatus = executingInject.getStatus().orElseThrow();
-                injectRunningStatus.setName(ExecutionStatus.PENDING);
-                injectStatusRepository.save(injectRunningStatus);
-              } catch (Exception e) {
-                injectStatusService.failInjectStatus(source.getId(), e.getMessage());
-              }
-            });
-  }
-
-  private void executeInternal(ExecutableInject executableInject) {
-    Injection source = executableInject.getInjection();
-    // Execute
-    source
-        .getInject()
-        .getInjectorContract()
-        .ifPresent(
-            injectorContract -> {
-              io.openbas.executors.Injector executor =
-                  context.getBean(
-                      injectorContract.getInjector().getType(),
-                      io.openbas.executors.Injector.class);
-              Execution execution = executor.executeInjection(executableInject);
-              // After execution, expectations are already created
-              // Injection status is filled after complete execution
-              // Report inject execution
-              Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
-              InjectStatus completeStatus =
-                  injectStatusService.fromExecution(execution, executedInject);
-              executedInject.setUpdatedAt(now());
-              executedInject.setStatus(completeStatus);
-              injectRepository.save(executedInject);
-            });
-  }
-
-  private void executeInject(ExecutableInject executableInject) {
+  private void executeInject(ExecutableInject executableInject)
+      throws IOException, TimeoutException, ErrorMessagesPreExecutionException {
     // Depending on injector type (internal or external) execution must be done differently
     Inject inject = executableInject.getInjection().getInject();
-
     // We are now checking if we depend on another inject and if it did not failed
-    Optional<List<String>> errorMessages = Optional.empty();
     if (ofNullable(executableInject.getExerciseId()).isPresent()) {
-      errorMessages = getErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
+      checkErrorMessagesPreExecution(executableInject.getExerciseId(), inject);
     }
-    if (errorMessages != null && errorMessages.isPresent()) {
-      InjectStatus finalStatus = injectStatusService.failInjectStatus(inject.getId(), null);
-      errorMessages
-          .get()
-          .forEach(errorMsg -> finalStatus.addErrorTrace(errorMsg, ExecutionTraceAction.COMPLETE));
-      injectStatusRepository.save(finalStatus);
-    } else {
-      setInjectStatusAndExecuteInject(executableInject, inject);
+    if (!inject.isReady()) {
+      throw new UnsupportedOperationException(
+          "The inject is not ready to be executed (missing mandatory fields)");
     }
-  }
-
-  private void setInjectStatusAndExecuteInject(ExecutableInject executableInject, Inject inject) {
-    inject
-        .getInjectorContract()
-        .ifPresentOrElse(
-            injectorContract -> {
-              if (!inject.isReady()) {
-                injectStatusService.failInjectStatus(
-                    inject.getId(),
-                    "The inject is not ready to be executed (missing mandatory fields)");
-                return;
-              }
-
-              Injector externalInjector =
-                  injectorRepository
-                      .findByType(injectorContract.getInjector().getType())
-                      .orElseThrow();
-              LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
-              // Executor logics
-              ExecutableInject newExecutableInject = executableInject;
-
-              InjectStatus injectStatus =
-                  injectStatusService.initializeInjectStatus(
-                      inject.getId(), ExecutionStatus.EXECUTING, null);
-              if (Boolean.TRUE.equals(injectorContract.getNeedsExecutor())) {
-                // Status
-                inject.setStatus(injectStatus);
-                try {
-                  newExecutableInject =
-                      this.executionExecutorService.launchExecutorContext(executableInject, inject);
-                } catch (Exception e) {
-                  injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
-                  return;
-                }
-              }
-              if (externalInjector.isExternal()) {
-                executeExternal(newExecutableInject);
-              } else {
-                executeInternal(newExecutableInject);
-              }
-            },
-            () ->
-                injectStatusService.failInjectStatus(
-                    inject.getId(), "Inject does not have a contract"));
+    LOGGER.log(Level.INFO, "Executing inject " + inject.getInject().getTitle());
+    this.executor.execute(executableInject);
   }
 
   /**
@@ -214,7 +111,8 @@ public class InjectsExecutionJob implements Job {
    * @param inject the inject to check
    * @return an optional of list of error message
    */
-  private Optional<List<String>> getErrorMessagesPreExecution(String exerciseId, Inject inject) {
+  private void checkErrorMessagesPreExecution(String exerciseId, Inject inject)
+      throws ErrorMessagesPreExecutionException {
     List<InjectDependency> injectDependencies =
         injectDependenciesRepository.findParents(List.of(inject.getId()));
     if (!injectDependencies.isEmpty()) {
@@ -226,7 +124,7 @@ public class InjectsExecutionJob implements Job {
       Map<String, Boolean> mapCondition =
           getStringBooleanMap(parents, exerciseId, injectDependencies);
 
-      List<String> results = null;
+      List<String> errorMessages = new ArrayList<>();
 
       for (InjectDependency injectDependency : injectDependencies) {
         String expressionToEvaluate = injectDependency.getInjectDependencyCondition().toString();
@@ -245,20 +143,20 @@ public class InjectsExecutionJob implements Job {
         Expression exp = parser.parseExpression(expressionToEvaluate);
         boolean canBeExecuted = Boolean.TRUE.equals(exp.getValue(mapCondition, Boolean.class));
         if (!canBeExecuted) {
-          if (results == null) {
-            results = new ArrayList<>();
-            results.add(
+          if (errorMessages.isEmpty()) {
+            errorMessages.add(
                 "This inject depends on other injects expectations that are not met. The following conditions were not as expected : ");
           }
-          results.addAll(
+          errorMessages.addAll(
               labelFromCondition(
                   injectDependency.getCompositeId().getInjectParent(),
                   injectDependency.getInjectDependencyCondition()));
         }
       }
-      return results == null ? Optional.empty() : Optional.of(results);
+      if (!errorMessages.isEmpty()) {
+        throw new ErrorMessagesPreExecutionException(errorMessages);
+      }
     }
-    return Optional.empty();
   }
 
   /**
@@ -271,18 +169,13 @@ public class InjectsExecutionJob implements Job {
    */
   private @NotNull Map<String, Boolean> getStringBooleanMap(
       List<Inject> parents, String exerciseId, List<InjectDependency> injectDependencies) {
-    Map<String, Boolean> mapCondition = new HashMap<>();
-
-    injectDependencies.forEach(
-        injectDependency -> {
-          injectDependency
-              .getInjectDependencyCondition()
-              .getConditions()
-              .forEach(
-                  condition -> {
-                    mapCondition.put(condition.getKey(), false);
-                  });
-        });
+    Map<String, Boolean> mapCondition =
+        injectDependencies.stream()
+            .flatMap(
+                injectDependency ->
+                    injectDependency.getInjectDependencyCondition().getConditions().stream())
+            .collect(
+                Collectors.toMap(InjectDependencyConditions.Condition::getKey, condition -> false));
 
     parents.forEach(
         parent -> {
@@ -354,7 +247,16 @@ public class InjectsExecutionJob implements Job {
       byExercises.forEach(
           (exercise, executableInjects) -> {
             // Execute each inject for the exercise in order.
-            executableInjects.forEach(this::executeInject);
+            executableInjects.forEach(
+                executableInject -> {
+                  try {
+                    this.executeInject(executableInject);
+                  } catch (Exception e) {
+                    Inject inject = executableInject.getInjection().getInject();
+                    LOGGER.log(Level.WARNING, e.getMessage(), e);
+                    injectStatusService.failInjectStatus(inject.getId(), e.getMessage());
+                  }
+                });
             // Update the exercise
             if (!exercise.equals("atomic")) {
               updateExercise(exercise);
