@@ -108,8 +108,10 @@ public class InjectExportTest extends IntegrationTest {
               .forInject(InjectFixture.getDefaultInject())
               .withTag(tagComposer.forTag(TagFixture.getTagWithText("Other challenge inject tag")))
               .withDocument(
-                  documentComposer.forDocument(
-                      DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))),
+                  documentComposer
+                      .forDocument(
+                          DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
+                      .withInMemoryFile(FileFixture.getPlainTextFileContent())),
           injectComposer
               .forInject(InjectFixture.getDefaultInject())
               .withTeam(
@@ -273,8 +275,8 @@ public class InjectExportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Returned zip file contains json with correct teams")
-      public void returnedZipFileContainsJsonWithCorrectTeams() throws Exception {
+      @DisplayName("Returned zip file contains json with empty teams key")
+      public void returnedZipFileContainsJsonWithEmptyTeamsKey() throws Exception {
         byte[] response = doExport();
 
         String actualJson =
@@ -284,8 +286,8 @@ public class InjectExportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Returned zip file contains json with correct users")
-      public void returnedZipFileContainsJsonWithCorrectUsers() throws Exception {
+      @DisplayName("Returned zip file contains json with absent users key")
+      public void returnedZipFileContainsJsonWithAbsentUsersKey() throws Exception {
         byte[] response = doExport();
 
         String actualJson =
