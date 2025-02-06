@@ -1,7 +1,5 @@
 package io.openbas.rest.inject.service;
 
-import static java.time.Instant.now;
-
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.AgentRepository;
@@ -39,11 +37,28 @@ public class InjectStatusService {
     // build status
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setInject(inject);
-    injectStatus.setTrackingSentDate(now());
     injectStatus.setName(ExecutionStatus.valueOf(input.getStatus()));
     // Save status for inject
     inject.setStatus(injectStatus);
     return injectRepository.save(inject);
+  }
+
+  public void addStartImplantExecutionTraceByInject(
+      String injectId, String agentId, String message) {
+    InjectStatus injectStatus =
+        injectStatusRepository.findByInjectId(injectId).orElseThrow(ElementNotFoundException::new);
+    Agent agent = agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
+    ExecutionTraces trace =
+        new ExecutionTraces(
+            injectStatus,
+            ExecutionTraceStatus.INFO,
+            null,
+            message,
+            ExecutionTraceAction.START,
+            agent,
+            null);
+    injectStatus.addTrace(trace);
+    injectStatusRepository.save(injectStatus);
   }
 
   private ExecutionTraceStatus convertExecutionStatus(ExecutionStatus status) {
@@ -81,16 +96,14 @@ public class InjectStatusService {
     return assets.size() == totalCompleteTrace;
   }
 
-  public void updateFinalInjectStatus(InjectStatus injectStatus, Instant finishTime) {
+  public void updateFinalInjectStatus(InjectStatus injectStatus) {
     ExecutionStatus finalStatus =
         computeStatus(
             injectStatus.getTraces().stream()
                 .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
                 .toList());
 
-    injectStatus.addTrace(
-        ExecutionTraceStatus.INFO, "Process finished", ExecutionTraceAction.COMPLETE, null);
-    injectStatus.setTrackingEndDate(finishTime == null ? Instant.now() : finishTime);
+    injectStatus.setTrackingEndDate(Instant.now());
     injectStatus.setName(finalStatus);
     injectStatus.getInject().setUpdatedAt(Instant.now());
   }
@@ -100,7 +113,7 @@ public class InjectStatusService {
     ExecutionTraceAction executionAction = convertExecutionAction(input.getAction());
     ExecutionTraceStatus traceStatus = ExecutionTraceStatus.valueOf(input.getStatus());
     return new ExecutionTraces(
-        injectStatus, traceStatus, null, input.getMessage(), executionAction, agent);
+        injectStatus, traceStatus, null, input.getMessage(), executionAction, agent, null);
   }
 
   private void computeExecutionTraceStatusIfNeeded(
@@ -131,7 +144,7 @@ public class InjectStatusService {
 
     if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
         && (agentId == null || isAllInjectAssetsExecuted(inject))) {
-      updateFinalInjectStatus(injectStatus, now());
+      updateFinalInjectStatus(injectStatus);
     }
     return injectRepository.save(inject);
   }
@@ -172,8 +185,6 @@ public class InjectStatusService {
   }
 
   public InjectStatus fromExecution(Execution execution, InjectStatus injectStatus) {
-    injectStatus.setTrackingSentDate(Instant.now());
-
     if (!execution.getTraces().isEmpty()) {
       List<ExecutionTraces> traces =
           execution.getTraces().stream().peek(t -> t.setInjectStatus(injectStatus)).toList();
@@ -183,7 +194,7 @@ public class InjectStatusService {
     if (execution.isAsync()) {
       injectStatus.setName(ExecutionStatus.PENDING);
     } else {
-      updateFinalInjectStatus(injectStatus, now());
+      updateFinalInjectStatus(injectStatus);
     }
 
     return injectStatus;

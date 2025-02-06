@@ -4,10 +4,10 @@ import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.InjectRepository;
 import io.openbas.injectors.openbas.model.OpenBASImplantInjectContent;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.payload.service.PayloadService;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -20,8 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutableInjectService {
 
-  private final InjectRepository injectRepository;
   private final InjectService injectService;
+  private final InjectStatusService injectStatusService;
+  private final PayloadService payloadService;
   private static final Pattern argumentsRegex = Pattern.compile("#\\{([^#{}]+)}");
   private static final Pattern cmdVariablesRegex = Pattern.compile("%(\\w+)%");
 
@@ -121,23 +122,40 @@ public class ExecutableInjectService {
     return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }
 
-  public Payload getExecutablePayloadInject(String injectId) throws Exception {
-    Inject inject =
-        this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+  public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
+      throws Exception {
+    Payload payloadToExecute = getExecutablePayloadInject(injectId);
+    this.injectStatusService.addStartImplantExecutionTraceByInject(
+        injectId, agentId, "Implant is up and starting execution");
+    return payloadToExecute;
+  }
+
+  private Payload getExecutablePayloadInject(String injectId) throws Exception {
+    Inject inject = injectService.inject(injectId);
     InjectorContract contract =
-        inject.getInjectorContract().orElseThrow(ElementNotFoundException::new);
+        inject
+            .getInjectorContract()
+            .orElseThrow(() -> new ElementNotFoundException("Inject contract not found"));
     OpenBASImplantInjectContent content =
         injectService.convertInjectContent(inject, OpenBASImplantInjectContent.class);
     String obfuscator = content.getObfuscator() != null ? content.getObfuscator() : "plain-text";
 
+    if (contract.getPayload() == null) {
+      throw new ElementNotFoundException("Payload not found");
+    }
+    Payload payloadToExecute = payloadService.generateDuplicatedPayload(contract.getPayload());
+
     // prerequisite
+    List<PayloadPrerequisite> prerequisiteList = new ArrayList<>();
     contract
         .getPayload()
         .getPrerequisites()
         .forEach(
             prerequisite -> {
+              PayloadPrerequisite payload = new PayloadPrerequisite();
+              payload.setExecutor(prerequisite.getExecutor());
               if (hasText(prerequisite.getCheckCommand())) {
-                prerequisite.setCheckCommand(
+                payload.setCheckCommand(
                     processAndEncodeCommand(
                         prerequisite.getCheckCommand(),
                         prerequisite.getExecutor(),
@@ -146,7 +164,7 @@ public class ExecutableInjectService {
                         obfuscator));
               }
               if (hasText(prerequisite.getGetCommand())) {
-                prerequisite.setGetCommand(
+                payload.setGetCommand(
                     processAndEncodeCommand(
                         prerequisite.getGetCommand(),
                         prerequisite.getExecutor(),
@@ -154,24 +172,26 @@ public class ExecutableInjectService {
                         inject.getContent(),
                         obfuscator));
               }
+              prerequisiteList.add(payload);
             });
+    payloadToExecute.setPrerequisites(prerequisiteList);
 
     // cleanup
     if (contract.getPayload().getCleanupCommand() != null) {
-      contract
-          .getPayload()
-          .setCleanupCommand(
-              processAndEncodeCommand(
-                  contract.getPayload().getCleanupCommand(),
-                  contract.getPayload().getCleanupExecutor(),
-                  contract.getPayload().getArguments(),
-                  inject.getContent(),
-                  obfuscator));
+      payloadToExecute.setCleanupExecutor(contract.getPayload().getCleanupExecutor());
+      payloadToExecute.setCleanupCommand(
+          processAndEncodeCommand(
+              contract.getPayload().getCleanupCommand(),
+              contract.getPayload().getCleanupExecutor(),
+              contract.getPayload().getArguments(),
+              inject.getContent(),
+              obfuscator));
     }
 
     // Command
     if (contract.getPayload().getTypeEnum().equals(PayloadType.COMMAND)) {
-      Command payloadCommand = (Command) contract.getPayload();
+      Command payloadCommand = (Command) payloadToExecute;
+      payloadCommand.setExecutor(((Command) contract.getPayload()).getExecutor());
       payloadCommand.setContent(
           processAndEncodeCommand(
               payloadCommand.getContent(),
@@ -182,6 +202,6 @@ public class ExecutableInjectService {
       return payloadCommand;
     }
 
-    return contract.getPayload();
+    return payloadToExecute;
   }
 }

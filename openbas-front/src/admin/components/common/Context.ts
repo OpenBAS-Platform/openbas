@@ -13,8 +13,7 @@ import type {
   Inject,
   InjectBulkProcessingInput,
   InjectBulkUpdateInputs,
-  InjectsImportInput,
-  InjectTestStatus,
+  InjectsImportInput, InjectTestStatusOutput,
   LessonsAnswer,
   LessonsAnswerCreateInput,
   LessonsCategory,
@@ -102,7 +101,7 @@ export type InjectContextType = {
   onBulkDeleteInjects: (param: InjectBulkProcessingInput) => Promise<Inject[]>;
   bulkTestInjects: (param: InjectBulkProcessingInput) => Promise<{
     uri: string;
-    data: InjectTestStatus[];
+    data: InjectTestStatusOutput[];
   }>;
 };
 export type LessonContextType = {
@@ -234,9 +233,9 @@ export const InjectContext = createContext<InjectContextType>({
   },
   bulkTestInjects(_param: InjectBulkProcessingInput): Promise<{
     uri: string;
-    data: InjectTestStatus[];
+    data: InjectTestStatusOutput[];
   }> {
-    return new Promise<{ uri: string; data: InjectTestStatus[] }>(() => {
+    return new Promise<{ uri: string; data: InjectTestStatusOutput[] }>(() => {
     });
   },
 });

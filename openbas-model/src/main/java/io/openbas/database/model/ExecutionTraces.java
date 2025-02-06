@@ -85,7 +85,7 @@ public class ExecutionTraces implements Base {
   private Instant updateDate = now();
 
   public List<String> getIdentifiers() {
-    return List.of(identifiers);
+    return identifiers == null ? List.of() : List.of(identifiers);
   }
 
   @Override
@@ -94,37 +94,40 @@ public class ExecutionTraces implements Base {
   }
 
   public static ExecutionTraces getNewErrorTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTraces(null, ExecutionTraceStatus.ERROR, null, message, action, null);
+    return new ExecutionTraces(null, ExecutionTraceStatus.ERROR, null, message, action, null, null);
   }
 
   public static ExecutionTraces getNewErrorTrace(
       String message, ExecutionTraceAction action, Agent agent) {
-    return new ExecutionTraces(null, ExecutionTraceStatus.ERROR, null, message, action, agent);
+    return new ExecutionTraces(
+        null, ExecutionTraceStatus.ERROR, null, message, action, agent, null);
   }
 
   public static ExecutionTraces getNewSuccessTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTraces(null, ExecutionTraceStatus.SUCCESS, null, message, action, null);
+    return new ExecutionTraces(
+        null, ExecutionTraceStatus.SUCCESS, null, message, action, null, null);
   }
 
   public static ExecutionTraces getNewSuccessTrace(
       String message, ExecutionTraceAction category, List<String> identifiers) {
     return new ExecutionTraces(
-        null, ExecutionTraceStatus.SUCCESS, identifiers, message, category, null);
+        null, ExecutionTraceStatus.SUCCESS, identifiers, message, category, null, null);
   }
 
   public static ExecutionTraces getNewInfoTrace(String message, ExecutionTraceAction action) {
-    return new ExecutionTraces(null, ExecutionTraceStatus.INFO, null, message, action, null);
+    return new ExecutionTraces(null, ExecutionTraceStatus.INFO, null, message, action, null, null);
   }
 
   public static ExecutionTraces getNewInfoTrace(
       String message, ExecutionTraceAction action, List<String> identifiers) {
-    return new ExecutionTraces(null, ExecutionTraceStatus.INFO, identifiers, message, action, null);
+    return new ExecutionTraces(
+        null, ExecutionTraceStatus.INFO, identifiers, message, action, null, null);
   }
 
   public static ExecutionTraces getNewInfoTrace(
       String message, ExecutionTraceAction action, Agent agent, List<String> identifiers) {
     return new ExecutionTraces(
-        null, ExecutionTraceStatus.INFO, identifiers, message, action, agent);
+        null, ExecutionTraceStatus.INFO, identifiers, message, action, agent, null);
   }
 
   public ExecutionTraces() {}
@@ -135,12 +138,13 @@ public class ExecutionTraces implements Base {
       List<String> identifiers,
       String message,
       ExecutionTraceAction action,
-      Agent agent) {
+      Agent agent,
+      Instant time) {
     this.injectStatus = injectStatus;
     this.status = status;
     this.identifiers = identifiers == null ? new String[0] : identifiers.toArray(new String[0]);
     this.message = message;
-    this.time = Instant.now();
+    this.time = time == null ? Instant.now() : time;
     this.action = action;
     this.agent = agent;
   }

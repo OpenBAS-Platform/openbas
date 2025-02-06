@@ -1,91 +1,31 @@
-import { Grid, Paper, Typography } from '@mui/material';
 import { Props } from 'html-react-parser/lib/attributes-to-props';
 import { FunctionComponent, useContext } from 'react';
-import { makeStyles } from 'tss-react/mui';
 
-import { useFormatter } from '../../../../components/i18n';
-import ItemStatus from '../../../../components/ItemStatus';
+import { EndpointOutput } from '../../../../utils/api-types';
+import InjectStatus from '../../common/injects/status/InjectStatus';
 import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
-const useStyles = makeStyles()(() => ({
-  paper: {
-    position: 'relative',
-    padding: 20,
-    overflow: 'hidden',
-    height: '100%',
-  },
-  header: {
-    fontWeight: 'bold',
-  },
-  listItem: {
-    marginBottom: 8,
-  },
-}));
-
 const AtomicTestingDetail: FunctionComponent<Props> = () => {
-  const { classes } = useStyles();
-  const { t } = useFormatter();
-
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
 
+  const endpointsMap: Map<string, EndpointOutput> = new Map();
+  injectResultOverviewOutput?.inject_targets.forEach((result) => {
+    if (result.targetType === 'ASSETS_GROUPS' && result.children) {
+      result.children.forEach(({ id, name, platformType }) => {
+        endpointsMap.set(id, { asset_id: id, asset_name: name, endpoint_platform: platformType } as EndpointOutput);
+      });
+    }
+    if (result.targetType === 'ASSETS') {
+      endpointsMap.set(result.id, { asset_id: result.id, asset_name: result.name, endpoint_platform: result.platformType } as EndpointOutput);
+    }
+  });
+
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} style={{ marginBottom: 30 }}>
-        <Typography variant="h4">{t('Execution logs')}</Typography>
-        {injectResultOverviewOutput ? (
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Typography variant="subtitle1" className={classes.header} gutterBottom>
-              {t('Execution status')}
-            </Typography>
-            {injectResultOverviewOutput.inject_status?.status_name
-            && <ItemStatus isInject={true} status={injectResultOverviewOutput.inject_status?.status_name} label={t(injectResultOverviewOutput.inject_status?.status_name)} />}
-            <Typography variant="subtitle1" className={classes.header} style={{ marginTop: 20 }} gutterBottom>
-              {t('Traces')}
-            </Typography>
-            <pre>
-              {injectResultOverviewOutput.inject_status?.tracking_sent_date ? (
-                <>
-                  <Typography variant="body1" gutterBottom>
-                    {t('Tracking Sent Date')}
-                    :
-                    {injectResultOverviewOutput.inject_status?.tracking_sent_date}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    {t('Tracking End Date')}
-                    :
-                    {injectResultOverviewOutput.inject_status?.tracking_end_date}
-                  </Typography>
-                </>
-              ) : (
-                <Typography variant="body1" gutterBottom>
-                  {t('No data available')}
-                </Typography>
-              )}
-              {(injectResultOverviewOutput.inject_status?.status_traces?.length ?? 0) > 0 && (
-                <>
-                  <Typography variant="body1" gutterBottom>
-                    {t('Traces')}
-                    :
-                  </Typography>
-                  <ul>
-                    {injectResultOverviewOutput.inject_status?.status_traces?.map((trace, index) => (
-                      <li key={index} className={classes.listItem}>
-                        {`${trace.execution_status} ${trace.execution_message}`}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </pre>
-          </Paper>
-        ) : (
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Typography variant="body1">{t('No data available')}</Typography>
-          </Paper>
-        )}
-      </Grid>
-    </Grid>
+    <InjectStatus
+      injectStatus={injectResultOverviewOutput?.inject_status ?? null}
+      endpointsMap={endpointsMap}
+    />
   );
 };
 

@@ -27,6 +27,7 @@ import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.form.DirectInjectInput;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.ScenarioService;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.fixtures.InjectFixture;
@@ -42,10 +43,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -78,6 +76,7 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
+  @SpyBean private InjectStatusService injectStatusService;
 
   @Autowired private ExerciseRepository exerciseRepository;
   @SpyBean private Executor executor;
@@ -660,11 +659,14 @@ class InjectApiTest extends IntegrationTest {
           InjectFixture.createInjectCommandPayload(PAYLOAD_INJECTOR_CONTRACT, payloadArguments);
 
       Inject injectSaved = injectRepository.save(inject);
+      doNothing()
+          .when(injectStatusService)
+          .addStartImplantExecutionTraceByInject(any(), any(), any());
 
       // -- EXECUTE --
       String response =
           mvc.perform(
-                  get(INJECT_URI + "/" + injectSaved.getId() + "/executable-payload")
+                  get(INJECT_URI + "/" + injectSaved.getId() + "/fakeId/executable-payload")
                       .accept(MediaType.APPLICATION_JSON))
               .andExpect(status().is2xxSuccessful())
               .andReturn()
@@ -711,11 +713,14 @@ class InjectApiTest extends IntegrationTest {
           InjectFixture.createInjectCommandPayload(PAYLOAD_INJECTOR_CONTRACT_2, payloadArguments);
 
       Inject injectSaved = injectRepository.save(inject);
+      doNothing()
+          .when(injectStatusService)
+          .addStartImplantExecutionTraceByInject(any(), any(), any());
 
       // -- EXECUTE --
       String response =
           mvc.perform(
-                  get(INJECT_URI + "/" + injectSaved.getId() + "/executable-payload")
+                  get(INJECT_URI + "/" + injectSaved.getId() + "/fakeagentID/executable-payload")
                       .accept(MediaType.APPLICATION_JSON))
               .andExpect(status().is2xxSuccessful())
               .andReturn()

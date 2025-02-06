@@ -127,6 +127,9 @@ public class CalderaExecutor extends Injector {
               }
               assets.forEach(
                   (asset, aBoolean) -> {
+                    if (!(asset instanceof Endpoint) || !((Endpoint) asset).getActive()) {
+                      return;
+                    }
                     try {
                       Endpoint executionEndpoint =
                           this.findAndRegisterAssetForExecution(
@@ -141,6 +144,12 @@ public class CalderaExecutor extends Injector {
                                   contract,
                                   additionalFields);
                           if (result.contains("complete")) {
+                            execution.addTrace(
+                                getNewInfoTrace(
+                                    "Request to execute the ability sent to Caldera",
+                                    ExecutionTraceAction.START,
+                                    ((Endpoint) asset).getAgents().getFirst(),
+                                    List.of()));
                             ExploitResult exploitResult =
                                 this.calderaService.exploitResult(
                                     executionEndpoint.getAgents().getFirst().getExternalReference(),
@@ -151,7 +160,7 @@ public class CalderaExecutor extends Injector {
                                     exploitResult.getCommand(),
                                     ExecutionTraceAction.EXECUTION,
                                     ((Endpoint) asset).getAgents().getFirst(),
-                                    List.of()));
+                                    List.of(exploitResult.getLinkId())));
                             // Compute expectations
                             boolean isInGroup =
                                 assets.get(
@@ -253,8 +262,6 @@ public class CalderaExecutor extends Injector {
     assetGroups.forEach(
         (assetGroup -> computeExpectationsForAssetGroup(expectations, content, assetGroup)));
 
-    String message = "Caldera executed the ability on " + asyncIds.size() + " asset(s)";
-    execution.addTrace(getNewInfoTrace(message, ExecutionTraceAction.EXECUTION, asyncIds));
     injectExpectationService.buildAndSaveInjectExpectations(injection, expectations);
     return new ExecutionProcess(true);
   }

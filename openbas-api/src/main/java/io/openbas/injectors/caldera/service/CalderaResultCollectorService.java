@@ -78,43 +78,60 @@ public class CalderaResultCollectorService implements Runnable {
             } else if (resultStatus.getPaw() != null
                 && resultStatus.isComplete()
                 && resultStatus.isFail()) {
-              injectStatus.addMayBePreventedTrace(
-                  "Failed result for linkID "
-                      + entry.getKey()
-                      + " ("
-                      + resultStatus.getContent()
-                      + ")",
-                  ExecutionTraceAction.COMPLETE,
-                  entry.getValue());
+              injectStatus.addTrace(
+                  new ExecutionTraces(
+                      injectStatus,
+                      ExecutionTraceStatus.MAYBE_PREVENTED,
+                      List.of(),
+                      "Failed result for linkID "
+                          + entry.getKey()
+                          + " ("
+                          + resultStatus.getContent()
+                          + ")",
+                      ExecutionTraceAction.COMPLETE,
+                      entry.getValue(),
+                      resultStatus.getFinish()));
 
             } else if (resultStatus.getPaw() != null
                 && resultStatus.isComplete()
                 && !resultStatus.isFail()) {
-              injectStatus.addSuccess(
-                  "Success result for linkID "
-                      + entry.getKey()
-                      + " ("
-                      + resultStatus.getContent()
-                      + ")",
-                  ExecutionTraceAction.COMPLETE,
-                  entry.getValue());
+              injectStatus.addTrace(
+                  new ExecutionTraces(
+                      injectStatus,
+                      ExecutionTraceStatus.SUCCESS,
+                      List.of(),
+                      "Success result for linkID "
+                          + entry.getKey()
+                          + " ("
+                          + resultStatus.getContent()
+                          + ")",
+                      ExecutionTraceAction.COMPLETE,
+                      entry.getValue(),
+                      resultStatus.getFinish()));
 
             } else if (resultStatus.getPaw() != null
                 && !resultStatus.isComplete()
                 && injectStatus
                     .getTrackingSentDate()
                     .isBefore(Instant.now().minus(5L, ChronoUnit.MINUTES))) {
-              injectStatus.addMayBePreventedTrace(
-                  "Timeout on linkID " + entry.getKey() + ", injection has failed",
-                  ExecutionTraceAction.COMPLETE,
-                  entry.getValue());
+
+              injectStatus.addTrace(
+                  new ExecutionTraces(
+                      injectStatus,
+                      ExecutionTraceStatus.MAYBE_PREVENTED,
+                      List.of(),
+                      "Timeout on linkID " + entry.getKey() + ", injection has failed",
+                      ExecutionTraceAction.COMPLETE,
+                      entry.getValue(),
+                      resultStatus.getFinish()));
+
               log.log(Level.INFO, "Timeout on linkID " + entry.getKey() + ", injection has failed");
             }
           }
 
           Inject relatedInject = injectStatus.getInject();
           if (injectStatusService.isAllInjectAssetsExecuted(relatedInject)) {
-            injectStatusService.updateFinalInjectStatus(injectStatus, resultStatus.getFinish());
+            injectStatusService.updateFinalInjectStatus(injectStatus);
           }
 
           injectRepository.save(relatedInject);

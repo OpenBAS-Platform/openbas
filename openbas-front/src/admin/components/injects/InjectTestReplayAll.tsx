@@ -5,17 +5,17 @@ import { FunctionComponent, useState } from 'react';
 import { bulkTestInjects } from '../../../actions/injects/inject-action';
 import DialogTest from '../../../components/common/DialogTest';
 import { useFormatter } from '../../../components/i18n';
-import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
+import type { InjectTestStatusOutput, SearchPaginationInput } from '../../../utils/api-types';
 import { MESSAGING$ } from '../../../utils/Environment';
 
 interface Props {
   searchPaginationInput: SearchPaginationInput;
   exerciseOrScenarioId: string;
   injectIds: string[] | undefined;
-  onTest?: (result: InjectTestStatus[]) => void;
+  onTest?: (result: InjectTestStatusOutput[]) => void;
 }
 
-const ImportUploaderMapper: FunctionComponent<Props> = ({
+const InjectTestReplayAll: FunctionComponent<Props> = ({
   searchPaginationInput,
   injectIds,
   exerciseOrScenarioId,
@@ -38,7 +38,7 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
     bulkTestInjects({
       search_pagination_input: searchPaginationInput,
       simulation_or_scenario_id: exerciseOrScenarioId,
-    }!).then((result: { data: InjectTestStatus[] }) => {
+    }!).then((result: { data: InjectTestStatusOutput[] }) => {
       onTest?.(result.data);
       MESSAGING$.notifySuccess(t('Test(s) sent'));
       return result;
@@ -74,4 +74,4 @@ const ImportUploaderMapper: FunctionComponent<Props> = ({
   );
 };
 
-export default ImportUploaderMapper;
+export default InjectTestReplayAll;

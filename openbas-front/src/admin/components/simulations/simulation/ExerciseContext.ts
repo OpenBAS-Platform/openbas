@@ -21,7 +21,7 @@ import type {
   InjectBulkProcessingInput,
   InjectBulkUpdateInputs,
   InjectsImportInput,
-  InjectTestStatus,
+  InjectTestStatusOutput,
   SearchPaginationInput,
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -71,7 +71,7 @@ const injectContextForExercise = (exercise: Exercise) => {
     onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
       return bulkDeleteInjectsSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
-    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatus[] }> {
+    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatusOutput[] }> {
       return bulkTestInjects(param).then(result => ({
         uri: `/admin/simulations/${exercise.exercise_id}/tests`,
         data: result.data,

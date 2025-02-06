@@ -9,8 +9,7 @@ import { buildSearchPagination } from '../../../components/common/queryable/Quer
 import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import type { InjectTestStatus, SearchPaginationInput } from '../../../utils/api-types';
-import { isNotEmptyField } from '../../../utils/utils';
+import type { InjectTestStatusOutput, SearchPaginationInput } from '../../../utils/api-types';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectTestDetail from './InjectTestDetail';
 import InjectTestPopover from './InjectTestPopover';
@@ -55,8 +54,8 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  searchInjectTests: (exerciseOrScenarioId: string, input: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatus> }>;
-  searchInjectTest: (testId: string) => Promise<{ data: InjectTestStatus }>;
+  searchInjectTests: (exerciseOrScenarioId: string, input: SearchPaginationInput) => Promise<{ data: Page<InjectTestStatusOutput> }>;
+  searchInjectTest: (testId: string) => Promise<{ data: InjectTestStatusOutput }>;
   exerciseOrScenarioId: string;
   statusId: string | undefined;
 }
@@ -71,12 +70,12 @@ const InjectTestList: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const { t, fldt } = useFormatter();
 
-  const [selectedTest, setSelectedTest] = useState<InjectTestStatus | null>(null);
+  const [selectedTest, setSelectedTest] = useState<InjectTestStatusOutput | null>(null);
 
   // Fetching test
   useEffect(() => {
     if (statusId !== null && statusId !== undefined) {
-      searchInjectTest(statusId).then((result: { data: InjectTestStatus }) => {
+      searchInjectTest(statusId).then((result: { data: InjectTestStatusOutput }) => {
         setSelectedTest(result.data);
       });
     }
@@ -88,26 +87,26 @@ const InjectTestList: FunctionComponent<Props> = ({
       field: 'inject_title',
       label: 'Inject title',
       isSortable: true,
-      value: (test: InjectTestStatus) => test.inject_title,
+      value: (test: InjectTestStatusOutput) => test.inject_title,
     },
     {
       field: 'tracking_sent_date',
       label: 'Test execution time',
       isSortable: true,
-      value: (test: InjectTestStatus) => fldt(test.tracking_sent_date),
+      value: (test: InjectTestStatusOutput) => fldt(test.tracking_sent_date),
     },
     {
       field: 'status_name',
       label: 'Test status',
       isSortable: true,
-      value: (test: InjectTestStatus) => {
+      value: (test: InjectTestStatusOutput) => {
         return (<ItemStatus isInject={true} status={test.status_name} label={t(test.status_name)} variant="inList" />);
       },
     },
   ];
 
   // Filter and sort hook
-  const [tests, setTests] = useState<InjectTestStatus[] | null>([]);
+  const [tests, setTests] = useState<InjectTestStatusOutput[] | null>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({}));
 
   return (
@@ -120,7 +119,7 @@ const InjectTestList: FunctionComponent<Props> = ({
         <InjectTestReplayAll
           searchPaginationInput={searchPaginationInput}
           exerciseOrScenarioId={exerciseOrScenarioId}
-          injectIds={tests?.map((test: InjectTestStatus) => test.inject_id!)}
+          injectIds={tests?.map((test: InjectTestStatusOutput) => test.inject_id!)}
           onTest={result => setTests(result)}
         />
       </PaginationComponent>
@@ -151,9 +150,10 @@ const InjectTestList: FunctionComponent<Props> = ({
               divider
               secondaryAction={(
                 <InjectTestPopover
-                  injectTestStatus={test}
-                  onTest={result => setTests(tests?.map(existing => (existing.status_id !== result.status_id ? existing : result)))}
-                  onDelete={result => setTests(tests.filter(existing => (existing.status_id !== result)))}
+                  injectTest={test}
+                  onTest={result =>
+                    setTests(tests?.map(existing => existing.status_id !== result.status_id ? existing : result))}
+                  onDelete={injectStatusId => setTests(tests.filter(existing => (existing.status_id !== injectStatusId)))}
                 />
               )}
               disablePadding
@@ -165,13 +165,7 @@ const InjectTestList: FunctionComponent<Props> = ({
               >
                 <ListItemIcon>
                   <InjectIcon
-                    isPayload={isNotEmptyField(test.injector_contract?.injector_contract_payload)}
-                    type={
-                      test.injector_contract?.injector_contract_payload
-                        ? test.injector_contract?.injector_contract_payload.payload_collector_type
-                        || test.injector_contract?.injector_contract_payload.payload_type
-                        : test.inject_type
-                    }
+                    type={test.inject_type}
                     variant="list"
                   />
                 </ListItemIcon>

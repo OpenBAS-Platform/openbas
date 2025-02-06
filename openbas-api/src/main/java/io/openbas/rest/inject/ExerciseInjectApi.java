@@ -6,9 +6,9 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteri
 
 import io.openbas.database.model.Base;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.InjectOutput;
+import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -79,7 +79,7 @@ public class ExerciseInjectApi extends RestBehavior {
   }
 
   @PostMapping("/api/exercise/{exerciseId}/injects/test")
-  public Page<InjectTestStatus> findAllExerciseInjectTests(
+  public Page<InjectTestStatusOutput> findAllExerciseInjectTests(
       @PathVariable @NotBlank String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return injectTestStatusService.findAllInjectTestsByExerciseId(

@@ -6,9 +6,9 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteri
 
 import io.openbas.database.model.Base;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectTestStatus;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.output.InjectOutput;
+import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectTestStatusService;
 import io.openbas.telemetry.Tracing;
@@ -64,7 +64,7 @@ public class ScenarioInjectApi extends RestBehavior {
   }
 
   @PostMapping("/api/scenario/{scenarioId}/injects/test")
-  public Page<InjectTestStatus> findAllScenarioInjectTests(
+  public Page<InjectTestStatusOutput> findAllScenarioInjectTests(
       @PathVariable @NotBlank String scenarioId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return injectTestStatusService.findAllInjectTestsByScenarioId(
