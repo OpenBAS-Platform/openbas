@@ -117,7 +117,7 @@ public class InjectsFileExport extends FileExportBase {
 
   @JsonIgnore
   public List<String> getAllDocumentIds() {
-      return new ArrayList<>(this.getDocuments().stream().map(Document::getId).toList());
+    return new ArrayList<>(this.getDocuments().stream().map(Document::getId).toList());
   }
 
   private InjectsFileExport(
