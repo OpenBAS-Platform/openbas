@@ -124,6 +124,7 @@ public class InjectApi extends RestBehavior {
     return injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
+  @Secured(ROLE_ADMIN)
   @GetMapping(INJECT_URI + "/{injectId}/{agentId}/executable-payload")
   @Operation(
       summary = "Get the payload ready to be executed",
