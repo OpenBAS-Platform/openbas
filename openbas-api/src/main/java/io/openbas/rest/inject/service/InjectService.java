@@ -78,8 +78,8 @@ public class InjectService {
       @Nullable final Exercise exercise,
       @Nullable final Scenario scenario,
       @NotNull final InjectInput input) {
-    if (exercise == null & scenario == null) {
-      throw new IllegalArgumentException("At least one of exercise or scenario should be present");
+    if (exercise == null && scenario == null || exercise != null && scenario != null) {
+      throw new IllegalArgumentException("Exactly one of exercise or scenario should be present");
     }
 
     InjectorContract injectorContract =

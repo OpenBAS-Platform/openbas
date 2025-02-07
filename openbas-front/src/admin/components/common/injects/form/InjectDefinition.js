@@ -257,7 +257,7 @@ class InjectDefinition extends Component {
       articlesIds: props.inject.inject_content?.articles || [],
       challengesIds: props.inject.inject_content?.challenges || [],
       documents: props.inject.inject_documents || [],
-      expectations: props.inject.inject_content?.expectations || [],
+      expectations: props.inject.inject_content?.expectations || props.injectorContract.fields.filter(f => f.key === 'expectations').flatMap(f => f.predefinedExpectations) || [],
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
       articlesSortBy: 'article_name',
@@ -900,7 +900,8 @@ class InjectDefinition extends Component {
             )}
             {hasExpectations && (
               <InjectExpectations
-                predefinedExpectationDatas={predefinedExpectations}
+                // FIXME: Remove all the logic here
+                // predefinedExpectationDatas={predefinedExpectations}
                 expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
                 handleExpectations={this.handleExpectations.bind(this)}
               />
