@@ -1,15 +1,14 @@
 package io.openbas.utils.fixtures.composers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.model.Tag;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.injectors.challenge.ChallengeContract;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,6 +24,8 @@ public class InjectComposer extends ComposerBase<Inject> {
     private final Inject inject;
     private final List<ChallengeComposer.Composer> challengeComposers = new ArrayList<>();
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
+    private final List<EndpointComposer.Composer> endpointComposers = new ArrayList<>();
+    private Optional<InjectStatusComposer.Composer> injectStatusComposers = Optional.empty();
 
     public Composer(Inject inject) {
       this.inject = inject;
@@ -52,8 +53,25 @@ public class InjectComposer extends ComposerBase<Inject> {
       return this;
     }
 
+    public Composer withInjectStatus(InjectStatusComposer.Composer injectStatus) {
+      injectStatusComposers = Optional.of(injectStatus);
+      injectStatus.get().setInject(this.inject);
+      this.inject.setStatus(injectStatus.get());
+      return this;
+    }
+
+    public Composer withEndpoint(EndpointComposer.Composer endpointComposer) {
+      endpointComposers.add(endpointComposer);
+      List<Asset> assets = inject.getAssets();
+      assets.add(endpointComposer.get());
+      this.inject.setAssets(assets);
+      return this;
+    }
+
     @Override
     public Composer persist() {
+      endpointComposers.forEach(EndpointComposer.Composer::persist);
+      injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
       challengeComposers.forEach(ChallengeComposer.Composer::persist);
       // replace the inject content if applicable, after persisting the challenges
@@ -70,6 +88,8 @@ public class InjectComposer extends ComposerBase<Inject> {
       injectRepository.delete(inject);
       challengeComposers.forEach(ChallengeComposer.Composer::delete);
       tagComposers.forEach(TagComposer.Composer::delete);
+      endpointComposers.forEach(EndpointComposer.Composer::delete);
+      injectStatusComposers.ifPresent(InjectStatusComposer.Composer::delete);
       return this;
     }
 

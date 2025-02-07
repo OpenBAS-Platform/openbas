@@ -24,20 +24,21 @@ import io.openbas.database.repository.*;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.executors.Executor;
 import io.openbas.rest.exercise.service.ExerciseService;
-import io.openbas.rest.inject.form.DirectInjectInput;
-import io.openbas.rest.inject.form.InjectBulkProcessingInput;
-import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.ScenarioService;
-import io.openbas.utils.fixtures.InjectExpectationFixture;
-import io.openbas.utils.fixtures.InjectFixture;
-import io.openbas.utils.fixtures.InjectorContractFixture;
-import io.openbas.utils.fixtures.PayloadFixture;
+import io.openbas.utils.fixtures.*;
+import io.openbas.utils.fixtures.composers.AgentComposer;
+import io.openbas.utils.fixtures.composers.EndpointComposer;
+import io.openbas.utils.fixtures.composers.InjectComposer;
+import io.openbas.utils.fixtures.composers.InjectStatusComposer;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -77,6 +78,11 @@ class InjectApiTest extends IntegrationTest {
   @Autowired private ScenarioService scenarioService;
   @Autowired private ExerciseService exerciseService;
   @SpyBean private InjectStatusService injectStatusService;
+
+  @Autowired private AgentComposer agentComposer;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private InjectStatusComposer injectStatusComposer;
 
   @Autowired private ExerciseRepository exerciseRepository;
   @SpyBean private Executor executor;
@@ -631,7 +637,7 @@ class InjectApiTest extends IntegrationTest {
   }
 
   @Nested
-  @WithMockPlannerUser
+  @WithMockAdminUser
   @DisplayName("Retrieving executable payloads injects")
   class RetrievingExecutablePayloadInject {
 
@@ -737,6 +743,212 @@ class InjectApiTest extends IntegrationTest {
 
       String expectedCmdEncoded = Base64.getEncoder().encodeToString(cmdToExecute.getBytes());
       assertEquals(expectedCmdEncoded, JsonPath.read(response, "$.command_content"));
+    }
+  }
+
+  @Nested
+  @Transactional
+  @WithMockAdminUser
+  @DisplayName("Inject Execution Callback Handling (simulating a request from an implant)")
+  class handleInjectExecutionCallback {
+
+    private Inject getPendingInjectWithAssets() {
+      return injectComposer
+          .forInject(InjectFixture.getDefaultInject())
+          .withEndpoint(
+              endpointComposer
+                  .forEndpoint(EndpointFixture.createEndpoint())
+                  .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgent())))
+          .withEndpoint(
+              endpointComposer
+                  .forEndpoint(EndpointFixture.createEndpoint())
+                  .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgent())))
+          .withInjectStatus(
+              injectStatusComposer.forInjectStatus(InjectStatusFixture.createDefaultInjectStatus()))
+          .persist()
+          .get();
+    }
+
+    private void performCallbackRequest(String agentId, String injectId, InjectExecutionInput input)
+        throws Exception {
+      mvc.perform(
+              post(INJECT_URI + "/execution/" + agentId + "/callback/" + injectId)
+                  .content(asJsonString(input))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().is2xxSuccessful())
+          .andReturn()
+          .getResponse()
+          .getContentAsString();
+    }
+
+    @Nested
+    @DisplayName("Action Handling:")
+    class ActionHandlingTest {
+      @DisplayName("Should add trace when process is not finished")
+      @Test
+      void shouldAddTraceWhenProcessNotFinished() throws Exception {
+        // -- PREPARE --
+        InjectExecutionInput input = new InjectExecutionInput();
+        String logMessage = "First log received";
+        input.setMessage(logMessage);
+        input.setAction(InjectExecutionAction.command_execution);
+        input.setStatus("SUCCESS");
+        Inject inject = getPendingInjectWithAssets();
+
+        // -- EXECUTE --
+        String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
+        performCallbackRequest(agentId, inject.getId(), input);
+
+        // -- ASSERT --
+        Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
+        InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
+        assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
+        assertEquals(1, injectStatusSaved.getTraces().size());
+        assertEquals(
+            ExecutionTraceStatus.SUCCESS, injectStatusSaved.getTraces().getFirst().getStatus());
+        assertEquals(
+            ExecutionTraceAction.EXECUTION, injectStatusSaved.getTraces().getFirst().getAction());
+        assertEquals(logMessage, injectStatusSaved.getTraces().getFirst().getMessage());
+      }
+
+      @DisplayName(
+          "Should add trace and compute agent status when one of two agents finishes execution")
+      @Test
+      void shouldAddTraceAndComputeAgentStatusWhenOneAgentFinishes() throws Exception {
+        // -- PREPARE --
+        InjectExecutionInput input = new InjectExecutionInput();
+        input.setMessage("First log received");
+        input.setAction(InjectExecutionAction.command_execution);
+        input.setStatus("COMMAND_NOT_FOUND");
+        Inject inject = getPendingInjectWithAssets();
+
+        // -- EXECUTE --
+        String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
+        performCallbackRequest(agentId, inject.getId(), input);
+
+        InjectExecutionInput input2 = new InjectExecutionInput();
+        String lastLogMessage = "Complete log received";
+        input2.setMessage(lastLogMessage);
+        input2.setAction(InjectExecutionAction.complete);
+        input2.setStatus("INFO");
+        performCallbackRequest(agentId, inject.getId(), input2);
+
+        // -- ASSERT --
+        Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
+        InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
+        // Check inject status
+        assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
+        assertEquals(2, injectStatusSaved.getTraces().size());
+        // The status of the complete trace should be ERROR
+        List<ExecutionTraces> completeTraces =
+            injectStatusSaved.getTraces().stream()
+                .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
+                .toList();
+        assertEquals(1, completeTraces.size());
+        assertEquals(
+            ExecutionTraceStatus.ERROR, completeTraces.stream().findFirst().get().getStatus());
+      }
+
+      @DisplayName(
+          "Should add trace, compute agent status, and update inject status when all agents finish execution")
+      @Test
+      void shouldAddTraceComputeAgentStatusAndUpdateInjectStatusWhenAllAgentsFinish()
+          throws Exception {
+        // -- PREPARE --
+        InjectExecutionInput input = new InjectExecutionInput();
+        input.setMessage("First log received");
+        input.setAction(InjectExecutionAction.command_execution);
+        input.setStatus("COMMAND_NOT_FOUND");
+        Inject inject = getPendingInjectWithAssets();
+
+        // -- EXECUTE --
+        String firstAgentId =
+            ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
+        String secondAgentId =
+            ((Endpoint) inject.getAssets().getFirst()).getAgents().getLast().getId();
+        performCallbackRequest(firstAgentId, inject.getId(), input);
+        input.setStatus("SUCCESS");
+        performCallbackRequest(secondAgentId, inject.getId(), input);
+
+        InjectExecutionInput input2 = new InjectExecutionInput();
+        String lastLogMessage = "Complete log received";
+        input2.setMessage(lastLogMessage);
+        input2.setAction(InjectExecutionAction.complete);
+        input2.setStatus("INFO");
+        performCallbackRequest(firstAgentId, inject.getId(), input2);
+        performCallbackRequest(secondAgentId, inject.getId(), input2);
+
+        // -- ASSERT --
+        Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
+        InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
+        // Check inject status
+        assertEquals(ExecutionStatus.PARTIAL, injectStatusSaved.getName());
+      }
+    }
+
+    @Nested
+    @DisplayName("Agent Status Computation")
+    class AgentStatusComputationTest {
+
+      private void testAgentStatusFunction(
+          String inputTraceStatus1,
+          String inputTraceStatus2,
+          ExecutionTraceStatus expectedAgentStatus)
+          throws Exception {
+        // -- PREPARE --
+        InjectExecutionInput input = new InjectExecutionInput();
+        input.setMessage("First log received");
+        input.setAction(InjectExecutionAction.command_execution);
+        input.setStatus(inputTraceStatus1);
+        Inject inject = getPendingInjectWithAssets();
+
+        // -- EXECUTE --
+        String firstAgentId =
+            ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
+        performCallbackRequest(firstAgentId, inject.getId(), input);
+        input.setStatus(inputTraceStatus2);
+        performCallbackRequest(firstAgentId, inject.getId(), input);
+        // send complete trace
+        input.setAction(InjectExecutionAction.complete);
+        input.setStatus("INFO");
+        performCallbackRequest(firstAgentId, inject.getId(), input);
+
+        // -- ASSERT --
+        Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
+        InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
+        List<ExecutionTraces> completeTraces =
+            injectStatusSaved.getTraces().stream()
+                .filter(t -> ExecutionTraceAction.COMPLETE.equals(t.getAction()))
+                .toList();
+        assertEquals(1, completeTraces.size());
+        assertEquals(expectedAgentStatus, completeTraces.stream().findFirst().get().getStatus());
+      }
+
+      @Test
+      @DisplayName("Should compute agent status as ERROR")
+      void shouldComputeAgentStatusAsError() throws Exception {
+        testAgentStatusFunction("COMMAND_NOT_FOUND", "ERROR", ExecutionTraceStatus.ERROR);
+      }
+
+      @Test
+      @DisplayName("Should compute agent status as SUCCESS")
+      void shouldComputeAgentStatusAsSuccess() throws Exception {
+        testAgentStatusFunction("SUCCESS", "WARNING", ExecutionTraceStatus.SUCCESS);
+      }
+
+      @Test
+      @DisplayName("Should compute agent status as PARTIAL")
+      void shouldComputeAgentStatusAsPartial() throws Exception {
+        testAgentStatusFunction("SUCCESS", "COMMAND_NOT_FOUND", ExecutionTraceStatus.PARTIAL);
+      }
+
+      @Test
+      @DisplayName("Should compute agent status as MAYBE_PREVENTED")
+      void shouldComputeAgentStatusAsMayBePrevented() throws Exception {
+        testAgentStatusFunction(
+            "COMMAND_CANNOT_BE_EXECUTED", "MAYBE_PREVENTED", ExecutionTraceStatus.MAYBE_PREVENTED);
+      }
     }
   }
 }
