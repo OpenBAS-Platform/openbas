@@ -124,7 +124,7 @@ const Lessons: React.FC<Props> = ({
   return (
     <div style={{ marginBottom: '30px' }}>
       <Grid container spacing={3}>
-        <Grid item xs={4}>
+        <Grid item xs={4} style={{ paddingTop: 10 }}>
           <Typography variant="h4">{t('Parameters')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
             <Grid container spacing={3}>
@@ -187,7 +187,7 @@ const Lessons: React.FC<Props> = ({
             </Grid>
           </Paper>
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={8} style={{ paddingTop: 10 }}>
           <LessonsObjectives
             objectives={objectives}
             setSelectedObjective={setSelectedObjective}
