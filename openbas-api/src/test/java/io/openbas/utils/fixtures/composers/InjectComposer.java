@@ -87,7 +87,9 @@ public class InjectComposer extends ComposerBase<Inject> {
       challengeComposers.forEach(ChallengeComposer.Composer::delete);
       tagComposers.forEach(TagComposer.Composer::delete);
       endpointComposers.forEach(EndpointComposer.Composer::delete);
-      injectStatusComposers.delete();
+      if (injectStatusComposers != null) {
+        injectStatusComposers.delete();
+      }
       return this;
     }
 
