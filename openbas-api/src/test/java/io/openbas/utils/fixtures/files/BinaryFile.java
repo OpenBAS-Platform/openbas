@@ -1,7 +1,7 @@
 package io.openbas.utils.fixtures.files;
 
-public class PngFile extends BaseFile<byte[]> {
-  public PngFile(byte[] data, String name) {
+public class BinaryFile extends BaseFile<byte[]> {
+  public BinaryFile(byte[] data, String name) {
     super(data, name);
   }
 

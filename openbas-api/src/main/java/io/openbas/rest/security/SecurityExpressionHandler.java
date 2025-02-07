@@ -1,6 +1,7 @@
 package io.openbas.rest.security;
 
 import io.openbas.database.repository.ExerciseRepository;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
 import java.util.function.Supplier;
@@ -20,16 +21,19 @@ public class SecurityExpressionHandler extends DefaultMethodSecurityExpressionHa
   private final UserRepository userRepository;
   private final ExerciseRepository exerciseRepository;
   private final ScenarioRepository scenarioRepository;
+  private final InjectRepository injectRepository;
 
   @Getter private SecurityExpression securityExpression;
 
   public SecurityExpressionHandler(
       final UserRepository userRepository,
       final ExerciseRepository exerciseRepository,
-      final ScenarioRepository scenarioRepository) {
+      final ScenarioRepository scenarioRepository,
+      final InjectRepository injectRepository) {
     this.userRepository = userRepository;
     this.exerciseRepository = exerciseRepository;
     this.scenarioRepository = scenarioRepository;
+    this.injectRepository = injectRepository;
   }
 
   @Override
@@ -45,7 +49,8 @@ public class SecurityExpressionHandler extends DefaultMethodSecurityExpressionHa
             delegate.getAuthentication(),
             this.userRepository,
             this.exerciseRepository,
-            this.scenarioRepository);
+            this.scenarioRepository,
+            this.injectRepository);
     this.securityExpression.setPermissionEvaluator(getPermissionEvaluator());
     this.securityExpression.setTrustResolver(this.trustResolver);
     this.securityExpression.setRoleHierarchy(getRoleHierarchy());

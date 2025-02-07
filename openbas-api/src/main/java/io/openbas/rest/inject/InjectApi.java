@@ -30,6 +30,7 @@ import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.*;
+import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.*;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -97,7 +98,6 @@ public class InjectApi extends RestBehavior {
     return this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/export")
   public void injectsExport(
       @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput,
@@ -110,7 +110,8 @@ public class InjectApi extends RestBehavior {
     List<Inject> injects = injectRepository.findAllById(targetIds);
 
     List<String> foundIds = injects.stream().map(Inject::getId).toList();
-    List<String> missedIds = targetIds.stream().filter(id -> !foundIds.contains(id)).toList();
+    List<String> missedIds = new ArrayList<>(targetIds.stream().filter(id -> !foundIds.contains(id)).toList());
+    missedIds.addAll(injectService.authorise(injects, SecurityExpression::isInjectObserver).getUnauthorised().stream().map(Inject::getId).toList());
 
     if (!missedIds.isEmpty()) {
       throw new ElementNotFoundException(String.join(", ", missedIds));

@@ -17,7 +17,9 @@ import io.openbas.service.FileService;
 import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
+import io.openbas.utils.helpers.GrantHelper;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +45,12 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private TagComposer tagComposer;
   @Autowired private UserComposer userComposer;
   @Autowired private TeamComposer teamComposer;
+  @Autowired private ExerciseComposer exerciseComposer;
+  @Autowired private ScenarioComposer scenarioComposer;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;
   @Autowired private FileService fileService;
+  @Autowired private GrantHelper grantHelper;
 
   @BeforeEach
   public void setup() throws Exception {
@@ -58,11 +63,108 @@ public class InjectExportTest extends IntegrationTest {
     teamComposer.reset();
     userComposer.reset();
     tagComposer.reset();
+    exerciseComposer.reset();
+    scenarioComposer.reset();
 
     // delete the test files from the minio service
     for (String fileName : WELL_KNOWN_FILES.keySet()) {
       fileService.deleteFile(fileName);
     }
+  }
+
+  private List<InjectComposer.Composer> createDefaultInjectWrappers() {
+    InjectComposer.Composer injectWithExerciseComposer =
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withTag(tagComposer.forTag(TagFixture.getTagWithText("Other inject tag")))
+            .withDocument(
+                documentComposer
+                    .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
+                    .withInMemoryFile(FileFixture.getPlainTextFileContent()));
+    // wrap it in a persisted exercise
+    exerciseComposer
+        .forExercise(ExerciseFixture.createDefaultExercise())
+        .persist()
+        .withInject(injectWithExerciseComposer);
+
+    InjectComposer.Composer injectWithScenarioComposer =
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withTeam(
+                teamComposer
+                    .forTeam(TeamFixture.getDefaultTeam())
+                    .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail())));
+
+    // wrap it in a persisted scenario
+    scenarioComposer
+        .forScenario(ScenarioFixture.getScenario())
+        .persist()
+        .withInject(injectWithScenarioComposer);
+
+    return List.of(
+        // challenge inject
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withInjectorContract(
+                injectorContractComposer
+                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                    .withChallenge(
+                        challengeComposer
+                            .forChallenge(ChallengeFixture.createDefaultChallenge())
+                            .withTag(
+                                tagComposer.forTag(
+                                    TagFixture.getTagWithText("Challenge inject tag"))))),
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withInjectorContract(
+                injectorContractComposer
+                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                    .withChallenge(
+                        challengeComposer
+                            .forChallenge(ChallengeFixture.createDefaultChallenge())
+                            .withDocument(
+                                documentComposer
+                                    .forDocument(
+                                        DocumentFixture.getDocument(
+                                            FileFixture.getPngFileContent()))
+                                    .withInMemoryFile(FileFixture.getPngFileContent())
+                                    .withTag(
+                                        tagComposer.forTag(
+                                            TagFixture.getTagWithText("Document tag")))))),
+        // this is set up above
+        injectWithExerciseComposer,
+        injectWithScenarioComposer);
+  }
+
+  private List<InjectExportTarget> createDefaultInjectTargets() {
+    return createDefaultInjectTargets(createDefaultInjectWrappers());
+  }
+
+  private List<InjectExportTarget> createDefaultInjectTargets(
+      List<InjectComposer.Composer> injectComposers) {
+    injectComposers.forEach(InjectComposer.Composer::persist);
+    List<String> persistedInjectIds = injectComposers.stream().map(w -> w.get().getId()).toList();
+
+    return new ArrayList<>(
+        persistedInjectIds.stream()
+            .map(
+                id -> {
+                  InjectExportTarget tgt = new InjectExportTarget();
+                  tgt.setId(id);
+                  return tgt;
+                })
+            .toList());
+  }
+
+  private InjectExportRequestInput createDefaultInjectExportRequestInput() {
+    return createDefaultInjectExportRequestInput(createDefaultInjectTargets());
+  }
+
+  private InjectExportRequestInput createDefaultInjectExportRequestInput(
+      List<InjectExportTarget> targets) {
+    InjectExportRequestInput input = new InjectExportRequestInput();
+    input.setInjects(targets);
+    return input;
   }
 
   @Nested
@@ -77,78 +179,51 @@ public class InjectExportTest extends IntegrationTest {
   }
 
   @Nested
-  @WithMockAdminUser
-  @DisplayName("With authorisation")
-  public class WithAuthorisation {
-    private List<InjectComposer.Composer> createDefaultInjectWrappers() {
-      return List.of(
-          // challenge inject
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withInjectorContract(
-                  injectorContractComposer
-                      .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
-                      .withChallenge(
-                          challengeComposer
-                              .forChallenge(ChallengeFixture.createDefaultChallenge())
-                              .withTag(
-                                  tagComposer.forTag(
-                                      TagFixture.getTagWithText("Challenge inject tag"))))),
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withInjectorContract(
-                  injectorContractComposer
-                      .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
-                      .withChallenge(
-                          challengeComposer
-                              .forChallenge(ChallengeFixture.createDefaultChallenge())
-                              .withDocument(
-                                  documentComposer
-                                      .forDocument(
-                                          DocumentFixture.getDocument(
-                                              FileFixture.getPngFileContent()))
-                                      .withInMemoryFile(FileFixture.getPngFileContent())
-                                      .withTag(
-                                          tagComposer.forTag(
-                                              TagFixture.getTagWithText("Document tag")))))),
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withTag(tagComposer.forTag(TagFixture.getTagWithText("Other challenge inject tag")))
-              .withDocument(
-                  documentComposer
-                      .forDocument(
-                          DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
-                      .withInMemoryFile(FileFixture.getPlainTextFileContent())),
-          injectComposer
-              .forInject(InjectFixture.getDefaultInject())
-              .withTeam(
-                  teamComposer
-                      .forTeam(TeamFixture.getDefaultTeam())
-                      .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()))));
-    }
-
-    private List<InjectExportTarget> createDefaultInjectTargets() {
+  @WithMockUnprivilegedUser
+  @DisplayName("When standard user with staggered privileges")
+  public class WhenStandardUserWithStaggeredPrivileges {
+    @Test
+    @DisplayName("When lacking OBSERVER grant on some exercises, return NOT FOUND")
+    public void whenLackingOBSERVERGrantOnSomeExercisesReturnNOTFOUND() throws Exception {
       List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
-      injectWrappers.forEach(InjectComposer.Composer::persist);
-      List<String> persistedInjectIds = injectWrappers.stream().map(w -> w.get().getId()).toList();
 
-      return new ArrayList<>(
-          persistedInjectIds.stream()
-              .map(
-                  id -> {
-                    InjectExportTarget tgt = new InjectExportTarget();
-                    tgt.setId(id);
-                    return tgt;
-                  })
-              .toList());
+      // grant Observer on exercise but not the scenario
+      InjectComposer.Composer injectWithExercise =
+          injectWrappers.stream()
+              .filter(wrapper -> wrapper.get().getExercise() != null)
+              .findAny()
+              .get();
+      grantHelper.grantExerciseObserver(injectWithExercise.get().getExercise());
+
+      InjectExportRequestInput input =
+          createDefaultInjectExportRequestInput(createDefaultInjectTargets(injectWrappers));
+
+      String not_found_response =
+          mvc.perform(
+                  post(INJECT_EXPORT_URI)
+                      .content(mapper.writeValueAsString(input))
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isNotFound())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<String> expected_not_found_ids =
+          injectWrappers.stream()
+              .map(wrapper -> wrapper.get().getId())
+              .filter(id -> !id.equals(injectWithExercise.get().getId()))
+              .toList();
+
+      assertThatJson(not_found_response)
+          .node("message")
+          .isEqualTo("Element not found: %s".formatted(String.join(", ", expected_not_found_ids)));
     }
+  }
 
-    private InjectExportRequestInput createDefaultInjectExportRequestInput() {
-      InjectExportRequestInput input = new InjectExportRequestInput();
-      input.setInjects(createDefaultInjectTargets());
-      return input;
-    }
-
+  @Nested
+  @WithMockAdminUser
+  @DisplayName("With admin authorisation")
+  public class WithAdminAuthorisation {
     @Test
     @DisplayName("When a single target inject is not found in the database, return NOT FOUND")
     public void whenSingleTargetInjectIsNotFound_returnNotFound() throws Exception {

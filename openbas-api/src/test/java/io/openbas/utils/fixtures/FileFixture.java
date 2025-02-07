@@ -3,8 +3,8 @@ package io.openbas.utils.fixtures;
 import static java.util.Map.entry;
 
 import io.openbas.utils.fixtures.files.BaseFile;
+import io.openbas.utils.fixtures.files.BinaryFile;
 import io.openbas.utils.fixtures.files.PlainTextFile;
-import io.openbas.utils.fixtures.files.PngFile;
 import java.util.HexFormat;
 import java.util.Map;
 
@@ -22,10 +22,10 @@ public class FileFixture {
   }
 
   // a small 16*16 black and white pixel grid
-  public static PngFile getPngFileContent() {
+  public static BinaryFile getPngFileContent() {
     String hexData =
         "89504e470d0a1a0a0000000d49484452000000100000001010000000006a087cfe000000184944415428cf636060f8ff1f2f2620cdc0306ac2303201000979ff01ee7eef0a0000000049454e44ae426082";
     String filename = DEFAULT_PNG_FILENAME;
-    return new PngFile(HexFormat.of().parseHex(hexData), filename);
+    return new BinaryFile(HexFormat.of().parseHex(hexData), filename);
   }
 }
