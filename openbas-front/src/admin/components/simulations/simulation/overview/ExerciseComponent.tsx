@@ -96,7 +96,7 @@ const ExerciseComponent = () => {
           </Paper>
         </Grid>
         {injectResults && resultAttackPatternIds.length > 0 && (
-          <Grid item xs={12} style={{ marginTop: 25 }}>
+          <Grid item xs={12} style={{ marginTop: 10 }}>
             <Typography variant="h4" gutterBottom>
               {t('MITRE ATT&CK Results')}
             </Typography>
