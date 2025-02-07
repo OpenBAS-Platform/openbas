@@ -22,10 +22,12 @@ import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.service.InjectExpectationService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,7 +39,8 @@ public class ChannelExecutor extends Injector {
   public static final String VARIABLE_ARTICLES = "articles";
   public static final String VARIABLE_ARTICLE = "article";
 
-  @Resource private OpenBASConfig openBASConfig;
+  @Resource
+  private OpenBASConfig openBASConfig;
   private final ArticleRepository articleRepository;
   private final EmailService emailService;
   private final InjectExpectationService injectExpectationService;
@@ -65,7 +68,9 @@ public class ChannelExecutor extends Injector {
     try {
       ChannelContent content = contentConvert(injection, ChannelContent.class);
       List<Article> articles = fromIterable(articleRepository.findAllById(content.getArticles()));
-
+      if (articles.isEmpty()) {
+        throw new UnsupportedOperationException("Inject needs at least one article");
+      }
       String contract =
           injection
               .getInjection()
@@ -81,6 +86,7 @@ public class ChannelExecutor extends Injector {
             articles.stream().map(Article::getName).collect(Collectors.joining(","));
         String publishedMessage = "Articles (" + articleNames + ") marked as published";
         execution.addTrace(getNewSuccessTrace(publishedMessage, ExecutionTraceAction.COMPLETE));
+
         Exercise exercise = injection.getInjection().getExercise();
         // Send the publication message.
         if (content.isEmailing()) {
@@ -137,11 +143,10 @@ public class ChannelExecutor extends Injector {
                       (entry) ->
                           switch (entry.getType()) {
                             case MANUAL -> Stream.of((Expectation) new ManualExpectation(entry));
-                            case ARTICLE ->
-                                articles.stream()
-                                    .map(
-                                        article ->
-                                            (Expectation) new ChannelExpectation(entry, article));
+                            case ARTICLE -> articles.stream()
+                                .map(
+                                    article ->
+                                        (Expectation) new ChannelExpectation(entry, article));
                             default -> Stream.of();
                           })
                   .toList());
