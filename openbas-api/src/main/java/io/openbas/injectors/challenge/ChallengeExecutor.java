@@ -21,12 +21,10 @@ import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.service.InjectExpectationService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,8 +33,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChallengeExecutor extends Injector {
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
   private final ChallengeRepository challengeRepository;
   private final EmailService emailService;
@@ -135,11 +132,12 @@ public class ChallengeExecutor extends Injector {
                       (entry) ->
                           switch (entry.getType()) {
                             case MANUAL -> Stream.of((Expectation) new ManualExpectation(entry));
-                            case CHALLENGE -> challenges.stream()
-                                .map(
-                                    challenge ->
-                                        (Expectation)
-                                            new ChallengeExpectation(entry, challenge));
+                            case CHALLENGE ->
+                                challenges.stream()
+                                    .map(
+                                        challenge ->
+                                            (Expectation)
+                                                new ChallengeExpectation(entry, challenge));
                             default -> Stream.of();
                           })
                   .toList());
