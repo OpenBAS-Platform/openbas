@@ -38,6 +38,7 @@ import io.openbas.utils.mockUser.WithMockPlannerUser;
 import jakarta.annotation.Resource;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -746,6 +747,7 @@ class InjectApiTest extends IntegrationTest {
   }
 
   @Nested
+  @Transactional
   @WithMockAdminUser
   @DisplayName("Inject Execution Callback Handling (simulating a request from an implant)")
   class handleInjectExecutionCallback {
@@ -786,6 +788,7 @@ class InjectApiTest extends IntegrationTest {
       @DisplayName("Should add trace when process is not finished")
       @Test
       void shouldAddTraceWhenProcessNotFinished() throws Exception {
+        // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
         String logMessage = "First log received";
         input.setMessage(logMessage);
@@ -797,6 +800,7 @@ class InjectApiTest extends IntegrationTest {
         String agentId = ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
         performCallbackRequest(agentId, inject.getId(), input);
 
+        // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
         InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
         assertEquals(ExecutionStatus.PENDING, injectStatusSaved.getName());
@@ -812,6 +816,7 @@ class InjectApiTest extends IntegrationTest {
           "Should add trace and compute agent status when one of two agents finishes execution")
       @Test
       void shouldAddTraceAndComputeAgentStatusWhenOneAgentFinishes() throws Exception {
+        // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
         input.setMessage("First log received");
         input.setAction(InjectExecutionAction.command_execution);
@@ -850,6 +855,7 @@ class InjectApiTest extends IntegrationTest {
       @Test
       void shouldAddTraceComputeAgentStatusAndUpdateInjectStatusWhenAllAgentsFinish()
           throws Exception {
+        // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
         input.setMessage("First log received");
         input.setAction(InjectExecutionAction.command_execution);
@@ -890,6 +896,7 @@ class InjectApiTest extends IntegrationTest {
           String inputTraceStatus2,
           ExecutionTraceStatus expectedAgentStatus)
           throws Exception {
+        // -- PREPARE --
         InjectExecutionInput input = new InjectExecutionInput();
         input.setMessage("First log received");
         input.setAction(InjectExecutionAction.command_execution);
