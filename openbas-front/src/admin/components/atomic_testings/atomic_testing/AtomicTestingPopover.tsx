@@ -6,10 +6,16 @@ import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import { useFormatter } from '../../../../components/i18n';
-import type { InjectResultOutput, InjectResultOverviewOutput } from '../../../../utils/api-types';
+import type {
+  InjectExportRequestInput,
+  InjectResultOutput,
+  InjectResultOverviewOutput
+} from '../../../../utils/api-types';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
+import {exportInjects} from "../../../../actions/injects/inject-action";
+import {download} from "../../../../utils/utils";
 
-type AtomicTestingActionType = 'Duplicate' | 'Update' | 'Delete';
+type AtomicTestingActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
 interface Props {
   atomic: InjectResultOutput | InjectResultOverviewOutput;
@@ -55,10 +61,24 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     });
   };
 
+  const handleExport = () => {
+    const exportData: InjectExportRequestInput = {injects:
+      [{inject_id: atomic.inject_id}]
+    }
+
+    exportInjects(exportData).then((result) => {
+      var contentDisposition = result.headers["content-disposition"];
+      var match = contentDisposition.match(/filename\s*=\s*(.*)/i);
+      var filename = match[1];
+      download(result.data, filename, result.headers['content-type'])
+    });
+  };
+
   // Button Popover
   const entries = [];
   if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
   if (actions.includes('Update') && atomic.inject_injector_contract !== null) entries.push({ label: 'Update', action: () => handleOpenEdit() });
+  if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({ label: t('inject_export_json_single'), action: () => handleExport() });
   if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
 
   return (
