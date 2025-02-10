@@ -545,7 +545,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 </Typography>
                 <Grid container={true} spacing={2}>
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
-                    const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
                     return (
                       <Grid key={index} item xs={4}>
                         <Card key={injectExpectation.inject_expectation_id}>
@@ -586,17 +585,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                             subheader={(
                               <>
                                 <div>{nsdt(expectationResult.date)}</div>
-                                <div style={{ marginTop: 10 }}>
-                                  <Typography variant="h4">{t('Expired after')}</Typography>
-                                  <Chip
-                                    classes={{ root: classes.duration }}
-                                    label={`${duration.days}
-                                      ${t('d')}, ${duration.hours}
-                                    ${t('h')}, ${duration.minutes}
-                                    ${t('m')}`}
-                                  />
-                                </div>
-
                               </>
                             )}
                           />
@@ -613,6 +601,30 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       && injectExpectation.inject_expectation_results
                       && injectExpectation.inject_expectation_results.length === 0))
                     && (
+                      <>
+                      <Grid container>
+                        {injectExpectation.inject_expectation_results && (() => {
+                          const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
+                          const trackingDate = inject.inject_status?.tracking_sent_date
+                            ? new Date(inject.inject_status?.tracking_sent_date).getTime()
+                            : 0;
+                          const remainingTime = splitDuration(trackingDate - Date.now());
+                          return (
+                            <div style={{ marginTop: 10 }}>
+                              <Typography variant="h4">{t("Expired after")}</Typography>
+                              <Chip
+                                classes={{ root: classes.duration }}
+                                label={`${duration.days} ${t("d")}, ${duration.hours} ${t("h")}, ${duration.minutes} ${t("m")}`}
+                              />
+                              <Typography variant="h4">{t("Remaining time")}</Typography>
+                              <Chip
+                                classes={{ root: classes.duration }}
+                                label={`${remainingTime.days} ${t("d")}, ${remainingTime.hours} ${t("h")}, ${remainingTime.minutes} ${t("m")}`}
+                              />
+                            </div>
+                          );
+                        })()}
+                      </Grid>
                       <Grid item xs={4}>
                         <Card classes={{ root: classes.resultCardDummy }}>
                           <CardActionArea
@@ -626,6 +638,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           </CardActionArea>
                         </Card>
                       </Grid>
+                      </>
                     )}
                 </Grid>
                 <Divider style={{ marginTop: 20 }} />
