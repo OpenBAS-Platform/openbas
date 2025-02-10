@@ -1,16 +1,16 @@
+import axios from 'axios';
 import { Dispatch } from 'redux';
 
-import {getReferential, simpleCall, simplePostCall} from '../../utils/Action';
+import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import {
   Exercise,
   InjectBulkProcessingInput,
   InjectExportRequestInput,
   Scenario,
-  SearchPaginationInput
+  SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
-import axios from "axios";
 
 export const testInject = (injectId: string) => {
   const uri = `/api/injects/${injectId}/test`;
@@ -27,7 +27,7 @@ export const bulkTestInjects = (data: InjectBulkProcessingInput) => {
 
 export const exportInjects = (data: InjectExportRequestInput) => {
   const uri = '/api/injects/export';
-  return axios.post(uri, data, {responseType: "arraybuffer"}).catch((error) => {
+  return axios.post(uri, data, { responseType: 'arraybuffer' }).catch((error) => {
     MESSAGING$.notifyError('Could not request export of injects');
     throw error;
   });

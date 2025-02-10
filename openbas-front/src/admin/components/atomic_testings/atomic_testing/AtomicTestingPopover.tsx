@@ -2,6 +2,7 @@ import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteAtomicTesting, duplicateAtomicTesting } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { exportInjects } from '../../../../actions/injects/inject-action';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
@@ -9,11 +10,10 @@ import { useFormatter } from '../../../../components/i18n';
 import type {
   InjectExportRequestInput,
   InjectResultOutput,
-  InjectResultOverviewOutput
+  InjectResultOverviewOutput,
 } from '../../../../utils/api-types';
+import { download } from '../../../../utils/utils';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
-import {exportInjects} from "../../../../actions/injects/inject-action";
-import {download} from "../../../../utils/utils";
 
 type AtomicTestingActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
@@ -62,15 +62,15 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   };
 
   const handleExport = () => {
-    const exportData: InjectExportRequestInput = {injects:
-      [{inject_id: atomic.inject_id}]
-    }
+    const exportData: InjectExportRequestInput = { injects:
+      [{ inject_id: atomic.inject_id }],
+    };
 
     exportInjects(exportData).then((result) => {
-      var contentDisposition = result.headers["content-disposition"];
-      var match = contentDisposition.match(/filename\s*=\s*(.*)/i);
-      var filename = match[1];
-      download(result.data, filename, result.headers['content-type'])
+      const contentDisposition = result.headers['content-disposition'];
+      const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
+      const filename = match[1];
+      download(result.data, filename, result.headers['content-type']);
     });
   };
 
