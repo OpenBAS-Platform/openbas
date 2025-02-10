@@ -39,28 +39,33 @@ public class Team implements Base {
   @UuidGenerator
   @JsonProperty("team_id")
   @NotBlank
+  @Schema(description = "ID of the team")
   private String id;
 
   @Column(name = "team_name")
   @JsonProperty("team_name")
   @Queryable(searchable = true, sortable = true)
   @NotBlank
+  @Schema(description = "Name of the team")
   private String name;
 
   @Queryable(searchable = true, sortable = true)
   @Column(name = "team_description")
   @JsonProperty("team_description")
+  @Schema(description = "Description of the team")
   private String description;
 
   @Column(name = "team_created_at")
   @JsonProperty("team_created_at")
   @NotNull
+  @Schema(description = "Creation date of the team", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant createdAt = now();
 
   @Queryable(sortable = true)
   @Column(name = "team_updated_at")
   @JsonProperty("team_updated_at")
   @NotNull
+  @Schema(description = "Update date of the team", accessMode = Schema.AccessMode.READ_ONLY)
   private Instant updatedAt = now();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -72,13 +77,14 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("team_tags")
+  @Schema(description = "IDs of the tags of the team")
   private Set<Tag> tags = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "team_organization")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("team_organization")
-  @Schema(type = "string")
+  @Schema(description = "Organization of the team", type = "string")
   private Organization organization;
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -89,6 +95,7 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "user_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_users")
+  @Schema(description = "IDs of the users of the team")
   private List<User> users = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -99,6 +106,7 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "exercise_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_exercises")
+  @Schema(description = "IDs of the simulations linked to the team")
   private List<Exercise> exercises = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -109,10 +117,14 @@ public class Team implements Base {
       inverseJoinColumns = @JoinColumn(name = "scenario_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_scenarios")
+  @Schema(description = "IDs of the scenarios linked to the team")
   private List<Scenario> scenarios = new ArrayList<>();
 
   @Column(name = "team_contextual")
   @JsonProperty("team_contextual")
+  @Schema(
+      description =
+          "True if the team is contextual (exists only in the scenario/simulation it is linked to)")
   private Boolean contextual = false;
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -123,9 +135,11 @@ public class Team implements Base {
       orphanRemoval = true)
   @JsonProperty("team_exercises_users")
   @JsonSerialize(using = MultiModelDeserializer.class)
+  @Schema(description = "List of 3-tuple linking simulation IDs and user IDs to this team ID")
   private List<ExerciseTeamUser> exerciseTeamUsers = new ArrayList<>();
 
   @JsonProperty("team_users_number")
+  @Schema(description = "Number of users of the team")
   public long getUsersNumber() {
     return getUsers().size();
   }
@@ -134,6 +148,7 @@ public class Team implements Base {
   @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("team_exercise_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
+  @Schema(description = "List of inject IDs from all simulations of the team")
   public List<Inject> getExercisesInjects() {
     Predicate<Inject> selectedInject =
         inject -> inject.isAllTeams() || inject.getTeams().contains(this);
@@ -144,6 +159,7 @@ public class Team implements Base {
   }
 
   @JsonProperty("team_exercise_injects_number")
+  @Schema(description = "Number of injects of all simulations of the team")
   public long getExercisesInjectsNumber() {
     return getExercisesInjects().size();
   }
@@ -151,6 +167,7 @@ public class Team implements Base {
   @ArraySchema(schema = @Schema(type = "string"))
   @JsonProperty("team_scenario_injects")
   @JsonSerialize(using = MultiIdListDeserializer.class)
+  @Schema(description = "List of inject IDs from all scenarios of the team")
   public List<Inject> getScenariosInjects() {
     Predicate<Inject> selectedInject =
         inject -> inject.isAllTeams() || inject.getTeams().contains(this);
@@ -161,6 +178,7 @@ public class Team implements Base {
   }
 
   @JsonProperty("team_scenario_injects_number")
+  @Schema(description = "Number of injects of all scenarios of the team")
   public long getScenariosInjectsNumber() {
     return getScenariosInjects().size();
   }
@@ -169,15 +187,18 @@ public class Team implements Base {
   @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("team_inject_expectations")
+  @Schema(description = "List of expectations id linked to this team")
   private List<InjectExpectation> injectExpectations = new ArrayList<>();
 
   @JsonProperty("team_injects_expectations_number")
+  @Schema(description = "Number of expectations linked to this team")
   public long getInjectExceptationsNumber() {
     return getInjectExpectations().size();
   }
 
   @JsonProperty("team_injects_expectations_total_score")
   @NotNull
+  @Schema(description = "Total score of expectations linked to this team")
   public double getInjectExceptationsTotalScore() {
     return getInjectExpectations().stream()
         .filter((inject) -> inject.getScore() != null)
@@ -187,6 +208,7 @@ public class Team implements Base {
 
   @JsonProperty("team_injects_expectations_total_score_by_exercise")
   @NotNull
+  @Schema(description = "Total score of expectations by simulation linked to this team")
   public Map<String, Double> getInjectExceptationsTotalScoreByExercise() {
     return getInjectExpectations().stream()
         .filter(
@@ -201,12 +223,14 @@ public class Team implements Base {
 
   @JsonProperty("team_injects_expectations_total_expected_score")
   @NotNull
+  @Schema(description = "Total expected score of expectations linked to this team")
   public double getInjectExceptationsTotalExpectedScore() {
     return getInjectExpectations().stream().mapToDouble(InjectExpectation::getExpectedScore).sum();
   }
 
   @JsonProperty("team_injects_expectations_total_expected_score_by_exercise")
   @NotNull
+  @Schema(description = "Total expected score of expectations by simulation linked to this team")
   public Map<String, Double> getInjectExpectationsTotalExpectedScoreByExercise() {
     return getInjectExpectations().stream()
         .filter(expectation -> Objects.nonNull(expectation.getExercise()))
@@ -219,6 +243,7 @@ public class Team implements Base {
   // endregion
 
   @JsonProperty("team_communications")
+  @Schema(description = "List of communications of this team")
   public List<Communication> getCommunications() {
     return getExercisesInjects().stream()
         .flatMap(inject -> inject.getCommunications().stream())
