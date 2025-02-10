@@ -31,16 +31,15 @@ public class SecurityExpressionHandler extends DefaultMethodSecurityExpressionHa
   // FIXME: a new one is created with the ambient identity
   public SecurityExpression getSecurityExpression() {
     if (securityExpression == null) {
-      securityExpression =
-          createSecurityExpression(
-              SecurityContextHolder.getContext().getAuthentication(),
-              userRepository,
-              exerciseRepository,
-              scenarioRepository,
-              injectRepository,
-              getPermissionEvaluator(),
-              this.trustResolver,
-              getRoleHierarchy());
+      return createSecurityExpression(
+          SecurityContextHolder.getContext().getAuthentication(),
+          userRepository,
+          exerciseRepository,
+          scenarioRepository,
+          injectRepository,
+          getPermissionEvaluator(),
+          this.trustResolver,
+          getRoleHierarchy());
     }
     return securityExpression;
   }
