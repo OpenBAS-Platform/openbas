@@ -1,6 +1,5 @@
 package io.openbas.utils.fixtures.composers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
