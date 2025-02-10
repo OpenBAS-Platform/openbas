@@ -63,6 +63,10 @@ public class InjectService {
 
   @Resource protected ObjectMapper mapper;
 
+  private SecurityExpression getAmbientSecurityExpression() {
+    return ((SecurityExpressionHandler) methodSecurityExpressionHandler).getSecurityExpression();
+  }
+
   public Inject inject(@NotBlank final String injectId) {
     return this.injectRepository
         .findById(injectId)
@@ -369,13 +373,12 @@ public class InjectService {
    *     scenario or exercise
    */
   public <T extends Base> void authoriseWithThrow(
-      List<Inject> injects,
-      BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
+      List<Inject> injects, BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
     InjectAuthorisationResult result = this.authorise(injects, authoriseFunction);
-    if(!result.getUnauthorised().isEmpty()) {
+    if (!result.getUnauthorised().isEmpty()) {
       throw new AccessDeniedException(
-              "You are not allowed to delete the injects of ids "
-                      + String.join(", ", result.getUnauthorised().stream().map(Inject::getId).toList()));
+          "You are not allowed to delete the injects of ids "
+              + String.join(", ", result.getUnauthorised().stream().map(Inject::getId).toList()));
     }
   }
 
@@ -383,15 +386,15 @@ public class InjectService {
    * Check if the user is allowed to operate on the injects based on security challenge
    *
    * @param injects the injects to check
-   * @param authoriseFunction the function to check if the user has the relevant privilege on injects
+   * @param authoriseFunction the function to check if the user has the relevant privilege on
+   *     injects
    * @return List of all authorised Injects
    */
   public InjectAuthorisationResult authorise(
-          List<Inject> injects,
-          BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
+      List<Inject> injects, BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
     InjectAuthorisationResult result = new InjectAuthorisationResult();
-    for(Inject inject: injects) {
-      if(authoriseFunction.apply(((SecurityExpressionHandler) methodSecurityExpressionHandler).getSecurityExpression(), inject.getId())) {
+    for (Inject inject : injects) {
+      if (authoriseFunction.apply(getAmbientSecurityExpression(), inject.getId())) {
         result.addAuthorised(inject);
       } else {
         result.addUnauthorised(inject);

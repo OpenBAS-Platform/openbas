@@ -20,6 +20,7 @@ import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.helpers.GrantHelper;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
+import jakarta.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private ObjectMapper mapper;
   @Autowired private FileService fileService;
   @Autowired private GrantHelper grantHelper;
+  @Autowired private EntityManager entityManager;
 
   @BeforeEach
   public void setup() throws Exception {
@@ -194,6 +196,9 @@ public class InjectExportTest extends IntegrationTest {
               .findAny()
               .get();
       grantHelper.grantExerciseObserver(injectWithExercise.get().getExercise());
+
+      entityManager.flush();
+      entityManager.clear();
 
       InjectExportRequestInput input =
           createDefaultInjectExportRequestInput(createDefaultInjectTargets(injectWrappers));

@@ -54,9 +54,10 @@ public class SecurityExpression extends SecurityExpressionRoot
 
   private boolean isUserHasBypass() {
     OpenBASPrincipal principal = getUser();
-    return principal != null && principal.getAuthorities().stream()
-        .map(GrantedAuthority::getAuthority)
-        .anyMatch(s -> s.equals(ROLE_ADMIN));
+    return principal != null
+        && principal.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .anyMatch(s -> s.equals(ROLE_ADMIN));
   }
 
   // endregion
@@ -121,9 +122,15 @@ public class SecurityExpression extends SecurityExpressionRoot
     }
 
     Inject inject = injectRepository.findById(injectId).orElseThrow();
-    if(inject.isAtomicTesting()) { return isUserHasBypass(); }
-    if(inject.getExercise() != null) { return isExerciseObserver(inject.getExercise().getId()); }
-    if(inject.getScenario() != null) { return isScenarioObserver(inject.getScenario().getId()); }
+    if (inject.isAtomicTesting()) {
+      return isUserHasBypass();
+    }
+    if (inject.getExercise() != null) {
+      return isExerciseObserver(inject.getExercise().getId());
+    }
+    if (inject.getScenario() != null) {
+      return isScenarioObserver(inject.getScenario().getId());
+    }
 
     return false;
   }
@@ -134,9 +141,15 @@ public class SecurityExpression extends SecurityExpressionRoot
     }
 
     Inject inject = injectRepository.findById(injectId).orElseThrow();
-    if(inject.isAtomicTesting()) { return isUserHasBypass(); }
-    if(inject.getExercise() != null) { return isExercisePlanner(inject.getExercise().getId()); }
-    if(inject.getScenario() != null) { return isScenarioPlanner(inject.getScenario().getId()); }
+    if (inject.isAtomicTesting()) {
+      return isUserHasBypass();
+    }
+    if (inject.getExercise() != null) {
+      return isExercisePlanner(inject.getExercise().getId());
+    }
+    if (inject.getScenario() != null) {
+      return isScenarioPlanner(inject.getScenario().getId());
+    }
 
     return false;
   }

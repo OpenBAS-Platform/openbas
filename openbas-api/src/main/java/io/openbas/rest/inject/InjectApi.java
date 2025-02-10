@@ -110,8 +110,15 @@ public class InjectApi extends RestBehavior {
     List<Inject> injects = injectRepository.findAllById(targetIds);
 
     List<String> foundIds = injects.stream().map(Inject::getId).toList();
-    List<String> missedIds = new ArrayList<>(targetIds.stream().filter(id -> !foundIds.contains(id)).toList());
-    missedIds.addAll(injectService.authorise(injects, SecurityExpression::isInjectObserver).getUnauthorised().stream().map(Inject::getId).toList());
+    List<String> missedIds =
+        new ArrayList<>(targetIds.stream().filter(id -> !foundIds.contains(id)).toList());
+    missedIds.addAll(
+        injectService
+            .authorise(injects, SecurityExpression::isInjectObserver)
+            .getUnauthorised()
+            .stream()
+            .map(Inject::getId)
+            .toList());
 
     if (!missedIds.isEmpty()) {
       throw new ElementNotFoundException(String.join(", ", missedIds));

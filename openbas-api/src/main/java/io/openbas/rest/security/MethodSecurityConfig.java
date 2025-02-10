@@ -23,6 +23,9 @@ public class MethodSecurityConfig {
   @Bean
   MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
     return new SecurityExpressionHandler(
-        this.userRepository, this.exerciseRepository, this.scenarioRepository, this.injectRepository);
+        this.userRepository,
+        this.exerciseRepository,
+        this.scenarioRepository,
+        this.injectRepository);
   }
 }

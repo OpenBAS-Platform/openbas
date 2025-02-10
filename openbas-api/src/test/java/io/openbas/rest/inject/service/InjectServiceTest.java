@@ -434,7 +434,8 @@ class InjectServiceTest {
 
     // Assert
     assertEquals(
-        "You are not allowed to delete the injects of ids " + String.join(", ", injects.stream().map(Inject::getId).toList()),
+        "You are not allowed to delete the injects of ids "
+            + String.join(", ", injects.stream().map(Inject::getId).toList()),
         exception.getMessage());
   }
 
@@ -493,8 +494,7 @@ class InjectServiceTest {
     // Act & Assert
     assertDoesNotThrow(
         () ->
-            injectService.authoriseWithThrow(
-                List.of(inject), SecurityExpression::isInjectPlanner));
+            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
   }
 
   @DisplayName("Test isPlanner with valid input and scenario planner KO")
@@ -512,8 +512,7 @@ class InjectServiceTest {
     assertThrows(
         AccessDeniedException.class,
         () ->
-            injectService.authoriseWithThrow(
-                List.of(inject), SecurityExpression::isInjectPlanner));
+            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
   }
 
   @DisplayName("Test isPlanner with valid input and simulation planner OK")
@@ -530,8 +529,7 @@ class InjectServiceTest {
     // Act & Assert
     assertDoesNotThrow(
         () ->
-            injectService.authoriseWithThrow(
-                List.of(inject), SecurityExpression::isInjectPlanner));
+            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
   }
 
   @DisplayName("Test isPlanner with valid input and simulation planner OK")
@@ -549,8 +547,7 @@ class InjectServiceTest {
     assertThrows(
         AccessDeniedException.class,
         () ->
-            injectService.authoriseWithThrow(
-                List.of(inject), SecurityExpression::isInjectPlanner));
+            injectService.authoriseWithThrow(List.of(inject), SecurityExpression::isInjectPlanner));
   }
 
   @DisplayName("Test isPlanner with no injects")
@@ -561,8 +558,7 @@ class InjectServiceTest {
     when(securityExpression.isInjectPlanner("exercise1")).thenReturn(false);
 
     // Act
-    injectService.authoriseWithThrow(
-        Collections.emptyList(), SecurityExpression::isInjectPlanner);
+    injectService.authoriseWithThrow(Collections.emptyList(), SecurityExpression::isInjectPlanner);
 
     // Assert
     verify(securityExpression, times(0)).isSimulationPlanner("exercise1");
