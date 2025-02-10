@@ -100,7 +100,7 @@
     "@vitest/eslint-plugin": "1.1.25",
     "chokidar": "4.0.3",
     "cross-env": "7.0.3",
-    "esbuild": "0.24.2",
+    "esbuild": "0.25.0",
     "eslint": "9.19.0",
     "eslint-import-resolver-oxc": "0.10.1",
     "eslint-plugin-custom-rules": "link:packages/eslint-plugin-custom-rules",
