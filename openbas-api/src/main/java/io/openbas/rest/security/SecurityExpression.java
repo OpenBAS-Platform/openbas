@@ -18,6 +18,7 @@ import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityExpression extends SecurityExpressionRoot
     implements MethodSecurityExpressionOperations {
@@ -45,7 +46,7 @@ public class SecurityExpression extends SecurityExpressionRoot
   }
 
   private OpenBASPrincipal getUser() {
-    return (OpenBASPrincipal) this.getPrincipal();
+    return (OpenBASPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
   }
 
   public boolean isAdmin() {
@@ -93,7 +94,6 @@ public class SecurityExpression extends SecurityExpressionRoot
     return planner.isPresent();
   }
 
-  @SuppressWarnings("unused")
   public boolean isExerciseObserver(String exerciseId) {
     if (isUserHasBypass()) {
       return true;
@@ -173,7 +173,6 @@ public class SecurityExpression extends SecurityExpressionRoot
     return planner.isPresent();
   }
 
-  @SuppressWarnings("unused")
   public boolean isScenarioObserver(@NotBlank final String scenarioId) {
     if (isUserHasBypass()) {
       return true;

@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Inject JSON export tests")
 public class InjectExportTest extends IntegrationTest {
 
@@ -217,6 +218,46 @@ public class InjectExportTest extends IntegrationTest {
           injectWrappers.stream()
               .map(wrapper -> wrapper.get().getId())
               .filter(id -> !id.equals(injectWithExercise.get().getId()))
+              .toList();
+
+      assertThatJson(not_found_response)
+          .node("message")
+          .isEqualTo("Element not found: %s".formatted(String.join(", ", expected_not_found_ids)));
+    }
+
+    @Test
+    @DisplayName("When lacking OBSERVER grant on some scenarios, return NOT FOUND")
+    public void whenLackingOBSERVERGrantOnSomeScenariosReturnNOTFOUND() throws Exception {
+      List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
+
+      // grant Observer on scenario but not the scenario
+      InjectComposer.Composer injectWithScenario =
+          injectWrappers.stream()
+              .filter(wrapper -> wrapper.get().getScenario() != null)
+              .findAny()
+              .get();
+      grantHelper.grantScenarioObserver(injectWithScenario.get().getScenario());
+
+      entityManager.flush();
+      entityManager.clear();
+
+      InjectExportRequestInput input =
+          createDefaultInjectExportRequestInput(createDefaultInjectTargets(injectWrappers));
+
+      String not_found_response =
+          mvc.perform(
+                  post(INJECT_EXPORT_URI)
+                      .content(mapper.writeValueAsString(input))
+                      .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isNotFound())
+              .andReturn()
+              .getResponse()
+              .getContentAsString();
+
+      List<String> expected_not_found_ids =
+          injectWrappers.stream()
+              .map(wrapper -> wrapper.get().getId())
+              .filter(id -> !id.equals(injectWithScenario.get().getId()))
               .toList();
 
       assertThatJson(not_found_response)

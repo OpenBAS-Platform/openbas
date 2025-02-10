@@ -25,6 +25,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
     public Composer withInject(InjectComposer.Composer injectComposer) {
       injectComposers.add(injectComposer);
       Set<Inject> tempInjects = new HashSet<>(this.scenario.getInjects());
+      injectComposer.get().setScenario(scenario);
       tempInjects.add(injectComposer.get());
       this.scenario.setInjects(tempInjects);
       return this;
