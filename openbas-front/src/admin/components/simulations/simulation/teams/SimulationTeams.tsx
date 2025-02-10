@@ -19,7 +19,7 @@ interface Props {
   exerciseTeamsUsers: Exercise['exercise_teams_users'];
 }
 
-const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
+const SimulationTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -36,21 +36,23 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
 
   return (
     <TeamContext.Provider value={teamContextForExercise(exerciseId, exerciseTeamsUsers)}>
-      <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
-        {t('Teams')}
-      </Typography>
-      {permissions.canWrite
-      && (
-        <UpdateTeams
-          addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
-        />
-      )}
-      <div className="clearfix" />
-      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
-        <ContextualTeams teams={teamsStore} />
-      </Paper>
+      <div>
+        <Typography variant="h4">
+          {t('Teams')}
+          {permissions.canWrite
+          && (
+            <UpdateTeams
+              addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
+            />
+          )}
+        </Typography>
+        <div className="clearfix" />
+        <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
+          <ContextualTeams teams={teamsStore} />
+        </Paper>
+      </div>
     </TeamContext.Provider>
   );
 };
 
-export default ExerciseTeams;
+export default SimulationTeams;

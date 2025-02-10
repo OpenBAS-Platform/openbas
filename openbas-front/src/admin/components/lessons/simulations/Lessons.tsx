@@ -1,34 +1,8 @@
-import {
-  BallotOutlined,
-  ContactMailOutlined,
-  ContentPasteGoOutlined,
-  DeleteSweepOutlined,
-  SpeakerNotesOutlined,
-  SportsScoreOutlined,
-  VisibilityOutlined,
-} from '@mui/icons-material';
-import {
-  Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  Link,
-  Paper,
-  Radio,
-  RadioGroup,
-  Switch,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { BallotOutlined, ContactMailOutlined, ContentPasteGoOutlined, DeleteSweepOutlined, SpeakerNotesOutlined, SportsScoreOutlined, VisibilityOutlined } from '@mui/icons-material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
-import { useContext, useState } from 'react';
 import * as React from 'react';
+import { useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../components/common/Transition';
@@ -37,16 +11,18 @@ import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsSe
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
+import CreateObjective from '../CreateObjective';
+import LessonsObjectives from '../LessonsObjectives';
 import ObjectiveEvaluations from '../ObjectiveEvaluations';
 import SendLessonsForm from '../SendLessonsForm';
 import AnswersByQuestionDialog from './AnswersByQuestionDialog';
+import CrysisIntensity from './CrysisIntensity';
 import LessonsCategories from './LessonsCategories';
-import LessonsObjectives from './LessonsObjectives';
 
 const useStyles = makeStyles()(theme => ({
   metric: {
     position: 'relative',
-    padding: 20,
+    padding: theme.spacing(2),
     height: 100,
     overflow: 'hidden',
   },
@@ -65,18 +41,6 @@ const useStyles = makeStyles()(theme => ({
     position: 'absolute',
     top: 25,
     right: 15,
-  },
-  paper: {
-    position: 'relative',
-    padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
-  paperPadding: {
-    position: 'relative',
-    padding: '20px 20px 0 20px',
-    overflow: 'hidden',
-    height: '100%',
   },
 }));
 
@@ -186,198 +150,196 @@ const Lessons: React.FC<Props> = ({
     return Math.round(Math.abs(endDate.getTime() - startDate.getTime()) / msInHour);
   };
   return (
-    <div style={{ marginBottom: '30px' }}>
-      <Grid container spacing={3} style={{ marginTop: -14, marginBottom: '30px' }}>
-        <Grid item xs={3} style={{ marginTop: -14 }}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Overall objectives score')}</div>
-            <div className={classes.number}>
-              {source.score}
-              %
-            </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={3} style={{ marginTop: -14 }}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Simulation logs')}</div>
-            <div className={classes.number}>
-              {source.logs_number}
-            </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={3} style={{ marginTop: -14 }}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Poll replies')}</div>
-            <div className={classes.number}>
-              {source.lessons_answers_number}
-            </div>
-          </Paper>
-        </Grid>
-        <Grid item xs={3} style={{ marginTop: -14 }}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Messages')}</div>
-            <div className={classes.number}>
-              {source.communications_number}
-            </div>
-          </Paper>
-        </Grid>
-      </Grid>
-      <Grid container spacing={3} style={{ marginBottom: '50px' }}>
-        <Grid item xs={4}>
-          <Typography variant="h4">{t('Details')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Start date')}</Typography>
-                {nsdt(source.start_date)}
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('End date')}</Typography>
-                {nsdt(source.end_date)}
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Duration')}</Typography>
-                {getHoursDiff(
-                  source.start_date
-                    ? new Date(source.start_date)
-                    : new Date(),
-                  source.end_date
-                    ? new Date(source.end_date)
-                    : new Date(),
-                )}
-                {' '}
-                {t('hours')}
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Team')}</Typography>
-                {source.users_number}
-                {' '}
-                {t('players')}
-              </Grid>
+    <div style={{ paddingBottom: theme.spacing(5) }}>
+      <div style={{ display: 'grid', gap: theme.spacing(3), gridTemplateColumns: '1fr 1fr 1fr 1fr' }}>
+        <Paper variant="outlined" classes={{ root: classes.metric }}>
+          <div className={classes.icon}>
+            <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
+          </div>
+          <div className={classes.title}>{t('Overall objectives score')}</div>
+          <div className={classes.number}>
+            {source.score}
+            %
+          </div>
+        </Paper>
+        <Paper variant="outlined" classes={{ root: classes.metric }}>
+          <div className={classes.icon}>
+            <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
+          </div>
+          <div className={classes.title}>{t('Simulation logs')}</div>
+          <div className={classes.number}>
+            {source.logs_number}
+          </div>
+        </Paper>
+        <Paper variant="outlined" classes={{ root: classes.metric }}>
+          <div className={classes.icon}>
+            <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
+          </div>
+          <div className={classes.title}>{t('Poll replies')}</div>
+          <div className={classes.number}>
+            {source.lessons_answers_number}
+          </div>
+        </Paper>
+        <Paper variant="outlined" classes={{ root: classes.metric }}>
+          <div className={classes.icon}>
+            <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
+          </div>
+          <div className={classes.title}>{t('Messages')}</div>
+          <div className={classes.number}>
+            {source.communications_number}
+          </div>
+        </Paper>
+      </div>
+      <div style={{ display: 'grid', marginTop: theme.spacing(3), gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr 1fr' }}>
+        <Typography variant="h4">{t('Details')}</Typography>
+        <Typography variant="h4">{t('Parameters')}</Typography>
+        <Typography variant="h4">{t('Control')}</Typography>
+        <Paper variant="outlined" sx={{ padding: theme.spacing(2) }}>
+          <Grid container spacing={3}>
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Start date')}</Typography>
+              {nsdt(source.start_date)}
             </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="h4">{t('Parameters')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Questionnaire mode')}</Typography>
-                <FormControlLabel
-                  control={(
-                    <Switch
-                      disabled={source.lessons_anonymized}
-                      checked={source.lessons_anonymized}
-                      onChange={() => setOpenAnonymize(true)}
-                      name="anonymized"
-                    />
-                  )}
-                  label={t('Anonymize answers')}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Template')}</Typography>
-                <Button
-                  startIcon={<ContentPasteGoOutlined />}
-                  color="primary"
-                  variant="contained"
-                  onClick={() => setOpenApplyTemplate(true)}
-                >
-                  {t('Apply')}
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Check')}</Typography>
-                <Button
-                  startIcon={<VisibilityOutlined />}
-                  color="secondary"
-                  variant="contained"
-                  component={Link}
-                  href={`/lessons/${source.type}/${source.id}?preview=true`}
-                >
-                  {t('Preview')}
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">
-                  {t('Categories and questions')}
-                </Typography>
-                <Button
-                  startIcon={<DeleteSweepOutlined />}
-                  color="error"
-                  variant="contained"
-                  onClick={() => setOpenEmptyLessons(true)}
-                >
-                  {t('Clear out')}
-                </Button>
-              </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('End date')}</Typography>
+              {nsdt(source.end_date)}
             </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="h4">{t('Control')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Alert severity="info">
-              {t(
-                'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Duration')}</Typography>
+              {getHoursDiff(
+                source.start_date
+                  ? new Date(source.start_date)
+                  : new Date(),
+                source.end_date
+                  ? new Date(source.end_date)
+                  : new Date(),
               )}
-            </Alert>
-            <Grid container spacing={3} style={{ marginTop: 0 }}>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Questionnaire')}</Typography>
-                <Button
-                  startIcon={<ContentPasteGoOutlined />}
-                  color="success"
-                  variant="contained"
-                  onClick={() => setOpenSendLessons(true)}
-                >
-                  {t('Send')}
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Answers')}</Typography>
-                <Button
-                  startIcon={<ContentPasteGoOutlined />}
-                  color="error"
-                  variant="contained"
-                  onClick={() => setOpenResetAnswers(true)}
-                >
-                  {t('Reset')}
-                </Button>
-              </Grid>
+              {' '}
+              {t('hours')}
             </Grid>
-          </Paper>
-        </Grid>
-      </Grid>
-      <LessonsObjectives
-        objectives={objectives}
-        injects={injects}
-        setSelectedObjective={setSelectedObjective}
-        source={source}
-        isReport={false}
-      />
-      <LessonsCategories
-        lessonsCategories={lessonsCategories}
-        lessonsAnswers={lessonsAnswers}
-        setSelectedQuestion={setSelectedQuestion}
-        lessonsQuestions={lessonsQuestions}
-        teamsMap={teamsMap}
-        teams={teams}
-        isReport={false}
-        style={{ marginTop: '60px' }}
-      />
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Team')}</Typography>
+              {source.users_number}
+              {' '}
+              {t('players')}
+            </Grid>
+          </Grid>
+        </Paper>
+        <Paper variant="outlined" sx={{ padding: theme.spacing(2) }}>
+          <Grid container spacing={3}>
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Questionnaire mode')}</Typography>
+              <FormControlLabel
+                control={(
+                  <Switch
+                    disabled={source.lessons_anonymized}
+                    checked={source.lessons_anonymized}
+                    onChange={() => setOpenAnonymize(true)}
+                    name="anonymized"
+                  />
+                )}
+                label={t('Anonymize answers')}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Template')}</Typography>
+              <Button
+                startIcon={<ContentPasteGoOutlined />}
+                color="primary"
+                variant="contained"
+                onClick={() => setOpenApplyTemplate(true)}
+              >
+                {t('Apply')}
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Check')}</Typography>
+              <Button
+                startIcon={<VisibilityOutlined />}
+                color="secondary"
+                variant="contained"
+                component={Link}
+                href={`/lessons/${source.type}/${source.id}?preview=true`}
+              >
+                {t('Preview')}
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h3">
+                {t('Categories and questions')}
+              </Typography>
+              <Button
+                startIcon={<DeleteSweepOutlined />}
+                color="error"
+                variant="contained"
+                onClick={() => setOpenEmptyLessons(true)}
+              >
+                {t('Clear out')}
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+        <Paper variant="outlined" sx={{ padding: theme.spacing(2) }}>
+          <Alert severity="info">
+            {t(
+              'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
+            )}
+          </Alert>
+          <Grid container spacing={3} style={{ marginTop: 0 }}>
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Questionnaire')}</Typography>
+              <Button
+                startIcon={<ContentPasteGoOutlined />}
+                color="success"
+                variant="contained"
+                onClick={() => setOpenSendLessons(true)}
+              >
+                {t('Send')}
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h3">{t('Answers')}</Typography>
+              <Button
+                startIcon={<ContentPasteGoOutlined />}
+                color="error"
+                variant="contained"
+                onClick={() => setOpenResetAnswers(true)}
+              >
+                {t('Reset')}
+              </Button>
+            </Grid>
+          </Grid>
+        </Paper>
+      </div>
+      <div style={{ display: 'grid', marginTop: theme.spacing(3), gap: `0 ${theme.spacing(3)}`, gridTemplateColumns: '1fr 2fr' }}>
+        <Typography variant="h4">
+          {t('Objectives')}
+          {' '}
+          {
+            source.isUpdatable && (<CreateObjective />)
+          }
+        </Typography>
+        <Typography variant="h4" style={{ alignContent: 'center' }}>
+          {t('Crisis intensity (injects by hour)')}
+        </Typography>
+        <LessonsObjectives
+          objectives={objectives}
+          setSelectedObjective={setSelectedObjective}
+          source={source}
+        />
+        <CrysisIntensity injects={injects} />
+      </div>
+      <div style={{ marginTop: theme.spacing(3) }}>
+        <LessonsCategories
+          lessonsCategories={lessonsCategories}
+          lessonsAnswers={lessonsAnswers}
+          setSelectedQuestion={setSelectedQuestion}
+          lessonsQuestions={lessonsQuestions}
+          teamsMap={teamsMap}
+          teams={teams}
+          isReport={false}
+        />
+      </div>
       <CreateLessonsCategory />
       <Dialog
         TransitionComponent={Transition}

@@ -57,7 +57,7 @@ const LessonsCategories = ({
     return onUpdateLessonsCategoryTeams(lessonsCategoryId, data);
   };
   return (
-    <div style={{ marginTop: 40 }}>
+    <div>
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
@@ -65,7 +65,7 @@ const LessonsCategories = ({
           ),
         );
         return (
-          <div key={category.lessonscategory_id} style={{ marginTop: 50 }}>
+          <div key={category.lessonscategory_id}>
             <Typography variant="h2" style={{ float: 'left' }}>
               {category.lessons_category_name}
             </Typography>

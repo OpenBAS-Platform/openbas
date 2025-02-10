@@ -1,11 +1,9 @@
 import { Paper, Typography } from '@mui/material';
-import { useContext } from 'react';
 import * as React from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router';
 
-import {
-  fetchScenarioTeams,
-} from '../../../../../actions/scenarios/scenario-actions';
+import { fetchScenarioTeams } from '../../../../../actions/scenarios/scenario-actions';
 import type { ScenariosHelper } from '../../../../../actions/scenarios/scenario-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
@@ -38,19 +36,21 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
 
   return (
     <TeamContext.Provider value={teamContextForScenario(scenarioId, scenarioTeamsUsers)}>
-      <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
-        {t('Teams')}
-      </Typography>
-      {permissions.canWrite
-      && (
-        <UpdateTeams
-          addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
-        />
-      )}
-      <div className="clearfix" />
-      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
-        <ContextualTeams teams={teamsStore} />
-      </Paper>
+      <div>
+        <Typography variant="h4">
+          {t('Teams')}
+          {permissions.canWrite
+          && (
+            <UpdateTeams
+              addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
+            />
+          )}
+        </Typography>
+        <div className="clearfix" />
+        <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
+          <ContextualTeams teams={teamsStore} />
+        </Paper>
+      </div>
     </TeamContext.Provider>
   );
 };

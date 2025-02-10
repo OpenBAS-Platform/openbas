@@ -101,7 +101,10 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
   const { permissions } = useContext(PermissionsContext);
 
   return (
-    <>
+    <div>
+      <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
+        {t('Media pressure')}
+      </Typography>
       {permissions.canWrite && (
         <CreateArticle
           openCreate={openCreate}
@@ -290,7 +293,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
           );
         })}
       </Grid>
-    </>
+    </div>
   );
 };
 

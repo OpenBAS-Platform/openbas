@@ -1,6 +1,7 @@
 import { Alert, Button, Paper, ToggleButtonGroup, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 
 import { updateReportForExercise, updateReportInjectCommentForExercise } from '../../../../../actions/reports/report-actions';
@@ -14,20 +15,21 @@ import { ReportContext, ReportContextType } from '../../../common/Context';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import ReportComment from '../../../components/reports/ReportComment';
 import ReportPopover from '../../../components/reports/ReportPopover';
-import AnswersByQuestionDialog from '../../../lessons/exercises/AnswersByQuestionDialog';
-import LessonsCategories from '../../../lessons/exercises/LessonsCategories';
-import ExerciseMainInformation from '../ExerciseMainInformation';
+import AnswersByQuestionDialog from '../../../lessons/simulations/AnswersByQuestionDialog';
+import LessonsCategories from '../../../lessons/simulations/LessonsCategories';
 import ExerciseDistribution from '../overview/ExerciseDistribution';
+import SimulationMainInformation from '../SimulationMainInformation';
 import ExerciseReportForm from './ExerciseReportForm';
 import getExerciseReportPdfDocDefinition from './getExerciseReportPdfDoc';
 import InjectReportResult from './InjectReportResult';
 import ReportInformationType from './ReportInformationType';
 import useExerciseReportData from './useExerciseReportData';
 
-const ExerciseReportPage: React.FC = () => {
+const SimulationReportPage: React.FC = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const { t, tPick, fldt } = useFormatter();
+  const theme = useTheme();
 
   const { exerciseId, reportId } = useParams() as { exerciseId: Exercise['exercise_id']; reportId: Report['report_id'] };
   const { loading, report, displayModule, setReloadReportDataCount, reportData } = useExerciseReportData(reportId, exerciseId);
@@ -105,7 +107,7 @@ const ExerciseReportPage: React.FC = () => {
             <Typography variant="h4" gutterBottom>
               {t('General information')}
             </Typography>
-            <ExerciseMainInformation exercise={reportData.exercise} />
+            <SimulationMainInformation exercise={reportData.exercise} />
           </div>
         )}
         {displayModule(ReportInformationType.SCORE_DETAILS)
@@ -143,16 +145,18 @@ const ExerciseReportPage: React.FC = () => {
         )}
         {displayModule(ReportInformationType.PLAYER_SURVEYS)
         && (
-          <LessonsCategories
-            style={{ width: '100%', paddingBottom: '60px' }}
-            lessonsCategories={reportData.lessonsCategories}
-            lessonsAnswers={reportData.lessonsAnswers}
-            lessonsQuestions={reportData.lessonsQuestions}
-            teamsMap={reportData.teamsMap}
-            teams={reportData.teams}
-            setSelectedQuestion={setSelectedQuestion}
-            isReport
-          />
+          <div style={{ marginTop: theme.spacing(3), width: '100%' }}>
+            <LessonsCategories
+              style={{ width: '100%', paddingBottom: '60px' }}
+              lessonsCategories={reportData.lessonsCategories}
+              lessonsAnswers={reportData.lessonsAnswers}
+              lessonsQuestions={reportData.lessonsQuestions}
+              teamsMap={reportData.teamsMap}
+              teams={reportData.teams}
+              setSelectedQuestion={setSelectedQuestion}
+              isReport
+            />
+          </div>
         )}
         {displayModule(ReportInformationType.EXERCISE_DETAILS)
         && <ExerciseDistribution exerciseId={exerciseId} isReport />}
@@ -169,4 +173,4 @@ const ExerciseReportPage: React.FC = () => {
   );
 };
 
-export default ExerciseReportPage;
+export default SimulationReportPage;

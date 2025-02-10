@@ -33,14 +33,16 @@ const ScenarioVariables = () => {
 
   return (
     <VariableContext.Provider value={context}>
-      <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
-        {t('Variables')}
-      </Typography>
-      {permissions.canWrite && (<CreateVariable />)}
-      <div className="clearfix" />
-      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
-        <Variables variables={variables} />
-      </Paper>
+      <div>
+        <Typography variant="h4">
+          {t('Variables')}
+          {permissions.canWrite && (<CreateVariable />)}
+        </Typography>
+        <div className="clearfix" />
+        <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
+          <Variables variables={variables} />
+        </Paper>
+      </div>
     </VariableContext.Provider>
   );
 };
