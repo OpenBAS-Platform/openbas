@@ -8448,12 +8448,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment-timezone@npm:0.5.45":
-  version: 0.5.45
-  resolution: "moment-timezone@npm:0.5.45"
+"moment-timezone@npm:0.5.47":
+  version: 0.5.47
+  resolution: "moment-timezone@npm:0.5.47"
   dependencies:
     moment: "npm:^2.29.4"
-  checksum: 10c0/7497f23c4b8c875dbf07c03f9a1253f79edaeedc29d5732e36bfd3c5577e25aed1924fbd84cbb713ce1920dbe822be0e21bd487851a7d13907226f289a5e568b
+  checksum: 10c0/6f7cdbebe712dcbb767a6380e097d352776b83dd7d1d797546d6ff21d813e8380633373da93aea1d24f2c3c031044fd4a18726cacad14eda3f1f428192ad955c
   languageName: node
   linkType: hard
 
@@ -8919,7 +8919,7 @@ __metadata:
     leaflet: "npm:1.9.4"
     mdi-material-ui: "npm:7.9.3"
     moment: "npm:2.30.1"
-    moment-timezone: "npm:0.5.45"
+    moment-timezone: "npm:0.5.47"
     monocart-coverage-reports: "npm:2.12.0"
     monocart-reporter: "npm:2.9.11"
     normalizr: "npm:3.6.2"
