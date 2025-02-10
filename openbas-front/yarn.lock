@@ -4451,7 +4451,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"console-grid@npm:^2.2.2, console-grid@npm:^2.2.3":
+"console-grid@npm:^2.2.3":
   version: 2.2.3
   resolution: "console-grid@npm:2.2.3"
   checksum: 10c0/cd1a27c9995c2c03b79bacbef46ea193860501c6f819b86c71fd76a2cf6f075afcdb64ec0066ca0e4895e5f7876f698f6e53b5ba5c16cc93044b103e90e86895
@@ -8486,7 +8486,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-coverage-reports@npm:^2.11.3":
+"monocart-coverage-reports@npm:^2.11.5":
   version: 2.12.1
   resolution: "monocart-coverage-reports@npm:2.12.1"
   dependencies:
@@ -8515,21 +8515,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-reporter@npm:2.9.11":
-  version: 2.9.11
-  resolution: "monocart-reporter@npm:2.9.11"
+"monocart-reporter@npm:2.9.13":
+  version: 2.9.13
+  resolution: "monocart-reporter@npm:2.9.13"
   dependencies:
-    console-grid: "npm:^2.2.2"
+    console-grid: "npm:^2.2.3"
     eight-colors: "npm:^1.3.1"
     koa: "npm:^2.15.3"
     koa-static-resolver: "npm:^1.0.6"
     lz-utils: "npm:^2.1.0"
-    monocart-coverage-reports: "npm:^2.11.3"
+    monocart-coverage-reports: "npm:^2.11.5"
     monocart-locator: "npm:^1.0.2"
     nodemailer: "npm:^6.9.16"
   bin:
     monocart: lib/cli.js
-  checksum: 10c0/086c31370dfd443de35ac4acd9a0d3229800c7f0bcfd06e4473ea0b510e8557c9f05e96903152ae37c1ffd3957cd27b7eadf608c95fd226e5ce4a0b143eded7d
+  checksum: 10c0/ecb9d8b8befa97c2d9e4a6761f4c7f8d4844efdd25996a38aaa8f2af71c6abb5f530ca716dc296005e76f2b64d2448309eca949b682ef6598a1dcb9043ca5e9e
   languageName: node
   linkType: hard
 
@@ -8921,7 +8921,7 @@ __metadata:
     moment: "npm:2.30.1"
     moment-timezone: "npm:0.5.47"
     monocart-coverage-reports: "npm:2.12.0"
-    monocart-reporter: "npm:2.9.11"
+    monocart-reporter: "npm:2.9.13"
     normalizr: "npm:3.6.2"
     pdfmake: "npm:0.2.13"
     prop-types: "npm:15.8.1"
