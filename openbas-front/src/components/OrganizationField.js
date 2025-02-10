@@ -73,21 +73,22 @@ class OrganizationField extends Component {
       organizations,
     );
     return (
-      <div>
+      <>
         <Autocomplete
           variant="standard"
           size="small"
           name={name}
           fullWidth={true}
           multiple={false}
+          disabled={false}
           label={t('Organization')}
           options={organizationsOptions}
           style={{ marginTop: 20 }}
           openCreate={this.handleOpenOrganizationCreation.bind(this)}
           renderOption={(props, option) => (
-            <Box component="li" {...props} key={option.id}>
+            <Box component="li" {...props} key={option.id} s>
               <div className={classes.icon}>
-                <DomainOutlined color="primary" />
+                <DomainOutlined sx={{ color: '#3880b7' }} />
               </div>
               <div className={classes.text}>{option.label}</div>
             </Box>
@@ -108,7 +109,7 @@ class OrganizationField extends Component {
             />
           </DialogContent>
         </Dialog>
-      </div>
+      </>
     );
   }
 }
