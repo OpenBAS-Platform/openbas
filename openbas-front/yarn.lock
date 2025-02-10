@@ -9214,7 +9214,7 @@ __metadata:
     tss-react: "npm:4.9.15"
     typescript: "npm:5.7.2"
     typescript-eslint: "npm:8.22.0"
-    usehooks-ts: "npm:3.1.0"
+    usehooks-ts: "npm:3.1.1"
     uuid: "npm:11.0.5"
     vite: "npm:6.1.0"
     vitest: "npm:2.1.1"
@@ -11805,14 +11805,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"usehooks-ts@npm:3.1.0":
-  version: 3.1.0
-  resolution: "usehooks-ts@npm:3.1.0"
+"usehooks-ts@npm:3.1.1":
+  version: 3.1.1
+  resolution: "usehooks-ts@npm:3.1.1"
   dependencies:
     lodash.debounce: "npm:^4.0.8"
   peerDependencies:
-    react: ^16.8.0  || ^17 || ^18
-  checksum: 10c0/2204d8c95109302bdaaa51a66bf216f3dba750f1d2795c20ecba75ba1c44a070a253935d537ef536514ab6e363bcc02ccc78b5ad63576ff8d880d577cf3fc48f
+    react: ^16.8.0  || ^17 || ^18 || ^19 || ^19.0.0-rc
+  checksum: 10c0/8bbebf52b063f2e705eb27364f08ec2eff987b9e8d28d82a28248652dd89ef53cb514e1f2ee1cbc6ac6e083a8dce86310301c3e92a99902b98c32a26381202d7
   languageName: node
   linkType: hard
 
