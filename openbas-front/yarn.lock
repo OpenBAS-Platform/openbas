@@ -1797,6 +1797,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/core@npm:^0.11.0":
+  version: 0.11.0
+  resolution: "@eslint/core@npm:0.11.0"
+  dependencies:
+    "@types/json-schema": "npm:^7.0.15"
+  checksum: 10c0/1e0671d035c908175f445864a7864cf6c6a8b67a5dfba8c47b2ac91e2d3ed36e8c1f2fd81d98a73264f8677055559699d4adb0f97d86588e616fc0dc9a4b86c9
+  languageName: node
+  linkType: hard
+
 "@eslint/eslintrc@npm:^3.2.0":
   version: 3.2.0
   resolution: "@eslint/eslintrc@npm:3.2.0"
@@ -1814,10 +1823,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.19.0":
-  version: 9.19.0
-  resolution: "@eslint/js@npm:9.19.0"
-  checksum: 10c0/45dc544c8803984f80a438b47a8e578fae4f6e15bc8478a703827aaf05e21380b42a43560374ce4dad0d5cb6349e17430fc9ce1686fed2efe5d1ff117939ff90
+"@eslint/js@npm:9.20.0":
+  version: 9.20.0
+  resolution: "@eslint/js@npm:9.20.0"
+  checksum: 10c0/10e7b5b9e628b5192e8fc6b0ecd27cf48322947e83e999ff60f9f9e44ac8d499138bcb9383cbfa6e51e780d53b4e76ccc2d1753b108b7173b8404fd484d37328
   languageName: node
   linkType: hard
 
@@ -3662,9 +3671,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/eslint-plugin@npm:1.1.25":
-  version: 1.1.25
-  resolution: "@vitest/eslint-plugin@npm:1.1.25"
+"@vitest/eslint-plugin@npm:1.1.27":
+  version: 1.1.27
+  resolution: "@vitest/eslint-plugin@npm:1.1.27"
   peerDependencies:
     "@typescript-eslint/utils": ">= 8.0"
     eslint: ">= 8.57.0"
@@ -3675,7 +3684,7 @@ __metadata:
       optional: true
     vitest:
       optional: true
-  checksum: 10c0/9707dbad11d86136a36c6c820fea063cb96e5fa6f8111ad24d3a9894df5594154da9a28ab51858a158ccaff4f49fbd79baada57b49d4891f98d5251cd53c90cb
+  checksum: 10c0/c7114a223df4491413b416962e7bb0948664c31b2b62c4daeffe30251735628f46dc14a829fcdbf2c20c2c934f7227791e834f1664530c1ead51c460acf168a5
   languageName: node
   linkType: hard
 
@@ -5851,12 +5860,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-refresh@npm:0.4.18":
-  version: 0.4.18
-  resolution: "eslint-plugin-react-refresh@npm:0.4.18"
+"eslint-plugin-react-refresh@npm:0.4.19":
+  version: 0.4.19
+  resolution: "eslint-plugin-react-refresh@npm:0.4.19"
   peerDependencies:
     eslint: ">=8.40"
-  checksum: 10c0/19140a0d90e126c198c07337bc106af24f398dd8f061314f42c17511a647bea93880a11b7d40219088ac0eaea598eb591d320cfc6f82262bfb05f602101b2acc
+  checksum: 10c0/7c19c864c5fb1292dd1c9df2ce73cb1f86457937975d108e8619d6f354855d838d3f56f0262ce5cd541a7087de103ad802a32906e13724ea1b93c6e3b6477708
   languageName: node
   linkType: hard
 
@@ -5921,16 +5930,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:9.19.0":
-  version: 9.19.0
-  resolution: "eslint@npm:9.19.0"
+"eslint@npm:9.20.0":
+  version: 9.20.0
+  resolution: "eslint@npm:9.20.0"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.2.0"
     "@eslint-community/regexpp": "npm:^4.12.1"
     "@eslint/config-array": "npm:^0.19.0"
-    "@eslint/core": "npm:^0.10.0"
+    "@eslint/core": "npm:^0.11.0"
     "@eslint/eslintrc": "npm:^3.2.0"
-    "@eslint/js": "npm:9.19.0"
+    "@eslint/js": "npm:9.20.0"
     "@eslint/plugin-kit": "npm:^0.2.5"
     "@humanfs/node": "npm:^0.16.6"
     "@humanwhocodes/module-importer": "npm:^1.0.1"
@@ -5966,7 +5975,7 @@ __metadata:
       optional: true
   bin:
     eslint: bin/eslint.js
-  checksum: 10c0/3b0dfaeff6a831de086884a3e2432f18468fe37c69f35e1a0a9a2833d9994a65b6dd2a524aaee28f361c849035ad9d15e3841029b67d261d0abd62c7de6d51f5
+  checksum: 10c0/5eb2d9b5ed85a0b022871d19719417d110afb07a4abfedd856ad03d9a821def5f6bc31d7c407ca27f56e5e66e39375300fd2b877017245eb99c44060d6c983bd
   languageName: node
   linkType: hard
 
@@ -9102,7 +9111,7 @@ __metadata:
     "@dagrejs/dagre": "npm:1.1.4"
     "@emotion/react": "npm:11.14.0"
     "@emotion/styled": "npm:11.14.0"
-    "@eslint/js": "npm:9.19.0"
+    "@eslint/js": "npm:9.20.0"
     "@faker-js/faker": "npm:9.4.0"
     "@fontsource/geologica": "npm:5.1.0"
     "@fontsource/ibm-plex-sans": "npm:5.1.0"
@@ -9134,7 +9143,7 @@ __metadata:
     "@typescript-eslint/utils": "npm:8.22.0"
     "@uiw/react-md-editor": "npm:4.0.5"
     "@vitejs/plugin-react": "npm:4.3.4"
-    "@vitest/eslint-plugin": "npm:1.1.25"
+    "@vitest/eslint-plugin": "npm:1.1.27"
     "@xyflow/react": "npm:12.4.2"
     apexcharts: "npm:4.4.0"
     axios: "npm:1.7.9"
@@ -9148,7 +9157,7 @@ __metadata:
     dompurify: "npm:3.2.4"
     elkjs: "npm:0.9.3"
     esbuild: "npm:0.25.0"
-    eslint: "npm:9.19.0"
+    eslint: "npm:9.20.0"
     eslint-import-resolver-oxc: "npm:0.10.1"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
     eslint-plugin-i18next: "npm:6.1.1"
@@ -9156,7 +9165,7 @@ __metadata:
     eslint-plugin-import-newlines: "npm:1.4.0"
     eslint-plugin-playwright: "npm:2.2.0"
     eslint-plugin-react: "npm:7.37.4"
-    eslint-plugin-react-refresh: "npm:0.4.18"
+    eslint-plugin-react-refresh: "npm:0.4.19"
     eslint-plugin-simple-import-sort: "npm:12.1.1"
     express: "npm:4.21.2"
     final-form: "npm:4.20.10"
