@@ -3487,9 +3487,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/eslint-plugin@npm:1.1.25":
-  version: 1.1.25
-  resolution: "@vitest/eslint-plugin@npm:1.1.25"
+"@vitest/eslint-plugin@npm:1.1.27":
+  version: 1.1.27
+  resolution: "@vitest/eslint-plugin@npm:1.1.27"
   peerDependencies:
     "@typescript-eslint/utils": ">= 8.0"
     eslint: ">= 8.57.0"
@@ -3500,7 +3500,7 @@ __metadata:
       optional: true
     vitest:
       optional: true
-  checksum: 10c0/9707dbad11d86136a36c6c820fea063cb96e5fa6f8111ad24d3a9894df5594154da9a28ab51858a158ccaff4f49fbd79baada57b49d4891f98d5251cd53c90cb
+  checksum: 10c0/c7114a223df4491413b416962e7bb0948664c31b2b62c4daeffe30251735628f46dc14a829fcdbf2c20c2c934f7227791e834f1664530c1ead51c460acf168a5
   languageName: node
   linkType: hard
 
@@ -8873,7 +8873,7 @@ __metadata:
     "@typescript-eslint/utils": "npm:8.22.0"
     "@uiw/react-md-editor": "npm:4.0.5"
     "@vitejs/plugin-react": "npm:4.3.4"
-    "@vitest/eslint-plugin": "npm:1.1.25"
+    "@vitest/eslint-plugin": "npm:1.1.27"
     "@xyflow/react": "npm:12.4.2"
     apexcharts: "npm:4.4.0"
     axios: "npm:1.7.9"
