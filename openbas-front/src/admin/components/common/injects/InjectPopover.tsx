@@ -7,16 +7,18 @@ import { Link } from 'react-router';
 import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
 import type { InjectStore } from '../../../../actions/injects/Inject';
-import { testInject } from '../../../../actions/injects/inject-action';
+import {exportInjects, testInject} from '../../../../actions/injects/inject-action';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import DialogTest from '../../../../components/common/DialogTest';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectStatus, InjectTestStatusOutput } from '../../../../utils/api-types';
+import type {Inject, InjectExportRequestInput, InjectStatus, InjectTestStatusOutput} from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { InjectContext, PermissionsContext } from '../Context';
+import {AxiosResponse} from "axios";
+import {download} from "../../../../utils/utils";
 
 type InjectPopoverType = {
   inject_id: string;
@@ -123,6 +125,18 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
   const handleCloseTest = () => setOpenTest(false);
 
+  const handleExportJsonSingle = () => {
+    const exportData: InjectExportRequestInput = {injects: [
+        { inject_id: inject.inject_id }
+      ]};
+    exportInjects(exportData).then((result) => {
+      var contentDisposition = result.headers["content-disposition"];
+      var match = contentDisposition.match(/filename\s*=\s*(.*)/i);
+      var filename = match[1];
+      download(result.data, filename, result.headers['content-type'])
+    });
+  };
+
   const submitTest = () => {
     testInject(inject.inject_id).then((result: { data: InjectTestStatusOutput }) => {
       if (isExercise) {
@@ -211,6 +225,9 @@ const InjectPopover: FunctionComponent<Props> = ({
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
+        <MenuItem onClick={handleExportJsonSingle} disabled={isDisabled}>
+          {t('inject_export_json_single')}
+        </MenuItem>
         <MenuItem onClick={handleOpenDuplicate} disabled={isDisabled}>
           {t('Duplicate')}
         </MenuItem>

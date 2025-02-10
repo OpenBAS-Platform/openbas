@@ -917,6 +917,8 @@ const i18n = {
       'inject_title': 'Titre',
       'inject_type': 'Type',
       'inject_updated_at': 'Mis à jour à',
+      'inject_export_json_single' : 'Exporter（JSON）',
+      'inject_export_json_selection' : 'Exporter la selection（JSON）',
       // Injector Contract
       'injector_contract_kill_chain_phases': 'Phase de kill chain',
       'injector_contract_injector': 'Injector',
@@ -2343,6 +2345,8 @@ const i18n = {
       'inject_title': '标题',
       'inject_type': '类型',
       'inject_updated_at': '更新于',
+      'inject_export_json_single' : '导出（JSON）',
+      'inject_export_json_selection' : '导出选择（JSON）',
       // Injector Contract
       'injector_contract_kill_chain_phases': '杀伤链阶段',
       'injector_contract_injector': '注入器',
@@ -2936,6 +2940,8 @@ const i18n = {
       'inject_title': 'Title',
       'inject_type': 'Type',
       'inject_updated_at': 'Updated at',
+      'inject_export_json_single' : 'Export（JSON）',
+      'inject_export_json_selection' : 'Export selection（JSON）',
       // Injector Contract
       'injector_contract_kill_chain_phases': 'Kill chain phase',
       'injector_contract_injector': 'Injector',
