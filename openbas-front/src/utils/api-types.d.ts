@@ -358,7 +358,6 @@ export interface ChallengeFlag {
 
 export interface ChallengeInformation {
   challenge_detail?: PublicChallenge;
-  /** List of expectations id linked to this team */
   challenge_expectation?: InjectExpectation;
 }
 
@@ -424,11 +423,9 @@ export interface ChannelCreateInput {
 
 export interface ChannelReader {
   channel_articles?: Article[];
-  /** IDs of the simulations linked to the team */
   channel_exercise?: Exercise;
   channel_id?: string;
   channel_information?: Channel;
-  /** IDs of the scenarios linked to the team */
   channel_scenario?: Scenario;
 }
 
@@ -942,7 +939,6 @@ export interface ExecutorUpdateInput {
   executor_last_execution?: string;
 }
 
-/** IDs of the simulations linked to the team */
 export interface Exercise {
   /** @format int64 */
   exercise_all_users_number?: number;
@@ -1102,7 +1098,6 @@ export interface ExerciseTeamPlayersEnableInput {
   exercise_team_players?: string[];
 }
 
-/** List of 3-tuple linking simulation IDs and user IDs to this team ID */
 export interface ExerciseTeamUser {
   exercise_id?: string;
   team_id?: string;
@@ -1250,7 +1245,6 @@ export interface Grant {
   listened?: boolean;
 }
 
-/** Group IDs of the user */
 export interface Group {
   group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_exercise_observer?: boolean;
@@ -1339,7 +1333,6 @@ export interface ImportTestSummary {
   total_injects?: number;
 }
 
-/** List of inject IDs from all scenarios of the team */
 export interface Inject {
   footer?: string;
   header?: string;
@@ -1464,7 +1457,6 @@ export interface InjectExecutionInput {
   execution_status: string;
 }
 
-/** List of expectations id linked to this team */
 export interface InjectExpectation {
   inject_expectation_agent?: string;
   inject_expectation_article?: string;
@@ -3215,7 +3207,6 @@ export interface RuleAttributeUpdateInput {
   rule_attribute_name: string;
 }
 
-/** IDs of the scenarios linked to the team */
 export interface Scenario {
   listened?: boolean;
   /** @format int64 */
@@ -3478,7 +3469,6 @@ export interface StatusPayloadOutput {
   payload_type?: string;
 }
 
-/** Tag IDs of the user */
 export interface Tag {
   listened?: boolean;
   /** Color of the tag */
@@ -3525,7 +3515,6 @@ export interface TargetSimple {
   target_type?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
-/** Team IDs of the user */
 export interface Team {
   listened?: boolean;
   /** List of communications of this team */
