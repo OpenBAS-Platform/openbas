@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import { searchTeams } from '../../../../actions/teams/team-actions';
+import {fetchTeam, searchTeams} from '../../../../actions/teams/team-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -19,6 +19,9 @@ import type { SearchPaginationInput, Team } from '../../../../utils/api-types';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
+import useDataLoader from "../../../../utils/hooks/useDataLoader";
+import {useAppDispatch} from "../../../../utils/hooks";
+import {TeamsHelper} from "../../../../actions/teams/team-helper";
 
 const useStyles = makeStyles()(() => ({
   itemHead: {
@@ -72,6 +75,7 @@ const Teams = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
+  const dispatch = useAppDispatch();
 
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
@@ -99,6 +103,28 @@ const Teams = () => {
     sorts: initSorting('team_name'),
     textSearch: search,
   }));
+
+
+  const { refetched } = useHelper((helper: TeamsHelper) => ({
+    refetched: helper.getTeam(selectedTeam ?? "")
+  }))
+
+  const refetchTeam = (team_id: string) : Team => {
+    dispatch(fetchTeam(team_id));
+    return refetched;
+  };
+
+  const onPlayersChanged = (team_id: string | null) => {
+    if (team_id) {
+      const refetched = refetchTeam(team_id);
+      onTeamUpdated(refetched);
+      setSelectedTeam(null);
+      }
+  };
+
+  const onTeamUpdated = (team: Team) => {
+    setTeams(teams.map(v => (v.team_id !== team.team_id ? v : team)));
+  }
 
   // Export
   const exportProps = {
@@ -176,7 +202,7 @@ const Teams = () => {
               <TeamPopover
                 team={team}
                 managePlayers={() => setSelectedTeam(team.team_id)}
-                onUpdate={result => setTeams(teams.map(v => (v.team_id !== result.team_id ? v : result)))}
+                onUpdate={result => onTeamUpdated(result)}
                 onDelete={result => setTeams(teams.filter(v => (v.team_id !== result)))}
                 openEditOnInit={team.team_id === searchId}
               />
@@ -190,13 +216,13 @@ const Teams = () => {
         anchor="right"
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelectedTeam(null)}
+        onClose={() => onPlayersChanged(selectedTeam)}
         elevation={1}
       >
         {selectedTeam !== null && (
           <TeamPlayers
             teamId={selectedTeam}
-            handleClose={() => setSelectedTeam(null)}
+            handleClose={() => onPlayersChanged(selectedTeam)}
           />
         )}
       </Drawer>
