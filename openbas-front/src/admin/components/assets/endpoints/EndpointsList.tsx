@@ -50,41 +50,25 @@ const inlineStyles: Record<string, CSSProperties> = {
 export type EndpointStoreWithType = EndpointOutput & EndpointOverviewOutput & { type: string };
 
 interface Props {
-  endpointIds: string[];
+  endpoints: EndpointStoreWithType[];
   actions: React.ReactElement;
 }
 
 const EndpointsList: FunctionComponent<Props> = ({
-  endpointIds = [],
+  endpoints,
   actions,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
 
-  const component = (endpoint: EndpointOutput) => {
+  const component = (endpoint: EndpointStoreWithType) => {
     return React.cloneElement(actions as React.ReactElement, { endpoint });
   };
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [endpointValues, setEndpointValues] = useState<EndpointOutput[]>([]);
-  useEffect(() => {
-    setLoading(true);
-    findEndpoints(endpointIds).then((result) => {
-      setEndpointValues(result.data);
-      setLoading(false);
-    });
-  }, [endpointIds]);
-
-  const isLoading = loading && endpointIds.length > 0;
-
   return (
     <>
-      {
-        isLoading
-          ? <ListLoader Icon={DevicesOtherOutlined} headers={[]} headerStyles={inlineStyles} />
-          : (
-              <List>
-                {endpointValues?.map((endpoint) => {
+      <List>
+                {endpoints?.map((endpoint) => {
                   return (
                     <ListItem
                       key={endpoint.asset_id}
@@ -137,8 +121,7 @@ const EndpointsList: FunctionComponent<Props> = ({
                   );
                 })}
               </List>
-            )
-      }
+
     </>
   );
 };
