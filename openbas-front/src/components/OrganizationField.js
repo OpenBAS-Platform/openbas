@@ -86,7 +86,7 @@ class OrganizationField extends Component {
           style={{ marginTop: 20 }}
           openCreate={this.handleOpenOrganizationCreation.bind(this)}
           renderOption={(props, option) => (
-            <Box component="li" {...props} key={option.id} s>
+            <Box component="li" {...props} key={option.id}>
               <div className={classes.icon}>
                 <DomainOutlined sx={{ color: '#3880b7' }} />
               </div>
