@@ -80,7 +80,6 @@ class OrganizationField extends Component {
           name={name}
           fullWidth={true}
           multiple={false}
-          disabled={false}
           label={t('Organization')}
           options={organizationsOptions}
           style={{ marginTop: 20 }}
