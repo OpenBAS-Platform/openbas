@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import { fetchTeam, searchTeams } from '../../../../actions/teams/team-actions';
+import { searchTeams } from '../../../../actions/teams/team-actions';
 import { TeamsHelper } from '../../../../actions/teams/team-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
@@ -17,7 +17,6 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import type { SearchPaginationInput, Team } from '../../../../utils/api-types';
-import { useAppDispatch } from '../../../../utils/hooks';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
@@ -74,7 +73,6 @@ const Teams = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
-  const dispatch = useAppDispatch();
 
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
@@ -107,18 +105,12 @@ const Teams = () => {
     refetched: helper.getTeam(selectedTeam ?? ''),
   }));
 
-  const refetchTeam = (team_id: string): Team => {
-    dispatch(fetchTeam(team_id));
-    return refetched;
-  };
-
   const onTeamUpdated = (team: Team) => {
     setTeams(teams.map(v => (v.team_id !== team.team_id ? v : team)));
   };
 
   const onPlayersChanged = (team_id: string | null) => {
     if (team_id) {
-      const refetched = refetchTeam(team_id);
       onTeamUpdated(refetched);
       setSelectedTeam(null);
     }
