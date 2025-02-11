@@ -56,6 +56,7 @@ const renderAutocomplete = ({
                   {
                     typeof openCreate === 'function' && (
                       <IconButton
+                        style={{ position: 'absolute', right: '35px' }}
                         onClick={() => openCreate()}
                       >
                         <AddOutlined />
