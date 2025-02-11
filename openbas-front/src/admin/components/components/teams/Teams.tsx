@@ -6,7 +6,8 @@ import { makeStyles } from 'tss-react/mui';
 
 import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
 import type { TagHelper, UserHelper } from '../../../../actions/helper';
-import {fetchTeam, searchTeams} from '../../../../actions/teams/team-actions';
+import { fetchTeam, searchTeams } from '../../../../actions/teams/team-actions';
+import { TeamsHelper } from '../../../../actions/teams/team-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -16,12 +17,10 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
 import type { SearchPaginationInput, Team } from '../../../../utils/api-types';
+import { useAppDispatch } from '../../../../utils/hooks';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
-import useDataLoader from "../../../../utils/hooks/useDataLoader";
-import {useAppDispatch} from "../../../../utils/hooks";
-import {TeamsHelper} from "../../../../actions/teams/team-helper";
 
 const useStyles = makeStyles()(() => ({
   itemHead: {
@@ -104,14 +103,17 @@ const Teams = () => {
     textSearch: search,
   }));
 
-
   const { refetched } = useHelper((helper: TeamsHelper) => ({
-    refetched: helper.getTeam(selectedTeam ?? "")
-  }))
+    refetched: helper.getTeam(selectedTeam ?? ''),
+  }));
 
-  const refetchTeam = (team_id: string) : Team => {
+  const refetchTeam = (team_id: string): Team => {
     dispatch(fetchTeam(team_id));
     return refetched;
+  };
+
+  const onTeamUpdated = (team: Team) => {
+    setTeams(teams.map(v => (v.team_id !== team.team_id ? v : team)));
   };
 
   const onPlayersChanged = (team_id: string | null) => {
@@ -119,12 +121,8 @@ const Teams = () => {
       const refetched = refetchTeam(team_id);
       onTeamUpdated(refetched);
       setSelectedTeam(null);
-      }
+    }
   };
-
-  const onTeamUpdated = (team: Team) => {
-    setTeams(teams.map(v => (v.team_id !== team.team_id ? v : team)));
-  }
 
   // Export
   const exportProps = {
