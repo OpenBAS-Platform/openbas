@@ -64,63 +64,60 @@ const EndpointsList: FunctionComponent<Props> = ({
   };
 
   return (
-    <>
-      <List>
-        {endpoints?.map((endpoint) => {
-          return (
-            <ListItem
-              key={endpoint.asset_id}
-              classes={{ root: classes.item }}
-              divider={true}
-              secondaryAction={component(endpoint)}
-            >
-              <ListItemIcon>
-                <DevicesOtherOutlined color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.asset_name}
-                    >
-                      {endpoint.asset_name}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.asset_platform}
-                    >
-                      <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
-                      {' '}
-                      {endpoint.endpoint_platform}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.asset_tags}
-                    >
-                      <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.asset_type}
-                    >
-                      <Tooltip title={endpoint.asset_type}>
-                        <Chip
-                          variant="outlined"
-                          className={classes.typeChip}
-                          label={endpoint.asset_type}
-                        />
-                      </Tooltip>
-                    </div>
-                  </>
-                )}
-              />
-            </ListItem>
-          );
-        })}
-      </List>
-
-    </>
+    <List>
+      {endpoints?.map((endpoint) => {
+        return (
+          <ListItem
+            key={endpoint.asset_id}
+            classes={{ root: classes.item }}
+            divider={true}
+            secondaryAction={component(endpoint)}
+          >
+            <ListItemIcon>
+              <DevicesOtherOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={(
+                <>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.asset_name}
+                  >
+                    {endpoint.asset_name}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.asset_platform}
+                  >
+                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                    {' '}
+                    {endpoint.endpoint_platform}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.asset_tags}
+                  >
+                    <ItemTags variant="reduced-view" tags={endpoint.asset_tags} />
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.asset_type}
+                  >
+                    <Tooltip title={endpoint.asset_type}>
+                      <Chip
+                        variant="outlined"
+                        className={classes.typeChip}
+                        label={endpoint.asset_type}
+                      />
+                    </Tooltip>
+                  </div>
+                </>
+              )}
+            />
+          </ListItem>
+        );
+      })}
+    </List>
   );
 };
 
