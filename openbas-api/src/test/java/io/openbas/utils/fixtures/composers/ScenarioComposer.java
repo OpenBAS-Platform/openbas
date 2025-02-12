@@ -1,5 +1,6 @@
 package io.openbas.utils.fixtures.composers;
 
+import io.openbas.database.model.Article;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ScenarioRepository;
@@ -17,6 +18,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
   public class Composer extends InnerComposerBase<Scenario> {
     private final Scenario scenario;
     private final List<InjectComposer.Composer> injectComposers = new ArrayList<>();
+    private final List<ArticleComposer.Composer> articleComposers = new ArrayList<>();
 
     public Composer(Scenario scenario) {
       this.scenario = scenario;
@@ -28,6 +30,15 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
       injectComposer.get().setScenario(scenario);
       tempInjects.add(injectComposer.get());
       this.scenario.setInjects(tempInjects);
+      return this;
+    }
+
+    public Composer withArticle(ArticleComposer.Composer articleComposer) {
+      articleComposers.add(articleComposer);
+      List<Article> tempArticles = new ArrayList<>(this.scenario.getArticles());
+      articleComposer.get().setScenario(scenario);
+      tempArticles.add(articleComposer.get());
+      this.scenario.setArticles(tempArticles);
       return this;
     }
 

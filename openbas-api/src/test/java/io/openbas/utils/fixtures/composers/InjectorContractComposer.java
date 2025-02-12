@@ -1,13 +1,16 @@
 package io.openbas.utils.fixtures.composers;
 
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.injectors.channel.ChannelContract.CHANNEL_PUBLISH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.InjectorContractRepository;
+import io.openbas.database.repository.InjectorRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
+import io.openbas.injectors.channel.model.ChannelContent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,22 +20,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class InjectorContractComposer extends ComposerBase<InjectorContract> {
   @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private InjectorRepository injectorRepository;
   @Autowired private ObjectMapper objectMapper;
 
   public class Composer extends InnerComposerBase<InjectorContract> {
-    private final List<String> WELL_KNOWN_CONTRACT_IDS = List.of(CHALLENGE_PUBLISH);
+    private final List<String> WELL_KNOWN_CONTRACT_IDS =
+        List.of(CHALLENGE_PUBLISH, CHANNEL_PUBLISH);
 
     private final InjectorContract injectorContract;
     private Optional<PayloadComposer.Composer> payloadComposer = Optional.empty();
     private final List<ChallengeComposer.Composer> challengeComposers = new ArrayList<>();
+    private final List<ArticleComposer.Composer> articleComposers = new ArrayList<>();
 
     public Composer(InjectorContract injectorContract) {
       this.injectorContract = injectorContract;
     }
 
     public Composer withPayload(PayloadComposer.Composer payloadComposer) {
-      if (!this.challengeComposers.isEmpty()) {
-        throw new IllegalStateException("Challenge composer already exists");
+      if (!this.articleComposers.isEmpty() || !this.challengeComposers.isEmpty()) {
+        throw new IllegalStateException("Inject already has a type");
       }
       this.payloadComposer = Optional.of(payloadComposer);
       this.injectorContract.setPayload(payloadComposer.get());
@@ -40,8 +46,8 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
     }
 
     public Composer withChallenge(ChallengeComposer.Composer challengeComposer) {
-      if (this.payloadComposer.isPresent()) {
-        throw new IllegalStateException("Payload composer already exists");
+      if (this.payloadComposer.isPresent() || !this.articleComposers.isEmpty()) {
+        throw new IllegalStateException("Inject already has a type");
       }
       // hack the wrapped object to match the well-known CHALLENGE_PUBLISH characteristics
       InjectorContract challengeInjectorContract =
@@ -55,6 +61,22 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       return this;
     }
 
+    public Composer withArticle(ArticleComposer.Composer articleComposer) {
+      if (this.payloadComposer.isPresent() || !this.challengeComposers.isEmpty()) {
+        throw new IllegalStateException("Inject already has a type");
+      }
+
+      InjectorContract articleInjectorContract =
+          injectorContractRepository.findById(CHANNEL_PUBLISH).orElseThrow();
+      this.injectorContract.setId(articleInjectorContract.getId());
+      this.injectorContract.setContent(articleInjectorContract.getContent());
+      this.injectorContract.setConvertedContent(articleInjectorContract.getConvertedContent());
+      this.injectorContract.setInjector(articleInjectorContract.getInjector());
+
+      this.articleComposers.add(articleComposer);
+      return this;
+    }
+
     public Composer withInjector(Injector injector) {
       this.injectorContract.setInjector(injector);
       return this;
@@ -62,7 +84,7 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
 
     public ObjectNode getInjectContent() {
       if (payloadComposer.isPresent()) {
-        return null;
+        return objectMapper.createObjectNode();
       }
 
       if (!challengeComposers.isEmpty()) {
@@ -73,14 +95,22 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
         return objectMapper.valueToTree(cc);
       }
 
-      return null;
+      if (!articleComposers.isEmpty()) {
+        ChannelContent cc = new ChannelContent();
+        cc.setArticles(articleComposers.stream().map(composer -> composer.get().getId()).toList());
+        return objectMapper.valueToTree(cc);
+      }
+
+      return objectMapper.createObjectNode();
     }
 
     @Override
     public Composer persist() {
       payloadComposer.ifPresent(PayloadComposer.Composer::persist);
       challengeComposers.forEach(ChallengeComposer.Composer::persist);
+      articleComposers.forEach(ArticleComposer.Composer::persist);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
+        injectorRepository.save(injectorContract.getInjector());
         injectorContractRepository.save(injectorContract);
       }
       return this;
@@ -90,7 +120,9 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
     public Composer delete() {
       payloadComposer.ifPresent(PayloadComposer.Composer::delete);
       challengeComposers.forEach(ChallengeComposer.Composer::delete);
+      articleComposers.forEach(ArticleComposer.Composer::delete);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
+        injectorRepository.delete(injectorContract.getInjector());
         injectorContractRepository.delete(injectorContract);
       }
       return this;

@@ -1,5 +1,6 @@
 package io.openbas.export;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
@@ -16,10 +17,10 @@ public class FileExportBase {
   @JsonProperty("export_version")
   private int version = 1;
 
-  protected int exportOptionsMask = ExportOptions.mask(false, false, false);
+  @JsonIgnore protected int exportOptionsMask = ExportOptions.mask(false, false, false);
 
-  public final ObjectMapper objectMapper;
-  protected final ChallengeService challengeService;
+  @JsonIgnore public final ObjectMapper objectMapper;
+  @JsonIgnore protected final ChallengeService challengeService;
 
   protected FileExportBase(ObjectMapper objectMapper, ChallengeService challengeService) {
     this.objectMapper = objectMapper;

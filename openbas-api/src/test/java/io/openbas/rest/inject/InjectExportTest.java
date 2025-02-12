@@ -74,13 +74,31 @@ public class InjectExportTest extends IntegrationTest {
     for (String fileName : WELL_KNOWN_FILES.keySet()) {
       fileService.deleteFile(fileName);
     }
+
+    knownArticlesToExport.clear();
   }
 
+  private List<Article> knownArticlesToExport = new ArrayList<>();
+
   private List<InjectComposer.Composer> createDefaultInjectWrappers() {
+    ArticleComposer.Composer articleToExportFromExercise =
+        articleComposer
+            .forArticle(ArticleFixture.getDefaultArticle())
+            .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel()));
+    knownArticlesToExport.add(articleToExportFromExercise.get());
+    ArticleComposer.Composer articleToExportFromScenario =
+        articleComposer
+            .forArticle(ArticleFixture.getDefaultArticle())
+            .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel()));
+    knownArticlesToExport.add(articleToExportFromScenario.get());
     InjectComposer.Composer injectWithExerciseComposer =
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
             .withTag(tagComposer.forTag(TagFixture.getTagWithText("Other inject tag")))
+            .withInjectorContract(
+                injectorContractComposer
+                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                    .withArticle(articleToExportFromExercise))
             .withDocument(
                 documentComposer
                     .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
@@ -88,12 +106,21 @@ public class InjectExportTest extends IntegrationTest {
     // wrap it in a persisted exercise
     exerciseComposer
         .forExercise(ExerciseFixture.createDefaultExercise())
+        .withArticle(
+            articleComposer
+                .forArticle(ArticleFixture.getDefaultArticle())
+                .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel())))
+        .withArticle(articleToExportFromExercise)
         .persist()
         .withInject(injectWithExerciseComposer);
 
     InjectComposer.Composer injectWithScenarioComposer =
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
+            .withInjectorContract(
+                injectorContractComposer
+                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                    .withArticle(articleToExportFromScenario))
             .withTeam(
                 teamComposer
                     .forTeam(TeamFixture.getDefaultTeam())
@@ -102,6 +129,11 @@ public class InjectExportTest extends IntegrationTest {
     // wrap it in a persisted scenario
     scenarioComposer
         .forScenario(ScenarioFixture.getScenario())
+        .withArticle(articleToExportFromScenario)
+        .withArticle(
+            articleComposer
+                .forArticle(ArticleFixture.getDefaultArticle())
+                .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel())))
         .persist()
         .withInject(injectWithScenarioComposer);
 
@@ -135,7 +167,7 @@ public class InjectExportTest extends IntegrationTest {
                                     .withTag(
                                         tagComposer.forTag(
                                             TagFixture.getTagWithText("Document tag")))))),
-        // this is set up above
+        // these are set up above
         injectWithExerciseComposer,
         injectWithScenarioComposer);
   }
@@ -378,7 +410,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Article.class, Mixins.Article.class);
-        String articleJson = objectMapper.writeValueAsString(articleComposer.generatedItems);
+        String articleJson = objectMapper.writeValueAsString(knownArticlesToExport);
 
         assertThatJson(actualJson)
             .when(IGNORING_ARRAY_ORDER)
@@ -396,7 +428,9 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Channel.class, Mixins.Channel.class);
-        String channelJson = objectMapper.writeValueAsString(channelComposer.generatedItems);
+        String channelJson =
+            objectMapper.writeValueAsString(
+                knownArticlesToExport.stream().map(Article::getChannel));
 
         assertThatJson(actualJson)
             .when(IGNORING_ARRAY_ORDER)
