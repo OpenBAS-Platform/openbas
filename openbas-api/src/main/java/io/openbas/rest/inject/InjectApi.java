@@ -101,9 +101,6 @@ public class InjectApi extends RestBehavior {
   @PostMapping(INJECT_URI + "/export")
   public void injectsExport(
       @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput,
-      @RequestParam(required = false) final boolean isWithTeams,
-      @RequestParam(required = false) final boolean isWithPlayers,
-      @RequestParam(required = false) final boolean isWithVariableValues,
       HttpServletResponse response)
       throws IOException {
     List<String> targetIds = injectExportRequestInput.getTargetsIds();
@@ -124,7 +121,11 @@ public class InjectApi extends RestBehavior {
       throw new ElementNotFoundException(String.join(", ", missedIds));
     }
 
-    int exportOptionsMask = ExportOptions.mask(isWithPlayers, isWithTeams, isWithVariableValues);
+    int exportOptionsMask =
+        ExportOptions.mask(
+            injectExportRequestInput.getExportOptions().isWithPlayers(),
+            injectExportRequestInput.getExportOptions().isWithTeams(),
+            injectExportRequestInput.getExportOptions().isWithVariableValues());
     byte[] zippedExport = injectExportService.exportExerciseToZip(injects, exportOptionsMask);
     String zipName = injectExportService.getZipFileName(exportOptionsMask);
 

@@ -3,14 +3,15 @@ package io.openbas.rest.inject.form;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class InjectExportRequestInput {
   @JsonProperty("injects")
   private List<InjectExportTarget> injects;
+
+  @JsonProperty("options")
+  private ExportOptionsInput exportOptions = new ExportOptionsInput();
 
   @JsonIgnore
   public List<String> getTargetsIds() {

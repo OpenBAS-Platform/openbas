@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.export.Mixins;
+import io.openbas.rest.inject.form.ExportOptionsInput;
 import io.openbas.rest.inject.form.InjectExportRequestInput;
 import io.openbas.rest.inject.form.InjectExportTarget;
 import io.openbas.service.FileService;
@@ -160,13 +161,32 @@ public class InjectExportTest extends IntegrationTest {
   }
 
   private InjectExportRequestInput createDefaultInjectExportRequestInput() {
-    return createDefaultInjectExportRequestInput(createDefaultInjectTargets());
+    return createDefaultInjectExportRequestInput(false, false, false);
+  }
+
+  private InjectExportRequestInput createDefaultInjectExportRequestInput(
+      boolean withPlayers, boolean withTeams, boolean withVariableValues) {
+    return createDefaultInjectExportRequestInput(
+        createDefaultInjectTargets(), withPlayers, withTeams, withVariableValues);
   }
 
   private InjectExportRequestInput createDefaultInjectExportRequestInput(
       List<InjectExportTarget> targets) {
+    return createDefaultInjectExportRequestInput(targets, false, false, false);
+  }
+
+  private InjectExportRequestInput createDefaultInjectExportRequestInput(
+      List<InjectExportTarget> targets,
+      boolean withPlayers,
+      boolean withTeams,
+      boolean withVariableValues) {
     InjectExportRequestInput input = new InjectExportRequestInput();
+    ExportOptionsInput exportOptions = new ExportOptionsInput();
+    exportOptions.setWithPlayers(withPlayers);
+    exportOptions.setWithTeams(withTeams);
+    exportOptions.setWithVariableValues(withVariableValues);
     input.setInjects(targets);
+    input.setExportOptions(exportOptions);
     return input;
   }
 
@@ -450,8 +470,9 @@ public class InjectExportTest extends IntegrationTest {
         return mvc.perform(
                 post(INJECT_EXPORT_URI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .queryParam("isWithTeams", "true")
-                    .content(mapper.writeValueAsString(createDefaultInjectExportRequestInput())))
+                    .content(
+                        mapper.writeValueAsString(
+                            createDefaultInjectExportRequestInput(false, true, false))))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
@@ -495,8 +516,9 @@ public class InjectExportTest extends IntegrationTest {
         return mvc.perform(
                 post(INJECT_EXPORT_URI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .queryParam("isWithPlayers", "true")
-                    .content(mapper.writeValueAsString(createDefaultInjectExportRequestInput())))
+                    .content(
+                        mapper.writeValueAsString(
+                            createDefaultInjectExportRequestInput(true, false, false))))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()
