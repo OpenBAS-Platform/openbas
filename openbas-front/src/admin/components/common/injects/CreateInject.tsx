@@ -28,7 +28,6 @@ import {
 } from '../../../../utils/api-types';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import { isNotEmptyField } from '../../../../utils/utils';
-// import CreateInjectDetails from './CreateInjectDetails';
 import InjectDetailsForm from './form/InjectDetailsForm';
 import { InjectorContractContent } from './form/InjectFormType';
 import InjectIcon from './InjectIcon';
