@@ -6,6 +6,7 @@ import { exportInjects } from '../../../../actions/injects/inject-action';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import { useFormatter } from '../../../../components/i18n';
 import type {
   InjectExportRequestInput,
@@ -14,7 +15,6 @@ import type {
 } from '../../../../utils/api-types';
 import { download } from '../../../../utils/utils';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
-import ExportOptionsDialog from "../../../../components/common/export/ExportOptionsDialog";
 
 type AtomicTestingActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
@@ -69,11 +69,11 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const doExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
     const exportData: InjectExportRequestInput = { injects:
       [{ inject_id: atomic.inject_id }],
-      options: {
-        with_players: withPlayers,
-        with_teams: withTeams,
-        with_variable_values: withVariableValues
-      }
+    options: {
+      with_players: withPlayers,
+      with_teams: withTeams,
+      with_variable_values: withVariableValues,
+    },
     };
 
     exportInjects(exportData).then((result) => {
@@ -121,15 +121,15 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
         />
       )}
       {actions.includes('Export')
-          && (
-              <ExportOptionsDialog
-                  title={t('Export this atomic testing')}
-                  open={exportOpen}
-                  onCancel={handleCloseExport}
-                  onClose={handleCloseExport}
-                  onSubmit={doExport}
-              />
-          )}
+      && (
+        <ExportOptionsDialog
+          title={t('Export this atomic testing')}
+          open={exportOpen}
+          onCancel={handleCloseExport}
+          onClose={handleCloseExport}
+          onSubmit={doExport}
+        />
+      )}
     </>
   );
 };

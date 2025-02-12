@@ -10,6 +10,7 @@ import type { InjectStore } from '../../../../actions/injects/Inject';
 import { exportInjects, testInject } from '../../../../actions/injects/inject-action';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import DialogTest from '../../../../components/common/DialogTest';
+import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -18,7 +19,6 @@ import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { download } from '../../../../utils/utils';
 import { InjectContext, PermissionsContext } from '../Context';
-import ExportOptionsDialog from "../../../../components/common/export/ExportOptionsDialog";
 
 type InjectPopoverType = {
   inject_id: string;
@@ -137,8 +137,8 @@ const InjectPopover: FunctionComponent<Props> = ({
       options: {
         with_players: withPlayers,
         with_teams: withTeams,
-        with_variable_values: withVariableValues
-      }
+        with_variable_values: withVariableValues,
+      },
     };
     exportInjects(exportData).then((result) => {
       const contentDisposition = result.headers['content-disposition'];
