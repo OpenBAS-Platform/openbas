@@ -289,6 +289,12 @@ class InjectDefinition extends Component {
       }
     };
 
+    const updateEndpointsIfChanged = (currentValue, newValue, stateKey) => {
+      if (!arraysEqual(currentValue.map(asset => asset.asset_id), newValue.map(asset => asset.asset_id))) {
+        this.setState({ [stateKey]: newValue || [] });
+      }
+    };
+
     const refreshEndpoints = async (assetIds) => {
       const result = await findEndpoints(assetIds);
       return result.data;
@@ -297,7 +303,7 @@ class InjectDefinition extends Component {
     updateStateIfChanged(inject.inject_all_teams, this.props.inject.inject_all_teams, 'allTeams');
     updateStateIfChanged(inject.inject_teams || [], this.props.inject.inject_teams || [], 'teamsIds');
     updateStateIfChanged(inject.inject_assets || [], this.props.inject.inject_assets || [], 'assetIds');
-    updateStateIfChanged(this.state.endpoints, await refreshEndpoints(this.props.inject.inject_assets), 'endpoints');
+    updateEndpointsIfChanged(this.state.endpoints, await refreshEndpoints(this.props.inject.inject_assets), 'endpoints');
     updateStateIfChanged(inject.inject_asset_groups || [], this.props.inject.inject_asset_groups || [], 'assetGroupIds');
     updateStateIfChanged(inject.inject_content?.articles || [], this.props.inject.inject_content?.articles || [], 'articlesIds');
     updateStateIfChanged(inject.inject_content?.challenges || [], this.props.inject.inject_content?.challenges || [], 'challengesIds');
@@ -480,6 +486,7 @@ class InjectDefinition extends Component {
       allTeams,
       teamsIds,
       assetIds,
+      endpoints,
       assetGroupIds,
       documents,
       expectations,
@@ -657,7 +664,7 @@ class InjectDefinition extends Component {
               {t('Targeted assets')}
             </Typography>
             <EndpointsList
-              endpointIds={assetIds}
+              endpointIds={endpoints}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore: Endpoint property handle by EndpointsList
               actions={
