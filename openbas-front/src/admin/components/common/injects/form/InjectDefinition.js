@@ -269,17 +269,18 @@ class InjectDefinition extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.props.fetchDocuments();
     this.props.fetchChannels();
     this.props.fetchChallenges();
     this.props.setInjectDetailsState(this.state);
+    this.setState({endpoints: await this.refreshEndpoints(this.state.assetIds)})
   }
 
-  async componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps) {
     const { inject } = prevProps;
 
-    const updateStateIfChanged = (currentValue, newValue, stateKey) => {
+    const updateStateIfChanged = async (currentValue, newValue, stateKey) => {
       if (Array.isArray(newValue) && Array.isArray(currentValue)) {
         if (!arraysEqual(newValue, currentValue)) {
           this.setState({ [stateKey]: newValue || [] });
@@ -289,21 +290,9 @@ class InjectDefinition extends Component {
       }
     };
 
-    const updateEndpointsIfChanged = (currentValue, newValue, stateKey) => {
-      if (!arraysEqual(currentValue.map(asset => asset.asset_id), newValue.map(asset => asset.asset_id))) {
-        this.setState({ [stateKey]: newValue || [] });
-      }
-    };
-
-    const refreshEndpoints = async (assetIds) => {
-      const result = await findEndpoints(assetIds);
-      return result.data;
-    }
-
     updateStateIfChanged(inject.inject_all_teams, this.props.inject.inject_all_teams, 'allTeams');
     updateStateIfChanged(inject.inject_teams || [], this.props.inject.inject_teams || [], 'teamsIds');
     updateStateIfChanged(inject.inject_assets || [], this.props.inject.inject_assets || [], 'assetIds');
-    updateEndpointsIfChanged(this.state.endpoints, await refreshEndpoints(this.props.inject.inject_assets), 'endpoints');
     updateStateIfChanged(inject.inject_asset_groups || [], this.props.inject.inject_asset_groups || [], 'assetGroupIds');
     updateStateIfChanged(inject.inject_content?.articles || [], this.props.inject.inject_content?.articles || [], 'articlesIds');
     updateStateIfChanged(inject.inject_content?.challenges || [], this.props.inject.inject_content?.challenges || [], 'challengesIds');
@@ -336,16 +325,26 @@ class InjectDefinition extends Component {
   }
 
   // Assets
-  handleAddAssets(assetIds) {
-    this.setState({
-      assetIds,
-    }, () => this.props.setInjectDetailsState(this.state));
+  async refreshEndpoints(assetIds) {
+    const result = await findEndpoints(assetIds);
+    return result.data;
   }
 
-  handleRemoveAsset(assetId) {
+  async setAssetIdsState(assetIds) {
     this.setState({
-      assetIds: this.state.assetIds.filter(a => a !== assetId),
+      assetIds: assetIds,
     }, () => this.props.setInjectDetailsState(this.state));
+
+    // also force update resolved endpoints at the cost of a backend call
+    this.setState({endpoints: await this.refreshEndpoints(assetIds)});
+  }
+
+  async handleAddAssets(assetIds) {
+    await this.setAssetIdsState(assetIds)
+  }
+
+  async handleRemoveAsset(assetId) {
+    await this.setAssetIdsState(this.state.assetIds.filter(a => a !== assetId))
   }
 
   // Asset Groups
@@ -664,7 +663,7 @@ class InjectDefinition extends Component {
               {t('Targeted assets')}
             </Typography>
             <EndpointsList
-              endpointIds={endpoints}
+              endpoints={endpoints}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore: Endpoint property handle by EndpointsList
               actions={
