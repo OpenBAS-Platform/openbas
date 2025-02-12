@@ -18,6 +18,7 @@ import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { download } from '../../../../utils/utils';
 import { InjectContext, PermissionsContext } from '../Context';
+import ExportOptionsDialog from "../../../../components/common/export/ExportOptionsDialog";
 
 type InjectPopoverType = {
   inject_id: string;
@@ -75,6 +76,7 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openDone, setOpenDone] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [openExportDialog, setOpenExportDialog] = useState(false);
 
   const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] !== undefined);
 
@@ -124,7 +126,10 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
   const handleCloseTest = () => setOpenTest(false);
 
-  const handleExportJsonSingle = () => {
+  const handleExportOpen = () => setOpenExportDialog(true);
+  const handleExportClose = () => setOpenExportDialog(false);
+
+  const handleExportJsonSingle = (withPlayers: boolean, withTeams: boolean, withVariableValue: boolean) => {
     const exportData: InjectExportRequestInput = { injects: [
       { inject_id: inject.inject_id },
     ] };
@@ -134,6 +139,7 @@ const InjectPopover: FunctionComponent<Props> = ({
       const filename = match[1];
       download(result.data, filename, result.headers['content-type']);
     });
+    handleExportClose();
   };
 
   const submitTest = () => {
@@ -224,7 +230,7 @@ const InjectPopover: FunctionComponent<Props> = ({
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleExportJsonSingle} disabled={isDisabled}>
+        <MenuItem onClick={handleExportOpen} disabled={isDisabled}>
           {t('inject_export_json_single')}
         </MenuItem>
         <MenuItem onClick={handleOpenDuplicate} disabled={isDisabled}>
@@ -408,6 +414,7 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
+      <ExportOptionsDialog title={t('Export this inject')} open={openExportDialog} onCancel={handleExportClose} onClose={handleExportClose} onSubmit={handleExportJsonSingle} />
     </>
   );
 };
