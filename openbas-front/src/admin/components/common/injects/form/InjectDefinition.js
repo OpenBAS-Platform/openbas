@@ -26,6 +26,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
+import { findEndpoints } from '../../../../../actions/assets/endpoint-actions.js';
 import { fetchChallenges } from '../../../../../actions/Challenge.js';
 import { fetchChannels } from '../../../../../actions/channels/channel-action.js';
 import { fetchDocuments } from '../../../../../actions/Document';
@@ -55,7 +56,6 @@ import InjectAddChallenges from '../InjectAddChallenges';
 import InjectAddTeams from '../InjectAddTeams';
 import InjectTeamsList from '../teams/InjectTeamsList';
 import InjectContentFieldComponent from './InjectContentFieldComponent';
-import {findEndpoints} from "../../../../../actions/assets/endpoint-actions.js";
 
 const styles = theme => ({
   header: {
@@ -274,7 +274,7 @@ class InjectDefinition extends Component {
     this.props.fetchChannels();
     this.props.fetchChallenges();
     this.props.setInjectDetailsState(this.state);
-    this.setState({endpoints: await this.refreshEndpoints(this.state.assetIds)})
+    this.setState({ endpoints: await this.refreshEndpoints(this.state.assetIds) });
   }
 
   componentDidUpdate(prevProps) {
@@ -299,6 +299,7 @@ class InjectDefinition extends Component {
     updateStateIfChanged(inject.inject_documents || [], this.props.inject.inject_documents || [], 'documents');
     updateStateIfChanged(inject.inject_content?.expectations || [], this.props.inject.inject_content?.expectations || [], 'expectations');
   }
+
   toggleAll() {
     this.setState({ allTeams: !this.state.allTeams }, () => this.props.setInjectDetailsState(this.state));
   }
@@ -336,15 +337,15 @@ class InjectDefinition extends Component {
     }, () => this.props.setInjectDetailsState(this.state));
 
     // also force update resolved endpoints at the cost of a backend call
-    this.setState({endpoints: await this.refreshEndpoints(assetIds)});
+    this.setState({ endpoints: await this.refreshEndpoints(assetIds) });
   }
 
   async handleAddAssets(assetIds) {
-    await this.setAssetIdsState(assetIds)
+    await this.setAssetIdsState(assetIds);
   }
 
   async handleRemoveAsset(assetId) {
-    await this.setAssetIdsState(this.state.assetIds.filter(a => a !== assetId))
+    await this.setAssetIdsState(this.state.assetIds.filter(a => a !== assetId));
   }
 
   // Asset Groups
