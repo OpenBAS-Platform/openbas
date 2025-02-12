@@ -129,10 +129,17 @@ const InjectPopover: FunctionComponent<Props> = ({
   const handleExportOpen = () => setOpenExportDialog(true);
   const handleExportClose = () => setOpenExportDialog(false);
 
-  const handleExportJsonSingle = (withPlayers: boolean, withTeams: boolean, withVariableValue: boolean) => {
-    const exportData: InjectExportRequestInput = { injects: [
-      { inject_id: inject.inject_id },
-    ] };
+  const handleExportJsonSingle = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
+    const exportData: InjectExportRequestInput = {
+      injects: [
+        { inject_id: inject.inject_id },
+      ],
+      options: {
+        with_players: withPlayers,
+        with_teams: withTeams,
+        with_variable_values: withVariableValues
+      }
+    };
     exportInjects(exportData).then((result) => {
       const contentDisposition = result.headers['content-disposition'];
       const match = contentDisposition.match(/filename\s*=\s*(.*)/i);

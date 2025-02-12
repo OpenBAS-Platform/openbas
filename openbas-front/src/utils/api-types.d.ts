@@ -1154,6 +1154,12 @@ export interface ExportMapperInput {
   ids_to_export: string[];
 }
 
+export interface ExportOptionsInput {
+  with_players?: boolean;
+  with_teams?: boolean;
+  with_variable_values?: boolean;
+}
+
 export interface FileDrop {
   file_drop_file?: string;
   listened?: boolean;
@@ -1531,6 +1537,7 @@ export interface InjectExpectationUpdateInput {
 
 export interface InjectExportRequestInput {
   injects?: InjectExportTarget[];
+  options?: ExportOptionsInput;
 }
 
 export interface InjectExportTarget {
