@@ -578,7 +578,7 @@ class InjectDefinition extends Component {
     const expectationsNotManual = injectorContract.fields.filter(
       f => f.expectation === true,
     );
-    console.log('In RENDER =>', expectations)
+
     return (
       <>
         {hasTeams && (
