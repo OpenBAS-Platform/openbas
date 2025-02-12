@@ -11,8 +11,8 @@ import { useHelper } from '../../../../store';
 import { Scenario } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useScenarioPermissions from '../../../../utils/Scenario';
-import ScenarioExportDialog from './ScenarioExportDialog';
 import ScenarioUpdate from './ScenarioUpdate';
+import ExportOptionsDialog from "../../../../components/common/export/ExportOptionsDialog";
 
 type ScenarioActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
@@ -115,10 +115,12 @@ const ScenarioPopover: FunctionComponent<Props> = ({
       )}
       {actions.includes('Export')
       && (
-        <ScenarioExportDialog
+        <ExportOptionsDialog
+          title={t('Export the scenario')}
           open={exportation}
-          handleClose={handleCloseExport}
-          handleSubmit={submitExport}
+          onCancel={handleCloseExport}
+          onClose={handleCloseExport}
+          onSubmit={submitExport}
         />
       )}
     </>

@@ -22,6 +22,7 @@ import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
+import ExportOptionsDialog from "../../../../components/common/export/ExportOptionsDialog";
 
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
 
@@ -107,9 +108,9 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleOpenApplyRule = () => setOpenApplyRule(true);
   const handleCloseApplyRule = () => setOpenApplyRule(false);
 
-  const submitExport = () => {
+  const submitExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
     const link = document.createElement('a');
-    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithTeams=${exportTeams}&isWithPlayers=${exportPlayers}&isWithVariableValues=${exportVariableValues}`;
+    link.href = `/api/exercises/${exercise.exercise_id}/export?isWithTeams=${withTeams}&isWithPlayers=${withPlayers}&isWithVariableValues=${withVariableValues}`;
     link.click();
     handleCloseExport();
   };
@@ -216,71 +217,13 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         handleSubmit={submitDuplicate}
         text={`${t('Do you want to duplicate this simulation:')} ${exercise.exercise_name} ?`}
       />
-      <Dialog
-        open={openExport}
-        TransitionComponent={Transition}
-        onClose={handleCloseExport}
-        PaperProps={{ elevation: 1 }}
-      >
-        <DialogTitle>{t('Export the simulation')}</DialogTitle>
-        <DialogContent>
-          <TableContainer>
-            <Table aria-label="export table" size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('Elements')}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    {t('Export')}
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    {t('Injects (including attached files)')}
-                  </TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    <Checkbox checked={true} disabled={true} />
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>{t('Teams')}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    <Checkbox
-                      checked={exportTeams}
-                      onChange={handleToggleExportTeams}
-                    />
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>{t('Players')}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    <Checkbox
-                      checked={exportPlayers}
-                      onChange={handleToggleExportPlayers}
-                    />
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>{t('Variable values')}</TableCell>
-                  <TableCell style={{ textAlign: 'center' }}>
-                    <Checkbox
-                      checked={exportVariableValues}
-                      onChange={handleToggleExportVariableValues}
-                    />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseExport}>{t('Cancel')}</Button>
-          <Button color="secondary" onClick={submitExport}>
-            {t('Export')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ExportOptionsDialog
+          title={t('Export the simulation')}
+          open={openExport}
+          onCancel={handleCloseExport}
+          onClose={handleCloseExport}
+          onSubmit={submitExport}
+      />
     </>
   );
 };
