@@ -9,11 +9,12 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { Inject } from '../../../../utils/api-types';
+import { Inject, InjectInput, InjectorContractOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import InjectDetailsForm from './form/InjectDetailsForm';
-import UpdateInjectDetails from './UpdateInjectDetails';
+import { InjectorContractContent } from './form/InjectFormType';
+// import UpdateInjectDetails from './UpdateInjectDetails';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
 
 interface Props {
@@ -48,7 +49,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
     setActiveTab(newValue);
   };
 
-  const [injectorContractContent, setInjectorContractContent] = useState(null);
+  const [injectorContractContent, setInjectorContractContent] = useState<InjectorContractContent>({} as InjectorContractContent);
   useEffect(() => {
     if (inject?.inject_injector_contract?.injector_contract_content) {
       setInjectorContractContent(JSON.parse(inject.inject_injector_contract?.injector_contract_content));
@@ -74,18 +75,6 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             })}
           </Tabs>
         )}
-        {/* {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && ( */}
-        {/*  <UpdateInjectDetails */}
-        {/*    drawerRef={drawerRef} */}
-        {/*    contractContent={injectorContractContent} */}
-        {/*    injectId={injectId} */}
-        {/*    inject={inject} */}
-        {/*    handleClose={handleClose} */}
-        {/*    onUpdateInject={onUpdateInject} */}
-        {/*    isAtomic={isAtomic} */}
-        {/*    {...props} */}
-        {/*  /> */}
-        {/* )} */}
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
           <InjectDetailsForm
             // contractContent
@@ -96,18 +85,18 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             injectHeaderAction={(
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-                  platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+                  (platform: InjectorContractOutput['injector_contract_platforms']) => <PlatformIcon key={String(platform)} width={20} platform={String(platform)} marginRight={10} />,
                 )}
               </div>
             )}
             injectHeaderTitle=""
             disabled={!injectorContractContent}
             isAtomic={isAtomic}
-            inject={inject}
+            defaultInject={inject}
             drawerRef={drawerRef}
             handleClose={handleClose}
             injectorContractContent={injectorContractContent}
-            onSubmitInject={onUpdateInject}
+            onSubmitInject={(data: InjectInput) => onUpdateInject(data as Inject)}
             openDetail
             {...props}
           />

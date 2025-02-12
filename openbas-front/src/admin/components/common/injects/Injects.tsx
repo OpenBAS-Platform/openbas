@@ -19,11 +19,12 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type {
+import {
   Article,
   FilterGroup,
   Inject,
   InjectBulkUpdateOperation,
+  InjectInput,
   InjectTestStatusOutput,
   Team,
   Variable,
@@ -286,8 +287,8 @@ const Injects: FunctionComponent<Props> = ({
     }
   };
 
-  const onCreateInject = async (data: Inject) => {
-    await injectContext.onAddInject(data).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+  const onCreateInject = async (data: InjectInput) => {
+    await injectContext.onAddInject(data as Inject).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
       onCreate(result);
     });
   };

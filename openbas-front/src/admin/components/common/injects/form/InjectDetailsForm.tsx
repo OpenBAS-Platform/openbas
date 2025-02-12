@@ -1,40 +1,37 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
-import { useTheme } from '@mui/styles';
-import * as R from 'ramda';
+import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import type { TagHelper } from '../../../../../actions/helper';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Theme } from '../../../../../components/Theme';
+import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
-import { Inject } from '../../../../../utils/api-types';
-import { tagOptions } from '../../../../../utils/Option';
+import { Inject, InjectInput } from '../../../../../utils/api-types';
 import { splitDuration } from '../../../../../utils/Time';
 import { isEmptyField } from '../../../../../utils/utils';
 import { PermissionsContext } from '../../Context';
 import InjectDefinition from './InjectDefinition';
 import InjectForm from './InjectForm';
+import { FieldValue, InjectorContractContent, InjectorContractContentField } from './InjectFormType';
 
 interface Props {
   injectContractIcon: React.ReactNode | undefined;
   injectHeaderAction: React.ReactNode;
   injectHeaderTitle: string;
   injectorContractLabel?: string;
+  handleClose: () => void;
   openDetail?: boolean;
   disabled?: boolean;
   isAtomic: boolean;
-  inject?: Inject;
-
-  handleClose: () => void;
-  drawerRef: string;
-  onSubmitInject: (data: Inject) => Promise<void>;
-  injectorContractContent: object; // TODO set the type
-  // contractContentFields: object; // TODO set the type
-  defaultFieldValues: object; // TODO set the type
+  isCreation?: boolean;
+  drawerRef: React.RefObject<HTMLDivElement | null>;
+  defaultInject: Inject | Omit<Inject, 'inject_id' | 'inject_created_at' | 'inject_updated_at'>;
+  onSubmitInject: (data: InjectInput) => Promise<void>;
+  injectorContractContent?: InjectorContractContent;
 }
 
 const InjectDetailsForm = ({
@@ -42,47 +39,58 @@ const InjectDetailsForm = ({
   injectHeaderAction,
   injectHeaderTitle,
   injectorContractLabel = '',
-
   handleClose,
-  drawerRef,
-
   openDetail = false,
   disabled = false,
   isAtomic,
-  inject = {} as Inject,
+  isCreation = false,
+  drawerRef,
+  defaultInject = {} as Inject,
   injectorContractContent,
   onSubmitInject,
+  ...props
 }: Props) => {
-  const theme: Theme = useTheme();
+  const theme = useTheme();
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
   const [defaultValues, setDefaultValues] = useState({});
   const [openDetails, setOpenDetails] = useState(openDetail);
-  const [injectDetailsState, setInjectDetailsState] = useState({});
+  const [injectDetailsState, setInjectDetailsState] = useState({
+    allTeams: false,
+    teamsIds: defaultInject?.inject_teams,
+    assetIds: defaultInject?.inject_assets,
+    assetGroupIds: defaultInject?.inject_asset_groups,
+    documents: defaultInject.inject_documents,
+    articlesIds: [],
+    challengesIds: [],
+    expectations: [],
+  });
 
   const { tagsMap } = useHelper((helper: TagHelper) => ({
     tagsMap: helper.getTagsMap(),
   }));
   const toggleInjectContent = () => {
     if (openDetails) {
-      drawerRef.current.scrollTop = 0;
+      if (drawerRef.current) {
+        drawerRef.current.scrollTop = 0;
+      }
       setOpenDetails(false);
     } else {
       setOpenDetails(true);
     }
   };
 
-  const getInitialValues = () => {
-    const duration = splitDuration(inject?.inject_depends_duration || 0);
-    const initialValues = {
-      ...inject,
-      ...inject?.inject_content,
-      inject_title: inject?.inject_title ?? injectorContractLabel,
-      inject_tags: inject?.inject_tags ? tagOptions(inject.inject_tags, tagsMap) : [],
+  const getInitialValues = (): Record<string, FieldValue> => {
+    const duration = splitDuration(defaultInject?.inject_depends_duration || 0);
+    const initialValues: Record<string, FieldValue> = {
+      ...defaultInject,
+      ...defaultInject?.inject_content,
+      inject_tags: defaultInject?.inject_tags || [],
       inject_depends_duration_days: duration.days,
       inject_depends_duration_hours: duration.hours,
       inject_depends_duration_minutes: duration.minutes,
     };
+
     // Enrich initialValues with default contract value
     if (injectorContractContent) {
       const builtInFields = [
@@ -97,7 +105,7 @@ const InjectDetailsForm = ({
 
       injectorContractContent.fields
         .filter(f => !builtInFields.includes(f.key))
-        .forEach((field) => {
+        .forEach((field: InjectorContractContentField) => {
           if (!initialValues[field.key]) {
             initialValues[field.key] = field.cardinality === '1'
               ? field.defaultValue?.[0]
@@ -108,24 +116,25 @@ const InjectDetailsForm = ({
           if (
             field.type === 'textarea'
             && field.richText
-            && initialValues[field.key]?.length > 0
+            && initialValues[field.key]
           ) {
-            initialValues[field.key] = initialValues[field.key]
+            initialValues[field.key] = (initialValues[field.key] as string)
               .replaceAll('<#list challenges as challenge>', '&lt;#list challenges as challenge&gt;')
               .replaceAll('<#list articles as article>', '&lt;#list articles as article&gt;')
               .replaceAll('</#list>', '&lt;/#list&gt;');
 
           // Specific tuple type field
           } else if (field.type === 'tuple' && initialValues[field.key]) {
-            const processValue = (pair: { key: string; value: string }) =>
-              pair.value?.includes(`${field.tupleFilePrefix}`)
-                ? { type: 'attachment', key: pair.key, value: pair.value.replace(`${field.tupleFilePrefix}`, '') }
-                : { ...pair, type: 'text' };
+            const processValue = ({ key, value }: { key: string; value: string }) => ({
+              type: field.tupleFilePrefix != null && value?.includes(field.tupleFilePrefix) ? 'attachment' : 'text',
+              key,
+              value: field.tupleFilePrefix != null && value?.replace(field.tupleFilePrefix, ''),
+            });
 
             if (field.cardinality === '1') {
-              initialValues[field.key] = processValue(initialValues[field.key]);
+              initialValues[field.key] = processValue(initialValues[field.key] as { key: string; value: string });
             } else {
-              initialValues[field.key] = initialValues[field.key].map(processValue);
+              initialValues[field.key] = (initialValues[field.key] as { key: string; value: string }[]).map(processValue);
             }
           }
         });
@@ -133,84 +142,78 @@ const InjectDetailsForm = ({
     return initialValues;
   };
 
-  // TODO
-  const onSubmit = async (data) => {
-    if (injectorContractContent) {
-      const finalData = {};
-      const hasArticles = injectorContractContent.fields
-        .map(f => f.key)
-        .includes('articles');
-      if (hasArticles && injectDetailsState.articlesIds) {
-        finalData.articles = injectDetailsState.articlesIds;
-      }
-      const hasChallenges = injectorContractContent.fields
-        .map(f => f.key)
-        .includes('challenges');
-      if (hasChallenges && injectDetailsState.challengesIds) {
-        finalData.challenges = injectDetailsState.challengesIds;
-      }
-      const hasExpectations = injectorContractContent.fields
-        .map(f => f.key)
-        .includes('expectations');
-      if (hasExpectations && injectDetailsState.expectations) {
-        finalData.expectations = injectDetailsState.expectations;
-      }
+  const convertDataFromInjectorContractContent = (data: Record<string, FieldValue>): object | null => {
+    const newContent: Record<string, unknown> = {};
+    const hasArticles = injectorContractContent?.fields
+      .map(f => f.key)
+      .includes('articles');
+    if (hasArticles && injectDetailsState.articlesIds.length > 0) {
+      newContent.articles = injectDetailsState.articlesIds;
+    }
+    const hasChallenges = injectorContractContent?.fields
+      .map(f => f.key)
+      .includes('challenges');
+    if (hasChallenges && injectDetailsState.challengesIds.length > 0) {
+      newContent.challenges = injectDetailsState.challengesIds;
+    }
+    const hasExpectations = injectorContractContent?.fields
+      .map(f => f.key)
+      .includes('expectations');
+    if (hasExpectations && injectDetailsState.expectations.length > 0) {
+      newContent.expectations = injectDetailsState.expectations;
+    }
 
-      injectorContractContent.fields
-        .filter(
-          f => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
-            f.key,
-          ),
-        )
-        .forEach((field) => {
-          if (field.type === 'number') {
-            finalData[field.key] = parseInt(data[field.key], 10);
-          } else if (
-            field.type === 'textarea'
-            && field.richText
-            && data[field.key]
-            && data[field.key].length > 0
-          ) {
-            const regex = /&lt;#list\s+(\w+)\s+as\s+(\w+)&gt;/g;
-            finalData[field.key] = data[field.key]
-              .replace(regex, (_, listName, identifier) => `<#list ${listName} as ${identifier}>`)
-              .replaceAll('&lt;/#list&gt;', '</#list>');
-          } else if (data[field.key] && field.type === 'tuple') {
-            if (field.cardinality && field.cardinality === '1') {
-              if (finalData[field.key].type === 'attachment') {
-                finalData[field.key] = {
-                  key: data[field.key].key,
-                  value: `${field.tupleFilePrefix}${data[field.key].value}`,
-                };
-              } else {
-                finalData[field.key] = R.dissoc('type', data[field.key]);
-              }
-            } else {
-              finalData[field.key] = data[field.key].map((pair) => {
-                if (pair.type === 'attachment') {
-                  return {
-                    key: pair.key,
-                    value: `${field.tupleFilePrefix}${pair.value}`,
-                  };
-                }
-                return R.dissoc('type', pair);
-              });
-            }
+    injectorContractContent?.fields
+      .filter(
+        f => !['teams', 'assets', 'assetgroups', 'articles', 'challenges', 'attachments', 'expectations'].includes(
+          f.key,
+        ),
+      )
+      .forEach((field) => {
+        if (field.type === 'number' && typeof data[field.key] === 'string') {
+          newContent[field.key] = parseInt(String(data[field.key]), 10);
+
+        // Specific richText type field
+        } else if (
+          field.type === 'textarea'
+          && field.richText
+          && (String(data[field.key]))?.length > 0
+        ) {
+          const regex = /&lt;#list\s+(\w+)\s+as\s+(\w+)&gt;/g;
+          newContent[field.key] = (data[field.key] as string)
+            .replace(regex, (_, listName, identifier) => `<#list ${listName} as ${identifier}>`)
+            .replaceAll('&lt;/#list&gt;', '</#list>');
+
+        // Specific tuple type field
+        } else if (data[field.key] && field.type === 'tuple') {
+          const fieldData = data[field.key];
+          const formatTuple = ({ type, ...pair }: { key: string; value: string; type?: string }) => {
+            return type === 'attachment' ? { key: pair.key, value: `${field.tupleFilePrefix}${pair.value}` } : pair;
+          };
+          if (field.cardinality === '1') {
+            newContent[field.key] = formatTuple(fieldData as { key: string; value: string; type?: string });
           } else {
-            finalData[field.key] = data[field.key];
+            newContent[field.key] = (fieldData as { key: string; value: string; type?: string }[]).map(data => formatTuple(data));
           }
-        });
+        } else {
+          newContent[field.key] = data[field.key];
+        }
+      });
+    return isEmptyField(newContent) ? null : newContent;
+  };
 
+  const onSubmit = async (data: Record<string, FieldValue>) => {
+    if (injectorContractContent) {
+      const inject_depends_duration = Number(data.inject_depends_duration_days) * 3600 * 24
+        + Number(data.inject_depends_duration_hours) * 3600
+        + Number(data.inject_depends_duration_minutes) * 60;
       const { allTeams, teamsIds, assetIds, assetGroupIds, documents } = injectDetailsState;
-      const inject_depends_duration = data.inject_depends_duration_days * 3600 * 24
-        + data.inject_depends_duration_hours * 3600
-        + data.inject_depends_duration_minutes * 60;
       const values = {
         inject_title: data.inject_title,
         inject_injector_contract: injectorContractContent.contract_id,
-        inject_description: data.inject_description,
+        inject_description: data.inject_description as string,
         inject_tags: data.inject_tags,
-        inject_content: isEmptyField(finalData) ? null : finalData,
+        inject_content: convertDataFromInjectorContractContent(data),
         inject_all_teams: allTeams,
         inject_teams: teamsIds,
         inject_assets: assetIds,
@@ -218,7 +221,7 @@ const InjectDetailsForm = ({
         inject_documents: documents,
         inject_depends_duration,
         inject_depends_on: data.inject_depends_on ? data.inject_depends_on : [],
-      };
+      } as InjectInput;
       await onSubmitInject(values);
     }
     handleClose();
@@ -240,7 +243,7 @@ const InjectDetailsForm = ({
         inject_depends_duration_days: z.number().int().min(0, { message: t('This field is required.') }),
         inject_depends_duration_hours: z.number().int().min(0, { message: t('This field is required.') }),
         inject_depends_duration_minutes: z.number().int().min(0, { message: t('This field is required.') }),
-        ...Object.keys(defaultValues).reduce((acc, key) => {
+        ...Object.keys(defaultValues).reduce<Record<string, z.ZodTypeAny>>((acc, key) => {
           acc[key] = z.any();
           return acc;
         }, {}),
@@ -254,9 +257,12 @@ const InjectDetailsForm = ({
     reset(initialValues, { keepDirtyValues: true });
   }, [injectorContractContent]);
 
+  if (Object.keys(defaultValues).length === 0) {
+    return <Loader />;
+  }
+
   return (
     <>
-      <div>NEW INJECT DETAILS</div>
       <Card elevation={0}>
         <CardHeader
           sx={{ backgroundColor: theme.palette.background.default }}
@@ -284,34 +290,22 @@ const InjectDetailsForm = ({
                 register={register}
                 values={getValues()}
                 setValue={setValue}
-                getValues={key => getValues(key)}
+                getValues={(key: keyof typeof defaultValues) => getValues(key)}
                 submitting={isSubmitting}
                 inject={defaultValues}
-                // TODO create inject default fields for creation
-                // inject={{
-                //   inject_injector_contract: {
-                //     injector_contract_id: contractId,
-                //     injector_contract_arch: contract.injector_contract_arch,
-                //   },
-                //   inject_type: contractContent.config.type,
-                //   inject_teams: [],
-                //   inject_assets: [],
-                //   inject_asset_groups: [],
-                //   inject_documents: [],
-                // }}
                 injectorContract={{ ...injectorContractContent }}
                 handleClose={handleClose}
                 tagsMap={tagsMap}
                 readOnly={permissions.readOnly}
                 articlesFromExerciseOrScenario={[]}
                 variablesFromExerciseOrScenario={[]}
-
                 setInjectDetailsState={setInjectDetailsState}
                 uriVariable=""
                 allUsersNumber={0}
                 usersNumber={0}
                 teamsUsers={[]}
                 isAtomic={isAtomic}
+                {...props}
               />
             )}
             <div
@@ -350,7 +344,7 @@ const InjectDetailsForm = ({
             type="submit"
             disabled={isSubmitting || Object.keys(errors).length > 0 || disabled}
           >
-            {t('Update')}
+            {isCreation ? t('Create') : t('Update')}
           </Button>
         </div>
       </form>

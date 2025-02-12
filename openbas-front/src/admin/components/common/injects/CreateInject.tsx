@@ -1,18 +1,8 @@
-import { KeyboardArrowRight } from '@mui/icons-material';
-import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { HighlightOffOutlined, KeyboardArrowRight } from '@mui/icons-material';
-import {
-  Chip,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
+import { Chip, Grid, IconButton,
+  List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip,
 } from '@mui/material';
-import { CSSProperties, FunctionComponent, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, FunctionComponent, useMemo, useRef, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
@@ -29,11 +19,18 @@ import { Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { AttackPattern, FilterGroup, Inject, InjectorContractOutput, KillChainPhase } from '../../../../utils/api-types';
+import {
+  AttackPattern,
+  FilterGroup,
+  InjectInput, InjectorContract,
+  InjectorContractOutput,
+  KillChainPhase,
+} from '../../../../utils/api-types';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import { isNotEmptyField } from '../../../../utils/utils';
-import CreateInjectDetails from './CreateInjectDetails';
+// import CreateInjectDetails from './CreateInjectDetails';
 import InjectDetailsForm from './form/InjectDetailsForm';
+import { InjectorContractContent } from './form/InjectFormType';
 import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles()(() => ({
@@ -83,17 +80,17 @@ const inlineStyles: Record<string, CSSProperties> = {
 
 interface Props {
   title: string;
-  onCreateInject: (data: Inject) => Promise<void>;
+  onCreateInject: (data: InjectInput) => Promise<void>;
   isAtomic?: boolean;
   open?: boolean;
   handleClose: () => void;
   presetInjectDuration?: number;
 }
 
-const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = false, handleClose, isAtomic = false, presetInjectDuration, ...props }) => {
+const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = false, handleClose, isAtomic = false, presetInjectDuration = 0, ...props }) => {
   // Standard hooks
   const { classes } = useStyles();
-  const drawerRef = useRef(null);
+  const drawerRef = useRef<HTMLDivElement | null>(null);
   const { t, tPick } = useFormatter();
 
   // Fetching data
@@ -207,165 +204,158 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
 
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(isAtomic ? 'injector-contracts-atomic' : 'injector-contracts', initSearchPaginationInput());
 
-  // TODO type of contract
-  const [selectedContract, setSelectedContract] = useState<any | null>(null);
-  const selectContract = (contract) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    drawerRef.current.scrollTop = 0;
-    const parsedContract = { ...contract, injector_contract_content: JSON.parse(contract.injector_contract_content) };
+  const [selectedContract, setSelectedContract] = useState<Omit<InjectorContractOutput, 'injector_contract_content'> & {
+    injector_contract_content: InjectorContractContent;
+  } | null>(null);
+  const selectContract = (contract: InjectorContractOutput) => {
+    if (drawerRef.current) {
+      drawerRef.current.scrollTop = 0;
+    }
+    const parsedContract: Omit<InjectorContractOutput, 'injector_contract_content'> & {
+      injector_contract_content: InjectorContractContent;
+    } = { ...contract, injector_contract_content: JSON.parse(contract.injector_contract_content) };
     setSelectedContract(parsedContract);
   };
+
   const handleCloseDrawer = () => {
     setSelectedContract(null);
     handleClose();
   };
-  // TODO clean that :
-
-  // useEffect(() => {
-  //   if (contracts && contracts.length > 0) {
-  //     setParsedContentContracts(contracts.map(c => JSON.parse(c.injector_contract_content)));
-  //   }
-  //   setSelectedContract(null);
-  // }, [contracts]);
 
   let selectedContractKillChainPhase = null;
   if (selectedContract) {
-    const selectedContractAttackPatterns = computeAttackPatterns(selectedContract, attackPatternsMap);
-    // eslint-disable-next-line max-len
-    const killChainPhaseforSelection = selectedContractAttackPatterns.map((contractAttackPattern: AttackPattern) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
-    selectedContractKillChainPhase = killChainPhaseforSelection && killChainPhasesMap[killChainPhaseforSelection] && killChainPhasesMap[killChainPhaseforSelection].phase_name;
+    const selectedContractAttackPatterns = computeAttackPatterns(selectedContract?.injector_contract_attack_patterns, attackPatternsMap);
+    const killChainPhaseForSelection = selectedContractAttackPatterns
+      .flatMap((contractAttackPattern: AttackPattern) => contractAttackPattern.attack_pattern_kill_chain_phases ?? [])
+      .at(0);
+    selectedContractKillChainPhase = killChainPhaseForSelection && killChainPhasesMap[killChainPhaseForSelection] && killChainPhasesMap[killChainPhaseForSelection].phase_name;
   }
 
   return (
-    <>
-      <Drawer
-        open={open}
-        handleClose={handleCloseDrawer}
-        title={title}
-        variant="full"
-        PaperProps={{
-          ref: drawerRef,
-        }}
-        disableEnforceFocus
-      >
-        <Grid container spacing={3}>
-          <Grid item xs={7} style={{ paddingTop: 30 }}>
-            <PaginationComponentV2
-              fetch={searchInjectorContracts}
-              searchPaginationInput={searchPaginationInput}
-              setContent={setContracts}
-              entityPrefix="injector_contract"
-              availableFilterNames={availableFilterNames}
-              queryableHelpers={queryableHelpers}
-              disablePagination
-              attackPatterns={attackPatterns}
-            />
-            <List>
-              <ListItem
-                classes={{ root: classes.itemHead }}
-                divider={false}
-                style={{ paddingTop: 0 }}
-              >
-                <ListItemIcon />
-                <ListItemText
-                  primary={(
-                    <SortHeadersComponentV2
-                      headers={headers}
-                      inlineStylesHeaders={inlineStyles}
-                      sortHelpers={queryableHelpers.sortHelpers}
+    <Drawer
+      open={open}
+      handleClose={handleCloseDrawer}
+      title={title}
+      variant="full"
+      PaperProps={{
+        ref: drawerRef,
+      }}
+      disableEnforceFocus
+    >
+      <Grid container spacing={3}>
+        <Grid item xs={7} style={{ paddingTop: 30 }}>
+          <PaginationComponentV2
+            fetch={searchInjectorContracts}
+            searchPaginationInput={searchPaginationInput}
+            setContent={setContracts}
+            entityPrefix="injector_contract"
+            availableFilterNames={availableFilterNames}
+            queryableHelpers={queryableHelpers}
+            disablePagination
+            attackPatterns={attackPatterns}
+          />
+          <List>
+            <ListItem
+              classes={{ root: classes.itemHead }}
+              divider={false}
+              style={{ paddingTop: 0 }}
+            >
+              <ListItemIcon />
+              <ListItemText
+                primary={(
+                  <SortHeadersComponentV2
+                    headers={headers}
+                    inlineStylesHeaders={inlineStyles}
+                    sortHelpers={queryableHelpers.sortHelpers}
+                  />
+                )}
+              />
+            </ListItem>
+            {contracts.map((contract) => {
+              const contractAttackPatterns = computeAttackPatterns(contract.injector_contract_attack_patterns, attackPatternsMap);
+              const contractKillChainPhase = contractAttackPatterns
+                .flatMap((contractAttackPattern: AttackPattern) => contractAttackPattern.attack_pattern_kill_chain_phases ?? [])
+                .at(0);
+              const resolvedContractKillChainPhase = contractKillChainPhase && killChainPhasesMap[contractKillChainPhase];
+              return (
+                <ListItemButton
+                  key={contract.injector_contract_id}
+                  divider
+                  onClick={() => selectContract(contract)}
+                  selected={selectedContract?.injector_contract_id === contract.injector_contract_id}
+                  disabled={(selectedContract?.injector_contract_id === contract.injector_contract_id)}
+                >
+                  <ListItemIcon>
+                    <InjectIcon
+                      variant="list"
+                      type={contract.injector_contract_payload_type ?? contract.injector_contract_injector_type}
+                      isPayload={isNotEmptyField(contract.injector_contract_payload_type)}
                     />
-                  )}
-                />
-              </ListItem>
-              {contracts.map((contract) => {
-                const contractAttackPatterns = computeAttackPatterns(contract, attackPatternsMap);
-                // eslint-disable-next-line max-len
-                const contractKillChainPhase = contractAttackPatterns.map((contractAttackPattern: AttackPattern) => contractAttackPattern.attack_pattern_kill_chain_phases ?? []).flat().at(0);
-                const resolvedContractKillChainPhase = contractKillChainPhase && killChainPhasesMap[contractKillChainPhase];
-                return (
-                  <ListItemButton
-                    key={contract.injector_contract_id}
-                    divider
-                    onClick={() => selectContract(contract)}
-                    selected={selectedContract?.injector_contract_id === contract.injector_contract_id}
-                    disabled={(selectedContract?.injector_contract_id === contract.injector_contract_id)}
-                  >
-                    <ListItemIcon>
-                      <InjectIcon
-                        variant="list"
-                        type={contract.injector_contract_payload_type ?? contract.injector_contract_injector_type}
-                        isPayload={isNotEmptyField(contract.injector_contract_payload_type)}
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={(
-                        <div className={classes.bodyItems}>
-                          {headers.map(header => (
-                            <div
-                              key={header.field}
-                              className={classes.bodyItem}
-                              style={inlineStyles[header.field]}
-                            >
-                              {header.value?.(contract, resolvedContractKillChainPhase, contractAttackPatterns)}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    />
-                    <ListItemIcon classes={{ root: classes.goIcon }}>
-                      <KeyboardArrowRight />
-                    </ListItemIcon>
-                  </ListItemButton>
-                );
-              })}
-            </List>
-          </Grid>
-          <Grid item xs={5} style={{ paddingTop: 10 }}>
-            <InjectDetailsForm
-              injectorContractLabel={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
-              injectContractIcon={selectedContract ? (
-                <InjectIcon
-                  type={
-                    selectedContract?.injector_contract_payload
-                      ? selectedContract?.injector_contract_payload?.payload_collector_type
-                      || selectedContract?.injector_contract_payload?.payload_type
-                      : selectedContract?.injector_contract_injector_type
-                  }
-                  isPayload={isNotEmptyField(selectedContract.injector_contract_payload)}
-                />
-              ) : undefined}
-              injectHeaderAction={(
-                <IconButton aria-label="delete" disabled={!selectedContract} onClick={() => setSelectedContract(null)}>
-                  <HighlightOffOutlined />
-                </IconButton>
-              )}
-              injectHeaderTitle={selectedContractKillChainPhase || t('Kill chain phase')}
-              isAtomic={isAtomic}
-              disabled={!selectedContract}
-              inject={{ inject_depends_duration: presetInjectDuration } as Inject}
-              injectorContractContent={selectedContract?.injector_contract_content}
-              drawerRef={drawerRef}
-              handleClose={handleClose}
-              onSubmitInject={onCreateInject}
-            />
-            {/* <CreateInjectDetails */}
-            {/*  drawerRef={drawerRef} */}
-            {/*  contractId={selectedContract !== null && contracts?.length ? contracts[selectedContract]?.injector_contract_id : null} */}
-            {/*  contractContent={selectedContract !== null ? parsedContentContracts[selectedContract] : null} */}
-            {/*  contract={selectedContract !== null ? contracts[selectedContract] : null} */}
-            {/*  setSelectedContract={setSelectedContract} */}
-            {/*  selectedContractKillChainPhase={selectedContractKillChainPhase} */}
-            {/*  handleClose={handleCloseDrawer} */}
-            {/*  onCreateInject={onCreateInject} */}
-            {/*  isAtomic={isAtomic} */}
-            {/*  presetValues={presetValues} */}
-            {/*  {...props} */}
-            {/* /> */}
-          </Grid>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div className={classes.bodyItems}>
+                        {headers.map(header => (
+                          <div
+                            key={header.field}
+                            className={classes.bodyItem}
+                            style={inlineStyles[header.field]}
+                          >
+                            {header.value?.(contract, resolvedContractKillChainPhase, contractAttackPatterns)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  />
+                  <ListItemIcon classes={{ root: classes.goIcon }}>
+                    <KeyboardArrowRight />
+                  </ListItemIcon>
+                </ListItemButton>
+              );
+            })}
+          </List>
         </Grid>
-      </Drawer>
-    </>
+        <Grid item xs={5} style={{ paddingTop: 10 }}>
+          <InjectDetailsForm
+            injectorContractLabel={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
+            injectContractIcon={selectedContract ? (
+              <InjectIcon
+                type={selectedContract?.injector_contract_injector_type}
+                isPayload={false}
+              />
+            ) : undefined}
+            injectHeaderAction={(
+              <IconButton aria-label="delete" disabled={!selectedContract} onClick={() => setSelectedContract(null)}>
+                <HighlightOffOutlined />
+              </IconButton>
+            )}
+            injectHeaderTitle={selectedContractKillChainPhase || t('Kill chain phase')}
+            isAtomic={isAtomic}
+            disabled={!selectedContract}
+            defaultInject={{
+              inject_title: tPick(selectedContract?.injector_contract_labels),
+              inject_description: '',
+              inject_depends_duration: presetInjectDuration,
+              inject_injector_contract: {
+                injector_contract_id: selectedContract?.injector_contract_id ?? '',
+                injector_contract_arch: selectedContract?.injector_contract_arch,
+              } as InjectorContract,
+              inject_type: selectedContract?.injector_contract_content?.config?.type,
+              inject_teams: [],
+              inject_assets: [],
+              inject_asset_groups: [],
+              inject_documents: [],
+            }}
+            injectorContractContent={selectedContract?.injector_contract_content}
+            drawerRef={drawerRef}
+            handleClose={handleClose}
+            onSubmitInject={onCreateInject}
+            isCreation
+            {...props}
+          />
+        </Grid>
+      </Grid>
+    </Drawer>
   );
 };
 
