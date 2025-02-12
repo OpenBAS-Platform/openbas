@@ -900,9 +900,8 @@ class InjectDefinition extends Component {
             )}
             {hasExpectations && (
               <InjectExpectations
-                // FIXME: Remove all the logic here
-                // predefinedExpectationDatas={predefinedExpectations}
-                expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
+                predefinedExpectationDatas={predefinedExpectations}
+                expectationDatas={expectations}
                 handleExpectations={this.handleExpectations.bind(this)}
               />
             )}

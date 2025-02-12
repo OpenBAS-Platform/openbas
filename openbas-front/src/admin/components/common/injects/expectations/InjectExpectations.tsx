@@ -31,7 +31,7 @@ interface InjectExpectationsProps {
 }
 
 const InjectExpectations: FunctionComponent<InjectExpectationsProps> = ({
-  predefinedExpectationDatas,
+  predefinedExpectationDatas = [],
   expectationDatas,
   handleExpectations,
 }) => {
