@@ -145,7 +145,9 @@ public class SimulationDetails {
    * @return an Exercise Simple object
    */
   public static SimulationDetails fromRawExercise(
-      RawSimulation exercise, List<ExerciseTeamUser> exerciseTeamsUsers, List<Objective> objectives) {
+      RawSimulation exercise,
+      List<ExerciseTeamUser> exerciseTeamsUsers,
+      List<Objective> objectives) {
     SimulationDetailsBuilder details =
         SimulationDetails.builder()
             .id(exercise.getExercise_id())

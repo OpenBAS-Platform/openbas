@@ -7,7 +7,6 @@ import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.fixtures.composers.ExerciseComposer;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @TestInstance(PER_CLASS)
 @Transactional
-public class ExerciseTest {
+class SimulationTest {
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private EntityManager entityManager;
@@ -28,7 +27,7 @@ public class ExerciseTest {
 
   @Test
   @DisplayName("Given a persisted exercise, current pause from raw query is correctly persisted.")
-  public void GivenAnExercise_CurrentPauseFromRawQueryIsCorrectlyPersisted() {
+  void GivenAnExercise_CurrentPauseFromRawQueryIsCorrectlyPersisted() {
     Instant expectedCurrentPauseTime = Instant.parse("2012-11-21T04:05:00Z");
     ExerciseComposer.Composer wrapper =
         exerciseComposer.forExercise(
