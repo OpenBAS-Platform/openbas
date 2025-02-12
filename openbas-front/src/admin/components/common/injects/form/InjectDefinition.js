@@ -280,7 +280,7 @@ class InjectDefinition extends Component {
   componentDidUpdate(prevProps) {
     const { inject } = prevProps;
 
-    const updateStateIfChanged = async (currentValue, newValue, stateKey) => {
+    const updateStateIfChanged = (currentValue, newValue, stateKey) => {
       if (Array.isArray(newValue) && Array.isArray(currentValue)) {
         if (!arraysEqual(newValue, currentValue)) {
           this.setState({ [stateKey]: newValue || [] });
