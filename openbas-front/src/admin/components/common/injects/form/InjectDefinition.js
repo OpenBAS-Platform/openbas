@@ -26,6 +26,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
+import { findEndpoints } from '../../../../../actions/assets/endpoint-actions.js';
 import { fetchChallenges } from '../../../../../actions/Challenge.js';
 import { fetchChannels } from '../../../../../actions/channels/channel-action.js';
 import { fetchDocuments } from '../../../../../actions/Document';
@@ -251,6 +252,7 @@ class InjectDefinition extends Component {
       allTeams: props.inject.inject_all_teams,
       teamsIds: props.inject.inject_teams || [],
       assetIds: props.inject.inject_assets || [],
+      endpoints: [],
       assetGroupIds: props.inject.inject_asset_groups || [],
       articlesIds: props.inject.inject_content?.articles || [],
       challengesIds: props.inject.inject_content?.challenges || [],
@@ -267,11 +269,12 @@ class InjectDefinition extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.props.fetchDocuments();
     this.props.fetchChannels();
     this.props.fetchChallenges();
     this.props.setInjectDetailsState(this.state);
+    this.setState({ endpoints: await this.refreshEndpoints(this.state.assetIds) });
   }
 
   componentDidUpdate(prevProps) {
@@ -323,16 +326,26 @@ class InjectDefinition extends Component {
   }
 
   // Assets
-  handleAddAssets(assetIds) {
-    this.setState({
-      assetIds,
-    }, () => this.props.setInjectDetailsState(this.state));
+  async refreshEndpoints(assetIds) {
+    const result = await findEndpoints(assetIds);
+    return result.data;
   }
 
-  handleRemoveAsset(assetId) {
+  async setAssetIdsState(assetIds) {
     this.setState({
-      assetIds: this.state.assetIds.filter(a => a !== assetId),
+      assetIds: assetIds,
     }, () => this.props.setInjectDetailsState(this.state));
+
+    // also force update resolved endpoints at the cost of a backend call
+    this.setState({ endpoints: await this.refreshEndpoints(assetIds) });
+  }
+
+  async handleAddAssets(assetIds) {
+    await this.setAssetIdsState(assetIds);
+  }
+
+  async handleRemoveAsset(assetId) {
+    await this.setAssetIdsState(this.state.assetIds.filter(a => a !== assetId));
   }
 
   // Asset Groups
@@ -473,6 +486,7 @@ class InjectDefinition extends Component {
       allTeams,
       teamsIds,
       assetIds,
+      endpoints,
       assetGroupIds,
       documents,
       expectations,
@@ -650,7 +664,7 @@ class InjectDefinition extends Component {
               {t('Targeted assets')}
             </Typography>
             <EndpointsList
-              endpointIds={assetIds}
+              endpoints={endpoints}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore: Endpoint property handle by EndpointsList
               actions={
