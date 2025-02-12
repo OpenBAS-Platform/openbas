@@ -123,7 +123,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
       {actions.includes('Export')
       && (
         <ExportOptionsDialog
-          title={t('Export this atomic testing')}
+          title={t('atomic_testing_export_prompt')}
           open={exportOpen}
           onCancel={handleCloseExport}
           onClose={handleCloseExport}

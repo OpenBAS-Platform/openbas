@@ -421,7 +421,13 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
-      <ExportOptionsDialog title={t('Export this inject')} open={openExportDialog} onCancel={handleExportClose} onClose={handleExportClose} onSubmit={handleExportJsonSingle} />
+      <ExportOptionsDialog
+        title={t('inject_export_prompt')}
+        open={openExportDialog}
+        onCancel={handleExportClose}
+        onClose={handleExportClose}
+        onSubmit={handleExportJsonSingle}
+      />
     </>
   );
 };
