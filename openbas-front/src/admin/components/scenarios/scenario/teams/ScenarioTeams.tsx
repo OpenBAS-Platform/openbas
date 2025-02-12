@@ -1,4 +1,5 @@
 import { Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import { useContext } from 'react';
 import { useParams } from 'react-router';
@@ -24,6 +25,7 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
+  const theme = useTheme();
 
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
@@ -36,7 +38,7 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
 
   return (
     <TeamContext.Provider value={teamContextForScenario(scenarioId, scenarioTeamsUsers)}>
-      <div>
+      <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateRows: 'min-content 1fr' }}>
         <Typography variant="h4">
           {t('Teams')}
           {permissions.canWrite
@@ -46,8 +48,7 @@ const ScenarioTeams: React.FC<Props> = ({ scenarioTeamsUsers }) => {
             />
           )}
         </Typography>
-        <div className="clearfix" />
-        <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
+        <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
           <ContextualTeams teams={teamsStore} />
         </Paper>
       </div>

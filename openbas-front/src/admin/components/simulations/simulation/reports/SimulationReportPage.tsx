@@ -145,18 +145,16 @@ const SimulationReportPage: React.FC = () => {
         )}
         {displayModule(ReportInformationType.PLAYER_SURVEYS)
         && (
-          <div style={{ marginTop: theme.spacing(3), width: '100%' }}>
-            <LessonsCategories
-              style={{ width: '100%', paddingBottom: '60px' }}
-              lessonsCategories={reportData.lessonsCategories}
-              lessonsAnswers={reportData.lessonsAnswers}
-              lessonsQuestions={reportData.lessonsQuestions}
-              teamsMap={reportData.teamsMap}
-              teams={reportData.teams}
-              setSelectedQuestion={setSelectedQuestion}
-              isReport
-            />
-          </div>
+          <LessonsCategories
+            style={{ marginTop: theme.spacing(3), width: '100%', paddingBottom: '60px' }}
+            lessonsCategories={reportData.lessonsCategories}
+            lessonsAnswers={reportData.lessonsAnswers}
+            lessonsQuestions={reportData.lessonsQuestions}
+            teamsMap={reportData.teamsMap}
+            teams={reportData.teams}
+            setSelectedQuestion={setSelectedQuestion}
+            isReport
+          />
         )}
         {displayModule(ReportInformationType.EXERCISE_DETAILS)
         && <ExerciseDistribution exerciseId={exerciseId} isReport />}

@@ -21,21 +21,19 @@ const SimulationDefinition = () => {
     exercise: helper.getExercise(exerciseId),
   }));
   return (
-    <>
-      <div style={{ display: 'grid', gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr' }}>
-        <SimulationTeams exerciseTeamsUsers={exercise.exercise_teams_users ?? []} />
-        <SimulationVariables />
-      </div>
-      <div style={{ display: 'grid', marginTop: theme.spacing(8), gridTemplateColumns: '1fr' }}>
+    <div style={{ display: 'grid', gap: `${theme.spacing(3)} ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr' }}>
+      <SimulationTeams exerciseTeamsUsers={exercise.exercise_teams_users ?? []} />
+      <SimulationVariables />
+      <div style={{ gridColumn: '1 / span 2' }}>
         <ExerciseArticles />
       </div>
-      <div>
-        <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
+      <div style={{ gridColumn: '1 / span 2' }}>
+        <Typography variant="h4" style={{ float: 'left' }}>
           {t('Used challenges (in injects)')}
         </Typography>
         <ExerciseChallenges />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -21,21 +21,19 @@ const ScenarioDefinition = () => {
     scenario: helper.getScenario(scenarioId),
   }));
   return (
-    <>
-      <div style={{ display: 'grid', gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr' }}>
-        <ScenarioTeams scenarioTeamsUsers={scenario.scenario_teams_users} />
-        <ScenarioVariables />
-      </div>
-      <div style={{ display: 'grid', marginTop: theme.spacing(8), gridTemplateColumns: '1fr' }}>
+    <div style={{ display: 'grid', gap: `${theme.spacing(3)} ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr' }}>
+      <ScenarioTeams scenarioTeamsUsers={scenario.scenario_teams_users} />
+      <ScenarioVariables />
+      <div style={{ gridColumn: '1 / span 2' }}>
         <ScenarioArticles />
       </div>
-      <div>
-        <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
+      <div style={{ gridColumn: '1 / span 2' }}>
+        <Typography variant="h4" style={{ float: 'left' }}>
           {t('Used challenges (in injects)')}
         </Typography>
         <ScenarioChallenges />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,4 +1,5 @@
 import { Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useContext } from 'react';
 import { useParams } from 'react-router';
 
@@ -17,6 +18,8 @@ const SimulationVariables = () => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const theme = useTheme();
+
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
   const { permissions } = useContext(PermissionsContext);
@@ -33,13 +36,12 @@ const SimulationVariables = () => {
 
   return (
     <VariableContext.Provider value={context}>
-      <div>
+      <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateRows: 'min-content 1fr' }}>
         <Typography variant="h4">
           {t('Variables')}
           {permissions.canWrite && (<CreateVariable />)}
         </Typography>
-        <div className="clearfix" />
-        <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
+        <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
           <Variables variables={variables} />
         </Paper>
       </div>

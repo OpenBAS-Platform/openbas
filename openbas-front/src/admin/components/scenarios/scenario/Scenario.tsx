@@ -42,11 +42,7 @@ const useStyles = makeStyles()(theme => ({
     width: 180,
   },
   paper: {
-    // height: '100%',
-    // minHeight: '100%',
-    // margin: '10px 0 0 0',
     padding: theme.spacing(2),
-    // borderRadius: 4,
   },
 }));
 

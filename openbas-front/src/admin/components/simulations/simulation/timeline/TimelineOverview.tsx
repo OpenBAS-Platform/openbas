@@ -101,18 +101,16 @@ const TimelineOverview = () => {
     <div>
       <AnimationMenu exerciseId={exerciseId} />
       <div>
-        <div>
-          <SearchFilter
-            variant="small"
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
-        </div>
+        <SearchFilter
+          variant="small"
+          onChange={filtering.handleSearch}
+          keyword={filtering.keyword}
+        />
+        <TagsFilter
+          onAddTag={filtering.handleAddTag}
+          onRemoveTag={filtering.handleRemoveTag}
+          currentTags={filtering.tags}
+        />
       </div>
       <Timeline
         injects={filteredInjects}

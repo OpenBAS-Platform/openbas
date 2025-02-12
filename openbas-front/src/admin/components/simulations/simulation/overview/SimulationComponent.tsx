@@ -104,9 +104,7 @@ const SimulationComponent = () => {
           </Paper>
         </div>
       )}
-      <div>
-        <ExerciseDistribution exerciseId={exerciseId} />
-      </div>
+      <ExerciseDistribution exerciseId={exerciseId} />
     </div>
   );
 };
