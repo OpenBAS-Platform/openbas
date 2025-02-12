@@ -14,6 +14,7 @@ import type {
 } from '../../../../utils/api-types';
 import { download } from '../../../../utils/utils';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
+import ExportOptionsDialog from "../../../../components/common/export/ExportOptionsDialog";
 
 type AtomicTestingActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
 
@@ -61,9 +62,18 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     });
   };
 
-  const handleExport = () => {
+  // export
+  const [exportOpen, setExportOpen] = useState(false);
+  const handleOpenExport = () => setExportOpen(true);
+  const handleCloseExport = () => setExportOpen(false);
+  const doExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
     const exportData: InjectExportRequestInput = { injects:
       [{ inject_id: atomic.inject_id }],
+      options: {
+        with_players: withPlayers,
+        with_teams: withTeams,
+        with_variable_values: withVariableValues
+      }
     };
 
     exportInjects(exportData).then((result) => {
@@ -78,7 +88,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const entries = [];
   if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
   if (actions.includes('Update') && atomic.inject_injector_contract !== null) entries.push({ label: 'Update', action: () => handleOpenEdit() });
-  if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({ label: t('inject_export_json_single'), action: () => handleExport() });
+  if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({ label: t('inject_export_json_single'), action: () => handleOpenExport() });
   if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
 
   return (
@@ -110,6 +120,16 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
           text={`${t('Do you want to delete this atomic testing:')} ${atomic.inject_title} ?`}
         />
       )}
+      {actions.includes('Export')
+          && (
+              <ExportOptionsDialog
+                  title={t('Export this atomic testing')}
+                  open={exportOpen}
+                  onCancel={handleCloseExport}
+                  onClose={handleCloseExport}
+                  onSubmit={doExport}
+              />
+          )}
     </>
   );
 };
