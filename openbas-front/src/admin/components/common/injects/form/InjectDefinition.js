@@ -55,6 +55,7 @@ import InjectAddChallenges from '../InjectAddChallenges';
 import InjectAddTeams from '../InjectAddTeams';
 import InjectTeamsList from '../teams/InjectTeamsList';
 import InjectContentFieldComponent from './InjectContentFieldComponent';
+import {findEndpoints} from "../../../../../actions/assets/endpoint-actions.js";
 
 const styles = theme => ({
   header: {
@@ -251,6 +252,7 @@ class InjectDefinition extends Component {
       allTeams: props.inject.inject_all_teams,
       teamsIds: props.inject.inject_teams || [],
       assetIds: props.inject.inject_assets || [],
+      endpoints: [],
       assetGroupIds: props.inject.inject_asset_groups || [],
       articlesIds: props.inject.inject_content?.articles || [],
       challengesIds: props.inject.inject_content?.challenges || [],
@@ -274,7 +276,7 @@ class InjectDefinition extends Component {
     this.props.setInjectDetailsState(this.state);
   }
 
-  componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps) {
     const { inject } = prevProps;
 
     const updateStateIfChanged = (currentValue, newValue, stateKey) => {
@@ -287,16 +289,21 @@ class InjectDefinition extends Component {
       }
     };
 
+    const refreshEndpoints = async (assetIds) => {
+      const result = await findEndpoints(assetIds);
+      return result.data;
+    }
+
     updateStateIfChanged(inject.inject_all_teams, this.props.inject.inject_all_teams, 'allTeams');
     updateStateIfChanged(inject.inject_teams || [], this.props.inject.inject_teams || [], 'teamsIds');
     updateStateIfChanged(inject.inject_assets || [], this.props.inject.inject_assets || [], 'assetIds');
+    updateStateIfChanged(this.state.endpoints, await refreshEndpoints(this.props.inject.inject_assets), 'endpoints');
     updateStateIfChanged(inject.inject_asset_groups || [], this.props.inject.inject_asset_groups || [], 'assetGroupIds');
     updateStateIfChanged(inject.inject_content?.articles || [], this.props.inject.inject_content?.articles || [], 'articlesIds');
     updateStateIfChanged(inject.inject_content?.challenges || [], this.props.inject.inject_content?.challenges || [], 'challengesIds');
     updateStateIfChanged(inject.inject_documents || [], this.props.inject.inject_documents || [], 'documents');
     updateStateIfChanged(inject.inject_content?.expectations || [], this.props.inject.inject_content?.expectations || [], 'expectations');
   }
-
   toggleAll() {
     this.setState({ allTeams: !this.state.allTeams }, () => this.props.setInjectDetailsState(this.state));
   }
