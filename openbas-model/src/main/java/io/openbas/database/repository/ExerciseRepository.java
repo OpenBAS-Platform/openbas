@@ -257,7 +257,7 @@ public interface ExerciseRepository
               + "WHERE ex.exercise_id = :exerciseId "
               + "GROUP BY ex.exercise_id, inj.inject_scenario, se.scenario_id ;",
       nativeQuery = true)
-  RawExercise rawDetailsById(@Param("exerciseId") String exerciseId);
+  RawSimulation rawDetailsById(@Param("exerciseId") String exerciseId);
 
   @Query(
       value =

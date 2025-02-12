@@ -7,7 +7,7 @@ import static io.openbas.database.specification.ExerciseSpecification.findGrante
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.exercise.form.ExerciseDetails.fromRawExercise;
+import static io.openbas.rest.exercise.form.SimulationDetails.fromRawExercise;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationCriteriaBuilder;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
@@ -386,12 +386,12 @@ public class ExerciseApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  public ExerciseDetails exercise(@PathVariable String exerciseId) {
+  public SimulationDetails exercise(@PathVariable String exerciseId) {
     // We get the raw exercise
-    RawExercise rawExercise = exerciseRepository.rawDetailsById(exerciseId);
+    RawSimulation rawSimulation = exerciseRepository.rawDetailsById(exerciseId);
     // We get the injects linked to this exercise
     List<RawInject> rawInjects =
-        injectRepository.findRawByIds(rawExercise.getInject_ids().stream().distinct().toList());
+        injectRepository.findRawByIds(rawSimulation.getInject_ids().stream().distinct().toList());
     // We get the tuple exercise/team/user
     List<RawExerciseTeamUser> listRawExerciseTeamUsers =
         exerciseTeamUserRepository.rawByExerciseIds(List.of(exerciseId));
@@ -445,7 +445,7 @@ public class ExerciseApi extends RestBehavior {
         listRawExerciseTeamUsers.stream().map(ExerciseTeamUser::fromRawExerciseTeamUser).toList();
 
     // We create an ExerciseDetails object and populate it
-    ExerciseDetails detail = fromRawExercise(rawExercise, listExerciseTeamUsers, objectives);
+    SimulationDetails detail = fromRawExercise(rawSimulation, listExerciseTeamUsers, objectives);
     detail.setPlatforms(
         rawInjects.stream()
             .flatMap(inject -> inject.getInject_platforms().stream())

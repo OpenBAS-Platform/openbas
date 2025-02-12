@@ -2,12 +2,12 @@ package io.openbas.database.model;
 
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-import io.openbas.database.raw.RawExercise;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.fixtures.composers.ExerciseComposer;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,11 +41,11 @@ public class ExerciseTest {
     entityManager.flush();
     entityManager.clear();
 
-    RawExercise dbExercise = exerciseRepository.rawDetailsById(expected.getId());
+    Exercise dbExercise = exerciseRepository.findById(expected.getId()).orElseThrow();
 
     Assertions.assertTrue(
         expected.getCurrentPause().isPresent(),
         "Current pause should be present for expected exercise");
-    Assertions.assertEquals(expected.getCurrentPause().get(), dbExercise.getExercise_pause_date());
+    Assertions.assertEquals(expected.getCurrentPause().get(), dbExercise.getCurrentPause().get());
   }
 }

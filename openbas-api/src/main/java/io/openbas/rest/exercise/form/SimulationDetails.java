@@ -9,7 +9,7 @@ import io.openbas.database.model.ExerciseTeamUser;
 import io.openbas.database.model.KillChainPhase;
 import io.openbas.database.model.Objective;
 import io.openbas.database.model.Scenario.SEVERITY;
-import io.openbas.database.raw.RawExercise;
+import io.openbas.database.raw.RawSimulation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -23,7 +23,7 @@ import lombok.Setter;
 @Builder
 @Setter
 @Getter
-public class ExerciseDetails {
+public class SimulationDetails {
 
   @JsonProperty("exercise_id")
   @NotBlank
@@ -144,10 +144,10 @@ public class ExerciseDetails {
    * @param exercise the raw exercise
    * @return an Exercise Simple object
    */
-  public static ExerciseDetails fromRawExercise(
-      RawExercise exercise, List<ExerciseTeamUser> exerciseTeamsUsers, List<Objective> objectives) {
-    ExerciseDetailsBuilder details =
-        ExerciseDetails.builder()
+  public static SimulationDetails fromRawExercise(
+      RawSimulation exercise, List<ExerciseTeamUser> exerciseTeamsUsers, List<Objective> objectives) {
+    SimulationDetailsBuilder details =
+        SimulationDetails.builder()
             .id(exercise.getExercise_id())
             .name(exercise.getExercise_name())
             .description(exercise.getExercise_description())

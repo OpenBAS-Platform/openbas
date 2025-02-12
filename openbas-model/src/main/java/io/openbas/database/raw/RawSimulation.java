@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
-public interface RawExercise {
+public interface RawSimulation {
 
   String getExercise_id();
 
