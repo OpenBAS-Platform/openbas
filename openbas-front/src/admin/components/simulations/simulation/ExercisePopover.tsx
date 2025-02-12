@@ -1,4 +1,3 @@
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -10,7 +9,7 @@ import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import Drawer from '../../../../components/common/Drawer';
-import Transition from '../../../../components/common/Transition';
+import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import type {
@@ -22,7 +21,6 @@ import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseForm from './ExerciseForm';
 import ExerciseReports from './reports/ExerciseReports';
-import ExportOptionsDialog from "../../../../components/common/export/ExportOptionsDialog";
 
 export type ExerciseActionPopover = 'Duplicate' | 'Update' | 'Delete' | 'Export' | 'Access reports';
 
@@ -92,9 +90,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   // Export
   const [openExport, setOpenExport] = useState(false);
-  const [exportTeams, setExportTeams] = useState(false);
-  const [exportPlayers, setExportPlayers] = useState(false);
-  const [exportVariableValues, setExportVariableValues] = useState(false);
   const handleOpenExport = () => setOpenExport(true);
   const handleCloseExport = () => setOpenExport(false);
 
@@ -114,10 +109,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
     link.click();
     handleCloseExport();
   };
-
-  const handleToggleExportTeams = () => setExportTeams(!exportTeams);
-  const handleToggleExportPlayers = () => setExportPlayers(!exportPlayers);
-  const handleToggleExportVariableValues = () => setExportVariableValues(!exportVariableValues);
 
   const permissions = usePermissions(exercise.exercise_id);
 
@@ -218,11 +209,11 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         text={`${t('Do you want to duplicate this simulation:')} ${exercise.exercise_name} ?`}
       />
       <ExportOptionsDialog
-          title={t('Export the simulation')}
-          open={openExport}
-          onCancel={handleCloseExport}
-          onClose={handleCloseExport}
-          onSubmit={submitExport}
+        title={t('Export the simulation')}
+        open={openExport}
+        onCancel={handleCloseExport}
+        onClose={handleCloseExport}
+        onSubmit={submitExport}
       />
     </>
   );
