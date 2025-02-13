@@ -152,17 +152,16 @@ public class ResultUtils {
 
     return injectIds.stream()
         .flatMap(
-            injectId -> {
-              return AtomicTestingUtils.getTargetsWithResultsFromRaw(
-                  expectationMap.getOrDefault(injectId, emptyList()),
-                  injectAssetMap.getOrDefault(injectId, emptyList()),
-                  teamMap,
-                  userMap,
-                  assetMap,
-                  assetGroupMap,
-                  dynamicForAssetGroupMap)
-                  .stream();
-            })
+            injectId ->
+                AtomicTestingUtils.getTargetsWithResultsFromRaw(
+                    expectationMap.getOrDefault(injectId, emptyList()),
+                    injectAssetMap.getOrDefault(injectId, emptyList()),
+                    teamMap,
+                    userMap,
+                    assetMap,
+                    assetGroupMap,
+                    dynamicForAssetGroupMap)
+                    .stream())
         .distinct()
         .toList();
   }
