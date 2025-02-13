@@ -146,7 +146,7 @@ const SimulationReportPage: React.FC = () => {
         {displayModule(ReportInformationType.PLAYER_SURVEYS)
         && (
           <LessonsCategories
-            style={{ marginTop: theme.spacing(3), width: '100%', paddingBottom: '60px' }}
+            style={{ marginTop: theme.spacing(3), width: '100%' }}
             lessonsCategories={reportData.lessonsCategories}
             lessonsAnswers={reportData.lessonsAnswers}
             lessonsQuestions={reportData.lessonsQuestions}
