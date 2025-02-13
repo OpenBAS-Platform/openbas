@@ -500,6 +500,7 @@ const Injects: FunctionComponent<Props> = ({
             isAtLeastOneValidInject={atLeastOneValidInject}
           />
         )}
+        contextId={exerciseOrScenarioId}
       />
       {viewModeContext === 'chain' && (
         <div style={{ marginBottom: 10 }}>
