@@ -1,6 +1,8 @@
 package io.openbas.rest.inject.service;
 
-import static io.openbas.utils.FilterUtilsJpa.*;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
 
@@ -9,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
@@ -17,22 +18,25 @@ import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.specification.InjectSpecification;
 import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
 import io.openbas.rest.inject.form.InjectBulkUpdateSupportedOperations;
+import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
-import io.openbas.service.AssetGroupService;
-import io.openbas.service.AssetService;
+import io.openbas.rest.tag.TagService;
+import io.openbas.service.*;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -42,6 +46,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -61,8 +66,90 @@ public class InjectService {
   private final InjectStatusRepository injectStatusRepository;
   private final InjectMapper injectMapper;
   private final MethodSecurityExpressionHandler methodSecurityExpressionHandler;
+  private final UserService userService;
+  private final InjectorContractService injectorContractService;
+  private final TagRuleService tagRuleService;
+  private final TagService tagService;
+  private final DocumentService documentService;
 
   @Resource protected ObjectMapper mapper;
+
+  public Inject createInject(
+      @Nullable final Exercise exercise,
+      @Nullable final Scenario scenario,
+      @NotNull final InjectInput input) {
+    if (exercise == null && scenario == null || exercise != null && scenario != null) {
+      throw new IllegalArgumentException("Exactly one of exercise or scenario should be present");
+    }
+
+    InjectorContract injectorContract =
+        this.injectorContractService.injectorContract(input.getInjectorContract());
+    // Get common attributes
+    Inject inject = input.toInject(injectorContract);
+    inject.setUser(this.userService.currentUser());
+    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
+    inject.setTags(iterableToSet(tagService.tags(input.getTagIds())));
+    List<InjectDocument> injectDocuments =
+        input.getDocuments().stream()
+            .map(i -> i.toDocument(documentService.document(i.getDocumentId()), inject))
+            .toList();
+    inject.setDocuments(injectDocuments);
+    // Set dependencies
+    if (input.getDependsOn() != null) {
+      inject
+          .getDependsOn()
+          .addAll(
+              input.getDependsOn().stream()
+                  .map(
+                      injectDependencyInput ->
+                          injectDependencyInput.toInjectDependency(
+                              inject,
+                              this.inject(
+                                  injectDependencyInput.getRelationship().getInjectParentId())))
+                  .toList());
+    }
+
+    Set<Tag> tags = new HashSet<>();
+    // EXERCISE
+    if (exercise != null) {
+      tags = exercise.getTags();
+      inject.setExercise(exercise);
+      // Linked documents directly to the exercise
+      inject
+          .getDocuments()
+          .forEach(
+              document -> {
+                if (!document.getDocument().getExercises().contains(exercise)) {
+                  exercise.getDocuments().add(document.getDocument());
+                }
+              });
+    }
+    // SCENARIO
+    if (scenario != null) {
+      tags = scenario.getTags();
+      inject.setScenario(scenario);
+      // Linked documents directly to the scenario
+      inject
+          .getDocuments()
+          .forEach(
+              document -> {
+                if (!document.getDocument().getScenarios().contains(scenario)) {
+                  scenario.getDocuments().add(document.getDocument());
+                }
+              });
+    }
+
+    // verify if inject is not manual/sms/emails...
+    if (this.canApplyAssetGroupToInject(inject)) {
+      // add default asset groups
+      inject.setAssetGroups(
+          this.tagRuleService.applyTagRuleToInjectCreation(
+              tags.stream().map(Tag::getId).toList(),
+              assetGroupService.assetGroups(input.getAssetGroups())));
+    }
+    return injectRepository.save(inject);
+  }
 
   public Inject inject(@NotBlank final String injectId) {
     return this.injectRepository
@@ -306,7 +393,9 @@ public class InjectService {
     Set<String> assetsIDs = new HashSet<>();
     Set<String> assetGroupsIDs = new HashSet<>();
     for (var operation : operations) {
-      if (CollectionUtils.isEmpty(operation.getValues())) continue;
+      if (CollectionUtils.isEmpty(operation.getValues())) {
+        continue;
+      }
 
       switch (operation.getField()) {
         case TEAMS -> teamsIDs.addAll(operation.getValues());
@@ -407,7 +496,9 @@ public class InjectService {
       Map<String, Team> teamsFromDB,
       Map<String, Asset> assetsFromDB,
       Map<String, AssetGroup> assetGroupsFromDB) {
-    if (CollectionUtils.isEmpty(operations)) return;
+    if (CollectionUtils.isEmpty(operations)) {
+      return;
+    }
 
     for (var operation : operations) {
       switch (operation.getField()) {
@@ -449,7 +540,9 @@ public class InjectService {
       List<String> newValuesIDs,
       Map<String, T> entitiesFromDB,
       InjectBulkUpdateSupportedOperations operation) {
-    if (operation == InjectBulkUpdateSupportedOperations.REPLACE) injectEntities.clear();
+    if (operation == InjectBulkUpdateSupportedOperations.REPLACE) {
+      injectEntities.clear();
+    }
     newValuesIDs.forEach(
         id -> {
           T entity = entitiesFromDB.get(id);
@@ -460,7 +553,9 @@ public class InjectService {
 
           switch (operation) {
             case REPLACE, ADD -> {
-              if (!injectEntities.contains(entity)) injectEntities.add(entity);
+              if (!injectEntities.contains(entity)) {
+                injectEntities.add(entity);
+              }
             }
             case REMOVE -> injectEntities.remove(entity);
             default ->

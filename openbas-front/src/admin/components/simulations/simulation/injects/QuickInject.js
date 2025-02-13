@@ -236,7 +236,7 @@ class QuickInject extends Component {
       allTeams: false,
       teamsIds: [],
       documents: [],
-      expectations: [],
+      expectations: props.injectorContract.fields.filter(f => f.key === 'expectations').flatMap(f => f.predefinedExpectations) || [],
       teamsSortBy: 'team_name',
       teamsOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -1260,7 +1260,7 @@ class QuickInject extends Component {
                     && (
                       <InjectExpectations
                         predefinedExpectationDatas={predefinedExpectations}
-                        expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
+                        expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
                       />
                     )}

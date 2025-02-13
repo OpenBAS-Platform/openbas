@@ -24,28 +24,6 @@ interface Props {
   injects?: InjectOutputType[];
 }
 
-function getInjectorContractWithEmptyPredefinedExpectations(injectorContractContent: string) {
-  const injectorContract = JSON.parse(injectorContractContent);
-  const { fields } = injectorContract;
-  const fieldsOnlyExpectations = fields.filter(
-    (f: { key: string }) => f.key === 'expectations',
-  );
-  if (fieldsOnlyExpectations.length === 0 || (fieldsOnlyExpectations.length > 0 && !Object.prototype.hasOwnProperty.call(fieldsOnlyExpectations[0], 'predefinedExpectations'))) {
-    return injectorContract;
-  }
-  const fieldsWithoutExpectations = fields.filter(
-    (f: { key: string }) => f.key !== 'expectations',
-  );
-  const fieldsWithEmptyPredefinedExpectations = [
-    ...fieldsWithoutExpectations,
-    {
-      ...fieldsOnlyExpectations[0],
-      predefinedExpectations: [],
-    },
-  ];
-  return { ...injectorContract, fields: fieldsWithEmptyPredefinedExpectations };
-}
-
 const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, injects, ...props }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
@@ -71,7 +49,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
   const [injectorContractContent, setInjectorContractContent] = useState(null);
   useEffect(() => {
     if (inject?.inject_injector_contract?.injector_contract_content) {
-      setInjectorContractContent(getInjectorContractWithEmptyPredefinedExpectations(inject.inject_injector_contract?.injector_contract_content));
+      setInjectorContractContent(JSON.parse(inject.inject_injector_contract?.injector_contract_content));
     }
   }, [inject]);
   return (
