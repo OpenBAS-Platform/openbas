@@ -113,12 +113,16 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @GetMapping(SCENARIO_URI + "/{scenarioId}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The scenario")})
+  @Operation(summary = "Get scenario", description = "Get a scenario")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Scenario scenario(@PathVariable @NotBlank final String scenarioId) {
     return scenarioService.scenario(scenarioId);
   }
 
   @PutMapping(SCENARIO_URI + "/{scenarioId}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The scenario")})
+  @Operation(summary = "Update scenario", description = "Update a scenario")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Scenario updateScenario(
       @PathVariable @NotBlank final String scenarioId,
@@ -131,6 +135,8 @@ public class ScenarioApi extends RestBehavior {
   }
 
   @DeleteMapping(SCENARIO_URI + "/{scenarioId}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200")})
+  @Operation(summary = "Update scenario", description = "Update a scenario")
   @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public void deleteScenario(@PathVariable @NotBlank final String scenarioId) {
     this.scenarioService.deleteScenario(scenarioId);
