@@ -7,6 +7,11 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import type { TagHelper } from '../../../../../actions/helper';
+import {
+  ContractElement,
+  FieldValue,
+  InjectorContractConverted,
+} from '../../../../../actions/injector_contracts/InjectorContract';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
@@ -16,7 +21,6 @@ import { isEmptyField } from '../../../../../utils/utils';
 import { PermissionsContext } from '../../Context';
 import InjectDefinition from './InjectDefinition';
 import InjectForm from './InjectForm';
-import { FieldValue, InjectorContractContent, InjectorContractContentField } from './InjectFormType';
 
 interface Props {
   injectContractIcon: React.ReactNode | undefined;
@@ -31,7 +35,7 @@ interface Props {
   drawerRef: React.RefObject<HTMLDivElement | null>;
   defaultInject: Inject | Omit<Inject, 'inject_id' | 'inject_created_at' | 'inject_updated_at'>;
   onSubmitInject: (data: InjectInput) => Promise<void>;
-  injectorContractContent?: InjectorContractContent;
+  injectorContractContent?: InjectorContractConverted['convertedContent'];
 }
 
 const InjectDetailsForm = ({
@@ -105,7 +109,7 @@ const InjectDetailsForm = ({
 
       injectorContractContent.fields
         .filter(f => !builtInFields.includes(f.key))
-        .forEach((field: InjectorContractContentField) => {
+        .forEach((field: ContractElement) => {
           if (!initialValues[field.key]) {
             initialValues[field.key] = field.cardinality === '1'
               ? field.defaultValue?.[0]
@@ -262,7 +266,7 @@ const InjectDetailsForm = ({
   }
 
   return (
-    <>
+    <form id="injectContentForm" onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
       <Card elevation={0}>
         <CardHeader
           sx={{ backgroundColor: theme.palette.background.default }}
@@ -271,7 +275,7 @@ const InjectDetailsForm = ({
           action={injectHeaderAction}
         />
         <CardContent sx={{
-          fontSize: 18,
+          fontSize: theme.typography.h6.fontSize,
           textAlign: 'center',
           ...disabled && { color: theme.palette?.text?.disabled },
           ...disabled && { fontStyle: 'italic' },
@@ -280,75 +284,58 @@ const InjectDetailsForm = ({
           {injectorContractLabel}
         </CardContent>
       </Card>
-      <form id="injectContentForm" onSubmit={handleSubmit(onSubmit)} style={{ marginTop: 10 }}>
-        <InjectForm control={control} disabled={disabled} isAtomic={isAtomic} register={register} />
-        {injectorContractContent && (
-          <div style={{ marginTop: 20 }}>
-            {openDetails && (
-              <InjectDefinition
-                control={control}
-                register={register}
-                values={getValues()}
-                setValue={setValue}
-                getValues={(key: keyof typeof defaultValues) => getValues(key)}
-                submitting={isSubmitting}
-                inject={defaultValues}
-                injectorContract={{ ...injectorContractContent }}
-                handleClose={handleClose}
-                tagsMap={tagsMap}
-                readOnly={permissions.readOnly}
-                articlesFromExerciseOrScenario={[]}
-                variablesFromExerciseOrScenario={[]}
-                setInjectDetailsState={setInjectDetailsState}
-                uriVariable=""
-                allUsersNumber={0}
-                usersNumber={0}
-                teamsUsers={[]}
-                isAtomic={isAtomic}
-                {...props}
-              />
-            )}
-            <div
-              style={{
-                width: '100%',
-                height: 40,
-                textTransform: 'uppercase',
-                border: `1px solid ${theme.palette.divider}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 4,
-                cursor: 'pointer',
-                color: theme.palette.primary.main,
-                fontWeight: 600,
-              }}
-              onClick={toggleInjectContent}
-            >
-              {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
-              {t('Inject content')}
-            </div>
-          </div>
-        )}
-        <div style={{ float: 'right', marginTop: 20 }}>
-          <Button
-            variant="contained"
-            onClick={handleClose}
-            style={{ marginRight: 10 }}
-            disabled={isSubmitting}
-          >
-            {t('Cancel')}
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            type="submit"
-            disabled={isSubmitting || Object.keys(errors).length > 0 || disabled}
-          >
-            {isCreation ? t('Create') : t('Update')}
+      <InjectForm control={control} disabled={disabled} isAtomic={isAtomic} register={register} />
+      {injectorContractContent && (
+        <div style={{ width: '100%' }}>
+          {openDetails && (
+            <InjectDefinition
+              control={control}
+              register={register}
+              values={getValues()}
+              setValue={setValue}
+              getValues={(key: keyof typeof defaultValues) => getValues(key)}
+              submitting={isSubmitting}
+              inject={defaultValues}
+              injectorContract={{ ...injectorContractContent }}
+              handleClose={handleClose}
+              tagsMap={tagsMap}
+              readOnly={permissions.readOnly}
+              articlesFromExerciseOrScenario={[]}
+              variablesFromExerciseOrScenario={[]}
+              setInjectDetailsState={setInjectDetailsState}
+              uriVariable=""
+              allUsersNumber={0}
+              usersNumber={0}
+              teamsUsers={[]}
+              isAtomic={isAtomic}
+              {...props}
+            />
+          )}
+
+          <Button variant="outlined" onClick={toggleInjectContent} style={{ width: '100%', height: theme.spacing(5) }}>
+            {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
+            {t('Inject content')}
           </Button>
         </div>
-      </form>
-    </>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: theme.spacing(1) }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          type="submit"
+          disabled={isSubmitting || Object.keys(errors).length > 0 || disabled}
+        >
+          {isCreation ? t('Create') : t('Update')}
+        </Button>
+        <Button
+          variant="contained"
+          onClick={handleClose}
+          disabled={isSubmitting}
+        >
+          {t('Cancel')}
+        </Button>
+      </div>
+    </form>
   );
 };
 

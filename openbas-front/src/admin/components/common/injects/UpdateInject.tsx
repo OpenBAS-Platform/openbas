@@ -1,8 +1,10 @@
 import { Avatar, Tab, Tabs } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { fetchInject } from '../../../../actions/Inject';
+import { InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
 import type { InjectOutputType } from '../../../../actions/injects/Inject';
 import type { InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
@@ -13,8 +15,6 @@ import { Inject, InjectInput, InjectorContractOutput } from '../../../../utils/a
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import InjectDetailsForm from './form/InjectDetailsForm';
-import { InjectorContractContent } from './form/InjectFormType';
-// import UpdateInjectDetails from './UpdateInjectDetails';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
 
 interface Props {
@@ -29,6 +29,7 @@ interface Props {
 
 const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, injects, ...props }) => {
   const { t, tPick } = useFormatter();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
   const drawerRef = useRef(null);
   const [availableTabs] = useState<string[]>(['Inject details', 'Logical chains']);
@@ -49,10 +50,10 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
     setActiveTab(newValue);
   };
 
-  const [injectorContractContent, setInjectorContractContent] = useState<InjectorContractContent>({} as InjectorContractContent);
+  const [injectorContractContent, setInjectorContractContent] = useState<InjectorContractConverted['convertedContent']>();
   useEffect(() => {
-    if (inject?.inject_injector_contract?.injector_contract_content) {
-      setInjectorContractContent(JSON.parse(inject.inject_injector_contract?.injector_contract_content));
+    if (inject?.inject_injector_contract?.convertedContent) {
+      setInjectorContractContent(inject.inject_injector_contract?.convertedContent);
     }
   }, [inject]);
   return (
@@ -67,7 +68,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
     >
       <>
         {!isAtomic && (
-          <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
+          <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{ marginBottom: theme.spacing(2) }}>
             {availableTabs.map((tab) => {
               return (
                 <Tab key={tab} label={tab} value={tab} />
@@ -77,7 +78,6 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
         )}
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
           <InjectDetailsForm
-            // contractContent
             injectorContractLabel={tPick(injectorContractContent?.label)}
             injectContractIcon={
               injectorContractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${injectorContractContent.config.type}`} /> : undefined
