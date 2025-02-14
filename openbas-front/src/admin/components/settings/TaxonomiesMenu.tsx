@@ -1,79 +1,30 @@
 import { RouteOutlined, StyleOutlined } from '@mui/icons-material';
-import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
 import { LockPattern } from 'mdi-material-ui';
-import * as React from 'react';
-import { Link, useLocation } from 'react-router';
-import { CSSObject } from 'tss-react';
-import { makeStyles } from 'tss-react/mui';
+import { type FunctionComponent } from 'react';
 
-import { useFormatter } from '../../../components/i18n';
+import RightMenu, { type RightMenuEntry } from '../../../components/common/menu/RightMenu';
 
-const useStyles = makeStyles()(theme => ({
-  drawer: {
-    minHeight: '100vh',
-    width: 200,
-    position: 'fixed',
-    overflow: 'auto',
-    padding: 0,
-    backgroundColor: theme.palette.background.nav,
+const entries: RightMenuEntry[] = [
+  {
+    path: '/admin/settings/taxonomies/tags',
+    icon: () => (<StyleOutlined fontSize="medium" />),
+    label: 'Tags',
   },
-  toolbar: theme.mixins.toolbar as CSSObject,
-  item: {
-    paddingTop: 10,
-    paddingBottom: 10,
+  {
+    path: '/admin/settings/taxonomies/attack_patterns',
+    icon: () => (<LockPattern fontSize="medium" />),
+    label: 'Attack patterns',
   },
-}));
+  {
+    path: '/admin/settings/taxonomies/kill_chain_phases',
+    icon: () => (<RouteOutlined fontSize="medium" />),
+    label: 'Kill chain phases',
+  },
+];
 
-const DefinitionMenu: React.FC = () => {
-  const location = useLocation();
-  const { classes } = useStyles();
-  const { t } = useFormatter();
+const DefinitionMenu: FunctionComponent = () => {
   return (
-    <Drawer
-      variant="permanent"
-      anchor="right"
-      classes={{ paper: classes.drawer }}
-    >
-      <div className={classes.toolbar} />
-      <MenuList component="nav">
-        <MenuItem
-          component={Link}
-          to="/admin/settings/taxonomies/tags"
-          selected={location.pathname === '/admin/settings/taxonomies/tags'}
-          classes={{ root: classes.item }}
-          dense={false}
-        >
-          <ListItemIcon>
-            <StyleOutlined fontSize="medium" />
-          </ListItemIcon>
-          <ListItemText primary={t('Tags')} />
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          to="/admin/settings/taxonomies/attack_patterns"
-          selected={location.pathname === '/admin/settings/taxonomies/attack_patterns'}
-          classes={{ root: classes.item }}
-          dense={false}
-        >
-          <ListItemIcon>
-            <LockPattern fontSize="medium" />
-          </ListItemIcon>
-          <ListItemText primary={t('Attack patterns')} />
-        </MenuItem>
-        <MenuItem
-          component={Link}
-          to="/admin/settings/taxonomies/kill_chain_phases"
-          selected={location.pathname === '/admin/settings/taxonomies/kill_chain_phases'}
-          classes={{ root: classes.item }}
-          dense={false}
-        >
-          <ListItemIcon>
-            <RouteOutlined fontSize="medium" />
-          </ListItemIcon>
-          <ListItemText primary={t('Kill chain phases')} />
-        </MenuItem>
-      </MenuList>
-    </Drawer>
+    <RightMenu entries={entries} />
   );
 };
 
