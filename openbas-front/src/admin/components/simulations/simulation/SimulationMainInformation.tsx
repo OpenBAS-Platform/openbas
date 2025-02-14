@@ -1,4 +1,4 @@
-import { Chip, Grid, Link as MUILink, Paper, Typography } from '@mui/material';
+import { Chip, Grid, Link as MUILink, Paper, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -19,8 +19,9 @@ interface Props {
   exercise: Exercise;
 }
 
-const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
+const SimulationMainInformation: React.FC<Props> = ({ exercise }) => {
   const { t } = useFormatter();
+  const theme = useTheme();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
   const scenarioBaseUri = '/admin/scenarios';
   const { scenario } = useHelper((helper: ScenariosHelper) => ({
@@ -28,7 +29,7 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
   }));
 
   return (
-    <Paper sx={{ padding: '15px' }} variant="outlined">
+    <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
       <Grid id="main_information" container spacing={3}>
         <Grid item xs={8} style={{ paddingTop: 10 }}>
           <Typography
@@ -153,4 +154,4 @@ const ExerciseMainInformation: React.FC<Props> = ({ exercise }) => {
   );
 };
 
-export default ExerciseMainInformation;
+export default SimulationMainInformation;

@@ -18,9 +18,9 @@ import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { LessonContext, LessonContextType } from '../../../common/Context';
-import Lessons from '../../../lessons/exercises/Lessons';
+import Lessons from '../../../lessons/simulations/Lessons';
 
-const ExerciseLessons = () => {
+const SimulationLessons = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
@@ -142,4 +142,4 @@ const ExerciseLessons = () => {
   );
 };
 
-export default ExerciseLessons;
+export default SimulationLessons;

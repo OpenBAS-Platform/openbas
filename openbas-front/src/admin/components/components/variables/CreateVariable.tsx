@@ -19,10 +19,6 @@ import { VariableContext } from '../../common/Context';
 import VariableForm from './VariableForm';
 
 const useStyles = makeStyles()(theme => ({
-  createButton: {
-    float: 'left',
-    marginTop: -15,
-  },
   text: {
     fontSize: 15,
     color: theme.palette.primary.main,
@@ -68,8 +64,7 @@ const CreateVariable: React.FC<Props> = ({
           color="primary"
           aria-label="Add"
           onClick={() => setOpen(true)}
-          classes={{ root: classes.createButton }}
-          size="large"
+          size="small"
         >
           <Add fontSize="small" />
         </IconButton>

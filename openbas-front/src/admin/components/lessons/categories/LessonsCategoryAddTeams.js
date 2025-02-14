@@ -28,10 +28,6 @@ import TagsFilter from '../../common/filters/TagsFilter';
 import CreateTeam from '../../components/teams/CreateTeam';
 
 const styles = theme => ({
-  createButton: {
-    float: 'left',
-    margin: '-15px 0 0 5px',
-  },
   box: {
     width: '100%',
     minHeight: '100%',
@@ -152,12 +148,11 @@ class LessonsCategoryAddTeams extends Component {
       R.take(10),
     )(teams);
     return (
-      <div>
+      <>
         <IconButton
-          classes={{ root: classes.createButton }}
           onClick={this.handleOpen.bind(this)}
           aria-haspopup="true"
-          size="large"
+          size="small"
           color="secondary"
         >
           <Add fontSize="small" />
@@ -274,7 +269,7 @@ class LessonsCategoryAddTeams extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-      </div>
+      </>
     );
   }
 }

@@ -3,19 +3,11 @@ import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
-import { withStyles } from 'tss-react/mui';
 
 import Transition from '../../../components/common/Transition';
 import inject18n from '../../../components/i18n';
 import { LessonContext } from '../common/Context';
 import ObjectiveForm from './ObjectiveForm';
-
-const styles = () => ({
-  createButton: {
-    float: 'left',
-    marginTop: -15,
-  },
-});
 
 class CreateObjective extends Component {
   // Context
@@ -46,15 +38,14 @@ class CreateObjective extends Component {
   };
 
   render() {
-    const { classes, t } = this.props;
+    const { t } = this.props;
     return (
-      <div>
+      <>
         <IconButton
           color="secondary"
           aria-label="Add"
           onClick={this.handleOpen.bind(this)}
-          classes={{ root: classes.createButton }}
-          size="large"
+          size="small"
         >
           <Add fontSize="small" />
         </IconButton>
@@ -75,18 +66,16 @@ class CreateObjective extends Component {
             />
           </DialogContent>
         </Dialog>
-      </div>
+      </>
     );
   }
 }
 
 CreateObjective.propTypes = {
-  classes: PropTypes.object,
   t: PropTypes.func,
   addObjective: PropTypes.func,
 };
 
 export default R.compose(
   inject18n,
-  Component => withStyles(Component, styles),
 )(CreateObjective);

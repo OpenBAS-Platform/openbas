@@ -67,7 +67,7 @@ const ChannelsFilter: React.FC<Props> = (props) => {
   });
   const channelsOptions: ChannelTransformed[] = channels.map(channelTransform);
   return (
-    <div style={{ display: 'flex', float: 'right', marginTop: -15 }}>
+    <div style={{ display: 'flex', float: 'right' }}>
       <Autocomplete
         sx={{ width: fullWidth ? '100%' : 250 }}
         selectOnFocus={true}

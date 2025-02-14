@@ -1,4 +1,5 @@
 import { Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import { useContext } from 'react';
 import { useParams } from 'react-router';
@@ -19,11 +20,12 @@ interface Props {
   exerciseTeamsUsers: Exercise['exercise_teams_users'];
 }
 
-const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
+const SimulationTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
   const { permissions } = useContext(PermissionsContext);
+  const theme = useTheme();
 
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
@@ -36,21 +38,22 @@ const ExerciseTeams: React.FC<Props> = ({ exerciseTeamsUsers }) => {
 
   return (
     <TeamContext.Provider value={teamContextForExercise(exerciseId, exerciseTeamsUsers)}>
-      <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
-        {t('Teams')}
-      </Typography>
-      {permissions.canWrite
-      && (
-        <UpdateTeams
-          addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
-        />
-      )}
-      <div className="clearfix" />
-      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
-        <ContextualTeams teams={teamsStore} />
-      </Paper>
+      <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateRows: 'min-content 1fr' }}>
+        <Typography variant="h4">
+          {t('Teams')}
+          {permissions.canWrite
+          && (
+            <UpdateTeams
+              addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
+            />
+          )}
+        </Typography>
+        <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
+          <ContextualTeams teams={teamsStore} />
+        </Paper>
+      </div>
     </TeamContext.Provider>
   );
 };
 
-export default ExerciseTeams;
+export default SimulationTeams;

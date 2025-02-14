@@ -21,10 +21,10 @@ import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import ExerciseHeader from './ExerciseHeader';
 
-const Exercise = lazy(() => import('./overview/ExerciseComponent'));
+const Simulation = lazy(() => import('./overview/SimulationComponent'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
-const Lessons = lazy(() => import('./lessons/ExerciseLessons'));
-const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
+const Lessons = lazy(() => import('./lessons/SimulationLessons'));
+const SimulationDefinition = lazy(() => import('./SimulationDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Tests = lazy(() => import('./tests/ExerciseTests'));
 const TimelineOverview = lazy(() => import('./timeline/TimelineOverview'));
@@ -85,7 +85,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
             sx={{
               borderBottom: 1,
               borderColor: 'divider',
-              marginBottom: 4,
+              marginBottom: 2,
             }}
           >
             <Tabs value={tabValue}>
@@ -133,9 +133,9 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="" element={errorWrapper(Exercise)()} />
+              <Route path="" element={errorWrapper(Simulation)()} />
               <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
-              <Route path="definition" element={errorWrapper(ExerciseDefinition)()} />
+              <Route path="definition" element={errorWrapper(SimulationDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
               <Route path="animation" element={<Navigate to="timeline" replace={true} />} />

@@ -1,5 +1,5 @@
 import { CastForEducationOutlined, HelpOutlined } from '@mui/icons-material';
-import { Chip, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Chip, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { useContext } from 'react';
@@ -21,10 +21,13 @@ const useStyles = makeStyles()(() => ({
 
 const LessonsCategories = ({
   lessonsCategories,
+  lessonsAnswers,
   lessonsQuestions,
+  setSelectedQuestion = {},
   teamsMap,
   teams,
   isReport,
+  style = {},
 }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -46,8 +49,27 @@ const LessonsCategories = ({
     const data = { lessons_category_teams: teamsIds };
     return onUpdateLessonsCategoryTeams(lessonsCategoryId, data);
   };
+  const consolidatedAnswers = R.pipe(
+    R.groupBy(R.prop('lessons_answer_question')),
+    R.toPairs,
+    R.map(([key, values]) => {
+      const totalScore = R.sum(R.map(o => o.lessons_answer_score, values));
+      return [
+        key,
+        {
+          score: Math.round(totalScore / values.length), // Calculate average directly
+          number: values.length,
+          comments: R.filter(
+            o => o.lessons_answer_positive !== null || o.lessons_answer_negative !== null,
+            values,
+          ).length,
+        },
+      ];
+    }),
+    R.fromPairs,
+  )(lessonsAnswers);
   return (
-    <div style={{ display: 'grid', gap: `${theme.spacing(2)} 0`, gridTemplateColumns: '1fr' }}>
+    <div id="lessons_categories" style={{ display: 'grid', gap: `${theme.spacing(2)} 0`, gridTemplateColumns: '1fr', ...style }}>
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
@@ -64,22 +86,21 @@ const LessonsCategories = ({
                 />
               )}
             </Typography>
-            <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateColumns: '3fr 2fr' }}>
-              <Typography variant="h4" style={{ alignContent: 'center' }}>{t('Questions')}</Typography>
-              <div>
-                <Typography variant="h4">
-                  {t('Targeted teams')}
-                  {!isReport && (
-                    <LessonsCategoryAddTeams
-                      lessonsCategoryId={category.lessonscategory_id}
-                      lessonsCategoryTeamsIds={category.lessons_category_teams}
-                      handleUpdateTeams={handleUpdateTeams}
-                      teams={teams}
-                      teamsMap={teamsMap}
-                    />
-                  )}
-                </Typography>
-              </div>
+            <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr 1fr' }}>
+              <Typography variant="h4">{t('Questions')}</Typography>
+              <Typography variant="h4">{t('Results')}</Typography>
+              <Typography variant="h4">
+                {t('Targeted teams')}
+                {!isReport && (
+                  <LessonsCategoryAddTeams
+                    lessonsCategoryId={category.lessonscategory_id}
+                    lessonsCategoryTeamsIds={category.lessons_category_teams}
+                    handleUpdateTeams={handleUpdateTeams}
+                    teams={teams}
+                    teamsMap={teamsMap}
+                  />
+                )}
+              </Typography>
               <Paper variant="outlined">
                 <List style={{ padding: 0 }}>
                   {questions.map(question => (
@@ -111,6 +132,56 @@ const LessonsCategories = ({
                       lessonsCategoryId={category.lessonscategory_id}
                     />
                   )}
+                </List>
+              </Paper>
+              <Paper variant="outlined">
+                <List style={{ padding: 0 }}>
+                  {questions.map((question) => {
+                    const consolidatedAnswer = consolidatedAnswers[
+                      question.lessonsquestion_id
+                    ] || { score: 0, number: 0, comments: 0 };
+                    return (
+                      <ListItemButton
+                        key={question.lessonsquestion_id}
+                        divider
+                        onClick={() => setSelectedQuestion && setSelectedQuestion(question)}
+                      >
+                        <ListItemText
+                          style={{ width: '50%' }}
+                          primary={`${consolidatedAnswer.number} ${t(
+                            'answers',
+                          )}`}
+                          secondary={`${t('of which')} ${
+                            consolidatedAnswer.comments
+                          } ${t('contain comments')}`}
+                        />
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '30%',
+                            marginRight: 1,
+                          }}
+                        >
+                          <Box sx={{ width: '100%', mr: 1 }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={consolidatedAnswer.score}
+                            />
+                          </Box>
+                          <Box sx={{ minWidth: 35 }}>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              {consolidatedAnswer.score}
+                              %
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </ListItemButton>
+                    );
+                  })}
                 </List>
               </Paper>
               <Paper variant="outlined" style={{ padding: theme.spacing(2) }}>
