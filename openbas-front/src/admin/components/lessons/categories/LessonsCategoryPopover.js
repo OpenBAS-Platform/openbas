@@ -2,7 +2,6 @@ import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Slide } from '@mui/material';
 import * as R from 'ramda';
 import { forwardRef, useContext, useState } from 'react';
-import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { LessonContext } from '../../common/Context';
@@ -13,16 +12,8 @@ const Transition = forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const useStyles = makeStyles()(() => ({
-  button: {
-    float: 'left',
-    margin: '-15px 0 0 5px',
-  },
-}));
-
 const LessonsCategoryPopover = ({ lessonsCategory }) => {
   // utils
-  const { classes } = useStyles();
   const { t } = useFormatter();
   // states
   const [openDelete, setOpenDelete] = useState(false);
@@ -70,12 +61,11 @@ const LessonsCategoryPopover = ({ lessonsCategory }) => {
     ]),
   )(lessonsCategory);
   return (
-    <div>
+    <>
       <IconButton
-        classes={{ root: classes.button }}
         onClick={handlePopoverOpen}
         aria-haspopup="true"
-        size="large"
+        size="small"
       >
         <MoreVert />
       </IconButton>
@@ -123,7 +113,7 @@ const LessonsCategoryPopover = ({ lessonsCategory }) => {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 };
 

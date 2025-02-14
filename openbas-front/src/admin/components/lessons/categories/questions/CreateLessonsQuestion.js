@@ -70,7 +70,6 @@ const CreateLessonsQuestion = (props) => {
         </ListItemButton>
       ) : (
         <IconButton
-          classes={{ root: classes.createButton }}
           onClick={handleOpen}
           aria-haspopup="true"
           size="large"

@@ -1,4 +1,5 @@
 import { Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useContext } from 'react';
 import { useParams } from 'react-router';
 
@@ -17,6 +18,8 @@ const ScenarioVariables = () => {
   // Standard hooks
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
+  const theme = useTheme();
+
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const { permissions } = useContext(PermissionsContext);
@@ -33,14 +36,15 @@ const ScenarioVariables = () => {
 
   return (
     <VariableContext.Provider value={context}>
-      <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
-        {t('Variables')}
-      </Typography>
-      {permissions.canWrite && (<CreateVariable />)}
-      <div className="clearfix" />
-      <Paper sx={{ minHeight: '100%', padding: 2 }} variant="outlined">
-        <Variables variables={variables} />
-      </Paper>
+      <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateRows: 'min-content 1fr' }}>
+        <Typography variant="h4">
+          {t('Variables')}
+          {permissions.canWrite && (<CreateVariable />)}
+        </Typography>
+        <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
+          <Variables variables={variables} />
+        </Paper>
+      </div>
     </VariableContext.Provider>
   );
 };

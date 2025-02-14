@@ -1,26 +1,7 @@
 import { ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
-import {
-  Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  Link,
-  Paper,
-  Radio,
-  RadioGroup,
-  Switch,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import { useContext, useState } from 'react';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid2, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
 import * as React from 'react';
-import { makeStyles } from 'tss-react/mui';
+import { useContext, useState } from 'react';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
@@ -28,24 +9,10 @@ import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsTe
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
+import CreateObjective from '../CreateObjective';
+import LessonsObjectives from '../LessonsObjectives';
 import ObjectiveEvaluations from '../ObjectiveEvaluations';
 import LessonsCategories from './LessonsCategories';
-import LessonsObjectives from './LessonsObjectives';
-
-const useStyles = makeStyles()(() => ({
-  paper: {
-    position: 'relative',
-    padding: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
-  paperPadding: {
-    position: 'relative',
-    padding: '20px 20px 0 20px',
-    overflow: 'hidden',
-    height: '90%',
-  },
-}));
 
 interface GenericSource {
   id: string;
@@ -84,7 +51,6 @@ const Lessons: React.FC<Props> = ({
   lessonsTemplates,
 }) => {
   // Standard hooks
-  const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
 
@@ -122,87 +88,91 @@ const Lessons: React.FC<Props> = ({
     return setOpenAnonymize(false);
   };
   return (
-    <div style={{ marginBottom: '30px' }}>
-      <Grid container spacing={3}>
-        <Grid item xs={4} style={{ paddingTop: 10 }}>
-          <Typography variant="h4">{t('Parameters')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperPadding }}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Questionnaire mode')}</Typography>
-                <FormControlLabel
-                  control={(
-                    <Switch
-                      disabled={false}
-                      checked={source.lessons_anonymized}
-                      onChange={() => {
-                        if (!source.lessons_anonymized) {
-                          setOpenAnonymize(true);
-                        } else {
-                          toggleAnonymize();
-                        }
-                      }}
-                      name="anonymized"
-                    />
-                  )}
-                  label={t('Anonymize answers')}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Template')}</Typography>
-                <Button
-                  startIcon={<ContentPasteGoOutlined />}
-                  color="primary"
-                  variant="contained"
-                  onClick={() => setOpenApplyTemplate(true)}
-                >
-                  {t('Apply')}
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">{t('Check')}</Typography>
-                <Button
-                  startIcon={<VisibilityOutlined />}
-                  color="secondary"
-                  variant="contained"
-                  component={Link}
-                  href={`/lessons/${source.type}/${source.id}?preview=true`}
-                >
-                  {t('Preview')}
-                </Button>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="h3">
-                  {t('Categories and questions')}
-                </Typography>
-                <Button
-                  startIcon={<DeleteSweepOutlined />}
-                  color="error"
-                  variant="contained"
-                  onClick={() => setOpenEmptyLessons(true)}
-                >
-                  {t('Clear out')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={8} style={{ paddingTop: 10 }}>
-          <LessonsObjectives
-            objectives={objectives}
-            setSelectedObjective={setSelectedObjective}
-            source={source}
-            isReport={false}
-          />
-        </Grid>
-      </Grid>
-      <LessonsCategories
-        lessonsCategories={lessonsCategories}
-        lessonsQuestions={lessonsQuestions}
-        teamsMap={teamsMap}
-        teams={teams}
-        isReport={false}
-      />
+    <>
+      <div style={{ display: 'grid', gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 2fr' }}>
+        <Typography variant="h4" style={{ alignContent: 'center' }}>{t('Parameters')}</Typography>
+        <Typography variant="h4">
+          {t('Objectives')}
+          {' '}
+          {
+            source.isUpdatable && (<CreateObjective />)
+          }
+        </Typography>
+        <Paper variant="outlined" sx={{ padding: theme.spacing(3) }}>
+          <Grid2 container spacing={3}>
+            <Grid2 size={{ xs: 6 }}>
+              <Typography variant="h3">{t('Questionnaire mode')}</Typography>
+              <FormControlLabel
+                control={(
+                  <Switch
+                    disabled={false}
+                    checked={source.lessons_anonymized}
+                    onChange={() => {
+                      if (!source.lessons_anonymized) {
+                        setOpenAnonymize(true);
+                      } else {
+                        toggleAnonymize();
+                      }
+                    }}
+                    name="anonymized"
+                  />
+                )}
+                label={t('Anonymize answers')}
+              />
+            </Grid2>
+            <Grid2 size={{ xs: 6 }}>
+              <Typography variant="h3">{t('Template')}</Typography>
+              <Button
+                startIcon={<ContentPasteGoOutlined />}
+                color="primary"
+                variant="contained"
+                onClick={() => setOpenApplyTemplate(true)}
+              >
+                {t('Apply')}
+              </Button>
+            </Grid2>
+            <Grid2 size={{ xs: 6 }}>
+              <Typography variant="h3">{t('Check')}</Typography>
+              <Button
+                startIcon={<VisibilityOutlined />}
+                color="secondary"
+                variant="contained"
+                component={Link}
+                href={`/lessons/${source.type}/${source.id}?preview=true`}
+              >
+                {t('Preview')}
+              </Button>
+            </Grid2>
+            <Grid2 size={{ xs: 6 }}>
+              <Typography variant="h3">
+                {t('Categories and questions')}
+              </Typography>
+              <Button
+                startIcon={<DeleteSweepOutlined />}
+                color="error"
+                variant="contained"
+                onClick={() => setOpenEmptyLessons(true)}
+              >
+                {t('Clear out')}
+              </Button>
+            </Grid2>
+          </Grid2>
+        </Paper>
+        <LessonsObjectives
+          objectives={objectives}
+          setSelectedObjective={setSelectedObjective}
+          source={source}
+        />
+      </div>
+      <div style={{ marginTop: theme.spacing(2) }}>
+        <LessonsCategories
+          lessonsCategories={lessonsCategories}
+          lessonsQuestions={lessonsQuestions}
+          teamsMap={teamsMap}
+          teams={teams}
+          isReport={false}
+        />
+      </div>
       <CreateLessonsCategory />
       <Dialog
         TransitionComponent={Transition}
@@ -333,7 +303,7 @@ const Lessons: React.FC<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 };
 

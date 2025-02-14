@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
 import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -69,6 +69,7 @@ const InjectTestList: FunctionComponent<Props> = ({
   // Standard hooks
   const { classes } = useStyles();
   const { t, fldt } = useFormatter();
+  const theme = useTheme();
 
   const [selectedTest, setSelectedTest] = useState<InjectTestStatusOutput | null>(null);
 
@@ -123,7 +124,7 @@ const InjectTestList: FunctionComponent<Props> = ({
           onTest={result => setTests(result)}
         />
       </PaginationComponent>
-      <List style={{ marginTop: 40 }}>
+      <List style={{ marginTop: theme.spacing(2) }} disablePadding>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}

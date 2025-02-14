@@ -32,7 +32,7 @@ import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   chip: {
     fontSize: 12,
     height: 25,
@@ -41,15 +41,8 @@ const useStyles = makeStyles()(() => ({
     borderRadius: 4,
     width: 180,
   },
-  gridContainer: {
-    marginBottom: 20,
-  },
   paper: {
-    height: '100%',
-    minHeight: '100%',
-    margin: '10px 0 0 0',
-    padding: '15px 15px 0 15px',
-    borderRadius: 4,
+    padding: theme.spacing(2),
   },
 }));
 
@@ -88,154 +81,140 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
     />
   );
   return (
-    <>
-      <Grid
-        container
-        spacing={3}
-        classes={{ container: classes.gridContainer }}
-      >
-        <Grid item xs={6} style={{ paddingTop: 10 }}>
-          <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="h4" gutterBottom>
-              {t('Information')}
-            </Typography>
-            <Button
-              component={Link}
-              to={scenario.scenario_external_url}
-              target="_blank"
-              size="small"
-              variant="outlined"
-              startIcon={<Avatar style={{ width: 20, height: 20 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />}
-              disabled={isEmptyField(scenario.scenario_external_url)}
-            >
-              {t('Threat intelligence')}
-            </Button>
-          </div>
-          <Paper classes={{ root: classes.paper }} variant="outlined">
-            <Grid container spacing={3}>
-              <Grid item xs={12} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Description')}
-                </Typography>
-                <ExpandableMarkdown
-                  source={scenario.scenario_description}
-                  limit={300}
-                />
-              </Grid>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Severity')}
-                </Typography>
-                <ItemSeverity severity={scenario.scenario_severity} label={t(scenario.scenario_severity ?? 'Unknown')} />
-              </Grid>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Category')}
-                </Typography>
-                <ItemCategory category={scenario.scenario_category} label={t(scenario.scenario_category ?? 'Unknown')} />
-              </Grid>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Main Focus')}
-                </Typography>
-                <ItemMainFocus mainFocus={scenario.scenario_main_focus} label={t(scenario.scenario_main_focus ?? 'Unknown')} />
-              </Grid>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Tags')}
-                </Typography>
-                <ItemTags tags={scenario.scenario_tags} limit={10} />
-              </Grid>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Platforms')}
-                </Typography>
-                {(scenario.scenario_platforms ?? []).length === 0 ? (
-                  <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
-                ) : scenario.scenario_platforms.map(
-                  (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
-                )}
-              </Grid>
-              <Grid item xs={4} style={{ paddingTop: 10 }}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                  style={{ marginTop: 20 }}
-                >
-                  {t('Kill Chain Phases')}
-                </Typography>
-                {(scenario.scenario_kill_chain_phases ?? []).length === 0 && '-'}
-                {sortByOrder(scenario.scenario_kill_chain_phases ?? [])?.map((killChainPhase: KillChainPhase) => (
-                  <Chip
-                    key={killChainPhase.phase_id}
-                    variant="outlined"
-                    classes={{ root: classes.chip }}
-                    color="error"
-                    label={killChainPhase.phase_name}
-                  />
-                ))}
-              </Grid>
+    <div style={{ paddingBottom: theme.spacing(5) }}>
+      <div style={{ display: 'grid', gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr' }}>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+          <Typography variant="h4" marginBottom={0}>{t('Information')}</Typography>
+          <Button
+            component={Link}
+            to={scenario.scenario_external_url}
+            target="_blank"
+            size="small"
+            variant="outlined"
+            startIcon={<Avatar style={{ width: 20, height: 20 }} src={theme.palette.mode === 'dark' ? octiDark : octiLight} alt="OCTI" />}
+            disabled={isEmptyField(scenario.scenario_external_url)}
+          >
+            {t('Threat intelligence')}
+          </Button>
+        </div>
+        <Typography variant="h4" style={{ alignContent: 'center' }}>{t('Latest 10 Finished Simulations')}</Typography>
+        <Paper classes={{ root: classes.paper }} variant="outlined">
+          <Grid container spacing={3}>
+            <Grid item xs={12} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Description')}
+              </Typography>
+              <ExpandableMarkdown
+                source={scenario.scenario_description}
+                limit={300}
+              />
             </Grid>
-          </Paper>
-        </Grid>
-        <Grid item xs={6} style={{ paddingTop: 10 }}>
-          <Typography variant="h4" gutterBottom style={{ margin: '9px 0 17px 0' }}>
-            {t('Latest 10 Finished Simulations')}
-          </Typography>
-          <Paper classes={{ root: classes.paper }} variant="outlined">
-            <ScenarioDistributionByExercise scenarioId={scenarioId} />
-          </Paper>
-        </Grid>
-        {areAnyExercisesInScenario && (
-          <Grid item xs={12} style={{ marginTop: 35 }}>
-            <Typography variant="h4" gutterBottom style={{ marginBottom: 15 }}>
-              {t('Simulations')}
-            </Typography>
-            <Paper classes={{ root: classes.paper }} variant="outlined">
-              <PaginationComponentV2
-                fetch={input => search(scenarioId, input)}
-                searchPaginationInput={searchPaginationInput}
-                setContent={setExercises}
-                entityPrefix="exercise"
-                availableFilterNames={['exercise_kill_chain_phases', 'exercise_name', 'exercise_tags']}
-                queryableHelpers={queryableHelpers}
-                searchEnable={false}
-              />
-              <ExerciseList
-                exercises={exercises}
-                queryableHelpers={queryableHelpers}
-                secondaryAction={secondaryAction}
-                loading={loadingExercises}
-                isGlobalScoreAsync={true}
-              />
-            </Paper>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Severity')}
+              </Typography>
+              <ItemSeverity severity={scenario.scenario_severity} label={t(scenario.scenario_severity ?? 'Unknown')} />
+            </Grid>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Category')}
+              </Typography>
+              <ItemCategory category={scenario.scenario_category} label={t(scenario.scenario_category ?? 'Unknown')} />
+            </Grid>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Main Focus')}
+              </Typography>
+              <ItemMainFocus mainFocus={scenario.scenario_main_focus} label={t(scenario.scenario_main_focus ?? 'Unknown')} />
+            </Grid>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Tags')}
+              </Typography>
+              <ItemTags tags={scenario.scenario_tags} limit={10} />
+            </Grid>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Platforms')}
+              </Typography>
+              {(scenario.scenario_platforms ?? []).length === 0 ? (
+                <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
+              ) : scenario.scenario_platforms.map(
+                (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+              )}
+            </Grid>
+            <Grid item xs={4} style={{ paddingTop: 10 }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                style={{ marginTop: 20 }}
+              >
+                {t('Kill Chain Phases')}
+              </Typography>
+              {(scenario.scenario_kill_chain_phases ?? []).length === 0 && '-'}
+              {sortByOrder(scenario.scenario_kill_chain_phases ?? [])?.map((killChainPhase: KillChainPhase) => (
+                <Chip
+                  key={killChainPhase.phase_id}
+                  variant="outlined"
+                  classes={{ root: classes.chip }}
+                  color="error"
+                  label={killChainPhase.phase_name}
+                />
+              ))}
+            </Grid>
           </Grid>
-        )}
-      </Grid>
+        </Paper>
+        <Paper classes={{ root: classes.paper }} variant="outlined">
+          <ScenarioDistributionByExercise scenarioId={scenarioId} />
+        </Paper>
+      </div>
+      {areAnyExercisesInScenario && (
+        <div style={{ display: 'grid', marginTop: theme.spacing(3), gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr' }}>
+          <Typography variant="h4">{t('Simulations')}</Typography>
+          <Paper classes={{ root: classes.paper }} variant="outlined">
+            <PaginationComponentV2
+              fetch={input => search(scenarioId, input)}
+              searchPaginationInput={searchPaginationInput}
+              setContent={setExercises}
+              entityPrefix="exercise"
+              availableFilterNames={['exercise_kill_chain_phases', 'exercise_name', 'exercise_tags']}
+              queryableHelpers={queryableHelpers}
+              searchEnable={false}
+            />
+            <ExerciseList
+              exercises={exercises}
+              queryableHelpers={queryableHelpers}
+              secondaryAction={secondaryAction}
+              loading={loadingExercises}
+              isGlobalScoreAsync={true}
+            />
+          </Paper>
+        </div>
+      )}
       {!areAnyExercisesInScenario && !scenario.scenario_recurrence && (
         <div style={{ marginTop: 100, textAlign: 'center' }}>
           <div style={{ fontSize: 20 }}>
@@ -260,7 +239,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
