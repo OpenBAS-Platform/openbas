@@ -1,11 +1,10 @@
 import { Divider, Drawer, MenuList, Toolbar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import * as React from 'react';
-import { FunctionComponent } from 'react';
+import { Fragment, type FunctionComponent } from 'react';
 
 import { computeBannerSettings } from '../../../../public/components/systembanners/utils';
 import useAuth from '../../../../utils/hooks/useAuth';
-import { hasHref, LeftMenuEntries } from './leftmenu-model';
+import { hasHref, type LeftMenuEntries } from './leftmenu-model';
 import MenuItemGroup from './MenuItemGroup';
 import MenuItemLogo from './MenuItemLogo';
 import MenuItemSingle from './MenuItemSingle';
@@ -40,36 +39,35 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
       }}
     >
       <Toolbar />
-      {entries.map((entry, idxList) => {
-        return (
-          <React.Fragment key={idxList}>
-            {idxList !== 0 && <Divider />}
-            <MenuList component="nav" sx={{ marginTop: bannerHeightNumber }}>
-              {(entry.userRight ?? true)
-              && entry.items.map((item) => {
-                if (hasHref(item)) {
+      <div style={{ marginTop: bannerHeightNumber }}>
+        {entries.map((entry, idxList) => {
+          return (
+            <Fragment key={idxList}>
+              {idxList !== 0 && <Divider />}
+              <MenuList component="nav">
+                {(entry.userRight ?? true)
+                && entry.items.map((item) => {
+                  if (hasHref(item)) {
+                    return (
+                      <MenuItemGroup
+                        key={item.label}
+                        item={item}
+                        state={state}
+                        helpers={helpers}
+                      />
+                    );
+                  }
                   return (
-                    <MenuItemGroup
-                      key={item.label}
-                      item={item}
-                      state={state}
-                      helpers={helpers}
-                    />
+                    <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
                   );
-                }
-                return (
-                  <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
-                );
-              })}
-            </MenuList>
-          </React.Fragment>
-        );
-      })}
+                })}
+              </MenuList>
+            </Fragment>
+          );
+        })}
+      </div>
       <div style={{ marginTop: 'auto' }}>
-        <MenuList
-          component="nav"
-          sx={{ marginBottom: bannerHeightNumber }}
-        >
+        <MenuList component="nav">
           <MenuItemLogo
             navOpen={state.navOpen}
             onClick={() => window.open('https://filigran.io/', '_blank')}
