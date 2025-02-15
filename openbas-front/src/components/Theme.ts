@@ -43,10 +43,12 @@ declare module '@mui/material/styles' {
   interface Palette {
     chip: PaletteColor;
     ee: PaletteColor;
+    ai: PaletteColor;
   }
   interface PaletteOptions {
     chip: PaletteColorOptions;
     ee: PaletteColorOptions;
+    ai: PaletteColorOptions;
   }
   interface Theme {
     logo: string | undefined;

@@ -39,6 +39,7 @@ const ThemeDark = (
     primary: { main: primary || THEME_DARK_DEFAULT_PRIMARY },
     secondary: { main: secondary || THEME_DARK_DEFAULT_SECONDARY },
     chip: { main: '#ffffff' },
+    ai: { main: '#9575cd', light: '#d1c4e9', dark: '#673ab7', contrastText: '#000000' },
     ee: {
       main: EE_COLOR,
       contrastText: '#ffffff',
