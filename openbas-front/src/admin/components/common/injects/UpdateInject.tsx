@@ -29,7 +29,7 @@ interface Props {
 }
 
 const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, massUpdateInject, injectId, isAtomic = false, injects, ...props }) => {
-  const { t, tPick } = useFormatter();
+  const { t } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const drawerRef = useRef(null);
@@ -56,8 +56,8 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
     }
   }, [inject]);
 
-  const contractPayload = inject.inject_injector_contract?.injector_contract_payload;
-  const injectorContract = inject.inject_injector_contract;
+  const contractPayload = inject?.inject_injector_contract?.injector_contract_payload;
+  const injectorContract = inject?.inject_injector_contract;
   const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} /${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
 
   return (
@@ -80,7 +80,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
         )}
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
           <InjectDetailsForm
-            injectorContractLabel={tPick(injectorContractContent?.label)}
+            injectorContractLabel={inject?.inject_title}
             injectContractIcon={
               injectorContractContent ? (
                 <InjectIcon
