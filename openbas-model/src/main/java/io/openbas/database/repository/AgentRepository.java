@@ -1,7 +1,9 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Agent;
+import io.openbas.database.raw.RawAgent;
 import java.util.List;
+import java.util.Set;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -46,4 +48,15 @@ public interface AgentRepository
   @Query(value = "DELETE FROM agents agent where agent.agent_id = :agentId;", nativeQuery = true)
   @Transactional
   void deleteByAgentId(String agentId);
+
+  @Query(
+      value =
+          "SELECT ag.agent_id, "
+              + "ag.agent_executed_by_user, "
+              + "ex.executor_type "
+              + "FROM agents ag "
+              + "Left JOIN executors ex ON ag.agent_executor = ex.executor_id "
+              + "WHERE ag.agent_id IN :agentIds ;",
+      nativeQuery = true)
+  Set<RawAgent> rawAgentByIds(Set<String> agentIds);
 }

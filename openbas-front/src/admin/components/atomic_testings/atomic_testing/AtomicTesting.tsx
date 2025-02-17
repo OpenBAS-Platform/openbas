@@ -1,5 +1,5 @@
-import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Chip, Divider, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../../../actions/Document';
@@ -40,6 +40,14 @@ const useStyles = makeStyles()(() => ({
     padding: 15,
     borderRadius: 4,
   },
+  dividerL: {
+    position: 'absolute',
+    backgroundColor: 'rgba(105, 103, 103, 0.45)',
+    width: '2px',
+    bottom: '0',
+    height: '99%',
+    left: '-10px',
+  },
 }));
 
 const AtomicTesting = () => {
@@ -65,9 +73,32 @@ const AtomicTesting = () => {
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
 
   // Handles
+
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult) => {
     setSelectedTarget(target);
     setCurrentParentTarget(currentParent);
+  };
+
+  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined) => {
+    return (
+      <>
+        <TargetListItem
+          onClick={() => handleTargetClick(target, parent)}
+          target={target}
+          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id}
+        />
+        {target?.children && target.children.length > 0 && (
+          <List disablePadding style={{ marginLeft: 15 }}>
+            {target.children.map(child => (
+              <React.Fragment key={child?.id}>
+                {renderTargetItem(child, target)}
+              </React.Fragment>
+            ))}
+            <Divider className={classes.dividerL} />
+          </List>
+        )}
+      </>
+    );
   };
 
   if (!injectResultOverviewOutput) {
@@ -281,23 +312,8 @@ const AtomicTesting = () => {
           {sortedTargets.length > 0 ? (
             <List>
               {sortedTargets.map(target => (
-                <div key={target?.id} style={{ marginBottom: 15 }}>
-                  <TargetListItem
-                    onClick={() => handleTargetClick(target, undefined)}
-                    target={target}
-                    selected={selectedTarget?.id === target.id && currentParentTarget?.id === undefined}
-                  />
-                  <List component="div" disablePadding>
-                    {target?.children?.map(child => (
-                      <TargetListItem
-                        key={child?.id}
-                        isChild
-                        onClick={() => handleTargetClick(child, target)}
-                        target={child}
-                        selected={selectedTarget?.id === child.id && currentParentTarget?.id === target.id}
-                      />
-                    ))}
-                  </List>
+                <div key={target?.id}>
+                  {renderTargetItem(target, undefined)}
                 </div>
               ))}
             </List>
@@ -326,7 +342,8 @@ const AtomicTesting = () => {
         </Paper>
       </Grid>
     </Grid>
-  );
+  )
+  ;
 };
 
 export default AtomicTesting;

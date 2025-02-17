@@ -15,8 +15,6 @@ import lombok.Setter;
 @Getter
 public class InjectTargetWithResult {
 
-  private final PLATFORM_TYPE platformType;
-
   @NotBlank private final String id;
 
   private final String name;
@@ -25,7 +23,11 @@ public class InjectTargetWithResult {
 
   private final List<InjectTargetWithResult> children = new ArrayList<>();
 
-  private final TargetType targetType;
+  @NotBlank private final TargetType targetType;
+
+  private final PLATFORM_TYPE platformType;
+
+  private final String executorType;
 
   public InjectTargetWithResult(
       @NotNull TargetType targetType,
@@ -33,26 +35,15 @@ public class InjectTargetWithResult {
       @NotNull String name,
       @NotNull List<ExpectationResultsByType> expectationResultsByTypes,
       @NotNull List<InjectTargetWithResult> children,
-      PLATFORM_TYPE platformType) {
+      PLATFORM_TYPE platformType,
+      String executorType) {
     this.targetType = targetType;
     this.platformType = platformType;
     this.id = id;
     this.name = name;
     this.expectationResultsByTypes = expectationResultsByTypes;
+    this.executorType = executorType;
     this.children.addAll(children);
-  }
-
-  public InjectTargetWithResult(
-      @NotNull TargetType targetType,
-      @NotNull String id,
-      @NotNull String name,
-      @NotNull List<ExpectationResultsByType> expectationResultsByTypes,
-      PLATFORM_TYPE platformType) {
-    this.targetType = targetType;
-    this.platformType = platformType;
-    this.id = id;
-    this.name = name;
-    this.expectationResultsByTypes = expectationResultsByTypes;
   }
 
   @Override
