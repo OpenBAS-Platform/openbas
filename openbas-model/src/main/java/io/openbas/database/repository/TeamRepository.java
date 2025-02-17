@@ -135,6 +135,6 @@ public interface TeamRepository
           + "   :simulationOrScenarioId is NULL AND i.exercise.id is NULL AND i.scenario.id IS NULL"
           + "   OR (i.exercise.id = :simulationOrScenarioId"
           + "   OR i.scenario.id = :simulationOrScenarioId)"
-          + " ) AND (:name IS NULL OR t.name iLIKE %:name%)")
+          + " ) AND (:name IS NULL OR lower(t.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
   List<Team> findAllBySimulationOrScenarioIdAndName(String simulationOrScenarioId, String name);
 }
