@@ -289,9 +289,13 @@ public class V1_DataImporter implements Importer {
       Scenario savedScenario,
       Map<String, Base> baseIds) {
     if (savedExercise != null) {
-      document.getExercises().add(savedExercise);
+      Set<Exercise> exercises = new HashSet<>(document.getExercises());
+      exercises.add(savedExercise);
+      document.setExercises(exercises);
     } else if (savedScenario != null) {
-      document.getScenarios().add(savedScenario);
+      Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
+      scenarios.add(savedScenario);
+      document.setScenarios(scenarios);
     }
     document.setTags(
         computeTagsCompletion(
