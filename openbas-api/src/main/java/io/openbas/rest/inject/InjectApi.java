@@ -85,7 +85,7 @@ public class InjectApi extends RestBehavior {
   private final TagRuleService tagRuleService;
   private final InjectStatusService injectStatusService;
   private final ExecutableInjectService executableInjectService;
-  private final ChallengeService challengeService;
+  private final ImportService importService;
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
   private final AuthorisationService authorisationService;
@@ -180,6 +180,8 @@ public class InjectApi extends RestBehavior {
         throw new AccessDeniedException("Insufficient privileges");
       }
     }
+
+    this.importService.handleFileImport(file, targetExercise, targetScenario);
   }
 
   @Secured(ROLE_ADMIN)

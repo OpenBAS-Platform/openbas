@@ -131,13 +131,13 @@ public class V1_DataImporter implements Importer {
 
   @Override
   @Transactional
-  public void importData(JsonNode importNode, Map<String, ImportEntry> docReferences) {
+  public void importData(JsonNode importNode, Map<String, ImportEntry> docReferences, Exercise exercise, Scenario scenario) {
     Map<String, Base> baseIds = new HashMap<>();
-    final String prefix = importNode.has("exercise_information") ? "exercise_" : "scenario_";
+    final String prefix = importNode.has("exercise_information") ? "exercise_" : importNode.has("scenario_information") ? "scenario_" : "inject_";
 
     importTags(importNode, prefix, baseIds);
-    Exercise savedExercise = importExercise(importNode, baseIds);
-    Scenario savedScenario = importScenario(importNode, baseIds);
+    Exercise savedExercise = Optional.ofNullable(importExercise(importNode, baseIds)).orElse(exercise);
+    Scenario savedScenario = Optional.ofNullable(importScenario(importNode, baseIds)).orElse(scenario);
     importDocuments(importNode, prefix, docReferences, savedExercise, savedScenario, baseIds);
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
@@ -777,27 +777,18 @@ public class V1_DataImporter implements Importer {
             .get()
             .filter(jsonNode -> !children.contains(jsonNode.get("inject_id").asText()));
 
-    if (savedExercise != null) {
-      importInjects(
-          baseIds,
-          savedExercise.getId(),
-          null,
-          injectsNoParent.toList(),
-          injectsStream.get().toList());
-    } else if (savedScenario != null) {
-      importInjects(
-          baseIds,
-          null,
-          savedScenario.getId(),
-          injectsNoParent.toList(),
-          injectsStream.get().toList());
-    }
+  importInjects(
+      baseIds,
+      savedExercise,
+      savedScenario,
+      injectsNoParent.toList(),
+      injectsStream.get().toList());
   }
 
   private void importInjects(
       Map<String, Base> baseIds,
-      String exerciseId,
-      String scenarioId,
+      Exercise exercise,
+      Scenario scenario,
       List<JsonNode> injectsToAdd,
       List<JsonNode> allInjects) {
     List<String> originalIds = new ArrayList<>();
@@ -862,7 +853,7 @@ public class V1_DataImporter implements Importer {
           String content = handleInjectContent(baseIds, injectorContractId, injectNode);
           Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
           boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
-          if (hasText(exerciseId)) {
+          if (exercise != null) {
             injectRepository.importSaveForExercise(
                 injectId,
                 title,
@@ -872,10 +863,10 @@ public class V1_DataImporter implements Importer {
                 injectorContractId,
                 allTeams,
                 enabled,
-                exerciseId,
+                exercise.getId(),
                 dependsDuration,
                 content);
-          } else if (hasText(scenarioId)) {
+          } else if (scenario != null) {
             injectRepository.importSaveForScenario(
                 injectId,
                 title,
@@ -885,7 +876,7 @@ public class V1_DataImporter implements Importer {
                 injectorContractId,
                 allTeams,
                 enabled,
-                scenarioId,
+                scenario.getId(),
                 dependsDuration,
                 content);
           }
@@ -977,7 +968,7 @@ public class V1_DataImporter implements Importer {
                 })
             .toList();
     if (!childInjects.isEmpty()) {
-      importInjects(baseIds, exerciseId, scenarioId, childInjects, allInjects);
+      importInjects(baseIds, exercise, scenario, childInjects, allInjects);
     }
   }
 
