@@ -1,10 +1,13 @@
 package io.openbas.rest;
 
+import static io.openbas.injectors.email.EmailContract.EMAIL_DEFAULT;
 import static io.openbas.rest.team.TeamApi.TEAM_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static io.openbas.utils.fixtures.InjectFixture.getInjectForEmailContract;
 import static io.openbas.utils.fixtures.TeamFixture.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,17 +15,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Inject;
 import io.openbas.database.model.Team;
+import io.openbas.database.repository.InjectRepository;
+import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.team.form.TeamCreateInput;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.servlet.ServletException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
+import org.json.JSONArray;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,9 +44,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class TeamApiTest extends IntegrationTest {
 
+  private static final String SEARCH_INPUT = "search input";
+
   @Autowired private MockMvc mvc;
 
   @Autowired private ExerciseService exerciseService;
+  @Autowired private InjectRepository injectRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private TeamRepository teamRepository;
 
   @DisplayName("Given valid team input, should create a team successfully")
@@ -263,5 +279,130 @@ class TeamApiTest extends IntegrationTest {
 
     // --ASSERT--
     assertTrue(actualMessage.contains(expectedMessage));
+  }
+
+  // Options endpoint tests
+
+  private Inject prepareOptionsEndpointTestData() {
+    // Teams
+    Team team1input = new Team();
+    team1input.setName(TEAM_NAME + "1");
+    Team team1 = this.teamRepository.save(team1input);
+    Team team2input = new Team();
+    team2input.setName(TEAM_NAME + "2");
+    Team team2 = this.teamRepository.save(team2input);
+    Team team3input = new Team();
+    team3input.setName(TEAM_NAME + "3");
+    Team team3 = this.teamRepository.save(team3input);
+    Team team4input = new Team();
+    team4input.setName(TEAM_NAME + "4");
+    Team team4 = this.teamRepository.save(team4input);
+    Exercise exInput = ExerciseFixture.getExercise();
+    Exercise exercise = this.exerciseService.createExercise(exInput);
+    // Inject
+    Inject inject =
+        getInjectForEmailContract(
+            this.injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow());
+    inject.setExercise(exercise);
+    inject.setTeams(
+        new ArrayList<>() {
+          {
+            add(team1);
+            add(team2);
+            add(team3);
+            add(team4);
+          }
+        });
+    return this.injectRepository.save(inject);
+  }
+
+  Stream<Arguments> optionsByNameTestParameters() {
+    return Stream.of(
+        Arguments.of(
+            null, false, 0), // Case 1: searchText is null and simulationOrScenarioId is null
+        Arguments.of(
+            TEAM_NAME, false, 0), // Case 2: searchText is valid and simulationOrScenarioId is null
+        Arguments.of(
+            TEAM_NAME + "2",
+            false,
+            0), // Case 2: searchText is valid and simulationOrScenarioId is null
+        Arguments.of(
+            null, true, 4), // Case 3: searchText is null and simulationOrScenarioId is valid
+        Arguments.of(
+            TEAM_NAME, true, 4), // Case 4: searchText is valid and simulationOrScenarioId is valid
+        Arguments.of(
+            TEAM_NAME + "2",
+            true,
+            1) // Case 5: searchText is valid and simulationOrScenarioId is valid
+        );
+  }
+
+  @DisplayName("Test optionsByName")
+  @ParameterizedTest
+  @MethodSource("optionsByNameTestParameters")
+  @WithMockAdminUser
+  void optionsByNameTest(
+      String searchText, Boolean simulationOrScenarioId, Integer expectedNumberOfResults)
+      throws Exception {
+    // --PREPARE--
+    Inject i = prepareOptionsEndpointTestData();
+    Exercise exercise = i.getExercise();
+
+    // --EXECUTE--;
+    String response =
+        mvc.perform(
+                get(TEAM_URI + "/options")
+                    .queryParam("searchText", searchText)
+                    .queryParam(
+                        "simulationOrScenarioId", simulationOrScenarioId ? exercise.getId() : null)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONArray jsonArray = new JSONArray(response);
+
+    // --ASSERT--
+    assertEquals(expectedNumberOfResults, jsonArray.length());
+  }
+
+  Stream<Arguments> optionsByIdTestParameters() {
+    return Stream.of(
+        Arguments.of(0, 0), // Case 1: 0 ID given
+        Arguments.of(1, 1), // Case 1: 1 ID given
+        Arguments.of(2, 2) // Case 2: 2 IDs given
+        );
+  }
+
+  @DisplayName("Test optionsById")
+  @ParameterizedTest
+  @MethodSource("optionsByIdTestParameters")
+  @WithMockAdminUser
+  void optionsByIdTest(Integer numberOfTeamToProvide, Integer expectedNumberOfResults)
+      throws Exception {
+    // --PREPARE--
+    Inject inject = prepareOptionsEndpointTestData();
+    List<Team> teams = inject.getTeams();
+
+    List<String> teamIdsToSearch = new ArrayList<>();
+    for (int i = 0; i < numberOfTeamToProvide; i++) {
+      teamIdsToSearch.add(teams.get(i).getId());
+    }
+
+    // --EXECUTE--;
+    String response =
+        mvc.perform(
+                post(TEAM_URI + "/options")
+                    .content(asJsonString(teamIdsToSearch))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    JSONArray jsonArray = new JSONArray(response);
+
+    // --ASSERT--
+    assertEquals(expectedNumberOfResults, jsonArray.length());
   }
 }

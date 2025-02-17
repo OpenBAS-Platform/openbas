@@ -100,6 +100,7 @@ const SimulationComponent = () => {
               goTo={injectId => `/admin/simulations/${exerciseId}/injects/${injectId}`}
               queryableHelpers={queryableHelpers}
               searchPaginationInput={searchPaginationInput}
+              contextId={exercise.exercise_id}
             />
           </Paper>
         </div>
