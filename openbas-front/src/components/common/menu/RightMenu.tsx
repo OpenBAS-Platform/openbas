@@ -1,4 +1,5 @@
 import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type ReactElement } from 'react';
 import { Link, useLocation } from 'react-router';
 import { type CSSObject } from 'tss-react';
@@ -10,19 +11,7 @@ import { isNotEmptyField } from '../../../utils/utils';
 import { useFormatter } from '../../i18n';
 
 const useStyles = makeStyles()(theme => ({
-  drawer: {
-    minHeight: '100vh',
-    width: 200,
-    position: 'fixed',
-    overflow: 'auto',
-    padding: 0,
-    backgroundColor: theme.palette.background.nav,
-  },
   toolbar: theme.mixins.toolbar as CSSObject,
-  item: {
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
 }));
 
 export interface RightMenuEntry {
@@ -36,7 +25,9 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }
   // Standard hooks
   const location = useLocation();
   const { classes } = useStyles();
+  const theme = useTheme();
   const { t } = useFormatter();
+
 
   const { settings } = useAuth();
   const { bannerHeight } = computeBannerSettings(settings);
@@ -45,7 +36,13 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }
     <Drawer
       variant="permanent"
       anchor="right"
-      classes={{ paper: classes.drawer }}
+      sx={{
+        'width': 200,
+        '& .MuiDrawer-paper': {
+          width: 200,
+          backgroundColor: theme.palette.background.nav,
+        },
+      }}
     >
       <div className={classes.toolbar} />
       <MenuList component="nav" sx={{ marginTop: bannerHeight }}>
@@ -57,7 +54,7 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }
               component={Link}
               to={entry.path}
               selected={isCurrentTab}
-              classes={{ root: classes.item }}
+              sx={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}
             >
               <ListItemIcon>
                 {entry.icon()}
