@@ -1553,6 +1553,7 @@ const i18n = {
       'Tags': '标签',
       'Reply': '答复',
       'newspaper': '报刊',
+      'TTP Unknown': 'TTP未知',
       'tv': '电视',
       'Anonymize': '匿名',
       'microblogging': '微博',
