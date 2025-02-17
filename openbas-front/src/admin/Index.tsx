@@ -58,7 +58,6 @@ const Index = () => {
   }, [logged]);
 
   const boxSx = {
-    height: '100vh',
     flexGrow: 1,
     padding: 3,
     transition: theme.transitions.create('width', {
