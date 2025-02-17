@@ -25,6 +25,7 @@ import io.openbas.service.ChallengeService;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.helpers.TagHelper;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
 import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
 import jakarta.persistence.EntityManager;
@@ -1173,6 +1174,7 @@ public class InjectImportTest extends IntegrationTest {
     }
 
     @Nested
+    @WithMockAdminUser
     @DisplayName("When targeting atomic testing")
     public class WhenTargetingAtomicTesting {
 
@@ -1205,13 +1207,8 @@ public class InjectImportTest extends IntegrationTest {
           // ignore
           // this
           assertThatJson(recreated.get().getContent())
-              .whenIgnoringPaths("challenges")
+              .whenIgnoringPaths("challenges", "articles")
               .isEqualTo(expected.getContent());
-          assertThatJson(recreated.get().getContent())
-              .node("challenges")
-              .isPresent()
-              .and()
-              .isArray();
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }

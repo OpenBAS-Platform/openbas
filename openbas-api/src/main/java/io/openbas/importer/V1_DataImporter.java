@@ -899,6 +899,18 @@ public class V1_DataImporter implements Importer {
                 scenario.getId(),
                 dependsDuration,
                 content);
+          } else {
+            injectRepository.importSaveStandAlone(
+                    injectId,
+                    title,
+                    description,
+                    country,
+                    city,
+                    injectorContractId,
+                    allTeams,
+                    enabled,
+                    dependsDuration,
+                    content);
           }
           baseIds.put(id, new BaseHolder(injectId));
           originalIds.add(id);
