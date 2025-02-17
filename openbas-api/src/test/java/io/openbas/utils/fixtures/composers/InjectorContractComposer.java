@@ -115,6 +115,7 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
         injectorRepository.save(injectorContract.getInjector());
         // for some reason hibernate refuses to save the entity with the repository
         entityManager.persist(injectorContract);
+        injectorContractRepository.save(injectorContract);
       }
       return this;
     }
@@ -125,8 +126,8 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       challengeComposers.forEach(ChallengeComposer.Composer::delete);
       articleComposers.forEach(ArticleComposer.Composer::delete);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
-        injectorRepository.delete(injectorContract.getInjector());
         injectorContractRepository.delete(injectorContract);
+        injectorRepository.delete(injectorContract.getInjector());
       }
       return this;
     }

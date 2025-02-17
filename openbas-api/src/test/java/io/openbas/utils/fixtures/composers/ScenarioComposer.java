@@ -24,6 +24,11 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
       this.scenario = scenario;
     }
 
+    public Composer withInjects(List<InjectComposer.Composer> injectComposers) {
+      injectComposers.forEach(this::withInject);
+      return this;
+    }
+
     public Composer withInject(InjectComposer.Composer injectComposer) {
       injectComposers.add(injectComposer);
       Set<Inject> tempInjects = new HashSet<>(this.scenario.getInjects());

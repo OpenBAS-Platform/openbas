@@ -16,7 +16,7 @@ import io.openbas.service.ChallengeService;
 import io.openbas.utils.Constants;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
-import io.openbas.utils.helpers.ExerciseHelper;
+import io.openbas.utils.helpers.TagHelper;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -641,7 +641,7 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
     entityManager.clear();
 
     List<Tag> dbTags =
-        ExerciseHelper.crawlAllTags(
+        TagHelper.crawlAllExerciseTags(
             findImportedExerciseFromDb(exerciseWrapper.get().getName()), challengeService);
     for (Tag expected : tagComposer.generatedItems) {
       Assertions.assertTrue(
