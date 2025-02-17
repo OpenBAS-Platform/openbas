@@ -47,23 +47,25 @@ const Policies: FunctionComponent = () => {
   };
 
   return (
-    <div className={classes.container}>
-      <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Security') }, {
-          label: t('Policies'),
-          current: true,
-        }]}
-      />
+    <div style={{ display: 'flex' }}>
+      <div style={{ flexGrow: 1 }}>
+        <Breadcrumbs
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Security') }, {
+            label: t('Policies'),
+            current: true,
+          }]}
+        />
+        <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+          <Typography variant="h4" gutterBottom={true}>
+            {t('Login messages')}
+          </Typography>
+          <Paper classes={{ root: classes.paper }} variant="outlined">
+            <PolicyForm onSubmit={onUpdate} initialValues={initialValues}></PolicyForm>
+          </Paper>
+        </Grid>
+      </div>
       <SecurityMenu />
-      <Grid item={true} xs={6} style={{ marginTop: 30 }}>
-        <Typography variant="h4" gutterBottom={true}>
-          {t('Login messages')}
-        </Typography>
-        <Paper classes={{ root: classes.paper }} variant="outlined">
-          <PolicyForm onSubmit={onUpdate} initialValues={initialValues}></PolicyForm>
-        </Paper>
-      </Grid>
     </div>
   );
 };

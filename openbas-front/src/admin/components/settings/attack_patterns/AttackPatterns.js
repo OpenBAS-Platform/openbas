@@ -16,10 +16,6 @@ import AttackPatternPopover from './AttackPatternPopover';
 import CreateAttackPattern from './CreateAttackPattern';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    margin: 0,
-    padding: '0 200px 50px 0',
-  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -95,118 +91,115 @@ const AttackPatterns = () => {
   };
 
   return (
-    <div className={classes.container}>
-      <Breadcrumbs
+    <div style={{ display: 'flex' }}>
+      <div style={{ flexGrow: 1 }}>
+        <Breadcrumbs
         variant="list"
         elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
           label: t('Attack patterns'),
           current: true,
         }]}
       />
-      <TaxonomiesMenu />
-      <PaginationComponent
-        fetch={searchAttackPatterns}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setAttackPatterns}
-        exportProps={exportProps}
-      />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={(
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-              />
-            )}
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {attackPatterns.map(attackPattern => (
+        <PaginationComponent
+          fetch={searchAttackPatterns}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setAttackPatterns}
+          exportProps={exportProps}
+        />
+        <List>
           <ListItem
-            key={attackPattern.attack_pattern_id}
-            classes={{ root: classes.item }}
-            divider={true}
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
           >
             <ListItemIcon>
-              <LockPattern color="primary" />
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+              &nbsp;
+              </span>
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div style={bodyItemsStyles.bodyItems}>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.kill_chain_phase,
-                  }}
-                  >
-                    {
-                      attackPattern.attack_pattern_kill_chain_phases.at(0)
-                        ? `[${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_kill_chain_name}] ${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_name}`
-                        : '-'
-                    }
-                  </div>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_external_id,
-                  }}
-                  >
-                    {attackPattern.attack_pattern_external_id}
-                  </div>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_name,
-                  }}
-                  >
-                    {attackPattern.attack_pattern_name}
-                  </div>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_created_at,
-                  }}
-                  >
-                    {nsdt(attackPattern.attack_pattern_created_at)}
-                  </div>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_updated_at,
-                  }}
-                  >
-                    {nsdt(attackPattern.attack_pattern_updated_at)}
-                  </div>
-                </div>
+                <SortHeadersComponent
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  searchPaginationInput={searchPaginationInput}
+                  setSearchPaginationInput={setSearchPaginationInput}
+                />
               )}
             />
-            <ListItemSecondaryAction>
-              <AttackPatternPopover
-                killChainPhasesMap={killChainPhasesMap}
-                attackPattern={attackPattern}
-                onUpdate={result => setAttackPatterns(attackPatterns.map(a => (a.attack_pattern_id !== result.attack_pattern_id ? a : result)))}
-                onDelete={result => setAttackPatterns(attackPatterns.filter(a => (a.attack_pattern_id !== result)))}
-              />
-            </ListItemSecondaryAction>
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-        ))}
-      </List>
-      <CreateAttackPattern
-        onCreate={result => setAttackPatterns([result, ...attackPatterns])}
-      />
+          {attackPatterns.map(attackPattern => (
+            <ListItem
+              key={attackPattern.attack_pattern_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <LockPattern color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div style={bodyItemsStyles.bodyItems}>
+                    <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.kill_chain_phase,
+                  }}>
+                      {
+                        attackPattern.attack_pattern_kill_chain_phases.at(0)
+                          ? `[${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_kill_chain_name}] ${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_name}`
+                          : '-'
+                      }
+                    </div>
+                    <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_external_id,
+                  }}>
+                      {attackPattern.attack_pattern_external_id}
+                    </div>
+                    <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_name,
+                  }}>
+                      {attackPattern.attack_pattern_name}
+                    </div>
+                    <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_created_at,
+                    }}
+                  >  {nsdt(attackPattern.attack_pattern_created_at)}
+                    </div>
+                    <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_updated_at,
+                  }}>
+                      {nsdt(attackPattern.attack_pattern_updated_at)}
+                    </div>
+                  </div>
+                )}
+              />
+              <ListItemSecondaryAction>
+                <AttackPatternPopover
+                  killChainPhasesMap={killChainPhasesMap}
+                  attackPattern={attackPattern}
+                  onUpdate={result => setAttackPatterns(attackPatterns.map(a => (a.attack_pattern_id !== result.attack_pattern_id ? a : result)))}
+                  onDelete={result => setAttackPatterns(attackPatterns.filter(a => (a.attack_pattern_id !== result)))}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+        <CreateAttackPattern
+          onCreate={result => setAttackPatterns([result, ...attackPatterns])}
+        />
+      </div>
+      <TaxonomiesMenu />
     </div>
   );
 };
