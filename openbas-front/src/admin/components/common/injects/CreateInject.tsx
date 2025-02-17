@@ -299,8 +299,8 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
           injectorContractLabel={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
           injectContractIcon={selectedContract ? (
             <InjectIcon
-              type={selectedContract?.injector_contract_injector_type}
-              isPayload={false}
+              type={selectedContract.injector_contract_payload_type ?? selectedContract.injector_contract_injector_type}
+              isPayload={isNotEmptyField(selectedContract?.injector_contract_payload_type)}
             />
           ) : undefined}
           injectHeaderAction={(

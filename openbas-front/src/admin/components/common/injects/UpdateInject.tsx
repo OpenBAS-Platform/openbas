@@ -1,4 +1,4 @@
-import { Avatar, Tab, Tabs } from '@mui/material';
+import { Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type SyntheticEvent, useEffect, useRef, useState } from 'react';
 
@@ -10,10 +10,12 @@ import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { type Inject, type InjectInput, type InjectorContractOutput } from '../../../../utils/api-types';
+import { type AttackPattern, type Inject, type InjectInput, type InjectorContractOutput, type KillChainPhase } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
+import { isNotEmptyField } from '../../../../utils/utils';
 import InjectDetailsForm from './form/InjectDetailsForm';
+import InjectIcon from './InjectIcon';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
 
 interface Props {
@@ -53,6 +55,11 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
       setInjectorContractContent(inject.inject_injector_contract?.convertedContent);
     }
   }, [inject]);
+
+  const contractPayload = inject.inject_injector_contract?.injector_contract_payload;
+  const injectorContract = inject.inject_injector_contract;
+  const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} /${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
+
   return (
     <Drawer
       open={open}
@@ -76,12 +83,9 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
             injectorContractLabel={tPick(injectorContractContent?.label)}
             injectContractIcon={
               injectorContractContent ? (
-                <Avatar
-                  sx={{
-                    width: 24,
-                    height: 24,
-                  }}
-                  src={`/api/images/injectors/${injectorContractContent.config.type}`}
+                <InjectIcon
+                  type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
+                  isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
                 />
               ) : undefined
             }
@@ -92,11 +96,18 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
               }}
               >
                 {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-                  (platform: InjectorContractOutput['injector_contract_platforms']) => <PlatformIcon key={String(platform)} width={20} platform={String(platform)} marginRight={10} />,
+                  (platform: InjectorContractOutput['injector_contract_platforms']) => (
+                    <PlatformIcon
+                      key={String(platform)}
+                      width={20}
+                      platform={String(platform)}
+                      marginRight={10}
+                    />
+                  ),
                 )}
               </div>
             )}
-            injectHeaderTitle=""
+            injectHeaderTitle={injectorContract?.injector_contract_needs_executor === true ? cardTitle : inject.inject_injector_contract?.injector_contract_injector_type_name}
             disabled={!injectorContractContent}
             isAtomic={isAtomic}
             defaultInject={inject}

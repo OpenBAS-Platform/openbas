@@ -10,7 +10,7 @@ import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectDependency } from '../../../../utils/api-types';
+import { AttackPattern, Inject, InjectDependency, KillChainPhase } from '../../../../utils/api-types';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectChainsForm from './InjectChainsForm';
 import InjectIcon from './InjectIcon';
@@ -110,6 +110,10 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
     handleClose();
   };
   const injectorContractContent = inject.inject_injector_contract?.injector_contract_content ? JSON.parse(inject.inject_injector_contract?.injector_contract_content) : undefined;
+  const contractPayload = inject.inject_injector_contract?.injector_contract_payload;
+  const injectorContract = inject.inject_injector_contract;
+  const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} /${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
+
   return (
     <>
       <Card elevation={0} classes={{ root: classes.injectorContract }}>
@@ -118,11 +122,11 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
           avatar={injectorContractContent
             ? (
                 <InjectIcon
-                  type={inject.inject_injector_contract?.injector_contract_payload ? (inject.inject_injector_contract.injector_contract_payload.payload_collector_type ?? inject.inject_injector_contract.injector_contract_payload.payload_type) : inject.inject_injector_contract?.injector_contract_injector_type}
-                  isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload?.payload_collector_type ?? inject.inject_injector_contract?.injector_contract_payload?.payload_type)}
+                  type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
+                  isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
                 />
               ) : (<Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>)}
-          title={inject.inject_injector_contract?.injector_contract_needs_executor === true ? (inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map(value => value.phase_name)?.join(', ')} /${inject?.inject_attack_patterns?.map(value => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown')) : inject.inject_injector_contract?.injector_contract_injector_type_name}
+          title={injectorContract?.injector_contract_needs_executor === true ? cardTitle : inject.inject_injector_contract?.injector_contract_injector_type_name}
           action={(
             <div style={{
               display: 'flex',

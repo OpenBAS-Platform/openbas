@@ -6,10 +6,8 @@ import io.openbas.database.model.Payload;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
 import java.util.*;
-
 import lombok.Data;
 
 @Data
