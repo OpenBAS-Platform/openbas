@@ -436,9 +436,13 @@ public class V1_DataImporter implements Importer {
         .forEach(
             (team) -> {
               if (savedExercise != null) {
-                team.getExercises().add(savedExercise);
+                Set<Exercise> exercises = new HashSet<>(team.getExercises());
+                exercises.add(savedExercise);
+                team.setExercises(exercises.stream().toList());
               } else if (savedScenario != null) {
-                team.getScenarios().add(savedScenario);
+                Set<Scenario> scenarios = new HashSet<>(team.getScenarios());
+                scenarios.add(savedScenario);
+                team.setScenarios(scenarios.stream().toList());
               }
             });
     baseIds.putAll(baseTeams);
@@ -750,7 +754,7 @@ public class V1_DataImporter implements Importer {
       Scenario savedScenario,
       Map<String, Base> baseIds) {
     Supplier<Stream<JsonNode>> injectsStream =
-        () -> resolveJsonElements(importNode, prefix + "injects");
+        () -> importNode.has(prefix + "injects") ? resolveJsonElements(importNode, prefix + "injects") : resolveJsonElements(importNode, prefix + "information");
 
     // Getting a list of all the children of the dependency
     List<String> children =

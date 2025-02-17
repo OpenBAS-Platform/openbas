@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import io.openbas.service.ScenarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ScenarioComposer extends ComposerBase<Scenario> {
   @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private ScenarioService scenarioService;
 
   public class Composer extends InnerComposerBase<Scenario> {
     private final Scenario scenario;
@@ -51,6 +54,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
     public Composer persist() {
       injectComposers.forEach(InjectComposer.Composer::persist);
       scenarioRepository.save(scenario);
+      scenarioService.createScenario(scenario);
       return this;
     }
 

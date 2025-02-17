@@ -64,7 +64,7 @@ public class TagHelper {
     tags.addAll(
         scenario.getInjects().stream().flatMap(inject -> inject.getTags().stream()).toList());
     List<Challenge> challenges = new ArrayList<>();
-    for (Challenge challenge : challengeService.getExerciseChallenges(scenario.getId())) {
+    for (Challenge challenge : challengeService.getScenarioChallenges(scenario)) {
       challenges.add(challenge);
     }
     tags.addAll(challenges.stream().flatMap(challenge -> challenge.getTags().stream()).toList());

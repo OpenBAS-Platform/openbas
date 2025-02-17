@@ -436,7 +436,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All injects were appended to destination")
       public void allInjectsWereAppendedToDestination() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -480,7 +480,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All articles have been recreated")
       public void allArticlesHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -514,7 +514,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All channels have been recreated")
       public void allChannelsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -553,7 +553,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All challenges have been recreated")
       public void allChallengesHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -593,7 +593,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -610,6 +610,7 @@ public class InjectImportTest extends IntegrationTest {
                   .map(Inject::getInjectorContract)
                   .filter(Optional::isPresent)
                   .map(injectorContract -> injectorContract.get().getPayload())
+                  .filter(Objects::nonNull)
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
@@ -635,7 +636,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All teams have been recreated")
       public void allTeamsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -663,7 +664,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All users have been recreated")
       public void allUsersHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -699,7 +700,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All organisations have been recreated")
       public void allOrganisationsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -729,7 +730,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All tags have been recreated")
       public void allTagsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -747,7 +748,7 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected user");
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected tag");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getColor(), recreated.get().getColor());
 
@@ -758,7 +759,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All documents have been recreated")
       public void allDocumentsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -799,7 +800,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All injects were appended to destination")
       public void allInjectsWereAppendedToDestination() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -844,7 +845,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All articles have been recreated")
       public void allArticlesHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -878,7 +879,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All channels have been recreated")
       public void allChannelsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -917,7 +918,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All challenges have been recreated")
       public void allChallengesHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -957,7 +958,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -974,6 +975,7 @@ public class InjectImportTest extends IntegrationTest {
                   .map(Inject::getInjectorContract)
                   .filter(Optional::isPresent)
                   .map(injectorContract -> injectorContract.get().getPayload())
+                      .filter(Objects::nonNull)
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
@@ -999,13 +1001,13 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All teams have been recreated")
       public void allTeamsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
                 InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
 
-        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        doImport(exportData, input).andExpect(status().isOk());
         clearEntityManager();
 
         for (Team expected : teamComposer.generatedItems) {
@@ -1027,7 +1029,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All users have been recreated")
       public void allUsersHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -1063,7 +1065,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All organisations have been recreated")
       public void allOrganisationsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -1093,7 +1095,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All tags have been recreated")
       public void allTagsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -1111,7 +1113,7 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected user");
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected tag");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getColor(), recreated.get().getColor());
 
@@ -1122,7 +1124,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All documents have been recreated")
       public void allDocumentsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
             createTargetInput(
@@ -1157,7 +1159,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("Each inject was created in its own atomic testing")
       public void eachInjectWasCreatedInAtomicTesting() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromExerciseWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
@@ -1197,7 +1199,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All payloads have been recreated")
       public void allPayloadsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
@@ -1209,6 +1211,7 @@ public class InjectImportTest extends IntegrationTest {
                   .map(Inject::getInjectorContract)
                   .filter(Optional::isPresent)
                   .map(injectorContract -> injectorContract.get().getPayload())
+                      .filter(Objects::nonNull)
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
@@ -1234,7 +1237,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All teams have been recreated")
       public void allTeamsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
@@ -1258,7 +1261,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All users have been recreated")
       public void allUsersHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
@@ -1290,7 +1293,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All organisations have been recreated")
       public void allOrganisationsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
@@ -1316,7 +1319,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All tags have been recreated")
       public void allTagsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
@@ -1339,7 +1342,7 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All documents have been recreated")
       public void allDocumentsHaveBeenRecreated() throws Exception {
-        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers());
+        byte[] exportData = getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
