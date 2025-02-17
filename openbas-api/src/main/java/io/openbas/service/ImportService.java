@@ -38,7 +38,11 @@ public class ImportService {
     dataImporters.put(1, v1_dataImporter);
   }
 
-  private void handleDataImport(InputStream inputStream, Map<String, ImportEntry> docReferences, Exercise exercise, Scenario scenario) {
+  private void handleDataImport(
+      InputStream inputStream,
+      Map<String, ImportEntry> docReferences,
+      Exercise exercise,
+      Scenario scenario) {
     try {
       JsonNode importNode = mapper.readTree(inputStream);
       int importVersion = importNode.get("export_version").asInt();
@@ -54,7 +58,8 @@ public class ImportService {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  public void handleFileImport(MultipartFile file, Exercise exercise, Scenario scenario) throws Exception {
+  public void handleFileImport(MultipartFile file, Exercise exercise, Scenario scenario)
+      throws Exception {
     // 01. Use a temporary file.
     File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".zip");
     FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
@@ -82,7 +87,8 @@ public class ImportService {
         }
       }
       // 02. Iter on each element to import
-      dataImports.forEach(dataStream -> handleDataImport(dataStream, docReferences, exercise, scenario));
+      dataImports.forEach(
+          dataStream -> handleDataImport(dataStream, docReferences, exercise, scenario));
     } finally {
       // 03. Delete the temporary file
       //noinspection ResultOfMethodCallIgnored

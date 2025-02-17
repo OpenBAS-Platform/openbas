@@ -15,7 +15,11 @@ import java.util.stream.StreamSupport;
 
 public interface Importer {
 
-  void importData(JsonNode importNode, Map<String, ImportEntry> docReferences, Exercise exercise, Scenario scenario);
+  void importData(
+      JsonNode importNode,
+      Map<String, ImportEntry> docReferences,
+      Exercise exercise,
+      Scenario scenario);
 
   default Stream<JsonNode> resolveJsonElements(JsonNode node, String key) {
     JsonNode dataNode = node.get(key);

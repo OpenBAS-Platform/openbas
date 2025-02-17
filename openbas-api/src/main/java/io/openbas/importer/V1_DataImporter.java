@@ -131,13 +131,22 @@ public class V1_DataImporter implements Importer {
 
   @Override
   @Transactional
-  public void importData(JsonNode importNode, Map<String, ImportEntry> docReferences, Exercise exercise, Scenario scenario) {
+  public void importData(
+      JsonNode importNode,
+      Map<String, ImportEntry> docReferences,
+      Exercise exercise,
+      Scenario scenario) {
     Map<String, Base> baseIds = new HashMap<>();
-    final String prefix = importNode.has("exercise_information") ? "exercise_" : importNode.has("scenario_information") ? "scenario_" : "inject_";
+    final String prefix =
+        importNode.has("exercise_information")
+            ? "exercise_"
+            : importNode.has("scenario_information") ? "scenario_" : "inject_";
 
     importTags(importNode, prefix, baseIds);
-    Exercise savedExercise = Optional.ofNullable(importExercise(importNode, baseIds)).orElse(exercise);
-    Scenario savedScenario = Optional.ofNullable(importScenario(importNode, baseIds)).orElse(scenario);
+    Exercise savedExercise =
+        Optional.ofNullable(importExercise(importNode, baseIds)).orElse(exercise);
+    Scenario savedScenario =
+        Optional.ofNullable(importScenario(importNode, baseIds)).orElse(scenario);
     importDocuments(importNode, prefix, docReferences, savedExercise, savedScenario, baseIds);
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
@@ -754,7 +763,10 @@ public class V1_DataImporter implements Importer {
       Scenario savedScenario,
       Map<String, Base> baseIds) {
     Supplier<Stream<JsonNode>> injectsStream =
-        () -> importNode.has(prefix + "injects") ? resolveJsonElements(importNode, prefix + "injects") : resolveJsonElements(importNode, prefix + "information");
+        () ->
+            importNode.has(prefix + "injects")
+                ? resolveJsonElements(importNode, prefix + "injects")
+                : resolveJsonElements(importNode, prefix + "information");
 
     // Getting a list of all the children of the dependency
     List<String> children =
@@ -785,12 +797,12 @@ public class V1_DataImporter implements Importer {
             .get()
             .filter(jsonNode -> !children.contains(jsonNode.get("inject_id").asText()));
 
-  importInjects(
-      baseIds,
-      savedExercise,
-      savedScenario,
-      injectsNoParent.toList(),
-      injectsStream.get().toList());
+    importInjects(
+        baseIds,
+        savedExercise,
+        savedScenario,
+        injectsNoParent.toList(),
+        injectsStream.get().toList());
   }
 
   private void importInjects(

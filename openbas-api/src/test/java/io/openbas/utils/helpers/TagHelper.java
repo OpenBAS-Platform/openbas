@@ -72,29 +72,39 @@ public class TagHelper {
   }
 
   public static List<Tag> crawlAllInjectsTags(
-          List<Inject> injects, ChallengeService challengeService) {
-    List<Tag> tags = new ArrayList<>(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
-    tags.addAll(injects.stream().flatMap(inject -> inject.getTeams().stream()).flatMap(team -> team.getTags().stream()).toList());
+      List<Inject> injects, ChallengeService challengeService) {
+    List<Tag> tags =
+        new ArrayList<>(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
     tags.addAll(
-            injects.stream().flatMap(inject -> inject.getTeams().stream())
-                    .flatMap(team -> team.getUsers().stream().flatMap(user -> user.getTags().stream()))
-                    .toList());
+        injects.stream()
+            .flatMap(inject -> inject.getTeams().stream())
+            .flatMap(team -> team.getTags().stream())
+            .toList());
     tags.addAll(
-            injects.stream().flatMap(inject -> inject.getTeams().stream())
-                    .flatMap(
-                            team ->
-                                    team.getUsers().stream()
-                                            .flatMap(
-                                                    user ->
-                                                            user.getOrganization() == null
-                                                                    ? null
-                                                                    : user.getOrganization().getTags().stream()
-                                                                    .filter(Objects::nonNull)))
-                    .toList());
+        injects.stream()
+            .flatMap(inject -> inject.getTeams().stream())
+            .flatMap(team -> team.getUsers().stream().flatMap(user -> user.getTags().stream()))
+            .toList());
     tags.addAll(
-            injects.stream().flatMap(inject -> inject.getDocuments().stream()).map(InjectDocument::getDocument).flatMap(document -> document.getTags().stream()).toList());
+        injects.stream()
+            .flatMap(inject -> inject.getTeams().stream())
+            .flatMap(
+                team ->
+                    team.getUsers().stream()
+                        .flatMap(
+                            user ->
+                                user.getOrganization() == null
+                                    ? null
+                                    : user.getOrganization().getTags().stream()
+                                        .filter(Objects::nonNull)))
+            .toList());
     tags.addAll(
-            injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
+        injects.stream()
+            .flatMap(inject -> inject.getDocuments().stream())
+            .map(InjectDocument::getDocument)
+            .flatMap(document -> document.getTags().stream())
+            .toList());
+    tags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
     List<Challenge> challenges = new ArrayList<>();
     for (Challenge challenge : challengeService.getInjectsChallenges(injects)) {
       challenges.add(challenge);
