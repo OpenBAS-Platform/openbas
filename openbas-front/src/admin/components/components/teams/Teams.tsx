@@ -13,6 +13,7 @@ import PaginationComponent from '../../../../components/common/pagination/Pagina
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
@@ -30,17 +31,6 @@ const useStyles = makeStyles()(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
   },
   drawerPaper: {
     minHeight: '100vh',
@@ -66,6 +56,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Teams = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const { classes: bodyItemsClasses } = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
 
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
@@ -185,20 +176,20 @@ const Teams = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.team_name}>
+                <div className={bodyItemsClasses.bodyItems}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.team_name}>
                     {team.team_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.team_description}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.team_description}>
                     {team.team_description}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.team_users_number}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.team_users_number}>
                     {team.team_users_number}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.team_tags}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.team_tags}>
                     <ItemTags variant="list" tags={team.team_tags} />
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.team_updated_at}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.team_updated_at}>
                     {nsdt(team.team_updated_at)}
                   </div>
                 </div>

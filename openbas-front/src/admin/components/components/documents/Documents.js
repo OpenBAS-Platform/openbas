@@ -13,6 +13,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
@@ -30,17 +31,6 @@ const useStyles = makeStyles()(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    fontSize: 13,
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
   },
   exercise: {
     fontSize: 12,
@@ -76,6 +66,7 @@ const inlineStyles = {
 const Documents = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const { classes: bodyItemsClasses } = useBodyItemsStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useFormatter();
@@ -219,21 +210,21 @@ const Documents = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div className={classes.bodyItems}>
+                  <div className={bodyItemsClasses.bodyItems}>
                     <div
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles.document_name}
                     >
                       {document.document_name}
                     </div>
                     <div
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles.document_description}
                     >
                       {document.document_description}
                     </div>
                     <div
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles.document_exercises}
                     >
                       {R.take(3, document.document_exercises).map((e, i) => {
@@ -264,7 +255,7 @@ const Documents = () => {
                       })}
                     </div>
                     <div
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles.document_scenarios}
                     >
                       {R.take(3, document.document_scenarios).map((e, i) => {
@@ -295,7 +286,7 @@ const Documents = () => {
                       })}
                     </div>
                     <div
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles.document_type}
                     >
                       <DocumentType
@@ -304,7 +295,7 @@ const Documents = () => {
                       />
                     </div>
                     <div
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles.document_tags}
                     >
                       <ItemTags variant="list" tags={document.document_tags} />

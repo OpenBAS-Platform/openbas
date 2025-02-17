@@ -9,6 +9,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
@@ -19,16 +20,9 @@ import TagRuleCreate from './TagRuleCreate';
 import TagRulePopover from './TagRulePopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: { textTransform: 'uppercase' },
-  item: {
-    height: 24,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
+  itemHead: {
+    textTransform: 'uppercase',
   },
-  items: { display: 'flex' },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
@@ -39,6 +33,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const TagRules = () => {
   const { t } = useFormatter();
   const { classes } = useStyles();
+  const { classes: bodyItemsClasses } = useBodyItemsStyles();
 
   const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
@@ -129,11 +124,11 @@ const TagRules = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.items}>
+                <div className={bodyItemsClasses.bodyItems}>
                   {headers.map(header => (
                     <div
                       key={header.field}
-                      className={classes.item}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles[header.field]}
                     >
                       {header.value?.(tagRule)}

@@ -8,6 +8,7 @@ import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { type QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { type Header } from '../../../components/common/SortHeadersList';
 import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
@@ -22,16 +23,11 @@ import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: { textTransform: 'uppercase' },
-  item: { height: 50 },
-  bodyItems: { display: 'flex' },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
+  itemHead: {
+    textTransform: 'uppercase',
+  },
+  item: {
+    height: 50,
   },
 }));
 
@@ -65,6 +61,7 @@ const InjectResultList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
+  const { classes: bodyItemsClasses } = useBodyItemsStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -220,11 +217,11 @@ const InjectResultList: FunctionComponent<Props> = ({
                       </ListItemIcon>
                       <ListItemText
                         primary={(
-                          <div className={classes.bodyItems}>
+                          <div className={bodyItemsClasses.bodyItems}>
                             {headers.map(header => (
                               <div
                                 key={header.field}
-                                className={classes.bodyItem}
+                                className={bodyItemsClasses.bodyItem}
                                 style={inlineStyles[header.field]}
                               >
                                 {header.value?.(injectResultOutput)}

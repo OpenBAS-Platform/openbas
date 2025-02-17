@@ -13,6 +13,7 @@ import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
@@ -25,17 +26,11 @@ import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: { textTransform: 'uppercase' },
-  item: { height: 50 },
-  bodyItems: { display: 'flex' },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-    boxSizing: 'content-box',
+  itemHead: {
+    textTransform: 'uppercase',
+  },
+  item: {
+    height: 50,
   },
 }));
 
@@ -54,6 +49,7 @@ const Players = () => {
   // Standard hooks
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
+  const { classes: bodyItemsClasses } = useBodyItemsStyles();
   const { t } = useFormatter();
 
   // Fetching data
@@ -182,11 +178,11 @@ const Players = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
+                <div className={bodyItemsClasses.bodyItems}>
                   {headers.map(header => (
                     <div
                       key={header.field}
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles[header.field]}
                     >
                       {header.value?.(player)}

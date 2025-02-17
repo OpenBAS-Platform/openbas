@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../../../actions/Executor';
 import { type ExecutorHelper } from '../../../../../actions/executors/executor-helper';
+import useBodyItemsStyles from '../../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
 import { type AgentOutput } from '../../../../../utils/api-types';
@@ -22,17 +23,6 @@ const useStyles = makeStyles()(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
   },
 }));
 
@@ -54,6 +44,7 @@ interface Props { agents: AgentOutput[] }
 
 const AgentList: FunctionComponent<Props> = ({ agents }) => {
   const { classes } = useStyles();
+  const { classes: bodyItemsClasses } = useBodyItemsStyles();
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
   // Fetching data
@@ -137,11 +128,11 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
         <ListItemText
           primary={(
             <div>
-              <div className={classes.bodyItems}>
+              <div className={bodyItemsClasses.bodyItems}>
                 {headers.map(header => (
                   <div
                     key={header.field}
-                    className={classes.bodyItem}
+                    className={bodyItemsClasses.bodyItem}
                     style={inlineStyles[header.field]}
                   >
                     {t(header.label)}
@@ -169,11 +160,11 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
+                <div className={bodyItemsClasses.bodyItems}>
                   {headers.map(header => (
                     <div
                       key={header.field}
-                      className={classes.bodyItem}
+                      className={bodyItemsClasses.bodyItem}
                       style={inlineStyles[header.field]}
                     >
                       {header.value(agent)}

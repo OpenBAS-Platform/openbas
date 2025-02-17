@@ -8,6 +8,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateKillChainPhase from './CreateKillChainPhase';
@@ -26,17 +27,6 @@ const useStyles = makeStyles()(() => ({
   item: {
     paddingLeft: 10,
     height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
   },
   chipInList: {
     fontSize: 12,
@@ -58,6 +48,7 @@ const inlineStyles = {
 const KillChainPhases = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const { classes: bodyItemsClasses } = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
 
   // Headers
@@ -156,8 +147,8 @@ const KillChainPhases = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.phase_kill_chain_name}>
+                <div className={bodyItemsClasses.bodyItems}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_kill_chain_name}>
                     <Chip
                       variant="outlined"
                       classes={{ root: classes.chipInList }}
@@ -165,13 +156,13 @@ const KillChainPhases = () => {
                       label={killChainPhase.phase_kill_chain_name}
                     />
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.phase_name}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_name}>
                     {killChainPhase.phase_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.phase_order}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_order}>
                     {killChainPhase.phase_order}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.phase_created_at}>
+                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_created_at}>
                     {nsdt(killChainPhase.phase_created_at)}
                   </div>
                 </div>
