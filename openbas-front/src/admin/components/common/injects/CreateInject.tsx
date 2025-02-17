@@ -237,7 +237,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       }}
       disableEnforceFocus
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: theme.spacing(2) }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '60% 40%', gap: theme.spacing(2) }}>
         <div>
           <PaginationComponentV2
             fetch={searchInjectorContracts}
@@ -341,6 +341,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
           isCreation
           {...props}
         />
+
       </div>
     </Drawer>
   );
