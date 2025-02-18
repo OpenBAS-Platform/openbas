@@ -86,7 +86,7 @@ public class InjectImportTest extends IntegrationTest {
 
     staticArticleWrappers.clear();
 
-    for(String filename : FileFixture.WELL_KNOWN_FILES.keySet()) {
+    for (String filename : FileFixture.WELL_KNOWN_FILES.keySet()) {
       fileService.deleteFile(filename);
     }
   }
@@ -746,7 +746,9 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected tag '%s'".formatted(expected.getName()));
+          Assertions.assertTrue(
+              recreated.isPresent(),
+              "Could not find expected tag '%s'".formatted(expected.getName()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getColor(), recreated.get().getColor());
 
@@ -775,7 +777,9 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected document %s".formatted(expected.getTarget()));
+          Assertions.assertTrue(
+              recreated.isPresent(),
+              "Could not find expected document %s".formatted(expected.getTarget()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
           Assertions.assertEquals(expected.getTarget(), recreated.get().getTarget());
@@ -1361,7 +1365,9 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected document %s".formatted(expected.getTarget()));
+          Assertions.assertTrue(
+              recreated.isPresent(),
+              "Could not find expected document %s".formatted(expected.getTarget()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
           Assertions.assertEquals(expected.getTarget(), recreated.get().getTarget());

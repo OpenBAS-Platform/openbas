@@ -99,23 +99,23 @@ public interface InjectRepository
 
   @Modifying
   @Query(
-          value =
-                  "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city,"
-                          + "inject_injector_contract, inject_all_teams, inject_enabled, "
-                          + "inject_depends_duration, inject_content) "
-                          + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :dependsDuration, :content)",
-          nativeQuery = true)
+      value =
+          "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city,"
+              + "inject_injector_contract, inject_all_teams, inject_enabled, "
+              + "inject_depends_duration, inject_content) "
+              + "values (:id, :title, :description, :country, :city, :contract, :allTeams, :enabled, :dependsDuration, :content)",
+      nativeQuery = true)
   void importSaveStandAlone(
-          @Param("id") String id,
-          @Param("title") String title,
-          @Param("description") String description,
-          @Param("country") String country,
-          @Param("city") String city,
-          @Param("contract") String contract,
-          @Param("allTeams") boolean allTeams,
-          @Param("enabled") boolean enabled,
-          @Param("dependsDuration") Long dependsDuration,
-          @Param("content") String content);
+      @Param("id") String id,
+      @Param("title") String title,
+      @Param("description") String description,
+      @Param("country") String country,
+      @Param("city") String city,
+      @Param("contract") String contract,
+      @Param("allTeams") boolean allTeams,
+      @Param("enabled") boolean enabled,
+      @Param("dependsDuration") Long dependsDuration,
+      @Param("content") String content);
 
   @Modifying
   @Query(
