@@ -19,9 +19,7 @@ const computeLangKeys = (lang) => {
   } else if (lang === 'zh') {
     data = fs.readFileSync(`${__dirname}/utils/lang/zh.json`, { encoding: 'utf8' });
   }
-  const regexp = `({[\\s\\S]*?},)`;
-  const matches = data?.match(regexp);
-  return matches[1];
+  return data;
 };
 
 // -- Match missing keys --
@@ -36,7 +34,7 @@ const checkLanguageSupport = (lang) => {
       const regexp = /(?<![a-zA-Z])t\('([\w\s]+)'\)/g;
       const matches = [...data.matchAll(regexp)];
       matches.forEach((m) => {
-        const regexWithQuote = `'${m[1]}':`;
+        const regexWithQuote = `"${m[1]}":`;
         const regexWithoutQuote = `${m[1]}:`;
         if (!langI18n.match(regexWithQuote) && !langI18n.match(regexWithoutQuote)) {
           results.push(m[1]);
@@ -64,7 +62,7 @@ const checkLanguageSupport = (lang) => {
 };
 
 const run = () => {
-  const languages = ['fr', 'zh'];
+  const languages = ['en', 'fr', 'zh'];
   const missingKeys = {};
 
   languages.forEach((lang) => {
