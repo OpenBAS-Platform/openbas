@@ -41,7 +41,10 @@ export const fetchEndpoint = (endpointId: string) => (dispatch: Dispatch) => {
 };
 
 export const searchEndpointAsOption = (searchText: string = '', simulationOrScenarioId: string = '') => {
-  const params = { searchText, simulationOrScenarioId };
+  const params = {
+    searchText,
+    simulationOrScenarioId,
+  };
   return simpleCall(`${ENDPOINT_URI}/options`, params);
 };
 

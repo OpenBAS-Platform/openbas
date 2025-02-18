@@ -111,6 +111,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
   // Build map of technical Injects or without team
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[] }, inject: InjectStore) => {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let keys: any[] = [];
 
     if (!allTeamInjectIds.has(inject.inject_id)) {
@@ -120,6 +121,7 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         && inject.inject_injector_contract.convertedContent.fields.some(
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           (field: any) => field.key === 'teams',
         )
       ) {

@@ -107,7 +107,7 @@ const TagRuleForm: FunctionComponent<Props> = ({
                   <AssetGroupsList
                     assetGroupIds={assetGroupIds}
                     actions={(
-                      // @ts-ignore
+                      // @ts-expect-error: assetGroup property handle by AssetGroupsList
                       <AssetGroupPopover
                         inline
                         onRemoveAssetGroupFromList={result =>
