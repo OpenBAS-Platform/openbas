@@ -1531,6 +1531,7 @@ public class InjectImportTest extends IntegrationTest {
     }
 
     @Nested
+    @WithMockAdminUser
     @DisplayName("When targeting atomic testing")
     public class WhenTargetingAtomicTesting {
 
