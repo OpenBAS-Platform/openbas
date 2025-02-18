@@ -127,7 +127,6 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       articleComposers.forEach(ArticleComposer.Composer::delete);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
         injectorContractRepository.delete(injectorContract);
-        injectorRepository.delete(injectorContract.getInjector());
       }
       return this;
     }

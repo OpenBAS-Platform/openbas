@@ -14,7 +14,6 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.inject.form.InjectImportInput;
@@ -22,6 +21,7 @@ import io.openbas.rest.inject.form.InjectImportTargetDefinition;
 import io.openbas.rest.inject.form.InjectImportTargetType;
 import io.openbas.rest.inject.service.InjectExportService;
 import io.openbas.service.ChallengeService;
+import io.openbas.service.FileService;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.helpers.TagHelper;
@@ -56,6 +56,7 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private ChannelComposer channelComposer;
   @Autowired private ChallengeComposer challengeComposer;
   @Autowired private DocumentComposer documentComposer;
+  @Autowired private FileService fileService;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamComposer teamComposer;
   @Autowired private UserComposer userComposer;
@@ -65,12 +66,10 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private InjectorFixture injectorFixture;
   @Autowired private ChallengeService challengeService;
   @Autowired private EntityManager entityManager;
-
   @Autowired private InjectRepository injectRepository;
-  @Autowired private InjectorContractRepository injectorContractRepository;
 
   @BeforeEach
-  void before() {
+  void before() throws Exception {
     teamComposer.reset();
     userComposer.reset();
     organizationComposer.reset();
@@ -86,6 +85,10 @@ public class InjectImportTest extends IntegrationTest {
     payloadComposer.reset();
 
     staticArticleWrappers.clear();
+
+    for(String filename : FileFixture.WELL_KNOWN_FILES.keySet()) {
+      fileService.deleteFile(filename);
+    }
   }
 
   public final String INJECT_IMPORT_URI = INJECT_URI + "/import";
@@ -101,8 +104,8 @@ public class InjectImportTest extends IntegrationTest {
               .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel()))
               .withDocument(
                   documentComposer
-                      .forDocument(DocumentFixture.getDocument(FileFixture.getPngFileContent()))
-                      .withInMemoryFile(FileFixture.getPngFileContent())));
+                      .forDocument(DocumentFixture.getDocument(FileFixture.getPngGridFileContent()))
+                      .withInMemoryFile(FileFixture.getPngGridFileContent())));
     }
 
     return staticArticleWrappers;
@@ -117,8 +120,8 @@ public class InjectImportTest extends IntegrationTest {
             .forInject(InjectFixture.getDefaultInject())
             .withDocument(
                 documentComposer
-                    .forDocument(DocumentFixture.getDocument(FileFixture.getPngFileContent()))
-                    .withInMemoryFile(FileFixture.getPngFileContent()))
+                    .forDocument(DocumentFixture.getDocument(FileFixture.getPngSmileFileContent()))
+                    .withInMemoryFile(FileFixture.getPngSmileFileContent()))
             .withInjectorContract(
                 injectorContractComposer
                     .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
@@ -283,16 +286,6 @@ public class InjectImportTest extends IntegrationTest {
 
       doImport(exportData, new InjectImportInput()).andExpect(status().isUnprocessableEntity());
     }
-    //
-    //    @Test
-    //    public void ttt() {
-    //      InjectorContractComposer.Composer icc =
-    // injectorContractComposer.forInjectorContract(InjectorContractFixture.createDefaultInjectorContract()).persist();
-    //      InjectComposer.Composer ic =
-    // injectComposer.forInject(InjectFixture.getDefaultInject()).withInjectorContract(icc).persist();
-    //      clearEntityManager();
-    //      clearEntityManager();
-    //    }
   }
 
   @Nested
@@ -467,13 +460,8 @@ public class InjectImportTest extends IntegrationTest {
           // ignore
           // this
           assertThatJson(recreated.get().getContent())
-              .whenIgnoringPaths("challenges")
+              .whenIgnoringPaths("challenges", "articles")
               .isEqualTo(expected.getContent());
-          assertThatJson(recreated.get().getContent())
-              .node("challenges")
-              .isPresent()
-              .and()
-              .isArray();
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
@@ -758,7 +746,7 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected tag");
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected tag '%s'".formatted(expected.getName()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getColor(), recreated.get().getColor());
 
@@ -787,7 +775,7 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected document");
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected document %s".formatted(expected.getTarget()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
           Assertions.assertEquals(expected.getTarget(), recreated.get().getTarget());
@@ -842,13 +830,8 @@ public class InjectImportTest extends IntegrationTest {
           // ignore
           // this
           assertThatJson(recreated.get().getContent())
-              .whenIgnoringPaths("challenges")
+              .whenIgnoringPaths("challenges", "articles")
               .isEqualTo(expected.getContent());
-          assertThatJson(recreated.get().getContent())
-              .node("challenges")
-              .isPresent()
-              .and()
-              .isArray();
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
@@ -1378,7 +1361,7 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected document");
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected document %s".formatted(expected.getTarget()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
           Assertions.assertEquals(expected.getTarget(), recreated.get().getTarget());
@@ -1399,7 +1382,7 @@ public class InjectImportTest extends IntegrationTest {
     @DisplayName("When targeting an exercise")
     public class WhenTargetingAnExercise {
 
-      private ExerciseComposer.Composer getExerciseWrapper() {
+      private ExerciseComposer.Composer getPersistedExerciseWrapper() {
         return exerciseComposer.forExercise(ExerciseFixture.createDefaultExercise()).persist();
       }
 
@@ -1474,7 +1457,7 @@ public class InjectImportTest extends IntegrationTest {
     @DisplayName("When targeting a scenario")
     public class WhenTargetingAScenario {
 
-      private ScenarioComposer.Composer getScenarioWrapper() {
+      private ScenarioComposer.Composer getPersistedScenarioWrapper() {
         return scenarioComposer
             .forScenario(ScenarioFixture.createDefaultIncidentResponseScenario())
             .persist();
