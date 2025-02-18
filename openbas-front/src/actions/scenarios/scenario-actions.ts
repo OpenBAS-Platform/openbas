@@ -160,7 +160,7 @@ export const dryImportXlsForScenario = (scenarioId: Scenario['scenario_id'], imp
 
 export const searchScenarioAsOption = (searchText: string = '') => {
   const params = { searchText };
-  return simpleCall(`${SCENARIO_URI}/options`, params);
+  return simpleCall(`${SCENARIO_URI}/options`, { params });
 };
 
 export const searchScenarioByIdAsOption = (ids: string[]) => {
@@ -169,7 +169,7 @@ export const searchScenarioByIdAsOption = (ids: string[]) => {
 
 export const searchScenarioCategoryAsOption = (searchText: string = '') => {
   const params = { searchText };
-  return simpleCall(`${SCENARIO_URI}/category/options`, params);
+  return simpleCall(`${SCENARIO_URI}/category/options`, { params });
 };
 
 // -- LESSONS --

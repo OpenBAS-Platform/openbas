@@ -23,7 +23,7 @@ export const bulkDeleteInjects = data => (dispatch) => {
 
 export const bulkDeleteInjectsSimple = (data) => {
   const uri = `/api/injects`;
-  return simpleDelCall(uri, data);
+  return simpleDelCall(uri, { data });
 };
 
 export const bulkUpdateInject = data => (dispatch) => {
