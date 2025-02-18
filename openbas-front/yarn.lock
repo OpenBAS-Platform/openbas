@@ -9005,7 +9005,6 @@ __metadata:
     "@testing-library/dom": "npm:10.4.0"
     "@testing-library/react": "npm:16.2.0"
     "@types/d3-hierarchy": "npm:3.1.7"
-    "@types/eslint__js": "npm:8.42.3"
     "@types/node": "npm:22.13.4"
     "@types/pdfmake": "npm:0.2.9"
     "@types/qs": "npm:6"
