@@ -241,6 +241,10 @@ public class CalderaExecutorService implements Runnable {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Used to delete existing agent in Caldera application if the clear ttl is reached (that means if
+   * agent Caldera is inactive in the Caldera app)
+   */
   private void clearAbilityForAgent(@NotNull final io.openbas.database.model.Agent existingAgent) {
     if ((now().toEpochMilli() - existingAgent.getClearedAt().toEpochMilli()) > CLEAR_TTL) {
       try {
