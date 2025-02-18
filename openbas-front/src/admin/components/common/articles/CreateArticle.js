@@ -29,7 +29,10 @@ const CreateArticle = (props) => {
   const { onAddArticle } = useContext(ArticleContext);
 
   const onSubmit = (data) => {
-    const inputValues = { ...data, article_channel: data.article_channel.id };
+    const inputValues = {
+      ...data,
+      article_channel: data.article_channel.id,
+    };
     return onAddArticle(inputValues).then(
       (result) => {
         if (result.result) {
@@ -81,7 +84,8 @@ const CreateArticle = (props) => {
             handleClose={handleCloseCreate}
             initialValues={{
               article_name: '',
-              article_channel: '' }}
+              article_channel: '',
+            }}
           />
         </DialogContent>
       </Dialog>

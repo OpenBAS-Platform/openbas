@@ -90,19 +90,13 @@ const styles = theme => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  title: {
-    float: 'left',
-  },
+  itemIcon: { color: theme.palette.primary.main },
+  title: { float: 'left' },
   allTeams: {
     float: 'right',
     marginTop: -7,
   },
-  container: {
-    padding: 20,
-  },
+  container: { padding: 20 },
 });
 
 const inlineStylesHeaders = {
@@ -264,21 +258,15 @@ class QuickInject extends Component {
   }
 
   handleModifyTeams(teamsIds) {
-    this.setState({
-      teamsIds: [...teamsIds],
-    });
+    this.setState({ teamsIds: [...teamsIds] });
   }
 
   handleRemoveTeam(teamId) {
-    this.setState({
-      teamsIds: this.state.teamsIds.filter(a => a !== teamId),
-    });
+    this.setState({ teamsIds: this.state.teamsIds.filter(a => a !== teamId) });
   }
 
   handleAddDocuments(documents) {
-    this.setState({
-      documents,
-    });
+    this.setState({ documents });
   }
 
   handleRemoveDocument(documentId) {
@@ -305,9 +293,7 @@ class QuickInject extends Component {
   }
 
   selectTupleFieldType(name, type) {
-    this.setState({
-      tupleFieldTypes: R.assoc(name, type, this.state.tupleFieldTypes),
-    });
+    this.setState({ tupleFieldTypes: R.assoc(name, type, this.state.tupleFieldTypes) });
   }
 
   teamsReverseBy(field) {
@@ -484,7 +470,10 @@ class QuickInject extends Component {
                       name={field.key}
                       label={t(field.label)}
                       fullWidth={true}
-                      style={{ marginTop: 20, height: 250 }}
+                      style={{
+                        marginTop: 20,
+                        height: 250,
+                      }}
                       disabled={isExerciseReadOnly(exercise)}
                     />
                   )
@@ -1411,7 +1400,11 @@ class QuickInject extends Component {
                     />
                   </List>
                 </div>
-                <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                <div style={{
+                  float: 'right',
+                  margin: '20px 0 20px 0',
+                }}
+                >
                   <Button
                     variant="contained"
                     color="primary"

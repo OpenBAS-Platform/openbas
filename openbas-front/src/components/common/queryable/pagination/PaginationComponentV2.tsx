@@ -1,21 +1,20 @@
 import { Box, Button, Chip } from '@mui/material';
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { cloneElement, type ReactElement, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import InjectorContractSwitchFilter from '../../../../admin/components/common/filters/InjectorContractSwitchFilter';
 import MitreFilter, { MITRE_FILTER_KEY } from '../../../../admin/components/common/filters/MitreFilter';
 import mitreAttack from '../../../../static/images/misc/attack.png';
-import type { AttackPattern, Filter, PropertySchemaDTO, SearchPaginationInput } from '../../../../utils/api-types';
+import { type AttackPattern, type Filter, type PropertySchemaDTO, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useFormatter } from '../../../i18n';
 import ClickableModeChip from '../../chips/ClickableModeChip';
 import Drawer from '../../Drawer';
-import FilterAutocomplete, { OptionPropertySchema } from '../filter/FilterAutocomplete';
+import FilterAutocomplete, { type OptionPropertySchema } from '../filter/FilterAutocomplete';
 import FilterChips from '../filter/FilterChips';
 import { availableOperators, isEmptyFilter } from '../filter/FilterUtils';
 import useFilterableProperties from '../filter/useFilterableProperties';
-import type { Page } from '../Page';
-import { QueryableHelpers } from '../QueryableHelpers';
+import { type Page } from '../Page';
+import { type QueryableHelpers } from '../QueryableHelpers';
 import TextSearchComponent from '../textSearch/TextSearchComponent';
 import TablePaginationComponentV2 from './TablePaginationComponentV2';
 
@@ -46,7 +45,7 @@ interface Props<T> {
   entityPrefix?: string;
   availableFilterNames?: string[];
   queryableHelpers: QueryableHelpers;
-  topBarButtons?: React.ReactElement | null;
+  topBarButtons?: ReactElement | null;
   attackPatterns?: AttackPattern[];
   reloadContentCount?: number;
   contextId?: string;
@@ -78,7 +77,11 @@ const PaginationComponentV2 = <T extends object>({
       useFilterableProperties(entityPrefix, availableFilterNames).then((propertySchemas: PropertySchemaDTO[]) => {
         const newOptions = propertySchemas.filter(property => property.schema_property_name !== MITRE_FILTER_KEY)
           .map(property => (
-            { id: property.schema_property_name, label: t(property.schema_property_name), operator: availableOperators(property)[0] } as OptionPropertySchema
+            {
+              id: property.schema_property_name,
+              label: t(property.schema_property_name),
+              operator: availableOperators(property)[0],
+            } as OptionPropertySchema
           ))
           .sort((a, b) => a.label.localeCompare(b.label));
         setOptions(newOptions);
@@ -103,7 +106,7 @@ const PaginationComponentV2 = <T extends object>({
 
   // Filters
   const [pristine, setPristine] = useState(true);
-  const [openMitreFilter, setOpenMitreFilter] = React.useState(false);
+  const [openMitreFilter, setOpenMitreFilter] = useState(false);
 
   const computeAttackPatternNameForFilter = () => {
     return searchPaginationInput.filterGroup?.filters?.filter(
@@ -118,13 +121,17 @@ const PaginationComponentV2 = <T extends object>({
   // TopBarChildren
   let topBarButtonComponent;
   if (topBarButtons) {
-    topBarButtonComponent = React.cloneElement(topBarButtons as React.ReactElement);
+    topBarButtonComponent = cloneElement(topBarButtons as ReactElement);
   }
 
   return (
     <>
       <div className={disablePagination ? classes.parametersWithoutPagination : classes.parameters}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
+        >
           {searchEnable && (
             <TextSearchComponent
               textSearch={searchPaginationInput.textSearch}
@@ -141,7 +148,13 @@ const PaginationComponentV2 = <T extends object>({
           {queryableHelpers.filterHelpers && availableFilterNames?.includes('injector_contract_attack_patterns') && (
             <>
               <div style={{ cursor: 'pointer' }} onClick={() => setOpenMitreFilter(true)}>
-                <Button variant="outlined" style={{ marginLeft: searchEnable ? 10 : 0, border: '1px solid #c74227' }}>
+                <Button
+                  variant="outlined"
+                  style={{
+                    marginLeft: searchEnable ? 10 : 0,
+                    border: '1px solid #c74227',
+                  }}
+                >
                   <img src={mitreAttack} alt="MITRE ATT&CK" style={{ width: 60 }} />
                 </Button>
               </div>

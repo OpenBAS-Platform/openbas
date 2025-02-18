@@ -1,13 +1,13 @@
-import { Props } from 'html-react-parser/lib/attributes-to-props';
-import { FunctionComponent, useContext, useEffect, useState } from 'react';
+import { type Props } from 'html-react-parser/lib/attributes-to-props';
+import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import Loader from '../../../../components/Loader';
-import { EndpointOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
+import { type EndpointOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import InjectStatus from '../../common/injects/status/InjectStatus';
-import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
 const AtomicTestingDetail: FunctionComponent<Props> = () => {
   // Fetching data
@@ -21,11 +21,19 @@ const AtomicTestingDetail: FunctionComponent<Props> = () => {
     injectResult?.inject_targets.forEach((result) => {
       if (result.targetType === 'ASSETS_GROUPS' && result.children) {
         result.children.forEach(({ id, name, platformType }) => {
-          map.set(id, { asset_id: id, asset_name: name, endpoint_platform: platformType } as EndpointOutput);
+          map.set(id, {
+            asset_id: id,
+            asset_name: name,
+            endpoint_platform: platformType,
+          } as EndpointOutput);
         });
       }
       if (result.targetType === 'ASSETS') {
-        map.set(result.id, { asset_id: result.id, asset_name: result.name, endpoint_platform: result.platformType } as EndpointOutput);
+        map.set(result.id, {
+          asset_id: result.id,
+          asset_name: result.name,
+          endpoint_platform: result.platformType,
+        } as EndpointOutput);
       }
     });
     return map;

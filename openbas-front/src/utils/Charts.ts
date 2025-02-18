@@ -1,6 +1,6 @@
-import { Theme } from '@mui/material';
+import { type Theme } from '@mui/material';
 import * as C from '@mui/material/colors';
-import { ApexOptions } from 'apexcharts';
+import { type ApexOptions } from 'apexcharts';
 
 type Temp = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800;
 
@@ -95,27 +95,15 @@ export const lineChartOptions = (
   chart: {
     type: 'line',
     background: 'transparent',
-    toolbar: {
-      show: false,
-    },
+    toolbar: { show: false },
     foreColor: theme.palette.text?.secondary,
   },
-  theme: {
-    mode: theme.palette.mode,
-  },
-  dataLabels: {
-    enabled: dataLabels,
-  },
+  theme: { mode: theme.palette.mode },
+  dataLabels: { enabled: dataLabels },
   colors: distributed
     ? colors(theme.palette.mode === 'dark' ? 400 : 600)
     : [theme.palette.primary.main],
-  states: {
-    hover: {
-      filter: {
-        type: 'lighten',
-      },
-    },
-  },
+  states: { hover: { filter: { type: 'lighten' } } },
   grid: {
     borderColor:
       theme.palette.mode === 'dark'
@@ -130,9 +118,7 @@ export const lineChartOptions = (
       vertical: 20,
     },
   },
-  stroke: {
-    curve: 'smooth',
-  },
+  stroke: { curve: 'smooth' },
   markers: {
     size: 4,
     strokeWidth: 2,
@@ -142,9 +128,7 @@ export const lineChartOptions = (
       sizeOffset: 3,
     },
   },
-  tooltip: {
-    theme: theme.palette.mode,
-  },
+  tooltip: { theme: theme.palette.mode },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',
     tickAmount,
@@ -156,9 +140,7 @@ export const lineChartOptions = (
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
   },
   yaxis: {
     labels: {
@@ -168,9 +150,7 @@ export const lineChartOptions = (
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
   },
 });
 
@@ -184,29 +164,17 @@ export const areaChartOptions = (
   chart: {
     type: 'area',
     background: 'transparent',
-    toolbar: {
-      show: false,
-    },
+    toolbar: { show: false },
     foreColor: theme.palette.text?.secondary,
   },
-  theme: {
-    mode: theme.palette.mode,
-  },
-  dataLabels: {
-    enabled: false,
-  },
+  theme: { mode: theme.palette.mode },
+  dataLabels: { enabled: false },
   stroke: {
     curve: 'smooth',
     width: 2,
   },
   colors: [theme.palette.primary.main],
-  states: {
-    hover: {
-      filter: {
-        type: 'lighten',
-      },
-    },
-  },
+  states: { hover: { filter: { type: 'lighten' } } },
   grid: {
     borderColor:
       theme.palette.mode === 'dark'
@@ -214,12 +182,8 @@ export const areaChartOptions = (
         : 'rgba(0, 0, 0, .1)',
     strokeDashArray: 3,
   },
-  legend: {
-    show: false,
-  },
-  tooltip: {
-    theme: theme.palette.mode,
-  },
+  legend: { show: false },
+  tooltip: { theme: theme.palette.mode },
   fill: {
     type: 'gradient',
     gradient: {
@@ -244,9 +208,7 @@ export const areaChartOptions = (
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
   },
   yaxis: {
     labels: {
@@ -256,20 +218,15 @@ export const areaChartOptions = (
         fontFamily: '"IBM Plex Sans", sans-serif',
       },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
   },
 });
 
 export interface CustomTooltipOptions {
   _: unknown[];
   seriesIndex: number;
-  dataPointIndex: number; w: {
-    globals: {
-      initialSeries: Array<{ data: object[] }>;
-    };
-  };
+  dataPointIndex: number;
+  w: { globals: { initialSeries: Array<{ data: object[] }> } };
 }
 
 export type CustomTooltipFunction = (options: CustomTooltipOptions) => unknown | undefined;
@@ -322,31 +279,15 @@ export const verticalBarsChartOptions = (
     stacked: isStacked,
     width: '100%',
     height: '100%',
-    zoom: {
-      enabled: !isFakeData,
-    },
-    animations: {
-      enabled: !isFakeData,
-    },
+    zoom: { enabled: !isFakeData },
+    animations: { enabled: !isFakeData },
   },
-  theme: {
-    mode: theme.palette.mode,
-  },
-  dataLabels: {
-    enabled: false,
-  },
+  theme: { mode: theme.palette.mode },
+  dataLabels: { enabled: false },
   colors: getColors(theme, isResult, distributed),
   states: {
-    hover: {
-      filter: {
-        type: isFakeData ? 'none' : 'lighten',
-      },
-    },
-    active: {
-      filter: {
-        type: isFakeData ? 'none' : 'lighten',
-      },
-    },
+    hover: { filter: { type: isFakeData ? 'none' : 'lighten' } },
+    active: { filter: { type: isFakeData ? 'none' : 'lighten' } },
   },
   grid: {
     borderColor:
@@ -361,12 +302,8 @@ export const verticalBarsChartOptions = (
       horizontal: 5,
       vertical: 20,
     },
-    onItemClick: {
-      toggleDataSeries: !isFakeData,
-    },
-    onItemHover: {
-      highlightDataSeries: !isFakeData,
-    },
+    onItemClick: { toggleDataSeries: !isFakeData },
+    onItemHover: { highlightDataSeries: !isFakeData },
   },
   tooltip: {
     theme: theme.palette.mode,
@@ -385,13 +322,9 @@ export const verticalBarsChartOptions = (
       },
       show: !isFakeData,
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
   },
-  fill: {
-    opacity: isFakeData ? 0.1 : 1,
-  },
+  fill: { opacity: isFakeData ? 0.1 : 1 },
   stroke: {
     colors: isResult ? ['transparent'] : undefined,
     width: isResult ? 5 : 2,
@@ -399,13 +332,9 @@ export const verticalBarsChartOptions = (
   yaxis: {
     labels: {
       formatter: (value: number) => (yFormatter ? yFormatter(value) : value.toString()),
-      style: {
-        fontFamily: '"IBM Plex Sans", sans-serif',
-      },
+      style: { fontFamily: '"IBM Plex Sans", sans-serif' },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
     max,
   },
   plotOptions: {
@@ -463,33 +392,17 @@ export const horizontalBarsChartOptions = (
     stacked,
     width: '100%',
     height: '100%',
-    zoom: {
-      enabled: !isFakeData,
-    },
-    animations: {
-      enabled: !isFakeData,
-    },
+    zoom: { enabled: !isFakeData },
+    animations: { enabled: !isFakeData },
   },
-  theme: {
-    mode: theme.palette.mode,
-  },
-  dataLabels: {
-    enabled: false,
-  },
+  theme: { mode: theme.palette.mode },
+  dataLabels: { enabled: false },
   colors: [
     theme.palette.primary.main,
     ...colors(theme.palette.mode === 'dark' ? 400 : 600),
   ],
-  states: {
-    hover: {
-      filter: {
-        type: isFakeData ? 'none' : 'lighten',
-      },
-    },
-  },
-  fill: {
-    opacity: isFakeData ? 0.1 : 0.9,
-  },
+  states: { hover: { filter: { type: isFakeData ? 'none' : 'lighten' } } },
+  fill: { opacity: isFakeData ? 0.1 : 0.9 },
   grid: {
     borderColor:
       theme.palette.mode === 'dark'
@@ -499,9 +412,7 @@ export const horizontalBarsChartOptions = (
   },
   legend: {
     show: legend,
-    itemMargin: {
-      horizontal: 5,
-    },
+    itemMargin: { horizontal: 5 },
   },
   tooltip: {
     enabled: !isFakeData,
@@ -513,13 +424,9 @@ export const horizontalBarsChartOptions = (
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error apexcharts typescript do not handle horizontal bar chart well
       formatter: (value: number) => (xFormatter ? xFormatter(value) : value.toString()),
-      style: {
-        fontFamily: '"IBM Plex Sans", sans-serif',
-      },
+      style: { fontFamily: '"IBM Plex Sans", sans-serif' },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
     tickAmount: adjustTicks ? 1 : undefined,
   },
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -527,13 +434,9 @@ export const horizontalBarsChartOptions = (
   yaxis: {
     labels: {
       formatter: (value: string) => (yFormatter ? yFormatter(value) : value),
-      style: {
-        fontFamily: '"IBM Plex Sans", sans-serif',
-      },
+      style: { fontFamily: '"IBM Plex Sans", sans-serif' },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
   },
   plotOptions: {
     bar: {
@@ -569,28 +472,14 @@ export const radarChartOptions = (theme: Theme, labels: string[], chartColors = 
   chart: {
     type: 'radar',
     background: 'transparent',
-    toolbar: {
-      show: false,
-    },
+    toolbar: { show: false },
     offsetY: -20,
   },
-  theme: {
-    mode: theme.palette.mode,
-  },
+  theme: { mode: theme.palette.mode },
   labels,
-  states: {
-    hover: {
-      filter: {
-        type: 'lighten',
-      },
-    },
-  },
-  legend: {
-    show: false,
-  },
-  tooltip: {
-    theme: theme.palette.mode,
-  },
+  states: { hover: { filter: { type: 'lighten' } } },
+  legend: { show: false },
+  tooltip: { theme: theme.palette.mode },
   fill: {
     opacity: 0.2,
     colors: [theme.palette.primary.main],
@@ -613,13 +502,9 @@ export const radarChartOptions = (theme: Theme, labels: string[], chartColors = 
         colors: chartColors,
       },
     },
-    axisBorder: {
-      show: false,
-    },
+    axisBorder: { show: false },
   },
-  yaxis: {
-    show: false,
-  },
+  yaxis: { show: false },
   plotOptions: {
     radar: {
       polygons: {
@@ -673,25 +558,13 @@ export const polarAreaChartOptions = (
       foreColor: theme.palette.text?.secondary,
       width: '100%',
       height: '100%',
-      zoom: {
-        enabled: !isFakeData,
-      },
-      animations: {
-        enabled: !isFakeData,
-      },
+      zoom: { enabled: !isFakeData },
+      animations: { enabled: !isFakeData },
     },
-    theme: {
-      mode: theme.palette.mode,
-    },
+    theme: { mode: theme.palette.mode },
     colors: chartFinalColors,
     labels,
-    states: {
-      hover: {
-        filter: {
-          type: 'lighten',
-        },
-      },
-    },
+    states: { hover: { filter: { type: 'lighten' } } },
     legend: {
       show: legend,
       position: legendPosition,
@@ -702,22 +575,14 @@ export const polarAreaChartOptions = (
       theme: theme.palette.mode,
       custom: simpleLabelTooltip(theme),
     },
-    fill: {
-      opacity: isFakeData ? 0.2 : 0.5,
-    },
-    stroke: {
-      show: !isFakeData,
-    },
+    fill: { opacity: isFakeData ? 0.2 : 0.5 },
+    stroke: { show: !isFakeData },
     yaxis: {
       labels: {
         formatter: (value: number) => (formatter ? formatter(value) : value.toString()),
-        style: {
-          fontFamily: '"IBM Plex Sans", sans-serif',
-        },
+        style: { fontFamily: '"IBM Plex Sans", sans-serif' },
       },
-      axisBorder: {
-        show: false,
-      },
+      axisBorder: { show: false },
     },
     plotOptions: {
       polarArea: {
@@ -813,28 +678,14 @@ export const donutChartOptions = ({
       foreColor: theme.palette.text?.secondary,
       width: '100%',
       height: '100%',
-      zoom: {
-        enabled: !isFakeData,
-      },
-      animations: {
-        enabled: !isFakeData || !disableAnimation,
-      },
+      zoom: { enabled: !isFakeData },
+      animations: { enabled: !isFakeData || !disableAnimation },
     },
-    theme: {
-      mode: theme.palette.mode,
-    },
+    theme: { mode: theme.palette.mode },
     colors: chartFinalColors,
     labels,
-    fill: {
-      opacity: isFakeData ? 0.1 : 1,
-    },
-    states: {
-      hover: {
-        filter: {
-          type: isFakeData ? 'none' : 'lighten',
-        },
-      },
-    },
+    fill: { opacity: isFakeData ? 0.1 : 1 },
+    states: { hover: { filter: { type: isFakeData ? 'none' : 'lighten' } } },
     stroke: {
       curve: 'smooth',
       width: 3,
@@ -849,12 +700,8 @@ export const donutChartOptions = ({
       show: displayLegend,
       position: legendPosition,
       fontFamily: '"IBM Plex Sans", sans-serif',
-      onItemClick: {
-        toggleDataSeries: !isFakeData,
-      },
-      onItemHover: {
-        highlightDataSeries: !isFakeData,
-      },
+      onItemClick: { toggleDataSeries: !isFakeData },
+      onItemHover: { highlightDataSeries: !isFakeData },
     },
     dataLabels: {
       enabled: !isFakeData && displayLabels,
@@ -864,21 +711,13 @@ export const donutChartOptions = ({
         fontWeight: 600,
         colors: dataLabelsColors,
       },
-      background: {
-        enabled: false,
-      },
-      dropShadow: {
-        enabled: false,
-      },
+      background: { enabled: false },
+      dropShadow: { enabled: false },
     },
     plotOptions: {
       pie: {
         donut: {
-          labels: {
-            value: {
-              show: displayValue,
-            },
-          },
+          labels: { value: { show: displayValue } },
           background: 'transparent',
           size: `${size}%`,
         },

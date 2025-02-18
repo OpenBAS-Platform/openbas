@@ -1,33 +1,34 @@
 import { HighlightOffOutlined, KeyboardArrowRight } from '@mui/icons-material';
-import { Chip, IconButton,
+import {
+  Chip, IconButton,
   List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { CSSProperties, FunctionComponent, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useMemo, useRef, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
-import { InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
+import { type AttackPatternHelper } from '../../../../actions/attack_patterns/attackpattern-helper';
+import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
 import { searchInjectorContracts } from '../../../../actions/InjectorContracts';
-import type { InjectorHelper } from '../../../../actions/injectors/injector-helper';
-import type { KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
+import { type InjectorHelper } from '../../../../actions/injectors/injector-helper';
+import { type KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import Drawer from '../../../../components/common/Drawer';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { Header } from '../../../../components/common/SortHeadersList';
+import { type Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
 import {
-  AtomicTestingInput,
-  AttackPattern,
-  FilterGroup,
-  InjectInput, InjectorContract,
-  InjectorContractOutput,
-  KillChainPhase,
+  type AtomicTestingInput,
+  type AttackPattern,
+  type FilterGroup,
+  type InjectInput, type InjectorContract,
+  type InjectorContractOutput,
+  type KillChainPhase,
 } from '../../../../utils/api-types';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import { isNotEmptyField } from '../../../../utils/utils';
@@ -35,12 +36,8 @@ import InjectDetailsForm from './form/InjectDetailsForm';
 import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles()(theme => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     fontSize: theme.typography.body2.fontSize,
     whiteSpace: 'nowrap',
@@ -58,18 +55,10 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  kill_chain_phase: {
-    width: '20%',
-  },
-  injector_contract_labels: {
-    width: '45%',
-  },
-  injector_contract_platforms: {
-    width: '15%',
-  },
-  attack_patterns: {
-    width: '20%',
-  },
+  kill_chain_phase: { width: '20%' },
+  injector_contract_labels: { width: '45%' },
+  injector_contract_platforms: { width: '15%' },
+  attack_patterns: { width: '20%' },
 };
 
 interface Props {
@@ -199,16 +188,15 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
 
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(isAtomic ? 'injector-contracts-atomic' : 'injector-contracts', initSearchPaginationInput());
 
-  const [selectedContract, setSelectedContract] = useState<Omit<InjectorContractOutput, 'injector_contract_content'> & {
-    injector_contract_content: InjectorContractConverted['convertedContent'];
-  } | null>(null);
+  const [selectedContract, setSelectedContract] = useState<Omit<InjectorContractOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } | null>(null);
   const selectContract = (contract: InjectorContractOutput) => {
     if (drawerRef.current) {
       drawerRef.current.scrollTop = 0;
     }
-    const parsedContract: Omit<InjectorContractOutput, 'injector_contract_content'> & {
-      injector_contract_content: InjectorContractConverted['convertedContent'];
-    } = { ...contract, injector_contract_content: JSON.parse(contract.injector_contract_content) };
+    const parsedContract: Omit<InjectorContractOutput, 'injector_contract_content'> & { injector_contract_content: InjectorContractConverted['convertedContent'] } = {
+      ...contract,
+      injector_contract_content: JSON.parse(contract.injector_contract_content),
+    };
     setSelectedContract(parsedContract);
   };
 
@@ -232,12 +220,15 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       handleClose={handleCloseDrawer}
       title={title}
       variant="full"
-      PaperProps={{
-        ref: drawerRef,
-      }}
+      PaperProps={{ ref: drawerRef }}
       disableEnforceFocus
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '60% 40%', gap: theme.spacing(2) }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '60% 40%',
+        gap: theme.spacing(2),
+      }}
+      >
         <div>
           <PaginationComponentV2
             fetch={searchInjectorContracts}

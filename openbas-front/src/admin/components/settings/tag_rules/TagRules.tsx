@@ -1,29 +1,25 @@
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
-import { CSSProperties, useMemo, useState } from 'react';
+import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import { type TagHelper, type UserHelper } from '../../../../actions/helper';
 import { searchTagRules } from '../../../../actions/tag_rules/tagrule-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
-import {
-  useQueryableWithLocalStorage,
-} from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { Header } from '../../../../components/common/SortHeadersList';
+import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
+import { type Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTargets from '../../../../components/ItemTargets';
 import { useHelper } from '../../../../store';
-import { TagRuleOutput } from '../../../../utils/api-types';
+import { type TagRuleOutput } from '../../../../utils/api-types';
 import TagRuleCreate from './TagRuleCreate';
 import TagRulePopover from './TagRulePopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
+  itemHead: { textTransform: 'uppercase' },
   item: {
     height: 24,
     fontSize: 13,
@@ -32,27 +28,19 @@ const useStyles = makeStyles()(() => ({
     textOverflow: 'ellipsis',
     paddingRight: 10,
   },
-  items: {
-    display: 'flex',
-  },
+  items: { display: 'flex' },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  tag_rule_tag: {
-    width: '20%',
-  },
-  tag_rule_asset_groups: {
-    width: '70%',
-  },
+  tag_rule_tag: { width: '20%' },
+  tag_rule_asset_groups: { width: '70%' },
 };
 
 const TagRules = () => {
   const { t } = useFormatter();
   const { classes } = useStyles();
 
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   const [tagRules, setTagRules] = useState<TagRuleOutput[]>([]);
 
@@ -61,8 +49,7 @@ const TagRules = () => {
     'tag_rule_tag',
     'tag_rule_asset_groups',
   ];
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('tag-rules2', buildSearchPagination({
-  }));
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('tag-rules2', buildSearchPagination({}));
 
   // Headers
   const headers: Header[] = useMemo(() => [
@@ -90,7 +77,13 @@ const TagRules = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Customization') }, { label: t('Default asset rules'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Customization') }, {
+          label: t('Default asset rules'),
+          current: true,
+        }]}
+      />
       <PaginationComponentV2
         fetch={searchTagRules}
         searchPaginationInput={searchPaginationInput}

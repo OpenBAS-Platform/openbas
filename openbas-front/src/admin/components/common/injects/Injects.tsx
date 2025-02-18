@@ -1,11 +1,10 @@
 import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import * as R from 'ramda';
-import { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
-import * as React from 'react';
+import { type CSSProperties, type FunctionComponent, type SyntheticEvent, useContext, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
+import { type InjectorContractConvertedContent, type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
@@ -20,14 +19,14 @@ import ItemTags from '../../../../components/ItemTags';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import {
-  Article,
-  FilterGroup,
-  Inject,
-  InjectBulkUpdateOperation,
-  InjectInput,
-  InjectTestStatusOutput,
-  Team,
-  Variable,
+  type Article,
+  type FilterGroup,
+  type Inject,
+  type InjectBulkUpdateOperation,
+  type InjectInput,
+  type InjectTestStatusOutput,
+  type Team,
+  type Variable,
 } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
@@ -59,15 +58,9 @@ const useStyles = makeStyles()(() => ({
     color: '#00b1ff',
     border: '1px solid #00b1ff',
   },
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     height: 20,
     fontSize: 13,
@@ -79,24 +72,12 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  inject_type: {
-    width: '15%',
-  },
-  inject_title: {
-    width: '25%',
-  },
-  inject_depends_duration: {
-    width: '18%',
-  },
-  inject_platforms: {
-    width: '10%',
-  },
-  inject_enabled: {
-    width: '12%',
-  },
-  inject_tags: {
-    width: '20%',
-  },
+  inject_type: { width: '15%' },
+  inject_title: { width: '25%' },
+  inject_depends_duration: { width: '18%' },
+  inject_platforms: { width: '10%' },
+  inject_enabled: { width: '12%' },
+  inject_tags: { width: '20%' },
 };
 
 interface Props {
@@ -262,7 +243,10 @@ const Injects: FunctionComponent<Props> = ({
   const [reloadInjectCount, setReloadInjectCount] = useState(0);
 
   // Optimistic update
-  const onCreate = (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+  const onCreate = (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => {
     if (result.entities) {
       const created = result.entities.injects[result.result];
       setInjects([created as InjectOutputType, ...injects]);
@@ -270,7 +254,10 @@ const Injects: FunctionComponent<Props> = ({
     }
   };
 
-  const onUpdate = (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+  const onUpdate = (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => {
     if (result.entities) {
       const updatedResults = result.entities.injects[result.result];
       setInjects(injects.map(i => i.inject_id !== updatedResults.inject_id ? i : updatedResults as InjectOutputType));
@@ -291,14 +278,20 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const onCreateInject = async (data: InjectInput) => {
-    await injectContext.onAddInject(data as Inject).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+    await injectContext.onAddInject(data as Inject).then((result: {
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }) => {
       onCreate(result);
     });
   };
 
   const onUpdateInject = async (data: Inject) => {
     if (selectedInjectId) {
-      await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+      await injectContext.onUpdateInject(selectedInjectId, data).then((result: {
+        result: string;
+        entities: { injects: Record<string, InjectStore> };
+      }) => {
         onUpdate(result);
         return result;
       });
@@ -308,7 +301,10 @@ const Injects: FunctionComponent<Props> = ({
   const massUpdateInject = async (data: Inject[]) => {
     const promises: Promise<InjectStore | undefined>[] = [];
     data.forEach((inject) => {
-      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: {
+        result: string;
+        entities: { injects: Record<string, InjectStore> };
+      }) => {
         if (result.entities) {
           return result.entities.injects[result.result];
         }
@@ -345,7 +341,7 @@ const Injects: FunctionComponent<Props> = ({
     onToggleEntity,
     numberOfSelectedElements,
   } = useEntityToggle<InjectOutputType>('inject', injects, queryableHelpers.paginationHelpers.getTotalElements());
-  const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
+  const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
@@ -457,15 +453,14 @@ const Injects: FunctionComponent<Props> = ({
       inject_ids_to_process: selectAll ? undefined : testIds,
       inject_ids_to_ignore: ignoreIds,
       simulation_or_scenario_id: exerciseOrScenarioId,
-    }).then((result: { uri: string; data: InjectTestStatusOutput[] }) => {
+    }).then((result: {
+      uri: string;
+      data: InjectTestStatusOutput[];
+    }) => {
       if (numberOfSelectedElements === 1) {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
-          itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link>,
-        }));
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link> }));
       } else {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
-          itsDedicatedPage: <Link to={`${result.uri}`}>{t('its dedicated page')}</Link>,
-        }));
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${result.uri}`}>{t('its dedicated page')}</Link> }));
       }
     }).finally(() => {
       setIsBulkLoading(false);

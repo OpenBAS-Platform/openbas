@@ -1,6 +1,6 @@
 import { Add } from '@mui/icons-material';
 import { Fab } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 const useStyles = makeStyles()(() => ({
@@ -11,13 +11,9 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-interface Props {
-  onClick: () => void;
-}
+interface Props { onClick: () => void }
 
-const ButtonCreate: FunctionComponent<Props> = ({
-  onClick,
-}) => {
+const ButtonCreate: FunctionComponent<Props> = ({ onClick }) => {
   // Standard hooks
   const { classes } = useStyles();
 

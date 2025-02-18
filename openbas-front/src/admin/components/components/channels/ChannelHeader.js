@@ -6,9 +6,7 @@ import { useHelper } from '../../../../store';
 import ChannelPopover from './ChannelPopover';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    width: '100%',
-  },
+  container: { width: '100%' },
   title: {
     float: 'left',
     textTransform: 'uppercase',

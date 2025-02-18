@@ -57,7 +57,11 @@ class ObjectiveForm extends Component {
               style={{ marginTop: 20 }}
               type="number"
             />
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div style={{
+              float: 'right',
+              marginTop: 20,
+            }}
+            >
               <Button
                 onClick={handleClose.bind(this)}
                 style={{ marginRight: 10 }}

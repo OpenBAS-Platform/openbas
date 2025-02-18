@@ -1,11 +1,11 @@
 import { CheckCircleOutlined, GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CSSProperties, FunctionComponent, useContext, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import ItemTags from '../../../../components/ItemTags';
-import type { Team } from '../../../../utils/api-types';
+import { type Team } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { PermissionsContext, TeamContext } from '../../common/Context';
 import TeamPlayers from './TeamPlayers';
@@ -118,13 +118,9 @@ const inlineStylesContextual: Record<string, CSSProperties> = {
   },
 };
 
-interface Props {
-  teams: Team[];
-}
+interface Props { teams: Team[] }
 
-interface TeamStoreExtended extends Team {
-  team_users_enabled_number: number;
-}
+interface TeamStoreExtended extends Team { team_users_enabled_number: number }
 
 const ContextualTeams: FunctionComponent<Props> = ({ teams }) => {
   // Standard hooks
@@ -169,7 +165,11 @@ const ContextualTeams: FunctionComponent<Props> = ({ teams }) => {
         >
           <ListItemIcon>
             <span
-              style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}
+              style={{
+                padding: '0 8px 0 10px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
             >
               #
             </span>

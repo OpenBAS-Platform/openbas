@@ -40,9 +40,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
   );
   const submitEvaluation = () => {
     setSubmitting(true);
-    const data = {
-      evaluation_score: value,
-    };
+    const data = { evaluation_score: value };
     if (currentUserEvaluation) {
       return onUpdateEvaluation(
         objectiveId,
@@ -88,7 +86,11 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
                   marginRight: 1,
                 }}
               >
-                <Box sx={{ width: '100%', mr: 1 }}>
+                <Box sx={{
+                  width: '100%',
+                  mr: 1,
+                }}
+                >
                   <LinearProgress
                     variant="determinate"
                     value={evaluation.evaluation_score}
@@ -124,7 +126,11 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
                 marginRight: 1,
               }}
             >
-              <Box sx={{ width: '100%', mr: 1 }}>
+              <Box sx={{
+                width: '100%',
+                mr: 1,
+              }}
+              >
                 <LinearProgress variant="determinate" value={0} />
               </Box>
               <Box sx={{ minWidth: 35 }}>
@@ -161,7 +167,11 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose, isUpdatable }) => {
           />
         </Box>
       )}
-      <div style={{ float: 'right', marginTop: 20 }}>
+      <div style={{
+        float: 'right',
+        marginTop: 20,
+      }}
+      >
         <Button
           onClick={handleClose}
           style={{ marginRight: isUpdatable ? 10 : 0 }}

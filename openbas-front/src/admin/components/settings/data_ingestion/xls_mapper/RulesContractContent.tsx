@@ -17,17 +17,16 @@ import {
   Typography,
 } from '@mui/material';
 import { CogOutline, InformationOutline } from 'mdi-material-ui';
-import { useEffect, useState } from 'react';
-import * as React from 'react';
-import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
+import { type FunctionComponent, useEffect, useState } from 'react';
+import { Controller, type FieldArrayWithId, useFieldArray, type UseFieldArrayRemove, type UseFormReturn } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import type { ContractElement, InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
+import { type ContractElement, type InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
 import { directFetchInjectorContract } from '../../../../../actions/InjectorContracts';
 import { useFormatter } from '../../../../../components/i18n';
 import InjectContractComponent from '../../../../../components/InjectContractComponent';
 import RegexComponent from '../../../../../components/RegexComponent';
-import type { ImportMapperAddInput } from '../../../../../utils/api-types';
+import { type ImportMapperAddInput } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles()(() => ({
   rulesArray: {
@@ -46,9 +45,7 @@ const useStyles = makeStyles()(() => ({
     color: 'rgb(244, 67, 54)',
     marginLeft: '2px',
   },
-  red: {
-    borderColor: 'rgb(244, 67, 54)',
-  },
+  red: { borderColor: 'rgb(244, 67, 54)' },
 }));
 
 interface Props {
@@ -58,7 +55,7 @@ interface Props {
   remove: UseFieldArrayRemove;
 }
 
-const RulesContractContent: React.FC<Props> = ({
+const RulesContractContent: FunctionComponent<Props> = ({
   field,
   methods,
   index,
@@ -126,9 +123,7 @@ const RulesContractContent: React.FC<Props> = ({
 
   useEffect(() => {
     if (methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)) {
-      directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: {
-        data: InjectorContractConverted;
-      }) => {
+      directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: { data: InjectorContractConverted }) => {
         const injectorContract = result.data;
         setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
         const tmp = injectorContract?.convertedContent?.fields
@@ -139,9 +134,7 @@ const RulesContractContent: React.FC<Props> = ({
   }, []);
 
   const onChangeInjectorContractId = () => {
-    directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: {
-      data: InjectorContractConverted;
-    }) => {
+    directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: { data: InjectorContractConverted }) => {
       const injectorContract = result.data;
       setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
       const tmp = injectorContract?.convertedContent?.fields
@@ -161,7 +154,7 @@ const RulesContractContent: React.FC<Props> = ({
     setCurrentRuleIndex(null);
   };
 
-  const [openAlertDelete, setOpenAlertDelete] = React.useState(false);
+  const [openAlertDelete, setOpenAlertDelete] = useState(false);
 
   const handleClickOpenAlertDelete = () => {
     setOpenAlertDelete(true);
@@ -176,10 +169,11 @@ const RulesContractContent: React.FC<Props> = ({
       <Accordion
         key={field.id}
         variant="outlined"
-        style={{ width: '100%', marginBottom: '10px' }}
-        className={cx({
-          [classes.red]: !!errors.import_mapper_inject_importers?.[index],
-        })}
+        style={{
+          width: '100%',
+          marginBottom: '10px',
+        }}
+        className={cx({ [classes.red]: !!errors.import_mapper_inject_importers?.[index] })}
       >
         <AccordionSummary
           expandIcon={<ExpandMore />}
@@ -199,7 +193,12 @@ const RulesContractContent: React.FC<Props> = ({
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'end',
+            gap: '8px',
+          }}
+          >
             <TextField
               variant="standard"
               fullWidth
@@ -326,7 +325,12 @@ const RulesContractContent: React.FC<Props> = ({
                       />
                       {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'trigger_time')
                       && (
-                        <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'end',
+                          gap: '8px',
+                        }}
+                        >
                           <TextField
                             label={t('Time pattern')}
                             fullWidth
@@ -348,7 +352,12 @@ const RulesContractContent: React.FC<Props> = ({
                       )}
                       {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'teams')
                       && (
-                        <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'end',
+                          gap: '8px',
+                        }}
+                        >
                           <TextField
                             label={t('All teams value')}
                             fullWidth

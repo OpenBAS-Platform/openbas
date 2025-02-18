@@ -1,20 +1,17 @@
 import { UpdateOutlined } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
-import { useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { updateExerciseStartDate } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Exercise } from '../../../../utils/api-types';
+import { type Exercise } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseDateForm from './ExerciseDateForm';
 
-interface Props {
-  exercise: Exercise;
-}
+interface Props { exercise: Exercise }
 
-const ExerciseDatePopover: React.FC<Props> = ({ exercise }) => {
+const ExerciseDatePopover: FunctionComponent<Props> = ({ exercise }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const { t } = useFormatter();
   const dispatch = useAppDispatch();

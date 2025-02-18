@@ -1,14 +1,14 @@
 import { FormHelperText, InputLabel, useTheme } from '@mui/material';
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
-import * as React from 'react';
-import { Field, FieldInputProps, FieldMetaState } from 'react-final-form';
+import { type CSSProperties, type FunctionComponent } from 'react';
+import { Field, type FieldInputProps, type FieldMetaState } from 'react-final-form';
 
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import { useFormatter } from '../i18n';
 
 interface Props {
   label: string;
-  style: React.CSSProperties;
+  style: CSSProperties;
   disabled?: boolean;
   input: FieldInputProps<string, HTMLElement>;
   meta: FieldMetaState<string>;
@@ -17,7 +17,7 @@ interface Props {
   inArticle?: boolean;
 }
 
-const MarkDownFieldBase: React.FC<Props> = ({
+const MarkDownFieldBase: FunctionComponent<Props> = ({
   label,
   style,
   disabled,
@@ -31,7 +31,10 @@ const MarkDownFieldBase: React.FC<Props> = ({
   const theme = useTheme();
   return (
     <div
-      style={{ ...style, position: 'relative' }}
+      style={{
+        ...style,
+        position: 'relative',
+      }}
       className={touched && invalid ? 'error' : 'main'}
       data-color-mode={theme.palette.mode}
     >
@@ -40,25 +43,59 @@ const MarkDownFieldBase: React.FC<Props> = ({
       </InputLabel>
       <MDEditor
         value={value}
-        textareaProps={{
-          disabled,
-        }}
+        textareaProps={{ disabled }}
         preview="edit"
         onChange={data => onChange(data)}
         commands={[
-          { ...commands.title, buttonProps: { disabled } },
-          { ...commands.bold, buttonProps: { disabled } },
-          { ...commands.italic, buttonProps: { disabled } },
-          { ...commands.strikethrough, buttonProps: { disabled } },
+          {
+            ...commands.title,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.bold,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.italic,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.strikethrough,
+            buttonProps: { disabled },
+          },
           { ...commands.divider },
-          { ...commands.link, buttonProps: { disabled } },
-          { ...commands.quote, buttonProps: { disabled } },
-          { ...commands.code, buttonProps: { disabled } },
-          { ...commands.image, buttonProps: { disabled } },
-          { ...commands.divider, buttonProps: { disabled } },
-          { ...commands.unorderedListCommand, buttonProps: { disabled } },
-          { ...commands.orderedListCommand, buttonProps: { disabled } },
-          { ...commands.checkedListCommand, buttonProps: { disabled } },
+          {
+            ...commands.link,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.quote,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.code,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.image,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.divider,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.unorderedListCommand,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.orderedListCommand,
+            buttonProps: { disabled },
+          },
+          {
+            ...commands.checkedListCommand,
+            buttonProps: { disabled },
+          },
         ]}
         extraCommands={[]}
       />

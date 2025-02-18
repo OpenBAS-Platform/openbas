@@ -1,12 +1,12 @@
 import { CastForEducationOutlined, CastOutlined } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { Fragment, FunctionComponent } from 'react';
+import { Fragment, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { InjectStore } from '../actions/injects/Inject';
+import { type InjectStore } from '../actions/injects/Inject';
 import InjectIcon from '../admin/components/common/injects/InjectIcon';
-import type { Inject, Team } from '../utils/api-types';
+import { type Inject, type Team } from '../utils/api-types';
 import useSearchAnFilter from '../utils/SortingFiltering';
 import { truncate } from '../utils/String';
 import { splitDuration } from '../utils/Time';
@@ -103,15 +103,13 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
   };
 
   const injectsPerTeam = R.mergeAll(
-    teams.map((a: Team) => ({
-      [a.team_id]: getInjectsPerTeam(a.team_id),
-    })),
+    teams.map((a: Team) => ({ [a.team_id]: getInjectsPerTeam(a.team_id) })),
   );
 
   const allTeamInjectIds = new Set(R.values(injectsPerTeam).flat().map((inj: Inject) => inj.inject_id));
 
   // Build map of technical Injects or without team
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const injectsWithoutTeamMap = injects.reduce((acc: { [x: string]: any[] }, inject: InjectStore) => {
     let keys: any[] = [];
 
@@ -141,7 +139,10 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
     return acc;
   }, {} as { [key: string]: Inject[] });
 
-  const injectsMap = { ...injectsPerTeam, ...injectsWithoutTeamMap };
+  const injectsMap = {
+    ...injectsPerTeam,
+    ...injectsWithoutTeamMap,
+  };
 
   // Sorted teams
   const teamInjectNames = R.map((key: string) => ({
@@ -250,7 +251,12 @@ const Timeline: FunctionComponent<Props> = ({ injects, onSelectInject, teams }) 
                             <Fragment>
                               {inject.inject_title}
                               <br />
-                              <span style={{ display: 'block', textAlign: 'center', fontWeight: 'bold' }}>
+                              <span style={{
+                                display: 'block',
+                                textAlign: 'center',
+                                fontWeight: 'bold',
+                              }}
+                              >
                                 {`${duration.days} ${t('d')}, ${duration.hours} ${t('h')}, ${duration.minutes} ${t('m')}`}
                               </span>
                             </Fragment>

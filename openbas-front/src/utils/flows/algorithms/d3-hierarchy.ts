@@ -1,7 +1,7 @@
 import { getIncomers, type Node } from '@xyflow/react';
 import { type HierarchyPointNode, stratify, tree } from 'd3-hierarchy';
 
-import type { Direction, LayoutAlgorithm } from './index';
+import { type Direction, type LayoutAlgorithm } from './index';
 
 // D3 Hierarchy doesn't support layouting in different directions, but we can
 // swap the coordinates around in different ways to get the same effect.
@@ -10,17 +10,32 @@ const getPosition = (x: number, y: number, direction: Direction) => {
   // eslint-disable-next-line default-case
   switch (direction) {
     case 'TB':
-      return { x, y };
+      return {
+        x,
+        y,
+      };
     case 'LR':
-      return { x: y, y: x };
+      return {
+        x: y,
+        y: x,
+      };
     case 'BT':
-      return { x: -x, y: -y };
+      return {
+        x: -x,
+        y: -y,
+      };
     case 'RL':
-      return { x: -y, y: x };
+      return {
+        x: -y,
+        y: x,
+      };
   }
 };
 
-type NodeWithPosition = Node & { x: number; y: number };
+type NodeWithPosition = Node & {
+  x: number;
+  y: number;
+};
 
 // Initialize the tree layout (see https://observablehq.com/@d3/tree for examples)
 const layout = tree<NodeWithPosition>()
@@ -36,7 +51,10 @@ const rootNode = {
   id: 'd3-hierarchy-root',
   x: 0,
   y: 0,
-  position: { x: 0, y: 0 },
+  position: {
+    x: 0,
+    y: 0,
+  },
   data: {},
 };
 
@@ -48,7 +66,10 @@ const d3HierarchyLayout: LayoutAlgorithm = async (nodes, edges, options) => {
   let maxNodeHeight = 0;
 
   for (const node of nodes) {
-    const nodeWithPosition = { ...node, ...node.position };
+    const nodeWithPosition = {
+      ...node,
+      ...node.position,
+    };
 
     initialNodes.push(nodeWithPosition);
     maxNodeWidth = Math.max(maxNodeWidth, node.width ?? 0);
@@ -101,10 +122,16 @@ const d3HierarchyLayout: LayoutAlgorithm = async (nodes, edges, options) => {
       y: position.y - (node.height ?? 0) / 2,
     };
 
-    return { ...node, position: offsetPosition };
+    return {
+      ...node,
+      position: offsetPosition,
+    };
   });
 
-  return { nodes: nextNodes, edges };
+  return {
+    nodes: nextNodes,
+    edges,
+  };
 };
 
 export default d3HierarchyLayout;

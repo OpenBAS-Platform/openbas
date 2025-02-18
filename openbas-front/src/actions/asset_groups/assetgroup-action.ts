@@ -1,4 +1,4 @@
-import { Dispatch } from 'redux';
+import { type Dispatch } from 'redux';
 
 import {
   delReferential,
@@ -8,7 +8,7 @@ import {
   simpleCall,
   simplePostCall,
 } from '../../utils/Action';
-import type { AssetGroup, AssetGroupInput, SearchPaginationInput, UpdateAssetsOnAssetGroupInput } from '../../utils/api-types';
+import { type AssetGroup, type AssetGroupInput, type SearchPaginationInput, type UpdateAssetsOnAssetGroupInput } from '../../utils/api-types';
 import { arrayOfAssetGroups, assetGroup } from './assetgroup-schema';
 
 const ASSET_GROUP_URI = '/api/asset_groups';

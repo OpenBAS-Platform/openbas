@@ -9,7 +9,13 @@ const renderSwitch = ({
   ...others
 }) => (
   <FormControl error={touched && invalid}>
-    <FormGroup row={true} style={{ ...style, marginLeft: 5 }}>
+    <FormGroup
+      row={true}
+      style={{
+        ...style,
+        marginLeft: 5,
+      }}
+    >
       <FormControlLabel
         control={(
           <MuiSwitch

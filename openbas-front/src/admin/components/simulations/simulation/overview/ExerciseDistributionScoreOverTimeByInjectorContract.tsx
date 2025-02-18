@@ -1,29 +1,28 @@
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { InjectStore } from '../../../../../actions/injects/Inject';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { type InjectStore } from '../../../../../actions/injects/Inject';
+import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Exercise, Inject, InjectExpectation } from '../../../../../utils/api-types';
+import { type Exercise, type Inject, type InjectExpectation } from '../../../../../utils/api-types';
 import { lineChartOptions } from '../../../../../utils/Charts';
 
-interface Props {
-  exerciseId: Exercise['exercise_id'];
-}
+interface Props { exerciseId: Exercise['exercise_id'] }
 
-const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Props> = ({
-  exerciseId,
-}) => {
+const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Props> = ({ exerciseId }) => {
   // Standard hooks
   const { t, nsdt, tPick } = useFormatter();
   const theme = useTheme();
 
   // Fetching data
-  const { injectsMap, injectExpectations }: { injectsMap: Record<string, Inject>; injectExpectations: InjectExpectation[] } = useHelper((helper: InjectHelper) => ({
+  const { injectsMap, injectExpectations }: {
+    injectsMap: Record<string, Inject>;
+    injectExpectations: InjectExpectation[];
+  } = useHelper((helper: InjectHelper) => ({
     injectsMap: helper.getInjectsMap(),
     injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
   }));
@@ -51,7 +50,10 @@ const ExerciseDistributionScoreOverTimeByInjectorContract: FunctionComponent<Pro
         )(n[1]),
       ];
     }),
-    R.map((n: [string, Array<InjectExpectation & { inject_expectation_cumulated_score: number; inject_expectation_inject: InjectStore }>]) => ({
+    R.map((n: [string, Array<InjectExpectation & {
+      inject_expectation_cumulated_score: number;
+      inject_expectation_inject: InjectStore;
+    }>]) => ({
       name: tPick(n[1][0].inject_expectation_inject.inject_injector_contract?.injector_contract_labels),
       color: n[1][0].inject_expectation_inject.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
       data: n[1].map((i: InjectExpectation & { inject_expectation_cumulated_score: number }) => ({

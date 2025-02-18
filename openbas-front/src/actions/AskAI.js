@@ -34,23 +34,39 @@ export const askAI = async (uri, input, eventCallback) => {
 };
 
 export const aiFixSpelling = async (content, format, eventCallback) => {
-  return askAI('/ai/fix_spelling', { ai_content: content, ai_format: format }, eventCallback);
+  return askAI('/ai/fix_spelling', {
+    ai_content: content,
+    ai_format: format,
+  }, eventCallback);
 };
 
 export const aiMakeShorter = async (content, format, eventCallback) => {
-  return askAI('/ai/make_shorter', { ai_content: content, ai_format: format }, eventCallback);
+  return askAI('/ai/make_shorter', {
+    ai_content: content,
+    ai_format: format,
+  }, eventCallback);
 };
 
 export const aiMakeLonger = async (content, format, eventCallback) => {
-  return askAI('/ai/make_longer', { ai_content: content, ai_format: format }, eventCallback);
+  return askAI('/ai/make_longer', {
+    ai_content: content,
+    ai_format: format,
+  }, eventCallback);
 };
 
 export const aiChangeTone = async (content, tone, format, eventCallback) => {
-  return askAI('/ai/change_tone', { ai_content: content, ai_tone: tone, ai_format: format }, eventCallback);
+  return askAI('/ai/change_tone', {
+    ai_content: content,
+    ai_tone: tone,
+    ai_format: format,
+  }, eventCallback);
 };
 
 export const aiSummarize = async (content, format, eventCallback) => {
-  return askAI('/ai/summarize', { ai_content: content, ai_format: format }, eventCallback);
+  return askAI('/ai/summarize', {
+    ai_content: content,
+    ai_format: format,
+  }, eventCallback);
 };
 
 export const aiExplain = async (content, eventCallback) => {

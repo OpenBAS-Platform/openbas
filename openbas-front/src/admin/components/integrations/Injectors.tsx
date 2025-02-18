@@ -4,20 +4,18 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectors } from '../../../actions/Injectors';
-import type { InjectorHelper } from '../../../actions/injectors/injector-helper';
+import { type InjectorHelper } from '../../../actions/injectors/injector-helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import SearchFilter from '../../../components/SearchFilter';
 import { useHelper } from '../../../store';
-import type { Injector } from '../../../utils/api-types';
+import { type Injector } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles()(theme => ({
-  parameters: {
-    marginTop: -3,
-  },
+  parameters: { marginTop: -3 },
   card: {
     position: 'relative',
     overflow: 'hidden',
@@ -27,12 +25,8 @@ const useStyles = makeStyles()(theme => ({
     width: '100%',
     height: '100%',
   },
-  content: {
-    padding: 20,
-  },
-  icon: {
-    padding: 0,
-  },
+  content: { padding: 20 },
+  icon: { padding: 0 },
   chipInList: {
     marginTop: 10,
     fontSize: 12,
@@ -78,18 +72,26 @@ const Injectors = () => {
   );
 
   // Fetching data
-  const { injectors } = useHelper((helper: InjectorHelper) => ({
-    injectors: helper.getInjectors(),
-  }));
+  const { injectors } = useHelper((helper: InjectorHelper) => ({ injectors: helper.getInjectors() }));
   useDataLoader(() => {
     dispatch(fetchInjectors());
   });
   const sortedInjectors = filtering.filterAndSort(injectors);
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Integrations') }, { label: t('Injectors'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Integrations') }, {
+          label: t('Injectors'),
+          current: true,
+        }]}
+      />
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div style={{
+          float: 'left',
+          marginRight: 10,
+        }}
+        >
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
@@ -114,7 +116,11 @@ const Injectors = () => {
                         <img
                           src={`/api/images/injectors/${injector.injector_type}`}
                           alt={injector.injector_type}
-                          style={{ width: 50, height: 50, borderRadius: 4 }}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            borderRadius: 4,
+                          }}
                         />
                       </div>
                       <Typography
@@ -136,7 +142,11 @@ const Injectors = () => {
                       color={injector.injector_external ? 'primary' : 'secondary'}
                       label={t(injector.injector_external ? 'External' : 'Built-in')}
                     />
-                    <div style={{ display: 'flex', marginTop: 30 }}>
+                    <div style={{
+                      display: 'flex',
+                      marginTop: 30,
+                    }}
+                    >
                       {
                         (injector.injector_external && injector.injector_updated_at) || !injector.injector_external
                           ? <div className={classes.dotGreen} /> : <div className={classes.dotRed} />

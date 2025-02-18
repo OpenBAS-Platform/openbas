@@ -9,7 +9,11 @@ import inject18n from './i18n';
 class Message extends Component {
   constructor(props) {
     super(props);
-    this.state = { open: false, error: false, text: '' };
+    this.state = {
+      open: false,
+      error: false,
+      text: '',
+    };
   }
 
   componentDidMount() {
@@ -22,7 +26,12 @@ class Message extends Component {
             : firstMessage.text;
           const error = firstMessage.type === 'error';
           const { sticky } = firstMessage;
-          this.setState({ open: true, error, text, sticky });
+          this.setState({
+            open: true,
+            error,
+            text,
+            sticky,
+          });
         }
       },
     });
@@ -41,7 +50,10 @@ class Message extends Component {
     const { text, error, open, sticky } = this.state;
     return (
       <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
         open={open}
         onClose={this.handleCloseMessage.bind(this)}
         autoHideDuration={sticky ? null : 4000}

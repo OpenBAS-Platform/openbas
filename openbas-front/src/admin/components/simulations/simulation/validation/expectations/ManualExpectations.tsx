@@ -15,11 +15,10 @@ import {
   Typography,
 } from '@mui/material';
 import * as R from 'ramda';
-import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { UserHelper } from '../../../../../../actions/helper';
+import { type UserHelper } from '../../../../../../actions/helper';
 import { fetchUsers } from '../../../../../../actions/User';
 import colorStyles from '../../../../../../components/Color';
 import Drawer from '../../../../../../components/common/Drawer';
@@ -27,17 +26,15 @@ import ExpandableText from '../../../../../../components/common/ExpendableText';
 import Paper from '../../../../../../components/common/Paper';
 import { useFormatter } from '../../../../../../components/i18n';
 import { useHelper } from '../../../../../../store';
-import type { Inject, User } from '../../../../../../utils/api-types';
+import { type Inject, type User } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { type InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 
 const useStyles = makeStyles()(theme => ({
-  item: {
-    height: 40,
-  },
+  item: { height: 40 },
   container: {
     display: 'flex',
     placeContent: 'space-between',
@@ -90,12 +87,8 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const [currentExpectations, setCurrentExpectations] = useState<InjectExpectationsStore[] | null>(null);
   const [expanded, setExpanded] = useState<string | false>(false);
 
-  const { usersMap }: {
-    usersMap: Record<string, User>;
-  } = useHelper((helper: UserHelper) => {
-    return ({
-      usersMap: helper.getUsersMap(),
-    });
+  const { usersMap }: { usersMap: Record<string, User> } = useHelper((helper: UserHelper) => {
+    return ({ usersMap: helper.getUsersMap() });
   });
   const dispatch = useAppDispatch();
   useDataLoader(() => {
@@ -111,7 +104,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
     setCurrentExpectations(null);
   };
 
-  const handleChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+  const handleChange = (panel: string) => (_event: SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
   };
 
@@ -186,7 +179,10 @@ const ManualExpectations: FunctionComponent<Props> = ({
           <Alert
             severity="warning"
             variant="outlined"
-            style={{ position: 'relative', marginBottom: 20 }}
+            style={{
+              position: 'relative',
+              marginBottom: 20,
+            }}
           >
             <AlertTitle>
               <ExpandableText
@@ -202,23 +198,42 @@ const ManualExpectations: FunctionComponent<Props> = ({
           <Alert
             severity="info"
             variant="outlined"
-            style={{ position: 'relative', marginBottom: 20 }}
+            style={{
+              position: 'relative',
+              marginBottom: 20,
+            }}
           >
             <AlertTitle>
               {t('The score set for the team will also be applied to all players in the team')}
             </AlertTitle>
           </Alert>
-          <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
+          <Typography
+            variant="h5"
+            style={{
+              fontWeight: 500,
+              margin: '10px',
+            }}
+          >
             {t('Team')}
           </Typography>
           <Paper>
             <ManualExpectationsValidationForm key={parentExpectation.target_id} expectation={parentExpectation} />
           </Paper>
           <Divider style={{ margin: '20px 0' }} />
-          <Typography variant="h5" style={{ fontWeight: 500, margin: '10px' }}>
+          <Typography
+            variant="h5"
+            style={{
+              fontWeight: 500,
+              margin: '10px',
+            }}
+          >
             {t('Players')}
           </Typography>
-          <div style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+          <div style={{
+            maxHeight: '80vh',
+            overflowY: 'auto',
+          }}
+          >
             {childrenExpectations.map((e) => {
               const panelId = `panel-${e.inject_expectation_id}`;
 
@@ -228,7 +243,8 @@ const ManualExpectations: FunctionComponent<Props> = ({
                   expanded={expanded === panelId}
                   onChange={handleChange(panelId)}
                   style={{
-                    boxShadow: 'none', margin: 0,
+                    boxShadow: 'none',
+                    margin: 0,
                   }}
                 >
                   <AccordionSummary
@@ -241,12 +257,25 @@ const ManualExpectations: FunctionComponent<Props> = ({
                       height: '10px',
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                    }}
+                    >
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                      >
                         <PersonOutlined color="primary" />
                         <Typography style={{ marginLeft: 8 }}>{targetLabel(e)}</Typography>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                      >
                         <Chip label={e.inject_expectation_score ?? 0} style={{ marginRight: 8 }} />
                         <Chip
                           classes={{ root: classes.chipStatusAcc }}

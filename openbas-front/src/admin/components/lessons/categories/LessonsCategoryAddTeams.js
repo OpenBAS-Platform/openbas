@@ -34,9 +34,7 @@ const styles = theme => ({
     padding: 20,
     border: '1px dashed rgba(255, 255, 255, 0.3)',
   },
-  chip: {
-    margin: '0 10px 10px 0',
-  },
+  chip: { margin: '0 10px 10px 0' },
   item: {
     paddingLeft: 10,
     height: 50,
@@ -64,7 +62,11 @@ class LessonsCategoryAddTeams extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false, keyword: '', teamsIds: [] });
+    this.setState({
+      open: false,
+      keyword: '',
+      teamsIds: [],
+    });
   }
 
   handleSearchTeams(value) {
@@ -82,9 +84,7 @@ class LessonsCategoryAddTeams extends Component {
   }
 
   addTeam(teamId) {
-    this.setState({
-      teamsIds: R.append(teamId, this.state.teamsIds),
-    });
+    this.setState({ teamsIds: R.append(teamId, this.state.teamsIds) });
   }
 
   addAllTeams() {
@@ -93,15 +93,11 @@ class LessonsCategoryAddTeams extends Component {
       R.map(n => n.team_id),
       R.filter(n => !lessonsCategoryTeamsIds.includes(n)),
     )(teams);
-    this.setState({
-      teamsIds: teamsToAdd,
-    });
+    this.setState({ teamsIds: teamsToAdd });
   }
 
   removeTeam(teamId) {
-    this.setState({
-      teamsIds: R.filter(u => u !== teamId, this.state.teamsIds),
-    });
+    this.setState({ teamsIds: R.filter(u => u !== teamId, this.state.teamsIds) });
   }
 
   submitAddTeams() {
@@ -175,7 +171,11 @@ class LessonsCategoryAddTeams extends Component {
             <div style={{ float: 'left' }}>
               {t('Add target teams in this lessons learned category')}
             </div>
-            <div style={{ float: 'right', marginTop: -4 }}>
+            <div style={{
+              float: 'right',
+              marginTop: -4,
+            }}
+            >
               <Button
                 onClick={this.addAllTeams.bind(this)}
                 variant="outlined"

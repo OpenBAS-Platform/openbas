@@ -113,7 +113,11 @@ const UserForm = (props) => {
             style={{ marginTop: 20 }}
             disabled={initialValues.user_email === 'admin@openbas.io'}
           />
-          <div style={{ float: 'right', marginTop: 40 }}>
+          <div style={{
+            float: 'right',
+            marginTop: 40,
+          }}
+          >
             <Button
               variant="contained"
               onClick={handleClose}

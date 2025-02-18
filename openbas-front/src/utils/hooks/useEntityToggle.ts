@@ -1,6 +1,5 @@
 import * as R from 'ramda';
-import * as React from 'react';
-import { useState } from 'react';
+import { type SyntheticEvent, useState } from 'react';
 
 export interface UseEntityToggle<T> {
   selectedElements: Record<string, T>;
@@ -9,7 +8,7 @@ export interface UseEntityToggle<T> {
   numberOfSelectedElements: number;
   onToggleEntity: (
     entity: T,
-    _?: React.SyntheticEvent,
+    _?: SyntheticEvent,
     forceRemove?: T[]
   ) => void;
   handleClearSelectedElements: () => void;
@@ -19,7 +18,7 @@ export interface UseEntityToggle<T> {
 
 // we don't know the type of every value in an object type passed here
 // nor is it relevant.
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const useEntityToggle = <T extends Record<string, any>>(
   prefix: string,
   knownElements: T[],
@@ -34,7 +33,7 @@ const useEntityToggle = <T extends Record<string, any>>(
   const [selectAll, setSelectAll] = useState(false);
   const onToggleEntity = (
     entity: T,
-    event?: React.SyntheticEvent,
+    event?: SyntheticEvent,
     forceRemove: T[] = [],
   ) => {
     if (event) {

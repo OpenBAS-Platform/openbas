@@ -6,15 +6,15 @@ import { useNavigate, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { updateExerciseStatus } from '../../../../actions/Exercise';
-import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Exercise, Exercise as ExerciseType } from '../../../../utils/api-types';
+import { type Exercise, type Exercise as ExerciseType } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
-import ExercisePopover, { ExerciseActionPopover } from './ExercisePopover';
+import ExercisePopover, { type ExerciseActionPopover } from './ExercisePopover';
 import ExerciseStatus from './ExerciseStatus';
 
 const useStyles = makeStyles()(() => ({
@@ -49,7 +49,10 @@ const Buttons = ({ exerciseId, exerciseStatus, exerciseName }: {
         if (!permissions.readOnlyBypassStatus) {
           return (
             <Button
-              style={{ marginRight: 10, lineHeight: 'initial' }}
+              style={{
+                marginRight: 10,
+                lineHeight: 'initial',
+              }}
               startIcon={<PlayArrowOutlined />}
               variant="contained"
               size="small"
@@ -194,9 +197,7 @@ const ExerciseHeader = () => {
 
   const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
   const { exercise } = useHelper((helper: ExercisesHelper) => {
-    return {
-      exercise: helper.getExercise(exerciseId),
-    };
+    return { exercise: helper.getExercise(exerciseId) };
   });
 
   const actions: ExerciseActionPopover[] = ['Update', 'Duplicate', 'Export', 'Delete', 'Access reports'];
@@ -208,7 +209,14 @@ const ExerciseHeader = () => {
           {truncate(exercise.exercise_name, 80)}
         </Typography>
       </Tooltip>
-      <div style={{ float: 'left', margin: '3px 10px 0 8px', color: theme.palette.text?.disabled, borderLeft: `1px solid ${theme.palette.text?.disabled}`, height: 20 }} />
+      <div style={{
+        float: 'left',
+        margin: '3px 10px 0 8px',
+        color: theme.palette.text?.disabled,
+        borderLeft: `1px solid ${theme.palette.text?.disabled}`,
+        height: 20,
+      }}
+      />
       <ExerciseStatus exerciseStatus={exercise.exercise_status} exerciseStartDate={exercise.exercise_start_date} />
       <div className={classes.actions}>
         <Buttons exerciseId={exercise.exercise_id} exerciseStatus={exercise.exercise_status} exerciseName={exercise.exercise_name} />

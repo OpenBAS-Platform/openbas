@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import type { Filter, FilterGroup } from '../../../../utils/api-types';
-import { FilterHelpers } from './FilterHelpers';
+import { type Filter, type FilterGroup } from '../../../../utils/api-types';
+import { type FilterHelpers } from './FilterHelpers';
 import {
   handleAddFilterWithEmptyValueUtil,
   handleAddMultipleValueFilterUtil,
@@ -22,9 +22,7 @@ const useFiltersState = (
   defaultFilters: FilterGroup = emptyFilterGroup,
   onChange?: (value: FilterGroup) => void,
 ): [FilterGroup, FilterHelpers] => {
-  const [filtersState, setFiltersState] = useState<Props>({
-    filters: initFilters,
-  });
+  const [filtersState, setFiltersState] = useState<Props>({ filters: initFilters });
   const helpers: FilterHelpers = {
     // Switch filter group operator
     handleSwitchMode: () => {

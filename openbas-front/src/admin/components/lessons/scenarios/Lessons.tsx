@@ -1,11 +1,10 @@
 import { ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid2, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
-import * as React from 'react';
-import { useContext, useState } from 'react';
+import { type ChangeEvent, type FunctionComponent, useContext, useState } from 'react';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsTemplate, Objective, Team, User } from '../../../../utils/api-types';
+import { type Inject, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
@@ -41,7 +40,7 @@ interface Props {
   usersMap: Record<string, User>;
 }
 
-const Lessons: React.FC<Props> = ({
+const Lessons: FunctionComponent<Props> = ({
   source,
   objectives,
   teams,
@@ -59,7 +58,7 @@ const Lessons: React.FC<Props> = ({
   const [openEmptyLessons, setOpenEmptyLessons] = useState<boolean>(false);
   const [openAnonymize, setOpenAnonymize] = useState<boolean>(false);
   const [templateValue, setTemplateValue] = useState<string | null>(null);
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTemplateValue(event.target.value);
   };
 
@@ -89,7 +88,12 @@ const Lessons: React.FC<Props> = ({
   };
   return (
     <>
-      <div style={{ display: 'grid', gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 2fr' }}>
+      <div style={{
+        display: 'grid',
+        gap: `0px ${theme.spacing(3)}`,
+        gridTemplateColumns: '1fr 2fr',
+      }}
+      >
         <Typography variant="h4" style={{ alignContent: 'center' }}>{t('Parameters')}</Typography>
         <Typography variant="h4">
           {t('Objectives')}
@@ -208,7 +212,11 @@ const Lessons: React.FC<Props> = ({
               `Applying a template will add all categories and questions of the selectedtemplate to this ${source.type}.`,
             )}
           </Alert>
-          <FormControl style={{ margin: '10px 0 0 5px', width: '100%' }}>
+          <FormControl style={{
+            margin: '10px 0 0 5px',
+            width: '100%',
+          }}
+          >
             <RadioGroup
               style={{ width: '100%' }}
               aria-labelledby="controlled-radio-buttons-group"
@@ -244,7 +252,11 @@ const Lessons: React.FC<Props> = ({
           </FormControl>
           <CreateLessonsTemplate inline />
           <div className="clearfix" />
-          <div style={{ float: 'right', marginTop: 20 }}>
+          <div style={{
+            float: 'right',
+            marginTop: 20,
+          }}
+          >
             <Button
               onClick={() => setOpenApplyTemplate(false)}
               style={{ marginRight: 10 }}

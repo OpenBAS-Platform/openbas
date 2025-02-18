@@ -1,10 +1,10 @@
 import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
-import { FunctionComponent, useContext } from 'react';
+import { type FunctionComponent, useContext } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { TagHelper } from '../../../../actions/helper';
-import type { InjectOutputType } from '../../../../actions/injects/Inject';
+import { type TagHelper } from '../../../../actions/helper';
+import { type InjectOutputType } from '../../../../actions/injects/Inject';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
@@ -45,9 +45,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
   const viewModeContext = useContext(ViewModeContext);
 
   // Fetching data
-  const { tagsMap } = useHelper((helper: TagHelper) => ({
-    tagsMap: helper.getTagsMap(),
-  }));
+  const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
 
   const exportInjects = exportData(
     'inject',
@@ -63,10 +61,16 @@ const InjectsListButtons: FunctionComponent<Props> = ({
     selectedInjects,
     tagsMap,
   );
-  const exportInjectsToXLS = useExportToXLS({ data: exportInjects, fileName: `${t('Injects')}` });
+  const exportInjectsToXLS = useExportToXLS({
+    data: exportInjects,
+    fileName: `${t('Injects')}`,
+  });
 
   const entries = [
-    { label: 'Export injects', action: exportInjectsToXLS },
+    {
+      label: 'Export injects',
+      action: exportInjectsToXLS,
+    },
   ];
 
   return (

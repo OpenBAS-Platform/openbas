@@ -1,18 +1,18 @@
 import { DomainOutlined, FileDownloadOutlined } from '@mui/icons-material';
 import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
-import { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { CSVLink } from 'react-csv';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { OrganizationHelper, TagHelper, UserHelper } from '../../../actions/helper';
+import { type OrganizationHelper, type TagHelper, type UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import { useHelper } from '../../../store';
-import type { Organization } from '../../../utils/api-types';
+import { type Organization } from '../../../utils/api-types';
 import { exportData } from '../../../utils/Environment';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
@@ -33,26 +33,20 @@ const useStyles = makeStyles()(theme => ({
     display: 'flex',
     gap: '10px',
   },
-  container: {
-    display: 'flex',
-  },
+  container: { display: 'flex' },
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
     paddingLeft: 10,
   },
-  item: {
-    height: 50,
-  },
+  item: { height: 50 },
   bodyItem: {
     fontSize: theme.typography.h3.fontSize,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  downloadButton: {
-    marginRight: 15,
-  },
+  downloadButton: { marginRight: 15 },
 }));
 
 const inlineStylesHeaders: Record<string, CSSProperties> = {
@@ -80,15 +74,9 @@ const inlineStylesHeaders: Record<string, CSSProperties> = {
 };
 
 const inlineStyles: Record<string, CSSProperties> = {
-  organization_name: {
-    width: '30%',
-  },
-  organization_description: {
-    width: '40%',
-  },
-  organization_tags: {
-    width: '30%',
-  },
+  organization_name: { width: '30%' },
+  organization_description: { width: '40%' },
+  organization_tags: { width: '30%' },
 };
 
 const Organizations = () => {
@@ -128,7 +116,13 @@ const Organizations = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Organizations'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Teams') }, {
+          label: t('Organizations'),
+          current: true,
+        }]}
+      />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter

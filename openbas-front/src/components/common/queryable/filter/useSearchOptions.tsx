@@ -9,7 +9,7 @@ import { searchOrganizationsByNameAsOption } from '../../../../actions/organizat
 import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
 import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamsAsOption } from '../../../../actions/teams/team-actions';
-import { Option } from '../../../../utils/Option';
+import { type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
 
 const useSearchOptions = () => {
@@ -73,12 +73,18 @@ const useSearchOptions = () => {
         break;
       case 'scenario_category':
         searchScenarioCategoryAsOption(search).then((response: { data: Option[] }) => {
-          setOptions(response.data.map(d => ({ id: d.id, label: t(d.label) })));
+          setOptions(response.data.map(d => ({
+            id: d.id,
+            label: t(d.label),
+          })));
         });
         break;
       case 'user_organization':
         searchOrganizationsByNameAsOption(search).then((response: { data: Option[] }) => {
-          setOptions(response.data.map(d => ({ id: d.id, label: t(d.label) })));
+          setOptions(response.data.map(d => ({
+            id: d.id,
+            label: t(d.label),
+          })));
         });
         break;
       default:

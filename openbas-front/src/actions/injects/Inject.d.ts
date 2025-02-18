@@ -1,25 +1,24 @@
-import type { Inject, InjectOutput } from '../../utils/api-types';
+import { type Inject, type InjectOutput } from '../../utils/api-types';
 
 export type InjectStore = Omit<Inject, 'inject_content' | 'inject_injector_contract'> & {
-  inject_content: { expectationScore: number; challenges: string[] | undefined };
+  inject_content: {
+    expectationScore: number;
+    challenges: string[] | undefined;
+  };
   inject_injector_contract: {
     // as we don't know the type of the content of a contract we need to put any here
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     injector_contract_content_parsed: any;
     convertedContent: {
       label: Record<string, string>;
-      config: {
-        expose: boolean;
-      };
+      config: { expose: boolean };
     };
   } & Inject['inject_injector_contract'];
 };
 
 export type InjectorContractConvertedContent = {
   label: Record<string, string>;
-  config: {
-    expose: boolean;
-  };
+  config: { expose: boolean };
 };
 
 export type InjectOutputType = InjectOutput & {

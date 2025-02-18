@@ -47,7 +47,5 @@ export const updateMeProfile = data => dispatch => putReferential(schema.user, '
 
 export const updateMeInformation = data => dispatch => putReferential(schema.user, '/api/me/information', data)(dispatch);
 
-export const renewToken = tokenId => dispatch => postReferential(schema.token, '/api/me/token/refresh', {
-  token_id: tokenId,
-})(dispatch);
+export const renewToken = tokenId => dispatch => postReferential(schema.token, '/api/me/token/refresh', { token_id: tokenId })(dispatch);
 // endregion

@@ -20,9 +20,7 @@ const useStyles = makeStyles()(() => ({
     float: 'left',
     margin: '5px 0 0 0',
   },
-  filter: {
-    marginRight: 10,
-  },
+  filter: { marginRight: 10 },
 }));
 
 const TagsFilter = (props) => {
@@ -39,7 +37,11 @@ const TagsFilter = (props) => {
   return (
     <>
       <Autocomplete
-        sx={{ width: fullWidth ? '100%' : 250, float: 'left', marginRight: '10px' }}
+        sx={{
+          width: fullWidth ? '100%' : 250,
+          float: 'left',
+          marginRight: '10px',
+        }}
         selectOnFocus={true}
         openOnFocus={true}
         autoSelect={false}

@@ -1,6 +1,6 @@
 import { TableViewOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { CSSProperties, useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchMappers } from '../../../../actions/mapper/mapper-actions';
@@ -11,16 +11,14 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
-import type { RawPaginationImportMapper, SearchPaginationInput } from '../../../../utils/api-types';
+import { type RawPaginationImportMapper, type SearchPaginationInput } from '../../../../utils/api-types';
 import DataIngestionMenu from '../DataIngestionMenu';
 import ImportUploaderMapper from './ImportUploaderMapper';
 import XlsMapperCreation from './xls_mapper/XlsMapperCreation';
 import XlsMapperPopover from './XlsMapperPopover';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    padding: '0 200px 50px 0',
-  },
+  container: { padding: '0 200px 50px 0' },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -67,13 +65,17 @@ const XlsMappers = () => {
   ];
 
   const [mappers, setMappers] = useState<RawPaginationImportMapper[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
-    sorts: initSorting('import_mapper_name'),
-  }));
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({ sorts: initSorting('import_mapper_name') }));
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, { label: t('XLS mappers'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, {
+          label: t('XLS mappers'),
+          current: true,
+        }]}
+      />
       <DataIngestionMenu />
       <PaginationComponent
         fetch={searchMappers}

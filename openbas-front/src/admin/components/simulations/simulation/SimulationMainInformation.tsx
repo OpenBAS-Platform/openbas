@@ -1,9 +1,9 @@
 import { Chip, Grid, Link as MUILink, Paper, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
-import * as React from 'react';
+import { type FunctionComponent } from 'react';
 import { Link } from 'react-router';
 
-import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import ItemCategory from '../../../../components/ItemCategory';
@@ -12,21 +12,17 @@ import ItemSeverity from '../../../../components/ItemSeverity';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { Exercise, KillChainPhase } from '../../../../utils/api-types';
+import { type Exercise, type KillChainPhase } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
 
-interface Props {
-  exercise: Exercise;
-}
+interface Props { exercise: Exercise }
 
-const SimulationMainInformation: React.FC<Props> = ({ exercise }) => {
+const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
   const { t } = useFormatter();
   const theme = useTheme();
   const sortByOrder = R.sortWith([R.ascend(R.prop('phase_order'))]);
   const scenarioBaseUri = '/admin/scenarios';
-  const { scenario } = useHelper((helper: ScenariosHelper) => ({
-    scenario: helper.getScenario(exercise.exercise_scenario || ''),
-  }));
+  const { scenario } = useHelper((helper: ScenariosHelper) => ({ scenario: helper.getScenario(exercise.exercise_scenario || '') }));
 
   return (
     <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
@@ -71,9 +67,7 @@ const SimulationMainInformation: React.FC<Props> = ({ exercise }) => {
             variant="h3"
             gutterBottom
             style={{ marginTop: 20 }}
-            sx={{
-              width: '100%',
-            }}
+            sx={{ width: '100%' }}
           >
             {t('Severity')}
           </Typography>
