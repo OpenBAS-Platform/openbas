@@ -1,25 +1,23 @@
 package io.openbas.executors.openbas.service;
 
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
+import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_NAME;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetAgentJobRepository;
+import io.openbas.executors.ExecutorContextService;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service
-public class OpenBASExecutorContextService {
+@Service(OPENBAS_EXECUTOR_NAME)
+@RequiredArgsConstructor
+public class OpenBASExecutorContextService extends ExecutorContextService {
 
-  private AssetAgentJobRepository assetAgentJobRepository;
-
-  @Autowired
-  public void setAssetAgentJobRepository(AssetAgentJobRepository assetAgentJobRepository) {
-    this.assetAgentJobRepository = assetAgentJobRepository;
-  }
+  private final AssetAgentJobRepository assetAgentJobRepository;
 
   private String computeCommand(
       @NotNull final Inject inject,
@@ -44,7 +42,9 @@ public class OpenBASExecutorContextService {
   }
 
   public void launchExecutorSubprocess(
-      @NotNull final Inject inject, @NotNull final Endpoint assetEndpoint) {
+      @NotNull final Inject inject,
+      @NotNull final Endpoint assetEndpoint,
+      @NotNull final Agent agent) {
     Endpoint.PLATFORM_TYPE platform =
         Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getPlatform() : null;
     Endpoint.PLATFORM_ARCH arch =
@@ -53,14 +53,9 @@ public class OpenBASExecutorContextService {
       throw new RuntimeException("Unsupported null platform");
     }
     AssetAgentJob assetAgentJob = new AssetAgentJob();
-    assetAgentJob.setCommand(
-        computeCommand(inject, assetEndpoint.getAgents().getFirst().getId(), platform, arch));
-    assetAgentJob.setAgent(assetEndpoint.getAgents().getFirst());
+    assetAgentJob.setCommand(computeCommand(inject, agent.getId(), platform, arch));
+    assetAgentJob.setAgent(agent);
     assetAgentJob.setInject(inject);
     assetAgentJobRepository.save(assetAgentJob);
-  }
-
-  public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {
-    // TODO
   }
 }

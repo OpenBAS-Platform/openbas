@@ -324,10 +324,32 @@ public class InjectorApi extends RestBehavior {
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody byte[] getCalderaImplant(
       @PathVariable String platform, @PathVariable String arch) throws IOException {
-    InputStream in =
-        getClass()
-            .getResourceAsStream(
-                "/implants/caldera/" + platform + "/" + arch + "/obas-implant-caldera-" + platform);
+    return getCalderaFile(platform, arch, null);
+  }
+
+  @GetMapping(
+      value = "/api/implant/caldera/{platform}/{arch}/{extension}",
+      produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  public @ResponseBody byte[] getCalderaScript(
+      @PathVariable String platform, @PathVariable String arch, @PathVariable String extension)
+      throws IOException {
+    return getCalderaFile(platform, arch, extension);
+  }
+
+  private byte[] getCalderaFile(String platform, String arch, String extension) throws IOException {
+    if (!AVAILABLE_PLATFORMS.contains(platform)) {
+      throw new IllegalArgumentException("Platform invalid : " + platform);
+    }
+    if (!AVAILABLE_ARCHITECTURES.contains(arch)) {
+      throw new IllegalArgumentException("Architecture invalid : " + arch);
+    }
+
+    String resource =
+        "/implants/caldera/" + platform + "/" + arch + "/obas-implant-caldera-" + platform;
+    if (extension != null) {
+      resource += "." + extension;
+    }
+    InputStream in = getClass().getResourceAsStream(resource);
     if (in != null) {
       return IOUtils.toByteArray(in);
     }
