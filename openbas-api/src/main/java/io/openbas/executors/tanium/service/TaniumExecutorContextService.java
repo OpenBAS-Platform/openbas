@@ -1,42 +1,37 @@
 package io.openbas.executors.tanium.service;
 
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
+import static io.openbas.executors.tanium.service.TaniumExecutorService.TANIUM_EXECUTOR_NAME;
 
 import io.openbas.database.model.*;
+import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
+import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
 import java.util.Base64;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service
-public class TaniumExecutorContextService {
-  private TaniumExecutorConfig taniumExecutorConfig;
+@Service(TANIUM_EXECUTOR_NAME)
+@RequiredArgsConstructor
+public class TaniumExecutorContextService extends ExecutorContextService {
 
-  private TaniumExecutorClient taniumExecutorClient;
-
-  @Autowired
-  public void setTaniumExecutorConfig(TaniumExecutorConfig taniumExecutorConfig) {
-    this.taniumExecutorConfig = taniumExecutorConfig;
-  }
-
-  @Autowired
-  public void setTaniumExecutorClient(TaniumExecutorClient taniumExecutorClient) {
-    this.taniumExecutorClient = taniumExecutorClient;
-  }
+  private final TaniumExecutorConfig taniumExecutorConfig;
+  private final TaniumExecutorClient taniumExecutorClient;
 
   public void launchExecutorSubprocess(
-      @NotNull final Inject inject, @NotNull final Endpoint assetEndpoint) {
-    Injector injector =
-        inject
-            .getInjectorContract()
-            .map(InjectorContract::getInjector)
-            .orElseThrow(
-                () -> new UnsupportedOperationException("Inject does not have a contract"));
+      @NotNull final Inject inject,
+      @NotNull final Endpoint assetEndpoint,
+      @NotNull final Agent agent)
+      throws AgentException {
+
+    if (!this.taniumExecutorConfig.isEnable()) {
+      throw new AgentException("Fatal error: Tanium executor is not enabled", agent);
+    }
 
     Endpoint.PLATFORM_TYPE platform =
         Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getPlatform() : null;
@@ -45,6 +40,13 @@ public class TaniumExecutorContextService {
     if (platform == null || arch == null) {
       throw new RuntimeException("Unsupported platform: " + platform + " (arch:" + arch + ")");
     }
+
+    Injector injector =
+        inject
+            .getInjectorContract()
+            .map(InjectorContract::getInjector)
+            .orElseThrow(
+                () -> new UnsupportedOperationException("Inject does not have a contract"));
 
     Integer packageId =
         switch (platform) {
@@ -55,15 +57,11 @@ public class TaniumExecutorContextService {
 
     String executorCommandKey = platform.name() + "." + arch.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
-    command =
-        replaceArgs(
-            platform, command, inject.getId(), assetEndpoint.getAgents().getFirst().getId());
+    command = replaceArgs(platform, command, inject.getId(), agent.getId());
 
     this.taniumExecutorClient.executeAction(
-        assetEndpoint.getAgents().getFirst().getExternalReference(),
+        agent.getExternalReference(),
         packageId,
         Base64.getEncoder().encodeToString(command.getBytes()));
   }
-
-  public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Asset asset) {}
 }

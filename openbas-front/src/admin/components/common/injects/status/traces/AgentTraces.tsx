@@ -1,5 +1,6 @@
 import { ArrowDropDownSharp, ArrowRightSharp } from '@mui/icons-material';
 import { Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
 import { useFormatter } from '../../../../../../components/i18n';
@@ -11,6 +12,8 @@ import TraceMessage from './TraceMessage';
 interface Props { agentStatus: AgentStatusOutput }
 
 const AgentTraces = ({ agentStatus }: Props) => {
+  // Standard hooks
+  const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
   const { t } = useFormatter();
 
@@ -40,6 +43,7 @@ const AgentTraces = ({ agentStatus }: Props) => {
       <div
         onClick={toggleExpand}
         style={{
+          marginTop: theme.spacing(1),
           cursor: 'pointer',
           display: 'flex',
         }}
