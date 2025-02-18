@@ -42,7 +42,7 @@ class ProfileForm extends Component {
             <div style={{ marginTop: 20 }}>
               <Button
                 variant="contained"
-                color="secondary"
+                color="primary"
                 type="submit"
                 disabled={pristine || submitting}
               >

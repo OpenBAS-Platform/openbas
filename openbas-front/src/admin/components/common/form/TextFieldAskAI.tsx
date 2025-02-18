@@ -15,6 +15,7 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useState } from 'react';
 
 import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMedia, aiGenMessage, aiGenSubject, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
@@ -51,6 +52,7 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   context,
   inArticle,
 }) => {
+  const theme = useTheme();
   const { t } = useFormatter();
   const isEnterpriseEdition = useEnterpriseEdition();
   const { enabled, configured } = useAI();
@@ -195,12 +197,14 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
           <span>
             <IconButton
               size="medium"
-              color="secondary"
               onClick={event => ((isEnterpriseEdition && enabled && configured) ? handleOpenMenu(event) : null)}
               disabled={disabled}
-              style={{ marginRight: -10 }}
+              style={{
+                marginTop: -4,
+                color: theme.palette.ai.main,
+              }}
             >
-              <AutoAwesomeOutlined fontSize="medium" />
+              <AutoAwesomeOutlined fontSize="small" />
             </IconButton>
           </span>
         </EETooltip>

@@ -11,7 +11,7 @@
 
     <groupId>io.openbas</groupId>
     <artifactId>openbas-platform</artifactId>
-    <version>1.12.0</version>
+    <version>1.12.2</version>
     <packaging>pom</packaging>
 
     <name>OpenBAS platform</name>

@@ -37,36 +37,35 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries =
       }}
     >
       <Toolbar />
-      {entries.map((entry, idxList) => {
-        return (
-          <Fragment key={idxList}>
-            {idxList !== 0 && <Divider />}
-            <MenuList component="nav" sx={{ marginTop: bannerHeightNumber }}>
-              {(entry.userRight ?? true)
-              && entry.items.map((item) => {
-                if (hasHref(item)) {
+      <div style={{ marginTop: bannerHeightNumber }}>
+        {entries.map((entry, idxList) => {
+          return (
+            <Fragment key={idxList}>
+              {idxList !== 0 && <Divider />}
+              <MenuList component="nav">
+                {(entry.userRight ?? true)
+                && entry.items.map((item) => {
+                  if (hasHref(item)) {
+                    return (
+                      <MenuItemGroup
+                        key={item.label}
+                        item={item}
+                        state={state}
+                        helpers={helpers}
+                      />
+                    );
+                  }
                   return (
-                    <MenuItemGroup
-                      key={item.label}
-                      item={item}
-                      state={state}
-                      helpers={helpers}
-                    />
+                    <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
                   );
-                }
-                return (
-                  <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
-                );
-              })}
-            </MenuList>
-          </Fragment>
-        );
-      })}
+                })}
+              </MenuList>
+            </Fragment>
+          );
+        })}
+      </div>
       <div style={{ marginTop: 'auto' }}>
-        <MenuList
-          component="nav"
-          sx={{ marginBottom: bannerHeightNumber }}
-        >
+        <MenuList component="nav">
           <MenuItemLogo
             navOpen={state.navOpen}
             onClick={() => window.open('https://filigran.io/', '_blank')}

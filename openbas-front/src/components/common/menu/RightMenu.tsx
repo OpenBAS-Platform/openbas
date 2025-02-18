@@ -4,6 +4,8 @@ import { Link, useLocation } from 'react-router';
 import { type CSSObject } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
 
+import { computeBannerSettings } from '../../../public/components/systembanners/utils';
+import useAuth from '../../../utils/hooks/useAuth';
 import { isNotEmptyField } from '../../../utils/utils';
 import { useFormatter } from '../../i18n';
 
@@ -35,6 +37,10 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }
   const location = useLocation();
   const { classes } = useStyles();
   const { t } = useFormatter();
+
+  const { settings } = useAuth();
+  const { bannerHeight } = computeBannerSettings(settings);
+
   return (
     <Drawer
       variant="permanent"
@@ -42,7 +48,7 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }
       classes={{ paper: classes.drawer }}
     >
       <div className={classes.toolbar} />
-      <MenuList component="nav">
+      <MenuList component="nav" sx={{ marginTop: bannerHeight }}>
         {entries.map((entry, idx) => {
           const isCurrentTab = location.pathname === entry.path;
           return (

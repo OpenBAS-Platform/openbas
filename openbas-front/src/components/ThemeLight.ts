@@ -39,6 +39,12 @@ const ThemeLight = (
     primary: { main: primary || THEME_LIGHT_DEFAULT_PRIMARY },
     secondary: { main: secondary || THEME_LIGHT_DEFAULT_SECONDARY },
     chip: { main: '#000000' },
+    ai: {
+      main: '#9c27b0',
+      light: '#ba68c8',
+      dark: '#7b1fa2',
+      contrastText: '#000000',
+    },
     ee: {
       main: EE_COLOR,
       background: hexToRGB(EE_COLOR, 0.2),
