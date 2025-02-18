@@ -97,11 +97,17 @@ const Channel = () => {
                 {logoDark ? (
                   <img
                     src={`/api/documents/${logoDark.document_id}/file`}
-                    style={{ maxHeight: 200, maxWidth: 200 }}
+                    style={{
+                      maxHeight: 200,
+                      maxWidth: 200,
+                    }}
                   />
                 ) : (
                   <Skeleton
-                    sx={{ width: 200, height: 200 }}
+                    sx={{
+                      width: 200,
+                      height: 200,
+                    }}
                     animation={false}
                     variant="rectangular"
                   />
@@ -119,11 +125,17 @@ const Channel = () => {
                 {logoLight ? (
                   <img
                     src={`/api/documents/${logoLight.document_id}/file`}
-                    style={{ maxHeight: 200, maxWidth: 200 }}
+                    style={{
+                      maxHeight: 200,
+                      maxWidth: 200,
+                    }}
                   />
                 ) : (
                   <Skeleton
-                    sx={{ width: 200, height: 200 }}
+                    sx={{
+                      width: 200,
+                      height: 200,
+                    }}
                     animation={false}
                     variant="rectangular"
                   />

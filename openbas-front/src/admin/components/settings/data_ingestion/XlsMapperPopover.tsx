@@ -1,13 +1,13 @@
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { deleteMapper, duplicateMapper, exportMapper } from '../../../../actions/mapper/mapper-actions';
-import { PopoverEntry } from '../../../../components/common/ButtonPopover';
+import { type PopoverEntry } from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import Drawer from '../../../../components/common/Drawer';
 import IconPopover from '../../../../components/common/IconPopover';
 import { useFormatter } from '../../../../components/i18n';
-import type { RawPaginationImportMapper } from '../../../../utils/api-types';
+import { type RawPaginationImportMapper } from '../../../../utils/api-types';
 import { download } from '../../../../utils/utils';
 import XlsMapperUpdate from './xls_mapper/XlsMapperUpdate';
 
@@ -67,7 +67,10 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
       ids_to_export: [mapper.import_mapper_id],
       export_mapper_name: mapper.import_mapper_name,
     }).then(
-      (result: { data: string; filename: string }) => {
+      (result: {
+        data: string;
+        filename: string;
+      }) => {
         download(JSON.stringify(result.data, null, 2), result.filename, 'application/json');
       },
     );
@@ -77,10 +80,22 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
   };
 
   const entries: PopoverEntry[] = [
-    { label: 'Duplicate', action: handleOpenDuplicate },
-    { label: 'Update', action: handleOpenEdit },
-    { label: 'Delete', action: handleOpenDelete },
-    { label: 'Export', action: exportMapperAction },
+    {
+      label: 'Duplicate',
+      action: handleOpenDuplicate,
+    },
+    {
+      label: 'Update',
+      action: handleOpenEdit,
+    },
+    {
+      label: 'Delete',
+      action: handleOpenDelete,
+    },
+    {
+      label: 'Export',
+      action: exportMapperAction,
+    },
   ];
 
   return (

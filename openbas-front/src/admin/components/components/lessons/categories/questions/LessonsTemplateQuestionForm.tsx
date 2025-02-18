@@ -1,17 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
-import { FunctionComponent } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { type FunctionComponent } from 'react';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import TextField from '../../../../../../components/fields/TextField';
 import { useFormatter } from '../../../../../../components/i18n';
-import type { LessonsTemplateQuestionInput } from '../../../../../../utils/api-types';
+import { type LessonsTemplateQuestionInput } from '../../../../../../utils/api-types';
 import { zodImplement } from '../../../../../../utils/Zod';
 
-export type LessonsTemplateQuestionInputForm = Omit<LessonsTemplateQuestionInput, 'lessons_template_question_order'> & {
-  lessons_template_question_order: string;
-};
+export type LessonsTemplateQuestionInputForm = Omit<LessonsTemplateQuestionInput, 'lessons_template_question_order'> & { lessons_template_question_order: string };
 
 interface Props {
   onSubmit: SubmitHandler<LessonsTemplateQuestionInputForm>;
@@ -81,7 +79,11 @@ const LessonsTemplateQuestionForm: FunctionComponent<Props> = ({
         type="number"
         InputLabelProps={{ required: true }}
       />
-      <div style={{ float: 'right', marginTop: 20 }}>
+      <div style={{
+        float: 'right',
+        marginTop: 20,
+      }}
+      >
         <Button
           variant="contained"
           onClick={handleClose}

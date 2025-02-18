@@ -2,24 +2,24 @@ import { UpdateOutlined } from '@mui/icons-material';
 import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import cronstrue from 'cronstrue';
-import { FunctionComponent, lazy, Suspense, useState } from 'react';
+import { type FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
-import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { useHelper } from '../../../../store';
-import { Scenario } from '../../../../utils/api-types';
-import { parseCron, ParsedCron } from '../../../../utils/Cron';
+import { type Scenario } from '../../../../utils/api-types';
+import { parseCron, type ParsedCron } from '../../../../utils/Cron';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useScenarioPermissions from '../../../../utils/Scenario';
-import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext, PermissionsContextType } from '../../common/Context';
+import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForScenario from './ScenarioContext';
 import ScenarioHeader from './ScenarioHeader';
 
@@ -41,20 +41,21 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({
-  scenario,
-}) => {
+const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ scenario }) => {
   const { t, ft, locale, fld } = useFormatter();
   const location = useLocation();
   const theme = useTheme();
   const { classes } = useStyles();
-  const permissionsContext: PermissionsContextType = {
-    permissions: useScenarioPermissions(scenario.scenario_id),
-  };
+  const permissionsContext: PermissionsContextType = { permissions: useScenarioPermissions(scenario.scenario_id) };
   const documentContext: DocumentContextType = {
     onInitDocument: () => ({
       document_tags: [],
-      document_scenarios: scenario ? [{ id: scenario.scenario_id, label: scenario.scenario_name }] : [],
+      document_scenarios: scenario
+        ? [{
+            id: scenario.scenario_id,
+            label: scenario.scenario_name,
+          }]
+        : [],
       document_exercises: [],
     }),
   };
@@ -101,8 +102,14 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({
           <Breadcrumbs
             variant="list"
             elements={[
-              { label: t('Scenarios'), link: '/admin/scenarios' },
-              { label: scenario.scenario_name, current: true },
+              {
+                label: t('Scenarios'),
+                link: '/admin/scenarios',
+              },
+              {
+                label: scenario.scenario_name,
+                current: true,
+              },
             ]}
           />
           <ScenarioHeader
@@ -120,7 +127,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({
             sx={{
               borderBottom: 1,
               borderColor: 'divider',
-              marginBottom: 4,
+              marginBottom: 2,
             }}
           >
             <Tabs value={tabValue}>
@@ -162,7 +169,13 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({
                 </IconButton>
               )}
               {cronExpression && !scenario.scenario_recurrence && (
-                <IconButton size="small" style={{ cursor: 'default', marginRight: 5 }}>
+                <IconButton
+                  size="small"
+                  style={{
+                    cursor: 'default',
+                    marginRight: 5,
+                  }}
+                >
                   <UpdateOutlined />
                 </IconButton>
               )}

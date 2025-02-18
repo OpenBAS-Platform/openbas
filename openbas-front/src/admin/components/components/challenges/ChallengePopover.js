@@ -26,9 +26,7 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge, inline }) =
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   // popover management
-  const { tagsMap } = useHelper(helper => ({
-    tagsMap: helper.getTagsMap(),
-  }));
+  const { tagsMap } = useHelper(helper => ({ tagsMap: helper.getTagsMap() }));
   const handlePopoverOpen = (event) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);

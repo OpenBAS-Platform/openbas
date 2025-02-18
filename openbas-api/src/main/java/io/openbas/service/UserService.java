@@ -7,11 +7,13 @@ import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
 
 import io.openbas.config.OpenBASPrincipal;
+import io.openbas.config.SessionHelper;
 import io.openbas.database.model.Group;
 import io.openbas.database.model.Token;
 import io.openbas.database.model.User;
 import io.openbas.database.repository.*;
 import io.openbas.database.specification.GroupSpecification;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.user.form.user.CreateUserInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -116,6 +118,12 @@ public class UserService {
 
   public User user(@NotBlank final String userId) {
     return this.userRepository.findById(userId).orElseThrow();
+  }
+
+  public User currentUser() {
+    return this.userRepository
+        .findById(SessionHelper.currentUser().getId())
+        .orElseThrow(() -> new ElementNotFoundException("Current user not found"));
   }
 
   // endregion

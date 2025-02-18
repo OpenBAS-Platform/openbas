@@ -22,7 +22,11 @@ const ChannelOverviewTvChannel = ({ channel }) => {
     <div className={classes.root}>
       {logo && channel.channel_mode !== 'title' && (
         <div
-          style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
+          style={{
+            margin: '0 auto',
+            textAlign: 'center',
+            marginBottom: 15,
+          }}
         >
           <img
             src={`/api/documents/${logo.document_id}/file`}
@@ -46,9 +50,7 @@ const ChannelOverviewTvChannel = ({ channel }) => {
       )}
       <Typography
         variant="h2"
-        style={{
-          textAlign: 'center',
-        }}
+        style={{ textAlign: 'center' }}
       >
         {channel.channel_description}
       </Typography>

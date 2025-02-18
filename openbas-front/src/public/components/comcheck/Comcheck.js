@@ -20,9 +20,7 @@ const useStyles = makeStyles()(() => ({
     width: '100%',
     padding: 20,
   },
-  appBar: {
-    textAlign: 'center',
-  },
+  appBar: { textAlign: 'center' },
   logo: {
     width: 200,
     margin: '0px 0px 50px 0px',
@@ -51,7 +49,10 @@ const Comcheck = () => {
     height: window.innerHeight,
   });
   const updateWindowDimensions = () => {
-    setDimension({ width: window.innerWidth, height: window.innerHeight });
+    setDimension({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
   };
   useEffect(() => {
     window.addEventListener('resize', updateWindowDimensions);

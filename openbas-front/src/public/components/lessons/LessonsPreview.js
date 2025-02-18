@@ -77,7 +77,11 @@ const LessonsPreview = (props) => {
             variant="outlined"
             component={Link}
             to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=false`}
-            style={{ position: 'absolute', top: 20, right: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 20,
+            }}
           >
             {t('Switch to player mode')}
           </Button>
@@ -88,13 +92,21 @@ const LessonsPreview = (props) => {
             variant="outlined"
             component={Link}
             to={`/admin/${source.type}s/${source.id}/lessons`}
-            style={{ position: 'absolute', top: 20, left: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              left: 20,
+            }}
           >
             {t('Back to administration')}
           </Button>
         )}
         <div className={classes.container}>
-          <div style={{ margin: '0 auto', textAlign: 'center' }}>
+          <div style={{
+            margin: '0 auto',
+            textAlign: 'center',
+          }}
+          >
             <img src={theme.logo} alt="logo" className={classes.logo} />
           </div>
           <Typography
@@ -108,9 +120,7 @@ const LessonsPreview = (props) => {
           </Typography>
           <Typography
             variant="h2"
-            style={{
-              textAlign: 'center',
-            }}
+            style={{ textAlign: 'center' }}
           >
             {source.subtitle}
           </Typography>
@@ -229,7 +239,11 @@ const LessonsPreview = (props) => {
                   </div>
                 );
               })}
-              <div style={{ margin: '50px auto', textAlign: 'center' }}>
+              <div style={{
+                margin: '50px auto',
+                textAlign: 'center',
+              }}
+              >
                 <Button color="secondary" variant="contained" disabled>
                   {t('Submit')}
                 </Button>

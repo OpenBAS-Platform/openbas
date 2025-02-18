@@ -1,13 +1,13 @@
-import { useRef, useState } from 'react';
+import { type MutableRefObject, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { MESSAGING$ } from '../../../../utils/Environment';
-import { hasHref, LeftMenuEntries } from './leftmenu-model';
+import { hasHref, type LeftMenuEntries } from './leftmenu-model';
 
 export interface LeftMenuState {
   navOpen: boolean;
   selectedMenu: string | null;
-  anchors: Record<string, React.MutableRefObject<HTMLLIElement | null>>;
+  anchors: Record<string, MutableRefObject<HTMLLIElement | null>>;
 }
 
 export interface LeftMenuHelpers {
@@ -18,7 +18,10 @@ export interface LeftMenuHelpers {
   handleGoToPage: (path: string) => void;
 }
 
-const useLeftMenu = (entries: LeftMenuEntries[]): { state: LeftMenuState; helpers: LeftMenuHelpers } => {
+const useLeftMenu = (entries: LeftMenuEntries[]): {
+  state: LeftMenuState;
+  helpers: LeftMenuHelpers;
+} => {
   // Standard hooks
   const navigate = useNavigate();
 
@@ -33,7 +36,7 @@ const useLeftMenu = (entries: LeftMenuEntries[]): { state: LeftMenuState; helper
         }
         return subAcc;
       }, acc),
-    {} as Record<string, React.MutableRefObject<HTMLLIElement | null>>,
+    {} as Record<string, MutableRefObject<HTMLLIElement | null>>,
   );
 
   const handleToggleDrawer = () => {
@@ -53,8 +56,18 @@ const useLeftMenu = (entries: LeftMenuEntries[]): { state: LeftMenuState; helper
   };
 
   return {
-    state: { navOpen, selectedMenu, anchors },
-    helpers: { handleToggleDrawer, handleSelectedMenuOpen, handleSelectedMenuClose, handleSelectedMenuToggle, handleGoToPage },
+    state: {
+      navOpen,
+      selectedMenu,
+      anchors,
+    },
+    helpers: {
+      handleToggleDrawer,
+      handleSelectedMenuOpen,
+      handleSelectedMenuClose,
+      handleSelectedMenuToggle,
+      handleGoToPage,
+    },
   };
 };
 

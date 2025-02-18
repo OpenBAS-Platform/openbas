@@ -17,7 +17,11 @@ const SimpleRichTextField = (props) => {
     onBlur = () => {},
   } = props;
   return (
-    <div style={{ ...style, position: 'relative' }}>
+    <div style={{
+      ...style,
+      position: 'relative',
+    }}
+    >
       <InputLabel
         variant="standard"
         shrink={true}

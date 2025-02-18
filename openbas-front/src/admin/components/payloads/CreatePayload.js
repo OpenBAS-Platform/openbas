@@ -23,7 +23,11 @@ const styles = () => ({
 class CreatePayload extends Component {
   constructor(props) {
     super(props);
-    this.state = { open: false, activeStep: 0, selectedType: null };
+    this.state = {
+      open: false,
+      activeStep: 0,
+      selectedType: null,
+    };
   }
 
   handleOpen() {
@@ -31,11 +35,18 @@ class CreatePayload extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false, activeStep: 0, selectedType: null });
+    this.setState({
+      open: false,
+      activeStep: 0,
+      selectedType: null,
+    });
   }
 
   handleSelectType(type) {
-    this.setState({ selectedType: type, activeStep: 1 });
+    this.setState({
+      selectedType: type,
+      activeStep: 1,
+    });
   }
 
   onSubmit(data) {

@@ -23,7 +23,11 @@ const styles = () => ({
 class CreateInjectorContract extends Component {
   constructor(props) {
     super(props);
-    this.state = { open: false, activeStep: 0, selectedInjectorContract: null };
+    this.state = {
+      open: false,
+      activeStep: 0,
+      selectedInjectorContract: null,
+    };
   }
 
   handleOpen() {
@@ -31,7 +35,11 @@ class CreateInjectorContract extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false, activeStep: 0, selectedInjectorContract: null });
+    this.setState({
+      open: false,
+      activeStep: 0,
+      selectedInjectorContract: null,
+    });
   }
 
   goToStep(step) {
@@ -39,7 +47,10 @@ class CreateInjectorContract extends Component {
   }
 
   handleSelectInjectorContract(injectorContractId) {
-    this.setState({ selectedInjectorContract: injectorContractId, activeStep: 1 });
+    this.setState({
+      selectedInjectorContract: injectorContractId,
+      activeStep: 1,
+    });
   }
 
   onSubmit(data, fields) {

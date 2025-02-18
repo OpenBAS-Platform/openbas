@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { addLessonsTemplate } from '../../../../actions/Lessons';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
@@ -6,7 +6,7 @@ import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import ListItemButtonCreate from '../../../../components/common/ListItemButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
-import type { LessonsTemplate, LessonsTemplateInput } from '../../../../utils/api-types';
+import { type LessonsTemplate, type LessonsTemplateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import LessonsTemplateForm from './LessonsTemplateForm';
 
@@ -27,7 +27,10 @@ const CreateLessonsTemplate: FunctionComponent<Props> = ({
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onSubmit = (data: LessonsTemplateInput) => {
-    return dispatch(addLessonsTemplate(data)).then((result: { result: string; entities: { lessonstemplates: Record<string, LessonsTemplate> } }) => {
+    return dispatch(addLessonsTemplate(data)).then((result: {
+      result: string;
+      entities: { lessonstemplates: Record<string, LessonsTemplate> };
+    }) => {
       if (result.result) {
         if (onCreate) {
           const created = result.entities.lessonstemplates[result.result];

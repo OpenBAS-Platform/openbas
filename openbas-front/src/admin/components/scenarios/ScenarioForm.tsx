@@ -10,15 +10,15 @@ import {
   TextField as MuiTextField,
   Typography,
 } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { type FunctionComponent, useState } from 'react';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
 import { useFormatter } from '../../../components/i18n';
-import type { ScenarioInput } from '../../../utils/api-types';
+import { type ScenarioInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
 import { scenarioCategories } from './constants';
 
@@ -268,7 +268,10 @@ const ScenarioForm: FunctionComponent<Props> = ({
       <Alert
         severity="warning"
         variant="outlined"
-        style={{ position: 'relative', border: 'none' }}
+        style={{
+          position: 'relative',
+          border: 'none',
+        }}
       >
         <AlertTitle>
           {t('If you remove the default email address, the email reception for this simulation / scenario will be disabled.')}
@@ -294,7 +297,11 @@ const ScenarioForm: FunctionComponent<Props> = ({
         inputProps={register('scenario_message_footer')}
         disabled={disabled}
       />
-      <div style={{ float: 'right', marginTop: 20 }}>
+      <div style={{
+        float: 'right',
+        marginTop: 20,
+      }}
+      >
         <Button
           variant="contained"
           onClick={handleClose}

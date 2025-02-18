@@ -145,6 +145,9 @@ KillChainPhasePopover.propTypes = {
 };
 
 export default R.compose(
-  connect(null, { updateKillChainPhase, deleteKillChainPhase }),
+  connect(null, {
+    updateKillChainPhase,
+    deleteKillChainPhase,
+  }),
   inject18n,
 )(KillChainPhasePopover);

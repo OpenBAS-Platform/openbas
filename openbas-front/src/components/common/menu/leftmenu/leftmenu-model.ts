@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { type ReactElement } from 'react';
 
 export interface LeftMenuEntries {
   items: LeftMenuItem[];
@@ -7,15 +7,13 @@ export interface LeftMenuEntries {
 
 export interface LeftMenuItem {
   path: string;
-  icon: () => React.ReactElement;
+  icon: () => ReactElement;
   label: string;
   href?: string;
   subItems?: LeftMenuSubItem[];
 }
 
-export interface LeftMenuItemWithHref extends LeftMenuItem {
-  href: string;
-}
+export interface LeftMenuItemWithHref extends LeftMenuItem { href: string }
 
 export function hasHref(item: LeftMenuItem): item is LeftMenuItemWithHref {
   return typeof item.href === 'string';
@@ -25,5 +23,5 @@ export interface LeftMenuSubItem {
   exact?: boolean;
   link: string;
   label: string;
-  icon?: () => React.ReactElement;
+  icon?: () => ReactElement;
 }

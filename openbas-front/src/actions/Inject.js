@@ -88,7 +88,10 @@ export const executeInject = (exerciseId, values, files) => (dispatch) => {
 };
 
 export const injectDone = (exerciseId, injectId) => (dispatch) => {
-  const data = { status: 'SUCCESS', message: 'Manual validation' };
+  const data = {
+    status: 'SUCCESS',
+    message: 'Manual validation',
+  };
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}/status`;
   return postReferential(schema.inject, uri, data)(dispatch);
 };

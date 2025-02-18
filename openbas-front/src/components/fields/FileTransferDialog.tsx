@@ -1,14 +1,13 @@
 import { DescriptionOutlined } from '@mui/icons-material';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { useEffect, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { DocumentHelper, UserHelper } from '../../actions/helper';
+import { type DocumentHelper, type UserHelper } from '../../actions/helper';
 import TagsFilter from '../../admin/components/common/filters/TagsFilter';
 import CreateDocument from '../../admin/components/components/documents/CreateDocument';
 import { useHelper } from '../../store';
-import type { RawDocument } from '../../utils/api-types';
+import { type RawDocument } from '../../utils/api-types';
 import { truncate } from '../../utils/String';
 import Transition from '../common/Transition';
 import { useFormatter } from '../i18n';
@@ -22,16 +21,12 @@ const useStyles = makeStyles()(theme => ({
     padding: 20,
     border: '1px dashed rgba(255, 255, 255, 0.3)',
   },
-  chip: {
-    margin: '0 10px 10px 0',
-  },
+  chip: { margin: '0 10px 10px 0' },
   item: {
     'paddingLeft': 10,
     'height': 50,
     'cursor': 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action?.hover,
-    },
+    '&:hover': { backgroundColor: theme.palette.action?.hover },
   },
 }));
 
@@ -47,7 +42,7 @@ interface Props {
   onSubmitAddDocuments?: (documents: RawDocument[]) => void;
 }
 
-const FileTransferDialog: React.FC<Props> = ({
+const FileTransferDialog: FunctionComponent<Props> = ({
   label,
   open,
   setOpen,
@@ -61,7 +56,11 @@ const FileTransferDialog: React.FC<Props> = ({
   const { t } = useFormatter();
 
   const [keyword, setKeyword] = useState<string>('');
-  const [tags, setTags] = useState<{ id: string; label: string; color: string }[]>([]);
+  const [tags, setTags] = useState<{
+    id: string;
+    label: string;
+    color: string;
+  }[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<RawDocument[]>([]);
 
   // Fetching data
@@ -86,7 +85,11 @@ const FileTransferDialog: React.FC<Props> = ({
     setKeyword(value || '');
   };
 
-  const handleAddTag = (value: { id: string; label: string; color: string }) => {
+  const handleAddTag = (value: {
+    id: string;
+    label: string;
+    color: string;
+  }) => {
     if (!tags.includes(value)) {
       setTags([...tags, value]);
     }

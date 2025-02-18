@@ -21,9 +21,7 @@ const useStyles = makeStyles()(() => ({
     margin: '0 auto',
     width: 1200,
   },
-  card: {
-    position: 'relative',
-  },
+  card: { position: 'relative' },
   logo: {
     maxHeight: 200,
     maxWidth: 300,
@@ -51,9 +49,7 @@ const ChannelNewspaper = ({ channelReader }) => {
     channel_information: channel,
   } = channelReader;
   const baseUri = `/api/player/${exercise?.exercise_id ?? scenario?.scenario_id}`;
-  const { documentsMap } = useHelper(helper => ({
-    documentsMap: helper.getDocumentsMap(),
-  }));
+  const { documentsMap } = useHelper(helper => ({ documentsMap: helper.getDocumentsMap() }));
   const logo = isDark ? channel.channel_logo_dark : channel.channel_logo_light;
   const firstArticle = R.head(articles) || null;
   const firstArticleImages = (firstArticle?.article_documents || [])
@@ -75,7 +71,11 @@ const ChannelNewspaper = ({ channelReader }) => {
     <div className={classes.container}>
       {logo && channel.channel_mode !== 'title' && (
         <div
-          style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
+          style={{
+            margin: '0 auto',
+            textAlign: 'center',
+            marginBottom: 15,
+          }}
         >
           <img
             src={`${baseUri}/documents/${logo}/file${queryParams}`}
@@ -99,9 +99,7 @@ const ChannelNewspaper = ({ channelReader }) => {
       )}
       <Typography
         variant="h2"
-        style={{
-          textAlign: 'center',
-        }}
+        style={{ textAlign: 'center' }}
       >
         {channel.channel_description}
       </Typography>
@@ -116,7 +114,10 @@ const ChannelNewspaper = ({ channelReader }) => {
             <Card
               variant="outlined"
               classes={{ root: classes.card }}
-              sx={{ width: '100%', height: '100%' }}
+              sx={{
+                width: '100%',
+                height: '100%',
+              }}
             >
               <CardHeader
                 avatar={(
@@ -147,7 +148,10 @@ const ChannelNewspaper = ({ channelReader }) => {
                   gutterBottom
                   variant="h1"
                   component="div"
-                  style={{ margin: '0 auto', textAlign: 'center' }}
+                  style={{
+                    margin: '0 auto',
+                    textAlign: 'center',
+                  }}
                 >
                   {firstArticle.article_name}
                 </Typography>
@@ -242,7 +246,10 @@ const ChannelNewspaper = ({ channelReader }) => {
                       gutterBottom
                       variant="h1"
                       component="div"
-                      style={{ margin: '0 auto', textAlign: 'center' }}
+                      style={{
+                        margin: '0 auto',
+                        textAlign: 'center',
+                      }}
                     >
                       {article.article_name}
                     </Typography>
@@ -307,7 +314,10 @@ const ChannelNewspaper = ({ channelReader }) => {
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
-                sx={{ width: '100%', height: '100%' }}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                }}
               >
                 <CardHeader
                   avatar={(
@@ -334,7 +344,10 @@ const ChannelNewspaper = ({ channelReader }) => {
                     gutterBottom
                     variant="h1"
                     component="div"
-                    style={{ margin: '0 auto', textAlign: 'center' }}
+                    style={{
+                      margin: '0 auto',
+                      textAlign: 'center',
+                    }}
                   >
                     {article.article_name}
                   </Typography>

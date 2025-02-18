@@ -47,12 +47,8 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles = {
-  group_name: {
-    width: '15%',
-  },
-  group_default_user_assign: {
-    width: '15%',
-  },
+  group_name: { width: '15%' },
+  group_default_user_assign: { width: '15%' },
   group_default_scenario_observer: {
     width: '15%',
     cursor: 'default',
@@ -89,19 +85,45 @@ const Groups = () => {
 
   // Headers
   const headers = [
-    { field: 'group_name', label: 'Name', isSortable: true },
-    { field: 'group_default_user_assign', label: 'Auto assign', isSortable: true },
-    { field: 'group_default_scenario_observer', label: 'Auto observer on scenarios', isSortable: false },
-    { field: 'group_default_scenario_planner', label: 'Auto planner on scenarios', isSortable: false },
-    { field: 'group_default_exercise_observer', label: 'Auto observer on exercises', isSortable: false },
-    { field: 'group_default_exercise_planner', label: 'Auto planner on exercises', isSortable: false },
-    { field: 'group_users_number', label: 'Users', isSortable: false },
+    {
+      field: 'group_name',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'group_default_user_assign',
+      label: 'Auto assign',
+      isSortable: true,
+    },
+    {
+      field: 'group_default_scenario_observer',
+      label: 'Auto observer on scenarios',
+      isSortable: false,
+    },
+    {
+      field: 'group_default_scenario_planner',
+      label: 'Auto planner on scenarios',
+      isSortable: false,
+    },
+    {
+      field: 'group_default_exercise_observer',
+      label: 'Auto observer on exercises',
+      isSortable: false,
+    },
+    {
+      field: 'group_default_exercise_planner',
+      label: 'Auto planner on exercises',
+      isSortable: false,
+    },
+    {
+      field: 'group_users_number',
+      label: 'Users',
+      isSortable: false,
+    },
   ];
 
   const [groups, setGroups] = useState([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('group_name'),
-  });
+  const [searchPaginationInput, setSearchPaginationInput] = useState({ sorts: initSorting('group_name') });
 
   // Export
   const exportProps = {
@@ -117,7 +139,13 @@ const Groups = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Security') }, { label: t('Groups'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Security') }, {
+          label: t('Groups'),
+          current: true,
+        }]}
+      />
       <SecurityMenu />
       <PaginationComponent
         fetch={searchGroups}

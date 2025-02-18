@@ -1,16 +1,16 @@
 import { HelpOutlined } from '@mui/icons-material';
 import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
 import arrayMutators from 'final-form-arrays';
-import * as React from 'react';
+import { type FunctionComponent } from 'react';
 import { Form } from 'react-final-form';
 import { makeStyles } from 'tss-react/mui';
 
-import type { InjectOutputType } from '../../../../actions/injects/Inject';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import { type InjectOutputType } from '../../../../actions/injects/Inject';
+import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectDependency } from '../../../../utils/api-types';
+import { type Inject, type InjectDependency } from '../../../../utils/api-types';
 import InjectChainsForm from './InjectChainsForm';
 
 const useStyles = makeStyles()(theme => ({
@@ -24,9 +24,7 @@ const useStyles = makeStyles()(theme => ({
     fontSize: 18,
     textAlign: 'center',
   },
-  injectorContractHeader: {
-    backgroundColor: theme.palette.background.default,
-  },
+  injectorContractHeader: { backgroundColor: theme.palette.background.default },
 }));
 
 interface Props {
@@ -36,13 +34,11 @@ interface Props {
   injects?: InjectOutputType[];
 }
 
-const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
+const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
   const { t, tPick } = useFormatter();
   const { classes } = useStyles();
 
-  const { injectsMap } = useHelper((helper: InjectHelper) => ({
-    injectsMap: helper.getInjectsMap(),
-  }));
+  const { injectsMap } = useHelper((helper: InjectHelper) => ({ injectsMap: helper.getInjectsMap() }));
 
   const initialValues = {
     ...inject,
@@ -117,11 +113,31 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
       <Card elevation={0} classes={{ root: classes.injectorContract }}>
         <CardHeader
           classes={{ root: classes.injectorContractHeader }}
-          avatar={injectorContractContent?.config?.type ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${injectorContractContent.config.type}`} />
-            : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
+          avatar={injectorContractContent?.config?.type ? (
+            <Avatar
+              sx={{
+                width: 24,
+                height: 24,
+              }}
+              src={`/api/images/injectors/${injectorContractContent.config.type}`}
+            />
+          )
+            : (
+                <Avatar sx={{
+                  width: 24,
+                  height: 24,
+                }}
+                >
+                  <HelpOutlined />
+                </Avatar>
+              )}
           title={inject?.inject_attack_patterns?.map(value => value.attack_pattern_external_id)?.join(', ')}
           action={(
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+            }}
+            >
               {inject?.inject_injector_contract?.injector_contract_platforms?.map(
                 platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
               )}
@@ -151,7 +167,11 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
                 values={values}
                 injects={injects}
               />
-              <div style={{ float: 'right', marginTop: 20 }}>
+              <div style={{
+                float: 'right',
+                marginTop: 20,
+              }}
+              >
                 <Button
                   variant="contained"
                   onClick={handleClose}

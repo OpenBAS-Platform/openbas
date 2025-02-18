@@ -51,8 +51,6 @@ const Index = () => {
   );
 };
 
-Index.propTypes = {
-  classes: PropTypes.object,
-};
+Index.propTypes = { classes: PropTypes.object };
 
 export default Index;

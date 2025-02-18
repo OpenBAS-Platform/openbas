@@ -1,13 +1,13 @@
 import { useParams } from 'react-router';
 
 import { fetchExerciseChallenges } from '../../../../../actions/Challenge';
-import type { ChallengeHelper } from '../../../../../actions/helper';
+import { type ChallengeHelper } from '../../../../../actions/helper';
 import { useHelper } from '../../../../../store';
-import type { Exercise } from '../../../../../utils/api-types';
+import { type Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import ContextualChallenges from '../../../common/challenges/ContextualChallenges';
-import { ChallengeContext, ChallengeContextType } from '../../../common/Context';
+import { ChallengeContext, type ChallengeContextType } from '../../../common/Context';
 
 const ExerciseChallenges = () => {
   // Standard hooks
@@ -18,9 +18,7 @@ const ExerciseChallenges = () => {
   useDataLoader(() => {
     dispatch(fetchExerciseChallenges(exerciseId));
   });
-  const context: ChallengeContextType = {
-    previewChallengeUrl: () => `/challenges/${exerciseId}?preview=true`,
-  };
+  const context: ChallengeContextType = { previewChallengeUrl: () => `/challenges/${exerciseId}?preview=true` };
   return (
     <ChallengeContext.Provider value={context}>
       <ContextualChallenges challenges={challenges} linkToInjects={`/admin/simulations/${exerciseId}/injects`} />

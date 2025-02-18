@@ -5,7 +5,7 @@ import Markdown from 'react-markdown';
 import { makeStyles } from 'tss-react/mui';
 
 import { askToken, checkKerberos, fetchPlatformParameters } from '../../../actions/Application';
-import type { LoggedHelper } from '../../../actions/helper';
+import { type LoggedHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import byFiligranDark from '../../../static/images/by_filigran_dark.png';
 import byFiligranLight from '../../../static/images/by_filigran_light.png';
@@ -73,7 +73,10 @@ const Login = () => {
     height: window.innerHeight,
   });
   const updateWindowDimensions = () => setDimension(
-    { width: window.innerWidth, height: window.innerHeight },
+    {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    },
   );
   useEffect(() => {
     window.addEventListener('resize', updateWindowDimensions);
@@ -83,7 +86,10 @@ const Login = () => {
     dispatch(fetchPlatformParameters());
     dispatch(checkKerberos());
   });
-  const onSubmit = (data: { username: string; password: string }) => dispatch(askToken(data.username, data.password));
+  const onSubmit = (data: {
+    username: string;
+    password: string;
+  }) => dispatch(askToken(data.username, data.password));
   let loginHeight = 320;
   if ((isOpenId || isSaml2) && isLocal) {
     loginHeight = 440;
@@ -165,7 +171,11 @@ const Login = () => {
           {isLocal && !reset && (
             <Paper variant="outlined" classes={{ root: classes.login }}>
               <LoginForm onSubmit={onSubmit} />
-              <div style={{ marginBottom: 10, cursor: 'pointer' }}>
+              <div style={{
+                marginBottom: 10,
+                cursor: 'pointer',
+              }}
+              >
                 <a onClick={() => setReset(true)}>
                   {t(
                     'I forgot my password',

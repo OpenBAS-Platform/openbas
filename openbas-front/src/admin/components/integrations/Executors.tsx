@@ -2,31 +2,25 @@ import { Card, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../actions/Executor';
-import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
+import { type ExecutorHelper } from '../../../actions/executors/executor-helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import SearchFilter from '../../../components/SearchFilter';
 import { useHelper } from '../../../store';
-import type { Executor } from '../../../utils/api-types';
+import { type Executor } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles()(theme => ({
-  parameters: {
-    marginTop: -3,
-  },
+  parameters: { marginTop: -3 },
   card: {
     position: 'relative',
     overflow: 'hidden',
     height: 180,
   },
-  content: {
-    padding: 20,
-  },
-  icon: {
-    padding: 0,
-  },
+  content: { padding: 20 },
+  icon: { padding: 0 },
   chipInList: {
     marginTop: 10,
     fontSize: 12,
@@ -57,18 +51,26 @@ const Executors = () => {
   );
 
   // Fetching data
-  const { executors } = useHelper((helper: ExecutorHelper) => ({
-    executors: helper.getExecutors(),
-  }));
+  const { executors } = useHelper((helper: ExecutorHelper) => ({ executors: helper.getExecutors() }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
   });
   const sortedExecutors = filtering.filterAndSort(executors);
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Integrations') }, { label: t('Executors'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Integrations') }, {
+          label: t('Executors'),
+          current: true,
+        }]}
+      />
       <div className={classes.parameters}>
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div style={{
+          float: 'left',
+          marginRight: 10,
+        }}
+        >
           <SearchFilter
             variant="small"
             onChange={filtering.handleSearch}
@@ -88,7 +90,11 @@ const Executors = () => {
                       <img
                         src={`/api/images/executors/${executor.executor_type}`}
                         alt={executor.executor_type}
-                        style={{ width: 50, height: 50, borderRadius: 4 }}
+                        style={{
+                          width: 50,
+                          height: 50,
+                          borderRadius: 4,
+                        }}
                       />
                     </div>
                     <Typography
@@ -110,7 +116,11 @@ const Executors = () => {
                     color="secondary"
                     label={t('Built-in')}
                   />
-                  <div style={{ display: 'flex', marginTop: 30 }}>
+                  <div style={{
+                    display: 'flex',
+                    marginTop: 30,
+                  }}
+                  >
                     <div className={classes.dotGreen} />
                     <Typography
                       variant="h4"

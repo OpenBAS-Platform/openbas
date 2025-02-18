@@ -1,4 +1,4 @@
-import { Dispatch } from 'redux';
+import { type Dispatch } from 'redux';
 
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import {

@@ -1,10 +1,10 @@
 import { addScenarioTeamPlayers, disableScenarioTeamPlayers, enableScenarioTeamPlayers, removeScenarioTeamPlayers } from '../../../../../actions/scenarios/scenario-actions';
 import { removeScenarioTeams, replaceScenarioTeams, searchScenarioTeams } from '../../../../../actions/scenarios/scenario-teams-action';
 import { addTeam, fetchTeams } from '../../../../../actions/teams/team-actions';
-import type { Page } from '../../../../../components/common/queryable/Page';
-import { Scenario, ScenarioTeamUser, SearchPaginationInput, Team, TeamCreateInput, TeamOutput } from '../../../../../utils/api-types';
+import { type Page } from '../../../../../components/common/queryable/Page';
+import { type Scenario, type ScenarioTeamUser, type SearchPaginationInput, type Team, type TeamCreateInput, type TeamOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import type { UserStore } from '../../../teams/players/Player';
+import { type UserStore } from '../../../teams/players/Player';
 
 const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTeamsUsers: Scenario['scenario_teams_users']) => {
   const dispatch = useAppDispatch();
@@ -19,7 +19,10 @@ const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTea
       return dispatch(fetchTeams());
     },
     onCreateTeam(team: TeamCreateInput): Promise<{ result: string }> {
-      return dispatch(addTeam({ ...team, team_scenarios: [scenarioId] }));
+      return dispatch(addTeam({
+        ...team,
+        team_scenarios: [scenarioId],
+      }));
     },
     checkUserEnabled(teamId: Team['team_id'], userId: UserStore['user_id']): boolean {
       return (scenarioTeamsUsers ?? [])?.filter((o: ScenarioTeamUser) => o.scenario_id === scenarioId && o.team_id === teamId && userId === o.user_id).length > 0;
@@ -27,10 +30,16 @@ const teamContextForScenario = (scenarioId: Scenario['scenario_id'], scenarioTea
     computeTeamUsersEnabled(teamId: Team['team_id']) {
       return scenarioTeamsUsers?.filter((o: ScenarioTeamUser) => o.team_id === teamId).length ?? 0;
     },
-    onRemoveTeam(teamId: Team['team_id']): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
+    onRemoveTeam(teamId: Team['team_id']): Promise<{
+      result: string[];
+      entities: { teams: Record<string, Team> };
+    }> {
       return dispatch(removeScenarioTeams(scenarioId, { scenario_teams: [teamId] }));
     },
-    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{ result: string[]; entities: { teams: Record<string, Team> } }> {
+    onReplaceTeam(teamIds: Team['team_id'][]): Promise<{
+      result: string[];
+      entities: { teams: Record<string, Team> };
+    }> {
       return dispatch(replaceScenarioTeams(scenarioId, { scenario_teams: teamIds }));
     },
     onToggleUser(teamId: Team['team_id'], userId: UserStore['user_id'], userEnabled: boolean): void {

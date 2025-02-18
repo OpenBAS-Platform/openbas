@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField as MuiTextField, Typography } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
-import type { SecurityPlatformHelper } from '../../../../../../actions/assets/asset-helper';
+import { type SecurityPlatformHelper } from '../../../../../../actions/assets/asset-helper';
 import { fetchSecurityPlatforms } from '../../../../../../actions/assets/securityPlatform-actions';
 import { updateInjectExpectation } from '../../../../../../actions/Exercise';
 import ExpandableText from '../../../../../../components/common/ExpendableText';
@@ -13,16 +13,14 @@ import SecurityPlatformField from '../../../../../../components/fields/SecurityP
 import { useFormatter } from '../../../../../../components/i18n';
 import ItemResult from '../../../../../../components/ItemResult';
 import { useHelper } from '../../../../../../store';
-import type { InjectExpectationResult, SecurityPlatform } from '../../../../../../utils/api-types';
+import { type InjectExpectationResult, type SecurityPlatform } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { zodImplement } from '../../../../../../utils/Zod';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { type InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 
 const useStyles = makeStyles()(theme => ({
-  marginTop_2: {
-    marginTop: theme.spacing(2),
-  },
+  marginTop_2: { marginTop: theme.spacing(2) },
   buttons: {
     display: 'flex',
     placeContent: 'end',
@@ -42,13 +40,15 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
   const { classes } = useStyles();
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const { securityPlatformsMap }: { securityPlatformsMap: Record<string, SecurityPlatform> } = useHelper((helper: SecurityPlatformHelper) => ({
-    securityPlatformsMap: helper.getSecurityPlatformsMap(),
-  }));
+  const { securityPlatformsMap }: { securityPlatformsMap: Record<string, SecurityPlatform> }
+    = useHelper((helper: SecurityPlatformHelper) => ({ securityPlatformsMap: helper.getSecurityPlatformsMap() }));
   useDataLoader(() => {
     dispatch(fetchSecurityPlatforms());
   });
-  const onSubmit = (data: { expectation_score: number; security_platform: string }) => {
+  const onSubmit = (data: {
+    expectation_score: number;
+    security_platform: string;
+  }) => {
     dispatch(updateInjectExpectation(expectation.inject_expectation_id, {
       ...data,
       source_id: data.security_platform,
@@ -63,9 +63,15 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<{ expectation_score: number; security_platform: string }>({
+  } = useForm<{
+    expectation_score: number;
+    security_platform: string;
+  }>({
     mode: 'onTouched',
-    resolver: zodResolver(zodImplement<{ expectation_score: number; security_platform: string }>().with({
+    resolver: zodResolver(zodImplement<{
+      expectation_score: number;
+      security_platform: string;
+    }>().with({
       expectation_score: z.coerce.number(),
       security_platform: z.string().min(1, { message: t('Should not be empty') }),
     })),

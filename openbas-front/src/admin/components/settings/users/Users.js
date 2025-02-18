@@ -46,25 +46,15 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles = {
-  user_email: {
-    width: '20%',
-  },
-  user_firstname: {
-    width: '15%',
-  },
-  user_lastname: {
-    width: '15%',
-  },
+  user_email: { width: '20%' },
+  user_firstname: { width: '15%' },
+  user_lastname: { width: '15%' },
   user_organization: {
     width: '15%',
     cursor: 'default',
   },
-  user_admin: {
-    width: '10%',
-  },
-  user_tags: {
-    width: '25%',
-  },
+  user_admin: { width: '10%' },
+  user_tags: { width: '25%' },
 };
 
 const Users = () => {
@@ -82,18 +72,40 @@ const Users = () => {
 
   // Headers
   const headers = [
-    { field: 'user_email', label: 'Email address', isSortable: true },
-    { field: 'user_firstname', label: 'Firstname', isSortable: true },
-    { field: 'user_lastname', label: 'Lastname', isSortable: true },
-    { field: 'user_organization', label: 'Organization', isSortable: false },
-    { field: 'user_admin', label: 'Administrator', isSortable: true },
-    { field: 'user_tags', label: 'Tags', isSortable: true },
+    {
+      field: 'user_email',
+      label: 'Email address',
+      isSortable: true,
+    },
+    {
+      field: 'user_firstname',
+      label: 'Firstname',
+      isSortable: true,
+    },
+    {
+      field: 'user_lastname',
+      label: 'Lastname',
+      isSortable: true,
+    },
+    {
+      field: 'user_organization',
+      label: 'Organization',
+      isSortable: false,
+    },
+    {
+      field: 'user_admin',
+      label: 'Administrator',
+      isSortable: true,
+    },
+    {
+      field: 'user_tags',
+      label: 'Tags',
+      isSortable: true,
+    },
   ];
 
   const [users, setUsers] = useState([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('user_email'),
-  });
+  const [searchPaginationInput, setSearchPaginationInput] = useState({ sorts: initSorting('user_email') });
 
   // Export
   const exportProps = {
@@ -109,7 +121,13 @@ const Users = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Security') }, { label: t('Users'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Security') }, {
+          label: t('Users'),
+          current: true,
+        }]}
+      />
       <SecurityMenu />
       <PaginationComponent
         fetch={searchUsers}

@@ -1,11 +1,11 @@
 import { MovieFilterOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
-import { CSSProperties, useMemo, useState } from 'react';
+import { type CSSProperties, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchStatistics } from '../../../actions/Application';
-import type { TagHelper, UserHelper } from '../../../actions/helper';
+import { type TagHelper, type UserHelper } from '../../../actions/helper';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
@@ -22,22 +22,16 @@ import ItemTags from '../../../components/ItemTags';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import type { FilterGroup, Scenario, SearchPaginationInput } from '../../../utils/api-types';
+import { type FilterGroup, type Scenario, type SearchPaginationInput } from '../../../utils/api-types';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import ScenarioCreation from './ScenarioCreation';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     height: 20,
     fontSize: 13,
@@ -49,27 +43,13 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  scenario_name: {
-    width: '25%',
-  },
-  scenario_severity: {
-    width: '8%',
-  },
-  scenario_category: {
-    width: '12%',
-  },
-  scenario_recurrence: {
-    width: '12%',
-  },
-  scenario_platforms: {
-    width: '10%',
-  },
-  scenario_tags: {
-    width: '18%',
-  },
-  scenario_updated_at: {
-    width: '10%',
-  },
+  scenario_name: { width: '25%' },
+  scenario_severity: { width: '8%' },
+  scenario_category: { width: '12%' },
+  scenario_recurrence: { width: '12%' },
+  scenario_platforms: { width: '10%' },
+  scenario_tags: { width: '18%' },
+  scenario_updated_at: { width: '10%' },
 };
 
 const Scenarios = () => {
@@ -80,9 +60,7 @@ const Scenarios = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   // Headers
   const headers = useMemo(() => [
@@ -205,7 +183,13 @@ const Scenarios = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{
+          label: t('Scenarios'),
+          current: true,
+        }]}
+      />
       <PaginationComponentV2
         fetch={search}
         searchPaginationInput={searchPaginationInput}

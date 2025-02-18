@@ -1,8 +1,6 @@
-import { ExecutionTracesOutput } from '../../../../../../utils/api-types';
+import { type ExecutionTracesOutput } from '../../../../../../utils/api-types';
 
-interface Props {
-  traces: ExecutionTracesOutput[];
-}
+interface Props { traces: ExecutionTracesOutput[] }
 
 const TraceMessage = ({ traces }: Props) => {
   return (

@@ -12,7 +12,10 @@ const useExportToXLS = <T extends object>({ data, fileName }: UseExportToXLSProp
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(workbook, worksheet, fileName);
-    const xlsData = XLSX.write(workbook, { bookType: 'xls', type: 'binary' });
+    const xlsData = XLSX.write(workbook, {
+      bookType: 'xls',
+      type: 'binary',
+    });
     const buffer = new ArrayBuffer(xlsData.length);
     const view = new Uint8Array(buffer);
     for (let i = 0; i < xlsData.length; i += 1) {

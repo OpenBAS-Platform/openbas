@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
-import { FunctionComponent, SyntheticEvent, useState } from 'react';
+import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
@@ -24,9 +24,7 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-interface FormProps {
-  file: File;
-}
+interface FormProps { file: File }
 
 interface Props {
   handleClose: () => void;
@@ -51,9 +49,7 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
   } = useForm<FormProps>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<FormProps>().with({
-        file: z.instanceof(File),
-      }),
+      zodImplement<FormProps>().with({ file: z.instanceof(File) }),
     ),
   });
 

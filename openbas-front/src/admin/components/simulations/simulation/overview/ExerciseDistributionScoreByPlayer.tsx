@@ -1,24 +1,20 @@
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { UserHelper } from '../../../../../actions/helper';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { type UserHelper } from '../../../../../actions/helper';
+import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Exercise, InjectExpectation, User } from '../../../../../utils/api-types';
+import { type Exercise, type InjectExpectation, type User } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 import { resolveUserName } from '../../../../../utils/String';
 
-interface Props {
-  exerciseId: Exercise['exercise_id'];
-}
+interface Props { exerciseId: Exercise['exercise_id'] }
 
-const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({
-  exerciseId,
-}) => {
+const ExerciseDistributionScoreByPlayer: FunctionComponent<Props> = ({ exerciseId }) => {
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();

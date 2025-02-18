@@ -1,5 +1,5 @@
 import { ContentCopyOutlined } from '@mui/icons-material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { truncate } from '../utils/String';
@@ -26,18 +26,14 @@ const useStyles = makeStyles()(theme => ({
     'right': 0,
     'top': 0,
     'cursor': 'pointer',
-    '&:hover': {
-      color: theme.palette.primary.main,
-    },
+    '&:hover': { color: theme.palette.primary.main },
   },
   iconInline: {
     'position': 'absolute',
     'right': 5,
     'top': 4,
     'cursor': 'pointer',
-    '&:hover': {
-      color: theme.palette.primary.main,
-    },
+    '&:hover': { color: theme.palette.primary.main },
   },
 }));
 

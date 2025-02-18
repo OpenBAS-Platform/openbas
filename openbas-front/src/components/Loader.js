@@ -14,9 +14,7 @@ const styles = () => ({
     height: '100%',
     display: 'table',
   },
-  containerSizeXS: {
-    width: 'auto',
-  },
+  containerSizeXS: { width: 'auto' },
   loader: {
     width: '100%',
     margin: 0,
@@ -35,9 +33,7 @@ const styles = () => ({
     verticalAlign: 'middle',
     textAlign: 'center',
   },
-  loaderCircle: {
-    display: 'inline-block',
-  },
+  loaderCircle: { display: 'inline-block' },
 });
 
 class Loader extends Component {

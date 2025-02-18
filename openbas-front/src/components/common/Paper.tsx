@@ -1,11 +1,8 @@
 import { Paper as PaperMui } from '@mui/material';
-import { FunctionComponent } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-interface PaperProps {
-  children: React.ReactElement;
-}
+interface PaperProps { children: ReactElement }
 
 const useStyles = makeStyles()(() => ({
   paper: {

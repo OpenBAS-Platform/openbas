@@ -1,17 +1,17 @@
 import { ChevronRightOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
-import type { UserHelper } from '../../../../actions/helper';
+import { type ChannelsHelper } from '../../../../actions/channels/channel-helper';
+import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { useFormatter } from '../../../../components/i18n';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useHelper } from '../../../../store';
-import type { Channel } from '../../../../utils/api-types';
+import { type Channel } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -107,7 +107,10 @@ const Channels = () => {
   const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('channel', 'name', searchColumns);
   // Fetching data
-  const { channels, userAdmin }: { channels: Channel[]; userAdmin: boolean } = useHelper((helper: ChannelsHelper & UserHelper) => ({
+  const { channels, userAdmin }: {
+    channels: Channel[];
+    userAdmin: boolean;
+  } = useHelper((helper: ChannelsHelper & UserHelper) => ({
     channels: helper.getChannels(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
@@ -117,7 +120,13 @@ const Channels = () => {
   const sortedChannels: Channel[] = filtering.filterAndSort(channels);
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Channels'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Components') }, {
+          label: t('Channels'),
+          current: true,
+        }]}
+      />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -136,7 +145,11 @@ const Channels = () => {
         >
           <ListItemIcon>
             <span
-              style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
             >
             &nbsp;
             </span>

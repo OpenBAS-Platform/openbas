@@ -13,15 +13,32 @@ const parseMarkdownLine = (line: string): Content[] => {
     }
 
     if (boldText) {
-      tokens.push({ text: boldText, style: 'boldText' });
+      tokens.push({
+        text: boldText,
+        style: 'boldText',
+      });
     } else if (strikethroughText) {
-      tokens.push({ text: strikethroughText, decoration: 'lineThrough' });
+      tokens.push({
+        text: strikethroughText,
+        decoration: 'lineThrough',
+      });
     } else if (italicText) {
-      tokens.push({ text: italicText, style: 'italicText' });
+      tokens.push({
+        text: italicText,
+        style: 'italicText',
+      });
     } else if (linkText && linkUrl) {
-      tokens.push({ text: linkText, link: linkUrl, color: 'blue' });
+      tokens.push({
+        text: linkText,
+        link: linkUrl,
+        color: 'blue',
+      });
     } else if (codeText) {
-      tokens.push({ text: codeText, background: '#d9d9d9', margin: [0, 5, 0, 5] });
+      tokens.push({
+        text: codeText,
+        background: '#d9d9d9',
+        margin: [0, 5, 0, 5],
+      });
     }
 
     lastIndex = offset + match.length;
@@ -43,11 +60,22 @@ const convertMarkdownToPdfMake = (markdown: string): Content[] => {
     if (line.startsWith('-')) {
       content.push({ ul: [{ text: convertMarkdownToPdfMake(line.replace('-', '')) as Content[] }] });
     } else if (line.startsWith('> ')) {
-      content.push({ text: line.replace('> ', ''), margin: [5, 2, 0, 2], background: '#f1f2f3', style: 'italicText' });
+      content.push({
+        text: line.replace('> ', ''),
+        margin: [5, 2, 0, 2],
+        background: '#f1f2f3',
+        style: 'italicText',
+      });
     } else if (line.startsWith('# ')) {
-      content.push({ text: line.replace('# ', ''), style: 'markdownHeaderH1' });
+      content.push({
+        text: line.replace('# ', ''),
+        style: 'markdownHeaderH1',
+      });
     } else if (line.startsWith('## ')) {
-      content.push({ text: line.replace('## ', ''), style: 'markdownHeaderH2' });
+      content.push({
+        text: line.replace('## ', ''),
+        style: 'markdownHeaderH2',
+      });
     } else if (line.startsWith('### ')) {
       content.push({ text: line.replace('### ', '') });
     } else if (line.trim().length > 0) {

@@ -2,11 +2,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../components/i18n';
 
-const useStyles = makeStyles()({
-  root: {
-    flexGrow: 1,
-  },
-});
+const useStyles = makeStyles()({ root: { flexGrow: 1 } });
 
 const Dashboard = () => {
   const { classes } = useStyles();

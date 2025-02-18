@@ -1,13 +1,13 @@
 import { Autocomplete as MuiAutocomplete, Box, TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { CSSProperties, FunctionComponent } from 'react';
-import { FieldErrors } from 'react-hook-form';
+import { type CSSProperties, type FunctionComponent } from 'react';
+import { type FieldErrors } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import type { SecurityPlatformHelper } from '../../actions/assets/asset-helper';
+import { type SecurityPlatformHelper } from '../../actions/assets/asset-helper';
 import { fetchSecurityPlatforms } from '../../actions/assets/securityPlatform-actions';
 import { useHelper } from '../../store';
-import type { SecurityPlatform } from '../../utils/api-types';
+import { type SecurityPlatform } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 
@@ -21,9 +21,7 @@ const useStyles = makeStyles()(() => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 }));
 
 interface Props {
@@ -64,9 +62,7 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { securityPlatforms }: { securityPlatforms: SecurityPlatform[] } = useHelper((helper: SecurityPlatformHelper) => ({
-    securityPlatforms: helper.getSecurityPlatforms(),
-  }));
+  const { securityPlatforms }: { securityPlatforms: SecurityPlatform[] } = useHelper((helper: SecurityPlatformHelper) => ({ securityPlatforms: helper.getSecurityPlatforms() }));
   useDataLoader(() => {
     dispatch(fetchSecurityPlatforms());
   });
@@ -98,7 +94,11 @@ const SecurityPlatformField: FunctionComponent<Props> = ({
                 <img
                   src={`/api/images/security_platforms/id/${option.id}/${theme.palette.mode}`}
                   alt={option.label}
-                  style={{ width: 25, height: 25, borderRadius: 4 }}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 4,
+                  }}
                 />
               </div>
               <div className={classes.text}>{option.label}</div>

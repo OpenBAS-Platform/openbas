@@ -48,9 +48,7 @@ const styles = theme => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 });
 
 class InjectForm extends Component {
@@ -64,7 +62,7 @@ class InjectForm extends Component {
       isAtomic = false,
     } = this.props;
     return (
-      <>
+      <div>
         <TextField
           variant="standard"
           inputProps={register('inject_title')}
@@ -131,7 +129,7 @@ class InjectForm extends Component {
             />
           </div>
         )}
-      </>
+      </div>
     );
   }
 }

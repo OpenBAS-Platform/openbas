@@ -41,10 +41,16 @@ const dagreLayout: LayoutAlgorithm = async (nodes, edges, options) => {
       y: y - (node.height ?? 0) / 2,
     };
 
-    return { ...node, position };
+    return {
+      ...node,
+      position,
+    };
   });
 
-  return { nodes: nextNodes, edges };
+  return {
+    nodes: nextNodes,
+    edges,
+  };
 };
 
 export default dagreLayout;

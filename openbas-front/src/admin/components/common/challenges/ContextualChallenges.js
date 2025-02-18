@@ -26,9 +26,7 @@ const useStyles = makeStyles()(() => ({
     maxWidth: 300,
     borderRadius: 4,
   },
-  card: {
-    position: 'relative',
-  },
+  card: { position: 'relative' },
   footer: {
     width: '100%',
     position: 'absolute',
@@ -36,9 +34,7 @@ const useStyles = makeStyles()(() => ({
     left: 0,
     bottom: 10,
   },
-  button: {
-    cursor: 'default',
-  },
+  button: { cursor: 'default' },
   createButton: {
     float: 'left',
     marginTop: -15,
@@ -106,7 +102,10 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
-                sx={{ width: '100%', height: '100%' }}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                }}
               >
                 <CardHeader
                   avatar={(

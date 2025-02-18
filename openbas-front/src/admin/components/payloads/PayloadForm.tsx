@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Button, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, TextField } from '@mui/material';
-import { FormEvent, FunctionComponent } from 'react';
-import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import { type FormEvent, type FunctionComponent } from 'react';
+import { Controller, type SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
@@ -12,13 +12,11 @@ import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import { useFormatter } from '../../../components/i18n';
 import PlatformField from '../../../components/PlatformField';
-import type { PayloadCreateInput } from '../../../utils/api-types';
-import type { Option } from '../../../utils/Option';
+import { type PayloadCreateInput } from '../../../utils/api-types';
+import { type Option } from '../../../utils/Option';
 
 const useStyles = makeStyles()(() => ({
-  errorColor: {
-    color: '#f44336',
-  },
+  errorColor: { color: '#f44336' },
   tuple: {
     marginTop: 5,
     paddingTop: 0,
@@ -113,14 +111,10 @@ const PayloadForm: FunctionComponent<Props> = ({
       });
       break;
     case 'FileDrop':
-      extendedSchema = baseSchema.extend({
-        file_drop_file: z.string().min(1, { message: t('Should not be empty') }),
-      });
+      extendedSchema = baseSchema.extend({ file_drop_file: z.string().min(1, { message: t('Should not be empty') }) });
       break;
     case 'DnsResolution':
-      extendedSchema = baseSchema.extend({
-        dns_resolution_hostname: z.string().min(1, { message: t('Should not be empty') }),
-      });
+      extendedSchema = baseSchema.extend({ dns_resolution_hostname: z.string().min(1, { message: t('Should not be empty') }) });
       break;
     default:
       extendedSchema = baseSchema;
@@ -352,7 +346,11 @@ const PayloadForm: FunctionComponent<Props> = ({
           {t('Arguments')}
           <IconButton
             onClick={() => {
-              append({ type: 'text', key: '', default_value: '' });
+              append({
+                type: 'text',
+                key: '',
+                default_value: '',
+              });
             }}
             aria-haspopup="true"
             size="medium"
@@ -563,7 +561,11 @@ const PayloadForm: FunctionComponent<Props> = ({
         )}
       />
 
-      <div style={{ float: 'right', marginTop: 20 }}>
+      <div style={{
+        float: 'right',
+        marginTop: 20,
+      }}
+      >
         <Button
           variant="contained"
           onClick={handleClose}

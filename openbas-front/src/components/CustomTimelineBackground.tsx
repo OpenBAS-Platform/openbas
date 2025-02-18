@@ -1,14 +1,15 @@
 import { useTheme } from '@mui/material/styles';
 import { type BackgroundProps, type ReactFlowState, useStore } from '@xyflow/react';
 import cc from 'classcat';
-import { CSSProperties, memo, useRef } from 'react';
+import { type CSSProperties, memo, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
 
-interface Props extends BackgroundProps {
-  minutesPerGap: number;
-}
+interface Props extends BackgroundProps { minutesPerGap: number }
 
-const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
+const selector = (s: ReactFlowState) => ({
+  transform: s.transform,
+  patternId: `pattern-${s.rfId}`,
+});
 
 /**
  * Custom background for the timeline
@@ -65,9 +66,7 @@ function BackgroundComponent({
         patternTransform={`translate(-${patternOffset[0]},-${patternOffset[1]})`}
       >
         <svg
-          style={{
-            transform: `scale(${transform[2]})`,
-          }}
+          style={{ transform: `scale(${transform[2]})` }}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
