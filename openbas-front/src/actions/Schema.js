@@ -28,9 +28,7 @@ export const arrayOfInjectStatuses = new schema.Array(injectStatus);
 export const platformParameters = new schema.Entity(
   'platformParameters',
   {},
-  {
-    idAttribute: () => 'parameters',
-  },
+  { idAttribute: () => 'parameters' },
 );
 
 export const token = new schema.Entity(
@@ -290,7 +288,7 @@ export const storeHelper = state => ({
   getMeTokens: () => entities('tokens', state).filter(
     t => t.token_user === me(state)?.user_id,
   ),
-  getStatistics: () => state.referential.entities.statistics?.openbas,
+  getStatistics: () => state.referential.entities.statistics?.openbas?.asMutable({ deep: true }),
   // exercises
   getExercises: () => entities('exercises', state),
   getExercisesMap: () => maps('exercises', state),
@@ -382,7 +380,7 @@ export const storeHelper = state => ({
   getTeams: () => entities('teams', state),
   getTeamsMap: () => maps('teams', state),
   getPlatformSettings: () => {
-    return state.referential.entities.platformParameters.parameters || {};
+    return state.referential.entities.platformParameters.parameters?.asMutable({ deep: true }) || {};
   },
   // kill chain phases
   getKillChainPhase: id => entity(id, 'killchainphases', state),

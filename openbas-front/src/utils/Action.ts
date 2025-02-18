@@ -1,9 +1,9 @@
-import { AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import { FORM_ERROR } from 'final-form';
-import type { Schema } from 'normalizr';
+import { type Schema } from 'normalizr';
 import * as R from 'ramda';
 import { createIntl, createIntlCache } from 'react-intl';
-import { Dispatch } from 'redux';
+import { type Dispatch } from 'redux';
 import Immutable from 'seamless-immutable';
 
 import { LANG } from '../components/AppIntlProvider';
@@ -140,11 +140,17 @@ export const getReferential = (schema: Schema, uri: string) => (dispatch: Dispat
   return api(schema)
     .get(buildUri(uri))
     .then((response) => {
-      dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
+      dispatch({
+        type: Constants.DATA_FETCH_SUCCESS,
+        payload: response.data,
+      });
       return response.data;
     })
     .catch((error) => {
-      dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      dispatch({
+        type: Constants.DATA_FETCH_ERROR,
+        payload: error,
+      });
       notifyError(error);
       throw error;
     });
@@ -155,13 +161,22 @@ export const putReferential = (schema: Schema, uri: string, data: unknown) => (d
   return api(schema)
     .put(buildUri(uri), data)
     .then((response) => {
-      dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
-      dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: response.data });
+      dispatch({
+        type: Constants.DATA_FETCH_SUCCESS,
+        payload: response.data,
+      });
+      dispatch({
+        type: Constants.DATA_UPDATE_SUCCESS,
+        payload: response.data,
+      });
       notifySuccess('The element has been successfully updated');
       return response.data;
     })
     .catch((error: AxiosError) => {
-      dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      dispatch({
+        type: Constants.DATA_FETCH_ERROR,
+        payload: error,
+      });
       notifyError(error);
       return buildError(error);
     });
@@ -172,12 +187,18 @@ export const postReferential = (schema: Schema | null, uri: string, data: unknow
   return api(schema)
     .post(buildUri(uri), data)
     .then((response) => {
-      dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
+      dispatch({
+        type: Constants.DATA_FETCH_SUCCESS,
+        payload: response.data,
+      });
       notifySuccess('The element has been successfully updated');
       return response.data;
     })
     .catch((error) => {
-      dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      dispatch({
+        type: Constants.DATA_FETCH_ERROR,
+        payload: error,
+      });
       notifyError(error);
       return buildError(error);
     });
@@ -190,12 +211,18 @@ export const delReferential = (uri: string, type: string, id: string) => (dispat
     .then(() => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
-        payload: Immutable({ type, id }),
+        payload: Immutable({
+          type,
+          id,
+        }),
       });
       notifySuccess('The element has been successfully deleted');
     })
     .catch((error) => {
-      dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      dispatch({
+        type: Constants.DATA_FETCH_ERROR,
+        payload: error,
+      });
       notifyError(error);
       throw error;
     });
@@ -208,12 +235,18 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
     .then((response) => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
-        payload: Immutable({ type, data }),
+        payload: Immutable({
+          type,
+          data,
+        }),
       });
       return response.data;
     })
     .catch((error) => {
-      dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
+      dispatch({
+        type: Constants.DATA_FETCH_ERROR,
+        payload: error,
+      });
       notifyError(error);
       throw error;
     });

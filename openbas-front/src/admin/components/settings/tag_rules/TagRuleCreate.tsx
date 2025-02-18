@@ -1,18 +1,16 @@
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { addTagRule } from '../../../../actions/tag_rules/tagrule-actions';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type {
-  TagRuleInput,
-  TagRuleOutput,
+import {
+  type TagRuleInput,
+  type TagRuleOutput,
 } from '../../../../utils/api-types';
 import TagRuleForm from './TagRuleForm';
 
-interface TagRuleCreateComponentProps {
-  onCreate?: (result: TagRuleOutput) => void;
-}
+interface TagRuleCreateComponentProps { onCreate?: (result: TagRuleOutput) => void }
 const TagRuleCreate: FunctionComponent<TagRuleCreateComponentProps> = ({ onCreate }) => {
   const [open, setOpen] = useState(false);
   const { t } = useFormatter();

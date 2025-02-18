@@ -1,11 +1,11 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { FunctionComponent, useContext, useState } from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
 import { PermissionsContext } from '../../admin/components/common/Context';
-import type { RawDocument } from '../../utils/api-types';
+import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
 import { useFormatter } from '../i18n';
@@ -25,7 +25,10 @@ const useStyles = makeStyles()(theme => ({
 
 interface Props {
   hasAttachments?: boolean;
-  handleAddDocuments: (documents: { document_id: string; document_attached: boolean }[]) => void;
+  handleAddDocuments: (documents: {
+    document_id: string;
+    document_attached: boolean;
+  }[]) => void;
   initialDocumentIds: string[];
 }
 

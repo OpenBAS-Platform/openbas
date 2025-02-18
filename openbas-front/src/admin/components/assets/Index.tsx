@@ -11,11 +11,7 @@ const IndexEndpoint = lazy(() => import('./endpoints/endpoint/Index'));
 const AssetGroups = lazy(() => import('./asset_groups/AssetGroups'));
 const SecurityPlatforms = lazy(() => import('./security_platforms/SecurityPlatforms'));
 
-const useStyles = makeStyles()(() => ({
-  root: {
-    flexGrow: 1,
-  },
-}));
+const useStyles = makeStyles()(() => ({ root: { flexGrow: 1 } }));
 
 const Index = () => {
   const { classes } = useStyles();

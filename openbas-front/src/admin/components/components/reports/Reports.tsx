@@ -1,10 +1,9 @@
 import { ContentPasteOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useContext } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, useContext } from 'react';
 
 import { useFormatter } from '../../../../components/i18n';
-import type { Report } from '../../../../utils/api-types';
+import { type Report } from '../../../../utils/api-types';
 import { PermissionsContext } from '../../common/Context';
 import ReportPopover from './ReportPopover';
 
@@ -13,13 +12,17 @@ interface Props {
   navigateToReportPage: (id: string) => void;
 }
 
-const Reports: React.FC<Props> = ({ reports, navigateToReportPage }) => {
+const Reports: FunctionComponent<Props> = ({ reports, navigateToReportPage }) => {
   const { t } = useFormatter();
   const { permissions } = useContext(PermissionsContext);
 
   if (reports.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: 20 }}>
+      <div style={{
+        textAlign: 'center',
+        padding: 20,
+      }}
+      >
         <i>{t('There is no report for this simulation yet')}</i>
       </div>
     );
@@ -32,7 +35,10 @@ const Reports: React.FC<Props> = ({ reports, navigateToReportPage }) => {
           <ListItem
             key={report.report_id}
             divider={true}
-            style={{ height: 50, padding: 0 }}
+            style={{
+              height: 50,
+              padding: 0,
+            }}
             secondaryAction={permissions.canWrite
             && (
               <ReportPopover

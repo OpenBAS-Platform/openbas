@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import { AttackPattern, InjectorContractOutput } from '../api-types';
+import { type AttackPattern, type InjectorContractOutput } from '../api-types';
 
 const computeAttackPatterns = (attackPatternIds: InjectorContractOutput['injector_contract_attack_patterns'], attackPatternsMap: Record<string, AttackPattern>) => {
   const attackPatternParents = (attackPatternIds ?? []).flatMap((attackPattern) => {

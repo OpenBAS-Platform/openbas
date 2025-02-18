@@ -4,15 +4,15 @@ import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField, Tool
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { InformationOutline } from 'mdi-material-ui';
 import moment from 'moment-timezone';
-import { FunctionComponent, SyntheticEvent, useContext, useEffect, useState } from 'react';
+import { type FunctionComponent, type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { searchMappers } from '../../../../actions/mapper/mapper-actions';
-import type { Page } from '../../../../components/common/queryable/Page';
+import { type Page } from '../../../../components/common/queryable/Page';
 import { useFormatter } from '../../../../components/i18n';
-import type { ImportMapper, ImportMessage, ImportTestSummary, InjectsImportInput } from '../../../../utils/api-types';
+import { type ImportMapper, type ImportMessage, type ImportTestSummary, type InjectsImportInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import { InjectContext } from '../Context';
 
@@ -90,9 +90,7 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
         path: ['startDate'],
       }),
     ),
-    defaultValues: {
-      timezone: moment.tz.guess(),
-    },
+    defaultValues: { timezone: moment.tz.guess() },
   });
 
   // Mapper
@@ -240,7 +238,10 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
                           <InformationOutline
                             fontSize="small"
                             color="primary"
-                            style={{ marginLeft: 4, cursor: 'default' }}
+                            style={{
+                              marginLeft: 4,
+                              cursor: 'default',
+                            }}
                           />
                         </Tooltip>
                       </Box>

@@ -1,10 +1,10 @@
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { deleteExercise, duplicateExercise, updateExercise } from '../../../../actions/Exercise';
 import { checkExerciseTagRules } from '../../../../actions/exercises/exercise-action';
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import { type TagHelper, type UserHelper } from '../../../../actions/helper';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogApplyTagRule from '../../../../components/common/DialogApplyTagRule';
 import DialogDelete from '../../../../components/common/DialogDelete';
@@ -13,10 +13,10 @@ import Drawer from '../../../../components/common/Drawer';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type {
-  CheckScenarioRulesOutput,
-  Exercise,
-  UpdateExerciseInput,
+import {
+  type CheckScenarioRulesOutput,
+  type Exercise,
+  type UpdateExerciseInput,
 } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
@@ -83,7 +83,10 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const handleCloseDuplicate = () => setOpenDuplicate(false);
 
   const submitDuplicate = () => {
-    dispatch(duplicateExercise(exercise.exercise_id)).then((result: { result: string; entities: { exercises: Exercise } }) => {
+    dispatch(duplicateExercise(exercise.exercise_id)).then((result: {
+      result: string;
+      entities: { exercises: Exercise };
+    }) => {
       handleCloseDuplicate();
       navigate(`/admin/simulations/${result.result}`);
     });
@@ -121,17 +124,32 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   const permissions = usePermissions(exercise.exercise_id);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWriteBypassStatus });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !userAdmin });
-  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
-  if (actions.includes('Access reports')) entries.push({ label: 'Access reports', action: () => handleOpenReports() });
+  if (actions.includes('Duplicate')) entries.push({
+    label: 'Duplicate',
+    action: () => handleOpenDuplicate(),
+  });
+  if (actions.includes('Update')) entries.push({
+    label: 'Update',
+    action: () => handleOpenEdit(),
+    disabled: !permissions.canWriteBypassStatus,
+  });
+  if (actions.includes('Delete')) entries.push({
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+    disabled: !userAdmin,
+  });
+  if (actions.includes('Export')) entries.push({
+    label: 'Export',
+    action: () => handleOpenExport(),
+  });
+  if (actions.includes('Access reports')) entries.push({
+    label: 'Access reports',
+    action: () => handleOpenReports(),
+  });
 
   const submitExerciseUpdate = (data: UpdateExerciseInput) => {
     const input = {

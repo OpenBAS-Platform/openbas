@@ -1,9 +1,9 @@
 import { AttachMoneyOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { CSSProperties, FunctionComponent, useContext } from 'react';
+import { type CSSProperties, type FunctionComponent, useContext } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { Variable } from '../../../../utils/api-types';
+import { type Variable } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { PermissionsContext, VariableContext } from '../../common/Context';
 import VariablePopover from './VariablePopover';
@@ -13,9 +13,7 @@ const useStyles = makeStyles()(() => ({
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
-  item: {
-    height: 50,
-  },
+  item: { height: 50 },
   bodyItem: {
     height: '100%',
     fontSize: 13,
@@ -85,9 +83,7 @@ const inlineStyles: {
   },
 };
 
-interface Props {
-  variables: Variable[];
-}
+interface Props { variables: Variable[] }
 
 const Variables: FunctionComponent<Props> = ({ variables }) => {
   // Standard hooks
@@ -110,7 +106,11 @@ const Variables: FunctionComponent<Props> = ({ variables }) => {
       >
         <ListItemIcon>
           <span
-            style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}
+            style={{
+              padding: '0 8px 0 10px',
+              fontWeight: 700,
+              fontSize: 12,
+            }}
           >
             #
           </span>

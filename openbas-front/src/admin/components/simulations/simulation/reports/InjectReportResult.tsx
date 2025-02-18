@@ -1,11 +1,10 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { CSSProperties } from 'react';
-import * as React from 'react';
-import { SubmitHandler } from 'react-hook-form';
+import { type CSSProperties, type FunctionComponent } from 'react';
+import { type SubmitHandler } from 'react-hook-form';
 
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTargets from '../../../../../components/ItemTargets';
-import type { InjectResultOutput, ReportInjectComment } from '../../../../../utils/api-types';
+import { type InjectResultOutput, type ReportInjectComment } from '../../../../../utils/api-types';
 import AtomicTestingResult from '../../../atomic_testings/atomic_testing/AtomicTestingResult';
 import InjectorContract from '../../../common/injects/InjectorContract';
 import ReportComment from '../../../components/reports/ReportComment';
@@ -18,7 +17,7 @@ interface Props {
   onCommentSubmit?: SubmitHandler<ReportInjectComment>;
 }
 
-const InjectReportResult: React.FC<Props> = ({
+const InjectReportResult: FunctionComponent<Props> = ({
   style,
   injects,
   injectsComments = [],
@@ -30,7 +29,10 @@ const InjectReportResult: React.FC<Props> = ({
   const findInjectCommentsByInjectId = (injectId: InjectResultOutput['inject_id']) => (injectsComments ?? []).find(c => c.inject_id === injectId) ?? null;
 
   const saveComment = (injectId: ReportInjectComment['inject_id'], value: string) => {
-    onCommentSubmit({ inject_id: injectId, report_inject_comment: value });
+    onCommentSubmit({
+      inject_id: injectId,
+      report_inject_comment: value,
+    });
   };
 
   const columns = [
@@ -80,13 +82,21 @@ const InjectReportResult: React.FC<Props> = ({
       </Typography>
 
       <Paper variant="outlined">
-        <TableContainer style={{ maxHeight: 'none', overflow: 'visible' }}>
+        <TableContainer style={{
+          maxHeight: 'none',
+          overflow: 'visible',
+        }}
+        >
           <Table aria-label="injects results">
             <TableHead>
               <TableRow>
                 {columns.map(col => (
                   <TableCell
-                    sx={col.label === 'Comments' ? { padding: '0px', width: '35%', flexGrow: 1 } : {}}
+                    sx={col.label === 'Comments' ? {
+                      padding: '0px',
+                      width: '35%',
+                      flexGrow: 1,
+                    } : {}}
                     key={col.label}
                   >
                     {' '}
@@ -104,7 +114,12 @@ const InjectReportResult: React.FC<Props> = ({
                 >
                   {columns.map(col => (
                     <TableCell
-                      sx={col.label === 'Comments' ? { padding: '16px 0 16px 0', width: '35%', flexGrow: 1, alignItems: 'flex-start' } : { verticalAlign: 'top' }}
+                      sx={col.label === 'Comments' ? {
+                        padding: '16px 0 16px 0',
+                        width: '35%',
+                        flexGrow: 1,
+                        alignItems: 'flex-start',
+                      } : { verticalAlign: 'top' }}
                       key={`${inject.inject_id}-${col.label}`}
                     >
                       {col.render(inject)}

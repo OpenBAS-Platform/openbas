@@ -21,15 +21,16 @@ const styles = () => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 });
 
 class KillChainPhaseField extends Component {
   constructor(props) {
     super(props);
-    this.state = { killChainPhaseCreation: false, killChainPhaseInput: '' };
+    this.state = {
+      killChainPhaseCreation: false,
+      killChainPhaseInput: '',
+    };
   }
 
   handleOpenKillChainPhaseCreation() {

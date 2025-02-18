@@ -1,13 +1,13 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import { CSSProperties, useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
-import type { ExecutorHelper } from '../../../../actions/executors/executor-helper';
-import type { UserHelper } from '../../../../actions/helper';
+import { type ExecutorHelper } from '../../../../actions/executors/executor-helper';
+import { type UserHelper } from '../../../../actions/helper';
 import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
@@ -20,7 +20,7 @@ import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { EndpointOutput, ExecutorOutput } from '../../../../utils/api-types';
+import { type EndpointOutput, type ExecutorOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -29,12 +29,8 @@ import AgentPrivilege from './AgentPrivilege';
 import EndpointPopover from './EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
   bodyItems: {
     display: 'flex',
     alignItems: 'center',
@@ -49,31 +45,21 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  asset_name: {
-    width: '25%',
-  },
-  endpoint_active: {
-    width: '10%',
-  },
-  endpoint_agents_privilege: {
-    width: '12%',
-  },
+  asset_name: { width: '25%' },
+  endpoint_active: { width: '10%' },
+  endpoint_agents_privilege: { width: '12%' },
   endpoint_platform: {
     width: '10%',
     display: 'flex',
     alignItems: 'center',
   },
-  endpoint_arch: {
-    width: '10%',
-  },
+  endpoint_arch: { width: '10%' },
   endpoint_agents_executor: {
     width: '13%',
     display: 'flex',
     alignItems: 'center',
   },
-  asset_tags: {
-    width: '15%',
-  },
+  asset_tags: { width: '15%' },
 };
 
 const Endpoints = () => {
@@ -125,7 +111,10 @@ const Endpoints = () => {
     const activeCount = endpoint.asset_agents.filter(agent => agent.agent_active).length;
     const inactiveCount = endpoint.asset_agents.length - activeCount;
     const isActive = activeCount > 0;
-    return { isActive: isActive, activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount };
+    return {
+      isActive: isActive,
+      activeMsgTooltip: t('Active') + ' : ' + activeCount + ' | ' + t('Inactive') + ' : ' + inactiveCount,
+    };
   };
 
   const getPrivilegesCount = (endpoint: EndpointOutput) => {
@@ -137,9 +126,15 @@ const Endpoints = () => {
         count.user += 1;
       }
       return count;
-    }, { admin: 0, user: 0 });
+    }, {
+      admin: 0,
+      user: 0,
+    });
 
-    return { adminCount: privilegeCount?.admin, userCount: privilegeCount?.user };
+    return {
+      adminCount: privilegeCount?.admin,
+      userCount: privilegeCount?.user,
+    };
   };
 
   const getExecutorsCount = (endpoint: EndpointOutput) => {
@@ -237,11 +232,20 @@ const Endpoints = () => {
                 if (count > 0) {
                   return (
                     <Tooltip key={executorType} title={`${base.executor_name} : ${count}`} arrow>
-                      <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                      }}
+                      >
                         <img
                           src={`/api/images/executors/${executorType}`}
                           alt={executorType}
-                          style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                          style={{
+                            width: 25,
+                            height: 25,
+                            borderRadius: 4,
+                            marginRight: 10,
+                          }}
                         />
                       </div>
                     </Tooltip>
@@ -267,7 +271,13 @@ const Endpoints = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Endpoints'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Assets') }, {
+          label: t('Endpoints'),
+          current: true,
+        }]}
+      />
       <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
         {t('To register new endpoints, you will need to install an agent. You can find detailed instructions on the ')}
         <a href={`${settings.platform_base_url}/admin/agents`} target="_blank" rel="noopener noreferrer">
@@ -318,7 +328,10 @@ const Endpoints = () => {
                   && (
                     <EndpointPopover
                       inline
-                      endpoint={{ ...endpoint, type: 'static' }}
+                      endpoint={{
+                        ...endpoint,
+                        type: 'static',
+                      }}
                       onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
                     />
                   ))

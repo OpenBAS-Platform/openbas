@@ -1,16 +1,16 @@
 import { PersonOutlined } from '@mui/icons-material';
 import { Box, Button } from '@mui/material';
-import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 
 import { findUsers, searchUsers } from '../../../../actions/User';
 import Drawer from '../../../../components/common/Drawer';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
+import SelectList, { type SelectListElements } from '../../../../components/common/SelectList';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
-import type { UserOutput } from '../../../../utils/api-types';
+import { type UserOutput } from '../../../../utils/api-types';
 import { resolveUserName } from '../../../../utils/String';
 
 interface Props {
@@ -39,9 +39,7 @@ const GroupManageUsers: FunctionComponent<Props> = ({
 
   // Headers
   const elements: SelectListElements<UserOutput> = useMemo(() => ({
-    icon: {
-      value: () => <PersonOutlined />,
-    },
+    icon: { value: () => <PersonOutlined /> },
     headers: [
       {
         field: 'user_name',
@@ -104,7 +102,11 @@ const GroupManageUsers: FunctionComponent<Props> = ({
           paginationComponent={paginationComponent}
           getName={(user: UserOutput) => resolveUserName(user)}
         />
-        <div style={{ float: 'right', marginTop: 20 }}>
+        <div style={{
+          float: 'right',
+          marginTop: 20,
+        }}
+        >
           <Button variant="contained" style={{ marginRight: 10 }} onClick={onClose}>
             {t('Cancel')}
           </Button>

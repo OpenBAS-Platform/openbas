@@ -1,14 +1,12 @@
 import { useTheme } from '@mui/material/styles';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../i18n';
-import { Scale } from './Tick';
+import { type Scale } from './Tick';
 
 const useStyles = makeStyles()(theme => ({
-  scaleBar: {
-    position: 'relative',
-  },
+  scaleBar: { position: 'relative' },
   track: {
     display: 'flex',
     width: '100%',
@@ -48,13 +46,9 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-interface Props {
-  expectationExpectedScore: number;
-}
+interface Props { expectationExpectedScore: number }
 
-const ScaleBar: FunctionComponent<Props> = ({
-  expectationExpectedScore,
-}) => {
+const ScaleBar: FunctionComponent<Props> = ({ expectationExpectedScore }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
@@ -102,14 +96,28 @@ const ScaleBar: FunctionComponent<Props> = ({
           <>
             <div className={classes.redTrack} style={{ width: '95%' }}>
               {expectationExpectedScore < 100 && (
-                <div className={classes.expectationScoreValue} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div
+                  className={classes.expectationScoreValue}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                  }}
+                >
                   <span>{expectationExpectedScore}</span>
                 </div>
               )}
               <div className={classes.failureLabel}><span>{scale.min.label}</span></div>
             </div>
             <div style={{ width: '5%' }}>
-              <div className={classes.successLabel} style={{ top: 0, marginTop: '3px' }}><span>{scale.ticks[0].label}</span></div>
+              <div
+                className={classes.successLabel}
+                style={{
+                  top: 0,
+                  marginTop: '3px',
+                }}
+              >
+                <span>{scale.ticks[0].label}</span>
+              </div>
             </div>
           </>
         )}

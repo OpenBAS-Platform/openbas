@@ -7,7 +7,7 @@ import {
   updateInjectActivationForScenario,
   updateInjectForScenario,
 } from '../../../../actions/Inject';
-import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
+import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { bulkTestInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
 import {
   dryImportXlsForScenario,
@@ -15,16 +15,16 @@ import {
   fetchScenarioTeams,
   importXlsForScenario,
 } from '../../../../actions/scenarios/scenario-actions';
-import { Page } from '../../../../components/common/queryable/Page';
-import type {
-  ImportTestSummary,
-  Inject,
-  InjectBulkProcessingInput,
-  InjectBulkUpdateInputs,
-  InjectsImportInput,
-  InjectTestStatusOutput,
-  Scenario,
-  SearchPaginationInput,
+import { type Page } from '../../../../components/common/queryable/Page';
+import {
+  type ImportTestSummary,
+  type Inject,
+  type InjectBulkProcessingInput,
+  type InjectBulkUpdateInputs,
+  type InjectsImportInput,
+  type InjectTestStatusOutput,
+  type Scenario,
+  type SearchPaginationInput,
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
@@ -35,13 +35,19 @@ const injectContextForScenario = (scenario: Scenario) => {
     searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
       return searchScenarioInjectsSimple(scenario.scenario_id, input);
     },
-    onAddInject(inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
+    onAddInject(inject: Inject): Promise<{
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }> {
       return dispatch(addInjectForScenario(scenario.scenario_id, inject));
     },
     onBulkUpdateInject(param: InjectBulkUpdateInputs): Promise<Inject[] | void> {
       return bulkUpdateInjectSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
-    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
+    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }> {
       return dispatch(updateInjectForScenario(scenario.scenario_id, injectId, inject));
     },
     onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
@@ -67,7 +73,10 @@ const injectContextForScenario = (scenario: Scenario) => {
     onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
       return bulkDeleteInjectsSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
-    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatusOutput[] }> {
+    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{
+      uri: string;
+      data: InjectTestStatusOutput[];
+    }> {
       return bulkTestInjects(param).then(result => ({
         uri: `/admin/scenarios/${scenario.scenario_id}/tests`,
         data: result.data,

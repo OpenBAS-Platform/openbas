@@ -66,7 +66,11 @@ class ChannelForm extends Component {
               label={t('Subtitle')}
               style={{ marginTop: 20 }}
             />
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div style={{
+              float: 'right',
+              marginTop: 20,
+            }}
+            >
               <Button
                 onClick={handleClose.bind(this)}
                 style={{ marginRight: 10 }}

@@ -51,7 +51,11 @@ const LessonsObjectives = ({
                     marginRight: 1,
                   }}
                 >
-                  <Box sx={{ width: '100%', mr: 1 }}>
+                  <Box sx={{
+                    width: '100%',
+                    mr: 1,
+                  }}
+                  >
                     <LinearProgress
                       variant="determinate"
                       value={objective.objective_score}

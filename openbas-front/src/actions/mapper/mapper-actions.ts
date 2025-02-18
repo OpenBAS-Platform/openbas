@@ -1,11 +1,11 @@
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
-import type {
-  ExportMapperInput,
-  ImportMapperAddInput,
-  ImportMapperUpdateInput,
-  InjectsImportTestInput,
-  RawPaginationImportMapper,
-  SearchPaginationInput,
+import {
+  type ExportMapperInput,
+  type ImportMapperAddInput,
+  type ImportMapperUpdateInput,
+  type InjectsImportTestInput,
+  type RawPaginationImportMapper,
+  type SearchPaginationInput,
 } from '../../utils/api-types';
 
 const XLS_MAPPER_URI = '/api/mappers';
@@ -54,7 +54,10 @@ export const testXlsFile = (importId: string, input: InjectsImportTestInput) => 
 export const exportMapper = (input: ExportMapperInput) => {
   const uri = `${XLS_MAPPER_URI}/export`;
   return simplePostCall(uri, input).then((response) => {
-    return { data: response.data, filename: response.headers['content-disposition'].split('filename=')[1] };
+    return {
+      data: response.data,
+      filename: response.headers['content-disposition'].split('filename=')[1],
+    };
   });
 };
 

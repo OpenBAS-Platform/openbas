@@ -1,10 +1,10 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
-import { CSSProperties, FunctionComponent } from 'react';
+import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../i18n';
-import { Header } from '../../SortHeadersList';
-import { SortHelpers } from './SortHelpers';
+import { type Header } from '../../SortHeadersList';
+import { type SortHelpers } from './SortHelpers';
 
 const useStyles = makeStyles()(() => ({
   sortableHeaderItem: {
@@ -15,9 +15,7 @@ const useStyles = makeStyles()(() => ({
     paddingRight: 10,
     alignItems: 'center',
   },
-  headerItems: {
-    display: 'flex',
-  },
+  headerItems: { display: 'flex' },
   headerItem: {
     display: 'flex',
     fontSize: 12,

@@ -1,17 +1,13 @@
 import { MoreVert } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { useFormatter } from '../i18n';
-import { PopoverEntry } from './ButtonPopover';
+import { type PopoverEntry } from './ButtonPopover';
 
-interface Props {
-  entries: PopoverEntry[];
-}
+interface Props { entries: PopoverEntry[] }
 
-const IconPopover: FunctionComponent<Props> = ({
-  entries,
-}) => {
+const IconPopover: FunctionComponent<Props> = ({ entries }) => {
   // Standard hooks
   const { t } = useFormatter();
 

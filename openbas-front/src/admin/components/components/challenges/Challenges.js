@@ -157,7 +157,13 @@ const Challenges = () => {
   const sortedChallenges = filtering.filterAndSort(challenges);
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Challenges'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Components') }, {
+          label: t('Challenges'),
+          current: true,
+        }]}
+      />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -182,7 +188,11 @@ const Challenges = () => {
         >
           <ListItemIcon>
             <span
-              style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
             >
               &nbsp;
             </span>

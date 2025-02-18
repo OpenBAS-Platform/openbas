@@ -1,17 +1,15 @@
-/* eslint-disable no-underscore-dangle */
 import fs from 'node:fs';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = `${path.dirname(__filename)}/src`;
+const filename = fileURLToPath(import.meta.url);
+const dirname = `${path.dirname(filename)}/src`;
 
 // -- Retrieve i18n lang keys --
 
 const computeLangKeys = (lang) => {
-  const data = fs.readFileSync(`${__dirname}/utils/Localization.js`, { encoding: 'utf8' });
+  const data = fs.readFileSync(`${dirname}/utils/Localization.js`, { encoding: 'utf8' });
   const regexp = `${lang}: ({[\\s\\S]*?},)`;
   const matches = data.match(regexp);
   return matches[1];
@@ -52,7 +50,7 @@ const checkLanguageSupport = (lang) => {
       }
     });
   };
-  read(__dirname);
+  read(dirname);
   return results;
 };
 

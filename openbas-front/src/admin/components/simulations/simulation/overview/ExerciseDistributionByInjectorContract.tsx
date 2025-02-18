@@ -1,23 +1,19 @@
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { InjectStore } from '../../../../../actions/injects/Inject';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { type InjectStore } from '../../../../../actions/injects/Inject';
+import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Exercise, InjectExpectation } from '../../../../../utils/api-types';
+import { type Exercise, type InjectExpectation } from '../../../../../utils/api-types';
 import { horizontalBarsChartOptions } from '../../../../../utils/Charts';
 
-interface Props {
-  exerciseId: Exercise['exercise_id'];
-}
+interface Props { exerciseId: Exercise['exercise_id'] }
 
-const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({
-  exerciseId,
-}) => {
+const ExerciseDistributionByInjectorContract: FunctionComponent<Props> = ({ exerciseId }) => {
   // Standard hooks
   const { t, tPick } = useFormatter();
   const theme = useTheme();

@@ -1,13 +1,12 @@
 import { BallotOutlined, ContactMailOutlined, ContentPasteGoOutlined, DeleteSweepOutlined, SpeakerNotesOutlined, SportsScoreOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
-import * as React from 'react';
-import { useContext, useState } from 'react';
+import { type ChangeEvent, type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
-import type { Inject, LessonsAnswer, LessonsCategory, LessonsQuestion, LessonsSendInput, LessonsTemplate, Objective, Team, User } from '../../../../utils/api-types';
+import { type Inject, type LessonsAnswer, type LessonsCategory, type LessonsQuestion, type LessonsSendInput, type LessonsTemplate, type Objective, type Team, type User } from '../../../../utils/api-types';
 import { LessonContext } from '../../common/Context';
 import CreateLessonsTemplate from '../../components/lessons/CreateLessonsTemplate';
 import CreateLessonsCategory from '../categories/CreateLessonsCategory';
@@ -73,7 +72,7 @@ interface Props {
   usersMap: Record<string, User>;
 }
 
-const Lessons: React.FC<Props> = ({
+const Lessons: FunctionComponent<Props> = ({
   source,
   objectives,
   injects,
@@ -98,7 +97,7 @@ const Lessons: React.FC<Props> = ({
   const [openAnonymize, setOpenAnonymize] = useState<boolean>(false);
   const [selectedQuestion, setSelectedQuestion] = useState<LessonsQuestion | null>(null);
   const [templateValue, setTemplateValue] = useState<string | null>(null);
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setTemplateValue(event.target.value);
   };
 
@@ -151,7 +150,12 @@ const Lessons: React.FC<Props> = ({
   };
   return (
     <div style={{ paddingBottom: theme.spacing(5) }}>
-      <div style={{ display: 'grid', gap: theme.spacing(3), gridTemplateColumns: '1fr 1fr 1fr 1fr' }}>
+      <div style={{
+        display: 'grid',
+        gap: theme.spacing(3),
+        gridTemplateColumns: '1fr 1fr 1fr 1fr',
+      }}
+      >
         <Paper variant="outlined" classes={{ root: classes.metric }}>
           <div className={classes.icon}>
             <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
@@ -190,7 +194,13 @@ const Lessons: React.FC<Props> = ({
           </div>
         </Paper>
       </div>
-      <div style={{ display: 'grid', marginTop: theme.spacing(3), gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr 1fr' }}>
+      <div style={{
+        display: 'grid',
+        marginTop: theme.spacing(3),
+        gap: `0px ${theme.spacing(3)}`,
+        gridTemplateColumns: '1fr 1fr 1fr',
+      }}
+      >
         <Typography variant="h4">{t('Details')}</Typography>
         <Typography variant="h4">{t('Parameters')}</Typography>
         <Typography variant="h4">{t('Control')}</Typography>
@@ -311,7 +321,13 @@ const Lessons: React.FC<Props> = ({
           </Grid>
         </Paper>
       </div>
-      <div style={{ display: 'grid', marginTop: theme.spacing(3), gap: `0 ${theme.spacing(3)}`, gridTemplateColumns: '1fr 2fr' }}>
+      <div style={{
+        display: 'grid',
+        marginTop: theme.spacing(3),
+        gap: `0 ${theme.spacing(3)}`,
+        gridTemplateColumns: '1fr 2fr',
+      }}
+      >
         <Typography variant="h4">
           {t('Objectives')}
           {' '}
@@ -375,7 +391,11 @@ const Lessons: React.FC<Props> = ({
               `Applying a template will add all categories and questions of the selectedtemplate to this ${source.type}.`,
             )}
           </Alert>
-          <FormControl style={{ margin: '10px 0 0 5px', width: '100%' }}>
+          <FormControl style={{
+            margin: '10px 0 0 5px',
+            width: '100%',
+          }}
+          >
             <RadioGroup
               style={{ width: '100%' }}
               aria-labelledby="controlled-radio-buttons-group"
@@ -411,7 +431,11 @@ const Lessons: React.FC<Props> = ({
           </FormControl>
           <CreateLessonsTemplate inline />
           <div className="clearfix" />
-          <div style={{ float: 'right', marginTop: 20 }}>
+          <div style={{
+            float: 'right',
+            marginTop: 20,
+          }}
+          >
             <Button
               onClick={() => setOpenApplyTemplate(false)}
               style={{ marginRight: 10 }}

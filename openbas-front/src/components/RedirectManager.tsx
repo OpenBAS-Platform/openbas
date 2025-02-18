@@ -1,20 +1,15 @@
-import { useEffect } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type ReactElement, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 import { MESSAGING$ } from '../utils/Environment';
 
-interface Props {
-  children: React.ReactElement;
-}
+interface Props { children: ReactElement }
 
-const RedirectManager: React.FC<Props> = ({ children }) => {
+const RedirectManager: FunctionComponent<Props> = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const subscription = MESSAGING$.redirect.subscribe({
-      next: url => navigate(url),
-    });
+    const subscription = MESSAGING$.redirect.subscribe({ next: url => navigate(url) });
 
     return () => subscription.unsubscribe();
   }, []);

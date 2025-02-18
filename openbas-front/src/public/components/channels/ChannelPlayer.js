@@ -30,9 +30,7 @@ const ChannelPlayer = () => {
   const { t } = useFormatter();
   const [userId, articleId] = useQueryParameter(['user', 'article']);
   const { channelId, exerciseId } = useParams();
-  const { channelReader } = useHelper(helper => ({
-    channelReader: helper.getChannelReader(channelId),
-  }));
+  const { channelReader } = useHelper(helper => ({ channelReader: helper.getChannelReader(channelId) }));
   const { channel_information: channel, channel_exercise: exercise } = channelReader ?? {};
   // Pass the full exercise because the exercise is never loaded in the store at this point
   const permissions = usePermissions(exerciseId, exercise);
@@ -50,7 +48,11 @@ const ChannelPlayer = () => {
             variant="outlined"
             component={Link}
             to={`/channels/${exerciseId}/${channelId}?article=${articleId}&user=${userId}&preview=true`}
-            style={{ position: 'absolute', top: 20, right: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 20,
+            }}
           >
             {t('Switch to preview mode')}
           </Button>
@@ -61,7 +63,11 @@ const ChannelPlayer = () => {
             variant="outlined"
             component={Link}
             to={`/admin/exercises/${exerciseId}/definition`}
-            style={{ position: 'absolute', top: 20, left: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              left: 20,
+            }}
           >
             {t('Back to administration')}
           </Button>

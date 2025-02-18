@@ -1,18 +1,18 @@
 import { Box, Tab, Tabs } from '@mui/material';
-import { FunctionComponent, Suspense, useEffect, useState } from 'react';
+import { type FunctionComponent, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectResultOverviewOutput } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { fetchExercise } from '../../../../../actions/Exercise';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import Breadcrumbs, { BACK_LABEL, BACK_URI, BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
+import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import Breadcrumbs, { BACK_LABEL, BACK_URI, type BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../../components/Error';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import NotFound from '../../../../../components/NotFound';
 import { useHelper } from '../../../../../store';
-import type { Exercise as ExerciseType, InjectResultOverviewOutput } from '../../../../../utils/api-types';
+import { type Exercise as ExerciseType, type InjectResultOverviewOutput } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
@@ -21,7 +21,7 @@ import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
 import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/AtomicTestingPayloadInfo';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
-import { PermissionsContext, PermissionsContextType } from '../../../common/Context';
+import { PermissionsContext, type PermissionsContextType } from '../../../common/Context';
 import InjectHeader from '../../../injects/InjectHeader';
 
 const useStyles = makeStyles()(() => ({
@@ -36,7 +36,10 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectResult: InjectResultOverviewOutput }> = ({
+const InjectIndexComponent: FunctionComponent<{
+  exercise: ExerciseType;
+  injectResult: InjectResultOverviewOutput;
+}> = ({
   exercise,
   injectResult,
 }) => {
@@ -45,9 +48,7 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
   const { classes } = useStyles();
 
   // Context
-  const permissionsContext: PermissionsContextType = {
-    permissions: usePermissions(exercise.exercise_id),
-  };
+  const permissionsContext: PermissionsContextType = { permissions: usePermissions(exercise.exercise_id) };
 
   const [searchParams] = useSearchParams();
   const backlabel = searchParams.get('backlabel');
@@ -62,14 +63,26 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
   };
 
   const breadcrumbs: BreadcrumbsElement[] = [
-    { label: t('Simulations'), link: '/admin/simulations' },
-    { label: t(exercise.exercise_name), link: `/admin/simulations/${exercise.exercise_id}` },
+    {
+      label: t('Simulations'),
+      link: '/admin/simulations',
+    },
+    {
+      label: t(exercise.exercise_name),
+      link: `/admin/simulations/${exercise.exercise_id}`,
+    },
   ];
   if (backlabel && backuri) {
-    breadcrumbs.push({ label: backlabel, link: backuri });
+    breadcrumbs.push({
+      label: backlabel,
+      link: backuri,
+    });
   }
   breadcrumbs.push({ label: t('Injects') });
-  breadcrumbs.push({ label: injectResultOverviewOutput.inject_title, current: true });
+  breadcrumbs.push({
+    label: injectResultOverviewOutput.inject_title,
+    current: true,
+  });
 
   const computePath = (path: string) => {
     if (backlabel && backuri) {
@@ -79,7 +92,11 @@ const InjectIndexComponent: FunctionComponent<{ exercise: ExerciseType; injectRe
   };
 
   return (
-    <InjectResultOverviewOutputContext.Provider value={{ injectResultOverviewOutput, updateInjectResultOverviewOutput }}>
+    <InjectResultOverviewOutputContext.Provider value={{
+      injectResultOverviewOutput,
+      updateInjectResultOverviewOutput,
+    }}
+    >
       <PermissionsContext.Provider value={permissionsContext}>
         <Breadcrumbs variant="object" elements={breadcrumbs} />
         <InjectHeader inject={injectResult} />

@@ -1,6 +1,6 @@
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { truncate } from '../../utils/String';
 
@@ -20,7 +20,12 @@ const ExpandableText: FunctionComponent<Props> = ({
     <span>
       <div style={{ position: 'relative' }}>
         {shouldBeTruncated && (
-          <div style={{ position: 'absolute', top: -32, right: 0 }}>
+          <div style={{
+            position: 'absolute',
+            top: -32,
+            right: 0,
+          }}
+          >
             <IconButton onClick={onClick} size="large">
               {expand ? <ExpandLess /> : <ExpandMore />}
             </IconButton>

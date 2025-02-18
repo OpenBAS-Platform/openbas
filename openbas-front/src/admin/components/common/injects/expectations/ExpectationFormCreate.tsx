@@ -1,24 +1,22 @@
 import { Alert, Button, InputLabel, MenuItem, Select as MUISelect, TextField as MuiTextField, TextField, Typography } from '@mui/material';
-import { FunctionComponent, SyntheticEvent, useEffect } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { type FunctionComponent, type SyntheticEvent, useEffect } from 'react';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import type { LoggedHelper } from '../../../../../actions/helper';
+import { type LoggedHelper } from '../../../../../actions/helper';
 import { useFormatter } from '../../../../../components/i18n';
 import ScaleBar from '../../../../../components/scalebar/ScaleBar';
 import { useHelper } from '../../../../../store';
-import type { PlatformSettings } from '../../../../../utils/api-types';
+import { type PlatformSettings } from '../../../../../utils/api-types';
 import { splitDuration } from '../../../../../utils/Time';
-import { ExpectationInput, ExpectationInputForm } from './Expectation';
+import { type ExpectationInput, type ExpectationInputForm } from './Expectation';
 import { formProps, infoMessage } from './ExpectationFormUtils';
 import { isTechnicalExpectation } from './ExpectationUtils';
 import ExpectationGroupField from './field/ExpectationGroupField';
 import useExpectationExpirationTime from './useExpectationExpirationTime';
 
 const useStyles = makeStyles()(theme => ({
-  marginTop_2: {
-    marginTop: theme.spacing(2),
-  },
+  marginTop_2: { marginTop: theme.spacing(2) },
   buttons: {
     display: 'flex',
     placeContent: 'end',
@@ -56,9 +54,7 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
   const { t } = useFormatter();
   const { classes } = useStyles();
 
-  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
-    settings: helper.getPlatformSettings(),
-  }));
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
 
   const manualExpectationExpirationTime = useExpectationExpirationTime('MANUAL');
 

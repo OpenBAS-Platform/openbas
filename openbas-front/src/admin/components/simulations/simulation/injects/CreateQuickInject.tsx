@@ -1,12 +1,12 @@
 import { Add } from '@mui/icons-material';
 import { Drawer, Fab } from '@mui/material';
-import { FunctionComponent, useEffect, useState } from 'react';
+import { type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { InjectorContractHelper } from '../../../../../actions/injector_contracts/injector-contract-helper';
+import { type InjectorContractHelper } from '../../../../../actions/injector_contracts/injector-contract-helper';
 import { fetchInjectorContract } from '../../../../../actions/InjectorContracts';
 import { useHelper } from '../../../../../store.js';
-import type { Exercise, InjectorContract } from '../../../../../utils/api-types';
+import { type Exercise, type InjectorContract } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks.js';
 import QuickInject, { EMAIL_CONTRACT } from './QuickInject';
 
@@ -23,17 +23,14 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-interface Props {
-  exercise: Exercise;
-}
+interface Props { exercise: Exercise }
 
 const CreateQuickInject: FunctionComponent<Props> = ({ exercise }) => {
   const dispatch = useAppDispatch();
   const { classes } = useStyles();
   const [open, setOpen] = useState(false);
-  const { injectorContract }: { injectorContract: InjectorContract } = useHelper((helper: InjectorContractHelper) => ({
-    injectorContract: helper.getInjectorContract(EMAIL_CONTRACT),
-  }));
+  const { injectorContract }: { injectorContract: InjectorContract }
+    = useHelper((helper: InjectorContractHelper) => ({ injectorContract: helper.getInjectorContract(EMAIL_CONTRACT) }));
   useEffect(() => {
     dispatch(fetchInjectorContract(EMAIL_CONTRACT));
   }, []);

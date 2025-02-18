@@ -81,19 +81,13 @@ const styles = theme => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  title: {
-    float: 'left',
-  },
+  itemIcon: { color: theme.palette.primary.main },
+  title: { float: 'left' },
   allTeams: {
     float: 'right',
     marginTop: -10,
   },
-  errorColor: {
-    color: theme.palette.error.main,
-  },
+  errorColor: { color: theme.palette.error.main },
   inline: {
     display: 'flex',
     flexDirection: 'row',
@@ -314,15 +308,11 @@ class InjectDefinition extends Component {
 
   // Teams
   handleModifyTeams(teamsIds) {
-    this.setState({
-      teamsIds: [...teamsIds],
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ teamsIds: [...teamsIds] }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveTeam(teamId) {
-    this.setState({
-      teamsIds: this.state.teamsIds.filter(a => a !== teamId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ teamsIds: this.state.teamsIds.filter(a => a !== teamId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Assets
@@ -332,9 +322,7 @@ class InjectDefinition extends Component {
   }
 
   async setAssetIdsState(assetIds) {
-    this.setState({
-      assetIds: assetIds,
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ assetIds: assetIds }, () => this.props.setInjectDetailsState(this.state));
 
     // also force update resolved endpoints at the cost of a backend call
     this.setState({ endpoints: await this.refreshEndpoints(assetIds) });
@@ -350,48 +338,34 @@ class InjectDefinition extends Component {
 
   // Asset Groups
   handleAddAssetGroups(assetGroupIds) {
-    this.setState({
-      assetGroupIds,
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ assetGroupIds }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveAssetGroup(assetGroupId) {
-    this.setState({
-      assetGroupIds: this.state.assetGroupIds.filter(a => a !== assetGroupId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ assetGroupIds: this.state.assetGroupIds.filter(a => a !== assetGroupId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Articles
   handleAddArticles(articlesIds) {
-    this.setState({
-      articlesIds: [...this.state.articlesIds, ...articlesIds],
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ articlesIds: [...this.state.articlesIds, ...articlesIds] }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveArticle(articleId) {
-    this.setState({
-      articlesIds: this.state.articlesIds.filter(a => a !== articleId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ articlesIds: this.state.articlesIds.filter(a => a !== articleId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Challenges
   handleAddChallenges(challengesIds) {
-    this.setState({
-      challengesIds: [...this.state.challengesIds, ...challengesIds],
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ challengesIds: [...this.state.challengesIds, ...challengesIds] }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveChallenge(challengeId) {
-    this.setState({
-      challengesIds: this.state.challengesIds.filter(a => a !== challengeId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ challengesIds: this.state.challengesIds.filter(a => a !== challengeId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Documents
   handleAddDocuments(documents) {
-    this.setState({
-      documents,
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ documents }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveDocument(documentId) {
@@ -583,7 +557,13 @@ class InjectDefinition extends Component {
       <>
         {hasTeams && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, float: 'left' }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                float: 'left',
+              }}
+            >
               {t('Targeted teams')}
             </Typography>
             <FormGroup row={true} classes={{ root: classes.allTeams }}>
@@ -660,7 +640,13 @@ class InjectDefinition extends Component {
         )}
         {hasAssets && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams ? 20 : 0,
+              }}
+            >
               {t('Targeted assets')}
             </Typography>
             <EndpointsList
@@ -682,7 +668,13 @@ class InjectDefinition extends Component {
         )}
         {hasAssetGroups && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams || hasAssets ? 20 : 0,
+              }}
+            >
               {t('Targeted asset groups')}
             </Typography>
             <AssetGroupsList
@@ -698,7 +690,13 @@ class InjectDefinition extends Component {
         )}
         {hasArticles && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0,
+              }}
+            >
               {t('Media pressure to publish')}
             </Typography>
             <List>
@@ -763,7 +761,13 @@ class InjectDefinition extends Component {
         )}
         {hasChallenges && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0,
+              }}
+            >
               {t('Challenges to publish')}
             </Typography>
             <List>
@@ -872,7 +876,13 @@ class InjectDefinition extends Component {
         }
         {(hasExpectations || expectationsNotManual.length > 0) && (
           <>
-            <Typography variant="h5" style={{ marginTop: 20, fontWeight: 500 }}>
+            <Typography
+              variant="h5"
+              style={{
+                marginTop: 20,
+                fontWeight: 500,
+              }}
+            >
               {t('Inject expectations')}
             </Typography>
             {expectationsNotManual.length > 0 && (
@@ -909,7 +919,13 @@ class InjectDefinition extends Component {
         )}
         {!isAtomic && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: 20 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: 20,
+              }}
+            >
               {t('Inject documents')}
             </Typography>
             <List>

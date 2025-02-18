@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 
-import type { Filter, FilterGroup, PropertySchemaDTO } from '../../../../utils/api-types';
+import { type Filter, type FilterGroup, type PropertySchemaDTO } from '../../../../utils/api-types';
 
 export const emptyFilterGroup: FilterGroup = {
   mode: 'and',
@@ -99,9 +99,7 @@ export const convertOperatorToIcon = (t: (text: string) => string, operator: Fil
   }
 };
 
-export const OperatorKeyValues: {
-  [key: string]: string;
-} = {
+export const OperatorKeyValues: { [key: string]: string } = {
   eq: 'Equals',
   not_eq: 'Not equals',
   contains: 'Contains',

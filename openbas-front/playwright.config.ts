@@ -1,3 +1,7 @@
+// imports to not let tools report them as unused
+import 'monocart-reporter';
+import 'monocart-coverage-reports';
+
 import { defineConfig, devices } from '@playwright/test';
 
 /**
@@ -52,7 +56,10 @@ export default defineConfig({
   timeout: 200000,
   /* Configure projects for major browsers */
   projects: [
-    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
     {
       // Do not change the project name as it is hardcoded in the baseFixtures
       name: 'chromium',

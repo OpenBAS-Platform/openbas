@@ -9,7 +9,7 @@ import { searchOrganizationByIdAsOptions } from '../../../../actions/organizatio
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
-import { Option } from '../../../../utils/Option';
+import { type Option } from '../../../../utils/Option';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -73,12 +73,18 @@ const useRetrieveOptions = () => {
         });
         break;
       default:
-        setOptions(ids.map(id => ({ id, label: id })));
+        setOptions(ids.map(id => ({
+          id,
+          label: id,
+        })));
         break;
     }
   };
 
-  return { options, searchOptions };
+  return {
+    options,
+    searchOptions,
+  };
 };
 
 export default useRetrieveOptions;
