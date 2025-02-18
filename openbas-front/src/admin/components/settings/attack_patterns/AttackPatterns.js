@@ -46,41 +46,49 @@ const inlineStyles = {
     width: '20%',
     cursor: 'default',
   },
-  attack_pattern_external_id: {
-    width: '15%',
-  },
-  attack_pattern_name: {
-    width: '35%',
-  },
-  attack_pattern_created_at: {
-    width: '12%',
-  },
-  attack_pattern_updated_at: {
-    width: '12%',
-  },
+  attack_pattern_external_id: { width: '15%' },
+  attack_pattern_name: { width: '35%' },
+  attack_pattern_created_at: { width: '12%' },
+  attack_pattern_updated_at: { width: '12%' },
 };
 
 const AttackPatterns = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
-  const { killChainPhasesMap } = useHelper(helper => ({
-    killChainPhasesMap: helper.getKillChainPhasesMap(),
-  }));
+  const { killChainPhasesMap } = useHelper(helper => ({ killChainPhasesMap: helper.getKillChainPhasesMap() }));
 
   // Headers
   const headers = [
-    { field: 'kill_chain_phase', label: 'Kill chain phase', isSortable: false },
-    { field: 'attack_pattern_external_id', label: 'External ID', isSortable: true },
-    { field: 'attack_pattern_name', label: 'Name', isSortable: true },
-    { field: 'attack_pattern_created_at', label: 'Created', isSortable: true },
-    { field: 'attack_pattern_updated_at', label: 'Updated', isSortable: true },
+    {
+      field: 'kill_chain_phase',
+      label: 'Kill chain phase',
+      isSortable: false,
+    },
+    {
+      field: 'attack_pattern_external_id',
+      label: 'External ID',
+      isSortable: true,
+    },
+    {
+      field: 'attack_pattern_name',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'attack_pattern_created_at',
+      label: 'Created',
+      isSortable: true,
+    },
+    {
+      field: 'attack_pattern_updated_at',
+      label: 'Updated',
+      isSortable: true,
+    },
   ];
 
   const [attackPatterns, setAttackPatterns] = useState([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('attack_pattern_external_id'),
-  });
+  const [searchPaginationInput, setSearchPaginationInput] = useState({ sorts: initSorting('attack_pattern_external_id') });
 
   // Export
   const exportProps = {
@@ -97,7 +105,13 @@ const AttackPatterns = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, { label: t('Attack patterns'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+          label: t('Attack patterns'),
+          current: true,
+        }]}
+      />
       <TaxonomiesMenu />
       <PaginationComponent
         fetch={searchAttackPatterns}

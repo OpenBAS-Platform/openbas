@@ -78,9 +78,7 @@ CreateGroup.propTypes = {
   addGroup: PropTypes.func,
 };
 
-const select = state => ({
-  organizations: state.referential.entities.organizations,
-});
+const select = state => ({ organizations: state.referential.entities.organizations });
 
 export default R.compose(
   connect(select, { addGroup }),

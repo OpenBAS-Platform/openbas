@@ -50,9 +50,7 @@ const CreateDocument = (props) => {
     const inputValues = computeInputValues(data);
     const formData = new FormData();
     formData.append('file', data.document_file[0]);
-    const blob = new Blob([JSON.stringify(inputValues)], {
-      type: 'application/json',
-    });
+    const blob = new Blob([JSON.stringify(inputValues)], { type: 'application/json' });
     formData.append('input', blob);
     return props.addDocument(formData).then((result) => {
       if (result.result) {
@@ -128,7 +126,10 @@ CreateDocument.propTypes = {
 };
 
 export default R.compose(
-  connect(null, { addDocument, fetchDocument }),
+  connect(null, {
+    addDocument,
+    fetchDocument,
+  }),
   inject18n,
   Component => withStyles(Component, styles),
 )(CreateDocument);

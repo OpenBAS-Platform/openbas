@@ -44,16 +44,18 @@ const ChannelMicroblogging = ({ channelReader }) => {
     channel_information: channel,
   } = channelReader;
   const baseUri = `/api/player/${exercise?.exercise_id ?? scenario?.scenario_id}`;
-  const { documentsMap } = useHelper(helper => ({
-    documentsMap: helper.getDocumentsMap(),
-  }));
+  const { documentsMap } = useHelper(helper => ({ documentsMap: helper.getDocumentsMap() }));
   const logo = isDark ? channel.channel_logo_dark : channel.channel_logo_light;
   const queryParams = userId && userId.length > 0 && userId !== 'null' ? `?userId=${userId}` : '';
   return (
     <div className={classes.container}>
       {logo && channel.channel_mode !== 'title' && (
         <div
-          style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
+          style={{
+            margin: '0 auto',
+            textAlign: 'center',
+            marginBottom: 15,
+          }}
         >
           <img
             src={`${baseUri}/documents/${logo}/file${queryParams}`}
@@ -77,9 +79,7 @@ const ChannelMicroblogging = ({ channelReader }) => {
       )}
       <Typography
         variant="h2"
-        style={{
-          textAlign: 'center',
-        }}
+        style={{ textAlign: 'center' }}
       >
         {channel.channel_description}
       </Typography>
@@ -120,7 +120,11 @@ const ChannelMicroblogging = ({ channelReader }) => {
               title={article.article_author || t('Unknown')}
               subheader={fldt(article.article_virtual_publication)}
             />
-            <CardContent style={{ marginTop: -20, paddingBottom: 50 }}>
+            <CardContent style={{
+              marginTop: -20,
+              paddingBottom: 50,
+            }}
+            >
               <ExpandableMarkdown
                 source={article.article_content}
                 limit={200}

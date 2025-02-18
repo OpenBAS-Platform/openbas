@@ -26,7 +26,10 @@ const useSearchAnFilter = (
   };
   const handleSearch = value => setKeyword(value);
   const reverseBy = (field) => {
-    setOrder({ sortBy: field, orderAsc: !order.orderAsc });
+    setOrder({
+      sortBy: field,
+      orderAsc: !order.orderAsc,
+    });
   };
   const buildHeader = (field, label, isSortable, styles) => {
     const sortComponent = order.orderAsc

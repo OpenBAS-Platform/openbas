@@ -24,9 +24,7 @@ const styles = theme => ({
     margin: '1px 5px 0 0',
     fontSize: 13,
   },
-  diffNumber: {
-    float: 'left',
-  },
+  diffNumber: { float: 'left' },
 });
 
 const inlineStyles = {

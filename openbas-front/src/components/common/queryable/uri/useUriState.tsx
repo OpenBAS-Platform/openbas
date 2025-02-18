@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import type { SearchPaginationInput } from '../../../../utils/api-types';
+import { type SearchPaginationInput } from '../../../../utils/api-types';
 import { buildSearchPagination, SearchPaginationInputSchema } from '../QueryableUtils';
-import { UriHelpers } from './UriHelpers';
+import { type UriHelpers } from './UriHelpers';
 
 export const retrieveFromUri = (localStorageKey: string, searchParams: URLSearchParams): SearchPaginationInput | null => {
   const encodedParams = searchParams.get('query') || '';
@@ -40,13 +40,12 @@ const useUriState = (localStorageKey: string, initSearchPaginationInput: SearchP
       }
     },
     updateUri: () => {
-      const params = qs.stringify({ ...initSearchPaginationInput, key: localStorageKey }, { allowEmptyArrays: true });
+      const params = qs.stringify({
+        ...initSearchPaginationInput,
+        key: localStorageKey,
+      }, { allowEmptyArrays: true });
       const encodedParams = btoa(params);
-      setSearchParams({
-        query: encodedParams,
-      }, {
-        replace: true,
-      });
+      setSearchParams({ query: encodedParams }, { replace: true });
     },
   };
 

@@ -1,15 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Add } from '@mui/icons-material';
 import { Button, IconButton, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
-import * as React from 'react';
-import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
+import { type FunctionComponent, useState } from 'react';
+import { Controller, type SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { useFormatter } from '../../../../../components/i18n';
 import RegexComponent from '../../../../../components/RegexComponent';
-import type { ImportMapperAddInput } from '../../../../../utils/api-types';
+import { type ImportMapperAddInput } from '../../../../../utils/api-types';
 import { zodImplement } from '../../../../../utils/Zod';
 import RulesContractContent from './RulesContractContent';
 import XlsMapperTestDialog from './XlsMapperTestDialog';
@@ -32,7 +31,7 @@ interface Props {
   initialValues?: ImportMapperAddInput;
 }
 
-const MapperForm: React.FC<Props> = ({
+const MapperForm: FunctionComponent<Props> = ({
   onSubmit,
   editing,
   initialValues = {
@@ -117,7 +116,11 @@ const MapperForm: React.FC<Props> = ({
             color="secondary"
             aria-label="Add"
             onClick={() => {
-              append({ inject_importer_type_value: '', inject_importer_injector_contract: '', inject_importer_rule_attributes: [] });
+              append({
+                inject_importer_type_value: '',
+                inject_importer_injector_contract: '',
+                inject_importer_rule_attributes: [],
+              });
             }}
             size="large"
           >
@@ -138,7 +141,11 @@ const MapperForm: React.FC<Props> = ({
           />
         ))}
 
-        <div style={{ float: 'right', marginTop: 20 }}>
+        <div style={{
+          float: 'right',
+          marginTop: 20,
+        }}
+        >
           <Button
             variant="contained"
             onClick={() => setOpenTest(true)}

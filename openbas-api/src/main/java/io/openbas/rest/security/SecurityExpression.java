@@ -87,12 +87,22 @@ public class SecurityExpression extends SecurityExpressionRoot
     return planner.isPresent();
   }
 
-  @SuppressWarnings("unused")
+  @Deprecated(since = "1.12.0", forRemoval = true)
   public boolean isExerciseObserver(String exerciseId) {
+    return isSimulationObserver(exerciseId);
+  }
+
+  /**
+   * Check that a user is a observer for a given simulation
+   *
+   * @param simulationId the simulation to check
+   * @return true if the user is an observer for given simulation
+   */
+  public boolean isSimulationObserver(String simulationId) {
     if (isUserHasBypass()) {
       return true;
     }
-    Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+    Exercise exercise = exerciseRepository.findById(simulationId).orElseThrow();
     List<User> observers = exercise.getObservers();
     Optional<User> observer =
         observers.stream().filter(user -> user.getId().equals(getUser().getId())).findAny();

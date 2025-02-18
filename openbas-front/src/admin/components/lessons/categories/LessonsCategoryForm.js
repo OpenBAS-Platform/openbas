@@ -52,7 +52,11 @@ const LessonsCategoryForm = (props) => {
             type="number"
             style={{ marginTop: 20 }}
           />
-          <div style={{ float: 'right', marginTop: 20 }}>
+          <div style={{
+            float: 'right',
+            marginTop: 20,
+          }}
+          >
             <Button
               onClick={handleClose}
               style={{ marginRight: 10 }}

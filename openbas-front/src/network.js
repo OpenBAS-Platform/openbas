@@ -3,9 +3,7 @@ import { normalize } from 'normalizr';
 
 // eslint-disable-next-line import/prefer-default-export
 export const api = (schema) => {
-  const instance = axios.create({
-    headers: { responseType: 'json' },
-  });
+  const instance = axios.create({ headers: { responseType: 'json' } });
   // Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(
     (response) => {
@@ -31,7 +29,10 @@ export const api = (schema) => {
       }
       if (res) {
         // eslint-disable-next-line prefer-promise-reject-errors
-        return Promise.reject({ status: res.status, ...res.data });
+        return Promise.reject({
+          status: res.status,
+          ...res.data,
+        });
       }
       // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject(false);

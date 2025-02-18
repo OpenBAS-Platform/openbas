@@ -1,6 +1,6 @@
 import { FlagOutlined, HelpOutlined, ModeStandbyOutlined, ScoreOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import { Handle, Node, NodeProps, Position } from '@xyflow/react';
+import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
 import { memo } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -72,7 +72,13 @@ export type NodeResultStep = Node<{
 const NodeResultStepComponent = ({ data }: NodeProps<NodeResultStep>) => {
   const { classes } = useStyles();
   return (
-    <div className={classes.node} style={{ backgroundColor: data.background, color: data.color }}>
+    <div
+      className={classes.node}
+      style={{
+        backgroundColor: data.background,
+        color: data.color,
+      }}
+    >
       <div className={classes.icon}>
         {renderIcon(data.key)}
       </div>

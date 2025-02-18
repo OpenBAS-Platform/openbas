@@ -1,13 +1,13 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { CSSProperties, FunctionComponent } from 'react';
+import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../../../actions/Executor';
-import type { ExecutorHelper } from '../../../../../actions/executors/executor-helper';
+import { type ExecutorHelper } from '../../../../../actions/executors/executor-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { AgentOutput } from '../../../../../utils/api-types';
+import { type AgentOutput } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AssetStatus from '../../AssetStatus';
@@ -37,41 +37,27 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  agent_executed_by_user: {
-    width: '30%',
-  },
+  agent_executed_by_user: { width: '30%' },
   agent_executor: {
     width: '15%',
     display: 'flex',
     alignItems: 'center',
     cursor: 'default',
   },
-  agent_privilege: {
-    width: '15%',
-  },
-  agent_deployment_mode: {
-    width: '10%',
-  },
-  agent_active: {
-    width: '10%',
-  },
-  agent_last_seen: {
-    width: '20%',
-  },
+  agent_privilege: { width: '15%' },
+  agent_deployment_mode: { width: '10%' },
+  agent_active: { width: '10%' },
+  agent_last_seen: { width: '20%' },
 };
 
-interface Props {
-  agents: AgentOutput[];
-}
+interface Props { agents: AgentOutput[] }
 
 const AgentList: FunctionComponent<Props> = ({ agents }) => {
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
   // Fetching data
-  const { executorsMap } = useHelper((helper: ExecutorHelper) => ({
-    executorsMap: helper.getExecutorsMap(),
-  }));
+  const { executorsMap } = useHelper((helper: ExecutorHelper) => ({ executorsMap: helper.getExecutorsMap() }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
   });
@@ -96,7 +82,12 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
               <img
                 src={`/api/images/executors/${executor.executor_type}`}
                 alt={executor.executor_type}
-                style={{ width: 25, height: 25, borderRadius: 4, marginRight: 10 }}
+                style={{
+                  width: 25,
+                  height: 25,
+                  borderRadius: 4,
+                  marginRight: 10,
+                }}
               />
             )}
             {executor?.executor_name ?? t('Unknown')}

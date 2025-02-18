@@ -1,21 +1,23 @@
 import { InfoOutlined } from '@mui/icons-material';
 import { InputLabel, Tooltip } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 
 import FilterField from '../../../../components/common/queryable/filter/FilterField';
 import { emptyFilterGroup } from '../../../../components/common/queryable/filter/FilterUtils';
 import useFiltersState from '../../../../components/common/queryable/filter/useFiltersState';
 import { useFormatter } from '../../../../components/i18n';
-import type { FilterGroup } from '../../../../utils/api-types';
+import { type FilterGroup } from '../../../../utils/api-types';
 
 interface Props {
   value?: FilterGroup;
   onChange?: (value: FilterGroup) => void;
+  contextId?: string;
 }
 
 const DynamicAssetField: FunctionComponent<Props> = ({
   value,
   onChange,
+  contextId,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -31,7 +33,12 @@ const DynamicAssetField: FunctionComponent<Props> = ({
 
   return (
     <div style={{ marginTop: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'end', gap: 10 }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'end',
+        gap: 10,
+      }}
+      >
         <InputLabel id="dynamic-asset-filter">{t('Rule')}</InputLabel>
         <Tooltip title={t('Filter allowing assets to be added dynamically to this group')}>
           <InfoOutlined
@@ -47,6 +54,7 @@ const DynamicAssetField: FunctionComponent<Props> = ({
         filterGroup={filterGroup}
         helpers={helpers}
         style={{ marginTop: 20 }}
+        contextId={contextId}
       />
     </div>
   );

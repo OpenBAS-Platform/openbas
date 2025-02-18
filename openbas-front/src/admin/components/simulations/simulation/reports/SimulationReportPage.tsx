@@ -1,17 +1,16 @@
 import { Alert, Button, Paper, ToggleButtonGroup, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { type FunctionComponent, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 
 import { updateReportForExercise, updateReportInjectCommentForExercise } from '../../../../../actions/reports/report-actions';
 import ExportPdfButton from '../../../../../components/ExportPdfButton';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
-import type { Exercise, LessonsQuestion, Report, ReportInput } from '../../../../../utils/api-types';
+import { type Exercise, type LessonsQuestion, type Report, type ReportInput } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
-import { ReportContext, ReportContextType } from '../../../common/Context';
+import { ReportContext, type ReportContextType } from '../../../common/Context';
 import ResponsePie from '../../../common/injects/ResponsePie';
 import ReportComment from '../../../components/reports/ReportComment';
 import ReportPopover from '../../../components/reports/ReportPopover';
@@ -25,13 +24,16 @@ import InjectReportResult from './InjectReportResult';
 import ReportInformationType from './ReportInformationType';
 import useExerciseReportData from './useExerciseReportData';
 
-const SimulationReportPage: React.FC = () => {
+const SimulationReportPage: FunctionComponent = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const { t, tPick, fldt } = useFormatter();
   const theme = useTheme();
 
-  const { exerciseId, reportId } = useParams() as { exerciseId: Exercise['exercise_id']; reportId: Report['report_id'] };
+  const { exerciseId, reportId } = useParams() as {
+    exerciseId: Exercise['exercise_id'];
+    reportId: Report['report_id'];
+  };
   const { loading, report, displayModule, setReloadReportDataCount, reportData } = useExerciseReportData(reportId, exerciseId);
   const [selectedQuestion, setSelectedQuestion] = useState<LessonsQuestion | null>(null);
   const selectedQuestionAnswers = selectedQuestion && selectedQuestion.lessonsquestion_id
@@ -78,7 +80,11 @@ const SimulationReportPage: React.FC = () => {
 
   return (
     <ReportContext.Provider value={context}>
-      <div style={{ margin: 20, display: 'flex' }}>
+      <div style={{
+        margin: 20,
+        display: 'flex',
+      }}
+      >
         <Button
           color="primary"
           variant="outlined"
@@ -89,21 +95,48 @@ const SimulationReportPage: React.FC = () => {
         </Button>
 
         <ToggleButtonGroup style={{ marginLeft: 'auto' }}>
-          <ExportPdfButton pdfName={report.report_name} getPdfDocDefinition={() => getExerciseReportPdfDocDefinition({ report, reportData, displayModule, tPick, fldt, t })} />
+          <ExportPdfButton
+            pdfName={report.report_name}
+            getPdfDocDefinition={() => getExerciseReportPdfDocDefinition({
+              report,
+              reportData,
+              displayModule,
+              tPick,
+              fldt,
+              t,
+            })}
+          />
           {permissions.canWrite && <ReportPopover variant="toggle" report={report} actions={['Update']} />}
         </ToggleButtonGroup>
       </div>
 
       <div
         id={`reportId_${report.report_id}`}
-        style={{ padding: 20, display: 'flex', flexFlow: 'wrap', maxWidth: '1400px', margin: 'auto' }}
+        style={{
+          padding: 20,
+          display: 'flex',
+          flexFlow: 'wrap',
+          maxWidth: '1400px',
+          margin: 'auto',
+        }}
       >
-        <div style={{ width: '100%', textAlign: 'center', fontSize: 25, fontWeight: 500, margin: '10px' }}>
+        <div style={{
+          width: '100%',
+          textAlign: 'center',
+          fontSize: 25,
+          fontWeight: 500,
+          margin: '10px',
+        }}
+        >
           {report.report_name}
         </div>
         {displayModule(ReportInformationType.MAIN_INFORMATION)
         && (
-          <div style={{ width: '50%', paddingRight: '25px' }}>
+          <div style={{
+            width: '50%',
+            paddingRight: '25px',
+          }}
+          >
             <Typography variant="h4" gutterBottom>
               {t('General information')}
             </Typography>
@@ -112,11 +145,22 @@ const SimulationReportPage: React.FC = () => {
         )}
         {displayModule(ReportInformationType.SCORE_DETAILS)
         && (
-          <div style={{ width: '50%', display: 'grid', gridTemplateRows: 'auto 1fr' }}>
+          <div style={{
+            width: '50%',
+            display: 'grid',
+            gridTemplateRows: 'auto 1fr',
+          }}
+          >
             <Typography variant="h4" gutterBottom>
               {t('Results')}
             </Typography>
-            <Paper variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
+            <Paper
+              variant="outlined"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults} disableChartAnimation />
             </Paper>
           </div>
@@ -127,13 +171,20 @@ const SimulationReportPage: React.FC = () => {
             canEditComment={canEditReport}
             injectsComments={report?.report_injects_comments}
             injects={reportData.injects}
-            style={{ width: '100%', marginTop: 20 }}
+            style={{
+              width: '100%',
+              marginTop: 20,
+            }}
             onCommentSubmit={value => dispatch(updateReportInjectCommentForExercise(exerciseId, report.report_id, value))}
           />
         )}
         {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
         && (
-          <div style={{ width: '100%', marginTop: 20 }}>
+          <div style={{
+            width: '100%',
+            marginTop: 20,
+          }}
+          >
             <Typography variant="h4" gutterBottom>
               {t('Global observation')}
             </Typography>
@@ -146,7 +197,10 @@ const SimulationReportPage: React.FC = () => {
         {displayModule(ReportInformationType.PLAYER_SURVEYS)
         && (
           <LessonsCategories
-            style={{ marginTop: theme.spacing(3), width: '100%' }}
+            style={{
+              marginTop: theme.spacing(3),
+              width: '100%',
+            }}
             lessonsCategories={reportData.lessonsCategories}
             lessonsAnswers={reportData.lessonsAnswers}
             lessonsQuestions={reportData.lessonsQuestions}

@@ -1,13 +1,13 @@
 import { GroupsOutlined } from '@mui/icons-material';
 import { Drawer, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { CSSProperties, useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
+import { type TagHelper, type UserHelper } from '../../../../actions/helper';
 import { searchTeams } from '../../../../actions/teams/team-actions';
-import { TeamsHelper } from '../../../../actions/teams/team-helper';
+import { type TeamsHelper } from '../../../../actions/teams/team-helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -16,7 +16,7 @@ import { buildSearchPagination } from '../../../../components/common/queryable/Q
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
-import type { SearchPaginationInput, Team } from '../../../../utils/api-types';
+import { type SearchPaginationInput, type Team } from '../../../../utils/api-types';
 import CreateTeam from './CreateTeam';
 import TeamPlayers from './TeamPlayers';
 import TeamPopover from './TeamPopover';
@@ -50,12 +50,8 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  team_name: {
-    width: '25%',
-  },
-  team_description: {
-    width: '20%',
-  },
+  team_name: { width: '25%' },
+  team_description: { width: '20%' },
   team_users_number: {
     width: '10%',
     cursor: 'default',
@@ -64,9 +60,7 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '25%',
     cursor: 'default',
   },
-  team_updated_at: {
-    width: '20%',
-  },
+  team_updated_at: { width: '20%' },
 };
 
 const Teams = () => {
@@ -82,17 +76,35 @@ const Teams = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   // Headers
   const headers = [
-    { field: 'team_name', label: 'Name', isSortable: true },
-    { field: 'team_description', label: 'Description', isSortable: true },
-    { field: 'team_users_number', label: 'Players', isSortable: false },
-    { field: 'team_tags', label: 'Tags', isSortable: false },
-    { field: 'team_updated_at', label: 'Updated', isSortable: true },
+    {
+      field: 'team_name',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'team_description',
+      label: 'Description',
+      isSortable: true,
+    },
+    {
+      field: 'team_users_number',
+      label: 'Players',
+      isSortable: false,
+    },
+    {
+      field: 'team_tags',
+      label: 'Tags',
+      isSortable: false,
+    },
+    {
+      field: 'team_updated_at',
+      label: 'Updated',
+      isSortable: true,
+    },
   ];
 
   const [teams, setTeams] = useState<Team[]>([]);
@@ -101,9 +113,7 @@ const Teams = () => {
     textSearch: search,
   }));
 
-  const { refetched } = useHelper((helper: TeamsHelper) => ({
-    refetched: helper.getTeam(selectedTeam ?? ''),
-  }));
+  const { refetched } = useHelper((helper: TeamsHelper) => ({ refetched: helper.getTeam(selectedTeam ?? '') }));
 
   const onTeamUpdated = (team: Team) => {
     setTeams(teams.map(v => (v.team_id !== team.team_id ? v : team)));
@@ -132,7 +142,13 @@ const Teams = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Teams of players'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Teams') }, {
+          label: t('Teams of players'),
+          current: true,
+        }]}
+      />
       <PaginationComponent
         fetch={searchTeams}
         searchPaginationInput={searchPaginationInput}

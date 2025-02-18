@@ -49,18 +49,10 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles = {
-  phase_kill_chain_name: {
-    width: '20%',
-  },
-  phase_name: {
-    width: '35%',
-  },
-  phase_order: {
-    width: '15%',
-  },
-  phase_created_at: {
-    width: '15%',
-  },
+  phase_kill_chain_name: { width: '20%' },
+  phase_name: { width: '35%' },
+  phase_order: { width: '15%' },
+  phase_created_at: { width: '15%' },
 };
 
 const KillChainPhases = () => {
@@ -70,16 +62,30 @@ const KillChainPhases = () => {
 
   // Headers
   const headers = [
-    { field: 'phase_kill_chain_name', label: 'Kill chain', isSortable: true },
-    { field: 'phase_name', label: 'Name', isSortable: true },
-    { field: 'phase_order', label: 'Order', isSortable: true },
-    { field: 'phase_created_at', label: 'Created', isSortable: true },
+    {
+      field: 'phase_kill_chain_name',
+      label: 'Kill chain',
+      isSortable: true,
+    },
+    {
+      field: 'phase_name',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'phase_order',
+      label: 'Order',
+      isSortable: true,
+    },
+    {
+      field: 'phase_created_at',
+      label: 'Created',
+      isSortable: true,
+    },
   ];
 
   const [killChainPhases, setKillChainPhases] = useState([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('phase_order'),
-  });
+  const [searchPaginationInput, setSearchPaginationInput] = useState({ sorts: initSorting('phase_order') });
 
   // Export
   const exportProps = {
@@ -96,7 +102,13 @@ const KillChainPhases = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, { label: t('Kill chain phases'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+          label: t('Kill chain phases'),
+          current: true,
+        }]}
+      />
       <TaxonomiesMenu />
       <PaginationComponent
         fetch={searchKillChainPhases}

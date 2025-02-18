@@ -43,9 +43,7 @@ esbuild
     entryPoints: ['src/index.tsx'],
     publicPath: '/',
     bundle: true,
-    banner: {
-      js: ' (() => new EventSource("http://localhost:3001/dev").onmessage = () => location.reload())();',
-    },
+    banner: { js: ' (() => new EventSource("http://localhost:3001/dev").onmessage = () => location.reload())();' },
     loader: {
       '.js': 'jsx',
       '.svg': 'file',

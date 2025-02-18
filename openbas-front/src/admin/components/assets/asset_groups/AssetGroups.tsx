@@ -1,12 +1,12 @@
 import { Box, Chip, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
-import { CSSProperties, Fragment, useMemo, useState } from 'react';
+import { type CSSProperties, Fragment, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
-import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
+import { type TagHelper, type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ExportButton from '../../../../components/common/ExportButton';
@@ -16,25 +16,19 @@ import PaginationComponentV2 from '../../../../components/common/queryable/pagin
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import { Header } from '../../../../components/common/SortHeadersList';
+import { type Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
-import type { AssetGroup, AssetGroupOutput } from '../../../../utils/api-types';
+import { type AssetGroup, type AssetGroupOutput } from '../../../../utils/api-types';
 import AssetGroupCreation from './AssetGroupCreation';
 import AssetGroupManagement from './AssetGroupManagement';
 import AssetGroupPopover from './AssetGroupPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     height: 24,
     fontSize: 13,
@@ -52,19 +46,13 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  asset_group_name: {
-    width: '20%',
-  },
-  asset_group_description: {
-    width: '20%',
-  },
+  asset_group_name: { width: '20%' },
+  asset_group_description: { width: '20%' },
   asset_group_assets: {
     width: '35%',
     cursor: 'default',
   },
-  asset_group_tags: {
-    width: '25%',
-  },
+  asset_group_tags: { width: '25%' },
 };
 
 const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => string) => {
@@ -140,9 +128,7 @@ const AssetGroups = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   // Headers
   const headers: Header[] = useMemo(() => [
@@ -200,7 +186,13 @@ const AssetGroups = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Asset groups'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Assets') }, {
+          label: t('Asset groups'),
+          current: true,
+        }]}
+      />
       <PaginationComponentV2
         fetch={searchAssetGroups}
         searchPaginationInput={searchPaginationInput}

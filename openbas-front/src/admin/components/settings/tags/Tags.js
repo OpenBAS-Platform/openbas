@@ -41,12 +41,8 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles = {
-  tag_name: {
-    width: '40%',
-  },
-  tag_color: {
-    width: '20%',
-  },
+  tag_name: { width: '40%' },
+  tag_color: { width: '20%' },
 };
 
 const Tags = () => {
@@ -56,14 +52,20 @@ const Tags = () => {
 
   // Headers
   const headers = [
-    { field: 'tag_name', label: 'Name', isSortable: true },
-    { field: 'tag_color', label: 'Color', isSortable: true },
+    {
+      field: 'tag_name',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'tag_color',
+      label: 'Color',
+      isSortable: true,
+    },
   ];
 
   const [tags, setTags] = useState([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('tag_name'),
-  });
+  const [searchPaginationInput, setSearchPaginationInput] = useState({ sorts: initSorting('tag_name') });
 
   // Export
   const exportProps = {
@@ -78,7 +80,13 @@ const Tags = () => {
 
   return (
     <div className={classes.container}>
-      <Breadcrumbs variant="list" elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, { label: t('Tags'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+          label: t('Tags'),
+          current: true,
+        }]}
+      />
       <TaxonomiesMenu />
       <PaginationComponent
         fetch={searchTags}

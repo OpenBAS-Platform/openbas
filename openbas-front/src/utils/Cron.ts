@@ -43,7 +43,13 @@ const parseCron = (cron: string): ParsedCron => {
     }
   }
 
-  return ({ w, d, h: Number(cronSplits[2]), m: Number(cronSplits[1]), owd });
+  return ({
+    w,
+    d,
+    h: Number(cronSplits[2]),
+    m: Number(cronSplits[1]),
+    owd,
+  });
 };
 
 export {

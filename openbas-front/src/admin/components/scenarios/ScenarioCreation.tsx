@@ -1,23 +1,19 @@
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { LoggedHelper } from '../../../actions/helper';
+import { type LoggedHelper } from '../../../actions/helper';
 import { addScenario } from '../../../actions/scenarios/scenario-actions';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import Drawer from '../../../components/common/Drawer';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { PlatformSettings, Scenario, ScenarioInput } from '../../../utils/api-types';
+import { type PlatformSettings, type Scenario, type ScenarioInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import ScenarioForm from './ScenarioForm';
 
-interface Props {
-  onCreate?: (result: Scenario) => void;
-}
+interface Props { onCreate?: (result: Scenario) => void }
 
-const ScenarioCreation: FunctionComponent<Props> = ({
-  onCreate,
-}) => {
+const ScenarioCreation: FunctionComponent<Props> = ({ onCreate }) => {
   // Standard hooks
   const [open, setOpen] = useState(false);
   const { t } = useFormatter();
@@ -27,7 +23,10 @@ const ScenarioCreation: FunctionComponent<Props> = ({
 
   const onSubmit = (data: ScenarioInput) => {
     dispatch(addScenario(data)).then(
-      (result: { result: string; entities: { scenarios: Record<string, Scenario> } }) => {
+      (result: {
+        result: string;
+        entities: { scenarios: Record<string, Scenario> };
+      }) => {
         if (result.entities) {
           if (onCreate) {
             const created = result.entities.scenarios[result.result];
@@ -40,9 +39,7 @@ const ScenarioCreation: FunctionComponent<Props> = ({
     );
   };
 
-  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({
-    settings: helper.getPlatformSettings(),
-  }));
+  const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
 
   const initialValues: ScenarioInput = {
     scenario_name: '',

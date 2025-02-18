@@ -1,8 +1,7 @@
 import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined } from '@mui/icons-material';
 import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -34,9 +33,7 @@ const useStyles = makeStyles()(theme => ({
     borderTop: 0,
     color: theme.palette.text?.primary,
   },
-  logoContainer: {
-    margin: '2px 0 0 10px',
-  },
+  logoContainer: { margin: '2px 0 0 10px' },
   logo: {
     cursor: 'pointer',
     height: 35,
@@ -73,9 +70,7 @@ const useStyles = makeStyles()(theme => ({
     'textAlign': 'center',
     'padding': '15px 0 10px 0',
     'borderRadius': 4,
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-    },
+    '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
   },
   xtmItemCurrent: {
     display: 'block',
@@ -93,7 +88,7 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-const TopBar: React.FC = () => {
+const TopBar: FunctionComponent = () => {
   // Standard hooks
   const theme = useTheme();
   const location = useLocation();
@@ -106,37 +101,53 @@ const TopBar: React.FC = () => {
   const [xtmOpen, setXtmOpen] = useState<{
     open: boolean;
     anchorEl: HTMLButtonElement | null;
-  }>({ open: false, anchorEl: null });
+  }>({
+    open: false,
+    anchorEl: null,
+  });
   const [menuOpen, setMenuOpen] = useState<{
     open: boolean;
     anchorEl: HTMLButtonElement | null;
-  }>({ open: false, anchorEl: null });
+  }>({
+    open: false,
+    anchorEl: null,
+  });
   const handleOpenMenu = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    event: ReactMouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.preventDefault();
-    setMenuOpen({ open: true, anchorEl: event.currentTarget });
+    setMenuOpen({
+      open: true,
+      anchorEl: event.currentTarget,
+    });
   };
   const handleCloseMenu = () => {
-    setMenuOpen({ open: false, anchorEl: null });
+    setMenuOpen({
+      open: false,
+      anchorEl: null,
+    });
   };
   const handleOpenXtm = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    event: ReactMouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.preventDefault();
-    setXtmOpen({ open: true, anchorEl: event.currentTarget });
+    setXtmOpen({
+      open: true,
+      anchorEl: event.currentTarget,
+    });
   };
   const handleCloseXtm = () => {
-    setXtmOpen({ open: false, anchorEl: null });
+    setXtmOpen({
+      open: false,
+      anchorEl: null,
+    });
   };
   const dispatch = useAppDispatch();
   const [navOpen, setNavOpen] = useState(
     localStorage.getItem('navOpen') === 'true',
   );
   useEffect(() => {
-    const sub = MESSAGING$.toggleNav.subscribe({
-      next: () => setNavOpen(localStorage.getItem('navOpen') === 'true'),
-    });
+    const sub = MESSAGING$.toggleNav.subscribe({ next: () => setNavOpen(localStorage.getItem('navOpen') === 'true') });
     return () => {
       sub.unsubscribe();
     };
@@ -164,7 +175,11 @@ const TopBar: React.FC = () => {
       variant="outlined"
       elevation={0}
     >
-      <Toolbar style={{ marginTop: bannerHeightNumber, paddingLeft: 0 }}>
+      <Toolbar style={{
+        marginTop: bannerHeightNumber,
+        paddingLeft: 0,
+      }}
+      >
         <div className={classes.logoContainer}>
           <Link to="/admin">
             <img
@@ -219,7 +234,12 @@ const TopBar: React.FC = () => {
                 horizontal: 'center',
               }}
             >
-              <Box sx={{ width: '300px', padding: '15px', textAlign: 'center' }}>
+              <Box sx={{
+                width: '300px',
+                padding: '15px',
+                textAlign: 'center',
+              }}
+              >
                 <div className={classes.subtitle}>{t('Filigran eXtended Threat Management')}</div>
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>

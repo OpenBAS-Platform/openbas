@@ -1,5 +1,4 @@
-import { FunctionComponent } from 'react';
-import * as React from 'react';
+import { cloneElement, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
@@ -7,24 +6,14 @@ import EEChip from './EEChip';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
-const useStyles = makeStyles()({
-  labelRoot: {
-    '& .MuiFormLabel-root': {
-      zIndex: 1,
-    },
-  },
-});
+const useStyles = makeStyles()({ labelRoot: { '& .MuiFormLabel-root': { zIndex: 1 } } });
 
-interface EEFieldProps {
-  children: React.ReactElement;
-}
+interface EEFieldProps { children: ReactElement<{ label: ReactElement }> }
 
-const EEField: FunctionComponent<EEFieldProps> = ({
-  children,
-}) => {
+const EEField: FunctionComponent<EEFieldProps> = ({ children }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const component = React.cloneElement(children, {
+  const component = cloneElement(children, {
     label:
       <>
         {t(children.props.label)}

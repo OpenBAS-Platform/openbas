@@ -1,20 +1,20 @@
 import { HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
-import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
+import { type QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
-import { Header } from '../../../components/common/SortHeadersList';
+import { type Header } from '../../../components/common/SortHeadersList';
 import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
+import { type InjectResultOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectorContract from '../common/injects/InjectorContract';
@@ -22,15 +22,9 @@ import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     height: 20,
     fontSize: 13,
@@ -42,27 +36,13 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  'inject_type': {
-    width: '10%',
-  },
-  'inject_title': {
-    width: '20%',
-  },
-  'inject_status.tracking_sent_date': {
-    width: '15%',
-  },
-  'inject_status': {
-    width: '10%',
-  },
-  'inject_targets': {
-    width: '20%',
-  },
-  'inject_expectations': {
-    width: '10%',
-  },
-  'inject_updated_at': {
-    width: '15%',
-  },
+  'inject_type': { width: '10%' },
+  'inject_title': { width: '20%' },
+  'inject_status.tracking_sent_date': { width: '15%' },
+  'inject_status': { width: '10%' },
+  'inject_targets': { width: '20%' },
+  'inject_expectations': { width: '10%' },
+  'inject_updated_at': { width: '15%' },
 };
 
 interface Props {
@@ -72,6 +52,7 @@ interface Props {
   queryableHelpers: QueryableHelpers;
   searchPaginationInput: SearchPaginationInput;
   availableFilterNames?: string[];
+  contextId?: string;
 }
 
 const InjectResultList: FunctionComponent<Props> = ({
@@ -80,6 +61,7 @@ const InjectResultList: FunctionComponent<Props> = ({
   goTo,
   queryableHelpers,
   searchPaginationInput,
+  contextId,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -94,6 +76,9 @@ const InjectResultList: FunctionComponent<Props> = ({
     'inject_title',
     'inject_type',
     'inject_updated_at',
+    'inject_assets',
+    'inject_asset_groups',
+    'inject_teams',
   ];
   const [injects, setInjects] = useState<InjectResultOutput[]>([]);
 
@@ -178,6 +163,7 @@ const InjectResultList: FunctionComponent<Props> = ({
         entityPrefix="inject"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
+        contextId={contextId}
       />
       <List>
         <ListItem

@@ -57,7 +57,10 @@ export const updatePlatformDarkParameters = data => (dispatch) => {
 };
 
 export const askReset = (username, locale) => (dispatch) => {
-  const data = { login: username, lang: locale };
+  const data = {
+    login: username,
+    lang: locale,
+  };
   return postReferential(schema.user, '/api/reset', data)(dispatch);
 };
 
@@ -87,7 +90,10 @@ export const validateResetToken = token => (dispatch) => {
 };
 
 export const askToken = (username, password) => (dispatch) => {
-  const data = { login: username, password };
+  const data = {
+    login: username,
+    password,
+  };
   const ref = postReferential(schema.user, '/api/login', data)(dispatch);
   return ref.then((finalData) => {
     if (finalData[FORM_ERROR]) {
@@ -112,7 +118,10 @@ export const checkKerberos = () => (dispatch) => {
 
 export const fetchMe = () => (dispatch) => {
   const ref = getReferential(schema.user, '/api/me')(dispatch);
-  return ref.then(data => dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data }));
+  return ref.then(data => dispatch({
+    type: Constants.IDENTITY_LOGIN_SUCCESS,
+    payload: data,
+  }));
 };
 
 export const logout = () => (dispatch) => {

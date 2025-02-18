@@ -47,11 +47,7 @@ const useStyles = makeStyles()((theme) => ({
 /* end banner classes needing eslint-disable */
 /* eslint-enable */
 
-const SystemBanners = (settings: {
-  settings: {
-    platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>;
-  };
-}) => {
+const SystemBanners = (settings: { settings: { platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]> } }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();

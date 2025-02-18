@@ -1,6 +1,6 @@
 import { Box, Button, InputLabel } from '@mui/material';
-import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
-import { FieldError, FieldErrors, FieldErrorsImpl, Merge } from 'react-hook-form';
+import { type FormEvent, type FunctionComponent, useEffect, useState } from 'react';
+import { type FieldError, type FieldErrors, type FieldErrorsImpl, type Merge } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import { truncate } from '../../utils/String';
@@ -23,19 +23,11 @@ const useStyles = makeStyles()(theme => ({
     'paddingBottom': '0.35rem',
     'borderBottom': `0.1rem solid ${theme.palette.grey[500]}`,
     'cursor': 'default',
-    '&:hover': {
-      borderBottom: '0.1rem solid white',
-    },
-    '&:active': {
-      borderBottom: `0.1rem solid ${theme.palette.primary.main}`,
-    },
+    '&:hover': { borderBottom: '0.1rem solid white' },
+    '&:active': { borderBottom: `0.1rem solid ${theme.palette.primary.main}` },
   },
-  boxError: {
-    borderBottom: `0.1rem solid ${theme.palette.error.main}`,
-  },
-  button: {
-    lineHeight: '0.65rem',
-  },
+  boxError: { borderBottom: `0.1rem solid ${theme.palette.error.main}` },
+  button: { lineHeight: '0.65rem' },
   div: {
     marginTop: 20,
     width: '100%',

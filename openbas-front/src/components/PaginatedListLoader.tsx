@@ -6,11 +6,11 @@ import {
   ListItemIcon,
   ListItemText,
   Skeleton,
-  SvgIconProps,
+  type SvgIconProps,
 } from '@mui/material';
-import { ComponentType, CSSProperties, FunctionComponent } from 'react';
+import { type ComponentType, type CSSProperties, type FunctionComponent } from 'react';
 
-import { Header } from './common/SortHeadersList';
+import { type Header } from './common/SortHeadersList';
 
 interface Props {
   headers: Header[];
@@ -43,7 +43,10 @@ const PaginatedListLoader: FunctionComponent<Props> = ({
         )}
       >
         <ListItemButton
-          style={{ height, pointerEvents: 'none' }}
+          style={{
+            height,
+            pointerEvents: 'none',
+          }}
         >
           <ListItemIcon>
             <Icon color="disabled" />
@@ -54,7 +57,10 @@ const PaginatedListLoader: FunctionComponent<Props> = ({
                 {headers.map(header => (
                   <div
                     key={header.field}
-                    style={{ ...headerStyles[header.field], paddingRight: 10 }}
+                    style={{
+                      ...headerStyles[header.field],
+                      paddingRight: 10,
+                    }}
                   >
                     <Skeleton height={40} />
                   </div>

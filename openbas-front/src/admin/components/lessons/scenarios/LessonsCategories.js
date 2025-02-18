@@ -13,11 +13,7 @@ import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
 import CreateLessonsQuestion from '../categories/questions/CreateLessonsQuestion';
 import LessonsQuestionPopover from '../categories/questions/LessonsQuestionPopover';
 
-const useStyles = makeStyles()(() => ({
-  chip: {
-    margin: '0 10px 10px 0',
-  },
-}));
+const useStyles = makeStyles()(() => ({ chip: { margin: '0 10px 10px 0' } }));
 
 const LessonsCategories = ({
   lessonsCategories,
@@ -31,9 +27,7 @@ const LessonsCategories = ({
   const theme = useTheme();
 
   // Context
-  const {
-    onUpdateLessonsCategoryTeams,
-  } = useContext(LessonContext);
+  const { onUpdateLessonsCategoryTeams } = useContext(LessonContext);
 
   const sortCategories = R.sortWith([
     R.ascend(R.prop('lessons_category_order')),
@@ -47,7 +41,12 @@ const LessonsCategories = ({
     return onUpdateLessonsCategoryTeams(lessonsCategoryId, data);
   };
   return (
-    <div style={{ display: 'grid', gap: `${theme.spacing(2)} 0`, gridTemplateColumns: '1fr' }}>
+    <div style={{
+      display: 'grid',
+      gap: `${theme.spacing(2)} 0`,
+      gridTemplateColumns: '1fr',
+    }}
+    >
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
@@ -64,7 +63,12 @@ const LessonsCategories = ({
                 />
               )}
             </Typography>
-            <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateColumns: '3fr 2fr' }}>
+            <div style={{
+              display: 'grid',
+              gap: `0 ${theme.spacing(3)}`,
+              gridTemplateColumns: '3fr 2fr',
+            }}
+            >
               <Typography variant="h4" style={{ alignContent: 'center' }}>{t('Questions')}</Typography>
               <div>
                 <Typography variant="h4">

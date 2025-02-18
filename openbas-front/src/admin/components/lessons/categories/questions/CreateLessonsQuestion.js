@@ -40,9 +40,7 @@ const CreateLessonsQuestion = (props) => {
   const [open, setOpen] = useState(false);
 
   // Context
-  const {
-    onAddLessonsQuestion,
-  } = useContext(LessonContext);
+  const { onAddLessonsQuestion } = useContext(LessonContext);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

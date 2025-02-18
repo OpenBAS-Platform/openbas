@@ -1,9 +1,9 @@
 import { Autocomplete, Box, TextField } from '@mui/material';
-import { FunctionComponent } from 'react';
-import { FieldError } from 'react-hook-form';
+import { type FunctionComponent } from 'react';
+import { type FieldError } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import type { Option } from '../utils/Option';
+import { type Option } from '../utils/Option';
 import { useFormatter } from './i18n';
 import PlatformIcon from './PlatformIcon';
 
@@ -17,9 +17,7 @@ const useStyles = makeStyles()(() => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 }));
 
 interface Props {
@@ -40,9 +38,18 @@ const PlatformField: FunctionComponent<Props> = ({
   const { t } = useFormatter();
 
   const platformsOptions: Option[] = [
-    { id: 'Windows', label: 'Windows' },
-    { id: 'Linux', label: 'Linux' },
-    { id: 'MacOS', label: 'MacOS' },
+    {
+      id: 'Windows',
+      label: 'Windows',
+    },
+    {
+      id: 'Linux',
+      label: 'Linux',
+    },
+    {
+      id: 'MacOS',
+      label: 'MacOS',
+    },
   ];
 
   return (

@@ -5,10 +5,10 @@ import { Link, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseTeams } from '../../../../../actions/Exercise';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import { fetchExerciseInjects, updateInjectForExercise } from '../../../../../actions/Inject';
-import type { InjectStore } from '../../../../../actions/injects/Inject';
-import type { InjectHelper } from '../../../../../actions/injects/inject-helper';
+import { type InjectStore } from '../../../../../actions/injects/Inject';
+import { type InjectHelper } from '../../../../../actions/injects/inject-helper';
 import { BACK_LABEL, BACK_URI } from '../../../../../components/Breadcrumbs';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
@@ -17,7 +17,7 @@ import ProgressBarCountdown from '../../../../../components/ProgressBarCountdown
 import SearchFilter from '../../../../../components/SearchFilter';
 import Timeline from '../../../../../components/Timeline';
 import { useHelper } from '../../../../../store';
-import type { Exercise, Inject } from '../../../../../utils/api-types';
+import { type Exercise, type Inject } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
@@ -33,9 +33,7 @@ import InjectOverTimeArea from './InjectOverTimeArea';
 import InjectOverTimeLine from './InjectOverTimeLine';
 
 const useStyles = makeStyles()(theme => ({
-  item: {
-    height: 50,
-  },
+  item: { height: 50 },
   bodyItems: {
     display: 'grid',
     gap: `0px ${theme.spacing(3)}`,
@@ -118,7 +116,13 @@ const TimelineOverview = () => {
         onSelectInject={(id: string) => setSelectedInjectId(id)}
       />
       <div className="clearfix" />
-      <div style={{ display: 'grid', marginTop: 50, gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{
+        display: 'grid',
+        marginTop: 50,
+        gap: `0px ${theme.spacing(3)}`,
+        gridTemplateColumns: '1fr 1fr',
+      }}
+      >
         <Typography variant="h4">{t('Pending injects')}</Typography>
         <Typography variant="h4">{t('Processed injects')}</Typography>
         <Paper variant="outlined">
@@ -264,7 +268,13 @@ const TimelineOverview = () => {
           )}
         </Paper>
       </div>
-      <div style={{ display: 'grid', marginTop: theme.spacing(3), gap: `0px ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr' }}>
+      <div style={{
+        display: 'grid',
+        marginTop: theme.spacing(3),
+        gap: `0px ${theme.spacing(3)}`,
+        gridTemplateColumns: '1fr 1fr',
+      }}
+      >
         <Typography variant="h4">{t('Sent injects over time')}</Typography>
         <Typography variant="h4">{t('Sent injects over time')}</Typography>
         <Paper variant="outlined">

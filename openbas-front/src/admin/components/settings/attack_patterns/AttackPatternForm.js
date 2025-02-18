@@ -60,7 +60,11 @@ const AttackPatternForm = (props) => {
             label={t('Description')}
             style={{ marginTop: 20 }}
           />
-          <div style={{ float: 'right', marginTop: 20 }}>
+          <div style={{
+            float: 'right',
+            marginTop: 20,
+          }}
+          >
             <Button
               variant="contained"
               onClick={handleClose}

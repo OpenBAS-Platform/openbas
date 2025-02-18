@@ -1,13 +1,16 @@
 import { useTheme } from '@mui/material/styles';
-import { type BackgroundProps, Panel, type ReactFlowState, useStore, Viewport } from '@xyflow/react';
+import { type BackgroundProps, Panel, type ReactFlowState, useStore, type Viewport } from '@xyflow/react';
 import moment from 'moment-timezone';
-import { CSSProperties, memo, useEffect, useState } from 'react';
+import { type CSSProperties, memo, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 import { shallow } from 'zustand/shallow';
 
 import { useFormatter } from './i18n';
 
-const selector = (s: ReactFlowState) => ({ transform: s.transform, patternId: `pattern-${s.rfId}` });
+const selector = (s: ReactFlowState) => ({
+  transform: s.transform,
+  patternId: `pattern-${s.rfId}`,
+});
 
 // @ts-expect-error pointer events is important and is mandatory
 const useStyles = makeStyles()(() => ({
@@ -17,9 +20,7 @@ const useStyles = makeStyles()(() => ({
     height: '100%',
     margin: '0px 0px 0px 5px !important',
   },
-  dateLabel: {
-    textAnchor: 'middle',
-  },
+  dateLabel: { textAnchor: 'middle' },
 }));
 
 interface Props extends BackgroundProps {

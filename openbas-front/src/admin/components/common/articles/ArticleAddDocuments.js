@@ -11,7 +11,8 @@ import {
   List,
   ListItemButton,
   ListItemIcon,
-  ListItemText } from '@mui/material';
+  ListItemText,
+} from '@mui/material';
 import * as R from 'ramda';
 import { useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -36,9 +37,7 @@ const useStyles = makeStyles()(theme => ({
     padding: 20,
     border: '1px dashed rgba(255, 255, 255, 0.3)',
   },
-  chip: {
-    margin: '0 10px 10px 0',
-  },
+  chip: { margin: '0 10px 10px 0' },
   item: {
     paddingLeft: 10,
     height: 50,
@@ -63,9 +62,7 @@ const ArticleAddDocuments = (props) => {
   const [tags, setTags] = useState([]);
 
   // Fetching data
-  const { documents } = useHelper(helper => ({
-    documents: helper.getDocumentsMap(),
-  }));
+  const { documents } = useHelper(helper => ({ documents: helper.getDocumentsMap() }));
   useDataLoader(() => {
     dispatch(fetchDocuments());
   });

@@ -1,12 +1,15 @@
 import { useState } from 'react';
 
+import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
+import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
-import { Option } from '../../../../utils/Option';
+import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
+import { type Option } from '../../../../utils/Option';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -44,6 +47,21 @@ const useRetrieveOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'inject_asset_groups':
+        searchAssetGroupByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'inject_assets':
+        searchEndpointByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'inject_teams':
+        searchTeamByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
       case 'exercise_scenario':
         searchScenarioByIdAsOption(ids).then((response) => {
           setOptions(response.data);
@@ -55,12 +73,18 @@ const useRetrieveOptions = () => {
         });
         break;
       default:
-        setOptions(ids.map(id => ({ id, label: id })));
+        setOptions(ids.map(id => ({
+          id,
+          label: id,
+        })));
         break;
     }
   };
 
-  return { options, searchOptions };
+  return {
+    options,
+    searchOptions,
+  };
 };
 
 export default useRetrieveOptions;

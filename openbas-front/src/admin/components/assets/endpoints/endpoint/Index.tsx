@@ -2,7 +2,7 @@ import { Alert, AlertTitle } from '@mui/material';
 import { lazy, useState } from 'react';
 import { Route, Routes, useParams } from 'react-router';
 
-import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
+import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import { fetchEndpoint } from '../../../../../actions/assets/endpoint-actions';
 import Breadcrumbs from '../../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../../components/Error';
@@ -10,7 +10,7 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import NotFound from '../../../../../components/NotFound';
 import { useHelper } from '../../../../../store';
-import type { EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
+import { type EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import EndpointHeader from './EndpointHeader';
@@ -25,9 +25,7 @@ const Index = () => {
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
 
   // Fetching data
-  const { endpoint } = useHelper((helper: EndpointHelper) => ({
-    endpoint: helper.getEndpoint(endpointId),
-  }));
+  const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
   useDataLoader(() => {
     setLoading(true);
     dispatch(fetchEndpoint(endpointId)).finally(() => {
@@ -54,8 +52,14 @@ const Index = () => {
         variant="object"
         elements={[
           { label: t('Assets') },
-          { label: t('Endpoints'), link: '/admin/assets/endpoints' },
-          { label: endpoint.asset_name, current: true },
+          {
+            label: t('Endpoints'),
+            link: '/admin/assets/endpoints',
+          },
+          {
+            label: endpoint.asset_name,
+            current: true,
+          },
         ]}
       />
       <EndpointHeader />
