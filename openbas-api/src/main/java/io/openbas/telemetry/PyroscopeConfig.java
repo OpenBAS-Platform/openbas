@@ -10,11 +10,13 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 @Aspect
 @Component
+@ConditionalOnProperty(prefix = "pyroscope.agent", name = "enabled")
 public class PyroscopeConfig {
 
   /** The pointcut to use. Targets all method in the package and subpackages io.openbas.rest */
