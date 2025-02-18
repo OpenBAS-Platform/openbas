@@ -337,6 +337,13 @@ public class InjectorApi extends RestBehavior {
   }
 
   private byte[] getCalderaFile(String platform, String arch, String extension) throws IOException {
+    if (!AVAILABLE_PLATFORMS.contains(platform)) {
+      throw new IllegalArgumentException("Platform invalid : " + platform);
+    }
+    if (!AVAILABLE_ARCHITECTURES.contains(arch)) {
+      throw new IllegalArgumentException("Architecture invalid : " + arch);
+    }
+
     String resource =
         "/implants/caldera/" + platform + "/" + arch + "/obas-implant-caldera-" + platform;
     if (extension != null) {

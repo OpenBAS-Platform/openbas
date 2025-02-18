@@ -1,5 +1,6 @@
 package io.openbas.executors.caldera.service;
 
+import static io.openbas.service.EndpointService.DELETE_TTL;
 import static io.openbas.utils.Time.toInstant;
 import static java.time.Instant.now;
 
@@ -28,7 +29,6 @@ import org.springframework.stereotype.Service;
 public class CalderaExecutorService implements Runnable {
 
   private static final int CLEAR_TTL = 1800000; // 30 minutes
-  private static final int DELETE_TTL = 86400000; // 24 hours
   private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
   private static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
@@ -136,7 +136,7 @@ public class CalderaExecutorService implements Runnable {
       if (optionalEndpoint.isPresent()) {
         Endpoint endpointToUpdate = optionalEndpoint.get();
         Optional<io.openbas.database.model.Agent> optionalAgent =
-            this.agentService.getAgentByAgentDetailsForAnAsset(
+            this.agentService.getAgentForAnAsset(
                 endpointToUpdate.getId(),
                 agent.getExecutedByUser(),
                 agent.getDeploymentMode(),
@@ -167,7 +167,7 @@ public class CalderaExecutorService implements Runnable {
     } else {
       if (optionalEndpoint.isPresent()) {
         Optional<io.openbas.database.model.Agent> optionalAgent =
-            this.agentService.getAgentByAgentDetailsForAnAsset(
+            this.agentService.getAgentForAnAsset(
                 optionalEndpoint.get().getId(),
                 agent.getExecutedByUser(),
                 agent.getDeploymentMode(),

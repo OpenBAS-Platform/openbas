@@ -48,7 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Log
 public class EndpointService {
 
-  private static final int DELETE_TTL = 86400000; // 24 hours
+  public static final int DELETE_TTL = 86400000; // 24 hours
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
@@ -79,7 +79,7 @@ public class EndpointService {
 
   public Endpoint endpoint(@NotBlank final String endpointId) {
     return this.endpointRepository
-        .findByEndpointId(endpointId)
+        .findById(endpointId)
         .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
   }
 
@@ -142,7 +142,7 @@ public class EndpointService {
       if (optionalEndpoint.isPresent()) {
         Endpoint endpointToUpdate = optionalEndpoint.get();
         Optional<Agent> optionalAgent =
-            this.agentService.getAgentByAgentDetailsForAnAsset(
+            this.agentService.getAgentForAnAsset(
                 endpointToUpdate.getId(),
                 agent.getExecutedByUser(),
                 agent.getDeploymentMode(),
@@ -171,7 +171,7 @@ public class EndpointService {
     } else {
       if (optionalEndpoint.isPresent()) {
         Optional<Agent> optionalAgent =
-            this.agentService.getAgentByAgentDetailsForAnAsset(
+            this.agentService.getAgentForAnAsset(
                 optionalEndpoint.get().getId(),
                 agent.getExecutedByUser(),
                 agent.getDeploymentMode(),
@@ -208,7 +208,7 @@ public class EndpointService {
       Agent.DEPLOYMENT_MODE deploymentMode =
           input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session;
       Optional<Agent> optionalAgent =
-          agentService.getAgentByAgentDetailsForAnAsset(
+          agentService.getAgentForAnAsset(
               endpoint.getId(),
               input.getExecutedByUser(),
               deploymentMode,

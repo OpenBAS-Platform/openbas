@@ -15,7 +15,7 @@ public class AgentService {
 
   private final AgentRepository agentRepository;
 
-  public Optional<Agent> getAgentByAgentDetailsForAnAsset(
+  public Optional<Agent> getAgentForAnAsset(
       String assetId,
       String user,
       Agent.DEPLOYMENT_MODE deploymentMode,
