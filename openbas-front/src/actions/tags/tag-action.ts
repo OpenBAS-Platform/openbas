@@ -4,7 +4,7 @@ const TAG_URI = '/api/tags';
 
 export const searchTagAsOption = (searchText: string = '') => {
   const params = { searchText };
-  return simpleCall(`${TAG_URI}/options`, params);
+  return simpleCall(`${TAG_URI}/options`, { params });
 };
 
 export const searchTagByIdAsOption = (ids: string[]) => {
