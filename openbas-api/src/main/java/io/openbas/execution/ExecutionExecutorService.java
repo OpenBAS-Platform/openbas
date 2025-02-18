@@ -15,7 +15,6 @@ import io.openbas.rest.exception.AgentException;
 import io.openbas.rest.inject.service.InjectService;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
@@ -73,12 +72,12 @@ public class ExecutionExecutorService {
     Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
     Executor executor = agent.getExecutor();
     if (executor == null) {
-      log.log(
-          Level.SEVERE,
+      throw new AgentException(
           "Cannot find the executor for the agent "
               + agent.getExecutedByUser()
               + " from the asset "
-              + assetEndpoint.getName());
+              + assetEndpoint.getName(),
+          agent);
     } else if (!agent.isActive()) {
       throw new AgentException(
           "Agent error: agent "

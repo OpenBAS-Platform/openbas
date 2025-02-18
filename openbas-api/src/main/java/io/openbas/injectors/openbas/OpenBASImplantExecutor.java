@@ -1,12 +1,10 @@
 package io.openbas.injectors.openbas;
 
 import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
-import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
-import static io.openbas.service.AgentService.hasOnlyValidTraces;
-import static io.openbas.service.AgentService.isPrimaryAgent;
+import static io.openbas.utils.ExpectationUtils.*;
 
 import io.openbas.database.model.*;
 import io.openbas.execution.ExecutableInject;
@@ -173,62 +171,6 @@ public class OpenBASImplantExecutor extends Injector {
     }
   }
 
-  private List<ManualExpectation> getManualExpectationList(
-      Asset asset, Inject inject, ManualExpectation manualExpectation) {
-    return getActiveAgents(asset, inject).stream()
-        .map(
-            agent ->
-                manualExpectationForAgent(
-                    manualExpectation.getScore(),
-                    manualExpectation.getName(),
-                    manualExpectation.getDescription(),
-                    agent,
-                    asset,
-                    manualExpectation.getExpirationTime()))
-        .toList();
-  }
-
-  private List<DetectionExpectation> getDetectionExpectationList(
-      Asset asset, Inject inject, String payloadType, DetectionExpectation detectionExpectation) {
-    return getActiveAgents(asset, inject).stream()
-        .map(
-            agent ->
-                detectionExpectationForAgent(
-                    detectionExpectation.getScore(),
-                    detectionExpectation.getName(),
-                    detectionExpectation.getDescription(),
-                    agent,
-                    asset,
-                    detectionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), payloadType)))
-        .toList();
-  }
-
-  private List<PreventionExpectation> getPreventionExpectationList(
-      Asset asset, Inject inject, String payloadType, PreventionExpectation preventionExpectation) {
-    return getActiveAgents(asset, inject).stream()
-        .map(
-            agent ->
-                preventionExpectationForAgent(
-                    preventionExpectation.getScore(),
-                    preventionExpectation.getName(),
-                    preventionExpectation.getDescription(),
-                    agent,
-                    asset,
-                    preventionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), payloadType)))
-        .toList();
-  }
-
-  private List<Agent> getActiveAgents(Asset asset, Inject inject) {
-    return ((Endpoint) asset)
-        .getAgents().stream()
-            .filter(
-                agent ->
-                    isPrimaryAgent(agent) && hasOnlyValidTraces(inject, agent) && agent.isActive())
-            .toList();
-  }
-
   /**
    * In case of asset group if expectation group -> we have an expectation for the group and one for
    * each asset if not expectation group -> we have an individual expectation for each asset
@@ -341,30 +283,5 @@ public class OpenBASImplantExecutor extends Injector {
                       })
               .toList());
     }
-  }
-
-  private static List<InjectExpectationSignature> computeSignatures(
-      String injectId, String agentId, String payloadType) {
-    List<InjectExpectationSignature> signatures = new ArrayList<>();
-    List<String> knownPayloadTypes =
-        Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
-
-    /*
-     * Always add the "Parent process" signature type for the OpenBAS Implant Executor
-     */
-    signatures.add(
-        createSignature(
-            EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
-            "obas-implant-" + injectId + "-agent-" + agentId));
-
-    if (!knownPayloadTypes.contains(payloadType)) {
-      throw new UnsupportedOperationException("Payload type " + payloadType + " is not supported");
-    }
-    return signatures;
-  }
-
-  private static InjectExpectationSignature createSignature(
-      String signatureType, String signatureValue) {
-    return builder().type(signatureType).value(signatureValue).build();
   }
 }

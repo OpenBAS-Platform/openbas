@@ -7,8 +7,7 @@ import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
-import static io.openbas.service.AgentService.hasOnlyValidTraces;
-import static io.openbas.service.AgentService.isPrimaryAgent;
+import static io.openbas.utils.AgentUtils.isValidAgent;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,6 +31,7 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AgentService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
+import io.openbas.utils.ExpectationUtils;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -153,11 +153,7 @@ public class CalderaExecutor extends Injector {
 
                           // Loop for every validated agent in this endpoint
                           endpointAgent.getAgents().stream()
-                              .filter(
-                                  agent ->
-                                      isPrimaryAgent(agent)
-                                          && hasOnlyValidTraces(inject, agent)
-                                          && agent.isActive())
+                              .filter(agent -> isValidAgent(inject, agent))
                               .forEach(
                                   agent -> {
                                     try {
@@ -415,7 +411,7 @@ public class CalderaExecutor extends Injector {
 
                           // We propagate the asset expectation to agents
                           List<PreventionExpectation> preventionExpectationList =
-                              getPreventionExpectationList(
+                              ExpectationUtils.getPreventionExpectationList(
                                   asset, executedAgents, payload, preventionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
@@ -438,7 +434,7 @@ public class CalderaExecutor extends Injector {
                                   expectation.getExpirationTime());
                           // We propagate the asset expectation to agents
                           List<DetectionExpectation> detectionExpectationList =
-                              getDetectionExpectationList(
+                              ExpectationUtils.getDetectionExpectationList(
                                   asset, executedAgents, payload, detectionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
@@ -460,7 +456,8 @@ public class CalderaExecutor extends Injector {
                                   expectationGroup);
                           // We propagate the asset expectation to agents
                           List<ManualExpectation> manualExpectationList =
-                              getManualExpectationList(asset, executedAgents, manualExpectation);
+                              ExpectationUtils.getManualExpectationList(
+                                  asset, executedAgents, manualExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
@@ -575,99 +572,5 @@ public class CalderaExecutor extends Injector {
                       })
               .toList());
     }
-  }
-
-  private List<PreventionExpectation> getPreventionExpectationList(
-      Asset asset,
-      List<io.openbas.database.model.Agent> executedAgents,
-      Payload payload,
-      PreventionExpectation preventionExpectation) {
-    return executedAgents.stream()
-        .map(
-            executedAgent ->
-                preventionExpectationForAgent(
-                    preventionExpectation.getScore(),
-                    preventionExpectation.getName(),
-                    preventionExpectation.getDescription(),
-                    executedAgent.getParent(),
-                    asset,
-                    preventionExpectation.getExpirationTime(),
-                    computeSignatures(payload, executedAgent.getProcessName())))
-        .toList();
-  }
-
-  private List<DetectionExpectation> getDetectionExpectationList(
-      Asset asset,
-      List<io.openbas.database.model.Agent> executedAgents,
-      Payload payload,
-      DetectionExpectation detectionExpectation) {
-    return executedAgents.stream()
-        .map(
-            executedAgent ->
-                detectionExpectationForAgent(
-                    detectionExpectation.getScore(),
-                    detectionExpectation.getName(),
-                    detectionExpectation.getDescription(),
-                    executedAgent.getParent(),
-                    asset,
-                    detectionExpectation.getExpirationTime(),
-                    computeSignatures(payload, executedAgent.getProcessName())))
-        .toList();
-  }
-
-  private List<ManualExpectation> getManualExpectationList(
-      Asset asset,
-      List<io.openbas.database.model.Agent> executedAgents,
-      ManualExpectation manualExpectation) {
-    return executedAgents.stream()
-        .map(
-            executedAgent ->
-                manualExpectationForAgent(
-                    manualExpectation.getScore(),
-                    manualExpectation.getName(),
-                    manualExpectation.getDescription(),
-                    executedAgent.getParent(),
-                    asset,
-                    manualExpectation.getExpirationTime()))
-        .toList();
-  }
-
-  private List<InjectExpectationSignature> computeSignatures(Payload payload, String processName) {
-    List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
-
-    if (payload != null) {
-      String expectationSignatureValue = payload.getExpectationSignatureValue();
-      PayloadType payloadType = payload.getTypeEnum();
-      switch (payloadType) {
-        case COMMAND:
-          injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                  .value(expectationSignatureValue)
-                  .build());
-          break;
-        case EXECUTABLE, FILE_DROP:
-          injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                  .value(expectationSignatureValue)
-                  .build());
-          break;
-        case DNS_RESOLUTION:
-          injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME)
-                  .value(expectationSignatureValue)
-                  .build());
-          break;
-        default:
-          throw new UnsupportedOperationException(
-              "Payload type " + payloadType + " is not supported");
-      }
-    } else {
-      injectExpectationSignatures.add(
-          builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(processName).build());
-    }
-    return injectExpectationSignatures;
   }
 }

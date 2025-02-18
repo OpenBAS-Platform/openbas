@@ -1,6 +1,6 @@
 package io.openbas.utils;
 
-import static io.openbas.service.AgentService.isPrimaryAgent;
+import static io.openbas.utils.AgentUtils.isPrimaryAgent;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 

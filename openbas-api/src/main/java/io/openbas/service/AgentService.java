@@ -40,27 +40,4 @@ public class AgentService {
   public Optional<Agent> findByExternalReference(String externalReference) {
     return agentRepository.findByExternalReference(externalReference);
   }
-
-  public static boolean hasOnlyValidTraces(Inject inject, Agent agent) {
-    return inject
-        .getStatus()
-        .map(InjectStatus::getTraces)
-        .map(
-            traces ->
-                Boolean.valueOf(
-                    traces.stream()
-                        .noneMatch(
-                            trace ->
-                                trace.getAgent() != null
-                                    && trace.getAgent().getId().equals(agent.getId())
-                                    && (ExecutionTraceStatus.ERROR.equals(trace.getStatus())
-                                        || ExecutionTraceStatus.AGENT_INACTIVE.equals(
-                                            trace.getStatus())))))
-        .orElse(Boolean.TRUE)
-        .booleanValue(); // If there are no traces, return true by default
-  }
-
-  public static boolean isPrimaryAgent(Agent agent) {
-    return agent.getParent() == null && agent.getInject() == null;
-  }
 }
