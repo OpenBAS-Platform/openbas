@@ -4,11 +4,11 @@ import { useParams } from 'react-router';
 import { fetchMe } from '../../../actions/Application';
 import { fetchExercise, fetchPlayerExercise } from '../../../actions/Exercise';
 import { addLessonsAnswers, fetchLessonsAnswers, fetchLessonsCategories, fetchLessonsQuestions, fetchPlayerLessonsAnswers, fetchPlayerLessonsCategories, fetchPlayerLessonsQuestions } from '../../../actions/exercises/exercise-action';
-import type { ExercisesHelper } from '../../../actions/exercises/exercise-helper';
-import type { UserHelper } from '../../../actions/helper';
-import { ViewLessonContext, ViewLessonContextType } from '../../../admin/components/common/Context';
+import { type ExercisesHelper } from '../../../actions/exercises/exercise-helper';
+import { type UserHelper } from '../../../actions/helper';
+import { ViewLessonContext, type ViewLessonContextType } from '../../../admin/components/common/Context';
 import { useHelper } from '../../../store';
-import type { Exercise } from '../../../utils/api-types';
+import { type Exercise } from '../../../utils/api-types';
 import { useQueryParameter } from '../../../utils/Environment';
 import { usePermissions } from '../../../utils/Exercise';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -95,14 +95,20 @@ const ExerciseViewLessons = () => {
     <ViewLessonContext.Provider value={context}>
       {isPreview ? (
         <LessonsPreview
-          source={{ ...source, finalUserId }}
+          source={{
+            ...source,
+            finalUserId,
+          }}
           lessonsCategories={lessonsCategories}
           lessonsQuestions={lessonsQuestions}
           permissions={permissions}
         />
       ) : (
         <LessonsPlayer
-          source={{ ...source, finalUserId }}
+          source={{
+            ...source,
+            finalUserId,
+          }}
           lessonsCategories={lessonsCategories}
           lessonsQuestions={lessonsQuestions}
           lessonsAnswers={lessonsAnswers}

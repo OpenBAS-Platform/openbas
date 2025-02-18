@@ -231,7 +231,11 @@ const Inject = () => {
                     );
                   },
                 )}
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                }}
+                >
                   <Button
                     variant="outlined"
                     style={{ marginBottom: 20 }}

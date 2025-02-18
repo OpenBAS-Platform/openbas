@@ -88,7 +88,10 @@ const UserPopover = ({ user, organizationsMap, tagsMap, onUpdate, onDelete }) =>
 
   const org = organizationsMap[user.user_organization];
   const userOrganization = org
-    ? { id: org.organization_id, label: org.organization_name }
+    ? {
+        id: org.organization_id,
+        label: org.organization_name,
+      }
     : null;
   const userTags = tagOptions(user.user_tags, tagsMap);
   const initialValues = R.pipe(

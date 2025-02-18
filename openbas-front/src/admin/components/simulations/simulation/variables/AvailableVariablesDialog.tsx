@@ -1,17 +1,16 @@
 import { CopyAllOutlined } from '@mui/icons-material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Alert, Button, Dialog, DialogActions, DialogContent, List, ListItem, ListItemButton, ListItemText, Tab } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { Contract } from '../../../../../actions/contract/contract';
-import type { UserHelper } from '../../../../../actions/helper';
+import { type Contract } from '../../../../../actions/contract/contract';
+import { type UserHelper } from '../../../../../actions/helper';
 import Transition from '../../../../../components/common/Transition';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Variable } from '../../../../../utils/api-types';
+import { type Variable } from '../../../../../utils/api-types';
 import { copyToClipboard } from '../../../../../utils/utils';
 
 interface VariableChildItemProps {
@@ -87,7 +86,7 @@ const AvailableVariablesDialog: FunctionComponent<
   const { t } = useFormatter();
   const [tab, setTab] = useState('1');
 
-  const handleChange = (_event: React.SyntheticEvent, newTab: string) => {
+  const handleChange = (_event: SyntheticEvent, newTab: string) => {
     setTab(newTab);
   };
 
@@ -106,7 +105,10 @@ const AvailableVariablesDialog: FunctionComponent<
       <TabContext value={tab}>
         <TabList
           onChange={handleChange}
-          style={{ marginLeft: 24, marginTop: 24 }}
+          style={{
+            marginLeft: 24,
+            marginTop: 24,
+          }}
         >
           <Tab
             sx={{ textTransform: 'none' }}
@@ -124,7 +126,11 @@ const AvailableVariablesDialog: FunctionComponent<
         <DialogContent>
           <TabPanel
             value="1"
-            style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
+            style={{
+              maxHeight: '100%',
+              overflow: 'auto',
+              padding: 0,
+            }}
           >
             <List>
               {injectorContract.variables.map((variable) => {
@@ -168,7 +174,11 @@ const AvailableVariablesDialog: FunctionComponent<
           {uriVariable && (
             <TabPanel
               value="2"
-              style={{ maxHeight: '100%', overflow: 'auto', padding: 0 }}
+              style={{
+                maxHeight: '100%',
+                overflow: 'auto',
+                padding: 0,
+              }}
             >
               <Alert severity="info">
                 {t('Please follow this link to')}

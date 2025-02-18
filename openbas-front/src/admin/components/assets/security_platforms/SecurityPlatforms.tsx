@@ -1,11 +1,11 @@
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { CSSProperties, useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchSecurityPlatforms } from '../../../../actions/assets/securityPlatform-actions';
-import type { UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
@@ -14,7 +14,7 @@ import { buildSearchPagination } from '../../../../components/common/queryable/Q
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import { useHelper } from '../../../../store';
-import type { SearchPaginationInput, SecurityPlatform } from '../../../../utils/api-types';
+import { type SearchPaginationInput, type SecurityPlatform } from '../../../../utils/api-types';
 import { isNotEmptyField } from '../../../../utils/utils';
 import SecurityPlatformCreation from './SecurityPlatformCreation';
 import SecurityPlatformPopover from './SecurityPlatformPopover';
@@ -43,20 +43,14 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  asset_name: {
-    width: '30%',
-  },
+  asset_name: { width: '30%' },
   security_platform_type: {
     width: '15%',
     display: 'flex',
     alignItems: 'center',
   },
-  asset_description: {
-    width: '40%',
-  },
-  asset_tags: {
-    width: '20%',
-  },
+  asset_description: { width: '40%' },
+  asset_tags: { width: '20%' },
 };
 
 const SecurityPlatforms = () => {
@@ -71,16 +65,30 @@ const SecurityPlatforms = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   // Headers
   const headers = [
-    { field: 'asset_name', label: 'Name', isSortable: true },
-    { field: 'security_platform_type', label: 'Type', isSortable: true },
-    { field: 'asset_description', label: 'Description', isSortable: true },
-    { field: 'asset_tags', label: 'Tags', isSortable: true },
+    {
+      field: 'asset_name',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'security_platform_type',
+      label: 'Type',
+      isSortable: true,
+    },
+    {
+      field: 'asset_description',
+      label: 'Description',
+      isSortable: true,
+    },
+    {
+      field: 'asset_tags',
+      label: 'Tags',
+      isSortable: true,
+    },
   ];
 
   const [securityPlatforms, setSecurityPlatforms] = useState<SecurityPlatform[]>([]);
@@ -104,7 +112,13 @@ const SecurityPlatforms = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Assets') }, { label: t('Security platforms'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Assets') }, {
+          label: t('Security platforms'),
+          current: true,
+        }]}
+      />
       <PaginationComponent
         fetch={searchSecurityPlatforms}
         searchPaginationInput={searchPaginationInput}
@@ -151,7 +165,11 @@ const SecurityPlatforms = () => {
                 <img
                   src={`/api/images/security_platforms/id/${securityPlatform.asset_id}/${theme.palette.mode}?${Date.now()}`}
                   alt={securityPlatform.asset_name}
-                  style={{ width: 25, height: 25, borderRadius: 4 }}
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 4,
+                  }}
                 />
               </ListItemIcon>
               <ListItemText
@@ -174,7 +192,10 @@ const SecurityPlatforms = () => {
               />
               <ListItemSecondaryAction>
                 <SecurityPlatformPopover
-                  securityPlatform={{ ...securityPlatform, type: 'static' }}
+                  securityPlatform={{
+                    ...securityPlatform,
+                    type: 'static',
+                  }}
                   onUpdate={result => setSecurityPlatforms(securityPlatforms.map(e => (e.asset_id !== result.asset_id ? e : result)))}
                   onDelete={result => setSecurityPlatforms(securityPlatforms.filter(e => (e.asset_id !== result)))}
                   openEditOnInit={securityPlatform.asset_id === searchId}

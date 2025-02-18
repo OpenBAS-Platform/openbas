@@ -155,6 +155,9 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
-  connect(select, { updateLog, deleteLog }),
+  connect(select, {
+    updateLog,
+    deleteLog,
+  }),
   inject18n,
 )(LogPopover);

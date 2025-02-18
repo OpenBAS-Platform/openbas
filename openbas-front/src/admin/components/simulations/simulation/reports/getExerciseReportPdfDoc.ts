@@ -2,11 +2,11 @@ import { toPng } from 'html-to-image';
 import type { Content, ContentTable, TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import LogoText from '../../../../../static/images/logo_text_light.png';
-import type { InjectResultOutput, LessonsAnswer, Report } from '../../../../../utils/api-types';
+import { type InjectResultOutput, type LessonsAnswer, type Report } from '../../../../../utils/api-types';
 import { resolveUserName } from '../../../../../utils/String';
 import convertMarkdownToPdfMake from './convertMarkdownToPdfMake';
 import ReportInformationType from './ReportInformationType';
-import { ExerciseReportData } from './useExerciseReportData';
+import { type ExerciseReportData } from './useExerciseReportData';
 
 const getBase64ImageFromURL = (url: string) => {
   return new Promise((resolve, reject) => {
@@ -96,14 +96,20 @@ const getExerciseReportPdfDocDefinition = async ({
   modulesImages.forEach((id) => {
     const element = document.getElementById(id);
     if (element) {
-      fetchPromises.push(toPng(element, { backgroundColor: 'white' }).then((img: string) => ({ key: id, img })));
+      fetchPromises.push(toPng(element, { backgroundColor: 'white' }).then((img: string) => ({
+        key: id,
+        img,
+      })));
     }
   });
   (reportData.injects || []).forEach((inject) => {
     const element = document.getElementById(`inject_expectations_${inject.inject_id}`);
     if (element) {
       fetchPromises.push(
-        toPng(element).then((img: string) => ({ key: `inject_${inject.inject_id}`, img })),
+        toPng(element).then((img: string) => ({
+          key: `inject_${inject.inject_id}`,
+          img,
+        })),
       );
     }
   });
@@ -111,7 +117,12 @@ const getExerciseReportPdfDocDefinition = async ({
   // Inject Result page
   const findCommentsByInjectId = (injectId: InjectResultOutput['inject_id']) => (report?.report_injects_comments ?? []).find(c => c.inject_id === injectId)?.report_inject_comment ?? null;
   const injectResultPage = (imagesMap: Map<string, string>) => ([
-    { text: t('Injects results'), tocItem: ['mainToc'], pageBreak: 'before', style: 'header' },
+    {
+      text: t('Injects results'),
+      tocItem: ['mainToc'],
+      pageBreak: 'before',
+      style: 'header',
+    },
     {
       style: 'tableStyle',
       table: {
@@ -126,7 +137,10 @@ const getExerciseReportPdfDocDefinition = async ({
               { text: tPick(inject.inject_injector_contract?.injector_contract_labels) },
               { text: inject.inject_title },
               { text: fldt(inject.inject_status?.tracking_sent_date) || 'N/A' },
-              { image: imagesMap.get(`inject_${inject.inject_id}`), width: 60 },
+              {
+                image: imagesMap.get(`inject_${inject.inject_id}`),
+                width: 60,
+              },
               { text: inject.inject_targets?.map(target => target.target_name).join(', ') },
               { stack: convertMarkdownToPdfMake(findCommentsByInjectId(inject.inject_id) || '') },
             ];
@@ -141,29 +155,59 @@ const getExerciseReportPdfDocDefinition = async ({
   const exerciseDetailsPage = (imagesMap: Map<string, string>) => {
     const doubleColumns = [
       [
-        { title: 'Distribution of score by team (in % of expectations)', img: imagesMap.get('exercise_distribution_score_by_team') },
-        { title: 'Teams scores over time (in % of expectations)', img: imagesMap.get('exercise_distribution_score_over_time') },
+        {
+          title: 'Distribution of score by team (in % of expectations)',
+          img: imagesMap.get('exercise_distribution_score_by_team'),
+        },
+        {
+          title: 'Teams scores over time (in % of expectations)',
+          img: imagesMap.get('exercise_distribution_score_over_time'),
+        },
       ],
       [
-        { title: 'Distribution of total score by team', img: imagesMap.get('exercise_distribution_total_score_by_team') },
-        { title: 'Teams scores over time)', img: imagesMap.get('exercise_distribution_score_over_time_by_team') },
+        {
+          title: 'Distribution of total score by team',
+          img: imagesMap.get('exercise_distribution_total_score_by_team'),
+        },
+        {
+          title: 'Teams scores over time)',
+          img: imagesMap.get('exercise_distribution_score_over_time_by_team'),
+        },
       ],
       [
-        { title: 'Distribution of total score by inject type', img: imagesMap.get('exercise_distribution_total_score_by_inject_type') },
-        { title: 'Inject types scores over time', img: imagesMap.get('exercise_distribution_score_over_time_by_inject') },
+        {
+          title: 'Distribution of total score by inject type',
+          img: imagesMap.get('exercise_distribution_total_score_by_inject_type'),
+        },
+        {
+          title: 'Inject types scores over time',
+          img: imagesMap.get('exercise_distribution_score_over_time_by_inject'),
+        },
       ],
     ];
 
     return [
-      { text: t('Exercise details'), tocItem: ['mainToc'], pageBreak: 'before', style: 'header' },
+      {
+        text: t('Exercise details'),
+        tocItem: ['mainToc'],
+        pageBreak: 'before',
+        style: 'header',
+      },
       ...doubleColumns.flatMap(columns => (
         {
           columns: columns.flatMap(col => (
             {
               width: '*',
               stack: [
-                { text: t(col.title), style: 'chartTitle' },
-                { image: col.img as string, width: 260, margin: [-5, 0, 0, 0] },
+                {
+                  text: t(col.title),
+                  style: 'chartTitle',
+                },
+                {
+                  image: col.img as string,
+                  width: 260,
+                  margin: [-5, 0, 0, 0],
+                },
               ],
             }
           )),
@@ -175,7 +219,10 @@ const getExerciseReportPdfDocDefinition = async ({
           {
             width: '50%',
             stack: [
-              { text: t('Distribution of total score by organization'), style: 'chartTitle' },
+              {
+                text: t('Distribution of total score by organization'),
+                style: 'chartTitle',
+              },
               {
                 image: imagesMap.get('exercise_distribution_total_score_by_organization'),
                 width: 250,
@@ -185,14 +232,26 @@ const getExerciseReportPdfDocDefinition = async ({
           }, {
             width: '25%',
             stack: [
-              { text: t('Distribution of total score by player'), style: 'chartTitle' },
-              { image: imagesMap.get('exercise_distribution_total_score_by_player'), width: 130 },
+              {
+                text: t('Distribution of total score by player'),
+                style: 'chartTitle',
+              },
+              {
+                image: imagesMap.get('exercise_distribution_total_score_by_player'),
+                width: 130,
+              },
             ],
           }, {
             width: '25%',
             stack: [
-              { text: t('Distribution of total score by inject'), style: 'chartTitle' },
-              { image: imagesMap.get('exercise_distribution_total_score_by_inject'), width: 130 },
+              {
+                text: t('Distribution of total score by inject'),
+                style: 'chartTitle',
+              },
+              {
+                image: imagesMap.get('exercise_distribution_total_score_by_inject'),
+                width: 130,
+              },
             ],
           }],
         margin: [0, 20, 0, 0],
@@ -202,14 +261,22 @@ const getExerciseReportPdfDocDefinition = async ({
 
   // Players Surveys page
   const playersSurveysPage = () => [
-    { text: t('Player surveys'), tocItem: ['mainToc'], pageBreak: 'before', style: 'header' },
+    {
+      text: t('Player surveys'),
+      tocItem: ['mainToc'],
+      pageBreak: 'before',
+      style: 'header',
+    },
     ...reportData.lessonsCategories.sort(lesson => lesson.lessons_category_order || 0).map((category) => {
       const lessonQuestions = reportData.lessonsQuestions
         .filter(q => (category.lessons_category_questions || []).includes(q.lessonsquestion_id))
         .sort((a, b) => (a.lessons_question_order || 0) - (b.lessons_question_order || 0));
 
       return ([
-        { text: [t('Category'), ` : ${category.lessons_category_name}`], style: 'markdownHeaderH1' },
+        {
+          text: [t('Category'), ` : ${category.lessons_category_name}`],
+          style: 'markdownHeaderH1',
+        },
         { text: [t('Targeted teams'), ` : ${(category.lessons_category_teams || []).map(teamId => reportData.teams.find(team => team.team_id === teamId)?.team_name).join(', ') || '-'}`] },
         ...lessonQuestions.flatMap((question) => {
           const lessonsAnswers = (question.lessons_question_answers || [])
@@ -221,7 +288,10 @@ const getExerciseReportPdfDocDefinition = async ({
             return '-';
           };
           return [
-            { text: [t('Question'), ` : ${question.lessons_question_content}`], margin: [0, 6, 0, 0] },
+            {
+              text: [t('Question'), ` : ${question.lessons_question_content}`],
+              margin: [0, 6, 0, 0],
+            },
             { text: [t('Total score'), ` : ${totalScore}`] },
             (lessonsAnswers.length > 0
               ? {
@@ -268,8 +338,16 @@ const getExerciseReportPdfDocDefinition = async ({
     footer: (currentPage_1: number) => {
       return {
         columns: [
-          { text: report.report_name, alignment: 'left', margin: [30, 10] },
-          { text: currentPage_1, alignment: 'right', margin: [30, 10] }, // Right side
+          {
+            text: report.report_name,
+            alignment: 'left',
+            margin: [30, 10],
+          },
+          {
+            text: currentPage_1,
+            alignment: 'right',
+            margin: [30, 10],
+          }, // Right side
         ],
         margin: [0, 0, 0, 10],
         style: 'footerStyle',
@@ -277,9 +355,21 @@ const getExerciseReportPdfDocDefinition = async ({
     },
     content: [
       // First Page
-      { image: imagesMap.get('openBAS_logo'), width: 150, margin: [0, 0, 0, 40] },
-      { text: report.report_name, style: 'reportTitle' },
-      reportData.exercise.exercise_start_date ? { text: fldt(reportData.exercise.exercise_start_date), margin: [0, 10, 0, 0] } : {},
+      {
+        image: imagesMap.get('openBAS_logo'),
+        width: 150,
+        margin: [0, 0, 0, 40],
+      },
+      {
+        text: report.report_name,
+        style: 'reportTitle',
+      },
+      reportData.exercise.exercise_start_date
+        ? {
+            text: fldt(reportData.exercise.exercise_start_date),
+            margin: [0, 10, 0, 0],
+          }
+        : {},
       reportData.exercise.exercise_teams?.length && reportData.exercise.exercise_teams?.length > 0
         ? {
             text: [{ text: t('Teams') }, { text: ` : ${reportData.exercise.exercise_teams?.map(teamId_1 => reportData.teams.find(team_1 => team_1.team_id === teamId_1)?.team_name).join(', ')}` }],
@@ -323,7 +413,11 @@ const getExerciseReportPdfDocDefinition = async ({
         ? [{
             toc: {
               id: 'mainToc',
-              title: { text: t('Table of contents'), style: 'header', margin: [0, 0, 0, 20] },
+              title: {
+                text: t('Table of contents'),
+                style: 'header',
+                margin: [0, 0, 0, 20],
+              },
             },
             pageBreak: 'before',
           }]
@@ -335,7 +429,12 @@ const getExerciseReportPdfDocDefinition = async ({
       // Global Information Page
       ...(displayGlobalObservation
         ? [
-            { text: t('Global observation'), tocItem: ['mainToc'], pageBreak: 'before', style: 'header' },
+            {
+              text: t('Global observation'),
+              tocItem: ['mainToc'],
+              pageBreak: 'before',
+              style: 'header',
+            },
             { stack: convertMarkdownToPdfMake(report.report_global_observation || ' -') },
           ]
         : []),
@@ -369,9 +468,7 @@ const getExerciseReportPdfDocDefinition = async ({
         bold: true,
         margin: [40, 10, 0, 10],
       },
-      tableStyle: {
-        fontSize: 8,
-      },
+      tableStyle: { fontSize: 8 },
       chartTitle: {
         fontSize: 8,
         bold: true,
@@ -380,16 +477,10 @@ const getExerciseReportPdfDocDefinition = async ({
         fontSize: 10,
         bold: true,
       },
-      boldText: {
-        bold: true,
-      },
-      italicText: {
-        italics: true,
-      },
+      boldText: { bold: true },
+      italicText: { italics: true },
     },
-    defaultStyle: {
-      fontSize: 10,
-    },
+    defaultStyle: { fontSize: 10 },
     pageMargins: [30, 40, 30, 40],
   };
 };

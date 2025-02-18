@@ -1,10 +1,10 @@
 import { PersonOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { CSSProperties, useMemo, useState } from 'react';
+import { type CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { OrganizationHelper, UserHelper } from '../../../actions/helper';
+import { type OrganizationHelper, type UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { searchPlayers } from '../../../actions/players/player-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
@@ -14,26 +14,20 @@ import PaginationComponentV2 from '../../../components/common/queryable/paginati
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
-import { Header } from '../../../components/common/SortHeadersList';
+import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import { useHelper } from '../../../store';
-import type { PlayerOutput } from '../../../utils/api-types';
+import { type PlayerOutput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     height: 20,
     fontSize: 13,
@@ -46,22 +40,14 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  user_email: {
-    width: '25%',
-  },
-  user_firstname: {
-    width: '15%',
-  },
-  user_lastname: {
-    width: '15%',
-  },
+  user_email: { width: '25%' },
+  user_firstname: { width: '15%' },
+  user_lastname: { width: '15%' },
   user_organization: {
     width: '20%',
     cursor: 'default',
   },
-  user_tags: {
-    width: '25%',
-  },
+  user_tags: { width: '25%' },
 };
 
 const Players = () => {
@@ -149,7 +135,13 @@ const Players = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Teams') }, { label: t('Players'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Teams') }, {
+          label: t('Players'),
+          current: true,
+        }]}
+      />
       <PaginationComponentV2
         fetch={searchPlayers}
         searchPaginationInput={searchPaginationInput}

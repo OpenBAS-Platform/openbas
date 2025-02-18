@@ -15,12 +15,8 @@ import CreateInjectorContract from './injector_contracts/CreateInjectorContract'
 import InjectorContractPopover from './injector_contracts/InjectorContractPopover';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    marginTop: 20,
-  },
-  list: {
-    marginTop: 10,
-  },
+  container: { marginTop: 20 },
+  list: { marginTop: 10 },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -45,18 +41,10 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const headerStyles = {
-  injector_contract_labels: {
-    width: '35%',
-  },
-  kill_chains: {
-    width: '20%',
-  },
-  attack_patterns: {
-    width: '30%',
-  },
-  injector_contract_updated_at: {
-    width: '12%',
-  },
+  injector_contract_labels: { width: '35%' },
+  kill_chains: { width: '20%' },
+  attack_patterns: { width: '30%' },
+  injector_contract_updated_at: { width: '12%' },
 };
 
 const inlineStyles = {
@@ -107,10 +95,26 @@ const InjectorContracts = () => {
 
   // Headers
   const headers = [
-    { field: 'injector_contract_labels', label: 'Name', isSortable: true },
-    { field: 'kill_chains', label: 'Kill chains', isSortable: false },
-    { field: 'attack_patterns', label: 'Attack patterns', isSortable: false },
-    { field: 'injector_contract_updated_at', label: 'Updated at', isSortable: true },
+    {
+      field: 'injector_contract_labels',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'kill_chains',
+      label: 'Kill chains',
+      isSortable: false,
+    },
+    {
+      field: 'attack_patterns',
+      label: 'Attack patterns',
+      isSortable: false,
+    },
+    {
+      field: 'injector_contract_updated_at',
+      label: 'Updated at',
+      isSortable: true,
+    },
   ];
 
   const [injectorContracts, setInjectorContracts] = useState([]);

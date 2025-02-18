@@ -1,15 +1,15 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
-import { CSSProperties, FunctionComponent, useEffect, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../components/common/pagination/SortHeadersComponent';
-import { Page } from '../../../components/common/queryable/Page';
+import { type Page } from '../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
-import type { InjectTestStatusOutput, SearchPaginationInput } from '../../../utils/api-types';
+import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectTestDetail from './InjectTestDetail';
 import InjectTestPopover from './InjectTestPopover';
@@ -45,12 +45,8 @@ const inlineStyles: Record<string, CSSProperties> = {
     width: '40%',
     cursor: 'default',
   },
-  tracking_sent_date: {
-    width: '40%',
-  },
-  status_name: {
-    width: '20%',
-  },
+  tracking_sent_date: { width: '40%' },
+  status_name: { width: '20%' },
 };
 
 interface Props {

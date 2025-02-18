@@ -1,7 +1,5 @@
 declare global {
-  interface Window {
-    BASE_PATH: string;
-  }
+  interface Window { BASE_PATH: string }
 }
 
 export {};

@@ -1,4 +1,4 @@
-import type { InjectorContract } from '../../utils/api-types';
+import { type InjectorContract } from '../../utils/api-types';
 
 export type ContractType = 'text' | 'number' | 'tuple' | 'checkbox' | 'textarea' | 'select' | 'article' | 'challenge' | 'dependency-select' | 'attachment' | 'team' | 'expectation' | 'asset' | 'asset-group' | 'payload';
 
@@ -7,8 +7,16 @@ interface LinkedFieldModel {
   type: string;
 }
 export type FieldValue = string | number | boolean | string[] | AttackPattern[]
-  | Option[] | object | { key: string; value: string; type?: string }
-  | { key: string; value: string; type?: string }[];
+  | Option[] | object | {
+    key: string;
+    value: string;
+    type?: string;
+  }
+  | {
+    key: string;
+    value: string;
+    type?: string;
+  }[];
 
 export interface ContractElement {
   key: string;

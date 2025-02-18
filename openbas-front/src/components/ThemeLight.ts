@@ -1,4 +1,4 @@
-import { ThemeOptions } from '@mui/material';
+import { type ThemeOptions } from '@mui/material';
 
 import LogoCollapsed from '../static/images/logo_light.png';
 import LogoText from '../static/images/logo_text_light.png';
@@ -56,15 +56,9 @@ const ThemeLight = (
   },
   typography: {
     fontFamily: '"IBM Plex Sans", sans-serif',
-    body2: {
-      fontSize: '0.8rem',
-    },
-    body1: {
-      fontSize: '0.9rem',
-    },
-    overline: {
-      fontWeight: 500,
-    },
+    body2: { fontSize: '0.8rem' },
+    body1: { fontSize: '0.9rem' },
+    overline: { fontWeight: 500 },
     h1: {
       margin: '0 0 10px 0',
       padding: 0,
@@ -110,38 +104,16 @@ const ThemeLight = (
     },
   },
   components: {
-    MuiAccordion: {
-      defaultProps: {
-        TransitionProps: {
-          unmountOnExit: true,
-        },
-      },
-    },
+    MuiAccordion: { defaultProps: { TransitionProps: { unmountOnExit: true } } },
     MuiTooltip: {
       styleOverrides: {
-        tooltip: {
-          backgroundColor: 'rgba(0,0,0,0.7)',
-        },
-        arrow: {
-          color: 'rgba(0,0,0,0.7)',
-        },
+        tooltip: { backgroundColor: 'rgba(0,0,0,0.7)' },
+        arrow: { color: 'rgba(0,0,0,0.7)' },
       },
     },
-    MuiFormControl: {
-      defaultProps: {
-        variant: 'standard',
-      },
-    },
-    MuiTextField: {
-      defaultProps: {
-        variant: 'standard',
-      },
-    },
-    MuiSelect: {
-      defaultProps: {
-        variant: 'standard',
-      },
-    },
+    MuiFormControl: { defaultProps: { variant: 'standard' } },
+    MuiTextField: { defaultProps: { variant: 'standard' } },
+    MuiSelect: { defaultProps: { variant: 'standard' } },
     MuiCssBaseline: {
       styleOverrides: {
         html: {
@@ -151,12 +123,8 @@ const ThemeLight = (
         body: {
           'scrollbarColor': `${accent || THEME_LIGHT_DEFAULT_ACCENT} ${paper || THEME_LIGHT_DEFAULT_PAPER}`,
           'scrollbarWidth': 'thin',
-          'html': {
-            WebkitFontSmoothing: 'auto',
-          },
-          'a': {
-            color: primary || THEME_LIGHT_DEFAULT_PRIMARY,
-          },
+          'html': { WebkitFontSmoothing: 'auto' },
+          'a': { color: primary || THEME_LIGHT_DEFAULT_PRIMARY },
           'input:-webkit-autofill': {
             WebkitAnimation: 'autofill 0s forwards',
             animation: 'autofill 0s forwards',
@@ -185,12 +153,8 @@ const ThemeLight = (
             'background': 'transparent',
             'borderBottom': '1px solid rgba(0, 0, 0, 0.87) !important',
             'transition': 'borderBottom .3s',
-            '&:hover': {
-              borderBottom: '2px solid #000000 !important',
-            },
-            '&:focus-within': {
-              borderBottom: `2px solid #${primary || THEME_LIGHT_DEFAULT_PRIMARY} !important`,
-            },
+            '&:hover': { borderBottom: '2px solid #000000 !important' },
+            '&:focus-within': { borderBottom: `2px solid #${primary || THEME_LIGHT_DEFAULT_PRIMARY} !important` },
           },
           '.error .w-md-editor': {
             'border': '0 !important',
@@ -209,40 +173,28 @@ const ThemeLight = (
             backgroundColor: 'transparent !important',
             color: '#000000 !important',
           },
-          '.w-md-editor-toolbar li button': {
-            color: '#000000 !important',
-          },
+          '.w-md-editor-toolbar li button': { color: '#000000 !important' },
           '.w-md-editor-text textarea': {
             fontFamily: '"IBM Plex Sans", sans-serif',
             fontSize: 13,
             color: '#000000',
           },
-          '.w-md-editor-preview': {
-            boxShadow: 'inset 1px 0 0 0 rgba(0, 0, 0, 0.2)',
-          },
+          '.w-md-editor-preview': { boxShadow: 'inset 1px 0 0 0 rgba(0, 0, 0, 0.2)' },
           '.wmde-markdown': {
             background: 'transparent',
             fontFamily: '"IBM Plex Sans", sans-serif',
             fontSize: 13,
             color: '#000000',
           },
-          '.wmde-markdown tr': {
-            background: 'transparent !important',
-          },
-          '.react-grid-placeholder': {
-            backgroundColor: `${accent || THEME_LIGHT_DEFAULT_ACCENT} !important`,
-          },
+          '.wmde-markdown tr': { background: 'transparent !important' },
+          '.react-grid-placeholder': { backgroundColor: `${accent || THEME_LIGHT_DEFAULT_ACCENT} !important` },
           '.react_time_range__track': {
             backgroundColor: 'rgba(1, 226, 255, 0.1) !important',
             borderLeft: '1px solid #00bcd4 !important',
             borderRight: '1px solid #00bcd4 !important',
           },
-          '.react_time_range__handle_marker': {
-            backgroundColor: '#00bcd4 !important',
-          },
-          '.leaflet-container': {
-            backgroundColor: `${paper || THEME_LIGHT_DEFAULT_PAPER} !important`,
-          },
+          '.react_time_range__handle_marker': { backgroundColor: '#00bcd4 !important' },
+          '.leaflet-container': { backgroundColor: `${paper || THEME_LIGHT_DEFAULT_PAPER} !important` },
           '.react-grid-item .react-resizable-handle::after': {
             borderRight: '2px solid rgba(0, 0, 0, 0.6) !important',
             borderBottom: '2px solid rgba(0, 0, 0, 0.6) !important',
@@ -252,9 +204,7 @@ const ThemeLight = (
     },
     MuiTableCell: {
       styleOverrides: {
-        head: {
-          borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-        },
+        head: { borderBottom: '1px solid rgba(255, 255, 255, 0.15)' },
         body: {
           borderTop: '1px solid rgba(255, 255, 255, 0.15)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
@@ -264,9 +214,7 @@ const ThemeLight = (
     MuiMenuItem: {
       styleOverrides: {
         root: {
-          ':hover': {
-            backgroundColor: 'rgba(0,0,0,0.04)',
-          },
+          ':hover': { backgroundColor: 'rgba(0,0,0,0.04)' },
           '&.Mui-selected': {
             boxShadow: `2px 0 ${primary || THEME_LIGHT_DEFAULT_PRIMARY} inset`,
             backgroundColor: hexToRGB(primary || THEME_LIGHT_DEFAULT_PRIMARY, 0.08),

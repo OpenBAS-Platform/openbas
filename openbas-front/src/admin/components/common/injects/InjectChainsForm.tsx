@@ -10,20 +10,19 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
+  type SelectChangeEvent,
   Tooltip,
   Typography,
 } from '@mui/material';
-import { FormApi } from 'final-form';
-import { ReactElement, ReactNode, useEffect, useState } from 'react';
+import { type FormApi } from 'final-form';
+import { type FunctionComponent, type ReactElement, type ReactNode, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { ConditionElement, ConditionType, Content, ConvertedContentType, Dependency, InjectOutputType } from '../../../../actions/injects/Inject';
-import type { Element } from '../../../../components/common/chips/ClickableChip';
-import ClickableChip from '../../../../components/common/chips/ClickableChip';
+import { type ConditionElement, type ConditionType, type Content, type ConvertedContentType, type Dependency, type InjectOutputType } from '../../../../actions/injects/Inject';
+import ClickableChip, { type Element } from '../../../../components/common/chips/ClickableChip';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import { useFormatter } from '../../../../components/i18n';
-import type { Inject, InjectDependency, InjectDependencyCondition, InjectOutput } from '../../../../utils/api-types';
+import { type Inject, type InjectDependency, type InjectDependencyCondition, type InjectOutput } from '../../../../utils/api-types';
 import { capitalize } from '../../../../utils/String';
 
 const useStyles = makeStyles()(() => ({
@@ -36,9 +35,7 @@ const useStyles = makeStyles()(() => ({
     alignItems: 'center',
     marginTop: 20,
   },
-  labelExecutionCondition: {
-    color: '#7c8088',
-  },
+  labelExecutionCondition: { color: '#7c8088' },
 }));
 
 interface Props {
@@ -47,7 +44,7 @@ interface Props {
   injects?: InjectOutputType[];
 }
 
-const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
+const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
 
@@ -226,7 +223,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
    * Add a new parent inject
    */
   const addParent = () => {
-    setParents([...parents, { inject: undefined, index: parents.length }]);
+    setParents([...parents, {
+      inject: undefined,
+      index: parents.length,
+    }]);
   };
 
   /**
@@ -291,7 +291,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
    * Add a new children inject
    */
   const addChildren = () => {
-    setChildrens([...childrens, { inject: undefined, index: childrens.length }]);
+    setChildrens([...childrens, {
+      inject: undefined,
+      index: childrens.length,
+    }]);
   };
 
   /**
@@ -740,7 +743,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
         return (
           <div key={`${condition.name}-${condition.index}`} style={{ display: 'contents' }}>
             <ClickableChip
-              selectedElement={{ key: condition.key, operator: 'is', value: condition.value ? 'Success' : 'Fail' }}
+              selectedElement={{
+                key: condition.key,
+                operator: 'is',
+                value: condition.value ? 'Success' : 'Fail',
+              }}
               pristine={true}
               availableKeys={getAvailableExpectations(parent.inject)}
               availableOperators={['is']}
@@ -785,7 +792,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
           return (
             <div key={`${condition.name}-${condition.index}`} style={{ display: 'contents' }}>
               <ClickableChip
-                selectedElement={{ key: condition.key, operator: 'is', value: condition.value ? 'Success' : 'Fail' }}
+                selectedElement={{
+                  key: condition.key,
+                  operator: 'is',
+                  value: condition.value ? 'Success' : 'Fail',
+                }}
                 pristine={true}
                 availableKeys={getAvailableExpectations(injects?.find(currentInject => currentInject.inject_id === values.inject_id))}
                 availableOperators={['is']}
@@ -838,7 +849,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
           <Accordion
             key={`accordion-parent-${parent.index}`}
             variant="outlined"
-            style={{ width: '100%', marginBottom: '10px' }}
+            style={{
+              width: '100%',
+              marginBottom: '10px',
+            }}
           >
             <AccordionSummary
               expandIcon={<ExpandMore />}
@@ -886,7 +900,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
                     })}
                 </Select>
               </FormControl>
-              <FormControl style={{ width: '100%', marginTop: '15px' }}>
+              <FormControl style={{
+                width: '100%',
+                marginTop: '15px',
+              }}
+              >
                 <label className={classes.labelExecutionCondition}>{t('Execution condition:')}</label>
                 <Box
                   sx={{
@@ -940,7 +958,10 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
           <Accordion
             key={`accordion-children-${children.index}`}
             variant="outlined"
-            style={{ width: '100%', marginBottom: '10px' }}
+            style={{
+              width: '100%',
+              marginBottom: '10px',
+            }}
           >
             <AccordionSummary
               expandIcon={<ExpandMore />}
@@ -989,7 +1010,11 @@ const InjectForm: React.FC<Props> = ({ values, form, injects }) => {
                     })}
                 </Select>
               </FormControl>
-              <FormControl style={{ width: '100%', marginTop: '15px' }}>
+              <FormControl style={{
+                width: '100%',
+                marginTop: '15px',
+              }}
+              >
                 <label className={classes.labelExecutionCondition}>{t('Execution condition:')}</label>
 
                 <Box

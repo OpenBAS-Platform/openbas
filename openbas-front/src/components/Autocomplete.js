@@ -22,11 +22,7 @@ const renderAutocomplete = ({
         clearOnBlur={false}
         clearOnEscape={false}
         disableClearable
-        slotProps={{
-          paper: {
-            elevation: 2,
-          },
-        }}
+        slotProps={{ paper: { elevation: 2 } }}
         onInputChange={(_event, value) => {
           if (others.freeSolo) {
             onChange(value);
@@ -56,7 +52,10 @@ const renderAutocomplete = ({
                   {
                     typeof openCreate === 'function' && (
                       <IconButton
-                        style={{ position: 'absolute', right: '35px' }}
+                        style={{
+                          position: 'absolute',
+                          right: '35px',
+                        }}
                         onClick={() => openCreate()}
                       >
                         <AddOutlined />

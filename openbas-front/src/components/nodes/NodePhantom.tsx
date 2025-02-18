@@ -1,5 +1,5 @@
 import { AddCircleOutline } from '@mui/icons-material';
-import { FunctionComponent, memo } from 'react';
+import { type FunctionComponent, memo } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 const useStyles = makeStyles()(() => ({
@@ -17,16 +17,10 @@ const useStyles = makeStyles()(() => ({
     'backgroundColor': '#09101e',
     'color': 'white',
     'cursor': 'none !important',
-    '&:hover': {
-      backgroundColor: '#0d1626',
-    },
+    '&:hover': { backgroundColor: '#0d1626' },
   },
-  iconContainer: {
-    width: '100%',
-  },
-  icon: {
-    textAlign: 'center',
-  },
+  iconContainer: { width: '100%' },
+  icon: { textAlign: 'center' },
   time: {
     position: 'relative',
     left: 60,
@@ -51,8 +45,19 @@ const NodePhantomComponent: FunctionComponent<Props> = (props) => {
 
   return (
     <>
-      <div style={{ width: '500px', height: '50px' }}>
-        <div className={classes.node} style={{ color: 'white', height: props.newNodeSize, width: props.newNodeSize }}>
+      <div style={{
+        width: '500px',
+        height: '50px',
+      }}
+      >
+        <div
+          className={classes.node}
+          style={{
+            color: 'white',
+            height: props.newNodeSize,
+            width: props.newNodeSize,
+          }}
+        >
           <div className={classes.iconContainer}>
             <AddCircleOutline className={classes.icon} style={{ fontSize: '30px' }} />
           </div>

@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
-import { Fragment, FunctionComponent, useEffect } from 'react';
+import { Fragment, type FunctionComponent, useEffect } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
-import { Option } from '../../../../utils/Option';
+import { type Filter, type PropertySchemaDTO } from '../../../../utils/api-types';
+import { type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
 import { convertOperatorToIcon } from './FilterUtils';
 import useRetrieveOptions from './useRetrieveOptions';
@@ -25,9 +25,7 @@ const useStyles = makeStyles()(theme => ({
   },
   label: {
     'cursor': 'pointer',
-    '&:hover': {
-      textDecorationLine: 'underline',
-    },
+    '&:hover': { textDecorationLine: 'underline' },
   },
 }));
 
@@ -117,7 +115,12 @@ const FilterChipValues: FunctionComponent<Props> = ({
           {convertOperatorToIcon(t, filter.operator)}
         </strong>
         {' '}
-        <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          overflow: 'hidden',
+        }}
+        >
           {toValues(options)}
         </Box>
       </span>

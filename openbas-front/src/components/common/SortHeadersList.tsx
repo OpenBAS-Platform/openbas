@@ -1,7 +1,6 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
-import { CSSProperties, FunctionComponent, useState } from 'react';
-import * as React from 'react';
+import { type CSSProperties, type FunctionComponent, type ReactElement, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../i18n';
@@ -19,17 +18,17 @@ export interface Header {
   field: string;
   label: string;
   isSortable: boolean;
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  value?: (...values: any[]) => React.ReactElement | string;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  value?: (...values: any[]) => ReactElement | string;
 }
 
 interface Props {
   headers: Header[];
   inlineStylesHeaders: Record<string, CSSProperties>;
   initialSortBy: string;
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   datas: any[];
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   setDatas: (datas: any[]) => void;
 }
 

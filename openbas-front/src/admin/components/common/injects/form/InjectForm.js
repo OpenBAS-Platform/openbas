@@ -48,9 +48,7 @@ const styles = theme => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 });
 
 class InjectForm extends Component {

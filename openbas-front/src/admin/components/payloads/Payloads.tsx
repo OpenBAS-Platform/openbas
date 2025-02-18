@@ -1,11 +1,11 @@
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CSSProperties, useMemo, useState } from 'react';
+import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchCollectors } from '../../../actions/Collector';
-import type { CollectorHelper } from '../../../actions/collectors/collector-helper';
+import { type CollectorHelper } from '../../../actions/collectors/collector-helper';
 import { fetchDocuments } from '../../../actions/Document';
-import type { DocumentHelper } from '../../../actions/helper';
+import { type DocumentHelper } from '../../../actions/helper';
 import { searchPayloads } from '../../../actions/Payload';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
@@ -16,13 +16,13 @@ import PaginationComponentV2 from '../../../components/common/queryable/paginati
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
-import { Header } from '../../../components/common/SortHeadersList';
+import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import PayloadIcon from '../../../components/PayloadIcon';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { Payload } from '../../../utils/api-types';
+import { type Payload } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePayload from './CreatePayload';
@@ -30,15 +30,9 @@ import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     height: 20,
     fontSize: 13,
@@ -75,30 +69,14 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  payload_type: {
-    width: '10%',
-  },
-  payload_name: {
-    width: '20%',
-  },
-  payload_platforms: {
-    width: '10%',
-  },
-  payload_description: {
-    width: '10%',
-  },
-  payload_tags: {
-    width: '20%',
-  },
-  payload_source: {
-    width: '10%',
-  },
-  payload_status: {
-    width: '10%',
-  },
-  payload_updated_at: {
-    width: '10%',
-  },
+  payload_type: { width: '10%' },
+  payload_name: { width: '20%' },
+  payload_platforms: { width: '10%' },
+  payload_description: { width: '10%' },
+  payload_tags: { width: '20%' },
+  payload_source: { width: '10%' },
+  payload_status: { width: '10%' },
+  payload_updated_at: { width: '10%' },
 };
 
 const chipSx = {
@@ -263,7 +241,13 @@ const Payloads = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Payloads'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Components') }, {
+          label: t('Payloads'),
+          current: true,
+        }]}
+      />
       <PaginationComponentV2
         fetch={searchPayloads}
         searchPaginationInput={searchPaginationInput}

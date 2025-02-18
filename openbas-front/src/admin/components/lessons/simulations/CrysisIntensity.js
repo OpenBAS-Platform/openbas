@@ -7,9 +7,7 @@ import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import { areaChartOptions } from '../../../../utils/Charts';
 
-const CrysisIntensity = ({
-  injects,
-}) => {
+const CrysisIntensity = ({ injects }) => {
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
   const injectsData = R.pipe(

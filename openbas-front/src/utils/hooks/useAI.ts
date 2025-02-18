@@ -20,7 +20,10 @@ const useAI = (): {
   enabled?: boolean | null;
 } => {
   const { settings } = useAuth();
-  return { enabled: settings.platform_ai_enabled, configured: settings.platform_ai_has_token };
+  return {
+    enabled: settings.platform_ai_enabled,
+    configured: settings.platform_ai_has_token,
+  };
 };
 
 export default useAI;

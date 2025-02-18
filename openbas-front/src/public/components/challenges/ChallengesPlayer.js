@@ -73,9 +73,7 @@ const useStyles = makeStyles()(() => ({
     marginRight: 7,
     maxWidth: 300,
   },
-  card: {
-    position: 'relative',
-  },
+  card: { position: 'relative' },
   footer: {
     width: '100%',
     position: 'absolute',
@@ -83,9 +81,7 @@ const useStyles = makeStyles()(() => ({
     left: 0,
     bottom: 10,
   },
-  button: {
-    cursor: 'default',
-  },
+  button: { cursor: 'default' },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -269,7 +265,11 @@ const ChallengesPlayer = () => {
             variant="outlined"
             component={Link}
             to={`/challenges/${exerciseId}?challenge=${challengeId}&user=${userId}&preview=true`}
-            style={{ position: 'absolute', top: 20, right: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 20,
+            }}
           >
             {t('Switch to preview mode')}
           </Button>
@@ -280,13 +280,21 @@ const ChallengesPlayer = () => {
             variant="outlined"
             component={Link}
             to={`/admin/exercises/${exerciseId}/definition`}
-            style={{ position: 'absolute', top: 20, left: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              left: 20,
+            }}
           >
             {t('Back to administration')}
           </Button>
         )}
         <div className={classes.container}>
-          <div style={{ margin: '0 auto', textAlign: 'center' }}>
+          <div style={{
+            margin: '0 auto',
+            textAlign: 'center',
+          }}
+          >
             <img src={theme.logo} alt="logo" className={classes.logo} />
           </div>
           <Typography
@@ -300,9 +308,7 @@ const ChallengesPlayer = () => {
           </Typography>
           <Typography
             variant="h2"
-            style={{
-              textAlign: 'center',
-            }}
+            style={{ textAlign: 'center' }}
           >
             {exercise.exercise_subtitle}
           </Typography>
@@ -326,7 +332,10 @@ const ChallengesPlayer = () => {
                         <Card
                           variant="outlined"
                           classes={{ root: classes.card }}
-                          sx={{ width: '100%', height: '100%' }}
+                          sx={{
+                            width: '100%',
+                            height: '100%',
+                          }}
                         >
                           <CardActionArea
                             onClick={() => setCurrentChallengeEntry(challengeEntry)}
@@ -527,7 +536,11 @@ const ChallengesPlayer = () => {
                     {t('Flag is not correct! Try again...')}
                   </Alert>
                 )}
-                <div style={{ float: 'right', marginTop: 20 }}>
+                <div style={{
+                  float: 'right',
+                  marginTop: 20,
+                }}
+                >
                   <Button onClick={handleClose} style={{ marginRight: 10 }}>
                     {t('Close')}
                   </Button>
@@ -553,7 +566,11 @@ const ChallengesPlayer = () => {
                       fullWidth={true}
                       label={t('Flag')}
                     />
-                    <div style={{ float: 'right', marginTop: 20 }}>
+                    <div style={{
+                      float: 'right',
+                      marginTop: 20,
+                    }}
+                    >
                       <Button
                         onClick={handleClose}
                         style={{ marginRight: 10 }}

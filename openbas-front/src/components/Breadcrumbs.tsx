@@ -1,5 +1,5 @@
 import { Breadcrumbs as MUIBreadcrumbs, Typography } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -28,9 +28,7 @@ const useStyles = makeStyles()(() => ({
     marginTop: -5,
     marginBottom: 15,
   },
-  breadcrumbsStandard: {
-    marginTop: -5,
-  },
+  breadcrumbsStandard: { marginTop: -5 },
 }));
 
 const Breadcrumbs: FunctionComponent<BreadcrumbsProps> = ({ elements, variant }) => {

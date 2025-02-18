@@ -121,9 +121,7 @@ const ChallengeForm = (props) => {
   };
   const required = value => (value ? undefined : t('This field is required.'));
   const requiredArray = value => (value && value.length > 0 ? undefined : t('This field is required.'));
-  const { documentsMap } = useHelper(helper => ({
-    documentsMap: helper.getDocumentsMap(),
-  }));
+  const { documentsMap } = useHelper(helper => ({ documentsMap: helper.getDocumentsMap() }));
   useDataLoader(() => {
     dispatch(fetchExercises());
     dispatch(fetchDocuments());
@@ -158,7 +156,10 @@ const ChallengeForm = (props) => {
     );
   };
   const submitForm = (data) => {
-    return onSubmit({ ...data, challenge_documents: documents });
+    return onSubmit({
+      ...data,
+      challenge_documents: documents,
+    });
   };
 
   // Rendering
@@ -318,10 +319,16 @@ const ChallengeForm = (props) => {
                   {t('Flags')}
                 </Typography>
                 <IconButton
-                  onClick={() => fields.push({ flag_type: 'VALUE', flag_value: '' })}
+                  onClick={() => fields.push({
+                    flag_type: 'VALUE',
+                    flag_value: '',
+                  })}
                   size="small"
                   color="primary"
-                  style={{ float: 'left', margin: '-8px 0 0 10px' }}
+                  style={{
+                    float: 'left',
+                    margin: '-8px 0 0 10px',
+                  }}
                 >
                   <ControlPointOutlined />
                 </IconButton>
@@ -375,7 +382,11 @@ const ChallengeForm = (props) => {
               {t('At least one flag is required for a challenge.')}
             </Typography>
           )}
-          <div style={{ float: 'right', marginTop: 20 }}>
+          <div style={{
+            float: 'right',
+            marginTop: 20,
+          }}
+          >
             <Button
               variant="contained"
               onClick={handleClose}

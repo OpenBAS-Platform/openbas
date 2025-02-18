@@ -16,8 +16,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useState } from 'react';
 
 import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMedia, aiGenMessage, aiGenSubject, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
 // eslint-disable-next-line import/no-cycle
@@ -69,19 +68,28 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   const [messageSender, setMessageSender] = useState<string>('');
   const [messageRecipient, setMessageRecipient] = useState<string>('');
   const [isAcceptable, setIsAcceptable] = useState(true);
-  const [menuOpen, setMenuOpen] = useState<{ open: boolean; anchorEl: HTMLButtonElement | null }>({
+  const [menuOpen, setMenuOpen] = useState<{
+    open: boolean;
+    anchorEl: HTMLButtonElement | null;
+  }>({
     open: false,
     anchorEl: null,
   });
   const [displayAskAI, setDisplayAskAI] = useState(false);
-  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleOpenMenu = (event: ReactMouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (isEnterpriseEdition) {
       event.preventDefault();
-      setMenuOpen({ open: true, anchorEl: event.currentTarget });
+      setMenuOpen({
+        open: true,
+        anchorEl: event.currentTarget,
+      });
     }
   };
   const handleCloseMenu = () => {
-    setMenuOpen({ open: false, anchorEl: null });
+    setMenuOpen({
+      open: false,
+      anchorEl: null,
+    });
   };
   const handleOpenToneOptions = () => {
     handleCloseMenu();
@@ -267,7 +275,10 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
             handleCloseAskAI();
           }}
           handleFollowUp={handleCloseAskAI}
-          followUpActions={[{ key: 'retry', label: t('Retry') }]}
+          followUpActions={[{
+            key: 'retry',
+            label: t('Retry'),
+          }]}
           format={format}
           isAcceptable={isAcceptable}
         />
@@ -286,7 +297,11 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               onChange={(value: string) => setMessageInput(value)}
               style={{ height: 200 }}
             />
-            <FormControl style={{ width: '100%', marginTop: 20 }}>
+            <FormControl style={{
+              width: '100%',
+              marginTop: 20,
+            }}
+            >
               <InputLabel id="messageTone">{t('Tone')}</InputLabel>
               <Select
                 labelId="messageTone"
@@ -368,7 +383,11 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
               onChange={(value: string) => setMessageInput(value)}
               style={{ height: 200 }}
             />
-            <FormControl style={{ width: '100%', marginTop: 20 }}>
+            <FormControl style={{
+              width: '100%',
+              marginTop: 20,
+            }}
+            >
               <InputLabel id="messageTone">{t('Tone')}</InputLabel>
               <Select
                 labelId="messageTone"
@@ -478,27 +497,49 @@ const TextFieldAskAI: FunctionComponent<TextFieldAskAiProps> = ({
   };
   if (variant === 'markdown') {
     return (
-      <div style={style || { position: 'absolute', top: 15, right: 0 }}>
+      <div style={style || {
+        position: 'absolute',
+        top: 15,
+        right: 0,
+      }}
+      >
         {renderButton()}
       </div>
     );
   }
   if (variant === 'html') {
     return (
-      <div style={style || { position: 'absolute', top: 15, right: 20 }}>
+      <div style={style || {
+        position: 'absolute',
+        top: 15,
+        right: 20,
+      }}
+      >
         {renderButton()}
       </div>
     );
   }
   if (variant === 'ckeditor') {
     return (
-      <div style={style || { position: 'absolute', top: 64, right: 20 }}>
+      <div style={style || {
+        position: 'absolute',
+        top: 64,
+        right: 20,
+      }}
+      >
         {renderButton()}
       </div>
     );
   }
   return (
-    <InputAdornment position="end" style={{ position: 'absolute', top: 5, right: 0 }}>
+    <InputAdornment
+      position="end"
+      style={{
+        position: 'absolute',
+        top: 5,
+        right: 0,
+      }}
+    >
       {renderButton()}
     </InputAdornment>
   );

@@ -65,7 +65,11 @@ class KillChainPhaseForm extends Component {
               label={t('Order')}
               style={{ marginTop: 20 }}
             />
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div style={{
+              float: 'right',
+              marginTop: 20,
+            }}
+            >
               <Button
                 variant="contained"
                 onClick={handleClose.bind(this)}

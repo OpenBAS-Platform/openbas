@@ -416,7 +416,10 @@ describe('exportData tests', () => {
 
     describe('when inject has an object content', () => {
       const obj = createObjWithDefaultKeys(objtype);
-      const object_content = { key1: 'content1', key2: 'content2' };
+      const object_content = {
+        key1: 'content1',
+        key2: 'content2',
+      };
       obj[`${objtype}_content`] = object_content;
       // mirror what's being done in the tested method
       const expected_string_content = JSON.stringify(object_content).toString().replaceAll('"', '""');

@@ -1,8 +1,8 @@
 import { MoreVert } from '@mui/icons-material';
-import { IconButton, ListItem, ListItemIcon, ListItemText, Skeleton, SvgIconProps } from '@mui/material';
-import { ComponentType, CSSProperties, FunctionComponent } from 'react';
+import { IconButton, ListItem, ListItemIcon, ListItemText, Skeleton, type SvgIconProps } from '@mui/material';
+import { type ComponentType, type CSSProperties, type FunctionComponent } from 'react';
 
-import { Header } from '../SortHeadersList';
+import { type Header } from '../SortHeadersList';
 
 interface Props {
   headers: Header[];
@@ -24,7 +24,10 @@ const ListLoader: FunctionComponent<Props> = ({
       <ListItem
         key={key}
         divider
-        style={{ height, pointerEvents: 'none' }}
+        style={{
+          height,
+          pointerEvents: 'none',
+        }}
         secondaryAction={(
           <IconButton
             size="large"
@@ -43,7 +46,10 @@ const ListLoader: FunctionComponent<Props> = ({
               {headers.map(header => (
                 <div
                   key={header.field}
-                  style={{ ...headerStyles[header.field], paddingRight: 10 }}
+                  style={{
+                    ...headerStyles[header.field],
+                    paddingRight: 10,
+                  }}
                 >
                   <Skeleton height={40} />
                 </div>

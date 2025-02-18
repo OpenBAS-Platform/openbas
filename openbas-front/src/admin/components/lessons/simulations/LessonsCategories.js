@@ -13,11 +13,7 @@ import LessonsCategoryPopover from '../categories/LessonsCategoryPopover';
 import CreateLessonsQuestion from '../categories/questions/CreateLessonsQuestion';
 import LessonsQuestionPopover from '../categories/questions/LessonsQuestionPopover';
 
-const useStyles = makeStyles()(() => ({
-  chip: {
-    margin: '0 10px 10px 0',
-  },
-}));
+const useStyles = makeStyles()(() => ({ chip: { margin: '0 10px 10px 0' } }));
 
 const LessonsCategories = ({
   lessonsCategories,
@@ -34,9 +30,7 @@ const LessonsCategories = ({
   const theme = useTheme();
 
   // Context
-  const {
-    onUpdateLessonsCategoryTeams,
-  } = useContext(LessonContext);
+  const { onUpdateLessonsCategoryTeams } = useContext(LessonContext);
 
   const sortCategories = R.sortWith([
     R.ascend(R.prop('lessons_category_order')),
@@ -69,7 +63,15 @@ const LessonsCategories = ({
     R.fromPairs,
   )(lessonsAnswers);
   return (
-    <div id="lessons_categories" style={{ display: 'grid', gap: `${theme.spacing(2)} 0`, gridTemplateColumns: '1fr', ...style }}>
+    <div
+      id="lessons_categories"
+      style={{
+        display: 'grid',
+        gap: `${theme.spacing(2)} 0`,
+        gridTemplateColumns: '1fr',
+        ...style,
+      }}
+    >
       {sortedCategories.map((category) => {
         const questions = sortQuestions(
           lessonsQuestions.filter(
@@ -86,7 +88,12 @@ const LessonsCategories = ({
                 />
               )}
             </Typography>
-            <div style={{ display: 'grid', gap: `0 ${theme.spacing(3)}`, gridTemplateColumns: '1fr 1fr 1fr' }}>
+            <div style={{
+              display: 'grid',
+              gap: `0 ${theme.spacing(3)}`,
+              gridTemplateColumns: '1fr 1fr 1fr',
+            }}
+            >
               <Typography variant="h4">{t('Questions')}</Typography>
               <Typography variant="h4">{t('Results')}</Typography>
               <Typography variant="h4">
@@ -139,7 +146,11 @@ const LessonsCategories = ({
                   {questions.map((question) => {
                     const consolidatedAnswer = consolidatedAnswers[
                       question.lessonsquestion_id
-                    ] || { score: 0, number: 0, comments: 0 };
+                    ] || {
+                      score: 0,
+                      number: 0,
+                      comments: 0,
+                    };
                     return (
                       <ListItemButton
                         key={question.lessonsquestion_id}
@@ -163,7 +174,11 @@ const LessonsCategories = ({
                             marginRight: 1,
                           }}
                         >
-                          <Box sx={{ width: '100%', mr: 1 }}>
+                          <Box sx={{
+                            width: '100%',
+                            mr: 1,
+                          }}
+                          >
                             <LinearProgress
                               variant="determinate"
                               value={consolidatedAnswer.score}

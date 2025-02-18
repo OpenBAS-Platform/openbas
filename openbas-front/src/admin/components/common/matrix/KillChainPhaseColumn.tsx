@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material/styles';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { AttackPattern, InjectExpectationResultsByAttackPattern, KillChainPhase } from '../../../../utils/api-types';
+import { type AttackPattern, type InjectExpectationResultsByAttackPattern, type KillChainPhase } from '../../../../utils/api-types';
 import AttackPatternBox from './AttackPatternBox';
 
 const useStyles = makeStyles()(() => ({
@@ -47,7 +47,15 @@ const KillChainPhaseColumn: FunctionComponent<KillChainPhaseComponentProps> = ({
   };
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ fontSize: 15, textAlign: 'center', marginBottom: 20, color: dummy ? theme.palette.text?.disabled : theme.palette.text?.primary }}>{killChainPhase.phase_name}</div>
+      <div style={{
+        fontSize: 15,
+        textAlign: 'center',
+        marginBottom: 20,
+        color: dummy ? theme.palette.text?.disabled : theme.palette.text?.primary,
+      }}
+      >
+        {killChainPhase.phase_name}
+      </div>
       <div className={classes.column}>
         {[...attackPatterns].sort(sortAttackPattern)
           .map(attackPattern => (

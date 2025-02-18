@@ -1,4 +1,4 @@
-import type { Filter, FilterGroup } from '../../../../utils/api-types';
+import { type Filter, type FilterGroup } from '../../../../utils/api-types';
 import { isExistFilter } from './FilterUtils';
 
 const updateFilters = (filters: FilterGroup, updateFn: (filter: Filter) => Filter): FilterGroup => {
@@ -29,15 +29,31 @@ export const handleAddFilterWithEmptyValueUtil = (filterGroup: FilterGroup, filt
 };
 
 export const handleAddSingleValueFilterUtil = (filters: FilterGroup, key: string, value: string) => {
-  return updateFilters(filters, f => (f.key === key ? { ...f, values: [value] } : f));
+  return updateFilters(filters, f => (f.key === key
+    ? {
+        ...f,
+        values: [value],
+      }
+    : f));
 };
 
 export const handleAddMultipleValueFilterUtil = (filters: FilterGroup, key: string, values: string[]) => {
-  return updateFilters(filters, f => (f.key === key ? { ...f, values } : f));
+  return updateFilters(filters, f => (f.key === key
+    ? {
+        ...f,
+        values,
+      }
+    : f));
 };
 
 export const handleChangeOperatorFiltersUtil = (filters: FilterGroup, key: string, operator: Filter['operator']) => {
-  return updateFilters(filters, f => (f.key === key ? { ...f, operator, values: operator && ['empty', 'not_empty'].includes(operator) ? [] : f.values } : f));
+  return updateFilters(filters, f => (f.key === key
+    ? {
+        ...f,
+        operator,
+        values: operator && ['empty', 'not_empty'].includes(operator) ? [] : f.values,
+      }
+    : f));
 };
 
 export const handleRemoveFilterUtil = (filters: FilterGroup, key: string) => {

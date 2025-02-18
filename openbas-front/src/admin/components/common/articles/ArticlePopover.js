@@ -34,7 +34,10 @@ const ArticlePopover = ({ article, onRemoveArticle = null }) => {
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
-    const inputValues = { ...data, article_channel: data.article_channel.id };
+    const inputValues = {
+      ...data,
+      article_channel: data.article_channel.id,
+    };
     return onUpdateArticle(article, inputValues).then(() => handleCloseEdit());
   };
   // Delete action

@@ -1,6 +1,6 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { addPlayer } from '../../../../actions/User';
@@ -8,10 +8,10 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { PlayerInput } from '../../../../utils/api-types';
+import { type PlayerInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { Option } from '../../../../utils/Option';
-import type { PlayerInputForm, UserStore } from './Player';
+import { type Option } from '../../../../utils/Option';
+import { type PlayerInputForm, type UserStore } from './Player';
 import PlayerForm from './PlayerForm';
 
 const useStyles = makeStyles()(theme => ({
@@ -49,7 +49,10 @@ const CreatePlayer: FunctionComponent<CreatePlayerProps> = ({
       user_tags: data.user_tags?.map((tag: Option) => tag.id),
     };
     return dispatch(addPlayer(inputValues)).then(
-      (result: { result: string; entities: { users: Record<string, UserStore> } }) => {
+      (result: {
+        result: string;
+        entities: { users: Record<string, UserStore> };
+      }) => {
         if (result.result) {
           if (onCreate) {
             const created = result.entities.users[result.result];

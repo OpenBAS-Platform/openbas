@@ -145,7 +145,11 @@ const Reset = ({ onCancel }) => {
               )}
             </Form>
           )}
-          <div style={{ marginTop: 10, cursor: 'pointer' }}>
+          <div style={{
+            marginTop: 10,
+            cursor: 'pointer',
+          }}
+          >
             <a onClick={() => onCancel()}>{t('Back to login')}</a>
           </div>
         </div>

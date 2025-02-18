@@ -1,11 +1,10 @@
-import { useContext, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, useContext, useState } from 'react';
 
-import ButtonPopover, { VariantButtonPopover } from '../../../../components/common/ButtonPopover';
+import ButtonPopover, { type VariantButtonPopover } from '../../../../components/common/ButtonPopover';
 import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
-import type { Report, ReportInput } from '../../../../utils/api-types';
+import { type Report, type ReportInput } from '../../../../utils/api-types';
 import { ReportContext } from '../../common/Context';
 
 type ReportActionType = 'Update' | 'Delete';
@@ -16,7 +15,7 @@ interface Props {
   variant?: VariantButtonPopover;
 }
 
-const ReportPopover: React.FC<Props> = ({
+const ReportPopover: FunctionComponent<Props> = ({
   report,
   actions,
   variant = 'icon',
@@ -42,8 +41,14 @@ const ReportPopover: React.FC<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => setOpenEdit(true) });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => setOpenDelete(true) });
+  if (actions.includes('Update')) entries.push({
+    label: 'Update',
+    action: () => setOpenEdit(true),
+  });
+  if (actions.includes('Delete')) entries.push({
+    label: 'Delete',
+    action: () => setOpenDelete(true),
+  });
 
   return (
     <>

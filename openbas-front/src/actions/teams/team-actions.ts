@@ -1,4 +1,4 @@
-import type { Dispatch } from 'redux';
+import { type Dispatch } from 'redux';
 
 import {
   delReferential,
@@ -8,7 +8,7 @@ import {
   simpleCall,
   simplePostCall,
 } from '../../utils/Action';
-import type { SearchPaginationInput, Team, TeamCreateInput, TeamUpdateInput, User } from '../../utils/api-types';
+import { type SearchPaginationInput, type Team, type TeamCreateInput, type TeamUpdateInput, type User } from '../../utils/api-types';
 import * as schema from '../Schema';
 
 const TEAMS_URI = '/api/teams';
@@ -60,7 +60,10 @@ export const deleteTeam = (teamId: Team['team_id']) => (dispatch: Dispatch) => {
 };
 
 export const searchTeamsAsOption = (searchText: string = '', simulationOrScenarioId: string = '') => {
-  const params = { searchText, simulationOrScenarioId };
+  const params = {
+    searchText,
+    simulationOrScenarioId,
+  };
   return simpleCall(`${TEAMS_URI}/options`, params);
 };
 

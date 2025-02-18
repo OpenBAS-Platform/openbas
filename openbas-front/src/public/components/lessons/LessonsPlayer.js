@@ -36,9 +36,7 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const LessonsPlayer = (props) => {
-  const {
-    source, lessonsCategories, lessonsQuestions, lessonsAnswers, permissions,
-  } = props;
+  const { source, lessonsCategories, lessonsQuestions, lessonsAnswers, permissions } = props;
 
   const theme = useTheme();
   const { classes } = useStyles();
@@ -46,9 +44,7 @@ const LessonsPlayer = (props) => {
   const [openValidate, setOpenValidate] = useState(false);
 
   // Context
-  const {
-    onAddLessonsAnswers, onFetchPlayerLessonsAnswers,
-  } = useContext(ViewLessonContext);
+  const { onAddLessonsAnswers, onFetchPlayerLessonsAnswers } = useContext(ViewLessonContext);
 
   const submitForm = (data) => {
     const idsArray = Array.from(new Set(Object.keys(data).map(key => key.split('_')[0])));
@@ -86,7 +82,11 @@ const LessonsPlayer = (props) => {
             variant="outlined"
             component={Link}
             to={`/lessons/${source.type}/${source.id}?user=${source.finalUserId}&preview=true`}
-            style={{ position: 'absolute', top: 20, right: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              right: 20,
+            }}
           >
             {t('Switch to preview mode')}
           </Button>
@@ -97,28 +97,35 @@ const LessonsPlayer = (props) => {
             variant="outlined"
             component={Link}
             to={`/admin/${source.type}s/${source.id}/lessons`}
-            style={{ position: 'absolute', top: 20, left: 20 }}
+            style={{
+              position: 'absolute',
+              top: 20,
+              left: 20,
+            }}
           >
             {t('Back to administration')}
           </Button>
         )}
         <div className={classes.container}>
-          <div style={{ margin: '0 auto', textAlign: 'center' }}>
+          <div style={{
+            margin: '0 auto',
+            textAlign: 'center',
+          }}
+          >
             <img src={theme.logo} alt="logo" className={classes.logo} />
           </div>
           <Typography
             variant="h1"
             style={{
-              textAlign: 'center', fontSize: 40,
+              textAlign: 'center',
+              fontSize: 40,
             }}
           >
             {source.name}
           </Typography>
           <Typography
             variant="h2"
-            style={{
-              textAlign: 'center',
-            }}
+            style={{ textAlign: 'center' }}
           >
             {source.subtitle}
           </Typography>
@@ -232,7 +239,11 @@ const LessonsPlayer = (props) => {
                   );
                 })}
                 {sortedCategories.length > 0 && (
-                  <div style={{ margin: '50px auto', textAlign: 'center' }}>
+                  <div style={{
+                    margin: '50px auto',
+                    textAlign: 'center',
+                  }}
+                  >
                     <Button
                       color="secondary"
                       variant="contained"

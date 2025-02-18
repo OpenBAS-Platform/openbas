@@ -1,8 +1,7 @@
 import { Drawer, ListItemIcon, ListItemText, MenuItem, MenuList } from '@mui/material';
-import { FunctionComponent } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type ReactElement } from 'react';
 import { Link, useLocation } from 'react-router';
-import { CSSObject } from 'tss-react';
+import { type CSSObject } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
 
 import { computeBannerSettings } from '../../../public/components/systembanners/utils';
@@ -10,8 +9,6 @@ import useAuth from '../../../utils/hooks/useAuth';
 import { isNotEmptyField } from '../../../utils/utils';
 import { useFormatter } from '../../i18n';
 
-// TODO jss-to-tss-react codemod: Unable to handle style definition reliably. Unsupported arrow function syntax.
-// Unexpected value type of MemberExpression.
 const useStyles = makeStyles()(theme => ({
   drawer: {
     minHeight: '100vh',
@@ -30,14 +27,12 @@ const useStyles = makeStyles()(theme => ({
 
 export interface RightMenuEntry {
   path: string;
-  icon: () => React.ReactElement;
+  icon: () => ReactElement;
   label: string;
   number?: number;
 }
 
-const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({
-  entries,
-}) => {
+const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }) => {
   // Standard hooks
   const location = useLocation();
   const { classes } = useStyles();

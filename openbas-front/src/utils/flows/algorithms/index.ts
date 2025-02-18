@@ -15,7 +15,10 @@ export type LayoutAlgorithm = (
   nodes: Node[],
   edges: Edge[],
   options: LayoutAlgorithmOptions
-) => Promise<{ nodes: Node[]; edges: Edge[] }>;
+) => Promise<{
+  nodes: Node[];
+  edges: Edge[];
+}>;
 
 export default {
   dagre,

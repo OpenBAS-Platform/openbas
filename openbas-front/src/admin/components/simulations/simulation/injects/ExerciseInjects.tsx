@@ -1,19 +1,19 @@
 import { BarChartOutlined, ReorderOutlined, ViewTimelineOutlined } from '@mui/icons-material';
 import { Grid, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExerciseArticles } from '../../../../../actions/channels/article-action';
-import type { ArticlesHelper } from '../../../../../actions/channels/article-helper';
+import { type ArticlesHelper } from '../../../../../actions/channels/article-helper';
 import { fetchExerciseInjectExpectations, fetchExerciseTeams } from '../../../../../actions/Exercise';
-import type { ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
-import type { ChallengeHelper } from '../../../../../actions/helper';
+import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
+import { type ChallengeHelper } from '../../../../../actions/helper';
 import { fetchVariablesForExercise } from '../../../../../actions/variables/variable-actions';
-import type { VariablesHelper } from '../../../../../actions/variables/variable-helper';
+import { type VariablesHelper } from '../../../../../actions/variables/variable-helper';
 import { useFormatter } from '../../../../../components/i18n';
 import { useHelper } from '../../../../../store';
-import type { Exercise } from '../../../../../utils/api-types';
+import { type Exercise } from '../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import { ArticleContext, TeamContext, ViewModeContext } from '../../../common/Context';
@@ -138,7 +138,14 @@ const ExerciseInjects: FunctionComponent = () => {
             </ToggleButtonGroup>
             <Grid container spacing={3}>
               <Grid container item spacing={3}>
-                <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Grid
+                  item
+                  xs={6}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
                   <Typography variant="h4">
                     {t('Distribution of injects by type')}
                   </Typography>
@@ -146,7 +153,14 @@ const ExerciseInjects: FunctionComponent = () => {
                     <InjectDistributionByType exerciseId={exerciseId} />
                   </Paper>
                 </Grid>
-                <Grid item xs={6} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Grid
+                  item
+                  xs={6}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
                   <Typography variant="h4">
                     {t('Distribution of injects by team')}
                   </Typography>
@@ -154,7 +168,14 @@ const ExerciseInjects: FunctionComponent = () => {
                     <InjectDistributionByTeam exerciseId={exerciseId} />
                   </Paper>
                 </Grid>
-                <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
                   <Typography variant="h4">
                     {t('Distribution of expectations by inject type')}
                     {' '}
@@ -164,7 +185,14 @@ const ExerciseInjects: FunctionComponent = () => {
                     <ExerciseDistributionScoreByTeamInPercentage exerciseId={exerciseId} />
                   </Paper>
                 </Grid>
-                <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
                   <Typography variant="h4">
                     {t('Distribution of expected total score by inject type')}
                   </Typography>
@@ -172,7 +200,14 @@ const ExerciseInjects: FunctionComponent = () => {
                     <ExerciseDistributionScoreOverTimeByInjectorContract exerciseId={exerciseId} />
                   </Paper>
                 </Grid>
-                <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
                   <Typography variant="h4">
                     {t('Distribution of expectations by team')}
                   </Typography>
@@ -180,7 +215,14 @@ const ExerciseInjects: FunctionComponent = () => {
                     <ExerciseDistributionScoreOverTimeByTeam exerciseId={exerciseId} />
                   </Paper>
                 </Grid>
-                <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
                   <Typography variant="h4">
                     {t('Distribution of expected total score by team')}
                   </Typography>

@@ -2,7 +2,7 @@ import { FileDownloadOutlined } from '@mui/icons-material';
 import { ToggleButton, Tooltip } from '@mui/material';
 import { CSVLink } from 'react-csv';
 
-import type { TagHelper } from '../../actions/helper';
+import { type TagHelper } from '../../actions/helper';
 import { useHelper } from '../../store';
 import { exportData } from '../../utils/Environment';
 import { useFormatter } from '../i18n';
@@ -23,9 +23,7 @@ const ExportButton = <T extends object>({ totalElements, exportProps }: Props<T>
   // Standard hooks
   const { t } = useFormatter();
   // Fetching data
-  const { tagsMap } = useHelper((helper: TagHelper) => ({
-    tagsMap: helper.getTagsMap(),
-  }));
+  const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
 
   return (
     <>

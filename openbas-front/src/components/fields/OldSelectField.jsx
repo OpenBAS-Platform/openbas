@@ -49,7 +49,10 @@ const renderSelectField = ({
       }}
       {...inputProps}
       {...others}
-      inputProps={{ name, id: name }}
+      inputProps={{
+        name,
+        id: name,
+      }}
       style={{ height: 30 }}
     >
       {children}

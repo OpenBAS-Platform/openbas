@@ -1,17 +1,16 @@
 import { Avatar, Tab, Tabs } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { type SyntheticEvent, useEffect, useRef, useState } from 'react';
 
 import { fetchInject } from '../../../../actions/Inject';
-import { InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
-import type { InjectOutputType } from '../../../../actions/injects/Inject';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
+import { type InjectOutputType } from '../../../../actions/injects/Inject';
+import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { Inject, InjectInput, InjectorContractOutput } from '../../../../utils/api-types';
+import { type Inject, type InjectInput, type InjectorContractOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import InjectDetailsForm from './form/InjectDetailsForm';
@@ -36,9 +35,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
   const [activeTab, setActiveTab] = useState<null | string>(availableTabs[0]);
   const [isInjectLoading, setIsInjectLoading] = useState(true);
   // Fetching data
-  const { inject } = useHelper((helper: InjectHelper) => ({
-    inject: helper.getInject(injectId),
-  }));
+  const { inject } = useHelper((helper: InjectHelper) => ({ inject: helper.getInject(injectId) }));
 
   useDataLoader(() => {
     setIsInjectLoading(true);
@@ -46,7 +43,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
   });
 
   // Selection
-  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (_: SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
   };
 
@@ -61,9 +58,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
       open={open}
       handleClose={handleClose}
       title={t('Update the inject')}
-      PaperProps={{
-        ref: drawerRef,
-      }}
+      PaperProps={{ ref: drawerRef }}
       disableEnforceFocus
     >
       <>
@@ -80,10 +75,22 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
           <InjectDetailsForm
             injectorContractLabel={tPick(injectorContractContent?.label)}
             injectContractIcon={
-              injectorContractContent ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${injectorContractContent.config.type}`} /> : undefined
+              injectorContractContent ? (
+                <Avatar
+                  sx={{
+                    width: 24,
+                    height: 24,
+                  }}
+                  src={`/api/images/injectors/${injectorContractContent.config.type}`}
+                />
+              ) : undefined
             }
             injectHeaderAction={(
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              >
                 {inject?.inject_injector_contract?.injector_contract_platforms?.map(
                   (platform: InjectorContractOutput['injector_contract_platforms']) => <PlatformIcon key={String(platform)} width={20} platform={String(platform)} marginRight={10} />,
                 )}

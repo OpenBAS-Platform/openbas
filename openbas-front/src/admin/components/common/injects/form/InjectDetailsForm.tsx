@@ -8,14 +8,14 @@ import { z } from 'zod';
 
 import type { TagHelper } from '../../../../../actions/helper';
 import {
-  ContractElement,
-  FieldValue,
-  InjectorContractConverted,
+  type ContractElement,
+  type FieldValue,
+  type InjectorContractConverted,
 } from '../../../../../actions/injector_contracts/InjectorContract';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { useHelper } from '../../../../../store';
-import { Inject, InjectInput } from '../../../../../utils/api-types';
+import { type Inject, type InjectInput } from '../../../../../utils/api-types';
 import { splitDuration } from '../../../../../utils/Time';
 import { isEmptyField } from '../../../../../utils/utils';
 import { PermissionsContext } from '../../Context';
@@ -70,9 +70,7 @@ const InjectDetailsForm = ({
     expectations: [],
   });
 
-  const { tagsMap } = useHelper((helper: TagHelper) => ({
-    tagsMap: helper.getTagsMap(),
-  }));
+  const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
   const toggleInjectContent = () => {
     if (openDetails) {
       if (drawerRef.current) {
@@ -129,16 +127,25 @@ const InjectDetailsForm = ({
 
           // Specific tuple type field
           } else if (field.type === 'tuple' && initialValues[field.key]) {
-            const processValue = ({ key, value }: { key: string; value: string }) => ({
+            const processValue = ({ key, value }: {
+              key: string;
+              value: string;
+            }) => ({
               type: field.tupleFilePrefix != null && value?.includes(field.tupleFilePrefix) ? 'attachment' : 'text',
               key,
               value: field.tupleFilePrefix != null && value?.replace(field.tupleFilePrefix, ''),
             });
 
             if (field.cardinality === '1') {
-              initialValues[field.key] = processValue(initialValues[field.key] as { key: string; value: string });
+              initialValues[field.key] = processValue(initialValues[field.key] as {
+                key: string;
+                value: string;
+              });
             } else {
-              initialValues[field.key] = (initialValues[field.key] as { key: string; value: string }[]).map(processValue);
+              initialValues[field.key] = (initialValues[field.key] as {
+                key: string;
+                value: string;
+              }[]).map(processValue);
             }
           }
         });
@@ -191,13 +198,30 @@ const InjectDetailsForm = ({
         // Specific tuple type field
         } else if (data[field.key] && field.type === 'tuple') {
           const fieldData = data[field.key];
-          const formatTuple = ({ type, ...pair }: { key: string; value: string; type?: string }) => {
-            return type === 'attachment' ? { key: pair.key, value: `${field.tupleFilePrefix}${pair.value}` } : pair;
+          const formatTuple = ({ type, ...pair }: {
+            key: string;
+            value: string;
+            type?: string;
+          }) => {
+            return type === 'attachment'
+              ? {
+                  key: pair.key,
+                  value: `${field.tupleFilePrefix}${pair.value}`,
+                }
+              : pair;
           };
           if (field.cardinality === '1') {
-            newContent[field.key] = formatTuple(fieldData as { key: string; value: string; type?: string });
+            newContent[field.key] = formatTuple(fieldData as {
+              key: string;
+              value: string;
+              type?: string;
+            });
           } else {
-            newContent[field.key] = (fieldData as { key: string; value: string; type?: string }[]).map(data => formatTuple(data));
+            newContent[field.key] = (fieldData as {
+              key: string;
+              value: string;
+              type?: string;
+            }[]).map(data => formatTuple(data));
           }
         } else {
           newContent[field.key] = data[field.key];
@@ -266,11 +290,27 @@ const InjectDetailsForm = ({
   }
 
   return (
-    <form id="injectContentForm" onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(2) }}>
+    <form
+      id="injectContentForm"
+      onSubmit={handleSubmit(onSubmit)}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: theme.spacing(2),
+      }}
+    >
       <Card elevation={0}>
         <CardHeader
           sx={{ backgroundColor: theme.palette.background.default }}
-          avatar={injectContractIcon ?? <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
+          avatar={injectContractIcon ?? (
+            <Avatar sx={{
+              width: 24,
+              height: 24,
+            }}
+            >
+              <HelpOutlined />
+            </Avatar>
+          )}
           title={injectHeaderTitle}
           action={injectHeaderAction}
         />
@@ -312,13 +352,25 @@ const InjectDetailsForm = ({
             />
           )}
 
-          <Button variant="outlined" onClick={toggleInjectContent} style={{ width: '100%', height: theme.spacing(5) }}>
+          <Button
+            variant="outlined"
+            onClick={toggleInjectContent}
+            style={{
+              width: '100%',
+              height: theme.spacing(5),
+            }}
+          >
             {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
             {t('Inject content')}
           </Button>
         </div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'row-reverse', gap: theme.spacing(1) }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row-reverse',
+        gap: theme.spacing(1),
+      }}
+      >
         <Button
           variant="contained"
           color="secondary"

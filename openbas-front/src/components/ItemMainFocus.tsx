@@ -1,6 +1,6 @@
 import { AccountBalanceOutlined, FireTruckOutlined, ImportantDevicesOutlined, KeyboardVoiceOutlined, QuizOutlined } from '@mui/icons-material';
 import { BookOpenBlankVariantOutline, FilterMultipleOutline } from 'mdi-material-ui';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 
 interface ItemMainFocusProps {
   mainFocus: string;
@@ -33,7 +33,11 @@ const ItemMainFocus: FunctionComponent<ItemMainFocusProps> = ({
   size,
 }) => {
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+    }}
+    >
       {renderIcon(mainFocus, size)}
       <span style={{
         fontSize: 14,

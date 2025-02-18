@@ -28,9 +28,7 @@ const CreateLessonsCategory = (props) => {
   const [open, setOpen] = useState(false);
 
   // Context
-  const {
-    onAddLessonsCategory,
-  } = useContext(LessonContext);
+  const { onAddLessonsCategory } = useContext(LessonContext);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

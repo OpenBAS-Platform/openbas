@@ -1,21 +1,17 @@
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import Chart from 'react-apexcharts';
 
-import type { InjectStore } from '../../../../../actions/injects/Inject';
+import { type InjectStore } from '../../../../../actions/injects/Inject';
 import Empty from '../../../../../components/Empty';
 import { useFormatter } from '../../../../../components/i18n';
-import type { Inject } from '../../../../../utils/api-types';
+import { type Inject } from '../../../../../utils/api-types';
 import { areaChartOptions } from '../../../../../utils/Charts';
 
-interface Props {
-  injects: Inject[];
-}
+interface Props { injects: Inject[] }
 
-const InjectOverTimeArea: FunctionComponent<Props> = ({
-  injects,
-}) => {
+const InjectOverTimeArea: FunctionComponent<Props> = ({ injects }) => {
   // Standard hooks
   const { t, nsdt } = useFormatter();
   const theme = useTheme();

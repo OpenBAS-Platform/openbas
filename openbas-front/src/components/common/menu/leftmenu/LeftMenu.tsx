@@ -11,9 +11,7 @@ import MenuItemSingle from './MenuItemSingle';
 import MenuItemToggle from './MenuItemToggle';
 import useLeftMenu from './useLeftMenu';
 
-const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
-  entries = [],
-}) => {
+const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries = [] }) => {
   // Standard hooks
   const theme = useTheme();
   const { settings } = useAuth();

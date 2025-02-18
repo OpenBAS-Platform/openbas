@@ -59,12 +59,8 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles = {
-  document_name: {
-    width: '20%',
-  },
-  document_description: {
-    width: '15%',
-  },
+  document_name: { width: '20%' },
+  document_description: { width: '15%' },
   document_exercises: {
     width: '20%',
     cursor: 'default',
@@ -73,12 +69,8 @@ const inlineStyles = {
     width: '20%',
     cursor: 'default',
   },
-  document_type: {
-    width: '12%',
-  },
-  document_tags: {
-    width: '13%',
-  },
+  document_type: { width: '12%' },
+  document_tags: { width: '13%' },
 };
 
 const Documents = () => {
@@ -99,18 +91,40 @@ const Documents = () => {
 
   // Headers
   const headers = [
-    { field: 'document_name', label: 'Name', isSortable: true },
-    { field: 'document_description', label: 'Description', isSortable: true },
-    { field: 'document_exercises', label: 'Simulations', isSortable: false },
-    { field: 'document_scenarios', label: 'Scenarios', isSortable: false },
-    { field: 'document_type', label: 'Type', isSortable: true },
-    { field: 'document_tags', label: 'Tags', isSortable: true },
+    {
+      field: 'document_name',
+      label: 'Name',
+      isSortable: true,
+    },
+    {
+      field: 'document_description',
+      label: 'Description',
+      isSortable: true,
+    },
+    {
+      field: 'document_exercises',
+      label: 'Simulations',
+      isSortable: false,
+    },
+    {
+      field: 'document_scenarios',
+      label: 'Scenarios',
+      isSortable: false,
+    },
+    {
+      field: 'document_type',
+      label: 'Type',
+      isSortable: true,
+    },
+    {
+      field: 'document_tags',
+      label: 'Tags',
+      isSortable: true,
+    },
   ];
 
   const [documents, setDocuments] = useState([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState({
-    sorts: initSorting('document_name'),
-  });
+  const [searchPaginationInput, setSearchPaginationInput] = useState({ sorts: initSorting('document_name') });
 
   /**
    * Callback when a new document has been created or an previous one updated with a new version
@@ -137,7 +151,13 @@ const Documents = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Documents'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Components') }, {
+          label: t('Documents'),
+          current: true,
+        }]}
+      />
       <PaginationComponent
         fetch={searchDocuments}
         searchPaginationInput={searchPaginationInput}
