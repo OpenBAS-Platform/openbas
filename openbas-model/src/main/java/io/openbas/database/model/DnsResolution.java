@@ -1,6 +1,5 @@
 package io.openbas.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
@@ -34,11 +33,5 @@ public class DnsResolution extends Payload {
 
   public DnsResolution(String id, String type, String name) {
     super(id, type, name);
-  }
-
-  @Override
-  @JsonIgnore
-  public final String getExpectationSignatureValue() {
-    return hostname.split("\\r?\\n")[0];
   }
 }

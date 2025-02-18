@@ -4,7 +4,6 @@ import static jakarta.persistence.DiscriminatorType.STRING;
 import static java.time.Instant.now;
 import static lombok.AccessLevel.NONE;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -227,13 +226,5 @@ public class Payload implements Base {
     this.name = name;
     this.id = id;
     this.type = type;
-  }
-
-  /*
-   * Return the value to match in expectations
-   */
-  @JsonIgnore
-  public String getExpectationSignatureValue() {
-    return "";
   }
 }

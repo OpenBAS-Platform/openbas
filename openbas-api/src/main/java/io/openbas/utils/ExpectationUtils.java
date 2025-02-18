@@ -13,6 +13,7 @@ import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.exception.ElementNotFoundException;
 import java.time.Instant;
 import java.util.*;
+import org.hibernate.Hibernate;
 
 public class ExpectationUtils {
 
@@ -163,28 +164,40 @@ public class ExpectationUtils {
     List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
 
     if (payload != null) {
-      String expectationSignatureValue = payload.getExpectationSignatureValue();
       PayloadType payloadType = payload.getTypeEnum();
       switch (payloadType) {
         case COMMAND:
           injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                  .value(expectationSignatureValue)
-                  .build());
+              builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(processName).build());
           break;
-        case EXECUTABLE, FILE_DROP:
+        case EXECUTABLE:
+          Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
           injectExpectationSignatures.add(
               builder()
                   .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                  .value(expectationSignatureValue)
+                  .value(
+                      Optional.ofNullable(payloadExecutable.getExecutableFile())
+                          .map(Document::getName)
+                          .orElse(""))
+                  .build());
+          break;
+        case FILE_DROP:
+          FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
+          injectExpectationSignatures.add(
+              builder()
+                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
+                  .value(
+                      Optional.ofNullable(payloadFileDrop.getFileDropFile())
+                          .map(Document::getName)
+                          .orElse(""))
                   .build());
           break;
         case DNS_RESOLUTION:
+          DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
           injectExpectationSignatures.add(
               builder()
                   .type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME)
-                  .value(expectationSignatureValue)
+                  .value(payloadDnsResolution.getHostname().split("\\r?\\n")[0])
                   .build());
           break;
         default:
