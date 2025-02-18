@@ -1,4 +1,4 @@
-import { type AxiosError } from 'axios';
+import { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { FORM_ERROR } from 'final-form';
 import { type Schema } from 'normalizr';
 import * as R from 'ramda';
@@ -90,14 +90,14 @@ const checkUnauthorized = (error: AxiosError) => {
 
 const simpleApi = api();
 
-export const simpleCall = (uri: string, params?: unknown, defaultErrorBehavior: boolean = true) => simpleApi.get(buildUri(uri), { params }).catch((error) => {
+export const simpleCall = (uri: string, config?: AxiosRequestConfig, defaultErrorBehavior: boolean = true) => simpleApi.get(buildUri(uri), config).catch((error) => {
   checkUnauthorized(error);
   if (defaultErrorBehavior) {
     notifyError(error);
   }
   throw error;
 });
-export const simplePostCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true) => simpleApi.post(buildUri(uri), data)
+export const simplePostCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true) => simpleApi.post(buildUri(uri), data, config)
   .catch((error) => {
     checkUnauthorized(error);
     if (defaultNotifyErrorBehavior) {
@@ -105,35 +105,36 @@ export const simplePostCall = (uri: string, data?: unknown, defaultNotifyErrorBe
     }
     throw error;
   });
-export const simplePutCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.put(buildUri(uri), data)
-  .then((response) => {
-    if (defaultSuccessBehavior) {
-      notifySuccess('The element has been successfully updated');
-    }
-    return response;
-  })
-  .catch((error) => {
-    checkUnauthorized(error);
-    if (defaultNotifyErrorBehavior) {
-      notifyError(error);
-    }
-    throw error;
-  });
-// eslint-disable-next-line max-len
-export const simpleDelCall = (uri: string, data?: unknown, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) => simpleApi.delete(buildUri(uri), data ? { data: data } : undefined)
-  .then((response) => {
-    if (defaultSuccessBehavior) {
-      notifySuccess('The element has been successfully deleted.');
-    }
-    return response;
-  })
-  .catch((error) => {
-    checkUnauthorized(error);
-    if (defaultNotifyErrorBehavior) {
-      notifyError(error);
-    }
-    throw error;
-  });
+export const simplePutCall = (uri: string, data?: unknown, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) =>
+  simpleApi.put(buildUri(uri), data, config)
+    .then((response) => {
+      if (defaultSuccessBehavior) {
+        notifySuccess('The element has been successfully updated');
+      }
+      return response;
+    })
+    .catch((error) => {
+      checkUnauthorized(error);
+      if (defaultNotifyErrorBehavior) {
+        notifyError(error);
+      }
+      throw error;
+    });
+export const simpleDelCall = (uri: string, config?: AxiosRequestConfig, defaultNotifyErrorBehavior: boolean = true, defaultSuccessBehavior: boolean = true) =>
+  simpleApi.delete(buildUri(uri), config)
+    .then((response) => {
+      if (defaultSuccessBehavior) {
+        notifySuccess('The element has been successfully deleted.');
+      }
+      return response;
+    })
+    .catch((error) => {
+      checkUnauthorized(error);
+      if (defaultNotifyErrorBehavior) {
+        notifyError(error);
+      }
+      throw error;
+    });
 
 export const getReferential = (schema: Schema, uri: string) => (dispatch: Dispatch) => {
   dispatch({ type: Constants.DATA_FETCH_SUBMITTED });

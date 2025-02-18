@@ -64,7 +64,7 @@ export const searchTeamsAsOption = (searchText: string = '', simulationOrScenari
     searchText,
     simulationOrScenarioId,
   };
-  return simpleCall(`${TEAMS_URI}/options`, params);
+  return simpleCall(`${TEAMS_URI}/options`, { params });
 };
 
 export const searchTeamByIdAsOption = (ids: string[]) => {

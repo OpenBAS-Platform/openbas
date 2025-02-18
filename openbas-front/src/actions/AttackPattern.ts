@@ -34,7 +34,7 @@ export const deleteAttackPattern = (attackPatternId: AttackPattern['attack_patte
 
 export const searchAttackPatternsByNameAsOption = (searchText: string = '') => {
   const params = { searchText };
-  return simpleCall(`${ATTACK_PATTERN_URI}/options`, params);
+  return simpleCall(`${ATTACK_PATTERN_URI}/options`, { params });
 };
 
 export const searchAttackPatternsByIdAsOption = (ids: string[]) => {
