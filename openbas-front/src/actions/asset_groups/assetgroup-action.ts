@@ -63,7 +63,7 @@ export const searchAssetGroupAsOption = (searchText: string = '', simulationOrSc
     searchText,
     simulationOrScenarioId,
   };
-  return simpleCall(`${ASSET_GROUP_URI}/options`, params);
+  return simpleCall(`${ASSET_GROUP_URI}/options`, { params });
 };
 
 export const searchAssetGroupByIdAsOption = (ids: string[]) => {
