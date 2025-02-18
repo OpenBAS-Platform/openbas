@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -137,18 +138,17 @@ public class CalderaExecutorServiceTest {
   void test_run_WITH_one_endpoint_one_agent() {
     when(client.agents()).thenReturn(List.of(calderaAgent));
     calderaExecutorService.run();
+    ArgumentCaptor<io.openbas.database.model.Agent> agentCaptor =
+        ArgumentCaptor.forClass(io.openbas.database.model.Agent.class);
     ArgumentCaptor<Endpoint> endpointCaptor = ArgumentCaptor.forClass(Endpoint.class);
-    verify(endpointService).createEndpoint(endpointCaptor.capture());
+    verify(endpointService)
+        .createNewEndpointAndAgent(agentCaptor.capture(), endpointCaptor.capture());
 
     Endpoint capturedEndpoint = endpointCaptor.getValue();
     assertEquals(CALDERA_AGENT_HOSTNAME, capturedEndpoint.getHostname());
     assertArrayEquals(new String[] {CALDERA_AGENT_IP}, capturedEndpoint.getIps());
     assertEquals(Endpoint.PLATFORM_TYPE.Windows, capturedEndpoint.getPlatform());
     assertEquals(Endpoint.PLATFORM_ARCH.x86_64, capturedEndpoint.getArch());
-
-    ArgumentCaptor<io.openbas.database.model.Agent> agentCaptor =
-        ArgumentCaptor.forClass(io.openbas.database.model.Agent.class);
-    verify(agentService).createOrUpdateAgent(agentCaptor.capture());
 
     io.openbas.database.model.Agent capturedAgent = agentCaptor.getValue();
     assertEquals(CALDERA_AGENT_EXTERNAL_REF, capturedAgent.getExternalReference());
@@ -157,11 +157,17 @@ public class CalderaExecutorServiceTest {
   @Test
   void test_run_WITH_2_existing_agents_same_machine() {
     when(client.agents()).thenReturn(List.of(calderaAgent));
+    when(this.endpointService.findEndpointByAgentDetails(
+            calderaEndpoint.getHostname(),
+            calderaEndpoint.getPlatform(),
+            calderaEndpoint.getArch()))
+        .thenReturn(Optional.of(calderaEndpoint));
+
     randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);
     randomEndpoint.setIps(new String[] {CALDERA_AGENT_IP});
     calderaExecutorService.run();
     ArgumentCaptor<Endpoint> endpointCaptor = ArgumentCaptor.forClass(Endpoint.class);
-    verify(endpointService).createEndpoint(endpointCaptor.capture());
+    verify(endpointService).updateEndpoint(endpointCaptor.capture());
 
     Endpoint capturedEndpoint = endpointCaptor.getValue();
     assertEquals(CALDERA_AGENT_HOSTNAME, capturedEndpoint.getHostname());
