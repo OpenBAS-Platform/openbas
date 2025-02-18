@@ -1,7 +1,6 @@
 import { Groups3Outlined, PersonOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
-import * as React from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import PlatformIcon from '../../../../components/PlatformIcon';
@@ -37,7 +36,11 @@ const TargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
         <img
           src={`/api/images/executors/${target.executorType}`}
           alt={target.executorType}
-          style={{ width: 20, height: 20, borderRadius: 4 }}
+          style={{
+            width: 20,
+            height: 20,
+            borderRadius: 4,
+          }}
         />
       ),
       TEAMS: <Groups3Outlined />,
@@ -55,7 +58,11 @@ const TargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
           </ListItemIcon>
           <ListItemText
             primary={(
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+              }}
+              >
                 <div className={classes.bodyTarget} style={{ width: '80%' }}>
                   {target?.name}
                 </div>
