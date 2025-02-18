@@ -78,7 +78,7 @@ public class ExecutionExecutorService {
     } else {
       try {
         ExecutorContextService executorContextService =
-            context.getBean(agent.getExecutor().getType(), ExecutorContextService.class);
+            context.getBean(agent.getExecutor().getName(), ExecutorContextService.class);
         executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
       } catch (NoSuchBeanDefinitionException e) {
         throw new AgentException("Fatal error: Unsupported executor " + executor.getType(), agent);

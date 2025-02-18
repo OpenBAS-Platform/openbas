@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class CrowdStrikeExecutorService implements Runnable {
 
   private static final String CROWDSTRIKE_EXECUTOR_TYPE = "openbas_crowdstrike";
-  private static final String CROWDSTRIKE_EXECUTOR_NAME = "CrowdStrike";
+  public static final String CROWDSTRIKE_EXECUTOR_NAME = "CrowdStrike";
   private static final String CROWDSTRIKE_EXECUTOR_DOCUMENTATION_LINK =
       "https://docs.openbas.io/latest/deployment/ecosystem/executors/#crowdstrike-falcon-agent";
 

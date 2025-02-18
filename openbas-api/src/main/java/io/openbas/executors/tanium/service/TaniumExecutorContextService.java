@@ -1,6 +1,7 @@
 package io.openbas.executors.tanium.service;
 
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
+import static io.openbas.executors.tanium.service.TaniumExecutorService.TANIUM_EXECUTOR_NAME;
 
 import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorContextService;
@@ -15,11 +16,10 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service(TaniumExecutorContextService.TANIUM_EXECUTOR_CONTEXT)
+@Service(TANIUM_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class TaniumExecutorContextService extends ExecutorContextService {
 
-  public static final String TANIUM_EXECUTOR_CONTEXT = "TaniumExecutorContext";
   private final TaniumExecutorConfig taniumExecutorConfig;
   private final TaniumExecutorClient taniumExecutorClient;
 

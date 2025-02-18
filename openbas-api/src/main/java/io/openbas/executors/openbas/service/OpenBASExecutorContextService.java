@@ -1,6 +1,7 @@
 package io.openbas.executors.openbas.service;
 
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
+import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_NAME;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetAgentJobRepository;
@@ -12,11 +13,10 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service(OpenBASExecutorContextService.OPENBAS_EXECUTOR_CONTEXT)
+@Service(OPENBAS_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class OpenBASExecutorContextService extends ExecutorContextService {
 
-  public static final String OPENBAS_EXECUTOR_CONTEXT = "OpenBASExecutorContext";
   private final AssetAgentJobRepository assetAgentJobRepository;
 
   private String computeCommand(

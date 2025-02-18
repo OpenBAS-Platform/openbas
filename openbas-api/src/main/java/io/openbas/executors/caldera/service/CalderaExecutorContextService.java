@@ -1,5 +1,7 @@
 package io.openbas.executors.caldera.service;
 
+import static io.openbas.executors.caldera.service.CalderaExecutorService.CALDERA_EXECUTOR_NAME;
+
 import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
@@ -16,11 +18,10 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service(CalderaExecutorContextService.CALDERA_EXECUTOR_CONTEXT)
+@Service(CALDERA_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class CalderaExecutorContextService extends ExecutorContextService {
 
-  public static final String CALDERA_EXECUTOR_CONTEXT = "CalderaExecutorContext";
   private final CalderaExecutorConfig calderaExecutorConfig;
   private final InjectorService injectorService;
   private final CalderaExecutorClient calderaExecutorClient;

@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 public class OpenBASExecutor {
 
   private final ExecutorService executorService;
-  public static String OPENBAS_EXECUTOR_ID = "2f9a0936-c327-4e95-b406-d161d32a2501";
-  public static String OPENBAS_EXECUTOR_TYPE = "openbas_agent";
-  public static String OPENBAS_EXECUTOR_NAME = "OpenBAS Agent";
+  public static final String OPENBAS_EXECUTOR_ID = "2f9a0936-c327-4e95-b406-d161d32a2501";
+  public static final String OPENBAS_EXECUTOR_TYPE = "openbas_agent";
+  public static final String OPENBAS_EXECUTOR_NAME = "OpenBAS Agent";
 
   @PostConstruct
   public void init() {

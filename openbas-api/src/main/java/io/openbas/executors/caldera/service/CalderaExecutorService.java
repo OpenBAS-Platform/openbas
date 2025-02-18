@@ -30,7 +30,7 @@ public class CalderaExecutorService implements Runnable {
 
   private static final int CLEAR_TTL = 1800000; // 30 minutes
   private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
-  private static final String CALDERA_EXECUTOR_NAME = "Caldera";
+  public static final String CALDERA_EXECUTOR_NAME = "Caldera";
 
   private final CalderaExecutorClient client;
 

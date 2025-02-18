@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 public class TaniumExecutorService implements Runnable {
 
   private static final String TANIUM_EXECUTOR_TYPE = "openbas_tanium";
-  private static final String TANIUM_EXECUTOR_NAME = "Tanium";
+  public static final String TANIUM_EXECUTOR_NAME = "Tanium";
   private static final String TANIUM_EXECUTOR_DOCUMENTATION_LINK =
       "https://docs.openbas.io/latest/deployment/ecosystem/executors/#tanium-agent";
 

@@ -1,6 +1,7 @@
 package io.openbas.executors.crowdstrike.service;
 
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
+import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_NAME;
 
 import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorContextService;
@@ -15,11 +16,10 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service(CrowdStrikeExecutorContextService.CROWDSTRIKE_EXECUTOR_CONTEXT)
+@Service(CROWDSTRIKE_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
-  public static final String CROWDSTRIKE_EXECUTOR_CONTEXT = "CrowdStrikeExecutorContext";
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
 
