@@ -1,16 +1,8 @@
 package io.openbas.execution;
 
 import io.openbas.database.model.*;
-import io.openbas.database.model.Executor;
-import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectStatusRepository;
-import io.openbas.executors.caldera.config.CalderaExecutorConfig;
-import io.openbas.executors.caldera.service.CalderaExecutorContextService;
-import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
-import io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorContextService;
-import io.openbas.executors.openbas.service.OpenBASExecutorContextService;
-import io.openbas.executors.tanium.config.TaniumExecutorConfig;
-import io.openbas.executors.tanium.service.TaniumExecutorContextService;
+import io.openbas.executors.ExecutorContextService;
 import io.openbas.rest.exception.AgentException;
 import io.openbas.rest.inject.service.InjectService;
 import java.util.List;
@@ -18,19 +10,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 @Log
 public class ExecutionExecutorService {
-  private final CalderaExecutorConfig calderaExecutorConfig;
-  private final CalderaExecutorContextService calderaExecutorContextService;
-  private final TaniumExecutorConfig taniumExecutorConfig;
-  private final TaniumExecutorContextService taniumExecutorContextService;
-  private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
-  private final CrowdStrikeExecutorContextService crowdStrikeExecutorContextService;
-  private final OpenBASExecutorContextService openBASExecutorContextService;
+
+  private final ApplicationContext context;
+
   private final InjectStatusRepository injectStatusRepository;
   private final InjectService injectService;
 
@@ -86,32 +76,12 @@ public class ExecutionExecutorService {
               + assetEndpoint.getName(),
           agent);
     } else {
-      switch (executor.getType()) {
-        case "openbas_caldera" -> {
-          if (!this.calderaExecutorConfig.isEnable()) {
-            throw new AgentException("Fatal error: Caldera executor is not enabled", agent);
-          }
-          this.calderaExecutorContextService.launchExecutorSubprocess(inject, agent);
-        }
-        case "openbas_tanium" -> {
-          if (!this.taniumExecutorConfig.isEnable()) {
-            throw new AgentException("Fatal error: Tanium executor is not enabled", agent);
-          }
-          this.taniumExecutorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
-        }
-        case "openbas_crowdstrike" -> {
-          if (!this.crowdStrikeExecutorConfig.isEnable()) {
-            throw new AgentException("Fatal error: CrowdStrike executor is not enabled", agent);
-          }
-          this.crowdStrikeExecutorContextService.launchExecutorSubprocess(
-              inject, assetEndpoint, agent);
-        }
-        case "openbas_agent" ->
-            this.openBASExecutorContextService.launchExecutorSubprocess(
-                inject, assetEndpoint, agent);
-        default ->
-            throw new AgentException(
-                "Fatal error: Unsupported executor " + executor.getType(), agent);
+      try {
+        ExecutorContextService executorContextService =
+            context.getBean(agent.getExecutor().getType(), ExecutorContextService.class);
+        executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
+      } catch (NoSuchBeanDefinitionException e) {
+        throw new AgentException("Fatal error: Unsupported executor " + executor.getType(), agent);
       }
     }
   }

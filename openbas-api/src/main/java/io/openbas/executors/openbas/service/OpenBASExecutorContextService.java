@@ -4,22 +4,20 @@ import static io.openbas.executors.ExecutorHelper.replaceArgs;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetAgentJobRepository;
+import io.openbas.executors.ExecutorContextService;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service
-public class OpenBASExecutorContextService {
+@Service(OpenBASExecutorContextService.OPENBAS_EXECUTOR_CONTEXT)
+@RequiredArgsConstructor
+public class OpenBASExecutorContextService extends ExecutorContextService {
 
-  private AssetAgentJobRepository assetAgentJobRepository;
-
-  @Autowired
-  public void setAssetAgentJobRepository(AssetAgentJobRepository assetAgentJobRepository) {
-    this.assetAgentJobRepository = assetAgentJobRepository;
-  }
+  public static final String OPENBAS_EXECUTOR_CONTEXT = "OpenBASExecutorContext";
+  private final AssetAgentJobRepository assetAgentJobRepository;
 
   private String computeCommand(
       @NotNull final Inject inject,

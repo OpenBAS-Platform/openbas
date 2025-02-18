@@ -139,58 +139,84 @@ public class EndpointService {
             endpoint.getHostname(), endpoint.getPlatform(), endpoint.getArch());
     if (agent.isActive()) {
       // Endpoint already created -> attributes to update
-      if (optionalEndpoint.isPresent()) {
-        Endpoint endpointToUpdate = optionalEndpoint.get();
-        Optional<Agent> optionalAgent =
-            this.agentService.getAgentForAnAsset(
-                endpointToUpdate.getId(),
-                agent.getExecutedByUser(),
-                agent.getDeploymentMode(),
-                agent.getPrivilege(),
-                executorType);
-        endpointToUpdate.setIps(endpoint.getIps());
-        endpointToUpdate.setMacAddresses(endpoint.getMacAddresses());
-        this.updateEndpoint(endpointToUpdate);
-        // Agent already created -> attributes to update
-        if (optionalAgent.isPresent()) {
-          Agent agentToUpdate = optionalAgent.get();
-          agentToUpdate.setAsset(endpointToUpdate);
-          agentToUpdate.setLastSeen(agent.getLastSeen());
-          agentToUpdate.setExternalReference(agent.getExternalReference());
-          this.agentService.createOrUpdateAgent(agentToUpdate);
-        } else {
-          // New agent to create for the endpoint
-          agent.setAsset(endpointToUpdate);
-          this.agentService.createOrUpdateAgent(agent);
-        }
-      } else {
-        // New endpoint and new agent to create
-        this.createEndpoint(endpoint);
-        this.agentService.createOrUpdateAgent(agent);
-      }
+      handleActiveAgent(agent, executorType, optionalEndpoint, endpoint);
     } else {
-      if (optionalEndpoint.isPresent()) {
-        Optional<Agent> optionalAgent =
-            this.agentService.getAgentForAnAsset(
-                optionalEndpoint.get().getId(),
-                agent.getExecutedByUser(),
-                agent.getDeploymentMode(),
-                agent.getPrivilege(),
-                executorType);
-        if (optionalAgent.isPresent()) {
-          Agent existingAgent = optionalAgent.get();
-          if ((now().toEpochMilli() - existingAgent.getLastSeen().toEpochMilli()) > DELETE_TTL) {
-            log.info(
-                "Found stale endpoint "
-                    + endpoint.getName()
-                    + ", deleting the agent "
-                    + existingAgent.getExecutedByUser()
-                    + " in it...");
-            this.agentService.deleteAgent(existingAgent.getId());
-          }
+      handleInactiveAgent(agent, executorType, optionalEndpoint, endpoint);
+    }
+  }
+
+  private void handleInactiveAgent(
+      Agent agent, String executorType, Optional<Endpoint> optionalEndpoint, Endpoint endpoint) {
+    if (optionalEndpoint.isPresent()) {
+      Optional<Agent> optionalAgent =
+          this.agentService.getAgentForAnAsset(
+              optionalEndpoint.get().getId(),
+              agent.getExecutedByUser(),
+              agent.getDeploymentMode(),
+              agent.getPrivilege(),
+              executorType);
+      if (optionalAgent.isPresent()) {
+        Agent existingAgent = optionalAgent.get();
+        if ((now().toEpochMilli() - existingAgent.getLastSeen().toEpochMilli()) > DELETE_TTL) {
+          log.info(
+              "Found stale endpoint "
+                  + endpoint.getName()
+                  + ", deleting the agent "
+                  + existingAgent.getExecutedByUser()
+                  + " in it...");
+          this.agentService.deleteAgent(existingAgent.getId());
         }
       }
     }
+  }
+
+  private void handleActiveAgent(
+      Agent agent, String executorType, Optional<Endpoint> optionalEndpoint, Endpoint endpoint) {
+    if (optionalEndpoint.isPresent()) {
+
+      Endpoint endpointToUpdate = optionalEndpoint.get();
+      endpointToUpdate.setIps(endpoint.getIps());
+      endpointToUpdate.setMacAddresses(endpoint.getMacAddresses());
+      this.updateEndpoint(endpointToUpdate);
+
+      Optional<Agent> optionalAgent =
+          this.agentService.getAgentForAnAsset(
+              endpointToUpdate.getId(),
+              agent.getExecutedByUser(),
+              agent.getDeploymentMode(),
+              agent.getPrivilege(),
+              executorType);
+
+      // Agent already created -> attributes to update
+      if (optionalAgent.isPresent()) {
+        updateExistingAgent(agent, optionalAgent, endpointToUpdate);
+      } else {
+        // New agent to create for the endpoint
+        createNewAgent(agent, endpointToUpdate);
+      }
+    } else {
+      // New endpoint and new agent to create
+      createNewEndpointAndAgent(agent, endpoint);
+    }
+  }
+
+  public void createNewEndpointAndAgent(Agent agent, Endpoint endpoint) {
+    this.createEndpoint(endpoint);
+    this.agentService.createOrUpdateAgent(agent);
+  }
+
+  public void createNewAgent(Agent agent, Endpoint endpointToUpdate) {
+    agent.setAsset(endpointToUpdate);
+    this.agentService.createOrUpdateAgent(agent);
+  }
+
+  private void updateExistingAgent(
+      Agent agent, Optional<Agent> optionalAgent, Endpoint endpointToUpdate) {
+    Agent agentToUpdate = optionalAgent.get();
+    agentToUpdate.setAsset(endpointToUpdate);
+    agentToUpdate.setLastSeen(agent.getLastSeen());
+    agentToUpdate.setExternalReference(agent.getExternalReference());
+    this.agentService.createOrUpdateAgent(agentToUpdate);
   }
 
   public Endpoint register(final EndpointRegisterInput input) throws IOException {

@@ -1,34 +1,29 @@
 package io.openbas.executors.caldera.service;
 
 import io.openbas.database.model.*;
+import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.client.model.Ability;
+import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.integrations.InjectorService;
+import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service
-public class CalderaExecutorContextService {
+@Service(CalderaExecutorContextService.CALDERA_EXECUTOR_CONTEXT)
+@RequiredArgsConstructor
+public class CalderaExecutorContextService extends ExecutorContextService {
 
-  private InjectorService injectorService;
-
-  private CalderaExecutorClient calderaExecutorClient;
-
-  @Autowired
-  public void setInjectorService(InjectorService injectorService) {
-    this.injectorService = injectorService;
-  }
-
-  @Autowired
-  public void setCalderaExecutorClient(CalderaExecutorClient calderaExecutorClient) {
-    this.calderaExecutorClient = calderaExecutorClient;
-  }
+  public static final String CALDERA_EXECUTOR_CONTEXT = "CalderaExecutorContext";
+  private final CalderaExecutorConfig calderaExecutorConfig;
+  private final InjectorService injectorService;
+  private final CalderaExecutorClient calderaExecutorClient;
 
   public final Map<String, Ability> injectorExecutorAbilities = new HashMap<>();
   public final Map<String, Ability> injectorExecutorClearAbilities = new HashMap<>();
@@ -70,7 +65,16 @@ public class CalderaExecutorContextService {
         });
   }
 
-  public void launchExecutorSubprocess(@NotNull final Inject inject, @NotNull final Agent agent) {
+  public void launchExecutorSubprocess(
+      @NotNull final Inject inject,
+      @NotNull final Endpoint assetEndpoint,
+      @NotNull final Agent agent)
+      throws AgentException {
+
+    if (!this.calderaExecutorConfig.isEnable()) {
+      throw new AgentException("Fatal error: Caldera executor is not enabled", agent);
+    }
+
     inject
         .getInjectorContract()
         .map(InjectorContract::getInjector)
