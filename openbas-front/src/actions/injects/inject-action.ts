@@ -2,11 +2,11 @@ import { type Dispatch } from 'redux';
 
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import {
-  Exercise,
-  InjectBulkProcessingInput,
-  InjectExportRequestInput,
-  Scenario,
-  SearchPaginationInput,
+  type Exercise,
+  type InjectBulkProcessingInput,
+  type InjectExportRequestInput,
+  type Scenario,
+  type SearchPaginationInput,
 } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';

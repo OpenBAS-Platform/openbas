@@ -11,7 +11,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { useFormatter } from '../../i18n';
 import Transition from '../Transition';

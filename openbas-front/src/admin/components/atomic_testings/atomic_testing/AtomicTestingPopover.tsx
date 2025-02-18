@@ -67,13 +67,14 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   const handleOpenExport = () => setExportOpen(true);
   const handleCloseExport = () => setExportOpen(false);
   const doExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
-    const exportData: InjectExportRequestInput = { injects:
+    const exportData: InjectExportRequestInput = {
+      injects:
       [{ inject_id: atomic.inject_id }],
-    options: {
-      with_players: withPlayers,
-      with_teams: withTeams,
-      with_variable_values: withVariableValues,
-    },
+      options: {
+        with_players: withPlayers,
+        with_teams: withTeams,
+        with_variable_values: withVariableValues,
+      },
     };
 
     exportInjects(exportData).then((result) => {
@@ -86,10 +87,22 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
-  if (actions.includes('Update') && atomic.inject_injector_contract !== null) entries.push({ label: 'Update', action: () => handleOpenEdit() });
-  if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({ label: t('inject_export_json_single'), action: () => handleOpenExport() });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete() });
+  if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({
+    label: 'Duplicate',
+    action: () => handleOpenDuplicate(),
+  });
+  if (actions.includes('Update') && atomic.inject_injector_contract !== null) entries.push({
+    label: 'Update',
+    action: () => handleOpenEdit(),
+  });
+  if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({
+    label: t('inject_export_json_single'),
+    action: () => handleOpenExport(),
+  });
+  if (actions.includes('Delete')) entries.push({
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+  });
 
   return (
     <>

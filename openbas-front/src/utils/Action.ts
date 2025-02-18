@@ -1,4 +1,4 @@
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { FORM_ERROR } from 'final-form';
 import { type Schema } from 'normalizr';
 import * as R from 'ramda';
