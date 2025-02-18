@@ -64,7 +64,7 @@ const ThemeLight = (
       padding: 0,
       fontWeight: 400,
       fontSize: 22,
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
     h2: {
       margin: '0 0 10px 0',
@@ -72,7 +72,7 @@ const ThemeLight = (
       fontWeight: 500,
       fontSize: 16,
       textTransform: 'uppercase',
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
     h3: {
       margin: '0 0 10px 0',
@@ -80,7 +80,7 @@ const ThemeLight = (
       color: '#757575',
       fontWeight: 400,
       fontSize: 13,
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
     h4: {
       margin: '0 0 10px 0',
@@ -100,7 +100,7 @@ const ThemeLight = (
       fontWeight: 400,
       fontSize: 18,
       color: primary || THEME_LIGHT_DEFAULT_PRIMARY,
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
   },
   components: {
