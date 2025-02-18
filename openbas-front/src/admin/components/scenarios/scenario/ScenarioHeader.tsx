@@ -1,18 +1,17 @@
 import { PlayArrowOutlined, Stop } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useEffect } from 'react';
-import * as React from 'react';
+import { type Dispatch, type SetStateAction, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { createRunningExerciseFromScenario, updateScenarioRecurrence } from '../../../../actions/scenarios/scenario-actions';
-import type { ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Exercise, Scenario } from '../../../../utils/api-types';
-import { parseCron, ParsedCron } from '../../../../utils/Cron';
+import { type Exercise, type Scenario } from '../../../../utils/api-types';
+import { parseCron, type ParsedCron } from '../../../../utils/Cron';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
@@ -49,12 +48,12 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface ScenarioHeaderProps {
-  setCronExpression: React.Dispatch<React.SetStateAction<string | null>>;
-  setParsedCronExpression: React.Dispatch<React.SetStateAction<ParsedCron | null>>;
-  setSelectRecurring: React.Dispatch<React.SetStateAction<string>>;
+  setCronExpression: Dispatch<SetStateAction<string | null>>;
+  setParsedCronExpression: Dispatch<SetStateAction<ParsedCron | null>>;
+  setSelectRecurring: Dispatch<SetStateAction<string>>;
   selectRecurring: string;
-  setOpenScenarioRecurringFormDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenInstantiateSimulationAndStart: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenScenarioRecurringFormDialog: Dispatch<SetStateAction<boolean>>;
+  setOpenInstantiateSimulationAndStart: Dispatch<SetStateAction<boolean>>;
   openScenarioRecurringFormDialog: boolean;
   openInstantiateSimulationAndStart: boolean;
   noRepeat: boolean;
@@ -80,16 +79,18 @@ const ScenarioHeader = ({
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   // Fetching data
-  const { scenario }: { scenario: Scenario } = useHelper((helper: ScenariosHelper) => ({
-    scenario: helper.getScenario(scenarioId),
-  }));
+  const { scenario }: { scenario: Scenario } = useHelper((helper: ScenariosHelper) => ({ scenario: helper.getScenario(scenarioId) }));
 
   // Local
   const ended = scenario.scenario_recurrence_end && new Date(scenario.scenario_recurrence_end).getTime() < new Date().getTime();
   const onSubmit = (cron: string, start: string, end?: string) => {
     setCronExpression(cron);
     setParsedCronExpression(parseCron(cron));
-    dispatch(updateScenarioRecurrence(scenarioId, { scenario_recurrence: cron, scenario_recurrence_start: start, scenario_recurrence_end: end }));
+    dispatch(updateScenarioRecurrence(scenarioId, {
+      scenario_recurrence: cron,
+      scenario_recurrence_start: start,
+      scenario_recurrence_end: end,
+    }));
     setOpenScenarioRecurringFormDialog(false);
   };
   useEffect(() => {
@@ -109,7 +110,11 @@ const ScenarioHeader = ({
   const stop = () => {
     setCronExpression(null);
     setParsedCronExpression(null);
-    dispatch(updateScenarioRecurrence(scenarioId, { scenario_recurrence: undefined, scenario_recurrence_start: undefined, scenario_recurrence_end: undefined }));
+    dispatch(updateScenarioRecurrence(scenarioId, {
+      scenario_recurrence: undefined,
+      scenario_recurrence_start: undefined,
+      scenario_recurrence_end: undefined,
+    }));
   };
 
   return (
@@ -119,7 +124,14 @@ const ScenarioHeader = ({
           {truncate(scenario.scenario_name, 80)}
         </Typography>
       </Tooltip>
-      <div style={{ float: 'left', margin: '4px 10px 0 8px', color: theme.palette.text?.disabled, borderLeft: `1px solid ${theme.palette.text?.disabled}`, height: 20 }} />
+      <div style={{
+        float: 'left',
+        margin: '4px 10px 0 8px',
+        color: theme.palette.text?.disabled,
+        borderLeft: `1px solid ${theme.palette.text?.disabled}`,
+        height: 20,
+      }}
+      />
       <Tooltip title={t(scenario.scenario_recurrence ? 'Scheduled' : 'Not scheduled')}>
         <div className={scenario.scenario_recurrence ? classes.statusScheduled : classes.statusNotScheduled} />
       </Tooltip>
@@ -137,7 +149,10 @@ const ScenarioHeader = ({
           </Button>
         ) : (
           <Button
-            style={{ marginRight: 10, lineHeight: 'initial' }}
+            style={{
+              marginRight: 10,
+              lineHeight: 'initial',
+            }}
             startIcon={<PlayArrowOutlined />}
             variant="contained"
             color="primary"
@@ -181,9 +196,7 @@ const ScenarioHeader = ({
             onClick={async () => {
               setOpenInstantiateSimulationAndStart(false);
               const exercise: Exercise = (await createRunningExerciseFromScenario(scenarioId)).data;
-              MESSAGING$.notifySuccess(t('New simulation successfully created and started. Click {here} to view the simulation.', {
-                here: <Link to={`/admin/simulations/${exercise.exercise_id}`}>{t('here')}</Link>,
-              }));
+              MESSAGING$.notifySuccess(t('New simulation successfully created and started. Click {here} to view the simulation.', { here: <Link to={`/admin/simulations/${exercise.exercise_id}`}>{t('here')}</Link> }));
             }}
           >
             {t('Confirm')}

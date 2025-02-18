@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
@@ -8,12 +7,12 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { EndpointOverviewOutput, EndpointUpdateInput } from '../../../../utils/api-types';
+import { type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { type EndpointStoreWithType } from './endpoint';
 import EndpointForm from './EndpointForm';
-import { EndpointStoreWithType } from './EndpointsList';
 
-interface Props {
+export interface EndpointPopoverProps {
   inline?: boolean;
   endpoint: EndpointStoreWithType;
   assetGroupId?: string;
@@ -25,7 +24,7 @@ interface Props {
   onDelete?: (result: string) => void;
 }
 
-const EndpointPopover: React.FC<Props> = ({
+const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   inline,
   endpoint,
   assetGroupId,
@@ -54,7 +53,10 @@ const EndpointPopover: React.FC<Props> = ({
   };
   const submitEdit = (data: EndpointUpdateInput) => {
     dispatch(updateEndpoint(endpoint.asset_id, data)).then(
-      (result: { result: string; entities: { endpoints: Record<string, EndpointOverviewOutput> } }) => {
+      (result: {
+        result: string;
+        entities: { endpoints: Record<string, EndpointOverviewOutput> };
+      }) => {
         if (result.entities) {
           if (onUpdate) {
             const endpointUpdated = result.entities.endpoints[result.result];
@@ -76,9 +78,7 @@ const EndpointPopover: React.FC<Props> = ({
   const submitRemoveFromAssetGroup = () => {
     if (assetGroupId) {
       dispatch(
-        updateAssetsOnAssetGroup(assetGroupId, {
-          asset_group_assets: assetGroupEndpointIds?.filter(id => id !== endpoint.asset_id),
-        }),
+        updateAssetsOnAssetGroup(assetGroupId, { asset_group_assets: assetGroupEndpointIds?.filter(id => id !== endpoint.asset_id) }),
       ).then(() => {
         if (onRemoveEndpointFromAssetGroup) {
           onRemoveEndpointFromAssetGroup(endpoint.asset_id);
@@ -107,10 +107,22 @@ const EndpointPopover: React.FC<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (onUpdate) entries.push({ label: 'Update', action: () => handleEdit() });
-  if (onRemoveEndpointFromInject) entries.push({ label: 'Remove from the inject', action: () => onRemoveEndpointFromInject(endpoint.asset_id) });
-  if ((assetGroupId && endpoint.type !== 'dynamic')) entries.push({ label: 'Remove from the asset group', action: () => handleRemoveFromAssetGroup() });
-  if (onDelete) entries.push({ label: 'Delete', action: () => handleDelete() });
+  if (onUpdate) entries.push({
+    label: 'Update',
+    action: () => handleEdit(),
+  });
+  if (onRemoveEndpointFromInject) entries.push({
+    label: 'Remove from the inject',
+    action: () => onRemoveEndpointFromInject(endpoint.asset_id),
+  });
+  if ((assetGroupId && endpoint.type !== 'dynamic')) entries.push({
+    label: 'Remove from the asset group',
+    action: () => handleRemoveFromAssetGroup(),
+  });
+  if (onDelete) entries.push({
+    label: 'Delete',
+    action: () => handleDelete(),
+  });
 
   return entries.length > 0 && (
     <>

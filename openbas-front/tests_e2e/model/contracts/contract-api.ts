@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 class ContractApiMock {
   constructor(private page: Page) {
@@ -18,8 +18,7 @@ class ContractApiMock {
                 },
                 type: 'openex_email',
               },
-              context: {
-              },
+              context: {},
               contract_id: '2790bd39-37d4-4e39-be7e-53f3ca783f86',
               fields: [
                 {
@@ -83,8 +82,7 @@ class ContractApiMock {
                 },
                 type: 'openex_email',
               },
-              context: {
-              },
+              context: {},
               contract_id: '138ad8f8-32f8-4a22-8114-aaa12322bd09',
               fields: [
                 {
@@ -146,8 +144,7 @@ class ContractApiMock {
                 },
                 type: 'openex_channel',
               },
-              context: {
-              },
+              context: {},
               contract_id: 'fb5e49a2-6366-4492-b69a-f9b9f39a533e',
               fields: [
                 {
@@ -209,8 +206,7 @@ class ContractApiMock {
                 },
                 type: 'openex_http',
               },
-              context: {
-              },
+              context: {},
               contract_id: '5948c96c-4064-4c0d-b079-51ec33f31b91',
               fields: [
                 {
@@ -258,13 +254,10 @@ class ContractApiMock {
                 color_light: '#9c27b0',
                 expose: false,
                 icon: '/img/sms.png',
-                label: {
-                  en: 'SMS (OVH)',
-                },
+                label: { en: 'SMS (OVH)' },
                 type: 'openex_ovh_sms',
               },
-              context: {
-              },
+              context: {},
               contract_id: 'e9e902bc-b03d-4223-89e1-fca093ac79dd',
               fields: [
                 {

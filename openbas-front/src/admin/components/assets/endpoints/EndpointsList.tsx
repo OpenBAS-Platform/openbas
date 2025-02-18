@@ -1,17 +1,15 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
-import * as React from 'react';
-import { CSSProperties, FunctionComponent } from 'react';
+import { cloneElement, type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { EndpointOutput, EndpointOverviewOutput } from '../../../../utils/api-types';
+import { type EndpointStoreWithType } from './endpoint';
+import { type EndpointPopoverProps } from './EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
-  item: {
-    height: 50,
-  },
+  item: { height: 50 },
   bodyItem: {
     fontSize: 13,
     float: 'left',
@@ -29,27 +27,19 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  asset_name: {
-    width: '35%',
-  },
+  asset_name: { width: '35%' },
   asset_platform: {
     width: '15%',
     display: 'flex',
     alignItems: 'center',
   },
-  asset_tags: {
-    width: '35%',
-  },
-  asset_type: {
-    width: '10%',
-  },
+  asset_tags: { width: '35%' },
+  asset_type: { width: '10%' },
 };
-
-export type EndpointStoreWithType = EndpointOutput & EndpointOverviewOutput & { type: string };
 
 interface Props {
   endpoints: EndpointStoreWithType[];
-  actions: React.ReactElement;
+  actions: ReactElement<EndpointPopoverProps>;
 }
 
 const EndpointsList: FunctionComponent<Props> = ({
@@ -60,7 +50,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   const { classes } = useStyles();
 
   const component = (endpoint: EndpointStoreWithType) => {
-    return React.cloneElement(actions as React.ReactElement, { endpoint });
+    return cloneElement(actions, { endpoint });
   };
 
   return (

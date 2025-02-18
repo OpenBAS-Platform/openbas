@@ -17,14 +17,10 @@ const iconSelector = (type, variant, fontSize) => {
       };
       break;
     case 'chip':
-      style = {
-        margin: '0 0 0 5px',
-      };
+      style = { margin: '0 0 0 5px' };
       break;
     default:
-      style = {
-        margin: 0,
-      };
+      style = { margin: 0 };
   }
 
   switch (type) {

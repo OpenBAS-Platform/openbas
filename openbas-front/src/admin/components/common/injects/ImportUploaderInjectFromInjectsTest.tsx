@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Autocomplete as MuiAutocomplete, Box, Button, MenuItem, TextField } from '@mui/material';
 import moment from 'moment-timezone';
-import { FunctionComponent, SyntheticEvent, useState } from 'react';
+import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { testXlsFile } from '../../../../actions/mapper/mapper-actions';
 import CodeBlock from '../../../../components/common/CodeBlock';
 import { useFormatter } from '../../../../components/i18n';
-import type { ImportMapperAddInput, ImportTestSummary, InjectsImportTestInput } from '../../../../utils/api-types';
+import { type ImportMapperAddInput, type ImportTestSummary, type InjectsImportTestInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 
 const useStyles = makeStyles()(() => ({
@@ -65,9 +65,7 @@ const ImportUploaderInjectFromInjectsTest: FunctionComponent<Props> = ({
         timezone: z.string().min(1, { message: t('Should not be empty') }),
       }),
     ),
-    defaultValues: {
-      timezone: moment.tz.guess(),
-    },
+    defaultValues: { timezone: moment.tz.guess() },
   });
 
   const [result, setResult] = useState<ImportTestSummary | undefined>(undefined);

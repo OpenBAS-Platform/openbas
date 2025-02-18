@@ -90,19 +90,13 @@ const styles = theme => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  title: {
-    float: 'left',
-  },
+  itemIcon: { color: theme.palette.primary.main },
+  title: { float: 'left' },
   allTeams: {
     float: 'right',
     marginTop: -7,
   },
-  container: {
-    padding: 20,
-  },
+  container: { padding: 20 },
 });
 
 const inlineStylesHeaders = {
@@ -236,7 +230,7 @@ class QuickInject extends Component {
       allTeams: false,
       teamsIds: [],
       documents: [],
-      expectations: [],
+      expectations: props.injectorContract.fields.filter(f => f.key === 'expectations').flatMap(f => f.predefinedExpectations) || [],
       teamsSortBy: 'team_name',
       teamsOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -264,21 +258,15 @@ class QuickInject extends Component {
   }
 
   handleModifyTeams(teamsIds) {
-    this.setState({
-      teamsIds: [...teamsIds],
-    });
+    this.setState({ teamsIds: [...teamsIds] });
   }
 
   handleRemoveTeam(teamId) {
-    this.setState({
-      teamsIds: this.state.teamsIds.filter(a => a !== teamId),
-    });
+    this.setState({ teamsIds: this.state.teamsIds.filter(a => a !== teamId) });
   }
 
   handleAddDocuments(documents) {
-    this.setState({
-      documents,
-    });
+    this.setState({ documents });
   }
 
   handleRemoveDocument(documentId) {
@@ -305,9 +293,7 @@ class QuickInject extends Component {
   }
 
   selectTupleFieldType(name, type) {
-    this.setState({
-      tupleFieldTypes: R.assoc(name, type, this.state.tupleFieldTypes),
-    });
+    this.setState({ tupleFieldTypes: R.assoc(name, type, this.state.tupleFieldTypes) });
   }
 
   teamsReverseBy(field) {
@@ -484,7 +470,10 @@ class QuickInject extends Component {
                       name={field.key}
                       label={t(field.label)}
                       fullWidth={true}
-                      style={{ marginTop: 20, height: 250 }}
+                      style={{
+                        marginTop: 20,
+                        height: 250,
+                      }}
                       disabled={isExerciseReadOnly(exercise)}
                     />
                   )
@@ -1260,7 +1249,7 @@ class QuickInject extends Component {
                     && (
                       <InjectExpectations
                         predefinedExpectationDatas={predefinedExpectations}
-                        expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
+                        expectationDatas={expectations}
                         handleExpectations={this.handleExpectations.bind(this)}
                       />
                     )}
@@ -1411,7 +1400,11 @@ class QuickInject extends Component {
                     />
                   </List>
                 </div>
-                <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
+                <div style={{
+                  float: 'right',
+                  margin: '20px 0 20px 0',
+                }}
+                >
                   <Button
                     variant="contained"
                     color="primary"

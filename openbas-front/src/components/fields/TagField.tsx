@@ -1,15 +1,15 @@
 import { AddOutlined, LabelOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
 import * as R from 'ramda';
-import { CSSProperties, FunctionComponent, useState } from 'react';
-import { FieldErrors } from 'react-hook-form';
+import { type CSSProperties, type FunctionComponent, useState } from 'react';
+import { type FieldErrors } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import type { TagHelper, UserHelper } from '../../actions/helper';
+import { type TagHelper, type UserHelper } from '../../actions/helper';
 import { addTag } from '../../actions/Tag';
 import TagForm from '../../admin/components/settings/tags/TagForm';
 import { useHelper } from '../../store';
-import type { Tag } from '../../utils/api-types';
+import { type Tag } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import { useFormatter } from '../i18n';
 
@@ -23,9 +23,7 @@ const useStyles = makeStyles()(() => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 }));
 
 interface Props {
@@ -50,7 +48,10 @@ const TagField: FunctionComponent<Props> = ({
   const { classes } = useStyles();
 
   // Fetching data
-  const { tags, userAdmin }: { tags: [Tag]; userAdmin: boolean } = useHelper((helper: TagHelper & UserHelper) => ({
+  const { tags, userAdmin }: {
+    tags: [Tag];
+    userAdmin: boolean;
+  } = useHelper((helper: TagHelper & UserHelper) => ({
     tags: helper.getTags(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
@@ -75,7 +76,10 @@ const TagField: FunctionComponent<Props> = ({
 
   const onSubmit = (data: Tag) => {
     dispatch(addTag(data))
-      .then((result: { entities: { tags: Record<string, Tag> }; result: string }) => {
+      .then((result: {
+        entities: { tags: Record<string, Tag> };
+        result: string;
+      }) => {
         if (result.result) {
           const newTag = result.entities.tags[result.result];
           const newTags = R.append(
@@ -127,7 +131,11 @@ const TagField: FunctionComponent<Props> = ({
       <IconButton
         onClick={() => handleOpenTagCreation()}
         edge="end"
-        style={{ position: 'absolute', top: 30, right: 35 }}
+        style={{
+          position: 'absolute',
+          top: 30,
+          right: 35,
+        }}
       >
         <AddOutlined />
       </IconButton>

@@ -28,9 +28,7 @@ const useStyles = makeStyles()(() => ({
     padding: 0,
     position: 'relative',
   },
-  heading: {
-    display: 'flex',
-  },
+  heading: { display: 'flex' },
 }));
 
 const Logs = () => {
@@ -162,7 +160,11 @@ const Logs = () => {
                 <span style={{ fontWeight: 500 }}>{t('Write an entry')}</span>
               </Typography>
             </AccordionSummary>
-            <AccordionDetails style={{ width: '100%', paddingBottom: 80 }}>
+            <AccordionDetails style={{
+              width: '100%',
+              paddingBottom: 80,
+            }}
+            >
               <LogForm
                 initialValues={{ log_tags: [] }}
                 onSubmit={submitCreateLog}

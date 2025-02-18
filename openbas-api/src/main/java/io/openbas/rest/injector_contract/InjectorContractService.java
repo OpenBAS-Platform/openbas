@@ -16,6 +16,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +47,16 @@ public class InjectorContractService {
 
   @Value("${openbas.xls.import.sms.enable}")
   private boolean smsImportEnabled;
+
+  // -- CRUD --
+
+  public InjectorContract injectorContract(@NotBlank final String id) {
+    return injectorContractRepository
+        .findById(id)
+        .orElseThrow(() -> new ElementNotFoundException("Injector contract not found"));
+  }
+
+  // -- OTHERS --
 
   @EventListener(ApplicationReadyEvent.class)
   public void initImportAvailableOnStartup() {

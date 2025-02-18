@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { createAtomicTesting, searchAtomicTestings } from '../../../actions/atomic_testings/atomic-testing-actions';
-import type { UserHelper } from '../../../actions/helper';
+import { type UserHelper } from '../../../actions/helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ButtonCreate from '../../../components/common/ButtonCreate';
 import { buildEmptyFilter } from '../../../components/common/queryable/filter/FilterUtils';
@@ -12,7 +12,7 @@ import { buildSearchPagination } from '../../../components/common/queryable/Quer
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
-import type { FilterGroup, Inject, InjectResultOverviewOutput } from '../../../utils/api-types';
+import { type AtomicTestingInput, type FilterGroup, type InjectResultOverviewOutput } from '../../../utils/api-types';
 import { TeamContext } from '../common/Context';
 import CreateInject from '../common/injects/CreateInject';
 import teamContextForAtomicTesting from './atomic_testing/context/TeamContextForAtomicTesting';
@@ -24,11 +24,9 @@ const AtomicTestings = () => {
   const navigate = useNavigate();
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
 
-  const { userAdmin } = useHelper((helper: UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
-  const onCreateAtomicTesting = async (data: Inject) => {
+  const onCreateAtomicTesting = async (data: AtomicTestingInput) => {
     const toCreate = R.pipe(
       R.assoc('inject_tags', data.inject_tags),
       R.assoc('inject_title', data.inject_title),
@@ -60,7 +58,13 @@ const AtomicTestings = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Atomic testings'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{
+          label: t('Atomic testings'),
+          current: true,
+        }]}
+      />
       <InjectResultList
         showActions
         fetchInjects={searchAtomicTestings}

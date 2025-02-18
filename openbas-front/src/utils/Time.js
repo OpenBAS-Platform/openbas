@@ -48,13 +48,19 @@ export const progression = (nowEntry, startDate, endDate) => (now > endDate
 
 export const groupBy = (elements, field, duration) => {
   const formatted = elements.map((elem) => {
-    return { date: moment(elem[field]).startOf(duration).format('YYYY-MM-DD'), count: 1 };
+    return {
+      date: moment(elem[field]).startOf(duration).format('YYYY-MM-DD'),
+      count: 1,
+    };
   });
   const dates = formatted.map(elem => elem.date);
   const uniqueDates = dates.filter((date, index) => dates.indexOf(date) === index);
   return uniqueDates.map((date) => {
     const count = formatted.filter(elem => elem.date === date).reduce(c => c + 1, 0);
-    return { date: duration === 'week' ? dayFormat(getMonday(new Date(date))) : monthFormat(date), value: count };
+    return {
+      date: duration === 'week' ? dayFormat(getMonday(new Date(date))) : monthFormat(date),
+      value: count,
+    };
   });
 };
 

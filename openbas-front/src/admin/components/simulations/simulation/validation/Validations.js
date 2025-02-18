@@ -25,9 +25,7 @@ const Transition = forwardRef((props, ref) => (
 Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles()(() => ({
-  item: {
-    height: 40,
-  },
+  item: { height: 40 },
   bodyItem: {
     height: '100%',
     float: 'left',
@@ -132,14 +130,22 @@ const Validations = () => {
     return (
       <div style={{ marginTop: -12 }}>
         <AnimationMenu exerciseId={exerciseId} />
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div style={{
+          float: 'left',
+          marginRight: 10,
+        }}
+        >
           <SearchFilter
             variant="small"
             onChange={handleSearch}
             keyword={keyword}
           />
         </div>
-        <div style={{ float: 'left', marginRight: 10 }}>
+        <div style={{
+          float: 'left',
+          marginRight: 10,
+        }}
+        >
           <TagsFilter
             onAddTag={handleAddTag}
             onRemoveTag={handleRemoveTag}

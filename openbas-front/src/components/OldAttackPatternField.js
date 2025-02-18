@@ -21,15 +21,16 @@ const styles = () => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 });
 
 class OldAttackPatternField extends Component {
   constructor(props) {
     super(props);
-    this.state = { attackPatternCreation: false, attackPatternInput: '' };
+    this.state = {
+      attackPatternCreation: false,
+      attackPatternInput: '',
+    };
   }
 
   componentDidMount() {
@@ -143,7 +144,10 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchAttackPatterns, addAttackPattern }),
+  connect(select, {
+    fetchAttackPatterns,
+    addAttackPattern,
+  }),
   inject18n,
   Component => withStyles(Component, styles),
 )(OldAttackPatternField);

@@ -1,18 +1,15 @@
-import { enUS, esES, frFR, Localization, zhCN } from '@mui/material/locale';
+import { enUS, esES, frFR, type Localization, zhCN } from '@mui/material/locale';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { ReactNode, useEffect, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type ReactNode, useEffect, useState } from 'react';
 
-import type { LoggedHelper } from '../actions/helper';
+import { type LoggedHelper } from '../actions/helper';
 import { useHelper } from '../store';
-import type { PlatformSettings } from '../utils/api-types';
+import { type PlatformSettings } from '../utils/api-types';
 import { useFormatter } from './i18n';
 import themeDark from './ThemeDark';
 import themeLight from './ThemeLight';
 
-interface Props {
-  children: ReactNode;
-}
+interface Props { children: ReactNode }
 
 const localeMap = {
   en: enUS,
@@ -21,9 +18,7 @@ const localeMap = {
   zh: zhCN,
 };
 
-const AppThemeProvider: React.FC<Props> = ({
-  children,
-}) => {
+const AppThemeProvider: FunctionComponent<Props> = ({ children }) => {
   const [muiLocale, setMuiLocale] = useState<Localization>(enUS);
   const { locale } = useFormatter();
   const { theme, dark, light }: {
@@ -35,7 +30,11 @@ const AppThemeProvider: React.FC<Props> = ({
     const settings = helper.getPlatformSettings();
     const rawPlatformTheme = settings.platform_theme ?? 'auto';
     const rawUserTheme = me?.user_theme ?? 'default';
-    return { theme: rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme, dark: settings.platform_dark_theme, light: settings.platform_light_theme };
+    return {
+      theme: rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme,
+      dark: settings.platform_dark_theme,
+      light: settings.platform_light_theme,
+    };
   });
   useEffect(() => {
     document.body.setAttribute('data-theme', theme);

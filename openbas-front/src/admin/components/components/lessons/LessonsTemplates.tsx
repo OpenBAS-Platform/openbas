@@ -1,10 +1,10 @@
 import { ChevronRightOutlined, SchoolOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
-import { CSSProperties, useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import { searchLessonsTemplates } from '../../../../actions/Lessons';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent.js';
@@ -13,7 +13,7 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { LessonsTemplate, SearchPaginationInput } from '../../../../utils/api-types';
+import { type LessonsTemplate, type SearchPaginationInput } from '../../../../utils/api-types';
 import CreateLessonsTemplate from './CreateLessonsTemplate';
 
 const useStyles = makeStyles()(() => ({
@@ -22,9 +22,7 @@ const useStyles = makeStyles()(() => ({
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
-  item: {
-    height: 50,
-  },
+  item: { height: 50 },
   bodyItems: {
     display: 'flex',
     alignItems: 'center',
@@ -40,12 +38,8 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  lessons_template_name: {
-    width: '25%',
-  },
-  lessons_template_description: {
-    width: '50%',
-  },
+  lessons_template_name: { width: '25%' },
+  lessons_template_description: { width: '50%' },
 };
 
 const LessonsTemplates = () => {
@@ -55,9 +49,7 @@ const LessonsTemplates = () => {
 
   // Fetching data
   const { userAdmin } = useHelper((helper: UserHelper) => {
-    return {
-      userAdmin: helper.getMe()?.user_admin ?? false,
-    };
+    return { userAdmin: helper.getMe()?.user_admin ?? false };
   });
 
   // Headers
@@ -77,13 +69,17 @@ const LessonsTemplates = () => {
   ];
 
   const [lessonTemplates, setLessonTemplates] = useState<LessonsTemplate[]>([]);
-  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({
-    sorts: initSorting('lessons_template_name'),
-  }));
+  const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({ sorts: initSorting('lessons_template_name') }));
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Lessons learned'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Components') }, {
+          label: t('Lessons learned'),
+          current: true,
+        }]}
+      />
       <PaginationComponent
         fetch={searchLessonsTemplates}
         searchPaginationInput={searchPaginationInput}

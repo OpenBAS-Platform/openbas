@@ -11,11 +11,7 @@ const IndexInjector = lazy(() => import('./injectors/Index'));
 const Collectors = lazy(() => import('./Collectors'));
 const Executors = lazy(() => import('./Executors'));
 
-const useStyles = makeStyles()(() => ({
-  root: {
-    flexGrow: 1,
-  },
-}));
+const useStyles = makeStyles()(() => ({ root: { flexGrow: 1 } }));
 
 const Index = () => {
   const { classes } = useStyles();

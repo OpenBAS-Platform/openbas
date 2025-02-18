@@ -1,17 +1,18 @@
 import { Chip, Tooltip } from '@mui/material';
 import * as R from 'ramda';
-import { FunctionComponent, useRef, useState } from 'react';
+import { type FunctionComponent, useRef, useState } from 'react';
 
-import type { Filter, PropertySchemaDTO } from '../../../../utils/api-types';
+import { type Filter, type PropertySchemaDTO } from '../../../../utils/api-types';
 import FilterChipPopover from './FilterChipPopover';
 import FilterChipValues from './FilterChipValues';
-import { FilterHelpers } from './FilterHelpers';
+import { type FilterHelpers } from './FilterHelpers';
 
 interface Props {
   filter: Filter;
   helpers: FilterHelpers;
   propertySchema: PropertySchemaDTO;
   pristine: boolean;
+  contextId?: string;
 }
 
 const FilterChip: FunctionComponent<Props> = ({
@@ -19,6 +20,7 @@ const FilterChip: FunctionComponent<Props> = ({
   helpers,
   propertySchema,
   pristine,
+  contextId,
 }) => {
   const chipRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(!pristine);
@@ -74,6 +76,7 @@ const FilterChip: FunctionComponent<Props> = ({
           onClose={handleClose}
           anchorEl={chipRef.current}
           propertySchema={propertySchema}
+          contextId={contextId}
         />
       )}
     </>

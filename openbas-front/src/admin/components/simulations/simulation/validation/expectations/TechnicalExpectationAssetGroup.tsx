@@ -1,22 +1,20 @@
 import { DnsOutlined } from '@mui/icons-material';
 import { ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { EndpointHelper } from '../../../../../../actions/assets/asset-helper';
-import type { Contract } from '../../../../../../actions/contract/contract';
+import { type EndpointHelper } from '../../../../../../actions/assets/asset-helper';
+import { type Contract } from '../../../../../../actions/contract/contract';
 import { useHelper } from '../../../../../../store';
-import type { AssetGroup, Endpoint, Team } from '../../../../../../utils/api-types';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { type AssetGroup, type Endpoint, type Team } from '../../../../../../utils/api-types';
+import { type InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 import { typeIcon } from '../../../../common/injects/expectations/ExpectationUtils';
 import ExpectationLine from './ExpectationLine';
 import groupedByAsset from './ExpectationUtils';
 import TechnicalExpectationAsset from './TechnicalExpectationAsset';
 
 const useStyles = makeStyles()(() => ({
-  item: {
-    height: 40,
-  },
+  item: { height: 40 },
   bodyItem: {
     height: '100%',
     float: 'left',
@@ -43,12 +41,8 @@ const TechnicalExpectationAssetGroup: FunctionComponent<Props> = ({
   const { classes } = useStyles();
 
   // Fetching data
-  const {
-    assetsMap,
-  } = useHelper((helper: EndpointHelper) => {
-    return {
-      assetsMap: helper.getEndpointsMap(),
-    };
+  const { assetsMap } = useHelper((helper: EndpointHelper) => {
+    return { assetsMap: helper.getEndpointsMap() };
   });
 
   return (

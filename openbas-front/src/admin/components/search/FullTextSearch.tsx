@@ -1,8 +1,7 @@
 import { KeyboardArrowRight } from '@mui/icons-material';
-import { TabPanelProps } from '@mui/lab';
+import { type TabPanelProps } from '@mui/lab';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tab, Tabs } from '@mui/material';
-import { CSSProperties, useEffect, useState } from 'react';
-import * as React from 'react';
+import { type CSSProperties, type SyntheticEvent, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -10,58 +9,46 @@ import { fullTextSearch, fullTextSearchByClass } from '../../../actions/fullText
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import PaginationComponent from '../../../components/common/pagination/PaginationComponent';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
-import { Header } from '../../../components/common/SortHeadersList';
+import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
-import type { FullTextSearchCountResult, FullTextSearchResult, SearchPaginationInput } from '../../../utils/api-types';
+import { type FullTextSearchCountResult, type FullTextSearchResult, type SearchPaginationInput } from '../../../utils/api-types';
 import useEntityIcon from '../../../utils/hooks/useEntityIcon';
 import useEntityLink from './useEntityLink';
 
 const useStyles = makeStyles()(theme => ({
-  container: {
-    display: 'flex',
-  },
-  tabs: {
-    minWidth: 'fit-content',
-  },
+  container: { display: 'flex' },
+  tabs: { minWidth: 'fit-content' },
   tab: {
     whiteSpace: 'nowrap',
     minWidth: 'fit-content',
   },
-  itemHead: {
-    textTransform: 'uppercase',
-  },
+  itemHead: { textTransform: 'uppercase' },
   bodyItemHeader: {
     fontSize: theme.typography.h4.fontSize,
     fontWeight: 700,
   },
-  item: {
-    height: 50,
-  },
+  item: { height: 50 },
   bodyItem: {
     fontSize: theme.typography.h3.fontSize,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  goIcon: {
-    justifyContent: 'right',
-  },
+  goIcon: { justifyContent: 'right' },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  result_name: {
-    width: '40%',
-  },
-  result_description: {
-    width: '40%',
-  },
-  result_tags: {
-    width: '20%',
-  },
+  result_name: { width: '40%' },
+  result_description: { width: '40%' },
+  result_tags: { width: '20%' },
 };
 
-const TabPanel = (props: TabPanelProps & { index: number; entity: string; searchPaginationInput: SearchPaginationInput }) => {
+const TabPanel = (props: TabPanelProps & {
+  index: number;
+  entity: string;
+  searchPaginationInput: SearchPaginationInput;
+}) => {
   const { value, index, entity, searchPaginationInput } = props;
 
   // Standard hooks
@@ -70,9 +57,24 @@ const TabPanel = (props: TabPanelProps & { index: number; entity: string; search
 
   // Headers
   const fields: Header[] = [
-    { field: 'result_name', label: 'Name', isSortable: false, value: (result: FullTextSearchResult) => <span>{result.name}</span> },
-    { field: 'result_description', label: 'Description', isSortable: false, value: (result: FullTextSearchResult) => <span>{result.description}</span> },
-    { field: 'result_tags', label: 'Tags', isSortable: false, value: (result: FullTextSearchResult) => <span><ItemTags variant="list" tags={result.tags} /></span> },
+    {
+      field: 'result_name',
+      label: 'Name',
+      isSortable: false,
+      value: (result: FullTextSearchResult) => <span>{result.name}</span>,
+    },
+    {
+      field: 'result_description',
+      label: 'Description',
+      isSortable: false,
+      value: (result: FullTextSearchResult) => <span>{result.description}</span>,
+    },
+    {
+      field: 'result_tags',
+      label: 'Tags',
+      isSortable: false,
+      value: (result: FullTextSearchResult) => <span><ItemTags variant="list" tags={result.tags} /></span>,
+    },
   ];
 
   const [elements, setElements] = useState<FullTextSearchResult[]>([]);
@@ -82,12 +84,18 @@ const TabPanel = (props: TabPanelProps & { index: number; entity: string; search
       role="tabpanel"
       hidden={value !== index.toString()}
       aria-labelledby={`vertical-tab-${index}`}
-      style={{ width: '100%', padding: '0 24px' }}
+      style={{
+        width: '100%',
+        padding: '0 24px',
+      }}
     >
       {value === index.toString() && (
         <>
           <PaginationComponent
-            fetch={input => fullTextSearchByClass(entity, { ...input, ...searchPaginationInput })}
+            fetch={input => fullTextSearchByClass(entity, {
+              ...input,
+              ...searchPaginationInput,
+            })}
             searchPaginationInput={searchPaginationInput}
             setContent={setElements}
             searchEnable={false}
@@ -161,9 +169,7 @@ const FullTextSearch = () => {
 
   const [searchParams] = useSearchParams();
   const [search] = searchParams.getAll('search');
-  const [searchPaginationInput, setSearchPaginationInput] = useState(buildSearchPagination({
-    textSearch: search,
-  }));
+  const [searchPaginationInput, setSearchPaginationInput] = useState(buildSearchPagination({ textSearch: search }));
 
   const [results, setResults] = useState<Record<string, FullTextSearchCountResult>>({});
 
@@ -175,9 +181,9 @@ const FullTextSearch = () => {
   }, [search]);
 
   // Tabs
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
 
-  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -191,7 +197,10 @@ const FullTextSearch = () => {
       <Breadcrumbs
         variant="object"
         elements={[
-          { label: t('Search'), current: true },
+          {
+            label: t('Search'),
+            current: true,
+          },
         ]}
       />
       <Box className={classes.container}>

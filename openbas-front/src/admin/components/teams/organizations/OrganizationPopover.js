@@ -155,6 +155,9 @@ OrganizationPopover.propTypes = {
 };
 
 export default R.compose(
-  connect(null, { updateOrganization, deleteOrganization }),
+  connect(null, {
+    updateOrganization,
+    deleteOrganization,
+  }),
   inject18n,
 )(OrganizationPopover);

@@ -11,18 +11,18 @@ import {
   updateInjectForExercise,
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
-import type { InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
+import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { bulkTestInjects, searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
-import { Page } from '../../../../components/common/queryable/Page';
-import type {
-  Exercise,
-  ImportTestSummary,
-  Inject,
-  InjectBulkProcessingInput,
-  InjectBulkUpdateInputs,
-  InjectsImportInput,
-  InjectTestStatusOutput,
-  SearchPaginationInput,
+import { type Page } from '../../../../components/common/queryable/Page';
+import {
+  type Exercise,
+  type ImportTestSummary,
+  type Inject,
+  type InjectBulkProcessingInput,
+  type InjectBulkUpdateInputs,
+  type InjectsImportInput,
+  type InjectTestStatusOutput,
+  type SearchPaginationInput,
 } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 
@@ -33,16 +33,25 @@ const injectContextForExercise = (exercise: Exercise) => {
     searchInjects(input: SearchPaginationInput): Promise<{ data: Page<InjectOutputType> }> {
       return searchExerciseInjectsSimple(exercise.exercise_id, input);
     },
-    onAddInject(inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
+    onAddInject(inject: Inject): Promise<{
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }> {
       return dispatch(addInjectForExercise(exercise.exercise_id, inject));
     },
     onBulkUpdateInject(param: InjectBulkUpdateInputs): Promise<Inject[] | void> {
       return bulkUpdateInjectSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
-    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
+    onUpdateInject(injectId: Inject['inject_id'], inject: Inject): Promise<{
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }> {
       return dispatch(updateInjectForExercise(exercise.exercise_id, injectId, inject));
     },
-    onUpdateInjectTrigger(injectId: Inject['inject_id']): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
+    onUpdateInjectTrigger(injectId: Inject['inject_id']): Promise<{
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }> {
       return dispatch(updateInjectTriggerForExercise(exercise.exercise_id, injectId));
     },
     onUpdateInjectActivation(injectId: Inject['inject_id'], injectEnabled: { inject_enabled: boolean }): Promise<{
@@ -51,7 +60,10 @@ const injectContextForExercise = (exercise: Exercise) => {
     }> {
       return dispatch(updateInjectActivationForExercise(exercise.exercise_id, injectId, injectEnabled));
     },
-    onInjectDone(injectId: Inject['inject_id']): Promise<{ result: string; entities: { injects: Record<string, InjectStore> } }> {
+    onInjectDone(injectId: Inject['inject_id']): Promise<{
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }> {
       return dispatch(injectDone(exercise.exercise_id, injectId));
     },
     onDeleteInject(injectId: Inject['inject_id']): Promise<void> {
@@ -71,7 +83,10 @@ const injectContextForExercise = (exercise: Exercise) => {
     onBulkDeleteInjects(param: InjectBulkProcessingInput): Promise<Inject[]> {
       return bulkDeleteInjectsSimple(param).then((result: { data: Inject[] }) => result?.data);
     },
-    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{ uri: string; data: InjectTestStatusOutput[] }> {
+    bulkTestInjects(param: InjectBulkProcessingInput): Promise<{
+      uri: string;
+      data: InjectTestStatusOutput[];
+    }> {
       return bulkTestInjects(param).then(result => ({
         uri: `/admin/simulations/${exercise.exercise_id}/tests`,
         data: result.data,

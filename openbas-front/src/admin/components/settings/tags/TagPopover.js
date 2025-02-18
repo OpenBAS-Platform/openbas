@@ -147,6 +147,9 @@ TagPopover.propTypes = {
 };
 
 export default R.compose(
-  connect(null, { updateTag, deleteTag }),
+  connect(null, {
+    updateTag,
+    deleteTag,
+  }),
   inject18n,
 )(TagPopover);

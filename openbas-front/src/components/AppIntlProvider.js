@@ -46,7 +46,10 @@ const AppIntlProvider = (props) => {
     const rawUserLang = me?.user_lang ?? 'auto';
     const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
     const userLang = rawUserLang !== 'auto' ? rawUserLang : platformLang;
-    return { platformName: name, lang: userLang };
+    return {
+      platformName: name,
+      lang: userLang,
+    };
   });
   LANG = lang;
   const baseMessages = i18n.messages[lang] || i18n.messages[DEFAULT_LANG];
@@ -78,9 +81,7 @@ const AppIntlProvider = (props) => {
   );
 };
 
-AppIntlProvider.propTypes = {
-  children: PropTypes.node,
-};
+AppIntlProvider.propTypes = { children: PropTypes.node };
 
 const ConnectedIntlProvider = AppIntlProvider;
 

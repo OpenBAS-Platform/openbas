@@ -13,11 +13,7 @@ const Challenges = lazy(() => import('./challenges/Challenges'));
 const Lessons = lazy(() => import('./lessons/LessonsTemplates'));
 const LessonIndex = lazy(() => import('./lessons/Index'));
 
-const useStyles = makeStyles()(() => ({
-  root: {
-    flexGrow: 1,
-  },
-}));
+const useStyles = makeStyles()(() => ({ root: { flexGrow: 1 } }));
 
 const Index = () => {
   const { classes } = useStyles();

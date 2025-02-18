@@ -25,9 +25,7 @@ const useStyles = makeStyles()(theme => ({
     padding: '20px 15px 0 15px',
     float: 'left',
   },
-  container: {
-    marginTop: 10,
-  },
+  container: { marginTop: 10 },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -58,9 +56,7 @@ const useStyles = makeStyles()(theme => ({
     overflow: 'hidden',
     height: '100%',
   },
-  paperList: {
-    padding: '0 0 20px 0',
-  },
+  paperList: { padding: '0 0 20px 0' },
   progress: {
     float: 'right',
     margin: '25px 90px 0 50px',
@@ -289,14 +285,22 @@ const Comcheck = () => {
         style={{ marginTop: 30 }}
       >
         <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 10 }}>
+          <div style={{
+            float: 'left',
+            marginRight: 10,
+          }}
+          >
             <SearchFilter
               variant="small"
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
             />
           </div>
-          <div style={{ float: 'left', marginRight: 10 }}>
+          <div style={{
+            float: 'left',
+            marginRight: 10,
+          }}
+          >
             <TagsFilter
               onAddTag={filtering.handleAddTag}
               onRemoveTag={filtering.handleRemoveTag}

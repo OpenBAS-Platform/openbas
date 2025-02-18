@@ -2,12 +2,12 @@ import { CropFree, UnfoldLess, UnfoldMore } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import {
-  Connection,
+  type Connection,
   ConnectionLineType,
-  ConnectionState,
+  type ConnectionState,
   ControlButton,
   Controls,
-  Edge,
+  type Edge,
   MarkerType,
   MiniMap,
   ReactFlow,
@@ -15,30 +15,29 @@ import {
   useEdgesState,
   useNodesState,
   useReactFlow,
-  Viewport,
-  XYPosition,
+  type Viewport,
+  type XYPosition,
 } from '@xyflow/react';
 import moment from 'moment-timezone';
-import { FunctionComponent, useEffect, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
-import type { EndpointHelper } from '../actions/assets/asset-helper';
-import type { ExercisesHelper } from '../actions/exercises/exercise-helper';
-import type { InjectOutputType, InjectStore } from '../actions/injects/Inject';
-import type { InjectHelper } from '../actions/injects/inject-helper';
-import type { ScenariosHelper } from '../actions/scenarios/scenario-helper';
-import type { TeamsHelper } from '../actions/teams/team-helper';
+import { type AssetGroupsHelper } from '../actions/asset_groups/assetgroup-helper';
+import { type EndpointHelper } from '../actions/assets/asset-helper';
+import { type ExercisesHelper } from '../actions/exercises/exercise-helper';
+import { type InjectOutputType, type InjectStore } from '../actions/injects/Inject';
+import { type InjectHelper } from '../actions/injects/inject-helper';
+import { type ScenariosHelper } from '../actions/scenarios/scenario-helper';
+import { type TeamsHelper } from '../actions/teams/team-helper';
 import { useHelper } from '../store';
-import type { Inject, InjectDependency } from '../utils/api-types';
+import { type Inject, type InjectDependency } from '../utils/api-types';
 import { parseCron } from '../utils/Cron';
 import ChainingUtils from './common/chaining/ChainingUtils';
 import CustomTimelineBackground from './CustomTimelineBackground';
 import CustomTimelinePanel from './CustomTimelinePanel';
 import { useFormatter } from './i18n';
 import nodeTypes from './nodes';
-import { NodeInject } from './nodes/NodeInject';
+import { type NodeInject } from './nodes/NodeInject';
 import NodePhantom from './nodes/NodePhantom';
 
 const useStyles = makeStyles()(() => ({
@@ -46,9 +45,7 @@ const useStyles = makeStyles()(() => ({
     marginTop: 30,
     paddingRight: 40,
   },
-  rotatedIcon: {
-    transform: 'rotate(90deg)',
-  },
+  rotatedIcon: { transform: 'rotate(90deg)' },
   newBox: {
     position: 'relative',
     zIndex: 4,
@@ -61,14 +58,16 @@ interface Props {
   injects: InjectOutputType[];
   exerciseOrScenarioId: string;
   onSelectedInject(inject?: InjectOutputType): void;
-  openCreateInjectDrawer(data: {
-    inject_depends_duration_days: number;
-    inject_depends_duration_minutes: number;
-    inject_depends_duration_hours: number;
-  }): void;
+  onTimelineClick(duration: number): void;
   onUpdateInject: (data: Inject[]) => void;
-  onCreate: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
-  onUpdate: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
+  onCreate: (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => void;
+  onUpdate: (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => void;
   onDelete: (result: string) => void;
 }
 
@@ -76,11 +75,12 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   injects,
   exerciseOrScenarioId,
   onSelectedInject,
-  openCreateInjectDrawer,
+  onTimelineClick,
   onUpdateInject,
   onCreate,
   onUpdate,
-  onDelete }) => {
+  onDelete,
+}) => {
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
@@ -90,7 +90,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   const [viewportData, setViewportData] = useState<Viewport>();
   const [minutesPerGapIndex, setMinutesPerGapIndex] = useState<number>(0);
   const [currentUpdatedNode, setCurrentUpdatedNode] = useState<NodeInject | null>(null);
-  const [currentMousePosition, setCurrentMousePosition] = useState<XYPosition>({ x: 0, y: 0 });
+  const [currentMousePosition, setCurrentMousePosition] = useState<XYPosition>({
+    x: 0,
+    y: 0,
+  });
   const [newNodeCursorVisibility, setNewNodeCursorVisibility] = useState<'visible' | 'hidden'>('hidden');
   const [newNodeCursorClickable, setNewNodeCursorClickable] = useState<boolean>(true);
   const [currentMouseTime, setCurrentMouseTime] = useState<string>('');
@@ -107,10 +110,14 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
 
   const { t } = useFormatter();
 
-  const proOptions = { account: 'paid-pro', hideAttribution: true };
+  const proOptions = {
+    account: 'paid-pro',
+    hideAttribution: true,
+  };
   const defaultEdgeOptions = {
     type: ConnectionLineType.Bezier,
-    markerEnd: { type: MarkerType.ArrowClosed,
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
       width: 30,
       height: 30,
     },
@@ -179,13 +186,22 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       const maxX = Math.max(currentNode.position.x + nodeWidthClearance, ...dependencies.map(value => value.data.boundingBox!.bottomRight.x));
       const maxY = Math.max(currentNode.position.y + nodeHeightClearance, ...dependencies.map(value => value.data.boundingBox!.bottomRight.y));
       return {
-        topLeft: { x: minX, y: minY },
-        bottomRight: { x: maxX, y: maxY },
+        topLeft: {
+          x: minX,
+          y: minY,
+        },
+        bottomRight: {
+          x: maxX,
+          y: maxY,
+        },
       };
     }
     return {
       topLeft: currentNode.position,
-      bottomRight: { x: currentNode.position.x + nodeWidthClearance, y: currentNode.position.y + nodeHeightClearance },
+      bottomRight: {
+        x: currentNode.position.x + nodeWidthClearance,
+        y: currentNode.position.y + nodeHeightClearance,
+      },
     };
   };
 
@@ -266,7 +282,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                 sourceHandle: `source-${inject.inject_depends_on[i].dependency_relationship?.inject_parent_id}`,
                 label: ChainingUtils.fromInjectDependencyToLabel(inject.inject_depends_on[i]),
                 labelShowBg: false,
-                labelStyle: { fill: theme.palette.text?.primary, fontSize: 14 },
+                labelStyle: {
+                  fill: theme.palette.text?.primary,
+                  fontSize: 14,
+                },
               });
             }
           }
@@ -302,8 +321,14 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             startDate,
             onSelectedInject,
             boundingBox: {
-              topLeft: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]), y: 0 },
-              bottomRight: { x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]) + nodeWidthClearance, y: nodeHeightClearance },
+              topLeft: {
+                x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]),
+                y: 0,
+              },
+              bottomRight: {
+                x: (inject.inject_depends_duration / 60) * (gapSize / minutesPerGapAllowed[minutesPerGapIndex]) + nodeWidthClearance,
+                y: nodeHeightClearance,
+              },
             },
             targets: inject.inject_assets!.map(asset => assets[asset]?.asset_name)
               .concat(inject.inject_asset_groups!.map(assetGroup => assetGroups[assetGroup]?.asset_group_name))
@@ -360,7 +385,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    * @param _event the mouse event (unused for now)
    * @param node the node to update
    */
-  const nodeDragStop = (_event: React.MouseEvent, node: NodeInject) => {
+  const nodeDragStop = (_event: ReactMouseEvent, node: NodeInject) => {
     const injectFromMap = injectsMap[node.id];
     if (injectFromMap !== undefined) {
       const inject = {
@@ -418,7 +443,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             mode: 'and',
             conditions: [
               {
-                key: 'Execution', operator: 'eq', value: true,
+                key: 'Execution',
+                operator: 'eq',
+                value: true,
               },
             ],
           },
@@ -439,7 +466,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    * @param _event the mouse event
    * @param node the node that is being dragged
    */
-  const nodeDrag = (_event: React.MouseEvent, node: NodeInject) => {
+  const nodeDrag = (_event: ReactMouseEvent, node: NodeInject) => {
     setDraggingOnGoing(true);
     const { position } = node;
     const { data } = node;
@@ -469,18 +496,15 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    * Actions when clicking the new node 'button'
    * @param event
    */
-  const onNewNodeClick = (event: React.MouseEvent) => {
+  const onNewNodeClick = (event: ReactMouseEvent) => {
     if (newNodeCursorClickable) {
-      const position = reactFlow.screenToFlowPosition({ x: event.clientX - (newNodeSize / 2), y: event.clientY });
-
-      const totalMinutes = position.x > 0
-        ? moment.duration((position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60, 's')
-        : moment.duration(0);
-      openCreateInjectDrawer({
-        inject_depends_duration_days: totalMinutes.days(),
-        inject_depends_duration_hours: totalMinutes.hours(),
-        inject_depends_duration_minutes: totalMinutes.minutes(),
+      const position = reactFlow.screenToFlowPosition({
+        x: event.clientX - (newNodeSize / 2),
+        y: event.clientY,
       });
+
+      const totalSeconds = (position.x / gapSize) * minutesPerGapAllowed[minutesPerGapIndex] * 60;
+      onTimelineClick(totalSeconds);
     }
   };
 
@@ -488,7 +512,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
    * Actions to do when the mouse move
    * @param eventMove the mouse event
    */
-  const onMouseMove = (eventMove: React.MouseEvent) => {
+  const onMouseMove = (eventMove: ReactMouseEvent) => {
     if (!draggingOnGoing) {
       const position = reactFlow.screenToFlowPosition({
         x: eventMove.clientX,
@@ -508,7 +532,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       if (startDate === undefined) {
         const momentOfTime = moment.utc(
           moment.duration(convertCoordinatesToTime(
-            { x: sidePosition.x > 0 ? sidePosition.x : 0, y: sidePosition.y },
+            {
+              x: sidePosition.x > 0 ? sidePosition.x : 0,
+              y: sidePosition.y,
+            },
           ), 's').asMilliseconds(),
         );
 
@@ -516,7 +543,10 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
       } else {
         const momentOfTime = moment.utc(startDate)
           .add(-new Date().getTimezoneOffset() / 60, 'h')
-          .add(convertCoordinatesToTime({ x: sidePosition.x > 0 ? sidePosition.x : 0, y: sidePosition.y }), 's');
+          .add(convertCoordinatesToTime({
+            x: sidePosition.x > 0 ? sidePosition.x : 0,
+            y: sidePosition.y,
+          }), 's');
 
         setCurrentMouseTime(momentOfTime.format('MMMM Do, YYYY - h:mmA'));
       }
@@ -544,7 +574,7 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
     setDraggingOnGoing(false);
   };
 
-  const onReconnectEnd = (event: React.MouseEvent, edge: Edge, handleType: 'source' | 'target', connectionState: Omit<ConnectionState, 'inProgress'>) => {
+  const onReconnectEnd = (event: ReactMouseEvent, edge: Edge, handleType: 'source' | 'target', connectionState: Omit<ConnectionState, 'inProgress'>) => {
     if (!connectionState.isValid) {
       const inject = injects.find(currentInject => currentInject.inject_id === edge.target);
       if (inject !== undefined) {
@@ -584,7 +614,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                 mode: 'and',
                 conditions: [
                   {
-                    key: 'Execution', operator: 'eq', value: true,
+                    key: 'Execution',
+                    operator: 'eq',
+                    value: true,
                   },
                 ],
               },
@@ -612,7 +644,9 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
                 mode: 'and',
                 conditions: [
                   {
-                    key: 'Execution', operator: 'eq', value: true,
+                    key: 'Execution',
+                    operator: 'eq',
+                    value: true,
                   },
                 ],
               },
@@ -631,7 +665,13 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
   return (
     <>
       {injects.length > 0 ? (
-        <div className={`${classes.container} chainedTimeline`} style={{ width: '100%', height: 510 }}>
+        <div
+          className={`${classes.container} chainedTimeline`}
+          style={{
+            width: '100%',
+            height: 510,
+          }}
+        >
           <ReactFlow
             colorMode={theme.palette.mode}
             nodes={nodes}
@@ -660,7 +700,11 @@ const ChainedTimelineFlow: FunctionComponent<Props> = ({
             proOptions={proOptions}
             translateExtent={[[-60, -50], [Infinity, Infinity]]}
             nodeExtent={[[0, 0], [Infinity, Infinity]]}
-            defaultViewport={{ x: 60, y: 50, zoom: 0.75 }}
+            defaultViewport={{
+              x: 60,
+              y: 50,
+              zoom: 0.75,
+            }}
             minZoom={0.3}
             onClick={onNewNodeClick}
             onMouseEnter={showNewNode}

@@ -6,6 +6,7 @@ import 'eslint-import-resolver-oxc';
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
+import customRules from 'eslint-plugin-custom-rules';
 import i18next from 'eslint-plugin-i18next';
 import importPlugin from 'eslint-plugin-import';
 import playwright from 'eslint-plugin-playwright';
@@ -14,8 +15,6 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import ts from 'typescript-eslint';
-
-import customRules from './packages/eslint-plugin-custom-rules/lib/index.js';
 
 export default [
   // rules recommended by @eslint/js
@@ -27,13 +26,7 @@ export default [
   // rules recommended by eslint-plugin-react
   react.configs.flat.recommended,
   react.configs.flat['jsx-runtime'],
-  {
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
-  },
+  { settings: { react: { version: 'detect' } } },
 
   // rules recommended by eslint-plugin-import
   importPlugin.flatConfigs.recommended,
@@ -48,9 +41,7 @@ export default [
   },
 
   // rules recommended by @stylistic/eslint-plugin
-  stylistic.configs.customize({
-    semi: true,
-  }),
+  stylistic.configs.customize({ semi: true }),
 
   // rules recommended by eslint-plugin-i18next
   i18next.configs['flat/recommended'],
@@ -58,7 +49,7 @@ export default [
   // other config
   {
     plugins: {
-      // eslint-plugin-react-refresh
+    // eslint-plugin-react-refresh
       'react-refresh': reactRefresh,
       // eslint-plugin-simple-import-sort
       'simple-import-sort': simpleImportSort,
@@ -66,12 +57,10 @@ export default [
       'custom-rules': customRules,
     },
     rules: {
-      // react-refresh rules
+    // react-refresh rules
       'react-refresh/only-export-components': [
         'warn',
-        {
-          allowConstantExport: true,
-        },
+        { allowConstantExport: true },
       ],
 
       // eslint-plugin-simple-import-sort rules
@@ -101,13 +90,16 @@ export default [
         },
       ],
       '@typescript-eslint/no-use-before-define': 'error',
+      '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
 
       // eslint-plugin-react rules
       'react/prop-types': 0,
 
       // @stylistic rules
-      '@stylistic/brace-style': ['error', '1tbs'],
+      '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
       '@stylistic/multiline-ternary': ['error', 'always-multiline', { ignoreJSX: true }],
+      '@stylistic/object-curly-newline': ['error', { multiline: true }],
+      '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: false }],
 
       // eslint-plugin-import rules
       'import/no-named-as-default-member': 'off',
@@ -154,12 +146,18 @@ export default [
             {
               group: [
                 '@mui/material/*', '!@mui/material/locale', '!@mui/material/styles', '!@mui/material/colors', '!@mui/material/transitions',
-                '@mui/styles/*',
                 '@mui/x-date-pickers/*', '!@mui/x-date-pickers/AdapterDateFnsV3',
                 '@mui/icons-material/*',
                 '@mui/lab/*',
               ],
               message: 'Please use named import from @mui/* instead.',
+            },
+          ],
+          paths: [
+            {
+              name: 'react',
+              importNames: ['*'],
+              message: 'Do not use `import * as React from \'react\'`. Use `import {...} from \'react\'` instead.',
             },
           ],
         },
@@ -174,18 +172,15 @@ export default [
         process: true,
       },
     },
-    linterOptions: {
-      reportUnusedDisableDirectives: 'off', // to fix when eslint handle disable directive on missing rules on purpose
-    },
+    // to fix when eslint handle disable directive on missing rules on purpose
+    linterOptions: { reportUnusedDisableDirectives: 'off' },
   },
 
   // unit tests config
   {
     files: ['src/__tests__/**/*'],
     // rules recommended by vitest
-    plugins: {
-      vitest,
-    },
+    plugins: { vitest },
     rules: {
       ...vitest.configs.recommended.rules,
       'import/no-extraneous-dependencies': [
