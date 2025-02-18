@@ -10,9 +10,6 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
   @Override
   public void migrate(Context context) throws Exception {
     Statement select = context.getConnection().createStatement();
-    // Migrate agent from a matching endpoint (hostname, platform and arch = endpoint id) to a
-    // unique one
-    // At the end, delete endpoints no longer linked to an agent.
     select.execute(
         """
                 -- update hostnames to have lowercase for every executors
