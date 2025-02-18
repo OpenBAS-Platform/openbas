@@ -1396,289 +1396,275 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All injects were appended to exercise")
       public void allInjectsWereAppendedToExercise() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
 
         for (Inject expected : injectComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Inject> recreated =
-                  dest.getInjects().stream()
-                          .filter(i -> i.getTitle().equals(expected.getTitle()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Inject> reused =
+              dest.getInjects().stream()
+                  .filter(i -> i.getTitle().equals(expected.getTitle()))
+                  .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected inject");
-          Assertions.assertEquals(expected.getCity(), recreated.get().getCity());
-          Assertions.assertEquals(expected.getCountry(), recreated.get().getCountry());
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected inject");
+          Assertions.assertEquals(expected.getCity(), reused.get().getCity());
+          Assertions.assertEquals(expected.getCountry(), reused.get().getCountry());
+          Assertions.assertEquals(expected.getDependsDuration(), reused.get().getDependsDuration());
           Assertions.assertEquals(
-                  expected.getDependsDuration(), recreated.get().getDependsDuration());
-          Assertions.assertEquals(
-                  expected.getNumberOfTargetUsers(), recreated.get().getNumberOfTargetUsers());
-          Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
+              expected.getNumberOfTargetUsers(), reused.get().getNumberOfTargetUsers());
+          Assertions.assertEquals(expected.getDescription(), reused.get().getDescription());
 
           // the challenge ID is necessarily different from source and imported values, therefore
           // ignore
           // this
-          assertThatJson(recreated.get().getContent())
-                  .whenIgnoringPaths("challenges", "articles")
-                  .isEqualTo(expected.getContent());
+          assertThatJson(reused.get().getContent())
+              .whenIgnoringPaths("challenges", "articles")
+              .isEqualTo(expected.getContent());
 
-          Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+          Assertions.assertNotEquals(expected.getId(), reused.get().getId());
         }
       }
 
       @Test
       @DisplayName("Create new articles anyway")
       public void createNewArticlesAnyway() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Article expected : articleComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Article> recreated =
-                  dest.getArticles().stream()
-                          .filter(a -> a.getName().equals(expected.getName()))
-                          .findFirst();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Article> reused =
+              dest.getArticles().stream()
+                  .filter(a -> a.getName().equals(expected.getName()))
+                  .findFirst();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected article");
-          Assertions.assertEquals(expected.getName(), recreated.get().getName());
-          Assertions.assertEquals(expected.getAuthor(), recreated.get().getAuthor());
-          Assertions.assertEquals(expected.getComments(), recreated.get().getComments());
-          Assertions.assertEquals(expected.getLikes(), recreated.get().getLikes());
-          Assertions.assertEquals(expected.getContent(), recreated.get().getContent());
-          Assertions.assertEquals(expected.getShares(), recreated.get().getShares());
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected article");
+          Assertions.assertEquals(expected.getName(), reused.get().getName());
+          Assertions.assertEquals(expected.getAuthor(), reused.get().getAuthor());
+          Assertions.assertEquals(expected.getComments(), reused.get().getComments());
+          Assertions.assertEquals(expected.getLikes(), reused.get().getLikes());
+          Assertions.assertEquals(expected.getContent(), reused.get().getContent());
+          Assertions.assertEquals(expected.getShares(), reused.get().getShares());
           Assertions.assertEquals(
-                  expected.getVirtualPublication(), recreated.get().getVirtualPublication());
+              expected.getVirtualPublication(), reused.get().getVirtualPublication());
 
-          Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+          Assertions.assertNotEquals(expected.getId(), reused.get().getId());
         }
       }
 
       @Test
       @DisplayName("Existing channels are reused")
       public void existingChannelsAreReused() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Channel expected : channelComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Channel> recreated =
-                  dest.getArticles().stream()
-                          .map(Article::getChannel)
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Channel> reused =
+              dest.getArticles().stream()
+                  .map(Article::getChannel)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected channel");
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected channel");
         }
       }
 
       @Test
       @DisplayName("Existing challenges are reused")
       public void existingChallengesAreReused() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Challenge expected : challengeComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Challenge> recreated =
-                  fromIterable(challengeService.getExerciseChallenges(dest.getId())).stream()
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Challenge> reused =
+              fromIterable(challengeService.getExerciseChallenges(dest.getId())).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected challenge");
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected challenge");
         }
       }
 
       @Test
       @DisplayName("Existing payloads are reused")
       public void existingPayloadsAreReused() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Payload expected : payloadComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Payload> recreated =
-                  dest.getInjects().stream()
-                          .map(Inject::getInjectorContract)
-                          .filter(Optional::isPresent)
-                          .map(injectorContract -> injectorContract.get().getPayload())
-                          .filter(Objects::nonNull)
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Payload> reused =
+              dest.getInjects().stream()
+                  .map(Inject::getInjectorContract)
+                  .filter(Optional::isPresent)
+                  .map(injectorContract -> injectorContract.get().getPayload())
+                  .filter(Objects::nonNull)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected payload");
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected payload");
         }
       }
 
       @Test
       @DisplayName("Existing teams are assigned to exercise")
       public void existingTeamsAreAssignedToExercise() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Team expected : teamComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Team> recreated =
-                  dest.getTeams().stream()
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Team> reused =
+              dest.getTeams().stream().filter(c -> c.getId().equals(expected.getId())).findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected team");
         }
       }
 
       @Test
       @DisplayName("Existing users are assigned to exercise")
       public void existingUsersAreAssignedToExercise() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (User expected : userComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<User> recreated =
-                  dest.getTeams().stream()
-                          .flatMap(team -> team.getUsers().stream())
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<User> reused =
+              dest.getTeams().stream()
+                  .flatMap(team -> team.getUsers().stream())
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected user");
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected user");
         }
       }
 
       @Test
       @DisplayName("Existing organisations are assigned to exercise")
       public void existingOrganisationsAreAssignedToExercise() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Organization expected : organizationComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Organization> recreated =
-                  dest.getTeams().stream()
-                          .flatMap(team -> team.getUsers().stream())
-                          .map(User::getOrganization)
-                          .filter(Objects::nonNull)
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Organization> reused =
+              dest.getTeams().stream()
+                  .flatMap(team -> team.getUsers().stream())
+                  .map(User::getOrganization)
+                  .filter(Objects::nonNull)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected organisation");
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected organisation");
         }
       }
 
       @Test
       @DisplayName("Existing tags are reused")
       public void existingTagsAreReused() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Tag expected : tagComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
 
-          Optional<Tag> recreated =
-                  TagHelper.crawlAllExerciseTags(dest, challengeService).stream()
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+          Optional<Tag> reused =
+              TagHelper.crawlAllExerciseTags(dest, challengeService).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
 
           Assertions.assertTrue(
-                  recreated.isPresent(),
-                  "Could not find expected tag '%s'".formatted(expected.getName()));
+              reused.isPresent(), "Could not find expected tag '%s'".formatted(expected.getName()));
         }
       }
 
       @Test
       @DisplayName("Existing documents are reused")
       public void existingDocumentsAreReused() throws Exception {
-        byte[] exportData =
-                getExportData(getInjectFromExerciseWrappers(), true, true, true);
+        byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
-                createTargetInput(
-                        InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
         for (Document expected : documentComposer.generatedItems) {
           Exercise dest =
-                  exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Document> recreated =
-                  crawlDocumentsFromInjects(dest.getInjects()).stream()
-                          .filter(c -> c.getId().equals(expected.getId()))
-                          .findAny();
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Document> reused =
+              crawlDocumentsFromInjects(dest.getInjects()).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
 
           Assertions.assertTrue(
-                  recreated.isPresent(),
-                  "Could not find expected document %s".formatted(expected.getTarget()));
+              reused.isPresent(),
+              "Could not find expected document %s".formatted(expected.getTarget()));
         }
       }
     }
@@ -1696,67 +1682,276 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("All injects were appended to scenario")
       public void allInjectsWereAppendedToScenario() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+
+        for (Inject expected : injectComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Inject> reused =
+              dest.getInjects().stream()
+                  .filter(i -> i.getTitle().equals(expected.getTitle()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected inject");
+          Assertions.assertEquals(expected.getCity(), reused.get().getCity());
+          Assertions.assertEquals(expected.getCountry(), reused.get().getCountry());
+          Assertions.assertEquals(expected.getDependsDuration(), reused.get().getDependsDuration());
+          Assertions.assertEquals(
+              expected.getNumberOfTargetUsers(), reused.get().getNumberOfTargetUsers());
+          Assertions.assertEquals(expected.getDescription(), reused.get().getDescription());
+
+          // the challenge ID is necessarily different from source and imported values, therefore
+          // ignore
+          // this
+          assertThatJson(reused.get().getContent())
+              .whenIgnoringPaths("challenges", "articles")
+              .isEqualTo(expected.getContent());
+
+          Assertions.assertNotEquals(expected.getId(), reused.get().getId());
+        }
       }
 
       @Test
       @DisplayName("Create new articles anyway")
       public void createNewArticlesAnyway() throws Exception {
-        Assertions.fail();
-      }
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
 
-      @Test
-      @DisplayName("New articles are assigned to scenario")
-      public void newArticlesAreAssignedToScenario() throws Exception {
-        Assertions.fail();
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Article expected : articleComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Article> reused =
+              dest.getArticles().stream()
+                  .filter(a -> a.getName().equals(expected.getName()))
+                  .findFirst();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected article");
+          Assertions.assertEquals(expected.getName(), reused.get().getName());
+          Assertions.assertEquals(expected.getAuthor(), reused.get().getAuthor());
+          Assertions.assertEquals(expected.getComments(), reused.get().getComments());
+          Assertions.assertEquals(expected.getLikes(), reused.get().getLikes());
+          Assertions.assertEquals(expected.getContent(), reused.get().getContent());
+          Assertions.assertEquals(expected.getShares(), reused.get().getShares());
+          Assertions.assertEquals(
+              expected.getVirtualPublication(), reused.get().getVirtualPublication());
+
+          Assertions.assertNotEquals(expected.getId(), reused.get().getId());
+        }
       }
 
       @Test
       @DisplayName("Existing channels are reused")
       public void existingChannelsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Channel expected : channelComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Channel> reused =
+              dest.getArticles().stream()
+                  .map(Article::getChannel)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected channel");
+        }
       }
 
       @Test
       @DisplayName("Existing challenges are reused")
       public void existingChallengesAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Challenge expected : challengeComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Challenge> reused =
+              fromIterable(challengeService.getScenarioChallenges(dest)).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected challenge");
+        }
       }
 
       @Test
       @DisplayName("Existing payloads are reused")
       public void existingPayloadsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Payload expected : payloadComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Payload> reused =
+              dest.getInjects().stream()
+                  .map(Inject::getInjectorContract)
+                  .filter(Optional::isPresent)
+                  .map(injectorContract -> injectorContract.get().getPayload())
+                  .filter(Objects::nonNull)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected payload");
+        }
       }
 
       @Test
       @DisplayName("Existing teams are assigned to scenario")
       public void existingTeamsAreAssignedToScenario() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Team expected : teamComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Team> reused =
+              dest.getTeams().stream().filter(c -> c.getId().equals(expected.getId())).findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected team");
+        }
       }
 
       @Test
       @DisplayName("Existing users are assigned to scenario")
       public void existingUsersAreAssignedToScenario() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (User expected : userComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<User> reused =
+              dest.getTeams().stream()
+                  .flatMap(team -> team.getUsers().stream())
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected user");
+        }
       }
 
       @Test
       @DisplayName("Existing organisations are assigned to scenario")
       public void existingOrganisationsAreAssignedToScenario() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Organization expected : organizationComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Organization> reused =
+              dest.getTeams().stream()
+                  .flatMap(team -> team.getUsers().stream())
+                  .map(User::getOrganization)
+                  .filter(Objects::nonNull)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected organisation");
+        }
       }
 
       @Test
       @DisplayName("Existing tags are reused")
       public void existingTagsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Tag expected : tagComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+
+          Optional<Tag> reused =
+              TagHelper.crawlAllScenarioTags(dest, challengeService).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(
+              reused.isPresent(), "Could not find expected tag '%s'".formatted(expected.getName()));
+        }
       }
 
       @Test
       @DisplayName("Existing documents are reused")
       public void existingDocumentsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Document expected : documentComposer.generatedItems) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Document> reused =
+              crawlDocumentsFromInjects(dest.getInjects()).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(
+              reused.isPresent(),
+              "Could not find expected document %s".formatted(expected.getTarget()));
+        }
       }
     }
 
