@@ -22,20 +22,9 @@ public class OperationUtilsJpa {
     }
 
     Predicate[] predicates =
-        texts.stream()
-            .map(text -> notContainsText(paths, cb, text, type))
-            .toArray(Predicate[]::new);
+        texts.stream().map(text -> containsText(paths, cb, text, type)).toArray(Predicate[]::new);
 
-    return cb.or(predicates);
-  }
-
-  public static Predicate notContainsText(
-      Expression<String> paths, CriteriaBuilder cb, String text, Class<?> type) {
-    if (isEmpty(text)) {
-      return cb.conjunction();
-    }
-
-    return containsText(paths, cb, text, type).not();
+    return cb.or(predicates).not();
   }
 
   // -- CONTAINS --

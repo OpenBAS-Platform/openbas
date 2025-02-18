@@ -77,7 +77,7 @@ public class FilterUtilsJpa {
   @SuppressWarnings("unchecked")
   private static <T, U> Specification<T> computeFilter(
       @Nullable final Filter filter, Map<String, Join<Base, Base>> joinMap) {
-    if (filter == null || filter.getValues() == null || filter.getValues().isEmpty()) {
+    if (filter == null) {
       return (Specification<T>) EMPTY_SPECIFICATION;
     }
     String filterKey = filter.getKey();
