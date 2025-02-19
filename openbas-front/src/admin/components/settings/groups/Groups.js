@@ -137,12 +137,12 @@ const Groups = () => {
     <div style={{ display: 'flex' }}>
       <div style={{ flexGrow: 1 }}>
         <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Security') }, {
-          label: t('Groups'),
-          current: true,
-        }]}
-      />
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Security') }, {
+            label: t('Groups'),
+            current: true,
+          }]}
+        />
         <PaginationComponent
           fetch={searchGroups}
           searchPaginationInput={searchPaginationInput}

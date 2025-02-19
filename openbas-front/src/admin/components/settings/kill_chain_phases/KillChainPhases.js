@@ -91,12 +91,12 @@ const KillChainPhases = () => {
     <div style={{ display: 'flex' }}>
       <div style={{ flexGrow: 1 }}>
         <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
-          label: t('Kill chain phases'),
-          current: true,
-        }]}
-      />
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+            label: t('Kill chain phases'),
+            current: true,
+          }]}
+        />
         <PaginationComponent
           fetch={searchKillChainPhases}
           searchPaginationInput={searchPaginationInput}

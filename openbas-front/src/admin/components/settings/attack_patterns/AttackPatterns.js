@@ -94,12 +94,12 @@ const AttackPatterns = () => {
     <div style={{ display: 'flex' }}>
       <div style={{ flexGrow: 1 }}>
         <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
-          label: t('Attack patterns'),
-          current: true,
-        }]}
-      />
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+            label: t('Attack patterns'),
+            current: true,
+          }]}
+        />
         <PaginationComponent
           fetch={searchAttackPatterns}
           searchPaginationInput={searchPaginationInput}

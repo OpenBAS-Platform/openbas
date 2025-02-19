@@ -70,12 +70,12 @@ const XlsMappers = () => {
     <div style={{ display: 'flex' }}>
       <div style={{ flexGrow: 1 }}>
         <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, {
-          label: t('XLS mappers'),
-          current: true,
-        }]}
-      />
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Data ingestion') }, {
+            label: t('XLS mappers'),
+            current: true,
+          }]}
+        />
         <PaginationComponent
           fetch={searchMappers}
           searchPaginationInput={searchPaginationInput}
