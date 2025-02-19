@@ -10,9 +10,7 @@ import useAuth from '../../../utils/hooks/useAuth';
 import { isNotEmptyField } from '../../../utils/utils';
 import { useFormatter } from '../../i18n';
 
-const useStyles = makeStyles()(theme => ({
-  toolbar: theme.mixins.toolbar as CSSObject,
-}));
+const useStyles = makeStyles()(theme => ({ toolbar: theme.mixins.toolbar as CSSObject }));
 
 export interface RightMenuEntry {
   path: string;
@@ -27,7 +25,6 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }
   const { classes } = useStyles();
   const theme = useTheme();
   const { t } = useFormatter();
-
 
   const { settings } = useAuth();
   const { bannerHeight } = computeBannerSettings(settings);
@@ -54,7 +51,10 @@ const RightMenu: FunctionComponent<{ entries: RightMenuEntry[] }> = ({ entries }
               component={Link}
               to={entry.path}
               selected={isCurrentTab}
-              sx={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}
+              sx={{
+                paddingTop: theme.spacing(1),
+                paddingBottom: theme.spacing(1),
+              }}
             >
               <ListItemIcon>
                 {entry.icon()}

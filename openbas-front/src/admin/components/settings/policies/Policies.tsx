@@ -14,10 +14,6 @@ import SecurityMenu from '../SecurityMenu';
 import PolicyForm from './PolicyForm';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    margin: 0,
-    padding: '0 200px 50px 0',
-  },
   paper: {
     height: '100%',
     minHeight: '100%',

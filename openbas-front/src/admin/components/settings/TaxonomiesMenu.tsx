@@ -1,8 +1,8 @@
 import { RouteOutlined, StyleOutlined } from '@mui/icons-material';
 import { LockPattern } from 'mdi-material-ui';
-import { FunctionComponent, memo } from 'react';
+import { type FunctionComponent, memo } from 'react';
 
-import RightMenu, { RightMenuEntry } from '../../../components/common/menu/RightMenu';
+import RightMenu, { type RightMenuEntry } from '../../../components/common/menu/RightMenu';
 
 const TaxonomiesMenuComponent: FunctionComponent = () => {
   const entries: RightMenuEntry[] = [
