@@ -1087,6 +1087,7 @@ public class InjectImportTest extends IntegrationTest {
               dest.getTeams().stream()
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
+                  .filter(Objects::nonNull)
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
@@ -1314,6 +1315,7 @@ public class InjectImportTest extends IntegrationTest {
                   .flatMap(inject -> inject.getTeams().stream())
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
+                  .filter(Objects::nonNull)
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 

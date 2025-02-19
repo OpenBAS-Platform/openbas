@@ -766,7 +766,9 @@ public class V1_DataImporter implements Importer {
         () ->
             importNode.has(prefix + "injects")
                 ? resolveJsonElements(importNode, prefix + "injects")
-                : resolveJsonElements(importNode, prefix + "information");
+                : Objects.equals(prefix, "inject_")
+                    ? resolveJsonElements(importNode, prefix + "information")
+                    : Stream.of();
 
     // Getting a list of all the children of the dependency
     List<String> children =
