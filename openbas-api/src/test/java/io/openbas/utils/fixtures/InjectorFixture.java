@@ -11,9 +11,14 @@ import org.springframework.stereotype.Component;
 public class InjectorFixture {
   @Autowired InjectorRepository injectorRepository;
 
-  public static Injector createDefaultInjector() {
-    return createInjector(
-        UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString());
+  public static Injector createDefaultPayloadInjector() {
+    Injector injector =
+        createInjector(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString());
+    injector.setPayloads(true);
+    return injector;
   }
 
   public static Injector createInjector(String id, String name, String type) {
@@ -28,6 +33,11 @@ public class InjectorFixture {
   }
 
   public Injector getWellKnownObasImplantInjector() {
-    return injectorRepository.findByType("openbas_implant").orElseThrow();
+    Injector injector = injectorRepository.findByType("openbas_implant").orElseThrow();
+    // ensure the injector is marked for payloads
+    // some tests not running in a transaction may flip this
+    injector.setPayloads(true);
+    injectorRepository.save(injector);
+    return injector;
   }
 }

@@ -367,7 +367,7 @@ public class Inject implements Base, Injection {
   }
 
   public List<Article> getArticles() {
-    if (!this.getContent().has("articles")) {
+    if (this.getContent() == null || !this.getContent().has("articles")) {
       return List.of();
     }
 

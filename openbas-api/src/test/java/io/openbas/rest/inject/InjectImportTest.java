@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
-import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
@@ -65,13 +64,11 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private OrganizationComposer organizationComposer;
   @Autowired private TagComposer tagComposer;
   @Autowired private PayloadComposer payloadComposer;
-  @Autowired private InjectorFixture injectorFixture;
   @Autowired private ChallengeService challengeService;
   @Autowired private EntityManager entityManager;
   @Autowired private InjectRepository injectRepository;
-
   @Autowired private ArticleService articleService;
-  @Autowired private ArticleRepository articleRepository;
+  @Autowired private InjectorFixture injectorFixture;
 
   @BeforeEach
   void before() throws Exception {
@@ -94,6 +91,8 @@ public class InjectImportTest extends IntegrationTest {
     for (String filename : FileFixture.WELL_KNOWN_FILES.keySet()) {
       fileService.deleteFile(filename);
     }
+
+    clearEntityManager();
   }
 
   public final String INJECT_IMPORT_URI = INJECT_URI + "/import";
@@ -1121,7 +1120,9 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected tag");
+          Assertions.assertTrue(
+              recreated.isPresent(),
+              "Could not find expected tag '%s'".formatted(expected.getName()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getColor(), recreated.get().getColor());
 
@@ -1178,7 +1179,7 @@ public class InjectImportTest extends IntegrationTest {
 
         for (Inject expected : injectComposer.generatedItems) {
           Optional<Inject> recreated =
-              injectRepository.findAll().stream()
+              getImportedInjectsFromDb().stream()
                   .filter(i -> i.getTitle().equals(expected.getTitle()))
                   .findAny();
 
@@ -1340,7 +1341,9 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected user");
+          Assertions.assertTrue(
+              recreated.isPresent(),
+              "Could not find expected tag '%s'".formatted(expected.getName()));
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getColor(), recreated.get().getColor());
 

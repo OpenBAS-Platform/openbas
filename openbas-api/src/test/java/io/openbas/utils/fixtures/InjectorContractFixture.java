@@ -1,7 +1,7 @@
 package io.openbas.utils.fixtures;
 
 import static io.openbas.database.model.InjectorContract.CONTACT_CONTENT_FIELDS;
-import static io.openbas.utils.fixtures.InjectorFixture.createDefaultInjector;
+import static io.openbas.utils.fixtures.InjectorFixture.createDefaultPayloadInjector;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +47,7 @@ public class InjectorContractFixture {
   @SneakyThrows
   public static InjectorContract createDefaultInjectorContract() {
     InjectorContract injectorContract = new InjectorContract();
-    injectorContract.setInjector(createDefaultInjector());
+    injectorContract.setInjector(createDefaultPayloadInjector());
     injectorContract.setId(UUID.randomUUID().toString());
 
     ObjectMapper objectMapper = new ObjectMapper();

@@ -112,6 +112,7 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       challengeComposers.forEach(ChallengeComposer.Composer::persist);
       articleComposers.forEach(ArticleComposer.Composer::persist);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
+        entityManager.persist(injectorContract.getInjector());
         injectorRepository.save(injectorContract.getInjector());
         // for some reason hibernate refuses to save the entity with the repository
         entityManager.persist(injectorContract);
