@@ -398,13 +398,16 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         fullWidth={true}
         maxWidth="md"
       >
-        <DialogTitle>{t('Install a simulation agent')}</DialogTitle>
+        <DialogTitle><Typography variant="h2" style={{ marginTop: 10 }}>{t('Install a simulation agent')}</Typography></DialogTitle>
         <DialogContent>
           {selectedExecutor && (
             <div style={{ marginTop: 20 }}>
+
+              {/* Caldera */}
               {selectedExecutor.executor_type === 'openbas_caldera' && (
                 <div style={{ marginTop: 20 }}>
-                  {platform === 'macos' && (
+
+                  {platform === 'MacOS' && (
                     <FormControl style={{ width: '100%' }}>
                       <InputLabel id="arch">{t('Architecture')}</InputLabel>
                       <Select
@@ -418,11 +421,14 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       </Select>
                     </FormControl>
                   )}
+
                   <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
+
                   <Alert variant="outlined" severity="info">
                     {t('Installing the agent is requiring local administrator privileges.')}
                   </Alert>
-                  {platform === 'windows' && (
+
+                  {platform === 'Windows' && (
                     <>
                       <p>
                         {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
@@ -439,7 +445,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       </div>
                     </>
                   )}
-                  {platform !== 'windows' && (
+
+                  {platform !== 'Windows' && (
                     <>
                       <p>
                         {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
@@ -459,6 +466,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       </div>
                     </>
                   )}
+
                   <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
                   <Alert variant="outlined" severity="info">
                     {t('The agent will never execute directly any payload.')}
@@ -470,197 +478,186 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 </div>
               )}
 
+              {/* OBAS */}
               {selectedExecutor && selectedExecutor.executor_type === 'openbas_agent' && (
                 <div style={{ marginTop: 20 }}>
-                  {' '}
-                  {/* Tab navigation */}
-                  {' '}
                   <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
-                    {' '}
                     <Tab label={t('Standard Installation')} />
-                    {' '}
                     <Tab label={t('Advanced Installation')} />
-                    {' '}
                   </Tabs>
-                  {' '}
-                  {/* Step 1 */}
-                  {' '}
-                  <Typography variant="h2" style={{ marginTop: 30 }}>
-                    {' '}
-                    {t('Step 1 - Install the agent')}
-                    {' '}
-                  </Typography>
-                  {' '}
-                  <Alert variant="outlined" severity="info">
-                    {' '}
-                    {t('Installing the agent requires local administrator privileges.')}
-                    {' '}
-                  </Alert>
-                  {' '}
-                  {/* Conditional content based on active tab */}
-                  {' '}
+
                   {activeTab === 0 && (
                     <>
-                      {' '}
-                      {/* Standard Installation content */}
-                      {' '}
-                      {platform === 'windows' && (
+                      <Alert variant="outlined" severity="info" style={{ marginTop: theme.spacing(3) }}>
+                        {t('Quick start with openBAS, install the agent with your own privilege, this installation requires local administrator privileges')}
+                      </Alert>
+
+                      <Typography variant="h2" style={{ marginTop: 30 }}>
+                        {t('Step 1 - Install the agent')}
+                      </Typography>
+
+                      <Alert variant="outlined" severity="warning">
+                        {t('Message detail explication')}
+                      </Alert>
+
+                      {platform === 'Windows' && (
                         <>
-                          {' '}
                           <p>
-                            {' '}
                             {t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
-                            {' '}
                           </p>
-                          {' '}
                           <pre style={{ margin: '20px 0 10px 0' }}>
-                            {' '}
                             {platformAgentSelector().displayedCode}
-                            {' '}
                           </pre>
-                          {' '}
                           <div style={{
                             display: 'flex',
                             justifyContent: 'center',
                             gap: 8,
                           }}
                           >
-                            {' '}
                             <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>
-                              {' '}
                               {t('Copy')}
-                              {' '}
                             </Button>
-                            {' '}
                             <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.ps1', 'text/plain')}>
-                              {' '}
                               {t('Download')}
-                              {' '}
                             </Button>
-                            {' '}
                           </div>
-                          {' '}
                         </>
                       )}
-                      {' '}
-                      {platform !== 'windows' && (
+
+                      {platform !== 'Windows' && (
                         <>
-                          {' '}
                           <p>
-                            {' '}
                             {t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
-                            {' '}
                           </p>
-                          {' '}
                           <pre style={{ margin: '20px 0 10px 0' }}>
-                            {' '}
                             {platformAgentSelector().displayedCode}
-                            {' '}
                           </pre>
-                          {' '}
                           <div style={{
                             display: 'flex',
                             justifyContent: 'center',
                             gap: 8,
                           }}
                           >
-                            {' '}
                             <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>
-                              {' '}
                               {t('Copy')}
-                              {' '}
                             </Button>
-                            {' '}
                             <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.sh', 'text/plain')}>
-                              {' '}
                               {t('Download')}
-                              {' '}
                             </Button>
-                            {' '}
                           </div>
-                          {' '}
                         </>
                       )}
-                      {' '}
+
                     </>
                   )}
-                  {' '}
                   {activeTab === 1 && (
                     <>
-                      {' '}
-                      {/* Advanced Installation content */}
-                      {' '}
-                      <Typography variant="h3">{t('Advanced Installation Instructions')}</Typography>
-                      {' '}
-                      <Alert variant="outlined" severity="warning">
-                        {' '}
-                        {t('Advanced installation requires specific configurations and knowledge.')}
-                        {' '}
+                      <Alert variant="outlined" severity="info" style={{ marginTop: theme.spacing(3) }}>
+                        {t('Deploy your agent as user account or a service account, this instalation requires local administrator privileges.')}
                       </Alert>
-                      {' '}
-                      {/* Additional content for advanced installation */}
-                      {' '}
-                      <p>
-                        {' '}
-                        {t('For advanced installation, follow the additional configuration steps:')}
-                        {' '}
-                      </p>
-                      {' '}
-                      <pre>{/* Insert advanced installation script/code here */}</pre>
-                      {' '}
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                      >
-                        {' '}
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, 'advanced_code_here')}>
-                          {' '}
-                          {t('Copy')}
-                          {' '}
-                        </Button>
-                        {' '}
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download('advanced_code_here', 'advanced_script.sh', 'text/plain')}>
-                          {' '}
-                          {t('Download')}
-                          {' '}
-                        </Button>
-                        {' '}
+
+                      <Typography variant="h2" style={{ marginTop: 30 }}>
+                        {t('Step 1 - Install the agent')}
+                      </Typography>
+
+                      <div>
+                        button radio
+                        * install agent as user
+                        * installa agent as System
                       </div>
-                      {' '}
+
+                      <Alert variant="outlined" severity="warning">
+                        {t('Message detail explication')}
+                        //depending option radio button
+                      </Alert>
+
+                      {platform === 'Windows' && (
+                        <>
+                          <p>
+                            {t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
+                          </p>
+                          <pre style={{ margin: '20px 0 10px 0' }}>
+                            {platformAgentSelector().displayedCode}
+                          </pre>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: 8,
+                          }}
+                          >
+                            <Button
+                              variant="outlined"
+                              style={{ marginBottom: 20 }}
+                              startIcon={<ContentCopyOutlined />}
+                              onClick={() => copyToClipboard(t, platformAgentSelector().code)}
+                            >
+                              {t('Copy')}
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              style={{ marginBottom: 20 }}
+                              startIcon={<DownloadCircleOutline />}
+                              onClick={() => download(platformAgentSelector().displayedCode, 'openbas.ps1', 'text/plain')}
+                            >
+                              {t('Download')}
+                            </Button>
+                          </div>
+                        </>
+                      )}
+
+                      {platform !== 'Windows' && (
+                        <>
+                          <p>
+                            {t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
+                          </p>
+                          <pre style={{ margin: '20px 0 10px 0' }}>
+                            {platformAgentSelector().displayedCode}
+                          </pre>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: 8,
+                          }}
+                          >
+                            <Button
+                              variant="outlined"
+                              style={{ marginBottom: 20 }}
+                              startIcon={<ContentCopyOutlined />}
+                              onClick={() => copyToClipboard(t, platformAgentSelector().code)}
+                            >
+                              {t('Copy')}
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              style={{ marginBottom: 20 }}
+                              startIcon={<DownloadCircleOutline />}
+                              onClick={() => download(platformAgentSelector().displayedCode, 'openbas.sh', 'text/plain')}
+                            >
+                              {t('Download')}
+                            </Button>
+                          </div>
+                        </>
+                      )}
+
                     </>
                   )}
-                  {' '}
-                  {/* Step 2 */}
-                  {' '}
+
                   <Typography variant="h2" style={{ marginTop: 30 }}>
-                    {' '}
                     {t('Step 2 - Add antivirus exclusions')}
-                    {' '}
                   </Typography>
-                  {' '}
                   <Alert variant="outlined" severity="info">
-                    {' '}
                     {t('The agent will never execute directly any payload.')}
-                    {' '}
                   </Alert>
-                  {' '}
                   <p>
-                    {' '}
                     {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future, but this is generally a good practice to ensure the agent will always be available.')}
-                    {' '}
                   </p>
-                  {' '}
                   <pre style={{ margin: '20px 0 10px 0' }}>
-                    {' '}
                     {platformAgentSelector().exclusions}
-                    {' '}
                   </pre>
-                  {' '}
                 </div>
               )}
 
+              {/* Others */}
               <ExecutorDocumentationLink executor={selectedExecutor} />
             </div>
           )}
