@@ -16,19 +16,19 @@ const executorBanners: Record<string, {
   img: string;
   backgroundColor: string;
 }> = {
-  openbas_tanium: {
+  openbas_agent: {
     img: openBasLogo,
     backgroundColor: '#001BDB',
   },
-  openbas_caldera: {
+  openbas_crowdstrike: {
     img: crowdstrikeLogo,
     backgroundColor: '#E12E37',
   },
-  openbas_agent: {
+  openbas_tanium: {
     img: taniumLogo,
     backgroundColor: '#E03E41',
   },
-  openbas_crowdstrike: {
+  openbas_caldera: {
     img: calderaLogo,
     backgroundColor: '#8B1316',
   },
