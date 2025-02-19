@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.export.FileExportBase;
 import io.openbas.rest.exercise.exports.ExportOptions;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class InjectsFileExport extends FileExportBase {
 
   @JsonProperty("inject_articles")
   private List<Article> getArticles() {
-    return injects.stream().flatMap(inject -> inject.getArticles().stream()).toList();
+    return articleService.getInjectsArticles(injects);
   }
 
   @JsonProperty("inject_channels")
@@ -112,14 +113,20 @@ public class InjectsFileExport extends FileExportBase {
   }
 
   private InjectsFileExport(
-      List<Inject> injects, ObjectMapper objectMapper, ChallengeService challengeService) {
-    super(objectMapper, challengeService);
+      List<Inject> injects,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    super(objectMapper, challengeService, articleService);
     this.injects = injects;
   }
 
   public static InjectsFileExport fromInjects(
-      List<Inject> injects, ObjectMapper objectMapper, ChallengeService challengeService) {
-    return new InjectsFileExport(injects, objectMapper, challengeService);
+      List<Inject> injects,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    return new InjectsFileExport(injects, objectMapper, challengeService, articleService);
   }
 
   @Override

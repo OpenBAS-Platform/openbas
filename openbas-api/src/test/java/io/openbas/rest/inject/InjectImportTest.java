@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
+import io.openbas.database.repository.ArticleRepository;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
@@ -20,6 +21,7 @@ import io.openbas.rest.inject.form.InjectImportInput;
 import io.openbas.rest.inject.form.InjectImportTargetDefinition;
 import io.openbas.rest.inject.form.InjectImportTargetType;
 import io.openbas.rest.inject.service.InjectExportService;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.FileService;
 import io.openbas.utils.fixtures.*;
@@ -67,6 +69,9 @@ public class InjectImportTest extends IntegrationTest {
   @Autowired private ChallengeService challengeService;
   @Autowired private EntityManager entityManager;
   @Autowired private InjectRepository injectRepository;
+
+  @Autowired private ArticleService articleService;
+  @Autowired private ArticleRepository articleRepository;
 
   @BeforeEach
   void before() throws Exception {
@@ -249,13 +254,11 @@ public class InjectImportTest extends IntegrationTest {
             .flatMap(challenge -> challenge.getDocuments().stream())
             .toList());
     documents.addAll(
-        injects.stream()
-            .flatMap(inject -> inject.getArticles().stream())
+        articleService.getInjectsArticles(injects).stream()
             .flatMap(article -> article.getDocuments().stream())
             .toList());
     documents.addAll(
-        injects.stream()
-            .flatMap(inject -> inject.getArticles().stream())
+        articleService.getInjectsArticles(injects).stream()
             .map(Article::getChannel)
             .flatMap(channel -> channel.getLogos().stream())
             .toList());
@@ -1999,8 +2002,7 @@ public class InjectImportTest extends IntegrationTest {
 
         for (Article expected : articleComposer.generatedItems) {
           Optional<Article> reused =
-              getImportedInjectsFromDb().stream()
-                  .flatMap(inject -> inject.getArticles().stream())
+              articleService.getInjectsArticles(getImportedInjectsFromDb()).stream()
                   .filter(a -> a.getName().equals(expected.getName()))
                   .findFirst();
 
@@ -2029,8 +2031,7 @@ public class InjectImportTest extends IntegrationTest {
 
         for (Channel expected : channelComposer.generatedItems) {
           Optional<Channel> reused =
-              getImportedInjectsFromDb().stream()
-                  .flatMap(inject -> inject.getArticles().stream())
+              articleService.getInjectsArticles(getImportedInjectsFromDb()).stream()
                   .map(Article::getChannel)
                   .filter(c -> c.getId().equals(expected.getId()))
                   .findAny();

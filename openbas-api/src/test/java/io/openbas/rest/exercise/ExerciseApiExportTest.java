@@ -15,6 +15,7 @@ import io.openbas.export.Mixins;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
@@ -51,6 +52,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private TagComposer tagComposer;
   @Autowired private InjectorContractComposer injectorContractComposer;
   @Autowired private ChallengeService challengeService;
+  @Autowired private ArticleService articleService;
   @Resource protected ObjectMapper mapper;
 
   @BeforeEach
@@ -147,7 +149,8 @@ public class ExerciseApiExportTest extends IntegrationTest {
     ObjectMapper exportMapper = mapper.copy();
     String expectedJson =
         exportMapper.writeValueAsString(
-            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService).withOptions(0));
+            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService, articleService)
+                .withOptions(0));
 
     assertThatJson(expectedJson).isObject().isEqualTo(actualJson);
   }
@@ -176,7 +179,8 @@ public class ExerciseApiExportTest extends IntegrationTest {
     ObjectMapper exportMapper = mapper.copy();
     String expectedJson =
         exportMapper.writeValueAsString(
-            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService).withOptions(7));
+            ExerciseFileExport.fromExercise(ex, exportMapper, challengeService, articleService)
+                .withOptions(7));
 
     assertThatJson(expectedJson).isObject().isEqualTo(actualJson);
   }

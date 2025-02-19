@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.export.FileExportBase;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import java.util.ArrayList;
 import java.util.List;
@@ -236,14 +237,20 @@ public class ExerciseFileExport extends FileExportBase {
   }
 
   private ExerciseFileExport(
-      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
-    super(objectMapper, challengeService);
+      Exercise exercise,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    super(objectMapper, challengeService, articleService);
     this.exercise = exercise;
   }
 
   public static ExerciseFileExport fromExercise(
-      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
-    return new ExerciseFileExport(exercise, objectMapper, challengeService);
+      Exercise exercise,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    return new ExerciseFileExport(exercise, objectMapper, challengeService, articleService);
   }
 
   @Override
