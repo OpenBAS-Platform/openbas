@@ -230,9 +230,10 @@ public class InjectImportTest extends IntegrationTest {
         .filter(
             inject ->
                 injectComposer.generatedItems.stream()
-                    .map(Inject::getTitle)
-                    .toList()
-                    .contains(inject.getTitle()))
+                    .anyMatch(
+                        wrapped ->
+                            wrapped.getTitle().equals(inject.getTitle())
+                                && !wrapped.getId().equals(inject.getId())))
         .toList();
   }
 
@@ -1957,67 +1958,234 @@ public class InjectImportTest extends IntegrationTest {
       @Test
       @DisplayName("Each inject is added to its own atomic testing")
       public void eachInjectWasAddedToAtomicTesting() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+
+        for (Inject expected : injectComposer.generatedItems) {
+          Optional<Inject> reused =
+              getImportedInjectsFromDb().stream()
+                  .filter(i -> i.getTitle().equals(expected.getTitle()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected inject");
+          Assertions.assertEquals(expected.getCity(), reused.get().getCity());
+          Assertions.assertEquals(expected.getCountry(), reused.get().getCountry());
+          Assertions.assertEquals(expected.getDependsDuration(), reused.get().getDependsDuration());
+          Assertions.assertEquals(
+              expected.getNumberOfTargetUsers(), reused.get().getNumberOfTargetUsers());
+          Assertions.assertEquals(expected.getDescription(), reused.get().getDescription());
+
+          // the challenge ID is necessarily different from source and imported values, therefore
+          // ignore
+          // this
+          assertThatJson(reused.get().getContent())
+              .whenIgnoringPaths("challenges", "articles")
+              .isEqualTo(expected.getContent());
+
+          Assertions.assertNotEquals(expected.getId(), reused.get().getId());
+        }
       }
 
       @Test
       @DisplayName("Create new articles anyway")
       public void createNewArticlesAnyway() throws Exception {
-        Assertions.fail();
-      }
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
-      @Test
-      @DisplayName("New articles are assigned to atomic testing")
-      public void newArticlesAreAssignedToAtomicTesting() throws Exception {
-        Assertions.fail();
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Article expected : articleComposer.generatedItems) {
+          Optional<Article> reused =
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getArticles().stream())
+                  .filter(a -> a.getName().equals(expected.getName()))
+                  .findFirst();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected article");
+          Assertions.assertEquals(expected.getName(), reused.get().getName());
+          Assertions.assertEquals(expected.getAuthor(), reused.get().getAuthor());
+          Assertions.assertEquals(expected.getComments(), reused.get().getComments());
+          Assertions.assertEquals(expected.getLikes(), reused.get().getLikes());
+          Assertions.assertEquals(expected.getContent(), reused.get().getContent());
+          Assertions.assertEquals(expected.getShares(), reused.get().getShares());
+          Assertions.assertEquals(
+              expected.getVirtualPublication(), reused.get().getVirtualPublication());
+
+          Assertions.assertNotEquals(expected.getId(), reused.get().getId());
+        }
       }
 
       @Test
       @DisplayName("Existing channels are reused")
       public void existingChannelsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Channel expected : channelComposer.generatedItems) {
+          Optional<Channel> reused =
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getArticles().stream())
+                  .map(Article::getChannel)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected channel");
+        }
       }
 
       @Test
       @DisplayName("Existing challenges are reused")
       public void existingChallengesAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Challenge expected : challengeComposer.generatedItems) {
+          Optional<Challenge> reused =
+              fromIterable(challengeService.getInjectsChallenges(getImportedInjectsFromDb()))
+                  .stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected challenge");
+        }
       }
 
       @Test
       @DisplayName("Existing payloads are reused")
       public void existingPayloadsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Payload expected : payloadComposer.generatedItems) {
+          Optional<Payload> reused =
+              getImportedInjectsFromDb().stream()
+                  .map(Inject::getInjectorContract)
+                  .filter(Optional::isPresent)
+                  .map(injectorContract -> injectorContract.get().getPayload())
+                  .filter(Objects::nonNull)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected payload");
+        }
       }
 
       @Test
       @DisplayName("Existing teams are assigned to atomic testing")
       public void existingTeamsAreAssignedToAtomicTesting() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Team expected : teamComposer.generatedItems) {
+          Optional<Team> reused =
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected team");
+        }
       }
 
       @Test
       @DisplayName("Existing users are assigned to atomic testing")
       public void existingUsersAreAssignedToAtomicTesting() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (User expected : userComposer.generatedItems) {
+          Optional<User> reused =
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .flatMap(team -> team.getUsers().stream())
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected user");
+        }
       }
 
       @Test
       @DisplayName("Existing organisations are assigned to atomic testing")
       public void existingOrganisationsAreAssignedToAtomicTesting() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Organization expected : organizationComposer.generatedItems) {
+          Optional<Organization> reused =
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .flatMap(team -> team.getUsers().stream())
+                  .map(User::getOrganization)
+                  .filter(Objects::nonNull)
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(reused.isPresent(), "Could not find expected organisation");
+        }
       }
 
       @Test
       @DisplayName("Existing tags are reused")
       public void existingTagsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Tag expected : tagComposer.generatedItems) {
+
+          Optional<Tag> reused =
+              TagHelper.crawlAllInjectsTags(getImportedInjectsFromDb(), challengeService).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(
+              reused.isPresent(), "Could not find expected tag '%s'".formatted(expected.getName()));
+        }
       }
 
       @Test
       @DisplayName("Existing documents are reused")
       public void existingDocumentsAreReused() throws Exception {
-        Assertions.fail();
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Document expected : documentComposer.generatedItems) {
+          Optional<Document> reused =
+              crawlDocumentsFromInjects(getImportedInjectsFromDb()).stream()
+                  .filter(c -> c.getId().equals(expected.getId()))
+                  .findAny();
+
+          Assertions.assertTrue(
+              reused.isPresent(),
+              "Could not find expected document %s".formatted(expected.getTarget()));
+        }
       }
     }
   }
