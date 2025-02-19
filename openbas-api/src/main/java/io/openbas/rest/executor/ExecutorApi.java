@@ -320,4 +320,9 @@ public class ExecutorApi extends RestBehavior {
     String installCommand = this.endpointService.generateInstallCommand(platform, token);
     return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(installCommand);
   }
+
+  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{mode-user}/{token}")
+  public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(){
+
+  }
 }
