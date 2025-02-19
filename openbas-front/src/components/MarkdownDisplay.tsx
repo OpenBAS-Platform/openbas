@@ -1,8 +1,7 @@
 import { type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
-import Markdown from 'react-markdown';
-import type { PluggableList } from 'react-markdown/lib';
+import Markdown, { Options as MarkdownOptions } from 'react-markdown';
 import remarkFlexibleMarkers from 'remark-flexible-markers';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
@@ -10,6 +9,8 @@ import remarkParse from 'remark-parse';
 import { truncate } from '../utils/String';
 import ExternalLinkPopover from './ExternalLinkPopover';
 import FieldOrEmpty from './FieldOrEmpty';
+
+type PluggableList = MarkdownOptions['remarkPlugins'];
 
 export const MarkDownComponents = (
   theme: Theme,
