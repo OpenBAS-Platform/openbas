@@ -370,8 +370,12 @@ public class EndpointService {
         .replace("${OPENBAS_WITH_PROXY}", String.valueOf(openBASConfig.isWithProxy()));
   }
 
-  public String generateInstallCommand(String platform, String token) throws IOException {
+  public String generateInstallCommand(String platform, String token, String mode) throws IOException {
     return getFileOrDownloadFromJfrog(platform, "openbas-agent-installer", token);
+  }
+
+  public String generateInstallCommand(String platform, String token, String modeuser) throws IOException {
+    return getFileOrDownloadFromJfrog(platform, "openbas-agent-installer".concat(modeuser), token);
   }
 
   public String generateUpgradeCommand(String platform) throws IOException {
