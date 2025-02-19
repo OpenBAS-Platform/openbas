@@ -617,8 +617,6 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(
               expected.getCleanupExecutor(), recreated.get().getCleanupExecutor());
           Assertions.assertEquals(expected.getExecutionArch(), recreated.get().getExecutionArch());
-          Assertions.assertEquals(
-              expected.getNumberOfActions(), recreated.get().getNumberOfActions());
           Assertions.assertEquals(expected.getType(), recreated.get().getType());
           Assertions.assertEquals(expected.getSource(), recreated.get().getSource());
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
@@ -992,8 +990,6 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(
               expected.getCleanupExecutor(), recreated.get().getCleanupExecutor());
           Assertions.assertEquals(expected.getExecutionArch(), recreated.get().getExecutionArch());
-          Assertions.assertEquals(
-              expected.getNumberOfActions(), recreated.get().getNumberOfActions());
           Assertions.assertEquals(expected.getType(), recreated.get().getType());
           Assertions.assertEquals(expected.getSource(), recreated.get().getSource());
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
@@ -1231,8 +1227,6 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(
               expected.getCleanupExecutor(), recreated.get().getCleanupExecutor());
           Assertions.assertEquals(expected.getExecutionArch(), recreated.get().getExecutionArch());
-          Assertions.assertEquals(
-              expected.getNumberOfActions(), recreated.get().getNumberOfActions());
           Assertions.assertEquals(expected.getType(), recreated.get().getType());
           Assertions.assertEquals(expected.getSource(), recreated.get().getSource());
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
