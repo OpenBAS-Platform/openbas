@@ -51,6 +51,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
 
     @Override
     public Composer persist() {
+      articleComposers.forEach(ArticleComposer.Composer::persist);
       injectComposers.forEach(InjectComposer.Composer::persist);
       scenarioRepository.save(scenario);
       scenarioService.createScenario(scenario);
@@ -59,6 +60,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
 
     @Override
     public Composer delete() {
+      articleComposers.forEach(ArticleComposer.Composer::delete);
       injectComposers.forEach(InjectComposer.Composer::delete);
       scenarioRepository.delete(scenario);
       return this;
