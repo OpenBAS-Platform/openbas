@@ -38,9 +38,16 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                 FROM (SELECT array_asset_id, uniq_asset_id FROM temp_assets) AS ta
                 WHERE ta.array_asset_id LIKE concat('%',a.agent_asset,'%');
                 -- update the relation assets_tags
+                ALTER TABLE assets_tags DROP CONSTRAINT assets_tags_pkey;
+
                 UPDATE assets_tags assets_tag SET asset_id=ta.uniq_asset_id
                 FROM (SELECT array_asset_id, uniq_asset_id FROM temp_assets) AS ta
                 WHERE ta.array_asset_id LIKE concat('%',assets_tag.asset_id,'%');
+
+                CREATE TABLE assets_tags_temp AS SELECT DISTINCT * FROM assets_tags;
+                DROP TABLE assets_tags;
+                ALTER TABLE assets_tags_temp RENAME TO assets_tags;
+                ALTER TABLE assets_tags ADD CONSTRAINT assets_tags_pkey PRIMARY KEY (asset_id, tag_id);
                 -- drop temp asset table
                 DROP TABLE temp_assets;
                 -- delete old endpoints which are unused now
