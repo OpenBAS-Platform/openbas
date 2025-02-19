@@ -12,7 +12,8 @@ import { MESSAGING$ } from '../utils/Environment';
 import { useFormatter } from './i18n';
 import Loader from './Loader';
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(pdfMake as any).addVirtualFileSystem(pdfFonts);
 
 interface Props {
   getPdfDocDefinition: () => Promise<TDocumentDefinitions>;

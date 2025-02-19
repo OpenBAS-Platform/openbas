@@ -12,7 +12,6 @@ import { donutChartOptions } from '../../../../utils/Charts';
 interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
-  immutable?: boolean;
   disableChartAnimation?: boolean;
 }
 
@@ -43,7 +42,6 @@ const iconOverlay = {
 const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
-  immutable,
   disableChartAnimation,
 }) => {
   // Standard hooks
@@ -135,7 +133,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         </Box>
       </Grid>
     );
-  }, [immutable, theme, displayHumanValidationBtn, humanValidationLink, pending]);
+  }, [theme, displayHumanValidationBtn, humanValidationLink, pending]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

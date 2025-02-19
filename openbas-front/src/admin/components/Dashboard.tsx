@@ -195,7 +195,7 @@ const Dashboard = () => {
         <Paper variant="outlined" classes={{ root: classes.paperWithChart }}>
           {loading
             ? <Loader variant="inElement" />
-            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} immutable={true} />}
+            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} />}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
