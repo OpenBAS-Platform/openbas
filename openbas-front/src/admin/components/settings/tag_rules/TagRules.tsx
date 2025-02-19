@@ -19,11 +19,7 @@ import { type TagRuleOutput } from '../../../../utils/api-types';
 import TagRuleCreate from './TagRuleCreate';
 import TagRulePopover from './TagRulePopover';
 
-const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-}));
+const useStyles = makeStyles()(() => ({ itemHead: { textTransform: 'uppercase' } }));
 
 const inlineStyles: Record<string, CSSProperties> = {
   tag_rule_tag: { width: '20%' },

@@ -30,12 +30,8 @@ import ScenarioStatus from './scenario/ScenarioStatus';
 import ScenarioCreation from './ScenarioCreation';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {

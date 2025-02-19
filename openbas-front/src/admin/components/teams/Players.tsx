@@ -26,12 +26,8 @@ import CreatePlayer from './players/CreatePlayer';
 import PlayerPopover from './players/PlayerPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {

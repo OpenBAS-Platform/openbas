@@ -31,12 +31,8 @@ import PayloadComponent from './PayloadComponent';
 import PayloadPopover from './PayloadPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
   chip: {
     fontSize: 12,
     height: 25,
@@ -67,8 +63,10 @@ const inlineStyles: Record<string, CSSProperties> = {
   payload_type: { width: '10%' },
   payload_name: { width: '20%' },
   payload_platforms: { width: '10%' },
-  payload_description: { width: '20%',
-maxWidth: '300px' }, // Workaround: we should change flex to grid
+  payload_description: {
+    width: '20%',
+    maxWidth: '300px',
+  }, // Workaround: we should change flex to grid
   payload_tags: { width: '10%' },
   payload_source: { width: '10%' },
   payload_status: { width: '10%' },

@@ -27,12 +27,8 @@ import AssetGroupManagement from './AssetGroupManagement';
 import AssetGroupPopover from './AssetGroupPopover';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
   drawerPaper: {
     minHeight: '100vh',
     width: '50%',

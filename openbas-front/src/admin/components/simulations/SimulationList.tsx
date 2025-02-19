@@ -19,12 +19,8 @@ import AtomicTestingResult from '../atomic_testings/atomic_testing/AtomicTesting
 import ExerciseStatus from './simulation/ExerciseStatus';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
 }));
 
 const getInlineStyles = (variant: string): Record<string, CSSProperties> => ({

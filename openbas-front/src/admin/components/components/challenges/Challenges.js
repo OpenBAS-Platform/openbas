@@ -85,21 +85,11 @@ const headerStyles = {
 };
 
 const inlineStyles = {
-  challenge_name: {
-    width: '25%',
-  },
-  challenge_category: {
-    width: '20%',
-  },
-  challenge_score: {
-    width: '10%',
-  },
-  challenge_exercises: {
-    width: '20%',
-  },
-  challenge_tags: {
-    height: 20,
-  },
+  challenge_name: { width: '25%' },
+  challenge_category: { width: '20%' },
+  challenge_score: { width: '10%' },
+  challenge_exercises: { width: '20%' },
+  challenge_tags: { height: 20 },
 };
 
 const Challenges = () => {
