@@ -95,7 +95,12 @@ const Executors = () => {
     setAgentFolder(null);
     setArch('x86_64');
   };
-  const buildCalderaUrlInstaller = () => {
+  const buildInstallationUrl = (baseUrl: String) => {
+    if (activeTab === 0) return `${baseUrl}/session-user`;
+    if (activeTab === 1 && selectedOption === "user") return `${baseUrl}/service-user`;
+    return baseUrl;
+  };
+  const buildCalderaInstaller = () => {
     switch (platform) {
       case 'Windows':
         return {
@@ -177,7 +182,7 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
         };
     }
   };
-  const buildOpenBASUrlInstaller = () => {
+  const buildOpenBASInstaller = () => {
     switch (platform) {
       case 'Windows':
         return {
@@ -192,7 +197,7 @@ MD5: 68c1795fb45cb9b522d6cf48443fdc37
 SHA1: 5f87d06f818ff8cba9e11e8cd1c6f9d990eca0f8
 SHA256: 6b180913acb8cdac3fb8d3154a2f6a0bed13c056a477f4f94c4679414ec13b9f
 SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd58d36058d7cde405bc8c5084f3ac060a6080bfc18a843738d3bee87fd`,
-          displayedCode: `iex (iwr "${settings.platform_base_url}/api/agent/installer/openbas/windows/${userToken?.token_value}").Content`,
+          displayedCode: `iex (iwr "${buildInstallationUrl("${settings.platform_base_url}/api/agent/installer/openbas/windows/")"${userToken?.token_value}}").Content`,
           code: `iex (iwr "${settings.platform_base_url}/api/agent/installer/openbas/windows/${userToken?.token_value}").Content`,
         };
       case 'Linux':
@@ -442,7 +447,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       <p>
                         {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
                       </p>
-                      <pre style={{ margin: '20px 0 10px 0' }}>{buildCalderaUrlInstaller().displayedCode}</pre>
+                      <pre style={{ margin: '20px 0 10px 0' }}>{buildCalderaInstaller().displayedCode}</pre>
                       <div style={{
                         display: 'flex',
                         justifyContent: 'center',
@@ -453,7 +458,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                           variant="outlined"
                           style={{ marginBottom: 20 }}
                           startIcon={<ContentCopyOutlined />}
-                          onClick={() => copyToClipboard(t, buildCalderaUrlInstaller().code)}
+                          onClick={() => copyToClipboard(t, buildCalderaInstaller().code)}
                         >
                           {t('Copy')}
                         </Button>
@@ -461,7 +466,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                           variant="outlined"
                           style={{ marginBottom: 20 }}
                           startIcon={<DownloadCircleOutline />}
-                          onClick={() => download(buildCalderaUrlInstaller().displayedCode, 'openbas.ps1', 'text/plain')}
+                          onClick={() => download(buildCalderaInstaller().displayedCode, 'openbas.ps1', 'text/plain')}
                         >
                           {t('Download')}
                         </Button>
@@ -477,7 +482,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       <Alert variant="outlined" severity="warning">
                         {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
                       </Alert>
-                      <pre style={{ margin: '20px 0 10px 0' }}>{buildCalderaUrlInstaller().displayedCode}</pre>
+                      <pre style={{ margin: '20px 0 10px 0' }}>{buildCalderaInstaller().displayedCode}</pre>
                       <div style={{
                         display: 'flex',
                         justifyContent: 'center',
@@ -488,7 +493,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                           variant="outlined"
                           style={{ marginBottom: 20 }}
                           startIcon={<ContentCopyOutlined />}
-                          onClick={() => copyToClipboard(t, buildCalderaUrlInstaller().code)}
+                          onClick={() => copyToClipboard(t, buildCalderaInstaller().code)}
                         >
                           {t('Copy')}
                         </Button>
@@ -496,7 +501,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                           variant="outlined"
                           style={{ marginBottom: 20 }}
                           startIcon={<DownloadCircleOutline />}
-                          onClick={() => download(buildCalderaUrlInstaller().displayedCode, 'openbas.sh', 'text/plain')}
+                          onClick={() => download(buildCalderaInstaller().displayedCode, 'openbas.sh', 'text/plain')}
                         >
                           {t('Download')}
                         </Button>
@@ -511,7 +516,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   <p>
                     {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
                   </p>
-                  <pre style={{ margin: '20px 0 10px 0' }}>{buildCalderaUrlInstaller().exclusions}</pre>
+                  <pre style={{ margin: '20px 0 10px 0' }}>{buildCalderaInstaller().exclusions}</pre>
                 </div>
               )}
 
@@ -551,7 +556,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                             {t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
                           </p>
                           <pre style={{ margin: '20px 0 10px 0' }}>
-                            {buildOpenBASUrlInstaller().displayedCode}
+                            {buildOpenBASInstaller().displayedCode}
                           </pre>
                           <div style={{
                             display: 'flex',
@@ -563,7 +568,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<ContentCopyOutlined />}
-                              onClick={() => copyToClipboard(t, buildOpenBASUrlInstaller().code)}
+                              onClick={() => copyToClipboard(t, buildOpenBASInstaller().code)}
                             >
                               {t('Copy')}
                             </Button>
@@ -571,7 +576,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<DownloadCircleOutline />}
-                              onClick={() => download(buildOpenBASUrlInstaller().displayedCode, 'openbas.ps1', 'text/plain')}
+                              onClick={() => download(buildOpenBASInstaller().displayedCode, 'openbas.ps1', 'text/plain')}
                             >
                               {t('Download')}
                             </Button>
@@ -585,7 +590,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                             {t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
                           </p>
                           <pre style={{ margin: '20px 0 10px 0' }}>
-                            {buildOpenBASUrlInstaller().displayedCode}
+                            {buildOpenBASInstaller().displayedCode}
                           </pre>
                           <div style={{
                             display: 'flex',
@@ -597,7 +602,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<ContentCopyOutlined />}
-                              onClick={() => copyToClipboard(t, buildOpenBASUrlInstaller().code)}
+                              onClick={() => copyToClipboard(t, buildOpenBASInstaller().code)}
                             >
                               {t('Copy')}
                             </Button>
@@ -605,7 +610,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<DownloadCircleOutline />}
-                              onClick={() => download(buildOpenBASUrlInstaller().displayedCode, 'openbas.sh', 'text/plain')}
+                              onClick={() => download(buildOpenBASInstaller().displayedCode, 'openbas.sh', 'text/plain')}
                             >
                               {t('Download')}
                             </Button>
@@ -655,7 +660,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                             {t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
                           </p>
                           <pre style={{ margin: '20px 0 10px 0' }}>
-                            {buildOpenBASUrlInstaller().displayedCode}
+                            {buildOpenBASInstaller().displayedCode}
                           </pre>
                           <div style={{
                             display: 'flex',
@@ -667,7 +672,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<ContentCopyOutlined />}
-                              onClick={() => copyToClipboard(t, buildOpenBASUrlInstaller().code)}
+                              onClick={() => copyToClipboard(t, buildOpenBASInstaller().code)}
                             >
                               {t('Copy')}
                             </Button>
@@ -675,7 +680,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<DownloadCircleOutline />}
-                              onClick={() => download(buildOpenBASUrlInstaller().displayedCode, 'openbas.ps1', 'text/plain')}
+                              onClick={() => download(buildOpenBASInstaller().displayedCode, 'openbas.ps1', 'text/plain')}
                             >
                               {t('Download')}
                             </Button>
@@ -689,7 +694,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                             {t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
                           </p>
                           <pre style={{ margin: '20px 0 10px 0' }}>
-                            {buildOpenBASUrlInstaller().displayedCode}
+                            {buildOpenBASInstaller().displayedCode}
                           </pre>
                           <div style={{
                             display: 'flex',
@@ -701,7 +706,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<ContentCopyOutlined />}
-                              onClick={() => copyToClipboard(t, buildOpenBASUrlInstaller().code)}
+                              onClick={() => copyToClipboard(t, buildOpenBASInstaller().code)}
                             >
                               {t('Copy')}
                             </Button>
@@ -709,7 +714,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                               variant="outlined"
                               style={{ marginBottom: 20 }}
                               startIcon={<DownloadCircleOutline />}
-                              onClick={() => download(buildOpenBASUrlInstaller().displayedCode, 'openbas.sh', 'text/plain')}
+                              onClick={() => download(buildOpenBASInstaller().displayedCode, 'openbas.sh', 'text/plain')}
                             >
                               {t('Download')}
                             </Button>
@@ -733,7 +738,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future, but this is generally a good practice to ensure the agent will always be available.')}
                   </p>
                   <pre style={{ margin: '20px 0 10px 0' }}>
-                    {buildOpenBASUrlInstaller().exclusions}
+                    {buildOpenBASInstaller().exclusions}
                   </pre>
                 </div>
               )}
