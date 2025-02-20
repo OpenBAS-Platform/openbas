@@ -81,9 +81,9 @@
     "@types/node": "22.13.4",
     "@types/pdfmake": "0.2.11",
     "@types/qs": "6",
-    "@types/react": "19.0.2",
+    "@types/react": "19.0.10",
     "@types/react-csv": "1.1.10",
-    "@types/react-dom": "19.0.2",
+    "@types/react-dom": "19.0.4",
     "@types/react-syntax-highlighter": "15",
     "@types/seamless-immutable": "7.1.19",
     "@typescript-eslint/utils": "8.22.0",
@@ -114,7 +114,7 @@
     "vitest": "2.1.9"
   },
   "resolutions": {
-    "@types/react": "19"
+    "@types/react": "19.0.10"
   },
   "engines": {
     "node": ">= 22.11.0"
