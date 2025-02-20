@@ -103,7 +103,7 @@
     "eslint-plugin-simple-import-sort": "12.1.1",
     "express": "4.21.2",
     "fs-extra": "11.3.0",
-    "globals": "15.14.0",
+    "globals": "15.15.0",
     "jsdom": "25.0.1",
     "monocart-coverage-reports": "2.12.0",
     "monocart-reporter": "2.9.13",
