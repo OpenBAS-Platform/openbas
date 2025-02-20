@@ -28,6 +28,7 @@ public class ResultUtils {
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
   private final AssetGroupService assetGroupService;
+  private final AgentRepository agentRepository;
 
   // -- UTILS --
   public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
@@ -135,6 +136,7 @@ public class ResultUtils {
             .distinct()
             .toList());
 
+    // Assets from inject or asset group
     List<RawAsset> rawAssets = assetRepository.rawByIdsOrInjectIds(assetIds, injectIds);
     Map<String, RawAsset> assetMap =
         rawAssets.stream().collect(Collectors.toMap(RawAsset::getAsset_id, rawAsset -> rawAsset));
@@ -150,6 +152,17 @@ public class ResultUtils {
                     Collectors.mapping(
                         injectAsset -> (String) injectAsset[1], Collectors.toList())));
 
+    // -- Agent Map --
+    Set<String> agentIds =
+        rawInjectExpectations.stream()
+            .map(RawInjectExpectation::getAgent_id)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+    Set<RawAgent> rawAgents = agentRepository.rawAgentByIds(agentIds);
+    Map<String, RawAgent> agentMap =
+        rawAgents.stream().collect(Collectors.toMap(RawAgent::getAgent_id, rawAgent -> rawAgent));
+
     return injectIds.stream()
         .flatMap(
             injectId ->
@@ -158,9 +171,10 @@ public class ResultUtils {
                     injectAssetMap.getOrDefault(injectId, emptyList()),
                     teamMap,
                     userMap,
+                    agentMap,
                     assetMap,
-                    assetGroupMap,
-                    dynamicForAssetGroupMap)
+                    dynamicForAssetGroupMap,
+                    assetGroupMap)
                     .stream())
         .distinct()
         .toList();

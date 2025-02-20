@@ -1693,11 +1693,12 @@ export interface InjectStatusSimple {
 /** Results of expectations for each target */
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
+  executorType?: string;
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
   platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  targetType: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
