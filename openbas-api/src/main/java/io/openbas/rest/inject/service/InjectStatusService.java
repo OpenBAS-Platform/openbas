@@ -1,31 +1,48 @@
 package io.openbas.rest.inject.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.finding.Finding;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
-import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static io.openbas.injector_contract.output.ContractOutputUtils.getContractOutputs;
+import static io.openbas.injector_contract.output.ContractOutputUtils.toFinding;
 
 @RequiredArgsConstructor
 @Service
 public class InjectStatusService {
+
   private final InjectRepository injectRepository;
   private final AgentRepository agentRepository;
   private final InjectService injectService;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
+  private final FindingService findingService;
+
+  @Resource
+  private ObjectMapper mapper;
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
@@ -75,8 +92,7 @@ public class InjectStatusService {
   private ExecutionTraceAction convertExecutionAction(InjectExecutionAction status) {
     return switch (status) {
       case InjectExecutionAction.prerequisite_check -> ExecutionTraceAction.PREREQUISITE_CHECK;
-      case InjectExecutionAction.prerequisite_execution ->
-          ExecutionTraceAction.PREREQUISITE_EXECUTION;
+      case InjectExecutionAction.prerequisite_execution -> ExecutionTraceAction.PREREQUISITE_EXECUTION;
       case InjectExecutionAction.cleanup_execution -> ExecutionTraceAction.CLEANUP_EXECUTION;
       case InjectExecutionAction.complete -> ExecutionTraceAction.COMPLETE;
       default -> ExecutionTraceAction.EXECUTION;
@@ -150,6 +166,28 @@ public class InjectStatusService {
         && (agentId == null || isAllInjectAgentsExecuted(inject))) {
       updateFinalInjectStatus(injectStatus);
     }
+
+    // -- FINDINGS --
+    // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
+    if (input.getRawStructured() != null) {
+      try {
+        List<Finding> findings = new ArrayList<>();
+        ObjectNode values = mapper.readValue(input.getRawStructured(), ObjectNode.class);
+        InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
+        List<JsonNode> contractOutputs = getContractOutputs(injectorContract.getConvertedContent());
+        if (!contractOutputs.isEmpty()) {
+          contractOutputs.forEach(
+              ouput -> {
+                Finding finding = toFinding(ouput, values);
+                findings.add(finding);
+              });
+        }
+        this.findingService.createFindings(findings, injectId);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     return injectRepository.save(inject);
   }
 
@@ -162,8 +200,7 @@ public class InjectStatusService {
         case SUCCESS, WARNING -> successCount++;
         case PARTIAL -> partialCount++;
         case ERROR, COMMAND_NOT_FOUND, AGENT_INACTIVE -> errorCount++;
-        case MAYBE_PREVENTED, MAYBE_PARTIAL_PREVENTED, COMMAND_CANNOT_BE_EXECUTED ->
-            maybePreventedCount++;
+        case MAYBE_PREVENTED, MAYBE_PARTIAL_PREVENTED, COMMAND_CANNOT_BE_EXECUTED -> maybePreventedCount++;
       }
     }
 
