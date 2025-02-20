@@ -10,11 +10,11 @@ import lombok.Data;
 public class InjectExecutionInput {
 
   @NotBlank(message = MANDATORY_MESSAGE)
-  @JsonProperty("execution_message")
+  @JsonProperty("execution_message") // FIXME: should be changed to execution_raw_output in implant repo
   private String message;
 
-//  private String rawOutput; // raw output
-//  private String structuredOutput; // structured output -> if exists findings generation based on contract
+  @JsonProperty("execution_raw_structured")
+  private String rawStructured;
 
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("execution_status")
