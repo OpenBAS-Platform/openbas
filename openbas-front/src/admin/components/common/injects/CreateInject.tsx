@@ -111,7 +111,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
         <>
           {(contract.injector_contract_platforms ?? []).map(
-            (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+            (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={theme.spacing(2)} />,
           )}
         </>
       ),

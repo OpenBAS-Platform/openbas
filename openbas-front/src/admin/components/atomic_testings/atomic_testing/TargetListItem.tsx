@@ -1,5 +1,6 @@
 import { Groups3Outlined, PersonOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from 'tss-react/mui';
 
@@ -25,13 +26,14 @@ interface Props {
 
 const TargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
   const { classes } = useStyles();
+  const theme = useTheme();
   const handleItemClick = () => {
     onClick(target);
   };
   const getIcon = (target: InjectTargetWithResult) => {
     const iconMap = {
       ASSETS_GROUPS: <SelectGroup />,
-      ASSETS: <PlatformIcon platform={target?.platformType ?? 'Unknown'} width={20} marginRight={10} />,
+      ASSETS: <PlatformIcon platform={target?.platformType ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />,
       AGENT: (
         <img
           src={`/api/images/executors/${target.executorType}`}

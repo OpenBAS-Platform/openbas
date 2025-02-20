@@ -1,5 +1,6 @@
 import { MovieFilterOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -56,6 +57,7 @@ const Scenarios = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
+  const theme = useTheme();
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -112,7 +114,7 @@ const Scenarios = () => {
         return (
           <>
             {platforms.map(
-              (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
+              (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={theme.spacing(2)} />,
             )}
           </>
         );

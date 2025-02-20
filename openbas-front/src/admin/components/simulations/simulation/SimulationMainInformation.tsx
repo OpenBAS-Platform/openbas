@@ -57,7 +57,7 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
                 overflow="hidden"
                 textOverflow="ellipsis"
               >
-                { truncate(scenario.scenario_name, 30) }
+                {truncate(scenario.scenario_name, 30)}
               </Typography>
             </MUILink>
           ) : '-'}
@@ -114,7 +114,7 @@ const SimulationMainInformation: FunctionComponent<Props> = ({ exercise }) => {
           {(exercise.exercise_platforms ?? []).length === 0 ? (
             <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
           ) : exercise.exercise_platforms?.map(
-            (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+            (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
           )}
         </Grid>
         <Grid item xs={4} style={{ paddingTop: 10 }}>
