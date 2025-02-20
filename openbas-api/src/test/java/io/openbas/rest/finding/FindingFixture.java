@@ -6,12 +6,12 @@ import static io.openbas.database.model.finding.FindingUtils.*;
 
 public class FindingFixture {
 
-  public static final String STRING_FIELD = "string_field";
+  public static final String TEXT_FIELD = "text_field";
   public static final String IPV6_FIELD = "ipv6_field";
   public static final String CREDENTIALS_FIELD = "credentials_field";
 
-  public static Finding createDefaultStringFinding() {
-    Finding finding = createFindingString(STRING_FIELD, "string_value");
+  public static Finding createDefaultTextFinding() {
+    Finding finding = createFindingText(TEXT_FIELD, "text_value");
     finding.setLabels(new String[]{
         "reconnaissance phase"
     });
