@@ -10,6 +10,7 @@ import { MESSAGING$ } from '../../../../utils/Environment';
 import { InjectContext } from '../Context';
 import ImportFileSelector from './ImportFileSelector';
 import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
+import InjectImportJsonDialog from './InjectImportJsonDialog';
 
 interface Props { onImportedInjects?: () => void }
 
@@ -80,10 +81,6 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
       });
     }
   };
-
-  const onFileSelectClose = () => {
-    handleJsonImportClose();
-  };
   const onFileSelectSubmit = (values: { file: File }) => {
     injectContext.onImportInjectFromJson?.(values.file).then(() => {
       onImportedInjects();
@@ -118,20 +115,7 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
         <MenuItem onClick={handleJsonImportOpen}>{t('inject_import_json_action')}</MenuItem>
         <MenuItem onClick={handleXlsImportOpen}>{t('inject_import_xls_action')}</MenuItem>
       </Menu>
-      <Dialog
-        open={openJsonImportDialog}
-        handleClose={handleJsonImportClose}
-        title={t('Import injects')}
-        maxWidth="sm"
-      >
-        <ImportFileSelector
-          label={t('inject_import_file_must_be_zip')}
-          mimeTypes="application/octet-stream, multipart/x-zip, application/zip, application/zip-compressed, application/x-zip-compressed"
-          handleClose={onFileSelectClose}
-          handleSubmit={onFileSelectSubmit}
-        />
-      </Dialog>
-
+      <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleJsonImportClose} handleSubmit={onFileSelectSubmit} />
       <Dialog
         open={openXlsImportDialog}
         handleClose={handleXlsImportClose}

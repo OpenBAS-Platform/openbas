@@ -1,9 +1,10 @@
-import { HelpOutlineOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { CloudUploadOutlined, HelpOutlineOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButton, Tooltip } from '@mui/material';
 import { type CSSProperties, type FunctionComponent, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import { importInjects } from '../../../actions/injects/inject-action';
 import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { type QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
@@ -17,6 +18,7 @@ import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type InjectResultOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
+import InjectImportJsonDialog from '../common/injects/InjectImportJsonDialog';
 import InjectorContract from '../common/injects/InjectorContract';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
@@ -68,6 +70,8 @@ const InjectResultList: FunctionComponent<Props> = ({
   const { t, fldt, tPick, nsdt } = useFormatter();
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [openJsonImportDialog, setOpenJsonImportDialog] = useState(false);
+  const [reloadCount, setReloadCount] = useState(0);
 
   // Filter and sort hook
   const availableFilterNames = [
@@ -154,6 +158,19 @@ const InjectResultList: FunctionComponent<Props> = ({
     return fetchInjects(input).finally(() => setLoading(false));
   };
 
+  const handleOpenJsonImportDialog = () => {
+    setOpenJsonImportDialog(true);
+  };
+  const handleCloseJsonImportDialog = () => {
+    setOpenJsonImportDialog(false);
+  };
+  const handleSubmitJsonImportFile = (values: { file: File }) => {
+    importInjects(values.file, { target: { type: 'ATOMIC_TESTING' } }).then(() => {
+      handleCloseJsonImportDialog();
+      setReloadCount(prev => prev + 1);
+    });
+  };
+
   return (
     <>
       <PaginationComponentV2
@@ -164,7 +181,24 @@ const InjectResultList: FunctionComponent<Props> = ({
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
         contextId={contextId}
+        reloadContentCount={reloadCount}
+        topBarButtons={(
+          <Tooltip title={t('inject_import_json_action')}>
+            <ToggleButton
+              value="import"
+              aria-label="import"
+              size="small"
+              onClick={handleOpenJsonImportDialog}
+            >
+              <CloudUploadOutlined
+                color="primary"
+                fontSize="small"
+              />
+            </ToggleButton>
+          </Tooltip>
+        )}
       />
+      <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleCloseJsonImportDialog} handleSubmit={handleSubmitJsonImportFile} />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
