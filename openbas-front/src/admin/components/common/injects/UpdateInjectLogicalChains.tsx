@@ -1,9 +1,9 @@
 import { HelpOutlined } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
+import { Avatar, Button } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import arrayMutators from 'final-form-arrays';
 import { type FunctionComponent } from 'react';
 import { Form } from 'react-final-form';
-import { makeStyles } from 'tss-react/mui';
 
 import { type InjectOutputType } from '../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../actions/injects/inject-helper';
@@ -16,20 +16,6 @@ import InjectCardComponent from './InjectCardComponent';
 import InjectChainsForm from './InjectChainsForm';
 import InjectIcon from './InjectIcon';
 
-const useStyles = makeStyles()(theme => ({
-  injectorContract: {
-    margin: '10px 0 20px 0',
-    width: '100%',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 4,
-  },
-  injectorContractContent: {
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  injectorContractHeader: { backgroundColor: theme.palette.background.default },
-}));
-
 interface Props {
   inject: Inject;
   handleClose: () => void;
@@ -39,7 +25,7 @@ interface Props {
 
 const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
   const { t } = useFormatter();
-  const { classes } = useStyles();
+  const theme = useTheme();
 
   const { injectsMap } = useHelper((helper: InjectHelper) => ({ injectsMap: helper.getInjectsMap() }));
 
@@ -141,7 +127,7 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
           }}
           >
             {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-              platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+              platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={theme.spacing(2)} />,
             )}
           </div>
         )}

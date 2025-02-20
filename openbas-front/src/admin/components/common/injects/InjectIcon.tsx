@@ -1,4 +1,5 @@
 import { DnsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
 import { type FunctionComponent } from 'react';
 
@@ -28,13 +29,13 @@ const InjectIcon: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-
+  const theme = useTheme();
   const fontSize = size || 'medium';
 
   const iconSelector = (type: string, isPayload: boolean, variant: string, fontSize: string, done: boolean, disabled: boolean) => {
     const style = {
-      marginTop: variant === 'list' ? 5 : 0,
-      padding: variant === 'timeline' ? 1 : 0,
+      marginTop: variant === 'list' ? theme.spacing(1) : 0,
+      padding: variant === 'timeline' ? theme.spacing(1) : 0,
       width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
       height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
       borderRadius: 4,
@@ -72,15 +73,7 @@ const InjectIcon: FunctionComponent<Props> = ({
         src={`/api/images/injectors/${type}`}
         onClick={onClick}
         alt={type}
-        style={{
-          marginTop: variant === 'list' ? 5 : 0,
-          padding: variant === 'timeline' ? 1 : 0,
-          cursor: 'pointer',
-          width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
-          borderRadius: 4,
-          filter: `${done ? 'filter:hue-rotate(100deg)' : `brightness(${disabled ? '30%' : '100%'})`}`,
-        }}
+        style={style}
       />
     );
   };

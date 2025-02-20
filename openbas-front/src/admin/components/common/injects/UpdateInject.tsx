@@ -101,7 +101,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
                       key={String(platform)}
                       width={20}
                       platform={String(platform)}
-                      marginRight={10}
+                      marginRight={theme.spacing(2)}
                     />
                   ),
                 )}
