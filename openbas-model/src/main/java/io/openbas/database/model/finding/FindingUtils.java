@@ -9,9 +9,9 @@ public class FindingUtils {
 
   private FindingUtils() {}
 
-  public static Finding createFindingString(@NotBlank final String field, @NotBlank final String value) {
+  public static Finding createFindingText(@NotBlank final String field, @NotBlank final String value) {
     Finding finding = new Finding();
-    finding.setType(STRING);
+    finding.setType(TEXT);
     finding.setField(field);
     finding.setValue(value);
     return finding;
