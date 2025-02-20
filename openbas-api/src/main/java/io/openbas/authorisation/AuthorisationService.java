@@ -9,10 +9,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 @Getter
-@Validated
 @RequiredArgsConstructor
 @Service
 public class AuthorisationService {

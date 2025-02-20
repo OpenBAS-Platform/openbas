@@ -6,11 +6,14 @@ import io.openbas.database.model.Article;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.ArticleRepository;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Set;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static io.openbas.utils.Constants.ARTICLES;
 
 @Service
 @RequiredArgsConstructor
@@ -19,25 +22,18 @@ public class ArticleService {
   private final ArticleRepository articleRepository;
   private final ObjectMapper objectMapper;
 
-  public List<Article> getInjectsArticles(List<Inject> injects) {
-    return injects.stream()
-        .flatMap(
-            inject -> {
-              if (!inject.getContent().has("articles")) {
-                return Stream.of();
-              }
-
-              try {
-                List<String> articleIds =
-                    objectMapper.readValue(
-                        inject.getContent().get("articles").traverse(),
-                        new TypeReference<List<String>>() {});
-                return StreamSupport.stream(
-                    articleRepository.findAllById(articleIds).spliterator(), false);
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .toList();
+  public List<Article> getInjectsArticles(List<Inject> injects) throws IOException {
+      Set<String> uniqueArticleIds = new HashSet<>();
+      for (Inject inject : injects) {
+          if (!inject.getContent().has(ARTICLES)) {
+              continue;
+          }
+          uniqueArticleIds.addAll(objectMapper.readValue(
+                  inject.getContent().get(ARTICLES).traverse(),
+                  new TypeReference<List<String>>() {
+                  }));
+      }
+      return StreamSupport.stream(
+              articleRepository.findAllById(uniqueArticleIds).spliterator(), false).toList();
   }
 }

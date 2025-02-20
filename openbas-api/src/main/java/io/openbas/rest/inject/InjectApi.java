@@ -144,10 +144,17 @@ public class InjectApi extends RestBehavior {
       throws Exception {
     // find target
     if (input == null || input.getTarget() == null) {
-      throw new UnprocessableContentException("Insufficient input");
+      throw new UnprocessableContentException("Insufficient input: target must not be null");
     }
     if (!List.of(InjectImportTargetType.values()).contains(input.getTarget().getType())) {
-      throw new UnprocessableContentException("Invalid target type");
+      throw new UnprocessableContentException(
+          "Invalid target type: must be one of %s"
+              .formatted(
+                  String.join(
+                      ", ",
+                      Arrays.stream(InjectImportTargetType.values())
+                          .map(Enum::toString)
+                          .toList())));
     }
 
     Exercise targetExercise = null;
@@ -161,7 +168,8 @@ public class InjectApi extends RestBehavior {
       if (!authorisationService
           .getSecurityExpression()
           .isSimulationPlanner(targetExercise.getId())) {
-        throw new AccessDeniedException("Insufficient privileges");
+        throw new AccessDeniedException(
+            "Insufficient privileges to act on simulation id#%s".formatted(targetExercise.getId()));
       }
     }
 
@@ -171,13 +179,15 @@ public class InjectApi extends RestBehavior {
               .findById(input.getTarget().getId())
               .orElseThrow(ElementNotFoundException::new);
       if (!authorisationService.getSecurityExpression().isScenarioPlanner(targetScenario.getId())) {
-        throw new AccessDeniedException("Insufficient privileges");
+        throw new AccessDeniedException(
+            "Insufficient privileges to act on scenario id#%s".formatted(targetScenario.getId()));
       }
     }
 
     if (input.getTarget().getType().equals(InjectImportTargetType.ATOMIC_TESTING)) {
       if (!authorisationService.getSecurityExpression().isAdmin()) {
-        throw new AccessDeniedException("Insufficient privileges");
+        throw new AccessDeniedException(
+            "Insufficient privileges: must be admin to act on atomic testing");
       }
     }
 

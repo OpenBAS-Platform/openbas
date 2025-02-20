@@ -241,7 +241,7 @@ public class InjectImportTest extends IntegrationTest {
         .toList();
   }
 
-  private List<Document> crawlDocumentsFromInjects(List<Inject> injects) {
+  private List<Document> crawlDocumentsFromInjects(List<Inject> injects) throws IOException {
     List<Document> documents = new ArrayList<>();
 
     documents.addAll(

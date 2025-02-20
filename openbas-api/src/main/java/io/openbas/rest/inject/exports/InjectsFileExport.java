@@ -11,6 +11,8 @@ import io.openbas.export.FileExportBase;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +26,7 @@ public class InjectsFileExport extends FileExportBase {
   private List<Inject> injects;
 
   @JsonProperty("inject_documents")
-  private List<Document> getDocuments() {
+  private List<Document> getDocuments() throws IOException {
     List<Document> documents = new ArrayList<>();
 
     documents.addAll(
@@ -44,7 +46,7 @@ public class InjectsFileExport extends FileExportBase {
   }
 
   @JsonProperty("inject_tags")
-  private List<Tag> getTags() {
+  private List<Tag> getTags() throws IOException {
     List<Tag> allTags = new ArrayList<>();
     allTags.addAll(this.getTeams().stream().flatMap(team -> team.getTags().stream()).toList());
     allTags.addAll(this.getUsers().stream().flatMap(user -> user.getTags().stream()).toList());
@@ -72,12 +74,12 @@ public class InjectsFileExport extends FileExportBase {
   }
 
   @JsonProperty("inject_articles")
-  private List<Article> getArticles() {
+  private List<Article> getArticles() throws IOException {
     return articleService.getInjectsArticles(injects);
   }
 
   @JsonProperty("inject_channels")
-  private List<Channel> getChannels() {
+  private List<Channel> getChannels() throws IOException {
     return this.getArticles().stream().map(Article::getChannel).distinct().toList();
   }
 
@@ -108,7 +110,7 @@ public class InjectsFileExport extends FileExportBase {
   }
 
   @JsonIgnore
-  public List<String> getAllDocumentIds() {
+  public List<String> getAllDocumentIds() throws IOException {
     return new ArrayList<>(this.getDocuments().stream().map(Document::getId).toList());
   }
 
