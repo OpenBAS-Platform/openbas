@@ -1,4 +1,5 @@
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -104,6 +105,7 @@ const Payloads = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t, nsdt } = useFormatter();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
@@ -144,7 +146,7 @@ const Payloads = () => {
       value: (payload: Payload) => (
         <>
           {payload.payload_platforms?.map(
-            platform => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
+            platform => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={theme.spacing(2)} />,
           )}
         </>
       ),

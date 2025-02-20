@@ -22,7 +22,7 @@ interface PlatformIconProps {
   width?: number;
   borderRadius?: number;
   tooltip?: boolean;
-  marginRight?: number;
+  marginRight?: string;
 }
 
 const platformIcons: Record<PlatformIconProps['platform'], Record<PaletteMode, string>> = {
@@ -56,7 +56,7 @@ const platformIcons: Record<PlatformIconProps['platform'], Record<PaletteMode, s
   },
 };
 
-const renderIcon = (platform: string, width: number | undefined = 40, borderRadius: number | undefined = 0, marginRight: number | undefined = 0) => {
+const renderIcon = (platform: string, width: number | undefined = 40, borderRadius: number | undefined = 0, marginRight: string | undefined = '') => {
   const theme = useTheme();
   const { mode } = theme.palette;
   const src = platformIcons[platform]?.[mode] || platformIcons.Unknown[mode];

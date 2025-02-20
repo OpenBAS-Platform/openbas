@@ -1,4 +1,5 @@
 import { Chip, Divider, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -55,6 +56,7 @@ const AtomicTesting = () => {
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t, tPick, fldt } = useFormatter();
+  const theme = useTheme();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
@@ -229,7 +231,7 @@ const AtomicTesting = () => {
                       marginRight: 15,
                     }}
                   >
-                    <PlatformIcon width={20} platform={platform} marginRight={5} />
+                    <PlatformIcon width={20} platform={platform} marginRight={theme.spacing(1)} />
                     {platform}
                   </div>
                 ))}
