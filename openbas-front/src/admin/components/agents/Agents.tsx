@@ -95,11 +95,12 @@ const Executors = () => {
     setAgentFolder(null);
     setArch('x86_64');
   };
-  const buildInstallationUrl = (baseUrl: String) => {
-    if (activeTab === 0) return `${baseUrl}/session-user`;
-    if (activeTab === 1 && selectedOption === "user") return `${baseUrl}/service-user`;
-    return baseUrl;
+  const buildInstallationUrl = (baseUrl: string) => {
+    if (activeTab === 0) return `${baseUrl}/session-user/${userToken?.token_value} -user USER -pwd PWD`;
+    if (activeTab === 1 && selectedOption === 'user') return `${baseUrl}/service-user/${userToken?.token_value} -user USER -pwd PWD`;
+    return `${baseUrl}/${userToken?.token_value}`;
   };
+
   const buildCalderaInstaller = () => {
     switch (platform) {
       case 'Windows':
@@ -182,71 +183,64 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
         };
     }
   };
+
   const buildOpenBASInstaller = () => {
     switch (platform) {
       case 'Windows':
         return {
           icon: <Powershell />,
           label: 'powershell',
-          defaultAgentFolder: 'C:\\Program Files (x86)\\Filigran\\OBAS Agent',
-          exclusions: `${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Agent'}
-${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Agent'}\\openbas-agent.exe
+          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? 'C:\\Program Files (x86)\\Filigran\\OBAS Agent' : 'C:\\Filigran'}
 
 Caldera injector hashes:
 MD5: 68c1795fb45cb9b522d6cf48443fdc37
 SHA1: 5f87d06f818ff8cba9e11e8cd1c6f9d990eca0f8
 SHA256: 6b180913acb8cdac3fb8d3154a2f6a0bed13c056a477f4f94c4679414ec13b9f
 SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd58d36058d7cde405bc8c5084f3ac060a6080bfc18a843738d3bee87fd`,
-          displayedCode: `iex (iwr "${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}/${userToken?.token_value}").Content`,
-          code: `iex (iwr "${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}/${userToken?.token_value}").Content`,
+          displayedCode: `iex (iwr "${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}").Content`,
+          code: `iex (iwr "${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}").Content`,
         };
       case 'Linux':
         return {
           icon: <Bash />,
           label: 'sh',
-          defaultAgentFolder: '/opt/openbas-agent',
-          exclusions: `${agentFolder ?? '/opt/openbas-agent'}
-${agentFolder ?? '/opt/openbas-agent/openbas-agent'}
+          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? '/opt/openbas-agent' : '/opt/openbas-agent'}
 
 Caldera injector hashes:
 MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${settings.platform_agent_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
-          code: `curl -s ${settings.platform_agent_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${(activeTab === 1 && selectedOption !== 'user') ? '| sudo sh' : ''}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${(activeTab === 1 && selectedOption !== 'user') ? '| sudo sh' : ''}`,
         };
       case 'MacOS':
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
-          defaultAgentFolder: '/opt/openbas-agent',
-          exclusions: `${agentFolder ?? '/opt/openbas-agent'}
-${agentFolder ?? '/opt/openbas-agent/openbas-agent'}
+          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? '/opt/openbas-agent' : '/opt/openbas-agent'}
 
 Caldera injector hashes:
 MD5: 1132906cc40001f51673108847b88d0c
 SHA1: 3177df4a8fa13a2e13ce63670c579955ad55df3f
 SHA256: 2b4397160925bf6b9dcca0949073fd9b2fc590ab641ea1d1c3d7d36048ed674a
 SHA512: f1c8cf0c41c7d193bcb2aad21d7a739c785902c3231e15986b2eb37f911824a802f50cb2dbb509deba1c7a2a535fb7b34cf100303c61a6087102948628133747`,
-          displayedCode: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/macos/${userToken?.token_value} | sudo sh`,
-          code: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/macos/${userToken?.token_value} | sudo sh`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${(activeTab === 1 && selectedOption !== 'user') ? '| sudo sh' : ''}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${(activeTab === 1 && selectedOption !== 'user') ? '| sudo sh' : ''}`,
         };
       default:
         return {
           icon: <Bash />,
           label: 'sh',
-          defaultAgentFolder: '/opt/openbas-agent',
-          exclusions: `${agentFolder ?? '/opt/openbas-agent'}
-${agentFolder ?? '/opt/openbas-agent/openbas-agent'}
+          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? '/opt/openbas-agent' : '/opt/openbas-agent'}
 
 Caldera injector hashes:
 MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
-          code: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${(activeTab === 1 && selectedOption !== 'user') ? '| sudo sh' : ''}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${(activeTab === 1 && selectedOption !== 'user') ? '| sudo sh' : ''}`,
         };
     }
   };
@@ -514,7 +508,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     {t('The agent will never execute directly any payload.')}
                   </Alert>
                   <p>
-                    {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
+                    {t('You will need to add proper antivirus exclusions for this agent (to ensure injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
                   </p>
                   <pre style={{ margin: '20px 0 10px 0' }}>{buildCalderaInstaller().exclusions}</pre>
                 </div>
@@ -532,26 +526,29 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
 
                   {activeTab === 0 && (
                     <>
-                      <Alert
-                        variant="outlined"
-                        severity="info"
-                        style={{ marginTop: theme.spacing(3) }}
-                      >
-                        {t('Quick start with openBAS, install the agent with your own privilege, this installation requires local administrator privileges')}
-                      </Alert>
-                      <Typography variant="h2" style={{ marginTop: 20 }}>
-                        {t('Step 1 - Install the agent')}
-                      </Typography>
-
-                      <Alert
-                        variant="outlined"
-                        severity="warning"
-                      >
-                        {t('Message detail explication')}
-                      </Alert>
-
                       {platform === 'Windows' && (
                         <>
+                          <Alert
+                            variant="outlined"
+                            severity="info"
+                            style={{ marginTop: theme.spacing(1) }}
+                          >
+                            {t('Quick start with openBAS, install the agent with your own privilege, this installation requires local administrator privileges')}
+                          </Alert>
+
+                          <Typography variant="h2" style={{ marginTop: 20 }}>
+                            {t('Step 1 - Install the agent')}
+                          </Typography>
+
+                          <Alert
+                            variant="outlined"
+                            severity="warning"
+                          >
+                            {t('The installation is in arriere plan as session. '
+                              + 'The agent will be executed only when the user benn connected and the session been active. '
+                              + 'The script can be executed as admin or a standard user.')}
+                          </Alert>
+
                           <p>
                             {t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
                           </p>
@@ -586,6 +583,17 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
 
                       {platform !== 'Windows' && (
                         <>
+                          <Typography variant="h2" style={{ marginTop: 20 }}>
+                            {t('Step 1 - Install the agent')}
+                          </Typography>
+
+                          <Alert
+                            variant="outlined"
+                            severity="warning"
+                          >
+                            {t('The installation is in arriere plan as session. '
+                              + 'The agent will be executed only when the user benn connected and the session been active. ')}
+                          </Alert>
                           <p>
                             {t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
                           </p>
@@ -625,7 +633,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       <Alert
                         variant="outlined"
                         severity="info"
-                        style={{ marginTop: theme.spacing(3) }}
+                        style={{ marginTop: theme.spacing(1) }}
                       >
                         {t('Deploy your agent as user account or a service account, this installation requires local administrator privileges.')}
                       </Alert>
@@ -646,16 +654,20 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                           <FormControlLabel value="system" control={<Radio />} label={t('Install agent as System')} />
                         </RadioGroup>
                       </div>
-                      <Alert
-                        variant="outlined"
-                        severity="warning"
-                        style={{ marginTop: theme.spacing(3) }}
-                      >
-                        {selectedOption === 'user' ? t('Installing as a user will require specific permissions.') : t('Installing as a system will install it with system-wide privileges.')}
-                      </Alert>
 
                       {platform === 'Windows' && (
                         <>
+
+                          <Alert
+                            variant="outlined"
+                            severity="warning"
+                            style={{ marginTop: theme.spacing(1) }}
+                          >
+                            {selectedOption === 'user' ? t('Installing as a user will require specific permissions. ')
+                            + t('You should add Log on as a service permission. Ajouter user/pwd dnas le script in param de le script.')
+                              : t('Installing as a system will install it with system-wide privileges.')}
+                          </Alert>
+
                           <p>
                             {t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
                           </p>
@@ -690,6 +702,17 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
 
                       {platform !== 'Windows' && (
                         <>
+
+                          <Alert
+                            variant="outlined"
+                            severity="warning"
+                            style={{ marginTop: theme.spacing(1) }}
+                          >
+                            {selectedOption === 'user' ? t('Installing as a user will require specific permissions')
+                            + t('Ajouter user/group in the script in param de le script.')
+                              : t('Installing as a system will install it with system-wide privileges.')}
+                          </Alert>
+
                           <p>
                             {t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
                           </p>
@@ -735,7 +758,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     {t('The agent will never execute directly any payload.')}
                   </Alert>
                   <p>
-                    {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future, but this is generally a good practice to ensure the agent will always be available.')}
+                    {t('You will need to add proper antivirus exclusions for this agent (to ensure injects execution to work properly). It may not be necessary in the future, but this is generally a good practice to ensure the agent will always be available.')}
                   </p>
                   <pre style={{ margin: '20px 0 10px 0' }}>
                     {buildOpenBASInstaller().exclusions}
