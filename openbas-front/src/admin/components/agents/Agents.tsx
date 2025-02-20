@@ -328,9 +328,10 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         open={selectedExecutor !== null && platform === null}
         TransitionComponent={Transition}
         onClose={closeInstall}
-        PaperProps={{ elevation: 1 }}
+        slotProps={{ paper: { elevation: 1 } }}
         fullWidth
         maxWidth="md"
+
       >
         <DialogTitle style={{ padding: '40px 40px 30px' }}>
           {selectedExecutor?.executor_name}
@@ -345,7 +346,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               marginBottom: 10,
             }}
           >
-            {t('Choose your platform')}
+            {t('Choose your platform : ')}
           </Typography>
           <Grid container spacing={1}>
             {selectedExecutor?.executor_platforms
@@ -397,20 +398,24 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         open={selectedExecutor !== null && platform !== null}
         TransitionComponent={Transition}
         onClose={closeInstall}
-        PaperProps={{ elevation: 1 }}
         fullWidth
         maxWidth="md"
+        slotProps={{ paper: { elevation: 1 } }}
       >
-        <DialogTitle><Typography variant="h6" style={{ marginTop: 10 }}>{t(` Installation ${selectedExecutor?.executor_name} - ${platform}`)}</Typography></DialogTitle>
+        <DialogTitle><Typography variant="h6" style={{ padding: '20px 20px 0' }}>{t(` Installation ${selectedExecutor?.executor_name} - ${platform}`)}</Typography></DialogTitle>
         <DialogContent>
           {selectedExecutor && (
-            <div>
+            <div style={{ padding: '0 20px 20px' }}>
               {/* Caldera */}
               {selectedExecutor.executor_type === 'openbas_caldera' && (
-                <div >
+                <div>
 
                   {platform === 'MacOS' && (
-                    <FormControl style={{ width: '100%' , margin: '20px 0 30px 0 '}}>
+                    <FormControl style={{
+                      width: '100%',
+                      margin: '20px 0 30px 0 ',
+                    }}
+                    >
                       <InputLabel id="arch">{t('Architecture')}</InputLabel>
                       <Select
                         labelId="arch"
