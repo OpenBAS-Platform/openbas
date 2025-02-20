@@ -27,7 +27,7 @@
         <commons-validator.version>1.9.0</commons-validator.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <jacoco-plugin.version>0.8.12</jacoco-plugin.version>
-        <pyroscope.version>0.17.0</pyroscope.version>
+        <pyroscope.version>0.18.0</pyroscope.version>
     </properties>
 
     <distributionManagement>
