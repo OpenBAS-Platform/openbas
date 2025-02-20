@@ -373,7 +373,7 @@ public class EndpointService {
   public String generateInstallCommand(String platform, String token, String installationMode)
       throws IOException {
     return getFileOrDownloadFromJfrog(
-        platform, "openbas-agent-installer".concat(installationMode), token);
+        platform, "openbas-agent-installer-".concat(installationMode), token);
   }
 
   public String generateUpgradeCommand(String platform) throws IOException {
