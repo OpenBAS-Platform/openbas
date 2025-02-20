@@ -308,7 +308,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               <HighlightOffOutlined />
             </IconButton>
           )}
-          injectHeaderTitle={selectedContractKillChainPhase || t('Kill chain phase')}
+          injectHeaderTitle={selectedContractKillChainPhase || selectedContract?.injector_contract_injector_name}
           isAtomic={isAtomic}
           disabled={!selectedContract}
           defaultInject={{

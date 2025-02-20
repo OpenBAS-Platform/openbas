@@ -1,6 +1,6 @@
 import { DnsOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 
 import CustomTooltip from '../../../../components/CustomTooltip';
 import { useFormatter } from '../../../../components/i18n';
@@ -31,7 +31,6 @@ const InjectIcon: FunctionComponent<Props> = ({
 
   const fontSize = size || 'medium';
 
-  // eslint-disable-next-line consistent-return
   const iconSelector = (type: string, isPayload: boolean, variant: string, fontSize: string, done: boolean, disabled: boolean) => {
     const style = {
       marginTop: variant === 'list' ? 5 : 0,
@@ -87,7 +86,7 @@ const InjectIcon: FunctionComponent<Props> = ({
   };
 
   return (
-    <CustomTooltip title={tooltip || (type ? t(type) : t('Unknown'))}>
+    <CustomTooltip title={tooltip ?? (t(type) || t('Unknown'))}>
       {iconSelector(type!, isPayload!, variant!, fontSize, done!, disabled!)}
     </CustomTooltip>
   );

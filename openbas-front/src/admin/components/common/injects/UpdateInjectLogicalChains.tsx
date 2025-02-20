@@ -12,6 +12,7 @@ import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
 import { type AttackPattern, type Inject, type InjectDependency, type KillChainPhase } from '../../../../utils/api-types';
 import { isNotEmptyField } from '../../../../utils/utils';
+import InjectCardComponent from './InjectCardComponent';
 import InjectChainsForm from './InjectChainsForm';
 import InjectIcon from './InjectIcon';
 
@@ -116,41 +117,36 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
 
   return (
     <>
-      <Card elevation={0} classes={{ root: classes.injectorContract }}>
-        <CardHeader
-          classes={{ root: classes.injectorContractHeader }}
-          avatar={injectorContractContent
-            ? (
-                <InjectIcon
-                  type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
-                  isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
-                />
-              ) : (
-                <Avatar sx={{
-                  width: 24,
-                  height: 24,
-                }}
-                >
-                  <HelpOutlined />
-                </Avatar>
-              )}
-          title={injectorContract?.injector_contract_needs_executor === true ? cardTitle : inject.inject_injector_contract?.injector_contract_injector_type_name}
-          action={(
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
-            >
-              {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-                platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
-              )}
-            </div>
-          )}
-        />
-        <CardContent classes={{ root: classes.injectorContractContent }}>
-          {inject?.inject_title}
-        </CardContent>
-      </Card>
+      <InjectCardComponent
+        avatar={injectorContractContent
+          ? (
+              <InjectIcon
+                type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
+                isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
+              />
+            ) : (
+              <Avatar sx={{
+                width: 24,
+                height: 24,
+              }}
+              >
+                <HelpOutlined />
+              </Avatar>
+            )}
+        title={injectorContract?.injector_contract_needs_executor === true ? cardTitle : inject.inject_injector_contract?.injector_contract_injector_type_name}
+        action={(
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          >
+            {inject?.inject_injector_contract?.injector_contract_platforms?.map(
+              platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+            )}
+          </div>
+        )}
+        content={inject?.inject_title}
+      />
       <Form
         keepDirtyOnReinitialize={true}
         initialValues={initialValues}

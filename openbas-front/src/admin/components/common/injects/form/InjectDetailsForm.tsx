@@ -19,6 +19,7 @@ import { type Inject, type InjectInput } from '../../../../../utils/api-types';
 import { splitDuration } from '../../../../../utils/Time';
 import { isEmptyField } from '../../../../../utils/utils';
 import { PermissionsContext } from '../../Context';
+import InjectCardComponent from '../InjectCardComponent';
 import InjectDefinition from './InjectDefinition';
 import InjectForm from './InjectForm';
 
@@ -125,7 +126,7 @@ const InjectDetailsForm = ({
               .replaceAll('<#list articles as article>', '&lt;#list articles as article&gt;')
               .replaceAll('</#list>', '&lt;/#list&gt;');
 
-          // Specific tuple type field
+            // Specific tuple type field
           } else if (field.type === 'tuple' && initialValues[field.key]) {
             const processValue = ({ key, value }: {
               key: string;
@@ -184,7 +185,7 @@ const InjectDetailsForm = ({
         if (field.type === 'number' && typeof data[field.key] === 'string') {
           newContent[field.key] = parseInt(String(data[field.key]), 10);
 
-        // Specific richText type field
+          // Specific richText type field
         } else if (
           field.type === 'textarea'
           && field.richText
@@ -195,7 +196,7 @@ const InjectDetailsForm = ({
             .replace(regex, (_, listName, identifier) => `<#list ${listName} as ${identifier}>`)
             .replaceAll('&lt;/#list&gt;', '</#list>');
 
-        // Specific tuple type field
+          // Specific tuple type field
         } else if (data[field.key] && field.type === 'tuple') {
           const fieldData = data[field.key];
           const formatTuple = ({ type, ...pair }: {
@@ -299,31 +300,21 @@ const InjectDetailsForm = ({
         gap: theme.spacing(2),
       }}
     >
-      <Card elevation={0}>
-        <CardHeader
-          sx={{ backgroundColor: theme.palette.background.default }}
-          avatar={injectContractIcon ?? (
-            <Avatar sx={{
-              width: 24,
-              height: 24,
-            }}
-            >
-              <HelpOutlined />
-            </Avatar>
-          )}
-          title={injectHeaderTitle}
-          action={injectHeaderAction}
-        />
-        <CardContent sx={{
-          fontSize: theme.typography.h6.fontSize,
-          textAlign: 'center',
-          ...disabled && { color: theme.palette?.text?.disabled },
-          ...disabled && { fontStyle: 'italic' },
-        }}
-        >
-          {injectorContractLabel}
-        </CardContent>
-      </Card>
+      <InjectCardComponent
+        avatar={injectContractIcon ?? (
+          <Avatar sx={{
+            width: 24,
+            height: 24,
+          }}
+          >
+            <HelpOutlined />
+          </Avatar>
+        )}
+        title={injectHeaderTitle}
+        action={injectHeaderAction}
+        content={injectorContractLabel}
+        disabled={disabled}
+      />
       <InjectForm control={control} disabled={disabled} isAtomic={isAtomic} register={register} />
       {injectorContractContent && (
         <div style={{ width: '100%' }}>
