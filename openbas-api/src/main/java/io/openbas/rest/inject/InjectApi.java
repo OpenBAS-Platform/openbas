@@ -137,7 +137,9 @@ public class InjectApi extends RestBehavior {
     outputStream.close();
   }
 
-  @PostMapping(path = INJECT_URI + "/import", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @PostMapping(
+      path = INJECT_URI + "/import",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public void injectsImport(
       @RequestPart("file") MultipartFile file,
       @RequestPart("input") InjectImportInput input,

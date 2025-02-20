@@ -8,7 +8,7 @@ import {
   updateInjectForScenario,
 } from '../../../../actions/Inject';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import {bulkTestInjects, importInjects, searchScenarioInjectsSimple} from '../../../../actions/injects/inject-action';
+import { bulkTestInjects, importInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
 import {
   dryImportXlsForScenario,
   fetchScenario,
@@ -20,7 +20,7 @@ import {
   type ImportTestSummary,
   type Inject,
   type InjectBulkProcessingInput,
-  type InjectBulkUpdateInputs, InjectImportInput,
+  type InjectBulkUpdateInputs,
   type InjectsImportInput,
   type InjectTestStatusOutput,
   type Scenario,
@@ -60,7 +60,12 @@ const injectContextForScenario = (scenario: Scenario) => {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
     },
     onImportInjectFromJson(file: File): Promise<void> {
-      return importInjects(file, { target: {type: "SCENARIO", id: scenario.scenario_id}}).then(response => new Promise((resolve, _reject) => {
+      return importInjects(file, {
+        target: {
+          type: 'SCENARIO',
+          id: scenario.scenario_id,
+        },
+      }).then(response => new Promise((resolve, _reject) => {
         dispatch(fetchScenarioInjects(scenario.scenario_id));
         dispatch(fetchScenario(scenario.scenario_id));
         dispatch(fetchScenarioTeams(scenario.scenario_id));

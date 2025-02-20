@@ -32,8 +32,6 @@ import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.*;
-
-import okhttp3.MultipartBody;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

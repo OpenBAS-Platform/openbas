@@ -4,8 +4,8 @@ import { storeXlsFile } from '../../../../../actions/mapper/mapper-actions';
 import Dialog from '../../../../../components/common/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
 import { type ImportMapperAddInput, type ImportPostSummary } from '../../../../../utils/api-types';
-import ImportUploaderInjectFromInjectsTest from '../../../common/injects/ImportUploaderInjectFromInjectsTest';
 import ImportFileSelector from '../../../common/injects/ImportFileSelector';
+import ImportUploaderInjectFromInjectsTest from '../../../common/injects/ImportUploaderInjectFromInjectsTest';
 
 interface IngestionCsvMapperTestDialogProps {
   open: boolean;
@@ -49,8 +49,8 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
         {importId === null
         && (
           <ImportFileSelector
-            label={t("Your file should be a XLS")}
-            mimeTypes={"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"}
+            label={t('Your file should be a XLS')}
+            mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             handleClose={handleClose}
             handleSubmit={onSubmitImportFile}
           />

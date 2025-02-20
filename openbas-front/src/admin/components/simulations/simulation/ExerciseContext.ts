@@ -12,7 +12,7 @@ import {
   updateInjectTriggerForExercise,
 } from '../../../../actions/Inject';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import {bulkTestInjects, importInjects, searchExerciseInjectsSimple} from '../../../../actions/injects/inject-action';
+import { bulkTestInjects, importInjects, searchExerciseInjectsSimple } from '../../../../actions/injects/inject-action';
 import { type Page } from '../../../../components/common/queryable/Page';
 import {
   type Exercise,
@@ -70,7 +70,12 @@ const injectContextForExercise = (exercise: Exercise) => {
       return dispatch(deleteInjectForExercise(exercise.exercise_id, injectId));
     },
     onImportInjectFromJson(file: File): Promise<void> {
-      return importInjects(file, { target: {type: "SIMULATION", id: exercise.exercise_id}}).then(response => new Promise((resolve, _reject) => {
+      return importInjects(file, {
+        target: {
+          type: 'SIMULATION',
+          id: exercise.exercise_id,
+        },
+      }).then(response => new Promise((resolve, _reject) => {
         dispatch(fetchExerciseInjects(exercise.exercise_id));
         dispatch(fetchExercise(exercise.exercise_id));
         dispatch(fetchExerciseTeams(exercise.exercise_id));

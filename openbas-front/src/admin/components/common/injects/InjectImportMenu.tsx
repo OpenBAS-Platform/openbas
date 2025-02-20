@@ -1,6 +1,6 @@
 import { CloudUploadOutlined } from '@mui/icons-material';
-import {ToggleButton, Tooltip, Menu, MenuItem} from '@mui/material';
-import {type MouseEvent as ReactMouseEvent, useContext, useState} from 'react';
+import { Menu, MenuItem, ToggleButton, Tooltip } from '@mui/material';
+import { type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
 import Dialog from '../../../../components/common/Dialog';
@@ -32,20 +32,6 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
     anchorEl: null,
   });
 
-  const handleXlsImportOpen = () => setOpenXlsImportDialog(true);
-  const handleXlsImportClose = () => {
-    setImportId(undefined);
-    setSheets([]);
-    setOpenXlsImportDialog(false);
-    handleCloseMenu();
-  };
-
-  const handleJsonImportOpen = () => setOpenJsonImportDialog(true);
-  const handleJsonImportClose = () => {
-    setOpenJsonImportDialog(false);
-    handleCloseMenu();
-  };
-
   const handleOpenMenu = (event: ReactMouseEvent<HTMLElement, MouseEvent>) => {
     event.preventDefault();
     setMenuOpen({
@@ -58,6 +44,20 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
       open: false,
       anchorEl: null,
     });
+  };
+
+  const handleXlsImportOpen = () => setOpenXlsImportDialog(true);
+  const handleXlsImportClose = () => {
+    setImportId(undefined);
+    setSheets([]);
+    setOpenXlsImportDialog(false);
+    handleCloseMenu();
+  };
+
+  const handleJsonImportOpen = () => setOpenJsonImportDialog(true);
+  const handleJsonImportClose = () => {
+    setOpenJsonImportDialog(false);
+    handleCloseMenu();
   };
 
   const onSubmitImportFile = (values: { file: File }) => {
@@ -81,11 +81,13 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
     }
   };
 
-  const onFileSelectClose = () => { handleJsonImportClose(); };
+  const onFileSelectClose = () => {
+    handleJsonImportClose();
+  };
   const onFileSelectSubmit = (values: { file: File }) => {
     injectContext.onImportInjectFromJson?.(values.file).then(() => {
       onImportedInjects();
-      handleJsonImportClose()
+      handleJsonImportClose();
     });
   };
 
@@ -108,25 +110,26 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
         </Tooltip>
       </ToggleButton>
       <Menu
-          id="menu-import-injects"
-          anchorEl={menuOpen.anchorEl}
-          open={menuOpen.open}
-          onClose={handleCloseMenu}
+        id="menu-import-injects"
+        anchorEl={menuOpen.anchorEl}
+        open={menuOpen.open}
+        onClose={handleCloseMenu}
       >
         <MenuItem onClick={handleJsonImportOpen}>{t('inject_import_json_action')}</MenuItem>
         <MenuItem onClick={handleXlsImportOpen}>{t('inject_import_xls_action')}</MenuItem>
       </Menu>
       <Dialog
-          open={openJsonImportDialog}
-          handleClose={handleJsonImportClose}
-          title={t('Import injects')}
-          maxWidth="sm"
+        open={openJsonImportDialog}
+        handleClose={handleJsonImportClose}
+        title={t('Import injects')}
+        maxWidth="sm"
       >
         <ImportFileSelector
-            label={t('inject_import_file_must_be_zip')}
-            mimeTypes={"application/octet-stream, multipart/x-zip, application/zip, application/zip-compressed, application/x-zip-compressed"}
-            handleClose={onFileSelectClose}
-            handleSubmit={onFileSelectSubmit} />
+          label={t('inject_import_file_must_be_zip')}
+          mimeTypes="application/octet-stream, multipart/x-zip, application/zip, application/zip-compressed, application/x-zip-compressed"
+          handleClose={onFileSelectClose}
+          handleSubmit={onFileSelectSubmit}
+        />
       </Dialog>
 
       <Dialog
@@ -139,8 +142,8 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
           {!importId
           && (
             <ImportFileSelector
-              label={t("Your file should be a XLS")}
-              mimeTypes={"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"}
+              label={t('Your file should be a XLS')}
+              mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
               handleClose={handleXlsImportClose}
               handleSubmit={onSubmitImportFile}
             />

@@ -27,8 +27,8 @@ const useStyles = makeStyles()(() => ({
 interface FormProps { file: File }
 
 interface Props {
-  label: string,
-  mimeTypes: string,
+  label: string;
+  mimeTypes: string;
   handleClose: () => void;
   handleSubmit: (values: FormProps) => void;
 }

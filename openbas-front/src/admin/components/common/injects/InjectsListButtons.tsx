@@ -6,8 +6,6 @@ import { makeStyles } from 'tss-react/mui';
 import { useFormatter } from '../../../../components/i18n';
 import { InjectContext, ViewModeContext } from '../Context';
 import InjectImportMenu from './InjectImportMenu';
-import ImportFileSelector from "./ImportFileSelector";
-import {importInjects} from "../../../../actions/injects/inject-action";
 
 const useStyles = makeStyles()(() => ({
   container: {

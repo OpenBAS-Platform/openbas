@@ -4,7 +4,7 @@ import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import {
   type Exercise,
   type InjectBulkProcessingInput,
-  type InjectExportRequestInput, InjectImportInput,
+  type InjectExportRequestInput, type InjectImportInput,
   type Scenario,
   type SearchPaginationInput,
 } from '../../utils/api-types';
@@ -36,9 +36,7 @@ export const importInjects = (file: File, input: InjectImportInput) => {
   const uri = '/api/injects/import';
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('input', new Blob([JSON.stringify(input)], {
-    type: "application/json"
-  }));
+  formData.append('input', new Blob([JSON.stringify(input)], { type: 'application/json' }));
   return simplePostCall(uri, formData).catch((error) => {
     MESSAGING$.notifyError('Could not request export of injects');
     throw error;
