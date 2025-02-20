@@ -334,6 +334,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
       >
         <DialogTitle style={{ padding: '40px 40px 30px' }}>
           {selectedExecutor?.executor_name}
+          {' '}
           {t('Installation')}
         </DialogTitle>
         <DialogContent>
@@ -400,16 +401,16 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         fullWidth={true}
         maxWidth="md"
       >
-        <DialogTitle><Typography variant="h2" style={{ marginTop: 10 }}>{t('Install a simulation agent')}</Typography></DialogTitle>
+        <DialogTitle><Typography variant="h6" style={{ marginTop: 10 }}>{t(` Installation ${selectedExecutor?.executor_name} - ${platform}`)}</Typography></DialogTitle>
         <DialogContent>
           {selectedExecutor && (
-            <div style={{ marginTop: 20 }}>
+            <div>
               {/* Caldera */}
               {selectedExecutor.executor_type === 'openbas_caldera' && (
-                <div style={{ marginTop: 20 }}>
+                <div >
 
                   {platform === 'MacOS' && (
-                    <FormControl style={{ width: '100%' }}>
+                    <FormControl style={{ width: '100%' , margin: '20px 0 30px 0 '}}>
                       <InputLabel id="arch">{t('Architecture')}</InputLabel>
                       <Select
                         labelId="arch"
@@ -423,7 +424,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     </FormControl>
                   )}
 
-                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
+                  <Typography variant="h2" style={{ marginTop: 20 }}>{t('Step 1 - Install the agent')}</Typography>
 
                   <Alert variant="outlined" severity="info">
                     {t('Installing the agent is requiring local administrator privileges.')}
@@ -496,7 +497,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     </>
                   )}
 
-                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
+                  <Typography variant="h2" style={{ marginTop: 20 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
                   <Alert variant="outlined" severity="info">
                     {t('The agent will never execute directly any payload.')}
                   </Alert>
@@ -509,7 +510,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
 
               {/* OBAS */}
               {selectedExecutor && selectedExecutor.executor_type === 'openbas_agent' && (
-                <div style={{ marginTop: 20 }}>
+                <div>
                   <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
                     <Tab label={t('Standard Installation')} />
                     <Tab
@@ -526,7 +527,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       >
                         {t('Quick start with openBAS, install the agent with your own privilege, this installation requires local administrator privileges')}
                       </Alert>
-                      <Typography variant="h2" style={{ marginTop: 30 }}>
+                      <Typography variant="h2" style={{ marginTop: 20 }}>
                         {t('Step 1 - Install the agent')}
                       </Typography>
 
@@ -616,7 +617,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                       >
                         {t('Deploy your agent as user account or a service account, this installation requires local administrator privileges.')}
                       </Alert>
-                      <Typography variant="h2" style={{ marginTop: 30 }}>
+                      <Typography variant="h2" style={{ marginTop: 20 }}>
                         {t('Step 1 - Install the agent')}
                       </Typography>
                       <div>
@@ -711,7 +712,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                     </>
                   )}
 
-                  <Typography variant="h2" style={{ marginTop: 30 }}>
+                  <Typography variant="h2" style={{ marginTop: 20 }}>
                     {t('Step 2 - Add antivirus exclusions')}
                   </Typography>
 
