@@ -285,7 +285,7 @@ public class ExecutorApi extends RestBehavior {
   @Operation(
       summary = "Retrieve OpenBAS Agent Installer Command",
       description =
-          "Generates the installation command for the OpenBAS agent for the specified platform and token.")
+          "Generates the installation command for the OpenBAS agent for the specified platform, installation mode and token.")
   @ApiResponses(
       value = {
         @ApiResponse(
