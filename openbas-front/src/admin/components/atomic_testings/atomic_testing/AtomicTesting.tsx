@@ -1,5 +1,5 @@
 import { Chip, Divider, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
-import React, { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../../../actions/Document';
@@ -90,9 +90,9 @@ const AtomicTesting = () => {
         {target?.children && target.children.length > 0 && (
           <List disablePadding style={{ marginLeft: 15 }}>
             {target.children.map(child => (
-              <React.Fragment key={child?.id}>
+              <Fragment key={child?.id}>
                 {renderTargetItem(child, target)}
-              </React.Fragment>
+              </Fragment>
             ))}
             <Divider className={classes.dividerL} />
           </List>
