@@ -21,7 +21,7 @@
     "@mui/x-date-pickers": "7.27.0",
     "@redux-devtools/extension": "3.3.0",
     "@uiw/react-md-editor": "4.0.5",
-    "@xyflow/react": "12.4.2",
+    "@xyflow/react": "12.4.3",
     "apexcharts": "4.4.0",
     "axios": "1.7.9",
     "ckeditor5": "44.1.0",
@@ -33,7 +33,7 @@
     "final-form": "4.20.10",
     "final-form-arrays": "3.1.0",
     "html-react-parser": "5.2.2",
-    "html-to-image": "1.11.11",
+    "html-to-image": "1.11.13",
     "http-proxy-middleware": "3.0.3",
     "js-file-download": "0.4.12",
     "mdi-material-ui": "7.9.3",
@@ -67,7 +67,7 @@
     "tss-react": "4.9.15",
     "usehooks-ts": "3.1.1",
     "uuid": "11.0.5",
-    "zod": "3.24.1",
+    "zod": "3.24.2",
     "zustand": "5.0.1"
   },
   "devDependencies": {
@@ -110,7 +110,7 @@
     "swagger-typescript-api": "13.0.23",
     "typescript": "5.7.3",
     "typescript-eslint": "8.22.0",
-    "vite": "6.1.0",
+    "vite": "6.1.1",
     "vitest": "2.1.9"
   },
   "resolutions": {
