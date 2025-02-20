@@ -6816,10 +6816,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-to-image@npm:1.11.11":
-  version: 1.11.11
-  resolution: "html-to-image@npm:1.11.11"
-  checksum: 10c0/0b6349221ad253dfca01d165c589d44341e942faf0273aab28c8b7d86ff2922d3e8e6390f57bf5ddaf6bac9a3b590a8cdaa77d52a363354796dd0e0e05eb35d2
+"html-to-image@npm:1.11.13":
+  version: 1.11.13
+  resolution: "html-to-image@npm:1.11.13"
+  checksum: 10c0/03bd7192d87b99499e37ff12a8e2b41ddce4cf8e33a93dfadff18df0f213434c7f1ba8328db2158f4805da07b7aec3c90aec3152908281153217e86784218b10
   languageName: node
   linkType: hard
 
@@ -9052,7 +9052,7 @@ __metadata:
     fs-extra: "npm:11.3.0"
     globals: "npm:15.14.0"
     html-react-parser: "npm:5.2.2"
-    html-to-image: "npm:1.11.11"
+    html-to-image: "npm:1.11.13"
     http-proxy-middleware: "npm:3.0.3"
     js-file-download: "npm:0.4.12"
     jsdom: "npm:25.0.1"
