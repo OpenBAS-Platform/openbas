@@ -8,7 +8,7 @@ import {
   updateInjectForScenario,
 } from '../../../../actions/Inject';
 import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import { bulkTestInjects, searchScenarioInjectsSimple } from '../../../../actions/injects/inject-action';
+import {bulkTestInjects, importInjects, searchScenarioInjectsSimple} from '../../../../actions/injects/inject-action';
 import {
   dryImportXlsForScenario,
   fetchScenario,
@@ -20,7 +20,7 @@ import {
   type ImportTestSummary,
   type Inject,
   type InjectBulkProcessingInput,
-  type InjectBulkUpdateInputs,
+  type InjectBulkUpdateInputs, InjectImportInput,
   type InjectsImportInput,
   type InjectTestStatusOutput,
   type Scenario,
@@ -58,6 +58,14 @@ const injectContextForScenario = (scenario: Scenario) => {
     },
     onDeleteInject(injectId: Inject['inject_id']): Promise<void> {
       return dispatch(deleteInjectScenario(scenario.scenario_id, injectId));
+    },
+    onImportInjectFromJson(file: File): Promise<void> {
+      return importInjects(file, { target: {type: "SCENARIO", id: scenario.scenario_id}}).then(response => new Promise((resolve, _reject) => {
+        dispatch(fetchScenarioInjects(scenario.scenario_id));
+        dispatch(fetchScenario(scenario.scenario_id));
+        dispatch(fetchScenarioTeams(scenario.scenario_id));
+        resolve(response.data);
+      }));
     },
     onImportInjectFromXls(importId: string, input: InjectsImportInput): Promise<ImportTestSummary> {
       return importXlsForScenario(scenario.scenario_id, importId, input).then(response => new Promise((resolve, _reject) => {

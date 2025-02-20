@@ -46,6 +46,7 @@ import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -136,10 +137,10 @@ public class InjectApi extends RestBehavior {
     outputStream.close();
   }
 
-  @PostMapping(INJECT_URI + "/import")
+  @PostMapping(path = INJECT_URI + "/import", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public void injectsImport(
       @RequestPart("file") MultipartFile file,
-      @RequestBody InjectImportInput input,
+      @RequestPart("input") InjectImportInput input,
       HttpServletResponse response)
       throws Exception {
     // find target

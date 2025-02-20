@@ -5,7 +5,9 @@ import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
 import { InjectContext, ViewModeContext } from '../Context';
-import ImportUploaderInjectFromXls from './ImportUploaderInjectFromXls';
+import InjectImportMenu from './InjectImportMenu';
+import ImportFileSelector from "./ImportFileSelector";
+import {importInjects} from "../../../../actions/injects/inject-action";
 
 const useStyles = makeStyles()(() => ({
   container: {
@@ -33,6 +35,8 @@ const InjectsListButtons: FunctionComponent<Props> = ({
   const injectContext = useContext(InjectContext);
   const viewModeContext = useContext(ViewModeContext);
 
+  const hasImportModesEnabled = () => !!injectContext.onImportInjectFromXls || !!injectContext.onImportInjectFromJson;
+
   return (
     <div className={classes.container}>
       <ToggleButtonGroup
@@ -41,8 +45,8 @@ const InjectsListButtons: FunctionComponent<Props> = ({
         style={{ float: 'right' }}
         aria-label="Change view mode"
       >
-        {injectContext.onImportInjectFromXls
-        && <ImportUploaderInjectFromXls onImportedInjects={onImportedInjects} />}
+        {hasImportModesEnabled()
+        && <InjectImportMenu onImportedInjects={onImportedInjects} />}
         {(!!setViewMode && availableButtons.includes('list'))
         && (
           <Tooltip title={t('List view')}>

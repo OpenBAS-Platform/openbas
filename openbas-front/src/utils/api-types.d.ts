@@ -989,55 +989,6 @@ export interface Exercise {
   listened?: boolean;
 }
 
-export interface ExerciseDetails {
-  /** @format int64 */
-  exercise_all_users_number?: number;
-  exercise_category?: string;
-  /** @format int64 */
-  exercise_communications_number?: number;
-  /** @format date-time */
-  exercise_created_at?: string;
-  exercise_description?: string;
-  /** @format date-time */
-  exercise_end_date?: string;
-  exercise_id: string;
-  exercise_kill_chain_phases?: KillChainPhase[];
-  exercise_lessons_anonymized?: boolean;
-  /** @format int64 */
-  exercise_lessons_answers_number?: number;
-  /** @format int64 */
-  exercise_logs_number?: number;
-  exercise_mail_from: string;
-  exercise_mails_reply_to?: string[];
-  exercise_main_focus?: string;
-  exercise_message_footer?: string;
-  exercise_message_header?: string;
-  exercise_name: string;
-  /** @uniqueItems true */
-  exercise_observers?: string[];
-  /** @uniqueItems true */
-  exercise_planners?: string[];
-  exercise_platforms?: string[];
-  exercise_scenario?: string;
-  /** @format double */
-  exercise_score?: number;
-  exercise_severity?: "low" | "medium" | "high" | "critical";
-  /** @format date-time */
-  exercise_start_date?: string;
-  exercise_status: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
-  exercise_subtitle?: string;
-  /** @uniqueItems true */
-  exercise_tags?: string[];
-  /** @uniqueItems true */
-  exercise_teams_users?: ExerciseTeamUser[];
-  /** @format date-time */
-  exercise_updated_at?: string;
-  /** @uniqueItems true */
-  exercise_users?: string[];
-  /** @format int64 */
-  exercise_users_number?: number;
-}
-
 export interface ExerciseInput {
   exercise_category?: string;
   exercise_description?: string;
@@ -1516,6 +1467,15 @@ export interface InjectExportRequestInput {
 
 export interface InjectExportTarget {
   inject_id?: string;
+}
+
+export interface InjectImportInput {
+  target: InjectImportTargetDefinition;
+}
+
+export interface InjectImportTargetDefinition {
+  id?: string;
+  type: "ATOMIC_TESTING" | "SIMULATION" | "SCENARIO";
 }
 
 export interface InjectImporter {
@@ -3365,6 +3325,55 @@ export interface SettingsUpdateInput {
   platform_name: string;
   /** Theme of the platform */
   platform_theme: string;
+}
+
+export interface SimulationDetails {
+  /** @format int64 */
+  exercise_all_users_number?: number;
+  exercise_category?: string;
+  /** @format int64 */
+  exercise_communications_number?: number;
+  /** @format date-time */
+  exercise_created_at?: string;
+  exercise_description?: string;
+  /** @format date-time */
+  exercise_end_date?: string;
+  exercise_id: string;
+  exercise_kill_chain_phases?: KillChainPhase[];
+  exercise_lessons_anonymized?: boolean;
+  /** @format int64 */
+  exercise_lessons_answers_number?: number;
+  /** @format int64 */
+  exercise_logs_number?: number;
+  exercise_mail_from: string;
+  exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
+  exercise_message_footer?: string;
+  exercise_message_header?: string;
+  exercise_name: string;
+  /** @uniqueItems true */
+  exercise_observers?: string[];
+  /** @uniqueItems true */
+  exercise_planners?: string[];
+  exercise_platforms?: string[];
+  exercise_scenario?: string;
+  /** @format double */
+  exercise_score?: number;
+  exercise_severity?: "low" | "medium" | "high" | "critical";
+  /** @format date-time */
+  exercise_start_date?: string;
+  exercise_status: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
+  exercise_subtitle?: string;
+  /** @uniqueItems true */
+  exercise_tags?: string[];
+  /** @uniqueItems true */
+  exercise_teams_users?: ExerciseTeamUser[];
+  /** @format date-time */
+  exercise_updated_at?: string;
+  /** @uniqueItems true */
+  exercise_users?: string[];
+  /** @format int64 */
+  exercise_users_number?: number;
 }
 
 export interface SimulationsResultsLatest {

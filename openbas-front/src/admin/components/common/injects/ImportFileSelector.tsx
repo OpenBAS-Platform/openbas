@@ -27,11 +27,15 @@ const useStyles = makeStyles()(() => ({
 interface FormProps { file: File }
 
 interface Props {
+  label: string,
+  mimeTypes: string,
   handleClose: () => void;
   handleSubmit: (values: FormProps) => void;
 }
 
-const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
+const ImportFileSelector: FunctionComponent<Props> = ({
+  label,
+  mimeTypes,
   handleClose,
   handleSubmit,
 }) => {
@@ -79,8 +83,8 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
                 <CustomFileUploader
                   name="file"
                   fieldOnChange={onChange}
-                  label={t('Your file should be a XLS')}
-                  acceptMimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                  label={label}
+                  acceptMimeTypes={mimeTypes}
                   errors={errors}
                 />
               )}
@@ -107,4 +111,4 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
   );
 };
 
-export default ImportUploaderInjectFromXlsFile;
+export default ImportFileSelector;

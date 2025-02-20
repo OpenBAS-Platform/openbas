@@ -32,10 +32,13 @@ import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.*;
+
+import okhttp3.MultipartBody;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
@@ -210,12 +213,14 @@ public class InjectImportTest extends IntegrationTest {
   }
 
   private ResultActions doImportStringInput(byte[] importZipData, String input) throws Exception {
+    MockPart jsonPart = new MockPart("input", input.getBytes());
+    jsonPart.getHeaders().setContentType(MediaType.APPLICATION_JSON);
     ResultActions ra =
         mvc.perform(
             multipart(INJECT_IMPORT_URI)
                 .file(new MockMultipartFile("file", importZipData))
-                .content(input)
-                .contentType(MediaType.APPLICATION_JSON));
+                .part(jsonPart)
+                .contentType(MediaType.MULTIPART_FORM_DATA));
     clearEntityManager();
     return ra;
   }
