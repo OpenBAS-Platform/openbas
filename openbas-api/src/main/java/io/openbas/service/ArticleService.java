@@ -1,5 +1,7 @@
 package io.openbas.service;
 
+import static io.openbas.utils.Constants.ARTICLES;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Article;
@@ -13,8 +15,6 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import static io.openbas.utils.Constants.ARTICLES;
-
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
@@ -23,17 +23,17 @@ public class ArticleService {
   private final ObjectMapper objectMapper;
 
   public List<Article> getInjectsArticles(List<Inject> injects) throws IOException {
-      Set<String> uniqueArticleIds = new HashSet<>();
-      for (Inject inject : injects) {
-          if (!inject.getContent().has(ARTICLES)) {
-              continue;
-          }
-          uniqueArticleIds.addAll(objectMapper.readValue(
-                  inject.getContent().get(ARTICLES).traverse(),
-                  new TypeReference<List<String>>() {
-                  }));
+    Set<String> uniqueArticleIds = new HashSet<>();
+    for (Inject inject : injects) {
+      if (!inject.getContent().has(ARTICLES)) {
+        continue;
       }
-      return StreamSupport.stream(
-              articleRepository.findAllById(uniqueArticleIds).spliterator(), false).toList();
+      uniqueArticleIds.addAll(
+          objectMapper.readValue(
+              inject.getContent().get(ARTICLES).traverse(), new TypeReference<List<String>>() {}));
+    }
+    return StreamSupport.stream(
+            articleRepository.findAllById(uniqueArticleIds).spliterator(), false)
+        .toList();
   }
 }

@@ -11,7 +11,6 @@ import io.openbas.export.FileExportBase;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
