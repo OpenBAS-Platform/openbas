@@ -35,7 +35,7 @@ class FindingServiceTest extends IntegrationTest {
   private InjectRepository injectRepository;
 
   FindingComposer.Composer createFindingComposer() {
-    return this.findingComposer.forFinding(createDefaultStringFinding())
+    return this.findingComposer.forFinding(createDefaultTextFinding())
         .withInject(injectComposer.forInject(getDefaultInject()))
         .persist();
   }
@@ -50,7 +50,7 @@ class FindingServiceTest extends IntegrationTest {
 
     // -- ASSERT --
     assertEquals(1, results.size());
-    assertEquals(STRING_FIELD, results.getFirst().getField());
+    assertEquals(TEXT_FIELD, results.getFirst().getField());
   }
 
   @Test
@@ -63,7 +63,7 @@ class FindingServiceTest extends IntegrationTest {
 
     // -- ASSERT --
     assertNotNull(result);
-    assertEquals(STRING_FIELD, result.getField());
+    assertEquals(TEXT_FIELD, result.getField());
   }
 
   @Test
@@ -78,20 +78,20 @@ class FindingServiceTest extends IntegrationTest {
     createFindingComposer();
 
     // -- EXECUTE --
-    Finding result = findingService.findingByField(STRING_FIELD);
+    Finding result = findingService.findingByField(TEXT_FIELD);
 
     // -- ASSERT --
     assertNotNull(result);
-    assertEquals(STRING_FIELD, result.getField());
+    assertEquals(TEXT_FIELD, result.getField());
   }
 
   @Nested
   class CreateFinding {
 
     @Test
-    void given_new_string_finding_should_create_finding() {
+    void given_new_text_finding_should_create_finding() {
       // -- PREPARE --
-      Finding finding = createDefaultStringFinding();
+      Finding finding = createDefaultTextFinding();
       Inject inject = injectRepository.save(getDefaultInject());
 
       // -- EXECUTE --
@@ -99,7 +99,7 @@ class FindingServiceTest extends IntegrationTest {
 
       // -- ASSERT --
       assertNotNull(result);
-      assertEquals(STRING_FIELD, result.getField());
+      assertEquals(TEXT_FIELD, result.getField());
     }
 
     @Test
