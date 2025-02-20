@@ -294,7 +294,7 @@ public class ExecutorApi extends RestBehavior {
         @ApiResponse(responseCode = "400", description = "Invalid platform specified."),
         @ApiResponse(responseCode = "404", description = "Token not found."),
       })
-  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{token}")
+  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{installation-mode}/{token}")
   public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(
       @Parameter(
               description =
@@ -306,7 +306,9 @@ public class ExecutorApi extends RestBehavior {
               description = "Unique token associated with the agent installation.",
               required = true)
           @PathVariable
-          String token)
+          String token,
+      @Parameter(description = "Installation Mode.", required = true) @PathVariable
+          String installationMode)
       throws IOException {
     platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
 
@@ -317,12 +319,8 @@ public class ExecutorApi extends RestBehavior {
     if (resolvedToken.isEmpty()) {
       throw new UnsupportedOperationException("Invalid token");
     }
-    String installCommand = this.endpointService.generateInstallCommand(platform, token);
+    String installCommand =
+        this.endpointService.generateInstallCommand(platform, token, installationMode);
     return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(installCommand);
-  }
-
-  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{mode-user}/{token}")
-  public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(){
-
   }
 }
