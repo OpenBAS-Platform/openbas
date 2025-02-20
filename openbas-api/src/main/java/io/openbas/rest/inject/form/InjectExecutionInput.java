@@ -13,6 +13,9 @@ public class InjectExecutionInput {
   @JsonProperty("execution_message")
   private String message;
 
+//  private String rawOutput; // raw output
+//  private String structuredOutput; // structured output -> if exists findings generation based on contract
+
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("execution_status")
   private String status;
