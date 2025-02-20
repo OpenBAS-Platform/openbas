@@ -1,5 +1,6 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { cloneElement, type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -48,6 +49,7 @@ const EndpointsList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
+  const theme = useTheme();
 
   const component = (endpoint: EndpointStoreWithType) => {
     return cloneElement(actions, { endpoint });
@@ -79,7 +81,7 @@ const EndpointsList: FunctionComponent<Props> = ({
                     className={classes.bodyItem}
                     style={inlineStyles.asset_platform}
                   >
-                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                    <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
                     {' '}
                     {endpoint.endpoint_platform}
                   </div>

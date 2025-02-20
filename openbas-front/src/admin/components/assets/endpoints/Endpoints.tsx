@@ -1,5 +1,6 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -68,6 +69,7 @@ const Endpoints = () => {
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   const { settings } = useAuth();
+  const theme = useTheme();
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -203,7 +205,7 @@ const Endpoints = () => {
       value: (endpoint: EndpointOutput) => {
         return (
           <>
-            <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={10} />
+            <PlatformIcon platform={endpoint.endpoint_platform ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />
             {endpoint.endpoint_platform}
           </>
         );
