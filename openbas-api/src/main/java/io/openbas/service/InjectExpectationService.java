@@ -510,27 +510,8 @@ public class InjectExpectationService {
       String sourceId,
       String sourceType,
       String sourceName) {
-    boolean success =
-        !expectationAgents.isEmpty()
-            && expectationAgents.stream().allMatch(e -> e.getExpectedScore().equals(e.getScore()));
-
-    boolean successScoreResult =
-        !expectationAgents.isEmpty()
-            && expectationAgents.stream()
-                .flatMap(
-                    exp -> exp.getResults().stream().filter(r -> r.getSourceId().equals(sourceId)))
-                .allMatch(r -> r.getScore().equals(expectationAsset.getExpectedScore()));
-
-    computeResult(
-        expectationAsset,
-        sourceId,
-        sourceType,
-        sourceName,
-        success ? "SUCCESS" : "FAILED",
-        successScoreResult ? expectationAsset.getExpectedScore() : 0.0,
-        null);
-    expectationAsset.setScore(success ? expectationAsset.getExpectedScore() : 0.0);
-    this.update(expectationAsset);
+    processExpectation(
+        expectationAsset, expectationAgents, sourceId, sourceType, sourceName, false);
   }
 
   public void computeExpectationGroup(
@@ -539,30 +520,52 @@ public class InjectExpectationService {
       @NotBlank final String sourceId,
       @NotBlank final String sourceType,
       @NotBlank final String sourceName) {
-    boolean success;
-    if (expectationAssetGroup.isExpectationGroup()) {
-      success = expectationAssets.stream().anyMatch(e -> e.getExpectedScore().equals(e.getScore()));
-    } else {
-      success = expectationAssets.stream().allMatch(e -> e.getExpectedScore().equals(e.getScore()));
-    }
+    processExpectation(
+        expectationAssetGroup,
+        expectationAssets,
+        sourceId,
+        sourceType,
+        sourceName,
+        expectationAssetGroup.isExpectationGroup());
+  }
 
+  private boolean isSuccess(List<InjectExpectation> expectations, boolean isGroup) {
+    return isGroup
+        ? expectations.stream().anyMatch(e -> e.getExpectedScore().equals(e.getScore()))
+        : expectations.stream().allMatch(e -> e.getExpectedScore().equals(e.getScore()));
+  }
+
+  private boolean isSuccessScoreResult(
+      List<InjectExpectation> expectations, String sourceId, double expectedScore) {
+    return !expectations.isEmpty()
+        && expectations.stream()
+            .flatMap(exp -> exp.getResults().stream().filter(r -> r.getSourceId().equals(sourceId)))
+            .allMatch(r -> r.getScore().equals(expectedScore));
+  }
+
+  private void processExpectation(
+      InjectExpectation expectation,
+      List<InjectExpectation> expectations,
+      String sourceId,
+      String sourceType,
+      String sourceName,
+      boolean isGroup) {
+
+    boolean success = isSuccess(expectations, isGroup);
     boolean successScoreResult =
-        !expectationAssets.isEmpty()
-            && expectationAssets.stream()
-                .flatMap(
-                    exp -> exp.getResults().stream().filter(r -> r.getSourceId().equals(sourceId)))
-                .allMatch(r -> r.getScore().equals(expectationAssetGroup.getExpectedScore()));
+        isSuccessScoreResult(expectations, sourceId, expectation.getExpectedScore());
+    double finalScore = success ? expectation.getExpectedScore() : 0.0;
 
     computeResult(
-        expectationAssetGroup,
+        expectation,
         sourceId,
         sourceType,
         sourceName,
         success ? "SUCCESS" : "FAILED",
-        successScoreResult ? expectationAssetGroup.getExpectedScore() : 0.0,
+        successScoreResult ? finalScore : 0.0,
         null);
-    expectationAssetGroup.setScore(success ? expectationAssetGroup.getExpectedScore() : 0.0);
-    this.update(expectationAssetGroup);
+    expectation.setScore(finalScore);
+    this.update(expectation);
   }
 
   // -- FINAL UPDATE --
