@@ -973,7 +973,6 @@ public class ExpectationApiTest extends IntegrationTest {
             detectionExpectationAgent));
 
     // Add results for created injectExpectation
-
     List<InjectExpectation> injectExpectations =
         injectExpectationRepository.findAllByInjectAndAgent(
             savedInject.getId(), savedAgent.getId());
@@ -982,7 +981,6 @@ public class ExpectationApiTest extends IntegrationTest {
     InjectExpectationUpdateInput expectationUpdateInput2 =
         getInjectExpectationUpdateInput(savedCollector2.getId(), "Not Detected", false);
 
-    // -- EXECUTE --
     mvc.perform(
             put(INJECTS_EXPECTATIONS_URI + "/" + injectExpectations.get(0).getId())
                 .content(asJsonString(expectationUpdateInput))
