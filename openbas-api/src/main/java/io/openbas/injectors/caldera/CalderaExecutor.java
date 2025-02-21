@@ -192,7 +192,7 @@ public class CalderaExecutor extends Injector {
                                                     List.of(exploitResult.getLinkId())));
                                             execution.addTrace(
                                                 getNewInfoTrace(
-                                                    "Caldera executed the ability on agent"
+                                                    "Caldera executed the ability on agent "
                                                         + executionAgent.getExecutedByUser()
                                                         + " using "
                                                         + executionAgent.getProcessName()
