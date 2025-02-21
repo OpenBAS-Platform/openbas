@@ -38,7 +38,7 @@ export const importInjects = (file: File, input: InjectImportInput) => {
   formData.append('file', file);
   formData.append('input', new Blob([JSON.stringify(input)], { type: 'application/json' }));
   return simplePostCall(uri, formData).catch((error) => {
-    MESSAGING$.notifyError('Could not request export of injects');
+    MESSAGING$.notifyError('Could not import injects');
     throw error;
   });
 };
