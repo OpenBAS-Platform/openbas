@@ -258,8 +258,7 @@ public class CalderaExecutor extends Injector {
                             content,
                             asset,
                             isInGroup,
-                            executedAgentByEndpoint.get(asset.getId()),
-                            injectorContract.getPayload());
+                            executedAgentByEndpoint.get(asset.getId()));
                       });
             },
             () ->
@@ -390,8 +389,7 @@ public class CalderaExecutor extends Injector {
       @NotNull final CalderaInjectContent content,
       @NotNull final Asset asset,
       final boolean expectationGroup,
-      final List<io.openbas.database.model.Agent> executedAgents,
-      final Payload payload) {
+      final List<io.openbas.database.model.Agent> executedAgents) {
 
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
@@ -412,7 +410,7 @@ public class CalderaExecutor extends Injector {
                           // We propagate the asset expectation to agents
                           List<PreventionExpectation> preventionExpectationList =
                               ExpectationUtils.getPreventionExpectationList(
-                                  asset, executedAgents, payload, preventionExpectation);
+                                  asset, executedAgents, preventionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
@@ -435,7 +433,7 @@ public class CalderaExecutor extends Injector {
                           // We propagate the asset expectation to agents
                           List<DetectionExpectation> detectionExpectationList =
                               ExpectationUtils.getDetectionExpectationList(
-                                  asset, executedAgents, payload, detectionExpectation);
+                                  asset, executedAgents, detectionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
