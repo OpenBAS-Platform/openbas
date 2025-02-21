@@ -6,6 +6,7 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import java.util.Optional;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -27,6 +28,11 @@ public class Executable extends Payload {
   @JsonProperty("executable_file")
   @Schema(type = "string")
   private Document executableFile;
+
+  @Override
+  public Optional<Document> getAttachedDocument() {
+    return Optional.of(this.getExecutableFile());
+  }
 
   public Executable() {}
 

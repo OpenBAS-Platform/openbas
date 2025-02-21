@@ -431,6 +431,14 @@ public class Inject implements Base, Injection {
     return VALID_TESTABLE_TYPES.contains(this.getType());
   }
 
+  @JsonIgnore
+  public Optional<Payload> getPayload() {
+    return Optional.ofNullable(
+        this.getInjectorContract().isPresent()
+            ? this.getInjectorContract().get().getPayload()
+            : null);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {

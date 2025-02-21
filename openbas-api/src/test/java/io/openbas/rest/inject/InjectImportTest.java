@@ -315,21 +315,13 @@ public class InjectImportTest extends IntegrationTest {
         injects.stream()
             .flatMap(
                 inject -> {
-                  if (inject.getInjectorContract().isEmpty()) {
+                  if (inject.getPayload().isEmpty()) {
                     return Stream.of();
                   }
-                  if (inject.getInjectorContract().get().getPayload() == null) {
-                    return Stream.of();
-                  }
-
-                  Payload pl = inject.getInjectorContract().get().getPayload();
-                  if (pl instanceof Executable) {
-                    return Stream.of(((Executable) pl).getExecutableFile());
-                  }
-                  if (pl instanceof FileDrop) {
-                    return Stream.of(((FileDrop) pl).getFileDropFile());
-                  }
-                  return Stream.of();
+                  Payload pl = inject.getPayload().get();
+                  return pl.getAttachedDocument().isPresent()
+                      ? Stream.of(pl.getAttachedDocument().get())
+                      : Stream.of();
                 })
             .toList());
 

@@ -215,6 +215,10 @@ public class Payload implements Base {
     return PayloadType.fromString(type);
   }
 
+  public Optional<Document> getAttachedDocument() {
+    return Optional.empty();
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(id);
