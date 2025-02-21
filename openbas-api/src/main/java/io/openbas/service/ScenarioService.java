@@ -381,12 +381,28 @@ public class ScenarioService {
     }
 
     // Add Documents
-    scenarioFileExport.setDocuments(scenario.getDocuments());
+    List<Document> documentExports = new ArrayList<>();
+    documentExports.addAll(scenario.getDocuments());
+    documentExports.addAll(
+        scenario.getInjects().stream()
+            .flatMap(
+                inject -> {
+                  if (inject.getPayload().isEmpty()) {
+                    return Stream.of();
+                  }
+                  Payload pl = inject.getPayload().get();
+                  return pl.getAttachedDocument().isPresent()
+                      ? Stream.of(pl.getAttachedDocument().get())
+                      : Stream.of();
+                })
+            .toList());
+
+    scenarioFileExport.setDocuments(documentExports);
     objectMapper.addMixIn(Document.class, Mixins.Document.class);
     scenarioTags.addAll(
         scenario.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
     List<String> documentIds =
-        new ArrayList<>(scenario.getDocuments().stream().map(Document::getId).toList());
+        new ArrayList<>(documentExports.stream().map(Document::getId).toList());
 
     if (isWithTeams) {
       // Add Teams
