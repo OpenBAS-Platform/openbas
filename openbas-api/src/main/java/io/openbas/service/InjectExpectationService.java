@@ -530,6 +530,7 @@ public class InjectExpectationService {
   }
 
   private boolean isSuccess(List<InjectExpectation> expectations, boolean isGroup) {
+    if (expectations.isEmpty()) return false;
     return isGroup
         ? expectations.stream().anyMatch(e -> e.getExpectedScore().equals(e.getScore()))
         : expectations.stream().allMatch(e -> e.getExpectedScore().equals(e.getScore()));
