@@ -424,7 +424,13 @@ public class ScenarioService {
       scenarioTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
       // organizations
       List<Organization> organizations =
-          players.stream().map(User::getOrganization).filter(Objects::nonNull).toList();
+          new ArrayList<>(
+              players.stream().map(User::getOrganization).filter(Objects::nonNull).toList());
+      organizations.addAll(
+          scenario.getTeams().stream()
+              .map(Team::getOrganization)
+              .filter(Objects::nonNull)
+              .toList());
       scenarioFileExport.setOrganizations(organizations);
       objectMapper.addMixIn(Organization.class, Mixins.Organization.class);
       scenarioTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());

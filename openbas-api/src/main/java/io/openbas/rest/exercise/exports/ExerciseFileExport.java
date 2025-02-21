@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 
 @Getter
 @Setter
@@ -71,13 +72,21 @@ public class ExerciseFileExport extends FileExportBase {
 
   public List<Organization> getOrganizations() {
     if (organizations == null) {
-      return this.exercise == null
-          ? new ArrayList<>()
-          : this.exercise.getUsers().stream()
-              .map(User::getOrganization)
+      if (this.exercise == null) {
+        return new ArrayList<>();
+      }
+      List<Organization> orgs = new ArrayList<>();
+      orgs.addAll(
+          this.exercise.getUsers().stream()
+              .map(user -> (Organization) Hibernate.unproxy(user.getOrganization()))
               .filter(Objects::nonNull)
-              .distinct()
-              .toList();
+              .toList());
+      orgs.addAll(
+          this.exercise.getTeams().stream()
+              .map(team -> (Organization) Hibernate.unproxy(team.getOrganization()))
+              .filter(Objects::nonNull)
+              .toList());
+      return orgs;
     }
     return organizations;
   }
