@@ -152,7 +152,7 @@ public class InjectImportTest extends IntegrationTest {
             .withTag(tagComposer.forTag(TagFixture.getTagWithText("inject with challenge tag")))
             .withTeam(
                 teamComposer
-                    .forTeam(TeamFixture.getDefaultTeam())
+                    .forTeam(TeamFixture.getDefaultContextualTeam())
                     .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()))),
         injectComposer
             .forInject(InjectFixture.getDefaultInject())
@@ -715,6 +715,7 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
+          Assertions.assertEquals(expected.getContextual(), recreated.get().getContextual());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
@@ -1096,6 +1097,7 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
+          Assertions.assertEquals(expected.getContextual(), recreated.get().getContextual());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
@@ -1332,6 +1334,7 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
           Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
+          Assertions.assertEquals(expected.getContextual(), recreated.get().getContextual());
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
@@ -1617,8 +1620,8 @@ public class InjectImportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Existing teams are assigned to exercise")
-      public void existingTeamsAreAssignedToExercise() throws Exception {
+      @DisplayName("Existing platform teams are assigned to exercise")
+      public void existingPlatformTeamsAreAssignedToExercise() throws Exception {
         byte[] exportData = getExportData(getInjectFromExerciseWrappers(), true, true, true);
         ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
         InjectImportInput input =
@@ -1628,13 +1631,44 @@ public class InjectImportTest extends IntegrationTest {
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
-        for (Team expected : teamComposer.generatedItems) {
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(team -> !team.getContextual()).toList()) {
           Exercise dest =
               exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
           Optional<Team> reused =
               dest.getTeams().stream().filter(c -> c.getId().equals(expected.getId())).findAny();
 
           Assertions.assertTrue(reused.isPresent(), "Could not find expected team");
+        }
+      }
+
+      @Test
+      @DisplayName("Contextual teams are recreated for exercise")
+      public void contextualTeamsAreRecreatedForExercise() throws Exception {
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ExerciseComposer.Composer destinationExerciseWrapper = getPersistedExerciseWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SIMULATION, destinationExerciseWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(Team::getContextual).toList()) {
+          Exercise dest =
+              exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
+          Optional<Team> recreated =
+              dest.getTeams().stream()
+                  .filter(c -> c.getName().equals(expected.getName()))
+                  .findAny();
+
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
+          Assertions.assertEquals(expected.getName(), recreated.get().getName());
+          Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
+          Assertions.assertEquals(expected.getContextual(), recreated.get().getContextual());
+
+          Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
       }
 
@@ -1903,8 +1937,8 @@ public class InjectImportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Existing teams are assigned to scenario")
-      public void existingTeamsAreAssignedToScenario() throws Exception {
+      @DisplayName("Existing platform teams are assigned to scenario")
+      public void existingPlatformTeamsAreAssignedToScenario() throws Exception {
         byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
         ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
         InjectImportInput input =
@@ -1914,13 +1948,44 @@ public class InjectImportTest extends IntegrationTest {
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
-        for (Team expected : teamComposer.generatedItems) {
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(team -> !team.getContextual()).toList()) {
           Scenario dest =
               scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
           Optional<Team> reused =
               dest.getTeams().stream().filter(c -> c.getId().equals(expected.getId())).findAny();
 
           Assertions.assertTrue(reused.isPresent(), "Could not find expected team");
+        }
+      }
+
+      @Test
+      @DisplayName("Contextual teams are recreated for scenario")
+      public void contextualTeamsAreRecreatedForScenario() throws Exception {
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        ScenarioComposer.Composer destinationScenarioWrapper = getPersistedScenarioWrapper();
+        InjectImportInput input =
+            createTargetInput(
+                InjectImportTargetType.SCENARIO, destinationScenarioWrapper.get().getId());
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(Team::getContextual).toList()) {
+          Scenario dest =
+              scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
+          Optional<Team> recreated =
+              dest.getTeams().stream()
+                  .filter(c -> c.getName().equals(expected.getName()))
+                  .findAny();
+
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
+          Assertions.assertEquals(expected.getName(), recreated.get().getName());
+          Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
+          Assertions.assertEquals(expected.getContextual(), recreated.get().getContextual());
+
+          Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
       }
 
@@ -2160,15 +2225,16 @@ public class InjectImportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Existing teams are assigned to atomic testing")
-      public void existingTeamsAreAssignedToAtomicTesting() throws Exception {
+      @DisplayName("Existing platform teams are assigned to atomic testing")
+      public void existingPlatformTeamsAreAssignedToAtomicTesting() throws Exception {
         byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
-        for (Team expected : teamComposer.generatedItems) {
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(team -> !team.getContextual()).toList()) {
           Optional<Team> reused =
               getImportedInjectsFromDb().stream()
                   .flatMap(inject -> inject.getTeams().stream())
@@ -2176,6 +2242,32 @@ public class InjectImportTest extends IntegrationTest {
                   .findAny();
 
           Assertions.assertTrue(reused.isPresent(), "Could not find expected team");
+        }
+      }
+
+      @Test
+      @DisplayName("Contextual teams are recreated for atomic testing")
+      public void contextualTeamsAreRecreatedForAtomicTesting() throws Exception {
+        byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(Team::getContextual).toList()) {
+          Optional<Team> recreated =
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .filter(c -> c.getName().equals(expected.getName()))
+                  .findAny();
+
+          Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
+          Assertions.assertEquals(expected.getName(), recreated.get().getName());
+          Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
+          Assertions.assertEquals(expected.getContextual(), recreated.get().getContextual());
+
+          Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }
       }
 
