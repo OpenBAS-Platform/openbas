@@ -119,7 +119,7 @@ const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClo
                 <HelpOutlined />
               </Avatar>
             )}
-        title={injectorContract?.injector_contract_needs_executor === true ? cardTitle : inject.inject_injector_contract?.injector_contract_injector_type_name}
+        title={injectorContract?.injector_contract_needs_executor === true ? cardTitle : inject?.inject_injector_contract?.injector_contract_injector_type_name}
         action={(
           <div style={{
             display: 'flex',
