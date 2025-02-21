@@ -561,7 +561,7 @@ public class InjectExpectationService {
         sourceId,
         sourceType,
         sourceName,
-        success ? "SUCCESS" : "FAILED",
+        successScoreResult ? "SUCCESS" : "FAILED",
         successScoreResult ? finalScore : 0.0,
         null);
     expectation.setScore(finalScore);
