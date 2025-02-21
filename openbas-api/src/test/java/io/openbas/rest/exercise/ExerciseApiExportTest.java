@@ -100,6 +100,9 @@ public class ExerciseApiExportTest extends IntegrationTest {
         .withTeam(
             teamComposer
                 .forTeam(TeamFixture.getEmptyTeam())
+                .withOrganisation(
+                    organizationComposer.forOrganization(
+                        OrganizationFixture.createDefaultOrganisation()))
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
                 .withUser(
                     userComposer

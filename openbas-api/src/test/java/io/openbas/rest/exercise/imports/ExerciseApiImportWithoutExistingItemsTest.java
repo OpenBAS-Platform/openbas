@@ -107,6 +107,9 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
         .withTeam(
             teamComposer
                 .forTeam(TeamFixture.getDefaultTeam())
+                .withOrganisation(
+                    organizationComposer.forOrganization(
+                        OrganizationFixture.createDefaultOrganisation()))
                 .withTag(tagComposer.forTag(TagFixture.getTagWithText("Team tag")))
                 .withUser(userComposer.forUser(UserFixture.getUserWithDefaultEmail()))
                 .withUser(
@@ -412,10 +415,15 @@ public class ExerciseApiImportWithoutExistingItemsTest extends IntegrationTest {
     entityManager.clear();
 
     List<Organization> dbOrgs =
+        new java.util.ArrayList<>(
+            findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
+                .flatMap(team -> team.getUsers().stream().map(User::getOrganization))
+                .filter(Objects::nonNull)
+                .toList());
+    dbOrgs.addAll(
         findImportedExerciseFromDb(exerciseWrapper.get().getName()).getTeams().stream()
-            .flatMap(team -> team.getUsers().stream().map(User::getOrganization))
-            .filter(Objects::nonNull)
-            .toList();
+            .map(Team::getOrganization)
+            .toList());
     for (Organization expected : organizationComposer.generatedItems) {
       Assertions.assertTrue(
           dbOrgs.stream().anyMatch(o -> o.getName().equals(expected.getName())),
