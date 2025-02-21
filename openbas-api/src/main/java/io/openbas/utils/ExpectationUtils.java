@@ -13,7 +13,6 @@ import io.openbas.model.expectation.PreventionExpectation;
 import io.openbas.rest.exception.ElementNotFoundException;
 import java.time.Instant;
 import java.util.*;
-import org.hibernate.Hibernate;
 
 public class ExpectationUtils {
 
@@ -105,10 +104,7 @@ public class ExpectationUtils {
   // -- CALDERA EXPECTATIONS --
 
   public static List<PreventionExpectation> getPreventionExpectationList(
-      Asset asset,
-      List<Agent> executedAgents,
-      Payload payload,
-      PreventionExpectation preventionExpectation) {
+      Asset asset, List<Agent> executedAgents, PreventionExpectation preventionExpectation) {
     return executedAgents.stream()
         .map(
             executedAgent ->
@@ -119,15 +115,15 @@ public class ExpectationUtils {
                     executedAgent.getParent(),
                     asset,
                     preventionExpectation.getExpirationTime(),
-                    computeSignatures(payload, executedAgent)))
+                    computeSignatures(
+                        executedAgent.getInject().getId(),
+                        executedAgent.getParent().getId(),
+                        "obas-implant-caldera-")))
         .toList();
   }
 
   public static List<DetectionExpectation> getDetectionExpectationList(
-      Asset asset,
-      List<Agent> executedAgents,
-      Payload payload,
-      DetectionExpectation detectionExpectation) {
+      Asset asset, List<Agent> executedAgents, DetectionExpectation detectionExpectation) {
     return executedAgents.stream()
         .map(
             executedAgent ->
@@ -138,7 +134,10 @@ public class ExpectationUtils {
                     executedAgent.getParent(),
                     asset,
                     detectionExpectation.getExpirationTime(),
-                    computeSignatures(payload, executedAgent)))
+                    computeSignatures(
+                        executedAgent.getInject().getId(),
+                        executedAgent.getParent().getId(),
+                        "obas-implant-caldera-")))
         .toList();
   }
 
@@ -155,68 +154,6 @@ public class ExpectationUtils {
                     asset,
                     manualExpectation.getExpirationTime()))
         .toList();
-  }
-
-  private static List<InjectExpectationSignature> computeSignatures(
-      Payload payload, Agent executedAgent) {
-    List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
-
-    if (payload != null) {
-      PayloadType payloadType = payload.getTypeEnum();
-      switch (payloadType) {
-        case COMMAND:
-          injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
-                  .value(executedAgent.getProcessName())
-                  .build());
-          break;
-        case EXECUTABLE:
-          Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-          injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                  .value(
-                      Optional.ofNullable(payloadExecutable.getExecutableFile())
-                          .map(Document::getName)
-                          .orElse(""))
-                  .build());
-          break;
-        case FILE_DROP:
-          FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
-          injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_FILE_NAME)
-                  .value(
-                      Optional.ofNullable(payloadFileDrop.getFileDropFile())
-                          .map(Document::getName)
-                          .orElse(""))
-                  .build());
-          break;
-        case DNS_RESOLUTION:
-          DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
-          injectExpectationSignatures.add(
-              builder()
-                  .type(EXPECTATION_SIGNATURE_TYPE_HOSTNAME)
-                  .value(payloadDnsResolution.getHostname().split("\\r?\\n")[0])
-                  .build());
-          break;
-        default:
-          throw new UnsupportedOperationException(
-              "Payload type " + payloadType + " is not supported");
-      }
-    } else {
-      injectExpectationSignatures.add(
-          createSignature(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME, executedAgent.getProcessName()));
-      injectExpectationSignatures.add(
-          createSignature(
-              EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
-              "obas-implant-caldera-"
-                  + executedAgent.getInject().getId()
-                  + "-agent-"
-                  + executedAgent.getParent().getId()));
-    }
-    return injectExpectationSignatures;
   }
 
   // OBAS IMPLANT EXPECTATIONS
@@ -237,7 +174,7 @@ public class ExpectationUtils {
   }
 
   public static List<DetectionExpectation> getDetectionExpectationList(
-      Asset asset, Inject inject, String payloadType, DetectionExpectation detectionExpectation) {
+      Asset asset, Inject inject, DetectionExpectation detectionExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -248,12 +185,12 @@ public class ExpectationUtils {
                     agent,
                     asset,
                     detectionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), payloadType)))
+                    computeSignatures(inject.getId(), agent.getId(), "obas-implant-")))
         .toList();
   }
 
   public static List<PreventionExpectation> getPreventionExpectationList(
-      Asset asset, Inject inject, String payloadType, PreventionExpectation preventionExpectation) {
+      Asset asset, Inject inject, PreventionExpectation preventionExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -264,27 +201,19 @@ public class ExpectationUtils {
                     agent,
                     asset,
                     preventionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), payloadType)))
+                    computeSignatures(inject.getId(), agent.getId(), "obas-implant-")))
         .toList();
   }
 
   private static List<InjectExpectationSignature> computeSignatures(
-      String injectId, String agentId, String payloadType) {
+      String injectId, String agentId, String prefixSignature) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
-    List<String> knownPayloadTypes =
-        Arrays.asList("Command", "Executable", "FileDrop", "DnsResolution");
 
-    /*
-     * Always add the "Parent process" signature type for the OpenBAS Implant Executor
-     */
     signatures.add(
         createSignature(
             EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
-            "obas-implant-" + injectId + "-agent-" + agentId));
+            prefixSignature + injectId + "-agent-" + agentId));
 
-    if (!knownPayloadTypes.contains(payloadType)) {
-      throw new UnsupportedOperationException("Payload type " + payloadType + " is not supported");
-    }
     return signatures;
   }
 

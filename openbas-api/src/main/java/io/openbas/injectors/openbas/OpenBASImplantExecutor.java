@@ -54,21 +54,10 @@ public class OpenBASImplantExecutor extends Injector {
         contentConvert(injection, OpenBASImplantInjectContent.class);
 
     List<Expectation> expectations = new ArrayList<>();
+
     assets.forEach(
         (asset, isInGroup) -> {
-          Optional<InjectorContract> contract = inject.getInjectorContract();
-          String payloadType = "";
-          if (contract.isPresent()) {
-            Payload payload = contract.get().getPayload();
-            if (payload == null) {
-              log.info(
-                  String.format("No payload for inject %s was found, skipping", inject.getId()));
-              return;
-            }
-            payloadType = payload.getType();
-          }
-          computeExpectationsForAssetAndAgents(
-              expectations, content, asset, isInGroup, inject, payloadType);
+          computeExpectationsForAssetAndAgents(expectations, content, asset, isInGroup, inject);
         });
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
@@ -88,8 +77,7 @@ public class OpenBASImplantExecutor extends Injector {
       @NotNull final OpenBASImplantInjectContent content,
       @NotNull final Asset asset,
       final boolean expectationGroup,
-      final Inject inject,
-      final String payloadType) {
+      final Inject inject) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
           content.getExpectations().stream()
@@ -108,8 +96,7 @@ public class OpenBASImplantExecutor extends Injector {
 
                           // We propagate the asset expectation to agents
                           List<PreventionExpectation> preventionExpectationList =
-                              getPreventionExpectationList(
-                                  asset, inject, payloadType, preventionExpectation);
+                              getPreventionExpectationList(asset, inject, preventionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
@@ -132,8 +119,7 @@ public class OpenBASImplantExecutor extends Injector {
 
                           // We propagate the asset expectation to agents
                           List<DetectionExpectation> detectionExpectationList =
-                              getDetectionExpectationList(
-                                  asset, inject, payloadType, detectionExpectation);
+                              getDetectionExpectationList(asset, inject, detectionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
