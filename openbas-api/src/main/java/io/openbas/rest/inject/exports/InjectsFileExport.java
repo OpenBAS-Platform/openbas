@@ -113,10 +113,18 @@ public class InjectsFileExport extends FileExportBase {
 
   @JsonProperty("inject_organizations")
   private List<Organization> getOrganizations() {
-    return this.getUsers().stream()
-        .map(user -> (Organization) Hibernate.unproxy(user.getOrganization()))
-        .filter(Objects::nonNull)
-        .toList();
+    List<Organization> orgs = new ArrayList<>();
+    orgs.addAll(
+        this.getUsers().stream()
+            .map(user -> (Organization) Hibernate.unproxy(user.getOrganization()))
+            .filter(Objects::nonNull)
+            .toList());
+    orgs.addAll(
+        this.getTeams().stream()
+            .map(team -> (Organization) Hibernate.unproxy(team.getOrganization()))
+            .filter(Objects::nonNull)
+            .toList());
+    return orgs;
   }
 
   @JsonProperty("inject_challenges")

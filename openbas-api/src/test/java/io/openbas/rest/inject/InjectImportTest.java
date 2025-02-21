@@ -136,6 +136,9 @@ public class InjectImportTest extends IntegrationTest {
             .withTeam(
                 teamComposer
                     .forTeam(TeamFixture.getDefaultTeam())
+                    .withOrganisation(
+                        organizationComposer.forOrganization(
+                            OrganizationFixture.createDefaultOrganisation()))
                     .withUser(
                         userComposer
                             .forUser(UserFixture.getUserWithDefaultEmail())
@@ -774,13 +777,22 @@ public class InjectImportTest extends IntegrationTest {
         for (Organization expected : organizationComposer.generatedItems) {
           Exercise dest =
               exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Organization> recreated =
-              dest.getTeams().stream()
+          List<Organization> orgs = new ArrayList<>();
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
                   .filter(Objects::nonNull)
-                  .filter(c -> c.getName().equals(expected.getName()))
-                  .findAny();
+                  .toList());
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .map(Team::getOrganization)
+                  .filter(Objects::nonNull)
+                  .toList());
+          Optional<Organization> recreated =
+              orgs.stream().filter(c -> c.getName().equals(expected.getName())).findAny();
 
           Assertions.assertTrue(recreated.isPresent(), "Could not find expected organisation");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
@@ -1156,13 +1168,22 @@ public class InjectImportTest extends IntegrationTest {
         for (Organization expected : organizationComposer.generatedItems) {
           Scenario dest =
               scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
-          Optional<Organization> recreated =
-              dest.getTeams().stream()
+          List<Organization> orgs = new ArrayList<>();
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
                   .filter(Objects::nonNull)
-                  .filter(c -> c.getName().equals(expected.getName()))
-                  .findAny();
+                  .toList());
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .map(Team::getOrganization)
+                  .filter(Objects::nonNull)
+                  .toList());
+          Optional<Organization> recreated =
+              orgs.stream().filter(c -> c.getName().equals(expected.getName())).findAny();
 
           Assertions.assertTrue(recreated.isPresent(), "Could not find expected user");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
@@ -1384,14 +1405,22 @@ public class InjectImportTest extends IntegrationTest {
         clearEntityManager();
 
         for (Organization expected : organizationComposer.generatedItems) {
-          Optional<Organization> recreated =
+          List<Organization> orgs = new ArrayList<>();
+          orgs.addAll(
               getImportedInjectsFromDb().stream()
                   .flatMap(inject -> inject.getTeams().stream())
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
                   .filter(Objects::nonNull)
-                  .filter(c -> c.getName().equals(expected.getName()))
-                  .findAny();
+                  .toList());
+          orgs.addAll(
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .map(Team::getOrganization)
+                  .filter(Objects::nonNull)
+                  .toList());
+          Optional<Organization> recreated =
+              orgs.stream().filter(c -> c.getName().equals(expected.getName())).findAny();
 
           Assertions.assertTrue(recreated.isPresent(), "Could not find expected user");
           Assertions.assertEquals(expected.getName(), recreated.get().getName());
@@ -1712,13 +1741,22 @@ public class InjectImportTest extends IntegrationTest {
         for (Organization expected : organizationComposer.generatedItems) {
           Exercise dest =
               exerciseRepository.findById(destinationExerciseWrapper.get().getId()).orElseThrow();
-          Optional<Organization> reused =
-              dest.getTeams().stream()
+          List<Organization> orgs = new ArrayList<>();
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
                   .filter(Objects::nonNull)
-                  .filter(c -> c.getId().equals(expected.getId()))
-                  .findAny();
+                  .toList());
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .map(Team::getOrganization)
+                  .filter(Objects::nonNull)
+                  .toList());
+          Optional<Organization> reused =
+              orgs.stream().filter(c -> c.getId().equals(expected.getId())).findAny();
 
           Assertions.assertTrue(reused.isPresent(), "Could not find expected organisation");
         }
@@ -2029,13 +2067,22 @@ public class InjectImportTest extends IntegrationTest {
         for (Organization expected : organizationComposer.generatedItems) {
           Scenario dest =
               scenarioRepository.findById(destinationScenarioWrapper.get().getId()).orElseThrow();
-          Optional<Organization> reused =
-              dest.getTeams().stream()
+          List<Organization> orgs = new ArrayList<>();
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
                   .filter(Objects::nonNull)
-                  .filter(c -> c.getId().equals(expected.getId()))
-                  .findAny();
+                  .toList());
+          orgs.addAll(
+              dest.getInjects().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .map(Team::getOrganization)
+                  .filter(Objects::nonNull)
+                  .toList());
+          Optional<Organization> reused =
+              orgs.stream().filter(c -> c.getId().equals(expected.getId())).findAny();
 
           Assertions.assertTrue(reused.isPresent(), "Could not find expected organisation");
         }
@@ -2302,14 +2349,22 @@ public class InjectImportTest extends IntegrationTest {
         clearEntityManager();
 
         for (Organization expected : organizationComposer.generatedItems) {
-          Optional<Organization> reused =
+          List<Organization> orgs = new ArrayList<>();
+          orgs.addAll(
               getImportedInjectsFromDb().stream()
                   .flatMap(inject -> inject.getTeams().stream())
                   .flatMap(team -> team.getUsers().stream())
                   .map(User::getOrganization)
                   .filter(Objects::nonNull)
-                  .filter(c -> c.getId().equals(expected.getId()))
-                  .findAny();
+                  .toList());
+          orgs.addAll(
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .map(Team::getOrganization)
+                  .filter(Objects::nonNull)
+                  .toList());
+          Optional<Organization> reused =
+              orgs.stream().filter(c -> c.getId().equals(expected.getId())).findAny();
 
           Assertions.assertTrue(reused.isPresent(), "Could not find expected organisation");
         }

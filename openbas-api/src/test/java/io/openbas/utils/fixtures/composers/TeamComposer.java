@@ -6,6 +6,7 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.TeamRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class TeamComposer extends ComposerBase<Team> {
     private final Team team;
     private final List<UserComposer.Composer> userComposers = new ArrayList<>();
     private final List<TagComposer.Composer> tagComposers = new ArrayList<>();
+    private Optional<OrganizationComposer.Composer> organisationComposer = Optional.empty();
 
     public Composer(Team team) {
       this.team = team;
@@ -39,6 +41,12 @@ public class TeamComposer extends ComposerBase<Team> {
       return this;
     }
 
+    public Composer withOrganisation(OrganizationComposer.Composer newOrganisationComposer) {
+      organisationComposer = Optional.of(newOrganisationComposer);
+      team.setOrganization(newOrganisationComposer.get());
+      return this;
+    }
+
     public Composer withId(String id) {
       this.team.setId(id);
       return this;
@@ -46,6 +54,7 @@ public class TeamComposer extends ComposerBase<Team> {
 
     @Override
     public Composer persist() {
+      organisationComposer.ifPresent(OrganizationComposer.Composer::persist);
       userComposers.forEach(UserComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
       teamRepository.save(team);
@@ -57,6 +66,7 @@ public class TeamComposer extends ComposerBase<Team> {
       teamRepository.delete(team);
       tagComposers.forEach(TagComposer.Composer::delete);
       userComposers.forEach(UserComposer.Composer::delete);
+      organisationComposer.ifPresent(OrganizationComposer.Composer::delete);
       return this;
     }
 
