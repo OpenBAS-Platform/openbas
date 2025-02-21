@@ -2,12 +2,10 @@ package io.openbas.utils.fixtures.files;
 
 public class BinaryFile extends BaseFile<byte[]> {
   public BinaryFile(byte[] data, String name) {
-    super(data, name);
+    this(data, name, "application/octet-stream");
   }
-
-  @Override
-  public String getMimeType() {
-    return "image/png";
+  public BinaryFile(byte[] data, String name, String mimeType) {
+    super(data, name, mimeType);
   }
 
   @Override

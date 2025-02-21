@@ -12,12 +12,16 @@ public class FileFixture {
   public static String DEFAULT_PLAIN_TEXT_FILENAME = "plain_text.txt";
   public static String DEFAULT_PNG_GRID_FILENAME = "grid.png";
   public static String DEFAULT_PNG_SMILE_FILENAME = "smile.png";
+  public static String DEFAULT_BAD_COFFEE_FILENAME = "badcoffee";
+  public static String DEFAULT_BEAD_FILENAME = "bead";
 
   public static Map<String, BaseFile<?>> WELL_KNOWN_FILES =
       Map.ofEntries(
           entry(DEFAULT_PLAIN_TEXT_FILENAME, getPlainTextFileContent()),
           entry(DEFAULT_PNG_GRID_FILENAME, getPngGridFileContent()),
-          entry(DEFAULT_PNG_SMILE_FILENAME, getPngSmileFileContent()));
+          entry(DEFAULT_PNG_SMILE_FILENAME, getPngSmileFileContent()),
+          entry(DEFAULT_BAD_COFFEE_FILENAME, getBadCoffeeFileContent()),
+          entry(DEFAULT_BEAD_FILENAME, getBeadFileContent()));
 
   public static PlainTextFile getPlainTextFileContent() {
     return new PlainTextFile("default plain text content", DEFAULT_PLAIN_TEXT_FILENAME);
@@ -30,7 +34,7 @@ public class FileFixture {
             + "087cfe000000184944415428cf636060f8ff1f2f2620cdc0306ac2303201"
             + "000979ff01ee7eef0a0000000049454e44ae426082";
     String filename = DEFAULT_PNG_GRID_FILENAME;
-    return new BinaryFile(HexFormat.of().parseHex(hexData), filename);
+    return new BinaryFile(HexFormat.of().parseHex(hexData), filename, "image/png");
   }
 
   // a small 16*16 beautiful smiley face
@@ -44,6 +48,20 @@ public class FileFixture {
             + "4aba3ec971d946bf5b92b49dd8d1574bb7bef713d50350388abc6cff0000"
             + "000049454e44ae426082";
     String filename = DEFAULT_PNG_SMILE_FILENAME;
+    return new BinaryFile(HexFormat.of().parseHex(hexData), filename, "image/png");
+  }
+
+  // ???
+  public static BinaryFile getBadCoffeeFileContent() {
+    String hexData = "abadc0ffee";
+    String filename = DEFAULT_BAD_COFFEE_FILENAME;
+    return new BinaryFile(HexFormat.of().parseHex(hexData), filename);
+  }
+
+  // ???????
+  public static BinaryFile getBeadFileContent() {
+    String hexData = "bead";
+    String filename = DEFAULT_BEAD_FILENAME;
     return new BinaryFile(HexFormat.of().parseHex(hexData), filename);
   }
 }

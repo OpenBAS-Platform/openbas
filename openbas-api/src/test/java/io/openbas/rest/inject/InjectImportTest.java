@@ -32,6 +32,8 @@ import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -165,7 +167,35 @@ public class InjectImportTest extends IntegrationTest {
                             .withTag(
                                 tagComposer.forTag(
                                     TagFixture.getTagWithText("secret payload tag")))))
-            .withTag(tagComposer.forTag(TagFixture.getTagWithText("inject with payload tag"))));
+            .withTag(tagComposer.forTag(TagFixture.getTagWithText("inject with payload tag"))),
+            injectComposer
+                    .forInject(InjectFixture.getDefaultInject())
+                    .withInjectorContract(
+                            injectorContractComposer
+                                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                                    .withInjector(injectorFixture.getWellKnownObasImplantInjector())
+                                    .withPayload(
+                                            payloadComposer
+                                                    .forPayload(PayloadFixture.createDefaultFileDrop())
+                                                    .withFileDrop(documentComposer.forDocument(DocumentFixture.getDocument(FileFixture.getBadCoffeeFileContent())).withInMemoryFile(FileFixture.getBadCoffeeFileContent()))
+                                                    .withTag(
+                                                            tagComposer.forTag(
+                                                                    TagFixture.getTagWithText("secret file drop tag")))))
+                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("filedrop inject with payload tag"))),
+            injectComposer
+                    .forInject(InjectFixture.getDefaultInject())
+                    .withInjectorContract(
+                            injectorContractComposer
+                                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                                    .withInjector(injectorFixture.getWellKnownObasImplantInjector())
+                                    .withPayload(
+                                            payloadComposer
+                                                    .forPayload(PayloadFixture.createDefaultExecutable())
+                                                    .withExecutable(documentComposer.forDocument(DocumentFixture.getDocument(FileFixture.getBeadFileContent())).withInMemoryFile(FileFixture.getBeadFileContent()))
+                                                    .withTag(
+                                                            tagComposer.forTag(
+                                                                    TagFixture.getTagWithText("secret executable payload tag")))))
+                    .withTag(tagComposer.forTag(TagFixture.getTagWithText("executable inject with payload tag"))));
   }
 
   private List<InjectComposer.Composer> getInjectFromExerciseWrappers() {
@@ -269,6 +299,16 @@ public class InjectImportTest extends IntegrationTest {
             .map(Article::getChannel)
             .flatMap(channel -> channel.getLogos().stream())
             .toList());
+    documents.addAll(
+            injects.stream().flatMap(inject -> {
+              if(inject.getInjectorContract().isEmpty()) { return Stream.of(); }
+              if(inject.getInjectorContract().get().getPayload() == null) { return Stream.of(); }
+
+              Payload pl = inject.getInjectorContract().get().getPayload();
+              if(pl instanceof Executable) { return Stream.of(((Executable) pl).getExecutableFile()); }
+              if(pl instanceof FileDrop) { return Stream.of(((FileDrop) pl).getFileDropFile()); }
+              return Stream.of();
+            }).toList());
 
     return documents;
   }
@@ -1004,6 +1044,14 @@ public class InjectImportTest extends IntegrationTest {
           Assertions.assertEquals(expected.getType(), recreated.get().getType());
           Assertions.assertEquals(expected.getSource(), recreated.get().getSource());
           Assertions.assertEquals(expected.getExternalId(), recreated.get().getExternalId());
+
+          if(Objects.equals(expected.getType(), "FileDrop")) {
+            Assertions.assertNotNull(((FileDrop) recreated.get()).getFileDropFile());
+          }
+
+          if(Objects.equals(expected.getType(), "Executable")) {
+            Assertions.assertNotNull(((Executable) recreated.get()).getExecutableFile());
+          }
 
           Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
         }

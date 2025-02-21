@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Return;
 import io.openbas.database.model.*;
 import io.openbas.export.FileExportBase;
 import io.openbas.rest.exercise.exports.ExportOptions;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.Getter;
 
@@ -40,6 +42,17 @@ public class InjectsFileExport extends FileExportBase {
         this.getArticles().stream().flatMap(article -> article.getDocuments().stream()).toList());
     documents.addAll(
         this.getChannels().stream().flatMap(channel -> channel.getLogos().stream()).toList());
+    documents.addAll(
+            injects.stream().flatMap(inject -> {
+              if(inject.getInjectorContract().isEmpty()) { return Stream.of(); }
+              if(inject.getInjectorContract().get().getPayload() == null) { return Stream.of(); }
+
+              Payload pl = inject.getInjectorContract().get().getPayload();
+              if(pl instanceof Executable) { return Stream.of(((Executable) pl).getExecutableFile()); }
+              if(pl instanceof FileDrop) { return Stream.of(((FileDrop) pl).getFileDropFile()); }
+              return Stream.of();
+            }).toList()
+    );
 
     return documents;
   }
