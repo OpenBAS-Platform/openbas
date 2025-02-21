@@ -150,7 +150,7 @@ public class ScenarioApi extends RestBehavior {
   @PostMapping(SCENARIO_URI + "/import")
   @Secured(ROLE_ADMIN)
   public void importScenario(@RequestPart("file") @NotNull MultipartFile file) throws Exception {
-    this.importService.handleFileImport(file);
+    this.importService.handleFileImport(file, null, null);
   }
 
   // -- TEAMS --

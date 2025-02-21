@@ -61,7 +61,7 @@ class V1_DataImporterTest extends IntegrationTest {
   @Transactional
   void testImportData() {
     // -- EXECUTE --
-    this.importer.importData(this.importNode, Map.of());
+    this.importer.importData(this.importNode, Map.of(), null, null);
 
     // -- ASSERT --
     Optional<Exercise> exercise = this.exerciseRepository.findOne(exerciseByName(EXERCISE_NAME));

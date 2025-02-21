@@ -45,6 +45,12 @@ public class TeamFixture {
     return createTeamWithDefaultName();
   }
 
+  public static Team getDefaultContextualTeam() {
+    Team team = getDefaultTeam();
+    team.setContextual(true);
+    return team;
+  }
+
   public static Team getEmptyTeam() {
     return createTeamWithName(TEAM_NAME);
   }

@@ -125,6 +125,7 @@ export type InjectContextType = {
     entities: { injects: Record<string, InjectStore> };
   }>;
   onDeleteInject: (injectId: Inject['inject_id']) => Promise<void>;
+  onImportInjectFromJson?: (file: File) => Promise<void>;
   onImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>;
   onDryImportInjectFromXls?: (importId: string, input: InjectsImportInput) => Promise<ImportTestSummary>;
   onBulkDeleteInjects: (param: InjectBulkProcessingInput) => Promise<Inject[]>;

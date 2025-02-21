@@ -9,12 +9,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.export.FileExportBase;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 
 @Getter
 @Setter
@@ -69,13 +72,21 @@ public class ExerciseFileExport extends FileExportBase {
 
   public List<Organization> getOrganizations() {
     if (organizations == null) {
-      return this.exercise == null
-          ? new ArrayList<>()
-          : this.exercise.getUsers().stream()
-              .map(User::getOrganization)
+      if (this.exercise == null) {
+        return new ArrayList<>();
+      }
+      List<Organization> orgs = new ArrayList<>();
+      orgs.addAll(
+          this.exercise.getUsers().stream()
+              .map(user -> (Organization) Hibernate.unproxy(user.getOrganization()))
               .filter(Objects::nonNull)
-              .distinct()
-              .toList();
+              .toList());
+      orgs.addAll(
+          this.exercise.getTeams().stream()
+              .map(team -> (Organization) Hibernate.unproxy(team.getOrganization()))
+              .filter(Objects::nonNull)
+              .toList());
+      return orgs;
     }
     return organizations;
   }
@@ -137,7 +148,25 @@ public class ExerciseFileExport extends FileExportBase {
 
   public List<Document> getDocuments() {
     if (documents == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getDocuments();
+      if (this.exercise == null) {
+        return new ArrayList<>();
+      }
+      List<Document> docs = new ArrayList<>();
+      docs.addAll(this.exercise.getDocuments());
+      docs.addAll(
+          this.exercise.getInjects().stream()
+              .flatMap(
+                  inject -> {
+                    if (inject.getPayload().isEmpty()) {
+                      return Stream.of();
+                    }
+                    if (inject.getPayload().get().getAttachedDocument().isPresent()) {
+                      return Stream.of(inject.getPayload().get().getAttachedDocument().get());
+                    }
+                    return Stream.of();
+                  })
+              .toList());
+      return docs;
     }
     return documents;
   }
@@ -236,14 +265,20 @@ public class ExerciseFileExport extends FileExportBase {
   }
 
   private ExerciseFileExport(
-      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
-    super(objectMapper, challengeService);
+      Exercise exercise,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    super(objectMapper, challengeService, articleService);
     this.exercise = exercise;
   }
 
   public static ExerciseFileExport fromExercise(
-      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
-    return new ExerciseFileExport(exercise, objectMapper, challengeService);
+      Exercise exercise,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    return new ExerciseFileExport(exercise, objectMapper, challengeService, articleService);
   }
 
   @Override

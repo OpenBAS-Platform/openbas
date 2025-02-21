@@ -83,6 +83,7 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
       const filename = match[1];
       download(result.data, filename, result.headers['content-type']);
     });
+    handleCloseExport ();
   };
 
   // Button Popover

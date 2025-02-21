@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type InjectorContractConvertedContent, type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
+import { exportInjects } from '../../../../actions/injects/inject-action';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
@@ -23,7 +24,7 @@ import {
   type Article,
   type FilterGroup,
   type Inject,
-  type InjectBulkUpdateOperation,
+  type InjectBulkUpdateOperation, type InjectExportRequestInput,
   type InjectInput,
   type InjectTestStatusOutput,
   type Team,
@@ -32,7 +33,7 @@ import {
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { splitDuration } from '../../../../utils/Time';
-import { isNotEmptyField } from '../../../../utils/utils';
+import { download, isNotEmptyField } from '../../../../utils/utils';
 import { InjectContext, PermissionsContext, ViewModeContext } from '../Context';
 import ToolBar from '../ToolBar';
 import CreateInject from './CreateInject';
@@ -469,6 +470,25 @@ const Injects: FunctionComponent<Props> = ({
     });
   };
 
+  const handleExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
+    const data: InjectExportRequestInput = {
+      injects: Object.keys(selectedElements).map((id) => {
+        return { inject_id: id };
+      }),
+      options: {
+        with_players: withPlayers,
+        with_teams: withTeams,
+        with_variable_values: withVariableValues,
+      },
+    };
+    exportInjects(data).then((result) => {
+      const contentDisposition = result.headers['content-disposition'];
+      const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
+      const filename = match[1];
+      download(result.data, filename, result.headers['content-type']);
+    });
+  };
+
   if (isBulkLoading) {
     return <Loader />;
   }
@@ -662,6 +682,7 @@ const Injects: FunctionComponent<Props> = ({
             handleUpdate={massUpdateInjects}
             handleBulkDelete={bulkDeleteInjects}
             handleBulkTest={massTestInjects}
+            handleExport={handleExport}
           />
           <CreateInject
             title={t('Create a new inject')}

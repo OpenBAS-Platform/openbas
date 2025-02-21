@@ -381,12 +381,28 @@ public class ScenarioService {
     }
 
     // Add Documents
-    scenarioFileExport.setDocuments(scenario.getDocuments());
+    List<Document> documentExports = new ArrayList<>();
+    documentExports.addAll(scenario.getDocuments());
+    documentExports.addAll(
+        scenario.getInjects().stream()
+            .flatMap(
+                inject -> {
+                  if (inject.getPayload().isEmpty()) {
+                    return Stream.of();
+                  }
+                  Payload pl = inject.getPayload().get();
+                  return pl.getAttachedDocument().isPresent()
+                      ? Stream.of(pl.getAttachedDocument().get())
+                      : Stream.of();
+                })
+            .toList());
+
+    scenarioFileExport.setDocuments(documentExports);
     objectMapper.addMixIn(Document.class, Mixins.Document.class);
     scenarioTags.addAll(
         scenario.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
     List<String> documentIds =
-        new ArrayList<>(scenario.getDocuments().stream().map(Document::getId).toList());
+        new ArrayList<>(documentExports.stream().map(Document::getId).toList());
 
     if (isWithTeams) {
       // Add Teams
@@ -408,7 +424,13 @@ public class ScenarioService {
       scenarioTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
       // organizations
       List<Organization> organizations =
-          players.stream().map(User::getOrganization).filter(Objects::nonNull).toList();
+          new ArrayList<>(
+              players.stream().map(User::getOrganization).filter(Objects::nonNull).toList());
+      organizations.addAll(
+          scenario.getTeams().stream()
+              .map(Team::getOrganization)
+              .filter(Objects::nonNull)
+              .toList());
       scenarioFileExport.setOrganizations(organizations);
       objectMapper.addMixIn(Organization.class, Mixins.Organization.class);
       scenarioTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());

@@ -5,6 +5,8 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Scenario;
 import io.openbas.importer.ImportException;
 import io.openbas.importer.Importer;
 import io.openbas.importer.V1_DataImporter;
@@ -36,13 +38,17 @@ public class ImportService {
     dataImporters.put(1, v1_dataImporter);
   }
 
-  private void handleDataImport(InputStream inputStream, Map<String, ImportEntry> docReferences) {
+  private void handleDataImport(
+      InputStream inputStream,
+      Map<String, ImportEntry> docReferences,
+      Exercise exercise,
+      Scenario scenario) {
     try {
       JsonNode importNode = mapper.readTree(inputStream);
       int importVersion = importNode.get("export_version").asInt();
       Importer importer = dataImporters.get(importVersion);
       if (importer != null) {
-        importer.importData(importNode, docReferences);
+        importer.importData(importNode, docReferences, exercise, scenario);
       } else {
         throw new ImportException("Export with version " + importVersion + " is not supported");
       }
@@ -52,7 +58,8 @@ public class ImportService {
   }
 
   @Transactional(rollbackOn = Exception.class)
-  public void handleFileImport(MultipartFile file) throws Exception {
+  public void handleFileImport(MultipartFile file, Exercise exercise, Scenario scenario)
+      throws Exception {
     // 01. Use a temporary file.
     File tempFile = createTempFile("openbas-import-" + now().getEpochSecond(), ".zip");
     FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
@@ -80,7 +87,8 @@ public class ImportService {
         }
       }
       // 02. Iter on each element to import
-      dataImports.forEach(dataStream -> handleDataImport(dataStream, docReferences));
+      dataImports.forEach(
+          dataStream -> handleDataImport(dataStream, docReferences, exercise, scenario));
     } finally {
       // 03. Delete the temporary file
       //noinspection ResultOfMethodCallIgnored

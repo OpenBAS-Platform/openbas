@@ -162,8 +162,8 @@ public class InjectExportTest extends IntegrationTest {
                                 documentComposer
                                     .forDocument(
                                         DocumentFixture.getDocument(
-                                            FileFixture.getPngFileContent()))
-                                    .withInMemoryFile(FileFixture.getPngFileContent())
+                                            FileFixture.getPngGridFileContent()))
+                                    .withInMemoryFile(FileFixture.getPngGridFileContent())
                                     .withTag(
                                         tagComposer.forTag(
                                             TagFixture.getTagWithText("Document tag")))))),

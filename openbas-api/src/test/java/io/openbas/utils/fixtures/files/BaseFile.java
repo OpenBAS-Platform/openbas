@@ -6,13 +6,17 @@ import lombok.Getter;
 public abstract class BaseFile<T> {
   private final T content;
   private final String fileName;
+  private final String mimeType;
 
-  public BaseFile(T content, String fileName) {
+  public BaseFile(T content, String fileName, String mimeType) {
     this.content = content;
     this.fileName = fileName;
+    this.mimeType = mimeType;
   }
 
-  public abstract String getMimeType();
+  public String getMimeType() {
+    return this.mimeType;
+  }
 
   public abstract byte[] getContentBytes();
 

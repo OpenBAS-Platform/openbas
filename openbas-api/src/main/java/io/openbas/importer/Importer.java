@@ -3,6 +3,8 @@ package io.openbas.importer;
 import static java.util.Spliterators.spliteratorUnknownSize;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.openbas.database.model.Exercise;
+import io.openbas.database.model.Scenario;
 import io.openbas.service.ImportEntry;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +15,11 @@ import java.util.stream.StreamSupport;
 
 public interface Importer {
 
-  void importData(JsonNode importNode, Map<String, ImportEntry> docReferences);
+  void importData(
+      JsonNode importNode,
+      Map<String, ImportEntry> docReferences,
+      Exercise exercise,
+      Scenario scenario);
 
   default Stream<JsonNode> resolveJsonElements(JsonNode node, String key) {
     JsonNode dataNode = node.get(key);

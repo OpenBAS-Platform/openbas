@@ -72,6 +72,7 @@ public class Mixins {
         "team_tags",
         "team_organization",
         "team_users",
+        "team_contextual",
       })
   public static class Team {}
 
