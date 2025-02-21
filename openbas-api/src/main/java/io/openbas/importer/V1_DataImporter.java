@@ -840,27 +840,29 @@ public class V1_DataImporter implements Importer {
           Optional<InjectorContract> injectorContract =
               this.injectorContractRepository.findById(injectorContractIdFromNode);
 
-          String injectorContractId;
+          String injectorContractId = null;
 
           // If not, rely on payload
           if (injectorContract.isEmpty()) {
             JsonNode payloadNode = injectContractNode.get("injector_contract_payload");
-            String externalId = payloadNode.get("payload_external_id").textValue();
-            // Rely on external collector
-            if (hasText(externalId)) {
-              Optional<InjectorContract> injectorContractFromPayload =
-                  this.injectorContractRepository.findOne(byPayloadExternalId(externalId));
-              if (injectorContractFromPayload.isPresent()) {
-                injectorContractId = injectorContractFromPayload.get().getId();
+            if (!payloadNode.isNull() && !payloadNode.isEmpty()) {
+              String externalId = payloadNode.get("payload_external_id").textValue();
+              // Rely on external collector
+              if (hasText(externalId)) {
+                Optional<InjectorContract> injectorContractFromPayload =
+                    this.injectorContractRepository.findOne(byPayloadExternalId(externalId));
+                if (injectorContractFromPayload.isPresent()) {
+                  injectorContractId = injectorContractFromPayload.get().getId();
+                  // Create new payload
+                } else {
+                  log.info(
+                      "Inject comes from a collector not set up in your environment, a new payload has been created.");
+                  injectorContractId = importPayload(payloadNode, baseIds);
+                }
                 // Create new payload
               } else {
-                log.info(
-                    "Inject comes from a collector not set up in your environment, a new payload has been created.");
                 injectorContractId = importPayload(payloadNode, baseIds);
               }
-              // Create new payload
-            } else {
-              injectorContractId = importPayload(payloadNode, baseIds);
             }
           } else {
             injectorContractId = injectorContract.get().getId();
