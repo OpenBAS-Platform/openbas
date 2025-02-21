@@ -29,6 +29,7 @@ interface FormProps { file: File }
 interface Props {
   label: string;
   mimeTypes: string;
+  submitActionLabel: string;
   handleClose: () => void;
   handleSubmit: (values: FormProps) => void;
 }
@@ -36,6 +37,7 @@ interface Props {
 const ImportFileSelector: FunctionComponent<Props> = ({
   label,
   mimeTypes,
+  submitActionLabel,
   handleClose,
   handleSubmit,
 }) => {
@@ -102,7 +104,7 @@ const ImportFileSelector: FunctionComponent<Props> = ({
               type="submit"
               disabled={!isDirty || isSubmitting}
             >
-              {t('Next')}
+              {submitActionLabel}
             </Button>
           </div>
         </form>

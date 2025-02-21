@@ -20,6 +20,7 @@ const InjectImportJsonDialog = (props: ImportJsonDialogProps) => {
       <ImportFileSelector
         label={t('inject_import_file_must_be_zip')}
         mimeTypes="application/octet-stream, multipart/x-zip, application/zip, application/zip-compressed, application/x-zip-compressed"
+        submitActionLabel={t('Import')}
         handleClose={props.handleClose}
         handleSubmit={props.handleSubmit}
       />

@@ -926,6 +926,7 @@ const i18n = {
       'inject_import_json_action': 'Import JSON',
       'inject_import_xls_action': 'Import XLS (mapper)',
       'inject_import_file_must_be_zip': 'Le fichier doit être une archive zip',
+      'Import': 'Importer',
       // Injector Contract
       'injector_contract_kill_chain_phases': 'Phase de kill chain',
       'injector_contract_injector': 'Injector',
@@ -2362,6 +2363,7 @@ const i18n = {
       'inject_import_json_action': 'JSON 导入',
       'inject_import_xls_action': 'XLS 导入（映射器）',
       'inject_import_file_must_be_zip': '文件必须是压缩包',
+      'Import': '进口',
       // Injector Contract
       'injector_contract_kill_chain_phases': '杀伤链阶段',
       'injector_contract_injector': '注入器',
@@ -2967,6 +2969,7 @@ const i18n = {
       'inject_import_json_action': 'JSON import',
       'inject_import_xls_action': 'XLS import (mapper)',
       'inject_import_file_must_be_zip': 'File must be a zip archive',
+      'Import': 'Import',
       // Injector Contract
       'injector_contract_kill_chain_phases': 'Kill chain phase',
       'injector_contract_injector': 'Injector',

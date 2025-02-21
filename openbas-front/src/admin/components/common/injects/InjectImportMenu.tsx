@@ -128,6 +128,7 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
             <ImportFileSelector
               label={t('Your file should be a XLS')}
               mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              submitActionLabel={t('Next')}
               handleClose={handleXlsImportClose}
               handleSubmit={onSubmitImportFile}
             />
