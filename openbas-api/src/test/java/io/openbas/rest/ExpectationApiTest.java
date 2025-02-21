@@ -99,10 +99,10 @@ public class ExpectationApiTest extends IntegrationTest {
     savedCollector = collectorRepository.save(collector);
 
     Collector collector2 = new Collector();
-    collector.setId(UUID.randomUUID().toString());
-    collector.setName("collector-2-name");
-    collector.setType(UUID.randomUUID().toString());
-    collector.setExternal(true);
+    collector2.setId(UUID.randomUUID().toString());
+    collector2.setName("collector-2-name");
+    collector2.setType(UUID.randomUUID().toString());
+    collector2.setExternal(true);
     savedCollector2 = collectorRepository.save(collector2);
   }
 
@@ -941,10 +941,11 @@ public class ExpectationApiTest extends IntegrationTest {
   }
 
   @Test
+  @WithMockAdminUser
   @DisplayName("Update Inject expectation from two collectors with one agent")
   void updateInjectExpectationFromTwoCollectors() throws Exception {
     // -- PREPARE --
-    // Build and save expectations for an asset with 2 agents
+    // Build and save expectations for an asset with 1 agent
     ExecutableInject executableInject =
         new ExecutableInject(
             false,
@@ -971,7 +972,8 @@ public class ExpectationApiTest extends IntegrationTest {
             detectionExpectationForAsset,
             detectionExpectationAgent));
 
-    // Fetch injectExpectation created for agent
+    // Add results for created injectExpectation
+
     List<InjectExpectation> injectExpectations =
         injectExpectationRepository.findAllByInjectAndAgent(
             savedInject.getId(), savedAgent.getId());
@@ -1004,16 +1006,48 @@ public class ExpectationApiTest extends IntegrationTest {
             .getResults()
             .size());
     assertEquals(
-        null,
+        100.0,
         injectExpectationRepository
             .findAllByInjectAndAsset(savedInject.getId(), savedEndpoint.getId())
             .getFirst()
-            .getResults());
+            .getResults()
+            .stream()
+            .filter(result -> result.getSourceId().equals(savedCollector.getId()))
+            .map(result -> result.getScore())
+            .findFirst()
+            .get());
     assertEquals(
-        null,
+        0.0,
+        injectExpectationRepository
+            .findAllByInjectAndAsset(savedInject.getId(), savedEndpoint.getId())
+            .getFirst()
+            .getResults()
+            .stream()
+            .filter(result -> result.getSourceId().equals(savedCollector2.getId()))
+            .map(result -> result.getScore())
+            .findFirst()
+            .get());
+    assertEquals(
+        100.0,
         injectExpectationRepository
             .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
             .getFirst()
-            .getResults());
+            .getResults()
+            .stream()
+            .filter(result -> result.getSourceId().equals(savedCollector.getId()))
+            .map(result -> result.getScore())
+            .findFirst()
+            .get());
+    assertEquals(
+        0.0,
+        injectExpectationRepository
+            .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
+            .getFirst()
+            .getResults()
+            .stream()
+            .filter(result -> result.getSourceId().equals(savedCollector2.getId()))
+            .map(result -> result.getScore())
+            .findFirst()
+            .get());
   }
 }
