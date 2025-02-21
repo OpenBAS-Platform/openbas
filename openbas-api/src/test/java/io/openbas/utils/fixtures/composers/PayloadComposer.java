@@ -34,14 +34,18 @@ public class PayloadComposer extends ComposerBase<Payload> {
     }
 
     public Composer withFileDrop(DocumentComposer.Composer newDocumentComposer) {
-      if(!(payload instanceof FileDrop)) { throw new IllegalArgumentException("Payload is not a FileDrop"); }
+      if (!(payload instanceof FileDrop)) {
+        throw new IllegalArgumentException("Payload is not a FileDrop");
+      }
       documentComposer = Optional.of(newDocumentComposer);
       ((FileDrop) payload).setFileDropFile(newDocumentComposer.get());
       return this;
     }
 
     public Composer withExecutable(DocumentComposer.Composer newDocumentComposer) {
-      if(!(payload instanceof Executable)) { throw new IllegalArgumentException("Payload is not a Executable"); }
+      if (!(payload instanceof Executable)) {
+        throw new IllegalArgumentException("Payload is not a Executable");
+      }
       documentComposer = Optional.of(newDocumentComposer);
       ((Executable) payload).setExecutableFile(newDocumentComposer.get());
       return this;

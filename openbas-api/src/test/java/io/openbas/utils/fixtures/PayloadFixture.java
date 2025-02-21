@@ -66,7 +66,7 @@ public class PayloadFixture {
 
   public static Payload createDefaultFileDrop() {
     final FileDrop filedrop =
-            new FileDrop("filedrop-id", Executable.EXECUTABLE_TYPE, "filedrop payload");
+        new FileDrop("filedrop-id", Executable.EXECUTABLE_TYPE, "filedrop payload");
     filedrop.setExecutionArch(Payload.PAYLOAD_EXECUTION_ARCH.arm64);
     initializeDefaultPayload(filedrop, MACOS_PLATFORM);
     return filedrop;

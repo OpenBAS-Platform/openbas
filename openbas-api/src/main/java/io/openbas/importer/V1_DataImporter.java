@@ -1009,11 +1009,16 @@ public class V1_DataImporter implements Importer {
 
   private String importPayload(@NotNull final JsonNode payloadNode, Map<String, Base> baseIds) {
     // swap executable file id or file drop file id
-    if(payloadNode.has("executable_file")) {
-      ((ObjectNode) payloadNode).put("executable_file", baseIds.get(payloadNode.get("executable_file").textValue()).getId());
+    if (payloadNode.has("executable_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "executable_file",
+              baseIds.get(payloadNode.get("executable_file").textValue()).getId());
     }
-    if(payloadNode.has("file_drop_file")) {
-      ((ObjectNode) payloadNode).put("file_drop_file", baseIds.get(payloadNode.get("file_drop_file").textValue()).getId());
+    if (payloadNode.has("file_drop_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "file_drop_file", baseIds.get(payloadNode.get("file_drop_file").textValue()).getId());
     }
 
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
