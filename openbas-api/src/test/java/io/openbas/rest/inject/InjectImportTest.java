@@ -159,7 +159,12 @@ public class InjectImportTest extends IntegrationTest {
                 injectorContractComposer
                     .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
                     .withInjector(injectorFixture.getWellKnownObasImplantInjector())
-                    .withPayload(payloadComposer.forPayload(PayloadFixture.createDefaultCommand())))
+                    .withPayload(
+                        payloadComposer
+                            .forPayload(PayloadFixture.createDefaultCommand())
+                            .withTag(
+                                tagComposer.forTag(
+                                    TagFixture.getTagWithText("secret payload tag")))))
             .withTag(tagComposer.forTag(TagFixture.getTagWithText("inject with payload tag"))));
   }
 

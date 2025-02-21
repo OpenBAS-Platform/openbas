@@ -5,6 +5,7 @@ import io.openbas.service.ChallengeService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class TagHelper {
   public static List<Tag> crawlAllExerciseTags(
@@ -36,6 +37,16 @@ public class TagHelper {
       challenges.add(challenge);
     }
     tags.addAll(challenges.stream().flatMap(challenge -> challenge.getTags().stream()).toList());
+    tags.addAll(
+        exercise.getInjects().stream()
+            .flatMap(
+                inject ->
+                    inject.getInjectorContract().isPresent()
+                        ? inject.getInjectorContract().get().getPayload() != null
+                            ? inject.getInjectorContract().get().getPayload().getTags().stream()
+                            : Stream.of()
+                        : Stream.of())
+            .toList());
     return tags;
   }
 
@@ -68,6 +79,16 @@ public class TagHelper {
       challenges.add(challenge);
     }
     tags.addAll(challenges.stream().flatMap(challenge -> challenge.getTags().stream()).toList());
+    tags.addAll(
+        scenario.getInjects().stream()
+            .flatMap(
+                inject ->
+                    inject.getInjectorContract().isPresent()
+                        ? inject.getInjectorContract().get().getPayload() != null
+                            ? inject.getInjectorContract().get().getPayload().getTags().stream()
+                            : Stream.of()
+                        : Stream.of())
+            .toList());
     return tags;
   }
 
@@ -110,6 +131,16 @@ public class TagHelper {
       challenges.add(challenge);
     }
     tags.addAll(challenges.stream().flatMap(challenge -> challenge.getTags().stream()).toList());
+    tags.addAll(
+        injects.stream()
+            .flatMap(
+                inject ->
+                    inject.getInjectorContract().isPresent()
+                        ? inject.getInjectorContract().get().getPayload() != null
+                            ? inject.getInjectorContract().get().getPayload().getTags().stream()
+                            : Stream.of()
+                        : Stream.of())
+            .toList());
     return tags;
   }
 }

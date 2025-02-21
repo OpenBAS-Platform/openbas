@@ -855,11 +855,11 @@ public class V1_DataImporter implements Importer {
               } else {
                 log.info(
                     "Inject comes from a collector not set up in your environment, a new payload has been created.");
-                injectorContractId = importPayload(payloadNode);
+                injectorContractId = importPayload(payloadNode, baseIds);
               }
               // Create new payload
             } else {
-              injectorContractId = importPayload(payloadNode);
+              injectorContractId = importPayload(payloadNode, baseIds);
             }
           } else {
             injectorContractId = injectorContract.get().getId();
@@ -1006,9 +1006,14 @@ public class V1_DataImporter implements Importer {
     }
   }
 
-  private String importPayload(@NotNull final JsonNode payloadNode) {
+  private String importPayload(@NotNull final JsonNode payloadNode, Map<String, Base> baseIds) {
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
+    payload.setTags(
+        resolveJsonIds(payloadNode, "payload_tags").stream()
+            .map(baseIds::get)
+            .map(Tag.class::cast)
+            .collect(Collectors.toSet()));
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
     if (injectorContractFromPayload.isPresent()) {
