@@ -1,6 +1,7 @@
 package io.openbas.rest.exercise;
 
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
+import static io.openbas.utils.fixtures.FileFixture.WELL_KNOWN_FILES;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
@@ -17,6 +18,7 @@ import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
+import io.openbas.service.FileService;
 import io.openbas.utils.ZipUtils;
 import io.openbas.utils.fixtures.*;
 import io.openbas.utils.fixtures.composers.*;
@@ -39,9 +41,11 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ArticleComposer articleComposer;
   @Autowired private ChannelComposer channelComposer;
+  @Autowired private InjectorFixture injectorFixture;
   @Autowired private LessonsQuestionsComposer lessonsQuestionsComposer;
   @Autowired private LessonsCategoryComposer lessonsCategoryComposer;
   @Autowired private VariableComposer variableComposer;
+  @Autowired private PayloadComposer payloadComposer;
   @Autowired private TeamComposer teamComposer;
   @Autowired private UserComposer userComposer;
   @Autowired private OrganizationComposer organizationComposer;
@@ -54,9 +58,10 @@ public class ExerciseApiExportTest extends IntegrationTest {
   @Autowired private ChallengeService challengeService;
   @Autowired private ArticleService articleService;
   @Resource protected ObjectMapper mapper;
+  @Autowired private FileService fileService;
 
   @BeforeEach
-  void before() {
+  void before() throws Exception {
     lessonsQuestionsComposer.reset();
     lessonsCategoryComposer.reset();
     teamComposer.reset();
@@ -71,6 +76,12 @@ public class ExerciseApiExportTest extends IntegrationTest {
     documentComposer.reset();
     tagComposer.reset();
     exerciseComposer.reset();
+    payloadComposer.reset();
+
+    // delete the test files from the minio service
+    for (String fileName : WELL_KNOWN_FILES.keySet()) {
+      fileService.deleteFile(fileName);
+    }
   }
 
   private Exercise getExercise() {
@@ -115,6 +126,23 @@ public class ExerciseApiExportTest extends IntegrationTest {
                                 .withTag(
                                     tagComposer.forTag(
                                         TagFixture.getTagWithText("Challenge tag"))))))
+        .withInject(
+            injectComposer
+                .forInject(InjectFixture.getInjectWithoutContract())
+                .withInjectorContract(
+                    injectorContractComposer
+                        .forInjectorContract(
+                            InjectorContractFixture.createDefaultInjectorContract())
+                        .withInjector(injectorFixture.getWellKnownObasImplantInjector())
+                        .withPayload(
+                            payloadComposer
+                                .forPayload(PayloadFixture.createDefaultFileDrop())
+                                .withFileDrop(
+                                    documentComposer
+                                        .forDocument(
+                                            DocumentFixture.getDocument(
+                                                FileFixture.getBadCoffeeFileContent()))
+                                        .withInMemoryFile(FileFixture.getBadCoffeeFileContent())))))
         .withDocument(
             documentComposer
                 .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
@@ -598,11 +626,9 @@ public class ExerciseApiExportTest extends IntegrationTest {
             .getResponse()
             .getContentAsByteArray();
 
-    List<Document> docs = documentComposer.generatedItems;
-
-    for (Document document : docs) {
+    for (Document document : documentComposer.generatedItems) {
       try (ByteArrayInputStream fis =
-          new ByteArrayInputStream(FileFixture.getPlainTextFileContent().getContentBytes())) {
+          new ByteArrayInputStream(WELL_KNOWN_FILES.get(document.getTarget()).getContentBytes())) {
         byte[] docFromZip =
             ZipUtils.getZipEntry(response, document.getTarget(), ZipUtils::streamToBytes);
         byte[] docFromDisk = fis.readAllBytes();
