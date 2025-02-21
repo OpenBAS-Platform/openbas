@@ -25,6 +25,7 @@ public class CalderaInjector {
       CalderaInjectorConfig calderaInjectorConfig,
       OpenBASConfig openBASConfig) {
     Map<String, String> executorCommands = new HashMap<>();
+    // TODO update filename with inject and agent id?, other arch?
     executorCommands.put(
         Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
         "$x=\"#{location}\";$location=$x.Replace(\"\\obas-agent-caldera.exe\", \"\");[Environment]::CurrentDirectory = $location;$random=-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_});$filename=\"obas-implant-caldera-$random.exe\";$server=\""

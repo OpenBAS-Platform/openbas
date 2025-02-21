@@ -106,7 +106,7 @@ public class ExpectationUtils {
 
   public static List<PreventionExpectation> getPreventionExpectationList(
       Asset asset,
-      List<io.openbas.database.model.Agent> executedAgents,
+      List<Agent> executedAgents,
       Payload payload,
       PreventionExpectation preventionExpectation) {
     return executedAgents.stream()
@@ -119,13 +119,13 @@ public class ExpectationUtils {
                     executedAgent.getParent(),
                     asset,
                     preventionExpectation.getExpirationTime(),
-                    computeSignatures(payload, executedAgent.getProcessName())))
+                    computeSignatures(payload, executedAgent)))
         .toList();
   }
 
   public static List<DetectionExpectation> getDetectionExpectationList(
       Asset asset,
-      List<io.openbas.database.model.Agent> executedAgents,
+      List<Agent> executedAgents,
       Payload payload,
       DetectionExpectation detectionExpectation) {
     return executedAgents.stream()
@@ -138,14 +138,12 @@ public class ExpectationUtils {
                     executedAgent.getParent(),
                     asset,
                     detectionExpectation.getExpirationTime(),
-                    computeSignatures(payload, executedAgent.getProcessName())))
+                    computeSignatures(payload, executedAgent)))
         .toList();
   }
 
   public static List<ManualExpectation> getManualExpectationList(
-      Asset asset,
-      List<io.openbas.database.model.Agent> executedAgents,
-      ManualExpectation manualExpectation) {
+      Asset asset, List<Agent> executedAgents, ManualExpectation manualExpectation) {
     return executedAgents.stream()
         .map(
             executedAgent ->
@@ -160,7 +158,7 @@ public class ExpectationUtils {
   }
 
   private static List<InjectExpectationSignature> computeSignatures(
-      Payload payload, String processName) {
+      Payload payload, Agent executedAgent) {
     List<InjectExpectationSignature> injectExpectationSignatures = new ArrayList<>();
 
     if (payload != null) {
@@ -168,7 +166,10 @@ public class ExpectationUtils {
       switch (payloadType) {
         case COMMAND:
           injectExpectationSignatures.add(
-              builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(processName).build());
+              builder()
+                  .type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME)
+                  .value(executedAgent.getProcessName())
+                  .build());
           break;
         case EXECUTABLE:
           Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
@@ -206,7 +207,14 @@ public class ExpectationUtils {
       }
     } else {
       injectExpectationSignatures.add(
-          builder().type(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME).value(processName).build());
+          createSignature(EXPECTATION_SIGNATURE_TYPE_PROCESS_NAME, executedAgent.getProcessName()));
+      injectExpectationSignatures.add(
+          createSignature(
+              EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
+              "obas-implant-caldera"
+                  + executedAgent.getInject().getId()
+                  + "-agent-"
+                  + executedAgent.getParent().getId()));
     }
     return injectExpectationSignatures;
   }
