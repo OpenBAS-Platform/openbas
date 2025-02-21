@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.Getter;
+import org.hibernate.Hibernate;
 
 @Getter
 @JsonInclude(NON_NULL)
@@ -112,7 +113,10 @@ public class InjectsFileExport extends FileExportBase {
 
   @JsonProperty("inject_organizations")
   private List<Organization> getOrganizations() {
-    return this.getUsers().stream().map(User::getOrganization).filter(Objects::nonNull).toList();
+    return this.getUsers().stream()
+        .map(user -> (Organization) Hibernate.unproxy(user.getOrganization()))
+        .filter(Objects::nonNull)
+        .toList();
   }
 
   @JsonProperty("inject_challenges")
