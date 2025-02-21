@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.database.audit.ModelBaseListener;
@@ -30,6 +31,7 @@ public class FileDrop extends Payload {
   private Document fileDropFile;
 
   @Override
+  @JsonIgnore
   public Optional<Document> getAttachedDocument() {
     return Optional.of(this.getFileDropFile());
   }
