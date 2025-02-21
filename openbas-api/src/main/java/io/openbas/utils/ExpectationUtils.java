@@ -211,7 +211,7 @@ public class ExpectationUtils {
       injectExpectationSignatures.add(
           createSignature(
               EXPECTATION_SIGNATURE_TYPE_PARENT_PROCESS_NAME,
-              "obas-implant-caldera"
+              "obas-implant-caldera-"
                   + executedAgent.getInject().getId()
                   + "-agent-"
                   + executedAgent.getParent().getId()));
