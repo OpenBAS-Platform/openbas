@@ -515,7 +515,9 @@ public class V1_DataImporter implements Importer {
         team.setOrganization((Organization) teamOrganization);
       }
     }
-    team.setContextual(jsonNode.get("team_contextual").booleanValue());
+    if (jsonNode.has("team_contextual")) {
+      team.setContextual(jsonNode.get("team_contextual").booleanValue());
+    }
     return team;
   }
 
