@@ -82,7 +82,7 @@ const SimulationList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const inlineStyles = getInlineStyles(variant);
   const { nsdt, vnsdt } = useFormatter();
 
@@ -199,12 +199,14 @@ const SimulationList: FunctionComponent<Props> = ({
                   </ListItemIcon>
                   <ListItemText
                     primary={(
-                      <div className={bodyItemsClasses.bodyItems}>
+                      <div style={bodyItemsStyles.bodyItems}>
                         {headers.map(header => (
                           <div
                             key={header.field}
-                            className={bodyItemsClasses.bodyItem}
-                            style={inlineStyles[header.field]}
+                            style={{
+                              ...bodyItemsStyles.bodyItem,
+                              ...inlineStyles[header.field],
+                            }}
                           >
                             {header.value?.(exercise)}
                           </div>

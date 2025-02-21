@@ -109,7 +109,7 @@ const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => s
 const AssetGroups = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
 
   const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroup['asset_group_id'] | undefined>(undefined);
@@ -242,12 +242,14 @@ const AssetGroups = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div className={bodyItemsClasses.bodyItems}>
+                  <div style={bodyItemsStyles.bodyItems}>
                     {headers.map(header => (
                       <div
                         key={header.field}
-                        className={bodyItemsClasses.bodyItem}
-                        style={inlineStyles[header.field]}
+                        style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles[header.field],
+                        }}
                       >
                         {header.value?.(assetGroup)}
                       </div>

@@ -92,7 +92,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Channels = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   // Filter and sort hook
@@ -148,7 +148,7 @@ const Channels = () => {
           </ListItemIcon>
           <ListItemText
             primary={(
-              <div className={bodyItemsClasses.bodyItems}>
+              <div style={bodyItemsStyles.bodyItems}>
                 {filtering.buildHeader(
                   'channel_type',
                   'Type',
@@ -188,22 +188,28 @@ const Channels = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={bodyItemsClasses.bodyItems}>
+                <div style={bodyItemsStyles.bodyItems}>
                   <div
-                    className={bodyItemsClasses.bodyItem}
-                    style={inlineStyles.channel_type}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.channel_type,
+                    }}
                   >
                     {t(channel.channel_type || 'Unknown')}
                   </div>
                   <div
-                    className={bodyItemsClasses.bodyItem}
-                    style={inlineStyles.channel_name}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.channel_name,
+                    }}
                   >
                     {channel.channel_name}
                   </div>
                   <div
-                    className={bodyItemsClasses.bodyItem}
-                    style={inlineStyles.channel_description}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.channel_description,
+                    }}
                   >
                     {channel.channel_description}
                   </div>

@@ -37,7 +37,7 @@ const SortHeadersComponentV2: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
 
   const sortComponent = (asc: boolean) => {
     return asc ? (<ArrowDropUpOutlined />) : (<ArrowDropDownOutlined />);
@@ -53,14 +53,20 @@ const SortHeadersComponentV2: FunctionComponent<Props> = ({
       );
     }
     return (
-      <div key={header.field} className={bodyItemsClasses.bodyItem} style={style}>
+      <div
+        key={header.field}
+        style={{
+          ...bodyItemsStyles.bodyItem,
+          ...style,
+        }}
+      >
         <div className={classes.headerItemText}>{t(header.label)}</div>
       </div>
     );
   };
 
   return (
-    <div className={bodyItemsClasses.bodyItems}>
+    <div style={bodyItemsStyles.bodyItems}>
       {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
     </div>
   );

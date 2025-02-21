@@ -38,7 +38,7 @@ const inlineStyles = {
 const Tags = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
 
   // Headers
@@ -125,11 +125,21 @@ const Tags = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={bodyItemsClasses.bodyItems}>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.tag_name}>
+                <div style={bodyItemsStyles.bodyItems}>
+                  <div
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.tag_name,
+                    }}
+                  >
                     {tag.tag_name}
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.tag_color}>
+                  <div
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.tag_color,
+                    }}
+                  >
                     {tag.tag_color}
                   </div>
                 </div>

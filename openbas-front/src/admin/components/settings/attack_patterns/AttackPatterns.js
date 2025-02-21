@@ -45,7 +45,7 @@ const inlineStyles = {
 const AttackPatterns = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
   const { killChainPhasesMap } = useHelper(helper => ({ killChainPhasesMap: helper.getKillChainPhasesMap() }));
 
@@ -150,24 +150,44 @@ const AttackPatterns = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={bodyItemsClasses.bodyItems}>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.kill_chain_phase}>
+                <div style={bodyItemsStyles.bodyItems}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.kill_chain_phase,
+                  }}
+                  >
                     {
                       attackPattern.attack_pattern_kill_chain_phases.at(0)
                         ? `[${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_kill_chain_name}] ${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_name}`
                         : '-'
                     }
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.attack_pattern_external_id}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_external_id,
+                  }}
+                  >
                     {attackPattern.attack_pattern_external_id}
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.attack_pattern_name}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_name,
+                  }}
+                  >
                     {attackPattern.attack_pattern_name}
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.attack_pattern_created_at}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_created_at,
+                  }}
+                  >
                     {nsdt(attackPattern.attack_pattern_created_at)}
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.attack_pattern_updated_at}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_updated_at,
+                  }}
+                  >
                     {nsdt(attackPattern.attack_pattern_updated_at)}
                   </div>
                 </div>

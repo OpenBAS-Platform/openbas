@@ -48,7 +48,7 @@ const inlineStyles = {
 const KillChainPhases = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
 
   // Headers
@@ -147,8 +147,12 @@ const KillChainPhases = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={bodyItemsClasses.bodyItems}>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_kill_chain_name}>
+                <div style={bodyItemsStyles.bodyItems}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.phase_kill_chain_name,
+                  }}
+                  >
                     <Chip
                       variant="outlined"
                       classes={{ root: classes.chipInList }}
@@ -156,13 +160,25 @@ const KillChainPhases = () => {
                       label={killChainPhase.phase_kill_chain_name}
                     />
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_name}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.phase_name,
+                  }}
+                  >
                     {killChainPhase.phase_name}
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_order}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.phase_order,
+                  }}
+                  >
                     {killChainPhase.phase_order}
                   </div>
-                  <div className={bodyItemsClasses.bodyItem} style={inlineStyles.phase_created_at}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.phase_created_at,
+                  }}
+                  >
                     {nsdt(killChainPhase.phase_created_at)}
                   </div>
                 </div>

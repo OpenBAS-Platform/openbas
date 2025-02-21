@@ -77,7 +77,7 @@ const Organizations = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
 
   // Fetching data
@@ -170,7 +170,7 @@ const Organizations = () => {
           <ListItemIcon />
           <ListItemText
             primary={(
-              <div className={bodyItemsClasses.bodyItems}>
+              <div style={bodyItemsStyles.bodyItems}>
                 {filtering.buildHeader(
                   'organization_name',
                   'Name',
@@ -205,16 +205,20 @@ const Organizations = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={bodyItemsClasses.bodyItems}>
+                <div style={bodyItemsStyles.bodyItems}>
                   <div
-                    className={bodyItemsClasses.bodyItem}
-                    style={inlineStyles.organization_name}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.organization_name,
+                    }}
                   >
                     {organization.organization_name}
                   </div>
                   <div
-                    className={bodyItemsClasses.bodyItem}
-                    style={inlineStyles.organization_description}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.organization_description,
+                    }}
                   >
                     {truncate(
                       organization.organization_description || '-',
@@ -222,8 +226,10 @@ const Organizations = () => {
                     )}
                   </div>
                   <div
-                    className={bodyItemsClasses.bodyItem}
-                    style={inlineStyles.organization_tags}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.organization_tags,
+                    }}
                   >
                     <ItemTags
                       variant="list"

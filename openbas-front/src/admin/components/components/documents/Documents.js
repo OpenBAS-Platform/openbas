@@ -66,7 +66,7 @@ const inlineStyles = {
 const Documents = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useFormatter();
@@ -210,22 +210,28 @@ const Documents = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div className={bodyItemsClasses.bodyItems}>
+                  <div style={bodyItemsStyles.bodyItems}>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.document_name}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.document_name,
+                      }}
                     >
                       {document.document_name}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.document_description}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.document_description,
+                      }}
                     >
                       {document.document_description}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.document_exercises}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.document_exercises,
+                      }}
                     >
                       {R.take(3, document.document_exercises).map((e, i) => {
                         const exercise = exercisesMap[e];
@@ -255,8 +261,10 @@ const Documents = () => {
                       })}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.document_scenarios}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.document_scenarios,
+                      }}
                     >
                       {R.take(3, document.document_scenarios).map((e, i) => {
                         const scenario = scenariosMap[e];
@@ -286,8 +294,10 @@ const Documents = () => {
                       })}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.document_type}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.document_type,
+                      }}
                     >
                       <DocumentType
                         type={document.document_type}
@@ -295,8 +305,10 @@ const Documents = () => {
                       />
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.document_tags}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.document_tags,
+                      }}
                     >
                       <ItemTags variant="list" tags={document.document_tags} />
                     </div>

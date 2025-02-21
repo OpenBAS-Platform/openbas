@@ -47,7 +47,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Scenarios = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -243,12 +243,14 @@ const Scenarios = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={(
-                          <div className={bodyItemsClasses.bodyItems}>
+                          <div style={bodyItemsStyles.bodyItems}>
                             {headers.map(header => (
                               <div
                                 key={header.field}
-                                className={bodyItemsClasses.bodyItem}
-                                style={inlineStyles[header.field]}
+                                style={{
+                                  ...bodyItemsStyles.bodyItem,
+                                  ...inlineStyles[header.field],
+                                }}
                               >
                                 {header.value(scenario)}
                               </div>

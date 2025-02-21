@@ -57,7 +57,7 @@ const InjectResultList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -213,12 +213,14 @@ const InjectResultList: FunctionComponent<Props> = ({
                       </ListItemIcon>
                       <ListItemText
                         primary={(
-                          <div className={bodyItemsClasses.bodyItems}>
+                          <div style={bodyItemsStyles.bodyItems}>
                             {headers.map(header => (
                               <div
                                 key={header.field}
-                                className={bodyItemsClasses.bodyItem}
-                                style={inlineStyles[header.field]}
+                                style={{
+                                  ...bodyItemsStyles.bodyItem,
+                                  ...inlineStyles[header.field],
+                                }}
                               >
                                 {header.value?.(injectResultOutput)}
                               </div>

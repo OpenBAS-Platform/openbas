@@ -46,7 +46,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const SecurityPlatforms = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const theme = useTheme();
   const { t } = useFormatter();
 
@@ -165,17 +165,33 @@ const SecurityPlatforms = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div className={bodyItemsClasses.bodyItems}>
-                    <div className={bodyItemsClasses.bodyItem} style={inlineStyles.asset_name}>
+                  <div style={bodyItemsStyles.bodyItems}>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.asset_name,
+                    }}
+                    >
                       {securityPlatform.asset_name}
                     </div>
-                    <div className={bodyItemsClasses.bodyItem} style={inlineStyles.security_platform_type}>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.security_platform_type,
+                    }}
+                    >
                       {securityPlatform.security_platform_type}
                     </div>
-                    <div className={bodyItemsClasses.bodyItem} style={inlineStyles.asset_description}>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.asset_description,
+                    }}
+                    >
                       {securityPlatform.asset_description}
                     </div>
-                    <div className={bodyItemsClasses.bodyItem} style={inlineStyles.asset_tags}>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.asset_tags,
+                    }}
+                    >
                       <ItemTags variant="list" tags={securityPlatform.asset_tags} />
                     </div>
                   </div>

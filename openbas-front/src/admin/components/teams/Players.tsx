@@ -45,7 +45,7 @@ const Players = () => {
   // Standard hooks
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
 
   // Fetching data
@@ -174,12 +174,14 @@ const Players = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={bodyItemsClasses.bodyItems}>
+                <div style={bodyItemsStyles.bodyItems}>
                   {headers.map(header => (
                     <div
                       key={header.field}
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles[header.field]}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles[header.field],
+                      }}
                     >
                       {header.value?.(player)}
                     </div>

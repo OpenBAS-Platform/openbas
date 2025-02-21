@@ -95,7 +95,7 @@ const inlineStyles = {
 const Challenges = () => {
   // Standard hooks
   const { classes } = useStyles();
-  const { classes: bodyItemsClasses } = useBodyItemsStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
 
@@ -158,7 +158,7 @@ const Challenges = () => {
           </ListItemIcon>
           <ListItemText
             primary={(
-              <div className={bodyItemsClasses.bodyItems}>
+              <div style={bodyItemsStyles.bodyItems}>
                 {filtering.buildHeader(
                   'challenge_name',
                   'Name',
@@ -209,28 +209,36 @@ const Challenges = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div className={bodyItemsClasses.bodyItems}>
+                  <div style={bodyItemsStyles.bodyItems}>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.challenge_name}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_name,
+                      }}
                     >
                       {challenge.challenge_name}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.challenge_category}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_category,
+                      }}
                     >
                       {challenge.challenge_category}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.challenge_score}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_score,
+                      }}
                     >
                       {challenge.challenge_score}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.challenge_exercises}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_exercises,
+                      }}
                     >
                       {R.take(3, challenge.challenge_exercises).map((e) => {
                         const exercise = exercisesMap[e] || {};
@@ -253,8 +261,10 @@ const Challenges = () => {
                       })}
                     </div>
                     <div
-                      className={bodyItemsClasses.bodyItem}
-                      style={inlineStyles.challenge_tags}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_tags,
+                      }}
                     >
                       <ItemTags
                         variant="list"
