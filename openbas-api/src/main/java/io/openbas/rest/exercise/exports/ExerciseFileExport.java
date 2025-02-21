@@ -14,6 +14,7 @@ import io.openbas.service.ChallengeService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -138,7 +139,25 @@ public class ExerciseFileExport extends FileExportBase {
 
   public List<Document> getDocuments() {
     if (documents == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getDocuments();
+      if (this.exercise == null) {
+        return new ArrayList<>();
+      }
+      List<Document> docs = new ArrayList<>();
+      docs.addAll(this.exercise.getDocuments());
+      docs.addAll(
+          this.exercise.getInjects().stream()
+              .flatMap(
+                  inject -> {
+                    if (inject.getPayload().isEmpty()) {
+                      return Stream.of();
+                    }
+                    if (inject.getPayload().get().getAttachedDocument().isPresent()) {
+                      return Stream.of(inject.getPayload().get().getAttachedDocument().get());
+                    }
+                    return Stream.of();
+                  })
+              .toList());
+      return docs;
     }
     return documents;
   }
