@@ -8,6 +8,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
 import TaxonomiesMenu from '../TaxonomiesMenu';
 import CreateTag from './CreateTag';
@@ -27,17 +28,6 @@ const useStyles = makeStyles()(() => ({
     paddingLeft: 10,
     height: 50,
   },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
 }));
 
 const inlineStyles = {
@@ -48,6 +38,7 @@ const inlineStyles = {
 const Tags = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
 
   // Headers
@@ -134,11 +125,21 @@ const Tags = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.tag_name}>
+                <div style={bodyItemsStyles.bodyItems}>
+                  <div
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.tag_name,
+                    }}
+                  >
                     {tag.tag_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.tag_color}>
+                  <div
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.tag_color,
+                    }}
+                  >
                     {tag.tag_color}
                   </div>
                 </div>

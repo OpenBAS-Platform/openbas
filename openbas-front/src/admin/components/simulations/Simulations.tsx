@@ -14,12 +14,12 @@ import { useQueryableWithLocalStorage } from '../../../components/common/queryab
 import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import { type ExerciseSimple, type FilterGroup, type SearchPaginationInput } from '../../../utils/api-types';
-import ExerciseList from './ExerciseList';
 import ImportUploaderExercise from './ImportUploaderExercise';
 import ExerciseCreation from './simulation/ExerciseCreation';
 import ExercisePopover from './simulation/ExercisePopover';
+import SimulationList from './SimulationList';
 
-const Exercises = () => {
+const Simulations = () => {
   // Standard hooks
   const { t } = useFormatter();
 
@@ -107,7 +107,7 @@ const Exercises = () => {
           </ToggleButtonGroup>
         )}
       />
-      <ExerciseList
+      <SimulationList
         exercises={exercises}
         queryableHelpers={queryableHelpers}
         secondaryAction={secondaryAction}
@@ -118,4 +118,4 @@ const Exercises = () => {
   );
 };
 
-export default Exercises;
+export default Simulations;

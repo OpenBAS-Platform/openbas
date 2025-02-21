@@ -25,8 +25,8 @@ import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
 import { type ExerciseSimple, type KillChainPhase, type Scenario as ScenarioType, type SearchPaginationInput } from '../../../../utils/api-types';
 import { isEmptyField } from '../../../../utils/utils';
-import ExerciseList from '../../simulations/ExerciseList';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
+import SimulationList from '../../simulations/SimulationList';
 import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 
 // Deprecated - https://mui.com/system/styles/basics/
@@ -228,7 +228,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
               queryableHelpers={queryableHelpers}
               searchEnable={false}
             />
-            <ExerciseList
+            <SimulationList
               exercises={exercises}
               queryableHelpers={queryableHelpers}
               secondaryAction={secondaryAction}

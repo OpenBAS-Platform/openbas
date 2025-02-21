@@ -8,6 +8,7 @@ import { makeStyles } from 'tss-react/mui';
 import { type OrganizationHelper, type TagHelper, type UserHelper } from '../../../actions/helper';
 import { fetchOrganizations } from '../../../actions/Organization';
 import Breadcrumbs from '../../../components/Breadcrumbs';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
@@ -22,7 +23,7 @@ import TagsFilter from '../common/filters/TagsFilter';
 import CreateOrganization from './organizations/CreateOrganization';
 import OrganizationPopover from './organizations/OrganizationPopover';
 
-const useStyles = makeStyles()(theme => ({
+const useStyles = makeStyles()(() => ({
   parameters: {
     marginTop: -10,
     display: 'flex',
@@ -33,19 +34,12 @@ const useStyles = makeStyles()(theme => ({
     display: 'flex',
     gap: '10px',
   },
-  container: { display: 'flex' },
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
     paddingLeft: 10,
   },
   item: { height: 50 },
-  bodyItem: {
-    fontSize: theme.typography.h3.fontSize,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
   downloadButton: { marginRight: 15 },
 }));
 
@@ -83,6 +77,7 @@ const Organizations = () => {
   // Standard hooks
   const dispatch = useAppDispatch();
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
 
   // Fetching data
@@ -175,7 +170,7 @@ const Organizations = () => {
           <ListItemIcon />
           <ListItemText
             primary={(
-              <div className={classes.container}>
+              <div style={bodyItemsStyles.bodyItems}>
                 {filtering.buildHeader(
                   'organization_name',
                   'Name',
@@ -210,16 +205,20 @@ const Organizations = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.container}>
+                <div style={bodyItemsStyles.bodyItems}>
                   <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.organization_name}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.organization_name,
+                    }}
                   >
                     {organization.organization_name}
                   </div>
                   <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.organization_description}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.organization_description,
+                    }}
                   >
                     {truncate(
                       organization.organization_description || '-',
@@ -227,8 +226,10 @@ const Organizations = () => {
                     )}
                   </div>
                   <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.organization_tags}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.organization_tags,
+                    }}
                   >
                     <ItemTags
                       variant="list"

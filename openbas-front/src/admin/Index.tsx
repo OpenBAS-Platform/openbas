@@ -24,7 +24,7 @@ import InjectIndex from './components/simulations/simulation/injects/InjectIndex
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
-const Exercises = lazy(() => import('./components/simulations/Exercises'));
+const Exercises = lazy(() => import('./components/simulations/Simulations'));
 const IndexExercise = lazy(() => import('./components/simulations/simulation/Index'));
 const AtomicTestings = lazy(() => import('./components/atomic_testings/AtomicTestings'));
 const IndexAtomicTesting = lazy(() => import('./components/atomic_testings/atomic_testing/Index'));

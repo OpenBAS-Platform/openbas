@@ -8,6 +8,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponent from '../../../../components/common/pagination/PaginationComponent';
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import TaxonomiesMenu from '../TaxonomiesMenu';
@@ -28,17 +29,6 @@ const useStyles = makeStyles()(() => ({
     paddingLeft: 10,
     height: 50,
   },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
 }));
 
 const inlineStyles = {
@@ -55,6 +45,7 @@ const inlineStyles = {
 const AttackPatterns = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
   const { killChainPhasesMap } = useHelper(helper => ({ killChainPhasesMap: helper.getKillChainPhasesMap() }));
 
@@ -159,24 +150,44 @@ const AttackPatterns = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.kill_chain_phase}>
+                <div style={bodyItemsStyles.bodyItems}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.kill_chain_phase,
+                  }}
+                  >
                     {
                       attackPattern.attack_pattern_kill_chain_phases.at(0)
                         ? `[${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_kill_chain_name}] ${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_name}`
                         : '-'
                     }
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.attack_pattern_external_id}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_external_id,
+                  }}
+                  >
                     {attackPattern.attack_pattern_external_id}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.attack_pattern_name}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_name,
+                  }}
+                  >
                     {attackPattern.attack_pattern_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.attack_pattern_created_at}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_created_at,
+                  }}
+                  >
                     {nsdt(attackPattern.attack_pattern_created_at)}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.attack_pattern_updated_at}>
+                  <div style={{
+                    ...bodyItemsStyles.bodyItem,
+                    ...inlineStyles.attack_pattern_updated_at,
+                  }}
+                  >
                     {nsdt(attackPattern.attack_pattern_updated_at)}
                   </div>
                 </div>
