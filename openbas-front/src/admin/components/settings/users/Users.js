@@ -120,98 +120,100 @@ const Users = () => {
   };
 
   return (
-    <div className={classes.container}>
-      <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Security') }, {
-          label: t('Users'),
-          current: true,
-        }]}
-      />
-      <SecurityMenu />
-      <PaginationComponent
-        fetch={searchUsers}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setUsers}
-        exportProps={exportProps}
-      />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={(
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-              />
-            )}
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {users.map(user => (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flexGrow: 1 }}>
+        <Breadcrumbs
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Security') }, {
+            label: t('Users'),
+            current: true,
+          }]}
+        />
+        <PaginationComponent
+          fetch={searchUsers}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setUsers}
+          exportProps={exportProps}
+        />
+        <List>
           <ListItem
-            key={user.user_id}
-            classes={{ root: classes.item }}
-            divider={true}
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
           >
             <ListItemIcon>
-              <PersonOutlined color="primary" />
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+              &nbsp;
+              </span>
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.user_email}>
-                    {user.user_email}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_firstname}>
-                    {user.user_firstname}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_lastname}>
-                    {user.user_lastname}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_organization}>
-                    {user.user_organization_name}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_admin}>
-                    {user.user_admin ? (<CheckCircleOutlined fontSize="small" />) : ('-')}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_tags}>
-                    <ItemTags variant="list" tags={user.user_tags} />
-                  </div>
-                </div>
+                <SortHeadersComponent
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  searchPaginationInput={searchPaginationInput}
+                  setSearchPaginationInput={setSearchPaginationInput}
+                />
               )}
             />
-            <ListItemSecondaryAction>
-              <UserPopover
-                user={user}
-                tagsMap={tagsMap}
-                organizationsMap={organizationsMap}
-                onUpdate={result => setUsers(users.map(u => (u.user_id !== result.user_id ? u : result)))}
-                onDelete={result => setUsers(users.filter(u => (u.user_id !== result)))}
-              />
-            </ListItemSecondaryAction>
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-        ))}
-      </List>
-      <CreateUser
-        onCreate={result => setUsers([result, ...users])}
-      />
+          {users.map(user => (
+            <ListItem
+              key={user.user_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <PersonOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div className={classes.bodyItems}>
+                    <div className={classes.bodyItem} style={inlineStyles.user_email}>
+                      {user.user_email}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.user_firstname}>
+                      {user.user_firstname}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.user_lastname}>
+                      {user.user_lastname}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.user_organization}>
+                      {user.user_organization_name}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.user_admin}>
+                      {user.user_admin ? (<CheckCircleOutlined fontSize="small" />) : ('-')}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.user_tags}>
+                      <ItemTags variant="list" tags={user.user_tags} />
+                    </div>
+                  </div>
+                )}
+              />
+              <ListItemSecondaryAction>
+                <UserPopover
+                  user={user}
+                  tagsMap={tagsMap}
+                  organizationsMap={organizationsMap}
+                  onUpdate={result => setUsers(users.map(u => (u.user_id !== result.user_id ? u : result)))}
+                  onDelete={result => setUsers(users.filter(u => (u.user_id !== result)))}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+        <CreateUser
+          onCreate={result => setUsers([result, ...users])}
+        />
+      </div>
+      <SecurityMenu />
     </div>
   );
 };
