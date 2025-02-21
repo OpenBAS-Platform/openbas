@@ -6,10 +6,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { enUS as dateFnsEnUSLocale, fr as dateFnsFrLocale, zhCN as dateFnsZhCNLocale } from 'date-fns/locale';
 import moment from 'moment';
-import { FunctionComponent, ReactElement, useEffect } from 'react';
+import { type FunctionComponent, type ReactElement, useEffect } from 'react';
 import { IntlProvider } from 'react-intl';
 
-import { LoggedHelper } from '../actions/helper';
+import { type LoggedHelper } from '../actions/helper';
 import { useHelper } from '../store';
 import locale, { DEFAULT_LANG } from '../utils/BrowserLanguage';
 import enOpenBAS from '../utils/lang/en.json';
@@ -41,7 +41,10 @@ const momentMap = {
 export let LANG = DEFAULT_LANG;
 
 const AppIntlProvider: FunctionComponent<{ children: ReactElement }> = ({ children }) => {
-  const { platformName, lang }: { platformName: string; lang: string } = useHelper((helper: LoggedHelper) => {
+  const { platformName, lang }: {
+    platformName: string;
+    lang: string;
+  } = useHelper((helper: LoggedHelper) => {
     const me = helper.getMe();
     const settings = helper.getPlatformSettings();
     const name = settings.platform_name ?? 'OpenBAS - Crisis Drills Planning Platform';
@@ -49,7 +52,10 @@ const AppIntlProvider: FunctionComponent<{ children: ReactElement }> = ({ childr
     const rawUserLang = me?.user_lang ?? 'auto';
     const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
     const userLang = rawUserLang !== 'auto' ? rawUserLang : platformLang;
-    return { platformName: name, lang: userLang };
+    return {
+      platformName: name,
+      lang: userLang,
+    };
   });
   LANG = lang;
   const baseMessages: Record<string, string> = obasLocaleMap[lang as Lang] || obasLocaleMap[DEFAULT_LANG];
