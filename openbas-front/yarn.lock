@@ -2036,12 +2036,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hookform/resolvers@npm:3.10.0":
-  version: 3.10.0
-  resolution: "@hookform/resolvers@npm:3.10.0"
+"@hookform/resolvers@npm:4.1.1":
+  version: 4.1.1
+  resolution: "@hookform/resolvers@npm:4.1.1"
+  dependencies:
+    caniuse-lite: "npm:^1.0.30001698"
   peerDependencies:
     react-hook-form: ^7.0.0
-  checksum: 10c0/7ee44533b4cdc28c4fa2a94894c735411e5a1f830f4a617c580533321a9b901df0cc8c1e2fad81ad8d55154ebc5cb844cf9c116a3148ffae2bc48758c33cbb8e
+  checksum: 10c0/3d0ea8cbe5a8e008361149a1e087124b7e086779534f79de1330fb6bc68cc2df2627152cfa3f0f33a1baa6294430edad6f80fa7eb8887a9d8c52d79c228e0709
   languageName: node
   linkType: hard
 
@@ -4244,6 +4246,13 @@ __metadata:
   version: 1.0.30001697
   resolution: "caniuse-lite@npm:1.0.30001697"
   checksum: 10c0/c114045be1bb5e610ca14c619157472910401bf59cc4d3050cc64ecd6887345ae8f685a5474c126755fabbd6e02f899b3b743218ab46dcbd5b6880607b67e18e
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001698":
+  version: 1.0.30001700
+  resolution: "caniuse-lite@npm:1.0.30001700"
+  checksum: 10c0/3d391bcdd193208166d3ad759de240b9c18ac3759dbd57195770f0fcd2eedcd47d5e853609aba1eee5a2def44b0a14eee457796bdb3451a27de0c8b27355017c
   languageName: node
   linkType: hard
 
@@ -9011,7 +9020,7 @@ __metadata:
     "@faker-js/faker": "npm:9.5.0"
     "@fontsource/geologica": "npm:5.1.1"
     "@fontsource/ibm-plex-sans": "npm:5.1.1"
-    "@hookform/resolvers": "npm:3.10.0"
+    "@hookform/resolvers": "npm:4.1.1"
     "@microsoft/fetch-event-source": "npm:2.0.1"
     "@mui/icons-material": "npm:6.4.5"
     "@mui/lab": "npm:6.0.0-beta.28"
