@@ -1,6 +1,8 @@
 package io.openbas.utils;
 
+import static io.openbas.rest.settings.PreviewFeature.AGENT_EXPECTATION_UI;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Endpoint;
@@ -9,7 +11,9 @@ import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
+import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.service.AssetGroupService;
+import io.openbas.service.PlatformSettingsService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -29,6 +33,7 @@ public class ResultUtils {
   private final AssetGroupRepository assetGroupRepository;
   private final AssetGroupService assetGroupService;
   private final AgentRepository agentRepository;
+  private final PlatformSettingsService platformSettingsService;
 
   // -- UTILS --
   public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
@@ -163,6 +168,9 @@ public class ResultUtils {
     Map<String, RawAgent> agentMap =
         rawAgents.stream().collect(Collectors.toMap(RawAgent::getAgent_id, rawAgent -> rawAgent));
 
+    PlatformSettings settings =
+        platformSettingsService.findSettings(); // TODO Remove when #1860 is merged
+
     return injectIds.stream()
         .flatMap(
             injectId ->
@@ -171,7 +179,9 @@ public class ResultUtils {
                     injectAssetMap.getOrDefault(injectId, emptyList()),
                     teamMap,
                     userMap,
-                    agentMap,
+                    settings.getEnabledDevFeatures().contains(AGENT_EXPECTATION_UI)
+                        ? agentMap
+                        : emptyMap(), // TODO Remove when #1860 is merged
                     assetMap,
                     dynamicForAssetGroupMap,
                     assetGroupMap)

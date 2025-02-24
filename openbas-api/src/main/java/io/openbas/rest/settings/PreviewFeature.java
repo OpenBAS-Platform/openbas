@@ -11,7 +11,8 @@ package io.openbas.rest.settings;
  */
 public enum PreviewFeature {
   // Reserved for internal use.
-  _RESERVED;
+  _RESERVED,
+  AGENT_EXPECTATION_UI;
 
   public static PreviewFeature fromStringIgnoreCase(String str) {
     for (PreviewFeature feature : PreviewFeature.values()) {
