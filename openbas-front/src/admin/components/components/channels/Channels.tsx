@@ -8,6 +8,7 @@ import { fetchChannels } from '../../../../actions/channels/channel-action';
 import { type ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import { type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../components/i18n';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useHelper } from '../../../../store';
@@ -40,10 +41,6 @@ const useStyles = makeStyles()(() => ({
     paddingLeft: 10,
     height: 50,
   },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-  },
 }));
 
 const headerStyles: Record<string, CSSProperties> = {
@@ -54,19 +51,16 @@ const headerStyles: Record<string, CSSProperties> = {
     top: '0px',
   },
   channel_type: {
-    float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   channel_name: {
-    float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
   channel_description: {
-    float: 'left',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -74,7 +68,6 @@ const headerStyles: Record<string, CSSProperties> = {
 
 const inlineStyles: Record<string, CSSProperties> = {
   channel_type: {
-    float: 'left',
     width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
@@ -82,7 +75,6 @@ const inlineStyles: Record<string, CSSProperties> = {
     textOverflow: 'ellipsis',
   },
   channel_name: {
-    float: 'left',
     width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
@@ -90,7 +82,6 @@ const inlineStyles: Record<string, CSSProperties> = {
     textOverflow: 'ellipsis',
   },
   channel_description: {
-    float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -101,6 +92,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Channels = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useAppDispatch();
   const { t } = useFormatter();
   // Filter and sort hook
@@ -156,7 +148,7 @@ const Channels = () => {
           </ListItemIcon>
           <ListItemText
             primary={(
-              <div>
+              <div style={bodyItemsStyles.bodyItems}>
                 {filtering.buildHeader(
                   'channel_type',
                   'Type',
@@ -196,22 +188,28 @@ const Channels = () => {
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div>
+                <div style={bodyItemsStyles.bodyItems}>
                   <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.channel_type}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.channel_type,
+                    }}
                   >
                     {t(channel.channel_type || 'Unknown')}
                   </div>
                   <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.channel_name}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.channel_name,
+                    }}
                   >
                     {channel.channel_name}
                   </div>
                   <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.channel_description}
+                    style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.channel_description,
+                    }}
                   >
                     {channel.channel_description}
                   </div>

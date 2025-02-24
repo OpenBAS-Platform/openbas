@@ -16,6 +16,7 @@ import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
@@ -33,16 +34,6 @@ import PayloadPopover from './PayloadPopover';
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
   item: { height: 50 },
-  bodyItems: { display: 'flex' },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-    boxSizing: 'content-box',
-  },
   chip: {
     fontSize: 12,
     height: 25,
@@ -73,8 +64,11 @@ const inlineStyles: Record<string, CSSProperties> = {
   payload_type: { width: '10%' },
   payload_name: { width: '20%' },
   payload_platforms: { width: '10%' },
-  payload_description: { width: '10%' },
-  payload_tags: { width: '20%' },
+  payload_description: {
+    width: '20%',
+    maxWidth: '300px',
+  }, // Workaround: we should change flex to grid
+  payload_tags: { width: '10%' },
   payload_source: { width: '10%' },
   payload_status: { width: '10%' },
   payload_updated_at: { width: '10%' },
@@ -104,6 +98,7 @@ const fromPayloadStatusToChipColor = (payloadStatus: string) => {
 const Payloads = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -322,12 +317,14 @@ const Payloads = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={(
-                      <div className={classes.bodyItems}>
+                      <div style={bodyItemsStyles.bodyItems}>
                         {headers.map(header => (
                           <div
                             key={header.field}
-                            className={classes.bodyItem}
-                            style={inlineStyles[header.field]}
+                            style={{
+                              ...bodyItemsStyles.bodyItem,
+                              ...inlineStyles[header.field],
+                            }}
                           >
                             {header.value?.(payload)}
                           </div>
