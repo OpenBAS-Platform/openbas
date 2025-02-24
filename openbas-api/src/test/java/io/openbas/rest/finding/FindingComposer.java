@@ -5,16 +5,14 @@ import io.openbas.database.repository.FindingRepository;
 import io.openbas.utils.fixtures.composers.ComposerBase;
 import io.openbas.utils.fixtures.composers.InjectComposer;
 import io.openbas.utils.fixtures.composers.InnerComposerBase;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class FindingComposer extends ComposerBase<Finding> {
 
-  @Autowired
-  private FindingRepository findingRepository;
+  @Autowired private FindingRepository findingRepository;
 
   public class Composer extends InnerComposerBase<Finding> {
 

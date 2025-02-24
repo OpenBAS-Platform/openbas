@@ -1,5 +1,8 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.createFinding;
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,16 +23,12 @@ import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static io.openbas.injector_contract.outputs.ContractOutputUtils.createFinding;
-import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
@@ -42,8 +41,7 @@ public class InjectStatusService {
   private final InjectStatusRepository injectStatusRepository;
   private final FindingService findingService;
 
-  @Resource
-  private ObjectMapper mapper;
+  @Resource private ObjectMapper mapper;
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
@@ -93,7 +91,8 @@ public class InjectStatusService {
   private ExecutionTraceAction convertExecutionAction(InjectExecutionAction status) {
     return switch (status) {
       case InjectExecutionAction.prerequisite_check -> ExecutionTraceAction.PREREQUISITE_CHECK;
-      case InjectExecutionAction.prerequisite_execution -> ExecutionTraceAction.PREREQUISITE_EXECUTION;
+      case InjectExecutionAction.prerequisite_execution ->
+          ExecutionTraceAction.PREREQUISITE_EXECUTION;
       case InjectExecutionAction.cleanup_execution -> ExecutionTraceAction.CLEANUP_EXECUTION;
       case InjectExecutionAction.complete -> ExecutionTraceAction.COMPLETE;
       default -> ExecutionTraceAction.EXECUTION;
@@ -175,15 +174,16 @@ public class InjectStatusService {
         List<Finding> findings = new ArrayList<>();
         // Get the contract
         InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
-        List<ContractOutputElement> contractOutputs = getContractOutputs(injectorContract.getConvertedContent(), mapper);
+        List<ContractOutputElement> contractOutputs =
+            getContractOutputs(injectorContract.getConvertedContent(), mapper);
         ObjectNode values = mapper.readValue(input.getOutputStructured(), ObjectNode.class);
         if (!contractOutputs.isEmpty()) {
           contractOutputs.forEach(
               contractOutput -> {
-                if( contractOutput.isMultiple() ) {
+                if (contractOutput.isMultiple()) {
                   JsonNode jsonNodes = values.get(contractOutput.getField());
-                  if( jsonNodes != null && jsonNodes.isArray() ) {
-                    for(JsonNode jsonNode : jsonNodes ) {
+                  if (jsonNodes != null && jsonNodes.isArray()) {
+                    for (JsonNode jsonNode : jsonNodes) {
                       Finding finding = createFinding(contractOutput);
                       finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
                       findings.add(finding);
@@ -215,7 +215,8 @@ public class InjectStatusService {
         case SUCCESS, WARNING -> successCount++;
         case PARTIAL -> partialCount++;
         case ERROR, COMMAND_NOT_FOUND, AGENT_INACTIVE -> errorCount++;
-        case MAYBE_PREVENTED, MAYBE_PARTIAL_PREVENTED, COMMAND_CANNOT_BE_EXECUTED -> maybePreventedCount++;
+        case MAYBE_PREVENTED, MAYBE_PARTIAL_PREVENTED, COMMAND_CANNOT_BE_EXECUTED ->
+            maybePreventedCount++;
       }
     }
 

@@ -1,11 +1,16 @@
 package io.openbas.rest.finding;
 
+import static io.openbas.rest.finding.FindingFixture.*;
+import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
+import static org.junit.jupiter.api.Assertions.*;
+
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.Finding;
 import io.openbas.database.model.Inject;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.utils.fixtures.composers.InjectComposer;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,27 +19,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static io.openbas.rest.finding.FindingFixture.*;
-import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 @Transactional
 class FindingServiceTest extends IntegrationTest {
 
-  @Autowired
-  private FindingComposer findingComposer;
-  @Autowired
-  private InjectComposer injectComposer;
-  @Autowired
-  private FindingService findingService;
-  @Autowired
-  private InjectRepository injectRepository;
+  @Autowired private FindingComposer findingComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private FindingService findingService;
+  @Autowired private InjectRepository injectRepository;
 
   FindingComposer.Composer createFindingComposer() {
-    return this.findingComposer.forFinding(createDefaultTextFinding())
+    return this.findingComposer
+        .forFinding(createDefaultTextFinding())
         .withInject(injectComposer.forInject(getDefaultInject()))
         .persist();
   }
@@ -168,4 +164,3 @@ class FindingServiceTest extends IntegrationTest {
     assertThrows(EntityNotFoundException.class, () -> findingService.deleteFinding("id"));
   }
 }
-

@@ -41,5 +41,4 @@ public class FindingInput {
     finding.setLabels(this.getLabels());
     return finding;
   }
-
 }

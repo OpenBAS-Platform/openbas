@@ -6,11 +6,10 @@ import io.openbas.rest.helper.RestBehavior;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/findings")
@@ -37,8 +36,10 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping
-  public ResponseEntity<Finding> createFinding(@RequestBody @Valid @NotNull final FindingInput input) {
-    return ResponseEntity.ok(this.findingService.createFinding(input.toFinding(new Finding()), input.getInjectId()));
+  public ResponseEntity<Finding> createFinding(
+      @RequestBody @Valid @NotNull final FindingInput input) {
+    return ResponseEntity.ok(
+        this.findingService.createFinding(input.toFinding(new Finding()), input.getInjectId()));
   }
 
   @PutMapping("/{id}")
@@ -47,7 +48,8 @@ public class FindingApi extends RestBehavior {
       @RequestBody @Valid @NotNull final FindingInput input) {
     Finding existingFinding = this.findingService.finding(id);
     Finding updatedFinding = input.toFinding(existingFinding);
-    return ResponseEntity.ok(this.findingService.updateFinding(updatedFinding, input.getInjectId()));
+    return ResponseEntity.ok(
+        this.findingService.updateFinding(updatedFinding, input.getInjectId()));
   }
 
   @DeleteMapping("/{id}")

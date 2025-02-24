@@ -1,10 +1,9 @@
 package io.openbas.migration;
 
+import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
-
-import java.sql.Statement;
 
 @Component
 public class V3_68__Add_Findings extends BaseJavaMigration {
@@ -24,8 +23,7 @@ public class V3_68__Add_Findings extends BaseJavaMigration {
                   finding_created_at TIMESTAMP DEFAULT now(),
                   finding_updated_at TIMESTAMP DEFAULT now()
               );
-              """
-      );
+              """);
     }
   }
 }

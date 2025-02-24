@@ -1,7 +1,6 @@
 package io.openbas.injector_contract.fields;
 
 import io.openbas.injector_contract.ContractCardinality;
-
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;

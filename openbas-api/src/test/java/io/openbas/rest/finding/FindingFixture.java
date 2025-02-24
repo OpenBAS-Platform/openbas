@@ -14,7 +14,7 @@ public class FindingFixture {
     finding.setType(ContractOutputType.Text);
     finding.setField(TEXT_FIELD);
     finding.setValue("text_value");
-    finding.setLabels(new String[]{"reconnaissance phase"});
+    finding.setLabels(new String[] {"reconnaissance phase"});
     return finding;
   }
 
@@ -33,5 +33,4 @@ public class FindingFixture {
     finding.setValue("admin:admin");
     return finding;
   }
-
 }

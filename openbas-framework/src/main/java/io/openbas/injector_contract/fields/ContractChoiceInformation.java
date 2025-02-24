@@ -1,7 +1,6 @@
 package io.openbas.injector_contract.fields;
 
 import io.openbas.injector_contract.ContractCardinality;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
