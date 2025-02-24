@@ -17,7 +17,7 @@ import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.specification.InjectSpecification;
-import io.openbas.injector_contract.ContractType;
+import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
@@ -319,7 +319,7 @@ public class InjectService {
     return !StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
         .filter(
             contractElement ->
-                contractElement.get("type").asText().equals(ContractType.AssetGroup.label))
+                contractElement.get("type").asText().equals(ContractFieldType.AssetGroup.label))
         .toList()
         .isEmpty();
   }

@@ -1,7 +1,6 @@
 package io.openbas.injector_contract.fields;
 
 import io.openbas.injector_contract.ContractCardinality;
-import io.openbas.injector_contract.ContractType;
 
 public class ContractChallenge extends ContractCardinalityElement {
 
@@ -15,7 +14,7 @@ public class ContractChallenge extends ContractCardinalityElement {
   }
 
   @Override
-  public ContractType getType() {
-    return ContractType.Challenge;
+  public ContractFieldType getType() {
+    return ContractFieldType.Challenge;
   }
 }

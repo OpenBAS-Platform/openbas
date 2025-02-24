@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 
 import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
-import type { InjectStore } from '../../../../actions/injects/Inject';
+import { type InjectStore } from '../../../../actions/injects/Inject';
 import { exportInjects, testInject } from '../../../../actions/injects/inject-action';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import DialogTest from '../../../../components/common/DialogTest';

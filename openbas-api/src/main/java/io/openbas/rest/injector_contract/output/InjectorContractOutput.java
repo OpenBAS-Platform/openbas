@@ -43,7 +43,7 @@ public class InjectorContractOutput {
   @JsonProperty("injector_contract_injector_name")
   private String injectorName;
 
-  @Schema(description = "Attack pattern Ids")
+  @Schema(description = "Attack pattern IDs")
   @JsonProperty("injector_contract_attack_patterns")
   private List<String> attackPatterns;
 

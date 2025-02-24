@@ -2,7 +2,6 @@ package io.openbas.injector_contract.fields;
 
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 
-import io.openbas.injector_contract.ContractType;
 import io.openbas.model.inject.form.Expectation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -36,7 +35,7 @@ public class ContractExpectations extends ContractCardinalityElement {
   }
 
   @Override
-  public ContractType getType() {
-    return ContractType.Expectation;
+  public ContractFieldType getType() {
+    return ContractFieldType.Expectation;
   }
 }

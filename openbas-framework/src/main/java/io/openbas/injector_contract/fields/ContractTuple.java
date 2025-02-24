@@ -2,7 +2,6 @@ package io.openbas.injector_contract.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.injector_contract.ContractCardinality;
-import io.openbas.injector_contract.ContractType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,8 +29,8 @@ public class ContractTuple extends ContractCardinalityElement {
   }
 
   @Override
-  public ContractType getType() {
-    return ContractType.Tuple;
+  public ContractFieldType getType() {
+    return ContractFieldType.Tuple;
   }
 
   public Boolean isContractAttachment() {
