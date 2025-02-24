@@ -84,8 +84,6 @@ public class ResultUtils {
   // -- TARGETS WITH RESULTS --
   public List<InjectTargetWithResult> computeTargetResults(@NotNull Set<String> injectIds) {
 
-    PlatformSettings settings = platformSettingsService.findSettings();
-
     // -- EXPECTATIONS --
     Set<RawInjectExpectation> rawInjectExpectations =
         injectExpectationRepository.rawByInjectIds(injectIds);
@@ -170,6 +168,9 @@ public class ResultUtils {
     Map<String, RawAgent> agentMap =
         rawAgents.stream().collect(Collectors.toMap(RawAgent::getAgent_id, rawAgent -> rawAgent));
 
+    PlatformSettings settings =
+        platformSettingsService.findSettings(); // TODO Remove when #1860 is merged
+
     return injectIds.stream()
         .flatMap(
             injectId ->
@@ -180,7 +181,7 @@ public class ResultUtils {
                     userMap,
                     settings.getEnabledDevFeatures().contains(AGENT_EXPECTATION_UI)
                         ? agentMap
-                        : emptyMap(),
+                        : emptyMap(), // TODO Remove when #1860 is merged
                     assetMap,
                     dynamicForAssetGroupMap,
                     assetGroupMap)
