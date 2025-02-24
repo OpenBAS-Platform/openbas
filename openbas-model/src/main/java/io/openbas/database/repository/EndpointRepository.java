@@ -20,14 +20,14 @@ public interface EndpointRepository
 
   @Query(
       value =
-          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_ips && :ips",
+          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_ips && cast(:ips as text[])",
       nativeQuery = true)
   Optional<Endpoint> findByHostnameAndAtleastOneIp(
       @NotBlank final @Param("hostname") String hostname,
       @NotNull final @Param("ips") String[] ips);
 
   @Query(
-      value = "select e.* from assets e where e.endpoint_mac_addresses && :macAddresses",
+      value = "select e.* from assets e where e.endpoint_mac_addresses && cast(:macAddresses as text[])",
       nativeQuery = true)
   Optional<Endpoint> findByAtleastOneMacAddress(
       @NotNull final @Param("macAddresses") String[] macAddresses);
