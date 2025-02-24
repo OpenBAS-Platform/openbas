@@ -11,6 +11,7 @@ import io.openbas.database.repository.DocumentRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.exports.ExerciseFileExport;
 import io.openbas.rest.exercise.exports.ExportOptions;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
@@ -30,6 +31,7 @@ public class ExportService {
   @Resource protected ObjectMapper mapper;
   @Resource private DocumentRepository documentRepository;
   @Resource private ChallengeService challengeService;
+  @Resource private ArticleService articleService;
   @Resource private FileService fileService;
 
   public String getZipFileName(Exercise exercise, int exportOptionsMask) {
@@ -54,7 +56,8 @@ public class ExportService {
     ObjectMapper objectMapper = mapper.copy();
 
     ExerciseFileExport importExport =
-        ExerciseFileExport.fromExercise(exercise, objectMapper, this.challengeService)
+        ExerciseFileExport.fromExercise(
+                exercise, objectMapper, this.challengeService, this.articleService)
             .withOptions(exportOptionsMask);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

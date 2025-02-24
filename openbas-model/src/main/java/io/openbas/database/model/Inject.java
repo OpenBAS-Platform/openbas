@@ -43,7 +43,10 @@ public class Inject implements Base, Injection {
         if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
           return o1.getDate().get().compareTo(o2.getDate().get());
         }
-        return o1.getId().compareTo(o2.getId());
+        if (o1.getId() != null && o2.getId() != null) {
+          return o1.getId().compareTo(o2.getId());
+        }
+        return 0;
       };
 
   @Getter
@@ -428,6 +431,14 @@ public class Inject implements Base, Injection {
     return VALID_TESTABLE_TYPES.contains(this.getType());
   }
 
+  @JsonIgnore
+  public Optional<Payload> getPayload() {
+    return Optional.ofNullable(
+        this.getInjectorContract().isPresent()
+            ? this.getInjectorContract().get().getPayload()
+            : null);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -437,6 +448,9 @@ public class Inject implements Base, Injection {
       return false;
     }
     Base base = (Base) o;
+    if (base.getId() == null || this.getId() == null) {
+      return false;
+    }
     return id.equals(base.getId());
   }
 

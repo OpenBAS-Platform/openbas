@@ -79,7 +79,7 @@ const InjectIcon: FunctionComponent<Props> = ({
   };
 
   return (
-    <CustomTooltip title={tooltip ?? (t(type) || t('Unknown'))}>
+    <CustomTooltip title={tooltip ?? (type ? t(type) : t('Unknown'))}>
       {iconSelector(type!, isPayload!, variant!, fontSize, done!, disabled!)}
     </CustomTooltip>
   );

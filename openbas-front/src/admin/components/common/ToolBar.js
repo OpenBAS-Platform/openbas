@@ -5,7 +5,7 @@ import {
   ClearOutlined,
   CloseOutlined,
   DeleteOutlined,
-  DevicesOtherOutlined,
+  DevicesOtherOutlined, FileDownloadOutlined,
   ForwardToInbox,
   GroupsOutlined,
 } from '@mui/icons-material';
@@ -37,6 +37,7 @@ import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
 import { storeHelper } from '../../../actions/Schema';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
+import ExportOptionsDialog from '../../../components/common/export/ExportOptionsDialog.js';
 import inject18n from '../../../components/i18n';
 import { MESSAGING$ } from '../../../utils/Environment';
 
@@ -160,6 +161,7 @@ class ToolBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      displayExport: false,
       displayUpdate: false,
       displayBulkDelete: false,
       displayBulkTest: false,
@@ -188,6 +190,23 @@ class ToolBar extends Component {
       displayUpdate: false,
       actionsInputs: [{}],
     });
+  }
+
+  handleOpenExport() {
+    this.setState({ displayExport: true });
+  }
+
+  handleCloseExport() {
+    this.setState({
+      displayExport: false,
+      actionsInputs: [{}],
+    });
+  }
+
+  handleSubmitExport(withPlayers, withTeams, withVariableValues) {
+    this.handleCloseExport();
+    this.props.handleClearSelectedElements();
+    this.props.handleExport(withPlayers, withTeams, withVariableValues);
   }
 
   handleOpenBulkTest() {
@@ -591,6 +610,22 @@ class ToolBar extends Component {
                 <ClearOutlined fontSize="small" />
               </IconButton>
             </Typography>
+            <Tooltip title={t('Export')}>
+              <span>
+                <IconButton
+                  aria-label="export"
+                  disabled={
+                    numberOfSelectedElements === 0
+                    || this.state.processing
+                  }
+                  onClick={this.handleOpenExport.bind(this)}
+                  color="primary"
+                  size="small"
+                >
+                  <FileDownloadOutlined fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
             <Tooltip title={t('Update')}>
               <span>
                 <IconButton
@@ -733,6 +768,13 @@ class ToolBar extends Component {
             </div>
           </Drawer>
         </Drawer>
+        <ExportOptionsDialog
+          title={t('inject_export_json_selection')}
+          open={this.state.displayExport}
+          onCancel={this.handleCloseExport.bind(this)}
+          onClose={this.handleCloseExport.bind(this)}
+          onSubmit={this.handleSubmitExport.bind(this)}
+        />
         <DialogDelete
           open={this.state.displayBulkDelete}
           handleClose={this.handleCloseBulkDelete.bind(this)}

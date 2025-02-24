@@ -11,6 +11,7 @@ import io.openbas.database.repository.DocumentRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.inject.exports.InjectsFileExport;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
@@ -31,6 +32,7 @@ public class InjectExportService {
   @Resource protected ObjectMapper mapper;
   @Resource private DocumentRepository documentRepository;
   @Resource private ChallengeService challengeService;
+  @Resource private ArticleService articleService;
   @Resource private FileService fileService;
 
   public String getZipFileName(int exportOptionsMask) {
@@ -51,12 +53,12 @@ public class InjectExportService {
     return ("injects_" + now().toString()) + "_" + infos + ".zip";
   }
 
-  public byte[] exportExerciseToZip(List<Inject> injects, int exportOptionsMask)
-      throws IOException {
+  public byte[] exportInjectsToZip(List<Inject> injects, int exportOptionsMask) throws IOException {
     ObjectMapper objectMapper = mapper.copy();
 
     InjectsFileExport importExport =
-        InjectsFileExport.fromInjects(injects, objectMapper, this.challengeService)
+        InjectsFileExport.fromInjects(
+                injects, objectMapper, this.challengeService, this.articleService)
             .withOptions(exportOptionsMask);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

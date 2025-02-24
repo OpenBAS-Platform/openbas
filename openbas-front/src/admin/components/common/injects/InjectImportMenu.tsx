@@ -1,6 +1,6 @@
 import { CloudUploadOutlined } from '@mui/icons-material';
-import { ToggleButton, Tooltip } from '@mui/material';
-import { useContext, useState } from 'react';
+import { Menu, MenuItem, ToggleButton, Tooltip } from '@mui/material';
+import { type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 
 import { storeXlsFile } from '../../../../actions/mapper/mapper-actions';
 import Dialog from '../../../../components/common/Dialog';
@@ -8,12 +8,13 @@ import { useFormatter } from '../../../../components/i18n';
 import { type ImportMessage, type ImportPostSummary, type ImportTestSummary, type InjectsImportInput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { InjectContext } from '../Context';
-import ImportUploaderInjectFromXlsFile from './ImportUploaderInjectFromXlsFile';
+import ImportFileSelector from './ImportFileSelector';
 import ImportUploaderInjectFromXlsInjects from './ImportUploaderInjectFromXlsInjects';
+import InjectImportJsonDialog from './InjectImportJsonDialog';
 
 interface Props { onImportedInjects?: () => void }
 
-const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) => {
+const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
   // Standard hooks
   const { t } = useFormatter();
   const injectContext = useContext(InjectContext);
@@ -22,12 +23,42 @@ const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) =>
   const [sheets, setSheets] = useState<string[]>([]);
 
   // Dialog
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => {
+  const [openXlsImportDialog, setOpenXlsImportDialog] = useState(false);
+  const [openJsonImportDialog, setOpenJsonImportDialog] = useState(false);
+  const [menuOpen, setMenuOpen] = useState<{
+    open: boolean;
+    anchorEl: HTMLElement | null;
+  }>({
+    open: false,
+    anchorEl: null,
+  });
+
+  const handleOpenMenu = (event: ReactMouseEvent<HTMLElement, MouseEvent>) => {
+    event.preventDefault();
+    setMenuOpen({
+      open: true,
+      anchorEl: event.currentTarget,
+    });
+  };
+  const handleCloseMenu = () => {
+    setMenuOpen({
+      open: false,
+      anchorEl: null,
+    });
+  };
+
+  const handleXlsImportOpen = () => setOpenXlsImportDialog(true);
+  const handleXlsImportClose = () => {
     setImportId(undefined);
     setSheets([]);
-    setOpen(false);
+    setOpenXlsImportDialog(false);
+    handleCloseMenu();
+  };
+
+  const handleJsonImportOpen = () => setOpenJsonImportDialog(true);
+  const handleJsonImportClose = () => {
+    setOpenJsonImportDialog(false);
+    handleCloseMenu();
   };
 
   const onSubmitImportFile = (values: { file: File }) => {
@@ -46,9 +77,15 @@ const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) =>
           MESSAGING$.notifyError(t(criticalMessages[0].message_code), true);
         }
         onImportedInjects();
-        handleClose();
+        handleXlsImportClose();
       });
     }
+  };
+  const onFileSelectSubmit = (values: { file: File }) => {
+    injectContext.onImportInjectFromJson?.(values.file).then(() => {
+      onImportedInjects();
+      handleJsonImportClose();
+    });
   };
 
   return (
@@ -57,7 +94,7 @@ const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) =>
         value="import"
         aria-label="import"
         size="small"
-        onClick={handleOpen}
+        onClick={event => handleOpenMenu(event)}
       >
         <Tooltip
           title={t('Import injects')}
@@ -69,17 +106,30 @@ const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) =>
           />
         </Tooltip>
       </ToggleButton>
+      <Menu
+        id="menu-import-injects"
+        anchorEl={menuOpen.anchorEl}
+        open={menuOpen.open}
+        onClose={handleCloseMenu}
+      >
+        <MenuItem onClick={handleJsonImportOpen}>{t('inject_import_json_action')}</MenuItem>
+        <MenuItem onClick={handleXlsImportOpen}>{t('inject_import_xls_action')}</MenuItem>
+      </Menu>
+      <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleJsonImportClose} handleSubmit={onFileSelectSubmit} />
       <Dialog
-        open={open}
-        handleClose={handleClose}
+        open={openXlsImportDialog}
+        handleClose={handleXlsImportClose}
         title={t('Import injects')}
         maxWidth="sm"
       >
         <>
           {!importId
             && (
-              <ImportUploaderInjectFromXlsFile
-                handleClose={handleClose}
+              <ImportFileSelector
+                label={t('Your file should be a XLS')}
+                mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                submitActionLabel={t('Next')}
+                handleClose={handleXlsImportClose}
                 handleSubmit={onSubmitImportFile}
               />
             )}
@@ -87,7 +137,7 @@ const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) =>
             && (
               <ImportUploaderInjectFromXlsInjects
                 sheets={sheets}
-                handleClose={handleClose}
+                handleClose={handleXlsImportClose}
                 importId={importId}
                 handleSubmit={onSubmitImportInjects}
               />
@@ -98,4 +148,4 @@ const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) =>
   );
 };
 
-export default ImportUploaderInjectFromXls;
+export default InjectImportMenu;

@@ -1,23 +1,24 @@
 package io.openbas.rest.inject.exports;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static io.openbas.utils.Constants.ARTICLES;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.export.FileExportBase;
 import io.openbas.rest.exercise.exports.ExportOptions;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.Getter;
+import org.hibernate.Hibernate;
 
 @Getter
 @JsonInclude(NON_NULL)
@@ -26,7 +27,7 @@ public class InjectsFileExport extends FileExportBase {
   private List<Inject> injects;
 
   @JsonProperty("inject_documents")
-  private List<Document> getDocuments() {
+  private List<Document> getDocuments() throws IOException {
     List<Document> documents = new ArrayList<>();
 
     documents.addAll(
@@ -41,12 +42,25 @@ public class InjectsFileExport extends FileExportBase {
         this.getArticles().stream().flatMap(article -> article.getDocuments().stream()).toList());
     documents.addAll(
         this.getChannels().stream().flatMap(channel -> channel.getLogos().stream()).toList());
+    documents.addAll(
+        injects.stream()
+            .flatMap(
+                inject -> {
+                  if (inject.getPayload().isEmpty()) {
+                    return Stream.of();
+                  }
+                  Payload pl = inject.getPayload().get();
+                  return pl.getAttachedDocument().isPresent()
+                      ? Stream.of(pl.getAttachedDocument().get())
+                      : Stream.of();
+                })
+            .toList());
 
     return documents;
   }
 
   @JsonProperty("inject_tags")
-  private List<Tag> getTags() {
+  private List<Tag> getTags() throws IOException {
     List<Tag> allTags = new ArrayList<>();
     allTags.addAll(this.getTeams().stream().flatMap(team -> team.getTags().stream()).toList());
     allTags.addAll(this.getUsers().stream().flatMap(user -> user.getTags().stream()).toList());
@@ -74,41 +88,12 @@ public class InjectsFileExport extends FileExportBase {
   }
 
   @JsonProperty("inject_articles")
-  private List<Article> getArticles() {
-    return injects.stream()
-        // only consider injects with articles
-        .filter(inject -> inject.getContent().has(ARTICLES))
-        .flatMap(
-            inject ->
-                inject.getExercise() != null
-                    ? inject.getExercise().getArticles().stream()
-                        .filter(article -> isArticleInInjectContent(inject.getContent(), article))
-                    : inject.getScenario() != null
-                        ? inject.getScenario().getArticles().stream()
-                            .filter(
-                                article -> isArticleInInjectContent(inject.getContent(), article))
-                        : Stream.of())
-        .toList();
-  }
-
-  private boolean isArticleInInjectContent(JsonNode injectContent, Article article) {
-    if (!injectContent.has(ARTICLES)) {
-      return false;
-    }
-
-    JsonNode injectArticles = injectContent.get(ARTICLES);
-    if (injectArticles.isArray()) {
-      List<String> injectArticleIds = new ArrayList<>();
-      for (JsonNode articleId : injectArticles) {
-        injectArticleIds.add(articleId.asText());
-      }
-      return injectArticleIds.contains(article.getId());
-    }
-    return false;
+  private List<Article> getArticles() throws IOException {
+    return articleService.getInjectsArticles(injects);
   }
 
   @JsonProperty("inject_channels")
-  private List<Channel> getChannels() {
+  private List<Channel> getChannels() throws IOException {
     return this.getArticles().stream().map(Article::getChannel).distinct().toList();
   }
 
@@ -128,7 +113,18 @@ public class InjectsFileExport extends FileExportBase {
 
   @JsonProperty("inject_organizations")
   private List<Organization> getOrganizations() {
-    return this.getUsers().stream().map(User::getOrganization).filter(Objects::nonNull).toList();
+    List<Organization> orgs = new ArrayList<>();
+    orgs.addAll(
+        this.getUsers().stream()
+            .map(user -> (Organization) Hibernate.unproxy(user.getOrganization()))
+            .filter(Objects::nonNull)
+            .toList());
+    orgs.addAll(
+        this.getTeams().stream()
+            .map(team -> (Organization) Hibernate.unproxy(team.getOrganization()))
+            .filter(Objects::nonNull)
+            .toList());
+    return orgs;
   }
 
   @JsonProperty("inject_challenges")
@@ -139,19 +135,25 @@ public class InjectsFileExport extends FileExportBase {
   }
 
   @JsonIgnore
-  public List<String> getAllDocumentIds() {
+  public List<String> getAllDocumentIds() throws IOException {
     return new ArrayList<>(this.getDocuments().stream().map(Document::getId).toList());
   }
 
   private InjectsFileExport(
-      List<Inject> injects, ObjectMapper objectMapper, ChallengeService challengeService) {
-    super(objectMapper, challengeService);
+      List<Inject> injects,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    super(objectMapper, challengeService, articleService);
     this.injects = injects;
   }
 
   public static InjectsFileExport fromInjects(
-      List<Inject> injects, ObjectMapper objectMapper, ChallengeService challengeService) {
-    return new InjectsFileExport(injects, objectMapper, challengeService);
+      List<Inject> injects,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    return new InjectsFileExport(injects, objectMapper, challengeService, articleService);
   }
 
   @Override

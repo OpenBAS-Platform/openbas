@@ -11,6 +11,7 @@ import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.injectors.challenge.model.ChallengeContent;
 import io.openbas.injectors.channel.model.ChannelContent;
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InjectorContractComposer extends ComposerBase<InjectorContract> {
   @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private EntityManager entityManager;
   @Autowired private InjectorRepository injectorRepository;
   @Autowired private ObjectMapper objectMapper;
 
@@ -110,7 +112,10 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       challengeComposers.forEach(ChallengeComposer.Composer::persist);
       articleComposers.forEach(ArticleComposer.Composer::persist);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
+        entityManager.persist(injectorContract.getInjector());
         injectorRepository.save(injectorContract.getInjector());
+        // for some reason hibernate refuses to save the entity with the repository
+        entityManager.persist(injectorContract);
         injectorContractRepository.save(injectorContract);
       }
       return this;
@@ -122,7 +127,6 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       challengeComposers.forEach(ChallengeComposer.Composer::delete);
       articleComposers.forEach(ArticleComposer.Composer::delete);
       if (!WELL_KNOWN_CONTRACT_IDS.contains(injectorContract.getId())) {
-        injectorRepository.delete(injectorContract.getInjector());
         injectorContractRepository.delete(injectorContract);
       }
       return this;

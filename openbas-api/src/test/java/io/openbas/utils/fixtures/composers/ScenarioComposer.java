@@ -4,6 +4,7 @@ import io.openbas.database.model.Article;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ScenarioRepository;
+import io.openbas.service.ScenarioService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScenarioComposer extends ComposerBase<Scenario> {
   @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired private ScenarioService scenarioService;
 
   public class Composer extends InnerComposerBase<Scenario> {
     private final Scenario scenario;
@@ -22,6 +24,11 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
 
     public Composer(Scenario scenario) {
       this.scenario = scenario;
+    }
+
+    public Composer withInjects(List<InjectComposer.Composer> injectComposers) {
+      injectComposers.forEach(this::withInject);
+      return this;
     }
 
     public Composer withInject(InjectComposer.Composer injectComposer) {
@@ -44,13 +51,16 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
 
     @Override
     public Composer persist() {
+      articleComposers.forEach(ArticleComposer.Composer::persist);
       injectComposers.forEach(InjectComposer.Composer::persist);
       scenarioRepository.save(scenario);
+      scenarioService.createScenario(scenario);
       return this;
     }
 
     @Override
     public Composer delete() {
+      articleComposers.forEach(ArticleComposer.Composer::delete);
       injectComposers.forEach(InjectComposer.Composer::delete);
       scenarioRepository.delete(scenario);
       return this;

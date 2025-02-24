@@ -14,6 +14,7 @@ import static org.springframework.util.StringUtils.hasText;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Scenario.SEVERITY;
 import io.openbas.database.repository.*;
@@ -131,13 +132,22 @@ public class V1_DataImporter implements Importer {
 
   @Override
   @Transactional
-  public void importData(JsonNode importNode, Map<String, ImportEntry> docReferences) {
+  public void importData(
+      JsonNode importNode,
+      Map<String, ImportEntry> docReferences,
+      Exercise exercise,
+      Scenario scenario) {
     Map<String, Base> baseIds = new HashMap<>();
-    final String prefix = importNode.has("exercise_information") ? "exercise_" : "scenario_";
+    final String prefix =
+        importNode.has("exercise_information")
+            ? "exercise_"
+            : importNode.has("scenario_information") ? "scenario_" : "inject_";
 
     importTags(importNode, prefix, baseIds);
-    Exercise savedExercise = importExercise(importNode, baseIds);
-    Scenario savedScenario = importScenario(importNode, baseIds);
+    Exercise savedExercise =
+        Optional.ofNullable(importExercise(importNode, baseIds)).orElse(exercise);
+    Scenario savedScenario =
+        Optional.ofNullable(importScenario(importNode, baseIds)).orElse(scenario);
     importDocuments(importNode, prefix, docReferences, savedExercise, savedScenario, baseIds);
     importOrganizations(importNode, prefix, baseIds);
     importUsers(importNode, prefix, baseIds);
@@ -289,9 +299,13 @@ public class V1_DataImporter implements Importer {
       Scenario savedScenario,
       Map<String, Base> baseIds) {
     if (savedExercise != null) {
-      document.getExercises().add(savedExercise);
+      Set<Exercise> exercises = new HashSet<>(document.getExercises());
+      exercises.add(savedExercise);
+      document.setExercises(exercises);
     } else if (savedScenario != null) {
-      document.getScenarios().add(savedScenario);
+      Set<Scenario> scenarios = new HashSet<>(document.getScenarios());
+      scenarios.add(savedScenario);
+      document.setScenarios(scenarios);
     }
     document.setTags(
         computeTagsCompletion(
@@ -426,22 +440,31 @@ public class V1_DataImporter implements Importer {
       Exercise savedExercise,
       Scenario savedScenario,
       Map<String, Base> baseIds) {
-    Map<String, Team> baseTeams = handlingTeams(importNode, prefix, baseIds);
+    Map<String, Team> baseTeams =
+        handlingTeams(importNode, prefix, baseIds, savedExercise, savedScenario);
     baseTeams
         .values()
         .forEach(
             (team) -> {
               if (savedExercise != null) {
-                team.getExercises().add(savedExercise);
+                Set<Exercise> exercises = new HashSet<>(team.getExercises());
+                exercises.add(savedExercise);
+                team.setExercises(exercises.stream().toList());
               } else if (savedScenario != null) {
-                team.getScenarios().add(savedScenario);
+                Set<Scenario> scenarios = new HashSet<>(team.getScenarios());
+                scenarios.add(savedScenario);
+                team.setScenarios(scenarios.stream().toList());
               }
             });
     baseIds.putAll(baseTeams);
   }
 
   private Map<String, Team> handlingTeams(
-      JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+      JsonNode importNode,
+      String prefix,
+      Map<String, Base> baseIds,
+      Exercise savedExercise,
+      Scenario savedScenario) {
     Map<String, Team> baseTeams = new HashMap<>();
 
     resolveJsonElements(importNode, prefix + "teams")
@@ -461,6 +484,14 @@ public class V1_DataImporter implements Importer {
               if (!existingTeams.isEmpty()) {
                 baseTeams.put(id, existingTeams.getFirst());
               } else {
+                // skip creating contextual team if atomic testing
+                if (nodeTeam.has("team_contextual")) {
+                  boolean isContextual = nodeTeam.get("team_contextual").booleanValue();
+                  if (isContextual && savedExercise == null && savedScenario == null) {
+                    return;
+                  }
+                }
+
                 Team team = createTeam(nodeTeam, baseIds);
                 // Tags
                 List<String> teamTagIds = resolveJsonIds(nodeTeam, "team_tags");
@@ -496,6 +527,9 @@ public class V1_DataImporter implements Importer {
       if (teamOrganization != null) {
         team.setOrganization((Organization) teamOrganization);
       }
+    }
+    if (jsonNode.has("team_contextual")) {
+      team.setContextual(jsonNode.get("team_contextual").booleanValue());
     }
     return team;
   }
@@ -746,7 +780,12 @@ public class V1_DataImporter implements Importer {
       Scenario savedScenario,
       Map<String, Base> baseIds) {
     Supplier<Stream<JsonNode>> injectsStream =
-        () -> resolveJsonElements(importNode, prefix + "injects");
+        () ->
+            importNode.has(prefix + "injects")
+                ? resolveJsonElements(importNode, prefix + "injects")
+                : Objects.equals(prefix, "inject_")
+                    ? resolveJsonElements(importNode, prefix + "information")
+                    : Stream.of();
 
     // Getting a list of all the children of the dependency
     List<String> children =
@@ -777,27 +816,18 @@ public class V1_DataImporter implements Importer {
             .get()
             .filter(jsonNode -> !children.contains(jsonNode.get("inject_id").asText()));
 
-    if (savedExercise != null) {
-      importInjects(
-          baseIds,
-          savedExercise.getId(),
-          null,
-          injectsNoParent.toList(),
-          injectsStream.get().toList());
-    } else if (savedScenario != null) {
-      importInjects(
-          baseIds,
-          null,
-          savedScenario.getId(),
-          injectsNoParent.toList(),
-          injectsStream.get().toList());
-    }
+    importInjects(
+        baseIds,
+        savedExercise,
+        savedScenario,
+        injectsNoParent.toList(),
+        injectsStream.get().toList());
   }
 
   private void importInjects(
       Map<String, Base> baseIds,
-      String exerciseId,
-      String scenarioId,
+      Exercise exercise,
+      Scenario scenario,
       List<JsonNode> injectsToAdd,
       List<JsonNode> allInjects) {
     List<String> originalIds = new ArrayList<>();
@@ -826,27 +856,29 @@ public class V1_DataImporter implements Importer {
           Optional<InjectorContract> injectorContract =
               this.injectorContractRepository.findById(injectorContractIdFromNode);
 
-          String injectorContractId;
+          String injectorContractId = null;
 
           // If not, rely on payload
           if (injectorContract.isEmpty()) {
             JsonNode payloadNode = injectContractNode.get("injector_contract_payload");
-            String externalId = payloadNode.get("payload_external_id").textValue();
-            // Rely on external collector
-            if (hasText(externalId)) {
-              Optional<InjectorContract> injectorContractFromPayload =
-                  this.injectorContractRepository.findOne(byPayloadExternalId(externalId));
-              if (injectorContractFromPayload.isPresent()) {
-                injectorContractId = injectorContractFromPayload.get().getId();
+            if (!payloadNode.isNull() && !payloadNode.isEmpty()) {
+              String externalId = payloadNode.get("payload_external_id").textValue();
+              // Rely on external collector
+              if (hasText(externalId)) {
+                Optional<InjectorContract> injectorContractFromPayload =
+                    this.injectorContractRepository.findOne(byPayloadExternalId(externalId));
+                if (injectorContractFromPayload.isPresent()) {
+                  injectorContractId = injectorContractFromPayload.get().getId();
+                  // Create new payload
+                } else {
+                  log.info(
+                      "Inject comes from a collector not set up in your environment, a new payload has been created.");
+                  injectorContractId = importPayload(payloadNode, baseIds);
+                }
                 // Create new payload
               } else {
-                log.info(
-                    "Inject comes from a collector not set up in your environment, a new payload has been created.");
-                injectorContractId = importPayload(payloadNode);
+                injectorContractId = importPayload(payloadNode, baseIds);
               }
-              // Create new payload
-            } else {
-              injectorContractId = importPayload(payloadNode);
             }
           } else {
             injectorContractId = injectorContract.get().getId();
@@ -862,7 +894,7 @@ public class V1_DataImporter implements Importer {
           String content = handleInjectContent(baseIds, injectorContractId, injectNode);
           Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
           boolean allTeams = injectNode.get("inject_all_teams").booleanValue();
-          if (hasText(exerciseId)) {
+          if (exercise != null) {
             injectRepository.importSaveForExercise(
                 injectId,
                 title,
@@ -872,10 +904,10 @@ public class V1_DataImporter implements Importer {
                 injectorContractId,
                 allTeams,
                 enabled,
-                exerciseId,
+                exercise.getId(),
                 dependsDuration,
                 content);
-          } else if (hasText(scenarioId)) {
+          } else if (scenario != null) {
             injectRepository.importSaveForScenario(
                 injectId,
                 title,
@@ -885,7 +917,19 @@ public class V1_DataImporter implements Importer {
                 injectorContractId,
                 allTeams,
                 enabled,
-                scenarioId,
+                scenario.getId(),
+                dependsDuration,
+                content);
+          } else {
+            injectRepository.importSaveStandAlone(
+                injectId,
+                title,
+                description,
+                country,
+                city,
+                injectorContractId,
+                allTeams,
+                enabled,
                 dependsDuration,
                 content);
           }
@@ -944,7 +988,7 @@ public class V1_DataImporter implements Importer {
           injectDocuments.forEach(
               jsonNode -> {
                 String docId = jsonNode.get("document_id").textValue();
-                if (!hasText(docId)) {
+                if (hasText(docId)) {
                   String documentId = baseIds.get(docId).getId();
                   boolean docAttached = jsonNode.get("document_attached").booleanValue();
                   injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
@@ -977,13 +1021,31 @@ public class V1_DataImporter implements Importer {
                 })
             .toList();
     if (!childInjects.isEmpty()) {
-      importInjects(baseIds, exerciseId, scenarioId, childInjects, allInjects);
+      importInjects(baseIds, exercise, scenario, childInjects, allInjects);
     }
   }
 
-  private String importPayload(@NotNull final JsonNode payloadNode) {
+  private String importPayload(@NotNull final JsonNode payloadNode, Map<String, Base> baseIds) {
+    // swap executable file id or file drop file id
+    if (payloadNode.has("executable_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "executable_file",
+              baseIds.get(payloadNode.get("executable_file").textValue()).getId());
+    }
+    if (payloadNode.has("file_drop_file")) {
+      ((ObjectNode) payloadNode)
+          .put(
+              "file_drop_file", baseIds.get(payloadNode.get("file_drop_file").textValue()).getId());
+    }
+
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
+    payload.setTags(
+        resolveJsonIds(payloadNode, "payload_tags").stream()
+            .map(baseIds::get)
+            .map(Tag.class::cast)
+            .collect(Collectors.toSet()));
     Optional<InjectorContract> injectorContractFromPayload =
         this.injectorContractRepository.findOne(byPayloadId(payload.getId()));
     if (injectorContractFromPayload.isPresent()) {

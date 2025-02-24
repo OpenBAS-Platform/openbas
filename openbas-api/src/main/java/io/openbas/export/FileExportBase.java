@@ -9,6 +9,7 @@ import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.exercise.exports.VariableMixin;
 import io.openbas.rest.exercise.exports.VariableWithValueMixin;
 import io.openbas.rest.inject.exports.InjectsFileExport;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
 import lombok.Getter;
 
@@ -21,10 +22,13 @@ public class FileExportBase {
 
   @JsonIgnore public final ObjectMapper objectMapper;
   @JsonIgnore protected final ChallengeService challengeService;
+  @JsonIgnore protected final ArticleService articleService;
 
-  protected FileExportBase(ObjectMapper objectMapper, ChallengeService challengeService) {
+  protected FileExportBase(
+      ObjectMapper objectMapper, ChallengeService challengeService, ArticleService articleService) {
     this.objectMapper = objectMapper;
     this.challengeService = challengeService;
+    this.articleService = articleService;
 
     this.objectMapper.addMixIn(Exercise.class, Mixins.Exercise.class);
     this.objectMapper.addMixIn(Document.class, Mixins.Document.class);

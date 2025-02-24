@@ -924,6 +924,10 @@ const i18n = {
       'inject_export_prompt': 'Exporter cet inject',
       'inject_export_json_single': 'Exporter (JSON)',
       'inject_export_json_selection': 'Exporter la selection (JSON)',
+      'inject_import_json_action': 'Import JSON',
+      'inject_import_xls_action': 'Import XLS (mapper)',
+      'inject_import_file_must_be_zip': 'Le fichier doit être une archive zip',
+      'Import': 'Importer',
       // Injector Contract
       'injector_contract_kill_chain_phases': 'Phase de kill chain',
       'injector_contract_injector': 'Injector',
@@ -2359,6 +2363,10 @@ const i18n = {
       'inject_export_prompt': '导出此注释',
       'inject_export_json_single': '导出（JSON）',
       'inject_export_json_selection': '导出选择（JSON）',
+      'inject_import_json_action': 'JSON 导入',
+      'inject_import_xls_action': 'XLS 导入（映射器）',
+      'inject_import_file_must_be_zip': '文件必须是压缩包',
+      'Import': '进口',
       // Injector Contract
       'injector_contract_kill_chain_phases': '杀伤链阶段',
       'injector_contract_injector': '注入器',
@@ -2961,6 +2969,10 @@ const i18n = {
       'inject_export_prompt': 'Export this inject',
       'inject_export_json_single': 'Export（JSON）',
       'inject_export_json_selection': 'Export selection（JSON）',
+      'inject_import_json_action': 'JSON import',
+      'inject_import_xls_action': 'XLS import (mapper)',
+      'inject_import_file_must_be_zip': 'File must be a zip archive',
+      'Import': 'Import',
       // Injector Contract
       'injector_contract_kill_chain_phases': 'Kill chain phase',
       'injector_contract_injector': 'Injector',
