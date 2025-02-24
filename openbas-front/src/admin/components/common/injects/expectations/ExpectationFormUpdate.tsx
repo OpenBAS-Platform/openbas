@@ -88,14 +88,14 @@ const ExpectationFormUpdate: FunctionComponent<Props> = ({
         </MUISelect>
       </div>
       {(getValues().expectation_type === 'ARTICLE' || getValues().expectation_type === 'CHALLENGE')
-      && (
-        <Alert
-          severity="info"
-          className={classes.marginTop_2}
-        >
-          {infoMessage(getValues().expectation_type, t)}
-        </Alert>
-      )}
+        && (
+          <Alert
+            severity="info"
+            className={classes.marginTop_2}
+          >
+            {infoMessage(getValues().expectation_type, t)}
+          </Alert>
+        )}
       <MuiTextField
         variant="standard"
         fullWidth

@@ -762,14 +762,14 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
               }}
             />
             {conditionIndex < conditions.conditionElement.length - 1
-            && (
-              <ClickableModeChip
-                mode={conditions.mode}
-                onClick={() => {
-                  changeModeParent(parentConditions, conditions);
-                }}
-              />
-            )}
+              && (
+                <ClickableModeChip
+                  mode={conditions.mode}
+                  onClick={() => {
+                    changeModeParent(parentConditions, conditions);
+                  }}
+                />
+              )}
           </div>
         );
       }
@@ -811,14 +811,14 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
                 }}
               />
               {conditionIndex < conditions.conditionElement.length - 1
-              && (
-                <ClickableModeChip
-                  mode={conditions?.mode}
-                  onClick={() => {
-                    changeModeChildren(childrenConditions, conditions);
-                  }}
-                />
-              )}
+                && (
+                  <ClickableModeChip
+                    mode={conditions?.mode}
+                    onClick={() => {
+                      changeModeChildren(childrenConditions, conditions);
+                    }}
+                  />
+                )}
             </div>
           );
         }
@@ -837,7 +837,7 @@ const InjectForm: FunctionComponent<Props> = ({ values, form, injects }) => {
           aria-label="Add"
           size="large"
           disabled={parents.length > 0
-          || injects?.filter(currentInject => currentInject.inject_depends_duration < values.inject_depends_duration).length === 0}
+            || injects?.filter(currentInject => currentInject.inject_depends_duration < values.inject_depends_duration).length === 0}
           onClick={addParent}
         >
           <Add fontSize="small" />

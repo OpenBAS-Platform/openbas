@@ -201,11 +201,11 @@ const Players = () => {
         ))}
       </List>
       {isPlanner
-      && (
-        <CreatePlayer
-          onCreate={result => setPlayers([result, ...players])}
-        />
-      )}
+        && (
+          <CreatePlayer
+            onCreate={result => setPlayers([result, ...players])}
+          />
+        )}
     </>
   );
 };

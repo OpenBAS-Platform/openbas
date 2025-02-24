@@ -127,14 +127,14 @@ const ExpectationFormCreate: FunctionComponent<Props> = ({
         </MUISelect>
       </div>
       {(watchType === 'ARTICLE' || watchType === 'CHALLENGE')
-      && (
-        <Alert
-          severity="info"
-          className={classes.marginTop_2}
-        >
-          {infoMessage(getValues().expectation_type, t)}
-        </Alert>
-      )}
+        && (
+          <Alert
+            severity="info"
+            className={classes.marginTop_2}
+          >
+            {infoMessage(getValues().expectation_type, t)}
+          </Alert>
+        )}
       <MuiTextField
         variant="standard"
         fullWidth

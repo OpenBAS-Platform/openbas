@@ -77,21 +77,21 @@ const ImportUploaderInjectFromXls = ({ onImportedInjects = () => {} }: Props) =>
       >
         <>
           {!importId
-          && (
-            <ImportUploaderInjectFromXlsFile
-              handleClose={handleClose}
-              handleSubmit={onSubmitImportFile}
-            />
-          )}
+            && (
+              <ImportUploaderInjectFromXlsFile
+                handleClose={handleClose}
+                handleSubmit={onSubmitImportFile}
+              />
+            )}
           {importId
-          && (
-            <ImportUploaderInjectFromXlsInjects
-              sheets={sheets}
-              handleClose={handleClose}
-              importId={importId}
-              handleSubmit={onSubmitImportInjects}
-            />
-          )}
+            && (
+              <ImportUploaderInjectFromXlsInjects
+                sheets={sheets}
+                handleClose={handleClose}
+                importId={importId}
+                handleSubmit={onSubmitImportInjects}
+              />
+            )}
         </>
       </Dialog>
     </>

@@ -47,21 +47,21 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
     >
       <>
         {importId === null
-        && (
-          <ImportUploaderInjectFromXlsFile
-            handleClose={handleClose}
-            handleSubmit={onSubmitImportFile}
-          />
-        )}
+          && (
+            <ImportUploaderInjectFromXlsFile
+              handleClose={handleClose}
+              handleSubmit={onSubmitImportFile}
+            />
+          )}
         {importId !== null
-        && (
-          <ImportUploaderInjectFromInjectsTest
-            importId={importId}
-            sheets={sheets}
-            importMapperValues={importMapperValues}
-            handleClose={handleClose}
-          />
-        )}
+          && (
+            <ImportUploaderInjectFromInjectsTest
+              importId={importId}
+              sheets={sheets}
+              importMapperValues={importMapperValues}
+              handleClose={handleClose}
+            />
+          )}
       </>
     </Dialog>
   );

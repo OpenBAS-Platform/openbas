@@ -45,11 +45,11 @@ const RichTextFieldBase = ({
           disabled={disabled}
         />
         {touched && invalid
-        && (
-          <FormHelperText error>
-            {(error && t(error)) || (submitError && t(submitError))}
-          </FormHelperText>
-        )}
+          && (
+            <FormHelperText error>
+              {(error && t(error)) || (submitError && t(submitError))}
+            </FormHelperText>
+          )}
         {askAi && (
           <TextFieldAskAI
             currentValue={value ?? ''}

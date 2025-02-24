@@ -108,41 +108,41 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
     <>
       <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
       {actions.includes('Duplicate')
-      && (
-        <DialogDuplicate
-          open={duplicate}
-          handleClose={handleCloseDuplicate}
-          handleSubmit={submitDuplicate}
-          text={`${t('Do you want to duplicate this atomic testing:')} ${atomic.inject_title} ?`}
-        />
-      )}
+        && (
+          <DialogDuplicate
+            open={duplicate}
+            handleClose={handleCloseDuplicate}
+            handleSubmit={submitDuplicate}
+            text={`${t('Do you want to duplicate this atomic testing:')} ${atomic.inject_title} ?`}
+          />
+        )}
       {actions.includes(('Update'))
-      && (
-        <AtomicTestingUpdate
-          open={edition}
-          handleClose={handleCloseEdit}
-          atomic={atomic}
-        />
-      )}
+        && (
+          <AtomicTestingUpdate
+            open={edition}
+            handleClose={handleCloseEdit}
+            atomic={atomic}
+          />
+        )}
       {actions.includes('Delete')
-      && (
-        <DialogDelete
-          open={deletion}
-          handleClose={handleCloseDelete}
-          handleSubmit={submitDelete}
-          text={`${t('Do you want to delete this atomic testing:')} ${atomic.inject_title} ?`}
-        />
-      )}
+        && (
+          <DialogDelete
+            open={deletion}
+            handleClose={handleCloseDelete}
+            handleSubmit={submitDelete}
+            text={`${t('Do you want to delete this atomic testing:')} ${atomic.inject_title} ?`}
+          />
+        )}
       {actions.includes('Export')
-      && (
-        <ExportOptionsDialog
-          title={t('atomic_testing_export_prompt')}
-          open={exportOpen}
-          onCancel={handleCloseExport}
-          onClose={handleCloseExport}
-          onSubmit={doExport}
-        />
-      )}
+        && (
+          <ExportOptionsDialog
+            title={t('atomic_testing_export_prompt')}
+            open={exportOpen}
+            onCancel={handleCloseExport}
+            onClose={handleCloseExport}
+            onSubmit={doExport}
+          />
+        )}
     </>
   );
 };

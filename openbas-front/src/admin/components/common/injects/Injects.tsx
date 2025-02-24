@@ -627,24 +627,24 @@ const Injects: FunctionComponent<Props> = ({
       {permissions.canWrite && (
         <>
           {selectedInjectId !== null
-          && (
-            <UpdateInject
-              open
-              handleClose={() => setSelectedInjectId(null)}
-              onUpdateInject={onUpdateInject}
-              massUpdateInject={massUpdateInject}
-              injectId={selectedInjectId}
-              // @ts-expect-error typing
-              articlesFromExerciseOrScenario={articles}
-              variablesFromExerciseOrScenario={variables}
-              exerciseOrScenarioId={exerciseOrScenarioId}
-              uriVariable={uriVariable}
-              allUsersNumber={allUsersNumber}
-              usersNumber={usersNumber}
-              teamsUsers={teamsUsers}
-              injects={injects}
-            />
-          )}
+            && (
+              <UpdateInject
+                open
+                handleClose={() => setSelectedInjectId(null)}
+                onUpdateInject={onUpdateInject}
+                massUpdateInject={massUpdateInject}
+                injectId={selectedInjectId}
+                // @ts-expect-error typing
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                exerciseOrScenarioId={exerciseOrScenarioId}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+                injects={injects}
+              />
+            )}
           <ButtonCreate onClick={() => {
             setOpenCreateDrawer(true);
             setPresetInjectDuration(0);

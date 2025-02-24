@@ -33,37 +33,37 @@ const ButtonPopover: FunctionComponent<Props> = ({
   return (
     <>
       {variant === 'toggle'
-      && (
-        <ToggleButton
-          value="popover"
-          size="small"
-          color="primary"
-          onClick={(ev) => {
-            ev.stopPropagation();
-            setAnchorEl(ev.currentTarget);
-          }}
-          style={{ ...buttonProps }}
-          disabled={disabled}
-        >
-          <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
-        </ToggleButton>
-      )}
+        && (
+          <ToggleButton
+            value="popover"
+            size="small"
+            color="primary"
+            onClick={(ev) => {
+              ev.stopPropagation();
+              setAnchorEl(ev.currentTarget);
+            }}
+            style={{ ...buttonProps }}
+            disabled={disabled}
+          >
+            <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
+          </ToggleButton>
+        )}
       {variant === 'icon'
-      && (
-        <IconButton
-          value="popover"
-          size="large"
-          color="primary"
-          onClick={(ev) => {
-            ev.stopPropagation();
-            setAnchorEl(ev.currentTarget);
-          }}
-          style={{ ...buttonProps }}
-          disabled={disabled}
-        >
-          <MoreVert color={disabled ? 'disabled' : 'primary'} />
-        </IconButton>
-      )}
+        && (
+          <IconButton
+            value="popover"
+            size="large"
+            color="primary"
+            onClick={(ev) => {
+              ev.stopPropagation();
+              setAnchorEl(ev.currentTarget);
+            }}
+            style={{ ...buttonProps }}
+            disabled={disabled}
+          >
+            <MoreVert color={disabled ? 'disabled' : 'primary'} />
+          </IconButton>
+        )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

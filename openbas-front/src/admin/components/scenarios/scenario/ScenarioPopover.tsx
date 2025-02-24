@@ -103,41 +103,41 @@ const ScenarioPopover: FunctionComponent<Props> = ({
     <>
       {actions.length > 0 && <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />}
       {actions.includes('Duplicate')
-      && (
-        <DialogDuplicate
-          open={duplicate}
-          handleClose={handleCloseDuplicate}
-          handleSubmit={submitDuplicate}
-          text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
-        />
-      )}
+        && (
+          <DialogDuplicate
+            open={duplicate}
+            handleClose={handleCloseDuplicate}
+            handleSubmit={submitDuplicate}
+            text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
+          />
+        )}
       {actions.includes(('Update'))
-      && (
-        <ScenarioUpdate
-          scenario={scenario}
-          open={edition}
-          handleClose={handleCloseEdit}
-        />
-      )}
+        && (
+          <ScenarioUpdate
+            scenario={scenario}
+            open={edition}
+            handleClose={handleCloseEdit}
+          />
+        )}
       {actions.includes('Delete')
-      && (
-        <DialogDelete
-          open={deletion}
-          handleClose={handleCloseDelete}
-          handleSubmit={submitDelete}
-          text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
-        />
-      )}
+        && (
+          <DialogDelete
+            open={deletion}
+            handleClose={handleCloseDelete}
+            handleSubmit={submitDelete}
+            text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
+          />
+        )}
       {actions.includes('Export')
-      && (
-        <ExportOptionsDialog
-          title={t('Export the scenario')}
-          open={exportation}
-          onCancel={handleCloseExport}
-          onClose={handleCloseExport}
-          onSubmit={submitExport}
-        />
-      )}
+        && (
+          <ExportOptionsDialog
+            title={t('Export the scenario')}
+            open={exportation}
+            onCancel={handleCloseExport}
+            onClose={handleCloseExport}
+            onSubmit={submitExport}
+          />
+        )}
     </>
   );
 };

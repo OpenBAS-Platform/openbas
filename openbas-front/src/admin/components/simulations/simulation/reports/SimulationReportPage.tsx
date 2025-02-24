@@ -131,87 +131,87 @@ const SimulationReportPage: FunctionComponent = () => {
           {report.report_name}
         </div>
         {displayModule(ReportInformationType.MAIN_INFORMATION)
-        && (
-          <div style={{
-            width: '50%',
-            paddingRight: '25px',
-          }}
-          >
-            <Typography variant="h4" gutterBottom>
-              {t('General information')}
-            </Typography>
-            <SimulationMainInformation exercise={reportData.exercise} />
-          </div>
-        )}
-        {displayModule(ReportInformationType.SCORE_DETAILS)
-        && (
-          <div style={{
-            width: '50%',
-            display: 'grid',
-            gridTemplateRows: 'auto 1fr',
-          }}
-          >
-            <Typography variant="h4" gutterBottom>
-              {t('Results')}
-            </Typography>
-            <Paper
-              variant="outlined"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
+          && (
+            <div style={{
+              width: '50%',
+              paddingRight: '25px',
+            }}
             >
-              <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults} disableChartAnimation />
-            </Paper>
-          </div>
-        )}
+              <Typography variant="h4" gutterBottom>
+                {t('General information')}
+              </Typography>
+              <SimulationMainInformation exercise={reportData.exercise} />
+            </div>
+          )}
+        {displayModule(ReportInformationType.SCORE_DETAILS)
+          && (
+            <div style={{
+              width: '50%',
+              display: 'grid',
+              gridTemplateRows: 'auto 1fr',
+            }}
+            >
+              <Typography variant="h4" gutterBottom>
+                {t('Results')}
+              </Typography>
+              <Paper
+                variant="outlined"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <ResponsePie expectationResultsByTypes={reportData.exerciseExpectationResults} disableChartAnimation />
+              </Paper>
+            </div>
+          )}
         {displayModule(ReportInformationType.INJECT_RESULT)
-        && (
-          <InjectReportResult
-            canEditComment={canEditReport}
-            injectsComments={report?.report_injects_comments}
-            injects={reportData.injects}
-            style={{
+          && (
+            <InjectReportResult
+              canEditComment={canEditReport}
+              injectsComments={report?.report_injects_comments}
+              injects={reportData.injects}
+              style={{
+                width: '100%',
+                marginTop: 20,
+              }}
+              onCommentSubmit={value => dispatch(updateReportInjectCommentForExercise(exerciseId, report.report_id, value))}
+            />
+          )}
+        {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
+          && (
+            <div style={{
               width: '100%',
               marginTop: 20,
             }}
-            onCommentSubmit={value => dispatch(updateReportInjectCommentForExercise(exerciseId, report.report_id, value))}
-          />
-        )}
-        {displayModule(ReportInformationType.GLOBAL_OBSERVATION)
-        && (
-          <div style={{
-            width: '100%',
-            marginTop: 20,
-          }}
-          >
-            <Typography variant="h4" gutterBottom>
-              {t('Global observation')}
-            </Typography>
+            >
+              <Typography variant="h4" gutterBottom>
+                {t('Global observation')}
+              </Typography>
 
-            <Paper variant="outlined" sx={{ padding: '10px 15px 10px 15px' }}>
-              <ReportComment canEditComment={canEditReport} initialComment={report.report_global_observation || ''} saveComment={saveGlobalObservation} />
-            </Paper>
-          </div>
-        )}
+              <Paper variant="outlined" sx={{ padding: '10px 15px 10px 15px' }}>
+                <ReportComment canEditComment={canEditReport} initialComment={report.report_global_observation || ''} saveComment={saveGlobalObservation} />
+              </Paper>
+            </div>
+          )}
         {displayModule(ReportInformationType.PLAYER_SURVEYS)
-        && (
-          <LessonsCategories
-            style={{
-              marginTop: theme.spacing(3),
-              width: '100%',
-            }}
-            lessonsCategories={reportData.lessonsCategories}
-            lessonsAnswers={reportData.lessonsAnswers}
-            lessonsQuestions={reportData.lessonsQuestions}
-            teamsMap={reportData.teamsMap}
-            teams={reportData.teams}
-            setSelectedQuestion={setSelectedQuestion}
-            isReport
-          />
-        )}
+          && (
+            <LessonsCategories
+              style={{
+                marginTop: theme.spacing(3),
+                width: '100%',
+              }}
+              lessonsCategories={reportData.lessonsCategories}
+              lessonsAnswers={reportData.lessonsAnswers}
+              lessonsQuestions={reportData.lessonsQuestions}
+              teamsMap={reportData.teamsMap}
+              teams={reportData.teams}
+              setSelectedQuestion={setSelectedQuestion}
+              isReport
+            />
+          )}
         {displayModule(ReportInformationType.EXERCISE_DETAILS)
-        && <ExerciseDistribution exerciseId={exerciseId} isReport />}
+          && <ExerciseDistribution exerciseId={exerciseId} isReport />}
         <AnswersByQuestionDialog
           open={!!selectedQuestion}
           onClose={() => setSelectedQuestion(null)}

@@ -583,10 +583,10 @@ class QuickInject extends Component {
                                   disabled={isExerciseReadOnly(exercise)}
                                 />
                                 {values
-                                && values[field.key]
-                                && values[field.key][index]
-                                && values[field.key][index].type
-                                === 'attachment' ? (
+                                  && values[field.key]
+                                  && values[field.key][index]
+                                  && values[field.key][index].type
+                                  === 'attachment' ? (
                                       <OldSelectField
                                         variant="standard"
                                         name={`${name}.value`}
@@ -1207,54 +1207,54 @@ class QuickInject extends Component {
                   </Button>
                 </div>
                 {(hasExpectations || expectationsNotManual.length > 0)
-                && (
-                  <>
-                    <Typography variant="h2" style={{ marginTop: 30 }}>
-                      {t('Inject expectations')}
-                    </Typography>
-                    {expectationsNotManual.length > 0 && (
-                      <div>
-                        <div style={{ marginTop: -15 }}>
-                          {this.renderFields(
-                            expectationsNotManual.filter((f) => {
+                  && (
+                    <>
+                      <Typography variant="h2" style={{ marginTop: 30 }}>
+                        {t('Inject expectations')}
+                      </Typography>
+                      {expectationsNotManual.length > 0 && (
+                        <div>
+                          <div style={{ marginTop: -15 }}>
+                            {this.renderFields(
+                              expectationsNotManual.filter((f) => {
                               // Filter display if linked fields
-                              for (
-                                let index = 0;
-                                index < f.linkedFields.length;
-                                index += 1
-                              ) {
-                                const linkedField = f.linkedFields[index];
-                                if (
-                                  linkedField.type === 'checkbox'
-                                  && values[linkedField.key] === false
+                                for (
+                                  let index = 0;
+                                  index < f.linkedFields.length;
+                                  index += 1
                                 ) {
-                                  return false;
+                                  const linkedField = f.linkedFields[index];
+                                  if (
+                                    linkedField.type === 'checkbox'
+                                    && values[linkedField.key] === false
+                                  ) {
+                                    return false;
+                                  }
+                                  if (
+                                    linkedField.type === 'select'
+                                    && !f.linkedValues.includes(values[linkedField.key])
+                                  ) {
+                                    return false;
+                                  }
                                 }
-                                if (
-                                  linkedField.type === 'select'
-                                  && !f.linkedValues.includes(values[linkedField.key])
-                                ) {
-                                  return false;
-                                }
-                              }
-                              return true;
-                            }),
-                            values,
-                            attachedDocs,
-                          )}
+                                return true;
+                              }),
+                              values,
+                              attachedDocs,
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {hasExpectations
-                    && (
-                      <InjectExpectations
-                        predefinedExpectationDatas={predefinedExpectations}
-                        expectationDatas={expectations}
-                        handleExpectations={this.handleExpectations.bind(this)}
-                      />
-                    )}
-                  </>
-                )}
+                      )}
+                      {hasExpectations
+                        && (
+                          <InjectExpectations
+                            predefinedExpectationDatas={predefinedExpectations}
+                            expectationDatas={expectations}
+                            handleExpectations={this.handleExpectations.bind(this)}
+                          />
+                        )}
+                    </>
+                  )}
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>
                     {t('Inject documents')}

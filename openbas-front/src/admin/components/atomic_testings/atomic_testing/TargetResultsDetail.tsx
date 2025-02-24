@@ -721,15 +721,15 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               {selectedExpectationForCreation && (
                 <>
                   {selectedExpectationForCreation.injectExpectation.inject_expectation_type === 'MANUAL'
-                  && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
+                    && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
                   {['DETECTION', 'PREVENTION'].includes(selectedExpectationForCreation.injectExpectation.inject_expectation_type)
-                  && (
-                    <DetectionPreventionExpectationsValidationForm
-                      expectation={selectedExpectationForCreation.injectExpectation}
-                      sourceIds={selectedExpectationForCreation.sourceIds}
-                      onUpdate={onUpdateValidation}
-                    />
-                  )}
+                    && (
+                      <DetectionPreventionExpectationsValidationForm
+                        expectation={selectedExpectationForCreation.injectExpectation}
+                        sourceIds={selectedExpectationForCreation.sourceIds}
+                        onUpdate={onUpdateValidation}
+                      />
+                    )}
                 </>
               )}
             </DialogContent>
@@ -746,20 +746,20 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               {selectedResultEdition && selectedResultEdition.injectExpectation && (
                 <>
                   {selectedResultEdition.injectExpectation.inject_expectation_type === 'MANUAL'
-                  && (
-                    <ManualExpectationsValidationForm
-                      expectation={selectedResultEdition.injectExpectation}
-                      onUpdate={onUpdateValidation}
-                    />
-                  )}
+                    && (
+                      <ManualExpectationsValidationForm
+                        expectation={selectedResultEdition.injectExpectation}
+                        onUpdate={onUpdateValidation}
+                      />
+                    )}
                   {['DETECTION', 'PREVENTION'].includes(selectedResultEdition.injectExpectation.inject_expectation_type)
-                  && (
-                    <DetectionPreventionExpectationsValidationForm
-                      expectation={selectedResultEdition.injectExpectation}
-                      result={selectedResultEdition.expectationResult}
-                      onUpdate={onUpdateValidation}
-                    />
-                  )}
+                    && (
+                      <DetectionPreventionExpectationsValidationForm
+                        expectation={selectedResultEdition.injectExpectation}
+                        result={selectedResultEdition.expectationResult}
+                        onUpdate={onUpdateValidation}
+                      />
+                    )}
                 </>
               )}
             </DialogContent>
