@@ -41,6 +41,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -438,7 +439,7 @@ public class InjectService {
    * @return the injects to update/delete
    * @throws AccessDeniedException if the user is not allowed to update/delete the injects
    */
-  public List<Inject> getInjectsAndCheckIsPlanner(InjectBulkProcessingInput input) {
+  public List<Inject> getInjectsAndCheckPermission(InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     // Specification building
     Specification<Inject> filterSpecifications = getInjectSpecification(input);
@@ -450,7 +451,10 @@ public class InjectService {
     // Assert that the user is allowed to delete the injects
     // Can't use PreAuthorized as we don't have the data about involved scenarios and simulations
 
-    authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectPlanner);
+    switch (requested_grant_level) {
+      case OBSERVER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectObserver);
+      case PLANNER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectPlanner);
+    }
     return injectsToProcess;
   }
 
@@ -468,7 +472,7 @@ public class InjectService {
     InjectAuthorisationResult result = this.authorise(injects, authoriseFunction);
     if (!result.getUnauthorised().isEmpty()) {
       throw new AccessDeniedException(
-          "You are not allowed to delete the injects of ids "
+          "You are not allowed to alter the injects of ids "
               + String.join(", ", result.getUnauthorised().stream().map(Inject::getId).toList()));
     }
   }

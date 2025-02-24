@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type InjectorContractConvertedContent, type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import { exportInjects } from '../../../../actions/injects/inject-action';
+import {exportInjects, exportInjectSearch} from '../../../../actions/injects/inject-action';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
@@ -24,7 +24,7 @@ import {
   type Article,
   type FilterGroup,
   type Inject,
-  type InjectBulkUpdateOperation, type InjectExportRequestInput,
+  type InjectBulkUpdateOperation, InjectExportFromSearchRequestInput, type InjectExportRequestInput,
   type InjectInput,
   type InjectTestStatusOutput,
   type Team,
@@ -471,21 +471,27 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const handleExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
-    const data: InjectExportRequestInput = {
-      injects: Object.keys(selectedElements).map((id) => {
-        return { inject_id: id };
-      }),
+    setIsBulkLoading(true);
+    const testIds = injectIdsToProcess(selectAll);
+    const ignoreIds = injectIdsToIgnore(selectAll);
+    const data: InjectExportFromSearchRequestInput = {
+      search_pagination_input: selectAll ? searchPaginationInput : undefined,
+      inject_ids_to_process: selectAll ? undefined : testIds,
+      inject_ids_to_ignore: ignoreIds,
+      simulation_or_scenario_id: exerciseOrScenarioId,
       options: {
         with_players: withPlayers,
         with_teams: withTeams,
         with_variable_values: withVariableValues,
       },
     };
-    exportInjects(data).then((result) => {
+    exportInjectSearch(data).then((result) => {
       const contentDisposition = result.headers['content-disposition'];
       const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
       const filename = match[1];
       download(result.data, filename, result.headers['content-type']);
+    }).finally(() => {
+      setIsBulkLoading(false);
     });
   };
 

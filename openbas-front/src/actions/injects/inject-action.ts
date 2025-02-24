@@ -3,7 +3,7 @@ import { type Dispatch } from 'redux';
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import {
   type Exercise,
-  type InjectBulkProcessingInput,
+  type InjectBulkProcessingInput, InjectExportFromSearchRequestInput,
   type InjectExportRequestInput, type InjectImportInput,
   type Scenario,
   type SearchPaginationInput,
@@ -20,6 +20,14 @@ export const bulkTestInjects = (data: InjectBulkProcessingInput) => {
   const uri = '/api/injects/test';
   return simplePostCall(uri, data, undefined, false).catch((error) => {
     MESSAGING$.notifyError('Can\'t be tested');
+    throw error;
+  });
+};
+
+export const exportInjectSearch = (data: InjectExportFromSearchRequestInput) => {
+  const uri = '/api/injects/search/export';
+  return simplePostCall(uri, data, { responseType: 'arraybuffer' }).catch((error) => {
+    MESSAGING$.notifyError('Could not request export of injects');
     throw error;
   });
 };
