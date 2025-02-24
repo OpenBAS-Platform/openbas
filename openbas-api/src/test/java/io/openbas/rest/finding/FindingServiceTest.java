@@ -1,8 +1,8 @@
 package io.openbas.rest.finding;
 
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.Inject;
 import io.openbas.database.model.Finding;
+import io.openbas.database.model.Inject;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.utils.fixtures.composers.InjectComposer;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static io.openbas.database.model.finding.FindingUtils.CREDENTIALS_SEPARATOR;
 import static io.openbas.rest.finding.FindingFixture.*;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
 import static org.junit.jupiter.api.Assertions.*;
@@ -130,7 +129,7 @@ class FindingServiceTest extends IntegrationTest {
       // -- ASSERT --
       assertNotNull(result);
       assertEquals(CREDENTIALS_FIELD, result.getField());
-      assertTrue(result.getValue().contains(CREDENTIALS_SEPARATOR));
+      assertTrue(result.getValue().contains(":"));
     }
   }
 

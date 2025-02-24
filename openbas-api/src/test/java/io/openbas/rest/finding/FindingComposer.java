@@ -2,7 +2,9 @@ package io.openbas.rest.finding;
 
 import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
-import io.openbas.utils.fixtures.composers.*;
+import io.openbas.utils.fixtures.composers.ComposerBase;
+import io.openbas.utils.fixtures.composers.InjectComposer;
+import io.openbas.utils.fixtures.composers.InnerComposerBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
