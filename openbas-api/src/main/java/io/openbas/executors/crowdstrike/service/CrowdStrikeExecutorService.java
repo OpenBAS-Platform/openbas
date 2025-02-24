@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CrowdStrikeExecutorService implements Runnable {
 
-  private static final String CROWDSTRIKE_EXECUTOR_TYPE = "openbas_crowdstrike";
+  public static final String CROWDSTRIKE_EXECUTOR_TYPE = "openbas_crowdstrike";
   public static final String CROWDSTRIKE_EXECUTOR_NAME = "CrowdStrike";
   private static final String CROWDSTRIKE_EXECUTOR_DOCUMENTATION_LINK =
       "https://docs.openbas.io/latest/deployment/ecosystem/executors/#crowdstrike-falcon-agent";
@@ -110,7 +110,6 @@ public class CrowdStrikeExecutorService implements Runnable {
               agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
 
               endpoint.setName(crowdStrikeDevice.getHostname());
-              endpoint.setDescription("Asset collected by CrowdStrike executor context.");
               endpoint.setIps(new String[] {crowdStrikeDevice.getConnection_ip()});
               endpoint.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
               endpoint.setHostname(crowdStrikeDevice.getHostname());

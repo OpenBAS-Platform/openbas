@@ -191,7 +191,8 @@ public class CalderaExecutorService implements Runnable {
         updateExistingAgent(agent, optionalAgent, endpointToUpdate);
       } else {
         // New agent to create for the endpoint
-        this.endpointService.createNewAgent(agent, endpointToUpdate);
+        agent.setAsset(endpointToUpdate);
+        this.agentService.createOrUpdateAgent(agent);
       }
     } else {
       // New endpoint and new agent to create
@@ -221,7 +222,6 @@ public class CalderaExecutorService implements Runnable {
             agent -> {
               Endpoint endpoint = new Endpoint();
               endpoint.setName(agent.getHost());
-              endpoint.setDescription("Asset collected by Caldera executor context.");
               endpoint.setIps(agent.getHost_ip_addrs());
               endpoint.setHostname(agent.getHost());
               endpoint.setPlatform(toPlatform(agent.getPlatform()));

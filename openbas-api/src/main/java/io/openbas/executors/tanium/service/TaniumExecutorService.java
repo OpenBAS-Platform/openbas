@@ -109,7 +109,6 @@ public class TaniumExecutorService implements Runnable {
               agent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
               agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
               endpoint.setName(taniumEndpoint.getName());
-              endpoint.setDescription("Asset collected by Tanium executor context.");
               endpoint.setIps(taniumEndpoint.getIpAddresses());
               endpoint.setMacAddresses(taniumEndpoint.getMacAddresses());
               endpoint.setHostname(taniumEndpoint.getName());

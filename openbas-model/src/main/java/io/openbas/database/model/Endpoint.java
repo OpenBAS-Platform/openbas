@@ -11,7 +11,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
@@ -24,6 +26,10 @@ import org.hibernate.annotations.Type;
 public class Endpoint extends Asset {
 
   public static final String ENDPOINT_TYPE = "Endpoint";
+  private static final String BAD_MAC_ADDRESS = "000000000000";
+  private static final List<String> BAD_IP_ADDRESSES =
+      Arrays.asList("127.0.0.1", "::1", "169.254.0.0");
+  private static final String REGEX_MAC_ADDRESS = "[^a-z0-9]";
 
   public enum PLATFORM_ARCH {
     @JsonProperty("x86_64")
@@ -95,8 +101,36 @@ public class Endpoint extends Asset {
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
 
-  public String getHostname() {
-    return hostname.toLowerCase();
+  public void setMacAddresses(String[] macAddresses) {
+    this.macAddresses =
+        Arrays.stream(macAddresses)
+            .map(macAddress -> macAddress.toLowerCase().replaceAll(REGEX_MAC_ADDRESS, ""))
+            .filter(macAddress -> !BAD_MAC_ADDRESS.equals(macAddress))
+            .distinct()
+            .toArray(String[]::new);
+  }
+
+  public void setIps(String[] ips) {
+    this.ips =
+        Arrays.stream(ips)
+            .map(String::toLowerCase)
+            .filter(ip -> !BAD_IP_ADDRESSES.contains(ip))
+            .distinct()
+            .toArray(String[]::new);
+  }
+
+  public void addAllMacAddresses(String[] macAddresses) {
+    this.macAddresses =
+        Stream.concat(Arrays.stream(macAddresses), Arrays.stream(this.macAddresses))
+            .distinct()
+            .toArray(String[]::new);
+  }
+
+  public void addAllIpAddresses(String[] ips) {
+    this.ips =
+        Stream.concat(Arrays.stream(ips), Arrays.stream(this.ips))
+            .distinct()
+            .toArray(String[]::new);
   }
 
   public void setHostname(String hostname) {

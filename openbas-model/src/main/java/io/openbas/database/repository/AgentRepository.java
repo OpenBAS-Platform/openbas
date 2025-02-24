@@ -30,7 +30,7 @@ public interface AgentRepository
       @Param("privilege") String privilege,
       @Param("executor") String executor);
 
-  Optional<Agent> findByExternalReference(String externalReference);
+  List<Agent> findByExternalReference(String externalReference);
 
   /**
    * Returns the agents for Caldera execution

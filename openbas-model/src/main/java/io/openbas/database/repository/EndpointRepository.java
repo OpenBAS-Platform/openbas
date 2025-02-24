@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,12 @@ public interface EndpointRepository
       @NotBlank final @Param("hostname") String hostname,
       @NotBlank final @Param("platform") String platform,
       @NotBlank final @Param("arch") String arch);
+
+  @Query(
+      value = "select e.* from assets e where e.endpoint_mac_addresses && :macAddresses",
+      nativeQuery = true)
+  Optional<Endpoint> findByAtleastOneMacAddress(
+      @NotNull final @Param("macAddresses") String[] macAddresses);
 
   @Override
   @Query(
