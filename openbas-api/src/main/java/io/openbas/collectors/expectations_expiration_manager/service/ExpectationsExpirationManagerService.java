@@ -36,7 +36,9 @@ public class ExpectationsExpirationManagerService {
 
   // -- PRIVATE --
   private void computeExpectations(@NotNull final List<InjectExpectation> expectations) {
-    expectations.forEach(
+    List<InjectExpectation> remainingExpectations =
+        expectations.stream().filter(exp -> exp.getScore() == null).toList();
+    remainingExpectations.forEach(
         expectation -> {
           if (isExpired(expectation)) {
             String result = computeFailedMessage(expectation.getType());
