@@ -1,6 +1,5 @@
 package io.openbas.injector_contract.fields;
 
-import io.openbas.injector_contract.ContractType;
 import io.openbas.model.LinkedFieldModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,5 +35,5 @@ public abstract class ContractElement {
     this.linkedFields = linkedFields.stream().map(LinkedFieldModel::fromField).toList();
   }
 
-  public abstract ContractType getType();
+  public abstract ContractFieldType getType();
 }

@@ -1,6 +1,5 @@
 package io.openbas.injector_contract.fields;
 
-import io.openbas.injector_contract.ContractType;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +29,7 @@ public class ContractCheckbox extends ContractElement {
   }
 
   @Override
-  public ContractType getType() {
-    return ContractType.Checkbox;
+  public ContractFieldType getType() {
+    return ContractFieldType.Checkbox;
   }
 }

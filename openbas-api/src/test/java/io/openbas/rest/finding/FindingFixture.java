@@ -1,6 +1,6 @@
 package io.openbas.rest.finding;
 
-import io.openbas.database.model.finding.Finding;
+import io.openbas.database.model.Finding;
 
 import static io.openbas.database.model.finding.FindingUtils.*;
 

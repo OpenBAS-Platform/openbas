@@ -1,6 +1,6 @@
 package io.openbas.rest.finding;
 
-import io.openbas.database.model.finding.Finding;
+import io.openbas.database.model.Finding;
 import io.openbas.rest.finding.form.FindingInput;
 import io.openbas.rest.helper.RestBehavior;
 import jakarta.validation.Valid;

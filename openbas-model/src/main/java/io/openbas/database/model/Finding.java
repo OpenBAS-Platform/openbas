@@ -1,12 +1,9 @@
-package io.openbas.database.model.finding;
+package io.openbas.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.database.model.Base;
-import io.openbas.database.model.Inject;
-import io.openbas.database.model.finding.FindingType.ValueType;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -19,7 +16,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
-import java.util.List;
 
 import static java.time.Instant.now;
 
@@ -46,7 +42,7 @@ public class Finding implements Base {
   @Enumerated(EnumType.STRING)
   @JsonProperty("finding_type")
   @NotNull
-  protected ValueType type;
+  protected ContractOutputType type;
 
   @Column(name = "finding_value", nullable = false)
   @JsonProperty("finding_value")

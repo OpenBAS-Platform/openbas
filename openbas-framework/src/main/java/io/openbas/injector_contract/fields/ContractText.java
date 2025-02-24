@@ -1,6 +1,5 @@
 package io.openbas.injector_contract.fields;
 
-import io.openbas.injector_contract.ContractType;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +33,7 @@ public class ContractText extends ContractElement {
   }
 
   @Override
-  public ContractType getType() {
-    return ContractType.Text;
+  public ContractFieldType getType() {
+    return ContractFieldType.Text;
   }
 }

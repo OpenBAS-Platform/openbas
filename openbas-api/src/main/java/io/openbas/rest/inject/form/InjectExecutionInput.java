@@ -13,8 +13,11 @@ public class InjectExecutionInput {
   @JsonProperty("execution_message") // FIXME: should be changed to execution_raw_output in implant repo
   private String message;
 
-  @JsonProperty("execution_raw_structured")
-  private String rawStructured;
+  @JsonProperty("execution_output_structured")
+  private String outputStructured;
+
+  @JsonProperty("execution_output_raw")
+  private String outputRaw;
 
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("execution_status")
