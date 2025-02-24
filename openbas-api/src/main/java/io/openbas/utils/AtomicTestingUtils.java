@@ -436,7 +436,10 @@ public class AtomicTestingUtils {
       Function<T, String> getNameFunction,
       Function<T, String> getExecutorTypeFunction) {
 
-    if (expectationsByEntity == null) {
+    if (expectationsByEntity == null
+        || expectationsByEntity.isEmpty()
+        || rawTargetMap == null
+        || rawTargetMap.isEmpty()) {
       return new ArrayList<>();
     }
 

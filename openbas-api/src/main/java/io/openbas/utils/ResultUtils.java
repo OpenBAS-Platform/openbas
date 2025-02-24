@@ -1,6 +1,7 @@
 package io.openbas.utils;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Endpoint;
@@ -9,7 +10,9 @@ import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
+import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.service.AssetGroupService;
+import io.openbas.service.PlatformSettingsService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -29,6 +32,8 @@ public class ResultUtils {
   private final AssetGroupRepository assetGroupRepository;
   private final AssetGroupService assetGroupService;
   private final AgentRepository agentRepository;
+
+  private PlatformSettingsService platformSettingsService;
 
   // -- UTILS --
   public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
@@ -78,6 +83,8 @@ public class ResultUtils {
 
   // -- TARGETS WITH RESULTS --
   public List<InjectTargetWithResult> computeTargetResults(@NotNull Set<String> injectIds) {
+
+    PlatformSettings settings = platformSettingsService.findSettings();
 
     // -- EXPECTATIONS --
     Set<RawInjectExpectation> rawInjectExpectations =
@@ -171,7 +178,7 @@ public class ResultUtils {
                     injectAssetMap.getOrDefault(injectId, emptyList()),
                     teamMap,
                     userMap,
-                    agentMap,
+                    settings.getEnabledDevFeatures().contains("agent-expectations-ui")? agentMap :emptyMap(),
                     assetMap,
                     dynamicForAssetGroupMap,
                     assetGroupMap)
