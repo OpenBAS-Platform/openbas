@@ -178,7 +178,9 @@ public class ResultUtils {
                     injectAssetMap.getOrDefault(injectId, emptyList()),
                     teamMap,
                     userMap,
-                    settings.getEnabledDevFeatures().contains("agent-expectations-ui")? agentMap :emptyMap(),
+                    settings.getEnabledDevFeatures().contains("agent-expectations-ui")
+                        ? agentMap
+                        : emptyMap(),
                     assetMap,
                     dynamicForAssetGroupMap,
                     assetGroupMap)
