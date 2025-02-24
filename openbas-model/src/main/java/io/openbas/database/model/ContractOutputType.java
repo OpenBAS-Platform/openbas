@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum ContractOutputType {
   @JsonProperty("text")
   Text("text"),
+  @JsonProperty("Number")
+  Number("number"),
   @JsonProperty("port")
   Port("port"),
   @JsonProperty("IPv4")
