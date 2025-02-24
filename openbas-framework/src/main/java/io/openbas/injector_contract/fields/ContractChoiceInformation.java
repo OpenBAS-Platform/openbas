@@ -1,7 +1,7 @@
 package io.openbas.injector_contract.fields;
 
 import io.openbas.injector_contract.ContractCardinality;
-import io.openbas.injector_contract.ContractType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class ContractChoiceInformation extends ContractCardinalityElement {
   }
 
   @Override
-  public ContractType getType() {
-    return ContractType.Choice;
+  public ContractFieldType getType() {
+    return ContractFieldType.Choice;
   }
 }

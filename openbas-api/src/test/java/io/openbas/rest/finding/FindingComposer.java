@@ -1,16 +1,12 @@
 package io.openbas.rest.finding;
 
-import io.openbas.database.model.Tag;
-import io.openbas.database.model.finding.Finding;
+import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.utils.fixtures.composers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Component
 public class FindingComposer extends ComposerBase<Finding> {

@@ -1,8 +1,8 @@
-package io.openbas.injector_contract;
+package io.openbas.injector_contract.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public enum ContractType {
+public enum ContractFieldType {
   @JsonProperty("text")
   Text("text"),
   @JsonProperty("number")
@@ -38,7 +38,7 @@ public enum ContractType {
 
   public final String label;
 
-  ContractType(String label) {
+  ContractFieldType(String label) {
     this.label = label;
   }
 }

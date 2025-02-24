@@ -1,7 +1,7 @@
 package io.openbas.rest.finding;
 
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.finding.Finding;
+import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.persistence.EntityNotFoundException;

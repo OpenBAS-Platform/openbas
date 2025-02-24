@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.model.finding.Finding;
+import io.openbas.database.model.Finding;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.injector_contract.outputs.ContractOutputElement;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionAction;
@@ -27,8 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static io.openbas.injector_contract.output.ContractOutputUtils.getContractOutputs;
-import static io.openbas.injector_contract.output.ContractOutputUtils.toFinding;
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
 
 @RequiredArgsConstructor
 @Service
@@ -169,17 +169,18 @@ public class InjectStatusService {
 
     // -- FINDINGS --
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
-    if (input.getRawStructured() != null) {
+    if (input.getOutputStructured() != null) {
       try {
         List<Finding> findings = new ArrayList<>();
-        ObjectNode values = mapper.readValue(input.getRawStructured(), ObjectNode.class);
+        // Get the contract
         InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
-        List<JsonNode> contractOutputs = getContractOutputs(injectorContract.getConvertedContent());
+        List<ContractOutputElement> contractOutputs = getContractOutputs(injectorContract.getConvertedContent());
+        ObjectNode values = mapper.readValue(input.getOutputStructured(), ObjectNode.class);
         if (!contractOutputs.isEmpty()) {
           contractOutputs.forEach(
-              ouput -> {
-                Finding finding = toFinding(ouput, values);
-                findings.add(finding);
+              output -> {
+                List<Finding> outputFindings = output.toFindings(values);
+                findings.addAll(outputFindings);
               });
         }
         this.findingService.createFindings(findings, injectId);

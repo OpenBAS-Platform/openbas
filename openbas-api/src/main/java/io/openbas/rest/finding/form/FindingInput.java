@@ -1,8 +1,8 @@
 package io.openbas.rest.finding.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.database.model.finding.Finding;
-import io.openbas.database.model.finding.FindingType;
+import io.openbas.database.model.ContractOutputType;
+import io.openbas.database.model.Finding;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class FindingInput {
 
   @JsonProperty("finding_type")
   @NotNull
-  protected FindingType.ValueType type;
+  protected ContractOutputType type;
 
   @JsonProperty("finding_value")
   @NotBlank

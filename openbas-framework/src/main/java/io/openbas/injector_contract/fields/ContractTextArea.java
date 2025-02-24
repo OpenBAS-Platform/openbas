@@ -1,6 +1,5 @@
 package io.openbas.injector_contract.fields;
 
-import io.openbas.injector_contract.ContractType;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +38,7 @@ public class ContractTextArea extends ContractElement {
   }
 
   @Override
-  public ContractType getType() {
-    return ContractType.Textarea;
+  public ContractFieldType getType() {
+    return ContractFieldType.Textarea;
   }
 }
