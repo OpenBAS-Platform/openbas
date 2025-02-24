@@ -40,12 +40,12 @@ const Reports: FunctionComponent<Props> = ({ reports, navigateToReportPage }) =>
               padding: 0,
             }}
             secondaryAction={permissions.canWrite
-            && (
-              <ReportPopover
-                report={report}
-                actions={['Delete', 'Update']}
-              />
-            )}
+              && (
+                <ReportPopover
+                  report={report}
+                  actions={['Delete', 'Update']}
+                />
+              )}
           >
             <ListItemButton onClick={() => navigateToReportPage(report.report_id)}>
               <ListItemIcon>

@@ -198,9 +198,9 @@ const InjectContentFieldComponent = ({
                         control={control}
                       />
                       {values
-                      && values[field.key]
-                      && values[field.key][index]
-                      && values[field.key][index].type === 'attachment' ? (
+                        && values[field.key]
+                        && values[field.key][index]
+                        && values[field.key][index].type === 'attachment' ? (
                             <TextField
                               variant="standard"
                               fullWidth={true}

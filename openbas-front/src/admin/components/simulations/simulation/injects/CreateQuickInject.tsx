@@ -47,24 +47,24 @@ const CreateQuickInject: FunctionComponent<Props> = ({ exercise }) => {
         <Add />
       </Fab>
       {injectorContract
-      && (
-        <Drawer
-          open={open}
-          keepMounted={false}
-          anchor="right"
-          sx={{ zIndex: 1202 }}
-          onClose={() => setOpen(false)}
-          elevation={1}
-          disableEnforceFocus={true}
-        >
-          <QuickInject
-            exerciseId={exercise.exercise_id}
-            exercise={exercise}
-            injectorContract={injectorContract}
-            handleClose={() => setOpen(false)}
-          />
-        </Drawer>
-      )}
+        && (
+          <Drawer
+            open={open}
+            keepMounted={false}
+            anchor="right"
+            sx={{ zIndex: 1202 }}
+            onClose={() => setOpen(false)}
+            elevation={1}
+            disableEnforceFocus={true}
+          >
+            <QuickInject
+              exerciseId={exercise.exercise_id}
+              exercise={exercise}
+              injectorContract={injectorContract}
+              handleClose={() => setOpen(false)}
+            />
+          </Drawer>
+        )}
     </>
   );
 };

@@ -42,11 +42,11 @@ const ScenarioTeams: FunctionComponent<Props> = ({ scenarioTeamsUsers }) => {
         <Typography variant="h4">
           {t('Teams')}
           {permissions.canWrite
-          && (
-            <UpdateTeams
-              addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
-            />
-          )}
+            && (
+              <UpdateTeams
+                addedTeamIds={teamsStore.map((team: Team) => team.team_id)}
+              />
+            )}
         </Typography>
         <Paper sx={{ padding: theme.spacing(2) }} variant="outlined">
           <ContextualTeams teams={teamsStore} />

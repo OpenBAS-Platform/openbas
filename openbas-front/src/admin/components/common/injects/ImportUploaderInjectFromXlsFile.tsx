@@ -69,40 +69,40 @@ const ImportUploaderInjectFromXlsFile: FunctionComponent<Props> = ({
     <>
       {loading && <Loader variant="inElement" />}
       {!loading
-      && (
-        <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation}>
-          <div className={classes.container}>
-            <Controller
-              control={control}
-              name="file"
-              render={({ field: { onChange } }) => (
-                <CustomFileUploader
-                  name="file"
-                  fieldOnChange={onChange}
-                  label={t('Your file should be a XLS')}
-                  acceptMimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                  errors={errors}
-                />
-              )}
-            />
-          </div>
-          <div className={classes.buttons}>
-            <Button
-              onClick={handleClose}
-              disabled={isSubmitting}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              color="secondary"
-              type="submit"
-              disabled={!isDirty || isSubmitting}
-            >
-              {t('Next')}
-            </Button>
-          </div>
-        </form>
-      )}
+        && (
+          <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation}>
+            <div className={classes.container}>
+              <Controller
+                control={control}
+                name="file"
+                render={({ field: { onChange } }) => (
+                  <CustomFileUploader
+                    name="file"
+                    fieldOnChange={onChange}
+                    label={t('Your file should be a XLS')}
+                    acceptMimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    errors={errors}
+                  />
+                )}
+              />
+            </div>
+            <div className={classes.buttons}>
+              <Button
+                onClick={handleClose}
+                disabled={isSubmitting}
+              >
+                {t('Cancel')}
+              </Button>
+              <Button
+                color="secondary"
+                type="submit"
+                disabled={!isDirty || isSubmitting}
+              >
+                {t('Next')}
+              </Button>
+            </div>
+          </form>
+        )}
     </>
   );
 };

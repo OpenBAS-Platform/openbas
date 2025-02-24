@@ -341,7 +341,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
                     style={inlineStyles.user_options}
                   >
                     {R.isNil(user.user_email)
-                    || R.isEmpty(user.user_email) ? (
+                      || R.isEmpty(user.user_email) ? (
                           <EmailOutlined
                             color="warning"
                             fontSize="small"
@@ -355,7 +355,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
                           />
                         )}
                     {R.isNil(user.user_pgp_key)
-                    || R.isEmpty(user.user_pgp_key) ? (
+                      || R.isEmpty(user.user_pgp_key) ? (
                           <KeyOutlined
                             color="warning"
                             fontSize="small"
@@ -369,7 +369,7 @@ const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
                           />
                         )}
                     {R.isNil(user.user_phone)
-                    || R.isEmpty(user.user_phone) ? (
+                      || R.isEmpty(user.user_phone) ? (
                           <SmartphoneOutlined
                             color="warning"
                             fontSize="small"

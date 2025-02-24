@@ -160,25 +160,25 @@ const SimulationList: FunctionComponent<Props> = ({
   return (
     <List>
       {hasHeader && queryableHelpers
-      && (
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-          secondaryAction={<>&nbsp;</>}
-        >
-          <ListItemIcon />
-          <ListItemText
-            primary={(
-              <SortHeadersComponentV2
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                sortHelpers={queryableHelpers.sortHelpers}
-              />
-            )}
-          />
-        </ListItem>
-      )}
+        && (
+          <ListItem
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
+            secondaryAction={<>&nbsp;</>}
+          >
+            <ListItemIcon />
+            <ListItemText
+              primary={(
+                <SortHeadersComponentV2
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  sortHelpers={queryableHelpers.sortHelpers}
+                />
+              )}
+            />
+          </ListItem>
+        )}
       {
         loading
           ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} />

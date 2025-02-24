@@ -26,11 +26,11 @@ const ReportComment: FunctionComponent<Props> = ({ initialComment, saveComment, 
     >
       <ExpandableMarkdown showAll source={comment} />
       { canEditComment
-      && (
-        <IconButton sx={{ marginLeft: 'auto' }} color="primary" onClick={() => setOpenEdit(true)}>
-          <Edit />
-        </IconButton>
-      )}
+        && (
+          <IconButton sx={{ marginLeft: 'auto' }} color="primary" onClick={() => setOpenEdit(true)}>
+            <Edit />
+          </IconButton>
+        )}
 
       <Dialog
         title={t('Update inject comment')}
