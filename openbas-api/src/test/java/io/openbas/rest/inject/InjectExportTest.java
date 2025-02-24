@@ -10,8 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.InjectRepository;
 import io.openbas.export.Mixins;
 import io.openbas.rest.inject.form.ExportOptionsInput;
+import io.openbas.rest.inject.form.InjectExportFromSearchRequestInput;
 import io.openbas.rest.inject.form.InjectExportRequestInput;
 import io.openbas.rest.inject.form.InjectExportTarget;
 import io.openbas.service.FileService;
@@ -21,11 +23,14 @@ import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.helpers.GrantHelper;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -38,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class InjectExportTest extends IntegrationTest {
 
   public final String INJECT_EXPORT_URI = INJECT_URI + "/export";
+  public final String INJECT_EXPORT_SEARCH_URI = INJECT_URI + "/search/export";
 
   @Autowired private InjectComposer injectComposer;
   @Autowired private DocumentComposer documentComposer;
@@ -50,11 +56,14 @@ public class InjectExportTest extends IntegrationTest {
   @Autowired private TeamComposer teamComposer;
   @Autowired private ExerciseComposer exerciseComposer;
   @Autowired private ScenarioComposer scenarioComposer;
+  @Autowired private InjectorFixture injectorFixture;
+  @Autowired private PayloadComposer payloadComposer;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;
   @Autowired private FileService fileService;
   @Autowired private GrantHelper grantHelper;
   @Autowired private EntityManager entityManager;
+  @Autowired private InjectRepository injectRepository;
 
   @BeforeEach
   public void setup() throws Exception {
@@ -69,6 +78,7 @@ public class InjectExportTest extends IntegrationTest {
     tagComposer.reset();
     exerciseComposer.reset();
     scenarioComposer.reset();
+    payloadComposer.reset();
 
     // delete the test files from the minio service
     for (String fileName : WELL_KNOWN_FILES.keySet()) {
@@ -103,6 +113,16 @@ public class InjectExportTest extends IntegrationTest {
                 documentComposer
                     .forDocument(DocumentFixture.getDocument(FileFixture.getPlainTextFileContent()))
                     .withInMemoryFile(FileFixture.getPlainTextFileContent()));
+    InjectComposer.Composer injectOtherForExerciseComposer =
+        injectComposer
+            .forInject(InjectFixture.getDefaultInject())
+            .withTag(tagComposer.forTag(TagFixture.getTagWithText("Other inject again tag")))
+            .withInjectorContract(
+                injectorContractComposer
+                    .forInjectorContract(InjectorContractFixture.createDefaultInjectorContract())
+                    .withInjector(InjectorFixture.createDefaultPayloadInjector())
+                    .withPayload(
+                        payloadComposer.forPayload(PayloadFixture.createDefaultCommand())));
     // wrap it in a persisted exercise
     exerciseComposer
         .forExercise(ExerciseFixture.createDefaultExercise())
@@ -112,7 +132,8 @@ public class InjectExportTest extends IntegrationTest {
                 .withChannel(channelComposer.forChannel(ChannelFixture.getDefaultChannel())))
         .withArticle(articleToExportFromExercise)
         .persist()
-        .withInject(injectWithExerciseComposer);
+        .withInject(injectWithExerciseComposer)
+        .withInject(injectOtherForExerciseComposer);
 
     InjectComposer.Composer injectWithScenarioComposer =
         injectComposer
@@ -169,7 +190,12 @@ public class InjectExportTest extends IntegrationTest {
                                             TagFixture.getTagWithText("Document tag")))))),
         // these are set up above
         injectWithExerciseComposer,
+        injectOtherForExerciseComposer,
         injectWithScenarioComposer);
+  }
+
+  private Set<Exercise> getExercisesFromInjectWrappers(List<InjectComposer.Composer> injects) {
+    return injects.stream().map(wrapper -> wrapper.get().getExercise()).collect(Collectors.toSet());
   }
 
   private List<InjectExportTarget> createDefaultInjectTargets() {
@@ -222,6 +248,40 @@ public class InjectExportTest extends IntegrationTest {
     return input;
   }
 
+  private InjectExportFromSearchRequestInput createDefaultInjectExportFromSearchInput(
+      List<InjectComposer.Composer> injectWrappers,
+      String simulationOrScenarioId,
+      boolean withPlayers,
+      boolean withTeams,
+      boolean withVariableValues) {
+    injectWrappers.forEach(InjectComposer.Composer::persist);
+
+    SearchPaginationInput searchInput = new SearchPaginationInput();
+    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    filterGroup.setMode(Filters.FilterMode.and);
+    Filters.Filter filter1 = new Filters.Filter();
+    filter1.setKey("inject_platforms");
+    filter1.setMode(Filters.FilterMode.and);
+    filter1.setValues(new ArrayList<>());
+    filter1.setOperator(Filters.FilterOperator.contains);
+    filterGroup.setFilters(List.of(filter1));
+    searchInput.setFilterGroup(filterGroup);
+    searchInput.setTextSearch("");
+
+    InjectExportFromSearchRequestInput exportInput = new InjectExportFromSearchRequestInput();
+    exportInput.setSearchPaginationInput(searchInput);
+    exportInput.setInjectIDsToIgnore(List.of());
+    exportInput.setSimulationOrScenarioId(simulationOrScenarioId);
+
+    ExportOptionsInput options = new ExportOptionsInput();
+    options.setWithPlayers(withPlayers);
+    options.setWithTeams(withTeams);
+    options.setWithVariableValues(withVariableValues);
+    exportInput.setExportOptions(options);
+
+    return exportInput;
+  }
+
   @Nested
   @DisplayName("When unauthenticated")
   public class WhenUnauthenticated {
@@ -238,17 +298,16 @@ public class InjectExportTest extends IntegrationTest {
   @DisplayName("When standard user with staggered privileges")
   public class WhenStandardUserWithStaggeredPrivileges {
     @Test
-    @DisplayName("When lacking OBSERVER grant on some exercises, return NOT FOUND")
-    public void whenLackingOBSERVERGrantOnSomeExercisesReturnNOTFOUND() throws Exception {
+    @DisplayName("When lacking OBSERVER grant on some scenarios, return NOT FOUND")
+    public void whenLackingOBSERVERGrantOnSomeScenariosReturnNOTFOUND() throws Exception {
       List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
 
       // grant Observer on exercise but not the scenario
-      InjectComposer.Composer injectWithExercise =
-          injectWrappers.stream()
-              .filter(wrapper -> wrapper.get().getExercise() != null)
-              .findAny()
-              .get();
-      grantHelper.grantExerciseObserver(injectWithExercise.get().getExercise());
+      List<InjectComposer.Composer> injectsFromExercise =
+          injectWrappers.stream().filter(wrapper -> wrapper.get().getExercise() != null).toList();
+
+      getExercisesFromInjectWrappers(injectsFromExercise)
+          .forEach(exercise -> grantHelper.grantExerciseObserver(exercise));
 
       entityManager.flush();
       entityManager.clear();
@@ -269,7 +328,12 @@ public class InjectExportTest extends IntegrationTest {
       List<String> expected_not_found_ids =
           injectWrappers.stream()
               .map(wrapper -> wrapper.get().getId())
-              .filter(id -> !id.equals(injectWithExercise.get().getId()))
+              .filter(
+                  id ->
+                      !injectsFromExercise.stream()
+                          .map(wrapper -> wrapper.get().getId())
+                          .toList()
+                          .contains(id))
               .toList();
 
       assertThatJson(not_found_response)
@@ -278,11 +342,11 @@ public class InjectExportTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("When lacking OBSERVER grant on some scenarios, return NOT FOUND")
-    public void whenLackingOBSERVERGrantOnSomeScenariosReturnNOTFOUND() throws Exception {
+    @DisplayName("When lacking OBSERVER grant on some exercises, return NOT FOUND")
+    public void whenLackingOBSERVERGrantOnSomeExercisesReturnNOTFOUND() throws Exception {
       List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
 
-      // grant Observer on scenario but not the scenario
+      // grant Observer on scenario but not the exercise
       InjectComposer.Composer injectWithScenario =
           injectWrappers.stream()
               .filter(wrapper -> wrapper.get().getScenario() != null)
@@ -315,6 +379,142 @@ public class InjectExportTest extends IntegrationTest {
       assertThatJson(not_found_response)
           .node("message")
           .isEqualTo("Element not found: %s".formatted(String.join(", ", expected_not_found_ids)));
+    }
+
+    @Nested
+    @DisplayName("With search specification input")
+    public class withSearchSpecificationInput {
+
+      @Test
+      @DisplayName("When lacking OBSERVER grant on exercise, return NOT FOUND")
+      public void whenLackingOBSERVERGrantOnExerciseReturnNotFound() throws Exception {
+        List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
+
+        // omit granting Observer on exercise
+        List<InjectComposer.Composer> injectsFromExercise =
+            injectWrappers.stream().filter(wrapper -> wrapper.get().getExercise() != null).toList();
+
+        InjectExportFromSearchRequestInput exportInput =
+            createDefaultInjectExportFromSearchInput(
+                injectWrappers,
+                injectsFromExercise.stream()
+                    .map(wrapper -> wrapper.get().getExercise())
+                    .collect(Collectors.toSet())
+                    .stream()
+                    .findAny()
+                    .get()
+                    .getId(),
+                false,
+                false,
+                false);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        String not_found_response =
+            mvc.perform(
+                    post(INJECT_EXPORT_SEARCH_URI)
+                        .content(mapper.writeValueAsString(exportInput))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThatJson(not_found_response).node("message").isEqualTo("Not Found");
+      }
+
+      @Test
+      @DisplayName("With OBSERVER grant on exercise, return injects")
+      public void withOBSERVERGrantOnExerciseReturnInjects() throws Exception {
+        List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
+
+        // omit granting Observer on exercise
+        List<InjectComposer.Composer> injectsFromExercise =
+            injectWrappers.stream().filter(wrapper -> wrapper.get().getExercise() != null).toList();
+        Set<Exercise> exercises = getExercisesFromInjectWrappers(injectsFromExercise);
+        exercises.forEach(exercise -> grantHelper.grantExerciseObserver(exercise));
+
+        InjectExportFromSearchRequestInput exportInput =
+            createDefaultInjectExportFromSearchInput(
+                injectWrappers, exercises.stream().findFirst().get().getId(), false, false, false);
+
+        entityManager.flush();
+        entityManager.clear();
+        byte[] response =
+            mvc.perform(
+                    post(INJECT_EXPORT_SEARCH_URI)
+                        .content(mapper.writeValueAsString(exportInput))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        ObjectMapper objectMapper = mapper.copy();
+        objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
+        List<Inject> injectsFromDb =
+            injectRepository.findAllById(
+                injectsFromExercise.stream().map(wrapper -> wrapper.get().getId()).toList());
+        String injectJson = objectMapper.writeValueAsString(injectsFromDb);
+
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_information")
+            .isEqualTo(injectJson);
+      }
+
+      @Test
+      @DisplayName("With OBSERVER grant on exercise with exclusion, return correct injects")
+      public void withOBSERVERGrantOnExerciseWithExclusionReturnCorrectInjects() throws Exception {
+        List<InjectComposer.Composer> injectWrappers = createDefaultInjectWrappers();
+
+        // omit granting Observer on exercise
+        List<InjectComposer.Composer> injectsFromExercise =
+            injectWrappers.stream().filter(wrapper -> wrapper.get().getExercise() != null).toList();
+        Set<Exercise> exercises = getExercisesFromInjectWrappers(injectsFromExercise);
+        exercises.forEach(exercise -> grantHelper.grantExerciseObserver(exercise));
+
+        InjectExportFromSearchRequestInput exportInput =
+            createDefaultInjectExportFromSearchInput(
+                injectWrappers, exercises.stream().findFirst().get().getId(), false, false, false);
+
+        List<String> excludedIds = List.of(injectsFromExercise.getFirst().get().getId());
+        exportInput.setInjectIDsToIgnore(excludedIds);
+
+        entityManager.flush();
+        entityManager.clear();
+        byte[] response =
+            mvc.perform(
+                    post(INJECT_EXPORT_SEARCH_URI)
+                        .content(mapper.writeValueAsString(exportInput))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+
+        String actualJson =
+            ZipUtils.getZipEntry(response, "injects.json", ZipUtils::streamToString);
+
+        ObjectMapper objectMapper = mapper.copy();
+        objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
+        List<Inject> injectsFromDb =
+            injectRepository.findAllById(
+                injectsFromExercise.stream()
+                    .map(wrapper -> wrapper.get().getId())
+                    .filter(id -> !excludedIds.contains(id))
+                    .toList());
+        String injectJson = objectMapper.writeValueAsString(injectsFromDb);
+
+        assertThatJson(actualJson)
+            .when(IGNORING_ARRAY_ORDER)
+            .node("inject_information")
+            .isEqualTo(injectJson);
+      }
     }
   }
 
