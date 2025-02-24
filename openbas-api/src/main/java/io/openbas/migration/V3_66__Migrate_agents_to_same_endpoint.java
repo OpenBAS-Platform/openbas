@@ -10,6 +10,11 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
   @Override
   public void migrate(Context context) throws Exception {
     Statement select = context.getConnection().createStatement();
+    // TODO migrate hostname becomes migrate address mac (all agents/assets except Caldera)
+    // => mac address -> lowercase + remove specific characters (keep only alphanumeric) + distinct + remove mac address 000000000000
+    // => same as before (with hostname) but with mac address + if no mac address matched, create new endpoint
+    // TODO migrate agents Caldera (all assets + only Caldera agent)
+    // => same as before (with hostname) but if 2 or more same hostnames, compare with ips, if no match do nothing
     select.execute(
         """
                 -- update hostnames to have lowercase for every executors
