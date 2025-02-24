@@ -16,8 +16,7 @@ public class ContractOutputUtils {
   private ContractOutputUtils() {
   }
 
-  public static List<ContractOutputElement> getContractOutputs(@NotNull final ObjectNode content) {
-    ObjectMapper mapper = new ObjectMapper();
+  public static List<ContractOutputElement> getContractOutputs(@NotNull final ObjectNode content, ObjectMapper mapper) {
     return StreamSupport.stream(content.get(OUTPUTS).spliterator(), false).map(jsonNode -> {
         try {
             return mapper.treeToValue(jsonNode, ContractOutputElement.class);

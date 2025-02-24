@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.createFinding;
 import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
 
 @RequiredArgsConstructor
@@ -174,13 +175,26 @@ public class InjectStatusService {
         List<Finding> findings = new ArrayList<>();
         // Get the contract
         InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
-        List<ContractOutputElement> contractOutputs = getContractOutputs(injectorContract.getConvertedContent());
+        List<ContractOutputElement> contractOutputs = getContractOutputs(injectorContract.getConvertedContent(), mapper);
         ObjectNode values = mapper.readValue(input.getOutputStructured(), ObjectNode.class);
         if (!contractOutputs.isEmpty()) {
           contractOutputs.forEach(
               output -> {
-                List<Finding> outputFindings = output.toFindings(values);
-                findings.addAll(outputFindings);
+                if( output.isMultiple() ) {
+                  JsonNode jsonNodes = values.get(output.getField());
+                  if( jsonNodes != null && jsonNodes.isArray() ) {
+                    for(JsonNode jsonNode : jsonNodes ) {
+                      Finding finding = createFinding(output);
+                      finding.setValue(output.getType().toFindingValue.apply(jsonNode));
+                      findings.add(finding);
+                    }
+                  }
+                } else {
+                  JsonNode jsonNode = values.get(output.getField());
+                  Finding finding = createFinding(output);
+                  finding.setValue(output.getType().toFindingValue.apply(jsonNode));
+                  findings.add(finding);
+                }
               });
         }
         this.findingService.createFindings(findings, injectId);
