@@ -33,7 +33,6 @@ public class ResultUtils {
   private final AssetGroupRepository assetGroupRepository;
   private final AssetGroupService assetGroupService;
   private final AgentRepository agentRepository;
-
   private final PlatformSettingsService platformSettingsService;
 
   // -- UTILS --
