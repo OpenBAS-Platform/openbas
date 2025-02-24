@@ -41,7 +41,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -439,7 +438,8 @@ public class InjectService {
    * @return the injects to update/delete
    * @throws AccessDeniedException if the user is not allowed to update/delete the injects
    */
-  public List<Inject> getInjectsAndCheckPermission(InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
+  public List<Inject> getInjectsAndCheckPermission(
+      InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     // Specification building
     Specification<Inject> filterSpecifications = getInjectSpecification(input);

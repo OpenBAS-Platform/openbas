@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { type InjectorContractConvertedContent, type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
-import {exportInjects, exportInjectSearch} from '../../../../actions/injects/inject-action';
+import { exportInjectSearch } from '../../../../actions/injects/inject-action';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
@@ -24,7 +24,7 @@ import {
   type Article,
   type FilterGroup,
   type Inject,
-  type InjectBulkUpdateOperation, InjectExportFromSearchRequestInput, type InjectExportRequestInput,
+  type InjectBulkUpdateOperation, type InjectExportFromSearchRequestInput,
   type InjectInput,
   type InjectTestStatusOutput,
   type Team,

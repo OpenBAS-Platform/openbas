@@ -3,7 +3,7 @@ import { type Dispatch } from 'redux';
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
 import {
   type Exercise,
-  type InjectBulkProcessingInput, InjectExportFromSearchRequestInput,
+  type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput,
   type InjectExportRequestInput, type InjectImportInput,
   type Scenario,
   type SearchPaginationInput,

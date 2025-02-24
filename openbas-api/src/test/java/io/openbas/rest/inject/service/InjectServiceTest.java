@@ -342,7 +342,8 @@ class InjectServiceTest {
     when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
-    List<Inject> result = injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
+    List<Inject> result =
+        injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
 
     // Assert
     assertNotNull(result);
@@ -363,7 +364,8 @@ class InjectServiceTest {
     when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
-    List<Inject> result = injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
+    List<Inject> result =
+        injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
 
     // Assert
     assertNotNull(result);
@@ -385,7 +387,8 @@ class InjectServiceTest {
     when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
-    List<Inject> result = injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
+    List<Inject> result =
+        injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
 
     // Assert
     assertNotNull(result);
@@ -401,7 +404,8 @@ class InjectServiceTest {
     // Act & assert
     BadRequestException exception =
         assertThrows(
-            BadRequestException.class, () -> injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER));
+            BadRequestException.class,
+            () -> injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER));
 
     // Assert
     assertEquals(
@@ -430,7 +434,8 @@ class InjectServiceTest {
     // Act & assert
     AccessDeniedException exception =
         assertThrows(
-            AccessDeniedException.class, () -> injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER));
+            AccessDeniedException.class,
+            () -> injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER));
 
     // Assert
     assertEquals(

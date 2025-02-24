@@ -8,8 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class InjectExportFromSearchRequestInput extends InjectBulkProcessingInput {
-    /** The export options to alter the shape of the response */
-    @JsonProperty("options")
-    private ExportOptionsInput exportOptions = new ExportOptionsInput();
+  /** The export options to alter the shape of the response */
+  @JsonProperty("options")
+  private ExportOptionsInput exportOptions = new ExportOptionsInput();
 }
-
