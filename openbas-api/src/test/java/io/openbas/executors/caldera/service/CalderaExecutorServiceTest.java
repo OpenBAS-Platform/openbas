@@ -157,10 +157,8 @@ public class CalderaExecutorServiceTest {
   @Test
   void test_run_WITH_2_existing_agents_same_machine() {
     when(client.agents()).thenReturn(List.of(calderaAgent));
-    when(this.endpointService.findEndpointByAgentDetails(
-            calderaEndpoint.getHostname(),
-            calderaEndpoint.getPlatform(),
-            calderaEndpoint.getArch()))
+    when(this.endpointService.findEndpointByHostnameAndAtLeastOneIp(
+            calderaEndpoint.getHostname(), calderaEndpoint.getIps()))
         .thenReturn(Optional.of(calderaEndpoint));
 
     randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);

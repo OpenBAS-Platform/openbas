@@ -42,7 +42,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -84,13 +83,9 @@ public class EndpointService {
         .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
   }
 
-  @Transactional(readOnly = true)
-  public Optional<Endpoint> findEndpointByAgentDetails(
-      @NotBlank final String hostname,
-      @NotNull final Endpoint.PLATFORM_TYPE platform,
-      @NotNull final Endpoint.PLATFORM_ARCH arch) {
-    return this.endpointRepository.findByHostnameArchAndPlatform(
-        hostname.toLowerCase(), platform.name(), arch.name());
+  public Optional<Endpoint> findEndpointByHostnameAndAtLeastOneIp(
+      @NotBlank final String hostname, @NotNull final String[] ips) {
+    return this.endpointRepository.findByHostnameAndAtleastOneIp(hostname, ips);
   }
 
   public Optional<Endpoint> findEndpointByAtLeastOneMacAddress(
@@ -139,7 +134,7 @@ public class EndpointService {
   // -- INSTALLATION AGENT --
   public void registerAgentEndpoint(Agent agent, String executorType) {
     Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
-    // Check if agent exists (only 1 agent per endpoint can be found for Crowdstrike and Tanium)
+    // Check if agent exists (only 1 agent can be found for Crowdstrike and Tanium)
     List<Agent> optionalAgents = agentService.findByExternalReference(agent.getExternalReference());
     if (!optionalAgents.isEmpty()) {
       Agent existingAgent = optionalAgents.getFirst();
@@ -204,6 +199,7 @@ public class EndpointService {
     if (optionalAgent.isPresent()) {
       // Update this specific agent
       agentToUpdate = optionalAgent.get();
+      // For OpenBAS agent
       agentToUpdate.setVersion(agent.getVersion());
       agentToUpdate.setLastSeen(agent.getLastSeen());
       agentToUpdate.setExternalReference(agent.getExternalReference());

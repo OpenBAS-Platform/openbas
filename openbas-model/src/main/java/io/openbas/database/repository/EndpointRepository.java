@@ -20,12 +20,11 @@ public interface EndpointRepository
 
   @Query(
       value =
-          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_platform = :platform and e.endpoint_arch = :arch",
+          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_ips && :ips",
       nativeQuery = true)
-  Optional<Endpoint> findByHostnameArchAndPlatform(
+  Optional<Endpoint> findByHostnameAndAtleastOneIp(
       @NotBlank final @Param("hostname") String hostname,
-      @NotBlank final @Param("platform") String platform,
-      @NotBlank final @Param("arch") String arch);
+      @NotNull final @Param("ips") String[] ips);
 
   @Query(
       value = "select e.* from assets e where e.endpoint_mac_addresses && :macAddresses",
