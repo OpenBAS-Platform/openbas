@@ -440,7 +440,8 @@ public class V1_DataImporter implements Importer {
       Exercise savedExercise,
       Scenario savedScenario,
       Map<String, Base> baseIds) {
-    Map<String, Team> baseTeams = handlingTeams(importNode, prefix, baseIds);
+    Map<String, Team> baseTeams =
+        handlingTeams(importNode, prefix, baseIds, savedExercise, savedScenario);
     baseTeams
         .values()
         .forEach(
@@ -459,7 +460,11 @@ public class V1_DataImporter implements Importer {
   }
 
   private Map<String, Team> handlingTeams(
-      JsonNode importNode, String prefix, Map<String, Base> baseIds) {
+      JsonNode importNode,
+      String prefix,
+      Map<String, Base> baseIds,
+      Exercise savedExercise,
+      Scenario savedScenario) {
     Map<String, Team> baseTeams = new HashMap<>();
 
     resolveJsonElements(importNode, prefix + "teams")
@@ -479,6 +484,14 @@ public class V1_DataImporter implements Importer {
               if (!existingTeams.isEmpty()) {
                 baseTeams.put(id, existingTeams.getFirst());
               } else {
+                // skip creating contextual team if atomic testing
+                if (nodeTeam.has("team_contextual")) {
+                  boolean isContextual = nodeTeam.get("team_contextual").booleanValue();
+                  if (isContextual && savedExercise == null && savedScenario == null) {
+                    return;
+                  }
+                }
+
                 Team team = createTeam(nodeTeam, baseIds);
                 // Tags
                 List<String> teamTagIds = resolveJsonIds(nodeTeam, "team_tags");

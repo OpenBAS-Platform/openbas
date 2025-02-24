@@ -44,7 +44,7 @@ const InjectsListButtons: FunctionComponent<Props> = ({
         aria-label="Change view mode"
       >
         {hasImportModesEnabled()
-        && <InjectImportMenu onImportedInjects={onImportedInjects} />}
+          && <InjectImportMenu onImportedInjects={onImportedInjects} />}
         {(!!setViewMode && availableButtons.includes('list'))
           && (
             <Tooltip title={t('List view')}>

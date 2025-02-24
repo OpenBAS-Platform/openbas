@@ -124,24 +124,24 @@ const InjectImportMenu = ({ onImportedInjects = () => {} }: Props) => {
       >
         <>
           {!importId
-          && (
-            <ImportFileSelector
-              label={t('Your file should be a XLS')}
-              mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-              submitActionLabel={t('Next')}
-              handleClose={handleXlsImportClose}
-              handleSubmit={onSubmitImportFile}
-            />
-          )}
+            && (
+              <ImportFileSelector
+                label={t('Your file should be a XLS')}
+                mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                submitActionLabel={t('Next')}
+                handleClose={handleXlsImportClose}
+                handleSubmit={onSubmitImportFile}
+              />
+            )}
           {importId
-          && (
-            <ImportUploaderInjectFromXlsInjects
-              sheets={sheets}
-              handleClose={handleXlsImportClose}
-              importId={importId}
-              handleSubmit={onSubmitImportInjects}
-            />
-          )}
+            && (
+              <ImportUploaderInjectFromXlsInjects
+                sheets={sheets}
+                handleClose={handleXlsImportClose}
+                importId={importId}
+                handleSubmit={onSubmitImportInjects}
+              />
+            )}
         </>
       </Dialog>
     </>

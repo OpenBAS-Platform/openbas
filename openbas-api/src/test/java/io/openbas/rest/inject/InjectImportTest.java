@@ -1336,8 +1336,8 @@ public class InjectImportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("All teams have been recreated")
-      public void allTeamsHaveBeenRecreated() throws Exception {
+      @DisplayName("All platform teams have been recreated")
+      public void allPlatformTeamsHaveBeenRecreated() throws Exception {
         byte[] exportData =
             getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
@@ -1345,7 +1345,8 @@ public class InjectImportTest extends IntegrationTest {
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
-        for (Team expected : teamComposer.generatedItems) {
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(team -> !team.getContextual()).toList()) {
           Optional<Team> recreated =
               getImportedInjectsFromDb().stream()
                   .flatMap(inject -> inject.getTeams().stream())
@@ -1362,8 +1363,8 @@ public class InjectImportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("All users have been recreated")
-      public void allUsersHaveBeenRecreated() throws Exception {
+      @DisplayName("Contextual teams have not been recreated")
+      public void contextualTeamsAreNotRecreated() throws Exception {
         byte[] exportData =
             getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
@@ -1371,7 +1372,32 @@ public class InjectImportTest extends IntegrationTest {
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
-        for (User expected : userComposer.generatedItems) {
+        for (Team expected :
+            teamComposer.generatedItems.stream().filter(Team::getContextual).toList()) {
+          Optional<Team> recreated =
+              getImportedInjectsFromDb().stream()
+                  .flatMap(inject -> inject.getTeams().stream())
+                  .filter(c -> c.getName().equals(expected.getName()))
+                  .findAny();
+
+          Assertions.assertTrue(recreated.isEmpty(), "Found unexpected contextual team");
+        }
+      }
+
+      @Test
+      @DisplayName("All users from platform teams have been recreated")
+      public void allUsersFromPlatformTeamsHaveBeenRecreated() throws Exception {
+        byte[] exportData =
+            getExportDataThenDelete(getInjectFromScenarioWrappers(), true, true, true);
+        InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
+
+        doImport(exportData, input).andExpect(status().is2xxSuccessful());
+        clearEntityManager();
+
+        for (User expected :
+            userComposer.generatedItems.stream()
+                .filter(user -> user.getTeams().stream().anyMatch(Team::getContextual))
+                .toList()) {
           Optional<User> recreated =
               getImportedInjectsFromDb().stream()
                   .flatMap(inject -> inject.getTeams().stream())
@@ -2293,8 +2319,8 @@ public class InjectImportTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("Contextual teams are recreated for atomic testing")
-      public void contextualTeamsAreRecreatedForAtomicTesting() throws Exception {
+      @DisplayName("Contextual teams are not recreated for atomic testing")
+      public void contextualTeamsAreNotRecreatedForAtomicTesting() throws Exception {
         byte[] exportData = getExportData(getInjectFromScenarioWrappers(), true, true, true);
         InjectImportInput input = createTargetInput(InjectImportTargetType.ATOMIC_TESTING, null);
 
@@ -2309,12 +2335,7 @@ public class InjectImportTest extends IntegrationTest {
                   .filter(c -> c.getName().equals(expected.getName()))
                   .findAny();
 
-          Assertions.assertTrue(recreated.isPresent(), "Could not find expected team");
-          Assertions.assertEquals(expected.getName(), recreated.get().getName());
-          Assertions.assertEquals(expected.getDescription(), recreated.get().getDescription());
-          Assertions.assertEquals(expected.getContextual(), recreated.get().getContextual());
-
-          Assertions.assertNotEquals(expected.getId(), recreated.get().getId());
+          Assertions.assertTrue(recreated.isEmpty(), "Found unexpected contextual team");
         }
       }
 
@@ -2327,7 +2348,10 @@ public class InjectImportTest extends IntegrationTest {
         doImport(exportData, input).andExpect(status().is2xxSuccessful());
         clearEntityManager();
 
-        for (User expected : userComposer.generatedItems) {
+        for (User expected :
+            userComposer.generatedItems.stream()
+                .filter(user -> user.getTeams().stream().anyMatch(Team::getContextual))
+                .toList()) {
           Optional<User> reused =
               getImportedInjectsFromDb().stream()
                   .flatMap(inject -> inject.getTeams().stream())

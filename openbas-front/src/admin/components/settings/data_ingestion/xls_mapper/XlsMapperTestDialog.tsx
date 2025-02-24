@@ -47,15 +47,15 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
     >
       <>
         {importId === null
-        && (
-          <ImportFileSelector
-            label={t('Your file should be a XLS')}
-            mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            submitActionLabel={t('Next')}
-            handleClose={handleClose}
-            handleSubmit={onSubmitImportFile}
-          />
-        )}
+          && (
+            <ImportFileSelector
+              label={t('Your file should be a XLS')}
+              mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              submitActionLabel={t('Next')}
+              handleClose={handleClose}
+              handleSubmit={onSubmitImportFile}
+            />
+          )}
         {importId !== null
           && (
             <ImportUploaderInjectFromInjectsTest

@@ -75,40 +75,40 @@ const ImportFileSelector: FunctionComponent<Props> = ({
     <>
       {loading && <Loader variant="inElement" />}
       {!loading
-      && (
-        <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation}>
-          <div className={classes.container}>
-            <Controller
-              control={control}
-              name="file"
-              render={({ field: { onChange } }) => (
-                <CustomFileUploader
-                  name="file"
-                  fieldOnChange={onChange}
-                  label={label}
-                  acceptMimeTypes={mimeTypes}
-                  errors={errors}
-                />
-              )}
-            />
-          </div>
-          <div className={classes.buttons}>
-            <Button
-              onClick={handleClose}
-              disabled={isSubmitting}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              color="secondary"
-              type="submit"
-              disabled={!isDirty || isSubmitting}
-            >
-              {submitActionLabel}
-            </Button>
-          </div>
-        </form>
-      )}
+        && (
+          <form id="importUploadInjectForm" onSubmit={handleSubmitWithoutPropagation}>
+            <div className={classes.container}>
+              <Controller
+                control={control}
+                name="file"
+                render={({ field: { onChange } }) => (
+                  <CustomFileUploader
+                    name="file"
+                    fieldOnChange={onChange}
+                    label={label}
+                    acceptMimeTypes={mimeTypes}
+                    errors={errors}
+                  />
+                )}
+              />
+            </div>
+            <div className={classes.buttons}>
+              <Button
+                onClick={handleClose}
+                disabled={isSubmitting}
+              >
+                {t('Cancel')}
+              </Button>
+              <Button
+                color="secondary"
+                type="submit"
+                disabled={!isDirty || isSubmitting}
+              >
+                {submitActionLabel}
+              </Button>
+            </div>
+          </form>
+        )}
     </>
   );
 };
