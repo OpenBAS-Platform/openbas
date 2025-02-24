@@ -1,4 +1,5 @@
 import { Grid, List, Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -19,6 +20,7 @@ const Endpoint = () => {
   const { classes } = useStyles();
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
   const { t } = useFormatter();
+  const theme = useTheme();
 
   // Fetching data
   const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
@@ -82,7 +84,7 @@ const Endpoint = () => {
                   paddingTop: 5,
                 }}
                 >
-                  <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                  <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
                   {' '}
                   {endpoint.endpoint_platform}
                 </div>

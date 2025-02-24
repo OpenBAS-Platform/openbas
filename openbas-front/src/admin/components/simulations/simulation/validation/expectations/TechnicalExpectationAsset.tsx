@@ -78,59 +78,59 @@ const TechnicalExpectationAsset: FunctionComponent<Props> = ({
             className={classes.marginBottom_2}
           >
             {selected == null
-            && (
-              <>
-                {!R.isEmpty(expectation.inject_expectation_results)
-                && (
-                  <>
-                    <ListItem divider>
-                      <ListItemText style={{ maxWidth: '200px' }} primary={<span>{t('Source')}</span>} />
-                      <ListItemText primary={<span>{t('Result')}</span>} />
-                      <ListItemIcon></ListItemIcon>
-                    </ListItem>
-                    <List
-                      component="div"
-                      disablePadding
-                    >
-                      {expectation.inject_expectation_results?.map(result => (
-                        <ListItemButton key={result.sourceId} divider onClick={() => setSelected(result)}>
-                          <ListItemText
-                            style={{
-                              minWidth: '200px',
-                              maxWidth: '200px',
-                            }}
-                            primary={<span>{result.sourceName}</span>}
-                          />
-                          <ListItemText primary={<span>{truncate(result.result, 40)}</span>} />
-                          <ListItemIcon>
-                            <KeyboardArrowRightOutlined />
-                          </ListItemIcon>
-                        </ListItemButton>
-                      ))}
-                    </List>
-                  </>
-                )}
-                {R.isEmpty(expectation.inject_expectation_results) && t('Pending result')}
-              </>
-            )}
+              && (
+                <>
+                  {!R.isEmpty(expectation.inject_expectation_results)
+                    && (
+                      <>
+                        <ListItem divider>
+                          <ListItemText style={{ maxWidth: '200px' }} primary={<span>{t('Source')}</span>} />
+                          <ListItemText primary={<span>{t('Result')}</span>} />
+                          <ListItemIcon></ListItemIcon>
+                        </ListItem>
+                        <List
+                          component="div"
+                          disablePadding
+                        >
+                          {expectation.inject_expectation_results?.map(result => (
+                            <ListItemButton key={result.sourceId} divider onClick={() => setSelected(result)}>
+                              <ListItemText
+                                style={{
+                                  minWidth: '200px',
+                                  maxWidth: '200px',
+                                }}
+                                primary={<span>{result.sourceName}</span>}
+                              />
+                              <ListItemText primary={<span>{truncate(result.result, 40)}</span>} />
+                              <ListItemIcon>
+                                <KeyboardArrowRightOutlined />
+                              </ListItemIcon>
+                            </ListItemButton>
+                          ))}
+                        </List>
+                      </>
+                    )}
+                  {R.isEmpty(expectation.inject_expectation_results) && t('Pending result')}
+                </>
+              )}
             {selected !== null
-            && (
-              <pre>
-                {toJsonFormat(selected.result)}
-              </pre>
-            )}
+              && (
+                <pre>
+                  {toJsonFormat(selected.result)}
+                </pre>
+              )}
           </Alert>
           <div className={classes.buttons}>
             <div>
               {selected != null
-              && (
-                <Button
-                  variant="contained"
-                  onClick={() => setSelected(null)}
-                >
-                  {t('Back')}
-                </Button>
-              )}
+                && (
+                  <Button
+                    variant="contained"
+                    onClick={() => setSelected(null)}
+                  >
+                    {t('Back')}
+                  </Button>
+                )}
             </div>
             <Button
               color="secondary"

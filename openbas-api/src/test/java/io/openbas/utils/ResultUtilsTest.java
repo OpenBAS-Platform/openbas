@@ -25,6 +25,7 @@ class ResultUtilsTest {
   @Mock private TeamRepository teamRepository;
   @Mock private UserRepository userRepository;
   @Mock private AssetRepository assetRepository;
+  @Mock private AgentRepository agentRepository;
   @Mock private AssetGroupRepository assetGroupRepository;
   @Mock private AssetGroupService assetGroupService;
 
@@ -39,7 +40,8 @@ class ResultUtilsTest {
             userRepository,
             assetRepository,
             assetGroupRepository,
-            assetGroupService);
+            assetGroupService,
+            agentRepository);
   }
 
   @Test

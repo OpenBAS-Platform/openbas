@@ -186,16 +186,16 @@ const ClickableChip: FunctionComponent<Props> = ({
         />
       </Tooltip>
       {chipRef?.current
-      && (
-        <ClickableChipPopover
-          handleChangeValue={handleChange}
-          open={open}
-          onClose={handleClose}
-          anchorEl={chipRef.current}
-          availableValues={availableOptions}
-          element={selectedValue}
-        />
-      )}
+        && (
+          <ClickableChipPopover
+            handleChangeValue={handleChange}
+            open={open}
+            onClose={handleClose}
+            anchorEl={chipRef.current}
+            availableValues={availableOptions}
+            element={selectedValue}
+          />
+        )}
     </>
   );
 };

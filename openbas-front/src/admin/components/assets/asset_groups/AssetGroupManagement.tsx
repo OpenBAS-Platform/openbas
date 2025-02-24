@@ -140,13 +140,13 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
           : <span> &nbsp; </span>}
       />
       {userAdmin
-      && (
-        <AssetGroupAddEndpoints
-          assetGroupId={assetGroup?.asset_group_id}
-          assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-          onUpdate={onUpdate}
-        />
-      )}
+        && (
+          <AssetGroupAddEndpoints
+            assetGroupId={assetGroup?.asset_group_id}
+            assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
+            onUpdate={onUpdate}
+          />
+        )}
     </>
   );
 };

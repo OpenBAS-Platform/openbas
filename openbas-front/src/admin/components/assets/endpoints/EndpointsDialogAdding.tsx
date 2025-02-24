@@ -1,5 +1,6 @@
 import { DevicesOtherOutlined } from '@mui/icons-material';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 
 import { findEndpoints, searchEndpoints } from '../../../../actions/assets/endpoint-actions';
@@ -36,6 +37,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
+  const theme = useTheme();
 
   const [endpointValues, setEndpointValues] = useState<Endpoint[]>([]);
   useEffect(() => {
@@ -77,7 +79,7 @@ const EndpointsDialogAdding: FunctionComponent<Props> = ({
             alignItems: 'center',
           }}
           >
-            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+            <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
             {endpoint.endpoint_platform}
           </div>
         ),

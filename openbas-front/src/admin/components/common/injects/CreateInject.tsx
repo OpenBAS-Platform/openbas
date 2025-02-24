@@ -111,7 +111,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
         <>
           {(contract.injector_contract_platforms ?? []).map(
-            (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
+            (platform: string) => <PlatformIcon key={platform} width={20} platform={platform} marginRight={theme.spacing(2)} />,
           )}
         </>
       ),
@@ -299,8 +299,8 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
           injectorContractLabel={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
           injectContractIcon={selectedContract ? (
             <InjectIcon
-              type={selectedContract?.injector_contract_injector_type}
-              isPayload={false}
+              type={selectedContract.injector_contract_payload_type ?? selectedContract.injector_contract_injector_type}
+              isPayload={isNotEmptyField(selectedContract?.injector_contract_payload_type)}
             />
           ) : undefined}
           injectHeaderAction={(
@@ -308,7 +308,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               <HighlightOffOutlined />
             </IconButton>
           )}
-          injectHeaderTitle={selectedContractKillChainPhase || t('Kill chain phase')}
+          injectHeaderTitle={selectedContractKillChainPhase || selectedContract?.injector_contract_injector_name}
           isAtomic={isAtomic}
           disabled={!selectedContract}
           defaultInject={{

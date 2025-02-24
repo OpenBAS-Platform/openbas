@@ -1,4 +1,5 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type Props } from 'html-react-parser/lib/attributes-to-props';
 import { type FunctionComponent, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
@@ -32,6 +33,7 @@ const useStyles = makeStyles()(() => ({
 const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme();
   const { injectId } = useParams();
   const [payloadOutput, setPayloadOutput] = useState<StatusPayloadOutput>();
 
@@ -76,7 +78,7 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                 {(payloadOutput.payload_platforms ?? []).length === 0 ? (
                   <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
                 ) : payloadOutput.payload_platforms?.map(
-                  platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+                  platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
                 )}
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -152,22 +154,21 @@ const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
                         );
                       })
                     )}
-                { payloadOutput.payload_obfuscator
-                && (
-                  <>
-                    <Typography
-                      variant="h3"
-                      gutterBottom
-                      style={{ marginTop: 20 }}
-                    >
-                      {t('Obfuscator')}
-                    </Typography>
-                    <Typography key="obfuscator" variant="body2">
-                      {payloadOutput.payload_obfuscator}
-                    </Typography>
-                  </>
-
-                )}
+                {payloadOutput.payload_obfuscator
+                  && (
+                    <>
+                      <Typography
+                        variant="h3"
+                        gutterBottom
+                        style={{ marginTop: 20 }}
+                      >
+                        {t('Obfuscator')}
+                      </Typography>
+                      <Typography key="obfuscator" variant="body2">
+                        {payloadOutput.payload_obfuscator}
+                      </Typography>
+                    </>
+                  )}
                 <Typography
                   variant="h3"
                   gutterBottom

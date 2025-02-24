@@ -11,6 +11,7 @@ import PaginationComponent from '../../../../components/common/pagination/Pagina
 import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
 import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import { type LessonsTemplate, type SearchPaginationInput } from '../../../../utils/api-types';
@@ -23,18 +24,6 @@ const useStyles = makeStyles()(() => ({
     cursor: 'pointer',
   },
   item: { height: 50 },
-  bodyItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
@@ -46,6 +35,7 @@ const LessonsTemplates = () => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
 
   // Fetching data
   const { userAdmin } = useHelper((helper: UserHelper) => {
@@ -118,12 +108,14 @@ const LessonsTemplates = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div className={classes.bodyItems}>
+                  <div style={bodyItemsStyles.bodyItems}>
                     {headers.map(header => (
                       <div
                         key={header.field}
-                        className={classes.bodyItem}
-                        style={inlineStyles[header.field]}
+                        style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles[header.field],
+                        }}
                       >
                         {header.value(lessonsTemplate)}
                       </div>

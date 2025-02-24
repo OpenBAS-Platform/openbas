@@ -39,6 +39,10 @@ public class InjectorContractOutput {
   @JsonProperty("injector_contract_injector_type")
   private String injectorType;
 
+  @Schema(description = "Injector name")
+  @JsonProperty("injector_contract_injector_name")
+  private String injectorName;
+
   @Schema(description = "Attack pattern Ids")
   @JsonProperty("injector_contract_attack_patterns")
   private List<String> attackPatterns;
@@ -57,6 +61,7 @@ public class InjectorContractOutput {
       String content,
       PLATFORM_TYPE[] platforms,
       String payloadType,
+      String injectorName,
       String collectorType,
       String injectorType,
       String[] attackPatterns,
@@ -67,6 +72,7 @@ public class InjectorContractOutput {
     this.content = content;
     this.platforms = platforms;
     this.payloadType = Optional.ofNullable(collectorType).orElse(payloadType);
+    this.injectorName = injectorName;
     this.injectorType = injectorType;
     this.attackPatterns =
         attackPatterns != null ? new ArrayList<>(Arrays.asList(attackPatterns)) : new ArrayList<>();

@@ -679,7 +679,7 @@ export const donutChartOptions = ({
       width: '100%',
       height: '100%',
       zoom: { enabled: !isFakeData },
-      animations: { enabled: !isFakeData || !disableAnimation },
+      animations: { enabled: !isFakeData && !disableAnimation },
     },
     theme: { mode: theme.palette.mode },
     colors: chartFinalColors,

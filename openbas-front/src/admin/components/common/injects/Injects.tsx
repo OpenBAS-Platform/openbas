@@ -1,4 +1,5 @@
 import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { type CSSProperties, type FunctionComponent, type SyntheticEvent, useContext, useMemo, useState } from 'react';
 import { Link } from 'react-router';
@@ -109,6 +110,7 @@ const Injects: FunctionComponent<Props> = ({
   // Standard hooks
   const { classes } = useStyles();
   const { t, tPick } = useFormatter();
+  const theme = useTheme();
   const injectContext = useContext(InjectContext);
   const viewModeContext = useContext(ViewModeContext);
   const { permissions } = useContext(PermissionsContext);
@@ -170,7 +172,7 @@ const Injects: FunctionComponent<Props> = ({
                   key={platform}
                   width={20}
                   platform={platform}
-                  marginRight={10}
+                  marginRight={theme.spacing(2)}
                 />
               ),
             )
@@ -645,24 +647,24 @@ const Injects: FunctionComponent<Props> = ({
       {permissions.canWrite && (
         <>
           {selectedInjectId !== null
-          && (
-            <UpdateInject
-              open
-              handleClose={() => setSelectedInjectId(null)}
-              onUpdateInject={onUpdateInject}
-              massUpdateInject={massUpdateInject}
-              injectId={selectedInjectId}
-              // @ts-expect-error typing
-              articlesFromExerciseOrScenario={articles}
-              variablesFromExerciseOrScenario={variables}
-              exerciseOrScenarioId={exerciseOrScenarioId}
-              uriVariable={uriVariable}
-              allUsersNumber={allUsersNumber}
-              usersNumber={usersNumber}
-              teamsUsers={teamsUsers}
-              injects={injects}
-            />
-          )}
+            && (
+              <UpdateInject
+                open
+                handleClose={() => setSelectedInjectId(null)}
+                onUpdateInject={onUpdateInject}
+                massUpdateInject={massUpdateInject}
+                injectId={selectedInjectId}
+                // @ts-expect-error typing
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                exerciseOrScenarioId={exerciseOrScenarioId}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+                injects={injects}
+              />
+            )}
           <ButtonCreate onClick={() => {
             setOpenCreateDrawer(true);
             setPresetInjectDuration(0);

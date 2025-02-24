@@ -22,7 +22,7 @@ import useDataLoader from '../../utils/hooks/useDataLoader';
 import ResponsePie from './common/injects/ResponsePie';
 import MitreMatrix from './common/matrix/MitreMatrix';
 import PaperMetric from './common/simulate/PaperMetric';
-import ExerciseList from './simulations/ExerciseList';
+import SimulationList from './simulations/SimulationList';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -195,7 +195,7 @@ const Dashboard = () => {
         <Paper variant="outlined" classes={{ root: classes.paperWithChart }}>
           {loading
             ? <Loader variant="inElement" />
-            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} immutable={true} />}
+            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} />}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
@@ -281,7 +281,7 @@ const Dashboard = () => {
         <Typography variant="h4">{t('Last simulations')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperList }}>
           {exercises.length === 0 && <Empty message={t('No simulation in this platform yet')} />}
-          <ExerciseList
+          <SimulationList
             exercises={exercises}
             hasHeader={false}
             variant="reduced-view"

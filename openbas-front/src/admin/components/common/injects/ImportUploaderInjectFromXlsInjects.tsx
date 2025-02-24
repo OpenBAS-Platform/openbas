@@ -216,42 +216,42 @@ const ImportUploaderInjectFromXlsInjects: FunctionComponent<Props> = ({
           )}
         />
         {needLaunchDate
-        && (
-          <Controller
-            control={control}
-            name="startDate"
-            render={({ field, fieldState }) => (
-              <DateTimePicker
-                views={['year', 'month', 'day']}
-                value={field.value ? new Date(field.value) : null}
-                minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
-                onChange={startDate => field.onChange(startDate?.toISOString())}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    error: !!fieldState.error,
-                    helperText: fieldState.error && fieldState.error?.message,
-                    label: (
-                      <Box display="flex" alignItems="center">
-                        {t('Start date')}
-                        <Tooltip title={t('The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build')}>
-                          <InformationOutline
-                            fontSize="small"
-                            color="primary"
-                            style={{
-                              marginLeft: 4,
-                              cursor: 'default',
-                            }}
-                          />
-                        </Tooltip>
-                      </Box>
-                    ),
-                  },
-                }}
-              />
-            )}
-          />
-        )}
+          && (
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field, fieldState }) => (
+                <DateTimePicker
+                  views={['year', 'month', 'day']}
+                  value={field.value ? new Date(field.value) : null}
+                  minDate={new Date(new Date().setUTCHours(0, 0, 0, 0))}
+                  onChange={startDate => field.onChange(startDate?.toISOString())}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: !!fieldState.error,
+                      helperText: fieldState.error && fieldState.error?.message,
+                      label: (
+                        <Box display="flex" alignItems="center">
+                          {t('Start date')}
+                          <Tooltip title={t('The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build')}>
+                            <InformationOutline
+                              fontSize="small"
+                              color="primary"
+                              style={{
+                                marginLeft: 4,
+                                cursor: 'default',
+                              }}
+                            />
+                          </Tooltip>
+                        </Box>
+                      ),
+                    },
+                  }}
+                />
+              )}
+            />
+          )}
         <Controller
           control={control}
           name="timezone"

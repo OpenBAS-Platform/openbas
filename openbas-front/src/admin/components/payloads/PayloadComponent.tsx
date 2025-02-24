@@ -1,4 +1,5 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -28,6 +29,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme();
 
   const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({ attackPatternsMap: helper.getAttackPatternsMap() }));
 
@@ -79,7 +81,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
           <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
         ) : selectedPayload?.payload_platforms?.map(
-          platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+          platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
         )}
         {(selectedPayload?.payload_execution_arch) && (
           <>

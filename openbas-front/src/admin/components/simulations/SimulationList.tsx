@@ -7,6 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import { fetchExercisesGlobalScores } from '../../../actions/exercises/exercise-action';
 import { type QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
@@ -20,15 +21,6 @@ import ExerciseStatus from './simulation/ExerciseStatus';
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
   item: { height: 50 },
-  bodyItems: { display: 'flex' },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
 }));
 
 const getInlineStyles = (variant: string): Record<string, CSSProperties> => ({
@@ -79,7 +71,7 @@ interface Props {
   isGlobalScoreAsync?: boolean;
 }
 
-const ExerciseList: FunctionComponent<Props> = ({
+const SimulationList: FunctionComponent<Props> = ({
   exercises = [],
   queryableHelpers,
   hasHeader = true,
@@ -90,6 +82,7 @@ const ExerciseList: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const inlineStyles = getInlineStyles(variant);
   const { nsdt, vnsdt } = useFormatter();
 
@@ -167,25 +160,25 @@ const ExerciseList: FunctionComponent<Props> = ({
   return (
     <List>
       {hasHeader && queryableHelpers
-      && (
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-          secondaryAction={<>&nbsp;</>}
-        >
-          <ListItemIcon />
-          <ListItemText
-            primary={(
-              <SortHeadersComponentV2
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                sortHelpers={queryableHelpers.sortHelpers}
-              />
-            )}
-          />
-        </ListItem>
-      )}
+        && (
+          <ListItem
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
+            secondaryAction={<>&nbsp;</>}
+          >
+            <ListItemIcon />
+            <ListItemText
+              primary={(
+                <SortHeadersComponentV2
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  sortHelpers={queryableHelpers.sortHelpers}
+                />
+              )}
+            />
+          </ListItem>
+        )}
       {
         loading
           ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} />
@@ -206,12 +199,14 @@ const ExerciseList: FunctionComponent<Props> = ({
                   </ListItemIcon>
                   <ListItemText
                     primary={(
-                      <div className={classes.bodyItems}>
+                      <div style={bodyItemsStyles.bodyItems}>
                         {headers.map(header => (
                           <div
                             key={header.field}
-                            className={classes.bodyItem}
-                            style={inlineStyles[header.field]}
+                            style={{
+                              ...bodyItemsStyles.bodyItem,
+                              ...inlineStyles[header.field],
+                            }}
                           >
                             {header.value?.(exercise)}
                           </div>
@@ -227,4 +222,4 @@ const ExerciseList: FunctionComponent<Props> = ({
   );
 };
 
-export default ExerciseList;
+export default SimulationList;

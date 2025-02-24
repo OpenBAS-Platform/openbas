@@ -35,13 +35,13 @@ const InjectStatus = ({ injectStatus = null, endpointsMap = new Map() }: Props) 
             {t('Execution status')}
           </Typography>
           {injectStatus.status_name
-          && (
-            <ItemStatus
-              isInject
-              status={injectStatus.status_name}
-              label={t(injectStatus.status_name)}
-            />
-          )}
+            && (
+              <ItemStatus
+                isInject
+                status={injectStatus.status_name}
+                label={t(injectStatus.status_name)}
+              />
+            )}
           <ExecutionTime style={{ marginTop: '16px' }} startDate={injectStatus.tracking_sent_date ?? null} endDate={injectStatus.tracking_end_date ?? null} />
           <Typography
             variant="subtitle1"

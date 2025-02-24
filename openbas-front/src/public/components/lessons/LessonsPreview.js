@@ -183,7 +183,7 @@ const LessonsPreview = (props) => {
                               </Typography>
                               <Typography variant="body2">
                                 {question.lessons_question_explanation
-                                || t('No explanation')}
+                                  || t('No explanation')}
                               </Typography>
                             </Grid>
                             <Grid item xs={3}>

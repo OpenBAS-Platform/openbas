@@ -1,5 +1,6 @@
 import { MovieFilterOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -14,6 +15,7 @@ import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
 import ItemCategory from '../../../components/ItemCategory';
@@ -31,15 +33,6 @@ import ScenarioCreation from './ScenarioCreation';
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
   item: { height: 50 },
-  bodyItems: { display: 'flex' },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
@@ -55,7 +48,9 @@ const inlineStyles: Record<string, CSSProperties> = {
 const Scenarios = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
+  const theme = useTheme();
 
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -112,7 +107,7 @@ const Scenarios = () => {
         return (
           <>
             {platforms.map(
-              (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
+              (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={theme.spacing(2)} />,
             )}
           </>
         );
@@ -250,12 +245,14 @@ const Scenarios = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={(
-                          <div className={classes.bodyItems}>
+                          <div style={bodyItemsStyles.bodyItems}>
                             {headers.map(header => (
                               <div
                                 key={header.field}
-                                className={classes.bodyItem}
-                                style={inlineStyles[header.field]}
+                                style={{
+                                  ...bodyItemsStyles.bodyItem,
+                                  ...inlineStyles[header.field],
+                                }}
                               >
                                 {header.value(scenario)}
                               </div>

@@ -15,6 +15,7 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
@@ -28,16 +29,6 @@ import AssetGroupPopover from './AssetGroupPopover';
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
   item: { height: 50 },
-  bodyItems: { display: 'flex' },
-  bodyItem: {
-    height: 24,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-    boxSizing: 'content-box',
-  },
   drawerPaper: {
     minHeight: '100vh',
     width: '50%',
@@ -118,6 +109,7 @@ const computeRuleValues = (assetGroup: AssetGroupOutput, t: (value: string) => s
 const AssetGroups = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
 
   const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroup['asset_group_id'] | undefined>(undefined);
@@ -250,12 +242,14 @@ const AssetGroups = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div className={classes.bodyItems}>
+                  <div style={bodyItemsStyles.bodyItems}>
                     {headers.map(header => (
                       <div
                         key={header.field}
-                        className={classes.bodyItem}
-                        style={inlineStyles[header.field]}
+                        style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles[header.field],
+                        }}
                       >
                         {header.value?.(assetGroup)}
                       </div>

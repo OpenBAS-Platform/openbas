@@ -44,21 +44,21 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries =
               {idxList !== 0 && <Divider />}
               <MenuList component="nav">
                 {(entry.userRight ?? true)
-                && entry.items.map((item) => {
-                  if (hasHref(item)) {
+                  && entry.items.map((item) => {
+                    if (hasHref(item)) {
+                      return (
+                        <MenuItemGroup
+                          key={item.label}
+                          item={item}
+                          state={state}
+                          helpers={helpers}
+                        />
+                      );
+                    }
                     return (
-                      <MenuItemGroup
-                        key={item.label}
-                        item={item}
-                        state={state}
-                        helpers={helpers}
-                      />
+                      <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
                     );
-                  }
-                  return (
-                    <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
-                  );
-                })}
+                  })}
               </MenuList>
             </Fragment>
           );

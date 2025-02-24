@@ -7,6 +7,7 @@ import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AtomicTestingUtils {
@@ -19,9 +20,10 @@ public class AtomicTestingUtils {
       List<String> injectAssets,
       Map<String, RawTeam> rawTeamMap,
       Map<String, RawUser> rawUserMap,
+      Map<String, RawAgent> rawAgentMap,
       Map<String, RawAsset> rawAssetMap,
-      Map<String, RawAssetGroup> rawAssetGroupMap,
-      Map<String, List<Endpoint>> dynamicAssetGroupMap) {
+      Map<String, List<Endpoint>> dynamicAssetGroupMap,
+      Map<String, RawAssetGroup> rawAssetGroupMap) {
 
     // Get expectations with default values
     List<ExpectationResultsByType> defaultExpectationResultsByTypes =
@@ -29,6 +31,7 @@ public class AtomicTestingUtils {
 
     List<RawInjectExpectation> teamExpectations = new ArrayList<>();
     List<RawInjectExpectation> playerExpectations = new ArrayList<>();
+    List<RawInjectExpectation> agentExpectations = new ArrayList<>();
     List<RawInjectExpectation> assetExpectations = new ArrayList<>();
     List<RawInjectExpectation> assetGroupExpectations = new ArrayList<>();
 
@@ -42,8 +45,12 @@ public class AtomicTestingUtils {
               teamExpectations.add(expectation);
             }
           }
-          if (expectation.getAsset_id() != null && expectation.getAgent_id() == null) {
-            assetExpectations.add(expectation);
+          if (expectation.getAsset_id() != null) {
+            if (expectation.getAgent_id() != null) {
+              agentExpectations.add(expectation);
+            } else {
+              assetExpectations.add(expectation);
+            }
           }
           if (expectation.getAsset_group_id() != null
               && expectation.getAsset_id() == null
@@ -83,6 +90,14 @@ public class AtomicTestingUtils {
                     RawInjectExpectation::getTeam_id,
                     Collectors.groupingBy(RawInjectExpectation::getUser_id)));
 
+    // Agents
+    Map<String, Map<String, List<RawInjectExpectation>>> groupedByAssetAndAgent =
+        agentExpectations.stream()
+            .collect(
+                Collectors.groupingBy(
+                    RawInjectExpectation::getAsset_id,
+                    Collectors.groupingBy(RawInjectExpectation::getAgent_id)));
+
     // Check if each team defined in an inject has an expectation. If not, create a result with
     // default expectations
     if (rawTeamMap != null) {
@@ -99,6 +114,8 @@ public class AtomicTestingUtils {
                       team.getTeam_id(),
                       team.getTeam_name(),
                       defaultExpectationResultsByTypes,
+                      Collections.emptyList(),
+                      null,
                       null);
               targets.add(target);
             }
@@ -125,10 +142,11 @@ public class AtomicTestingUtils {
                           asset.getAsset_id(),
                           asset.getAsset_name(),
                           defaultExpectationResultsByTypes,
+                          Collections.emptyList(),
                           Objects.equals(asset.getAsset_type(), ENDPOINT)
                               ? Endpoint.PLATFORM_TYPE.valueOf(asset.getEndpoint_platform())
-                              : null);
-
+                              : null,
+                          null);
                   targets.add(target);
                 }
               });
@@ -146,43 +164,60 @@ public class AtomicTestingUtils {
                         exp -> exp.getAsset_group_id().equals(assetGroup.getAsset_group_id()));
 
             List<InjectTargetWithResult> children = new ArrayList<>();
+            Set<String> addedAssetIds = new HashSet<>();
 
             // Process each asset in the asset group
             assetGroup
                 .getAsset_ids()
                 .forEach(
                     assetId -> {
-                      RawAsset finalAsset = rawAssetMap.get(assetId);
-                      if (finalAsset != null) {
-                        children.add(
-                            new InjectTargetWithResult(
-                                TargetType.ASSETS,
-                                assetId,
-                                finalAsset.getAsset_name(),
-                                defaultExpectationResultsByTypes,
-                                Objects.equals(finalAsset.getAsset_type(), ENDPOINT)
-                                    ? Endpoint.PLATFORM_TYPE.valueOf(
-                                        finalAsset.getEndpoint_platform())
-                                    : null));
+                      // Check if the assetId has already been added
+                      if (!addedAssetIds.contains(assetId)) {
+                        RawAsset finalAsset = rawAssetMap.get(assetId);
+                        if (finalAsset != null) {
+                          children.add(
+                              new InjectTargetWithResult(
+                                  TargetType.ASSETS,
+                                  assetId,
+                                  finalAsset.getAsset_name(),
+                                  defaultExpectationResultsByTypes,
+                                  Collections.emptyList(),
+                                  Objects.equals(finalAsset.getAsset_type(), ENDPOINT)
+                                      ? Endpoint.PLATFORM_TYPE.valueOf(
+                                          finalAsset.getEndpoint_platform())
+                                      : null,
+                                  null));
+                          // Add the assetId to the set to track it as added
+                          addedAssetIds.add(assetId);
+                        }
                       }
                     });
 
-            // Add dynamic assets as children
+            // Add dynamic assets as children, but check if the dynamicAsset ID is already added
             if (dynamicAssetGroupMap.containsKey(assetGroup.getAsset_group_id())) {
               dynamicAssetGroupMap
                   .get(assetGroup.getAsset_group_id())
                   .forEach(
-                      dynamicAsset ->
+                      dynamicAsset -> {
+                        String dynamicAssetId = dynamicAsset.getId();
+                        // Only add if dynamicAssetId has not been added before
+                        if (!addedAssetIds.contains(dynamicAssetId)) {
                           children.add(
                               new InjectTargetWithResult(
                                   TargetType.ASSETS,
-                                  dynamicAsset.getId(),
+                                  dynamicAssetId,
                                   dynamicAsset.getName(),
                                   defaultExpectationResultsByTypes,
+                                  Collections.emptyList(),
                                   Objects.equals(dynamicAsset.getType(), ENDPOINT)
                                       ? Endpoint.PLATFORM_TYPE.valueOf(
                                           String.valueOf(dynamicAsset.getPlatform()))
-                                      : null)));
+                                      : null,
+                                  null));
+                          // Add the dynamicAssetId to the set to track it
+                          addedAssetIds.add(dynamicAssetId);
+                        }
+                      });
             }
 
             if (noMatchingExpectations) {
@@ -193,6 +228,7 @@ public class AtomicTestingUtils {
                       assetGroup.getAsset_group_name(),
                       defaultExpectationResultsByTypes,
                       children,
+                      null,
                       null);
 
               targets.add(target);
@@ -223,15 +259,21 @@ public class AtomicTestingUtils {
                           entry.getValue(),
                           playerExpectations.isEmpty()
                               ? List.of()
-                              : calculateResultsForPlayersFromRaw(
-                                  groupedByTeamAndUser.get(entry.getKey()), rawUserMap),
+                              : calculateResultsFromChildren(
+                                  groupedByTeamAndUser.get(entry.getKey()),
+                                  rawUserMap,
+                                  TargetType.PLAYER,
+                                  RawInjectExpectation::getUser_id,
+                                  RawUser::computeName,
+                                  null),
+                          null,
                           null))
               .toList());
     }
 
     // Calculate asset results from expectations
     if (!assetExpectations.isEmpty()) {
-      // Assets are saves in assetsToRefine because we need check if the asset is linked to the
+      // Assets are saved in assetsToRefine because we need check if the asset is linked to the
       // inject and, at the same time, also linked to the asset group
       assetsToRefine.addAll(
           assetExpectations.stream()
@@ -252,10 +294,20 @@ public class AtomicTestingUtils {
                               .get(assetExpectationMap.get(entry.getKey()).getAsset_id())
                               .getAsset_name(),
                           entry.getValue(),
+                          agentExpectations.isEmpty()
+                              ? List.of()
+                              : calculateResultsFromChildren(
+                                  groupedByAssetAndAgent.get(entry.getKey()),
+                                  rawAgentMap,
+                                  TargetType.AGENT,
+                                  RawInjectExpectation::getAgent_id,
+                                  RawAgent::getAgent_executed_by_user,
+                                  RawAgent::getExecutor_type),
                           Objects.equals(rawAssetMap.get(entry.getKey()).getAsset_type(), ENDPOINT)
                               ? Endpoint.PLATFORM_TYPE.valueOf(
                                   rawAssetMap.get(entry.getKey()).getEndpoint_platform())
-                              : null))
+                              : null,
+                          null))
               .toList());
     }
 
@@ -315,11 +367,13 @@ public class AtomicTestingUtils {
                                         asset,
                                         rawAssetMap.get(asset).getAsset_name(),
                                         defaultExpectationResultsByTypes,
+                                        Collections.emptyList(),
                                         Objects.equals(
                                                 rawAssetMap.get(asset).getAsset_type(), ENDPOINT)
                                             ? Endpoint.PLATFORM_TYPE.valueOf(
                                                 rawAssetMap.get(asset).getEndpoint_platform())
-                                            : null));
+                                            : null,
+                                        null));
                               }
                             });
 
@@ -340,10 +394,12 @@ public class AtomicTestingUtils {
                                           dynamicAsset.getId(),
                                           dynamicAsset.getName(),
                                           defaultExpectationResultsByTypes,
+                                          Collections.emptyList(),
                                           Objects.equals(dynamicAsset.getType(), ENDPOINT)
                                               ? Endpoint.PLATFORM_TYPE.valueOf(
                                                   String.valueOf(dynamicAsset.getPlatform()))
-                                              : null));
+                                              : null,
+                                          null));
                                 }
                               });
                     }
@@ -356,6 +412,7 @@ public class AtomicTestingUtils {
                             .getAsset_group_name(),
                         entry.getValue(),
                         sortResults(children),
+                        null,
                         null);
                   })
               .toList());
@@ -370,21 +427,39 @@ public class AtomicTestingUtils {
     return sortResults(targets);
   }
 
-  // -- PRE CALCULATED RESULTS FOR PLAYERS --
-  private static List<InjectTargetWithResult> calculateResultsForPlayersFromRaw(
-      Map<String, List<RawInjectExpectation>> expectationsByUser, Map<String, RawUser> rawUserMap) {
-    if (expectationsByUser == null) {
+  // -- PRE CALCULATED RESULTS FOR CHILDREN --
+  private static <T> List<InjectTargetWithResult> calculateResultsFromChildren(
+      Map<String, List<RawInjectExpectation>> expectationsByEntity,
+      Map<String, T> rawTargetMap,
+      TargetType targetType,
+      Function<RawInjectExpectation, String> getIdFunction,
+      Function<T, String> getNameFunction,
+      Function<T, String> getExecutorTypeFunction) {
+
+    if (expectationsByEntity == null) {
       return new ArrayList<>();
     }
-    return expectationsByUser.entrySet().stream()
+
+    return expectationsByEntity.entrySet().stream()
         .map(
-            userEntry ->
-                new InjectTargetWithResult(
-                    TargetType.PLAYER,
-                    userEntry.getKey(),
-                    rawUserMap.get(userEntry.getValue().get(0).getUser_id()).computeName(),
-                    getExpectationResultByTypesFromRaw(userEntry.getValue()),
-                    null))
+            entry -> {
+              String targetId = entry.getKey();
+              List<RawInjectExpectation> expectations = entry.getValue();
+              T rawTarget = rawTargetMap.get(getIdFunction.apply(expectations.get(0)));
+              String name = getNameFunction.apply(rawTarget);
+              String executorType =
+                  Optional.ofNullable(getExecutorTypeFunction)
+                      .map(executorFunction -> executorFunction.apply(rawTarget))
+                      .orElse(null);
+              return new InjectTargetWithResult(
+                  targetType,
+                  targetId,
+                  name,
+                  getExpectationResultByTypesFromRaw(entry.getValue()),
+                  Collections.emptyList(),
+                  null,
+                  executorType);
+            })
         .toList();
   }
 

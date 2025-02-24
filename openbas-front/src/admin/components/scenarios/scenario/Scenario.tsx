@@ -25,8 +25,8 @@ import octiLight from '../../../../static/images/xtm/octi_light.png';
 import { useHelper } from '../../../../store';
 import { type ExerciseSimple, type KillChainPhase, type Scenario as ScenarioType, type SearchPaginationInput } from '../../../../utils/api-types';
 import { isEmptyField } from '../../../../utils/utils';
-import ExerciseList from '../../simulations/ExerciseList';
 import ExercisePopover from '../../simulations/simulation/ExercisePopover';
+import SimulationList from '../../simulations/SimulationList';
 import ScenarioDistributionByExercise from './ScenarioDistributionByExercise';
 
 // Deprecated - https://mui.com/system/styles/basics/
@@ -57,7 +57,10 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
   // Exercises
   const [loadingExercises, setLoadingExercises] = useState(true);
   const [exercises, setExercises] = useState<ExerciseSimple[]>([]);
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({ sorts: initSorting('exercise_updated_at', 'DESC') }));
+  const {
+    queryableHelpers,
+    searchPaginationInput,
+  } = useQueryableWithLocalStorage(`scenario-${scenarioId}-simulations`, buildSearchPagination({ sorts: initSorting('exercise_updated_at', 'DESC') }));
   const search = (scenarioId: ScenarioType['scenario_id'], input: SearchPaginationInput) => {
     setLoadingExercises(true);
     return searchScenarioExercises(scenarioId, input).finally(() => {
@@ -178,7 +181,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
               {(scenario.scenario_platforms ?? []).length === 0 ? (
                 <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
               ) : scenario.scenario_platforms.map(
-                (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+                (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
               )}
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>
@@ -225,7 +228,7 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
               queryableHelpers={queryableHelpers}
               searchEnable={false}
             />
-            <ExerciseList
+            <SimulationList
               exercises={exercises}
               queryableHelpers={queryableHelpers}
               secondaryAction={secondaryAction}
