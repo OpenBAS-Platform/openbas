@@ -1,5 +1,6 @@
 package io.openbas.utils;
 
+import static io.openbas.rest.settings.PreviewFeature.AGENT_EXPECTATION_UI;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
@@ -178,7 +179,7 @@ public class ResultUtils {
                     injectAssetMap.getOrDefault(injectId, emptyList()),
                     teamMap,
                     userMap,
-                    settings.getEnabledDevFeatures().contains("agent-expectations-ui")
+                    settings.getEnabledDevFeatures().contains(AGENT_EXPECTATION_UI)
                         ? agentMap
                         : emptyMap(),
                     assetMap,
