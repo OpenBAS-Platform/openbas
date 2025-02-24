@@ -179,20 +179,20 @@ public class InjectStatusService {
         ObjectNode values = mapper.readValue(input.getOutputStructured(), ObjectNode.class);
         if (!contractOutputs.isEmpty()) {
           contractOutputs.forEach(
-              output -> {
-                if( output.isMultiple() ) {
-                  JsonNode jsonNodes = values.get(output.getField());
+              contractOutput -> {
+                if( contractOutput.isMultiple() ) {
+                  JsonNode jsonNodes = values.get(contractOutput.getField());
                   if( jsonNodes != null && jsonNodes.isArray() ) {
                     for(JsonNode jsonNode : jsonNodes ) {
-                      Finding finding = createFinding(output);
-                      finding.setValue(output.getType().toFindingValue.apply(jsonNode));
+                      Finding finding = createFinding(contractOutput);
+                      finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
                       findings.add(finding);
                     }
                   }
                 } else {
-                  JsonNode jsonNode = values.get(output.getField());
-                  Finding finding = createFinding(output);
-                  finding.setValue(output.getType().toFindingValue.apply(jsonNode));
+                  JsonNode jsonNode = values.get(contractOutput.getField());
+                  Finding finding = createFinding(contractOutput);
+                  finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
                   findings.add(finding);
                 }
               });

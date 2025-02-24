@@ -8,7 +8,9 @@ public enum ContractOutputTechnicalType {
   @JsonProperty("number")
   Number("number"),
   @JsonProperty("boolean")
-  Boolean("boolean");
+  Boolean("boolean"),
+  @JsonProperty("object")
+  Object("object");
 
   public final String label;
 
