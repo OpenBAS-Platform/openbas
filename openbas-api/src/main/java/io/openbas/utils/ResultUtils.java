@@ -33,7 +33,7 @@ public class ResultUtils {
   private final AssetGroupService assetGroupService;
   private final AgentRepository agentRepository;
 
-  private PlatformSettingsService platformSettingsService;
+  private final PlatformSettingsService platformSettingsService;
 
   // -- UTILS --
   public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
