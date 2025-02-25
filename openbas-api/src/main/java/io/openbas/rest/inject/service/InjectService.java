@@ -454,6 +454,9 @@ public class InjectService {
     switch (requested_grant_level) {
       case OBSERVER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectObserver);
       case PLANNER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectPlanner);
+      default ->
+          throw new AccessDeniedException(
+              "No specified behaviour for grant %s".formatted(requested_grant_level.toString()));
     }
     return injectsToProcess;
   }
