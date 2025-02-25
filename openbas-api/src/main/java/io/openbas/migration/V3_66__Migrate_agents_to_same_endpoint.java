@@ -10,9 +10,6 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
   @Override
   public void migrate(Context context) throws Exception {
     Statement select = context.getConnection().createStatement();
-    // TODO migrate agents Caldera (all assets + only Caldera agent)
-    // => same as before (with hostname) but if 2 or more same hostnames, compare with ips, if no
-    // match do nothing
     select.execute(
         """
                     -- update hostnames to have lowercase for every executors
@@ -27,8 +24,7 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                     WHERE array_length(endpoint_mac_addresses, 1) > 0;
 
                     UPDATE ASSETS as ASS
-                    SET endpoint_mac_addresses = ARRAY
-                                                 (
+                    SET endpoint_mac_addresses = ARRAY(
                             SELECT DISTINCT *
                             FROM unnest(endpoint_mac_addresses) AS mac
                             WHERE mac IS NOT NULL
