@@ -235,7 +235,10 @@ public class CalderaExecutorService implements Runnable {
 
   private void createNewEndpointAndAgent(EndpointRegisterInput input) {
     Endpoint endpoint = new Endpoint();
-    endpoint.setUpdateAttributes(input);
+    endpoint.setName(input.getName());
+    endpoint.setPlatform(input.getPlatform());
+    endpoint.setArch(input.getArch());
+    endpoint.setHostname(input.getHostname());
     endpoint.addAllIpAddresses(input.getIps());
     endpointService.createEndpoint(endpoint);
     io.openbas.database.model.Agent agent = new io.openbas.database.model.Agent();
