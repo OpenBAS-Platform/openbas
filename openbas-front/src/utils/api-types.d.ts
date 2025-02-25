@@ -1468,6 +1468,14 @@ export interface InjectExpectationUpdateInput {
   result: string;
 }
 
+export interface InjectExportFromSearchRequestInput {
+  inject_ids_to_ignore?: string[];
+  inject_ids_to_process?: string[];
+  options?: ExportOptionsInput;
+  search_pagination_input?: SearchPaginationInput;
+  simulation_or_scenario_id?: string;
+}
+
 export interface InjectExportRequestInput {
   injects?: InjectExportTarget[];
   options?: ExportOptionsInput;

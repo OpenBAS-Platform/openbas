@@ -25,7 +25,7 @@ public class ArticleService {
   public List<Article> getInjectsArticles(List<Inject> injects) throws IOException {
     Set<String> uniqueArticleIds = new HashSet<>();
     for (Inject inject : injects) {
-      if (!inject.getContent().has(ARTICLES)) {
+      if (inject.getContent() == null || !inject.getContent().has(ARTICLES)) {
         continue;
       }
       uniqueArticleIds.addAll(

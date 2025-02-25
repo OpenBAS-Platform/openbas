@@ -58,6 +58,9 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       this.injectorContract.setContent(challengeInjectorContract.getContent());
       this.injectorContract.setConvertedContent(challengeInjectorContract.getConvertedContent());
       this.injectorContract.setInjector(challengeInjectorContract.getInjector());
+      this.injectorContract.setPlatforms(challengeInjectorContract.getPlatforms());
+      this.injectorContract.setUpdatedAt(challengeInjectorContract.getUpdatedAt());
+      this.injectorContract.setCreatedAt(challengeInjectorContract.getCreatedAt());
 
       this.challengeComposers.add(challengeComposer);
       return this;
@@ -74,6 +77,9 @@ public class InjectorContractComposer extends ComposerBase<InjectorContract> {
       this.injectorContract.setContent(articleInjectorContract.getContent());
       this.injectorContract.setConvertedContent(articleInjectorContract.getConvertedContent());
       this.injectorContract.setInjector(articleInjectorContract.getInjector());
+      this.injectorContract.setPlatforms(articleInjectorContract.getPlatforms());
+      this.injectorContract.setUpdatedAt(articleInjectorContract.getUpdatedAt());
+      this.injectorContract.setCreatedAt(articleInjectorContract.getCreatedAt());
 
       this.articleComposers.add(articleComposer);
       return this;
