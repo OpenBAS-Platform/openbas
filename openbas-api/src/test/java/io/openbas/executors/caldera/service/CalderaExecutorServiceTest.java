@@ -14,7 +14,6 @@ import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.integrations.InjectorService;
-import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.service.AgentService;
 import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
@@ -140,8 +139,7 @@ public class CalderaExecutorServiceTest {
     calderaExecutorService.run();
     ArgumentCaptor<io.openbas.database.model.Agent> agentCaptor =
         ArgumentCaptor.forClass(io.openbas.database.model.Agent.class);
-    verify(agentService)
-        .createOrUpdateAgent(agentCaptor.capture());
+    verify(agentService).createOrUpdateAgent(agentCaptor.capture());
 
     io.openbas.database.model.Agent agent = agentCaptor.getValue();
     assertEquals(CALDERA_AGENT_EXTERNAL_REF, agent.getExternalReference());
