@@ -456,6 +456,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         List<Inject> injectsFromDb =
             injectRepository.findAllById(
                 injectsFromExercise.stream().map(wrapper -> wrapper.get().getId()).toList());
@@ -502,6 +503,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         List<Inject> injectsFromDb =
             injectRepository.findAllById(
                 injectsFromExercise.stream()
@@ -574,6 +576,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Inject.class, Mixins.Inject.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         String injectJson = objectMapper.writeValueAsString(injectComposer.generatedItems);
 
         assertThatJson(actualJson)
@@ -592,6 +595,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Challenge.class, Mixins.Challenge.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         String challengeJson = objectMapper.writeValueAsString(challengeComposer.generatedItems);
 
         assertThatJson(actualJson)
@@ -610,6 +614,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Article.class, Mixins.Article.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         String articleJson = objectMapper.writeValueAsString(knownArticlesToExport);
 
         assertThatJson(actualJson)
@@ -628,6 +633,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Channel.class, Mixins.Channel.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         String channelJson =
             objectMapper.writeValueAsString(
                 knownArticlesToExport.stream().map(Article::getChannel));
@@ -648,6 +654,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Document.class, Mixins.Document.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         String documentJson = objectMapper.writeValueAsString(documentComposer.generatedItems);
 
         assertThatJson(actualJson)
@@ -723,6 +730,7 @@ public class InjectExportTest extends IntegrationTest {
 
         ObjectMapper objectMapper = mapper.copy();
         objectMapper.addMixIn(Team.class, Mixins.EmptyTeam.class);
+        objectMapper.addMixIn(Base.class, Mixins.Base.class);
         String teamJson = objectMapper.writeValueAsString(teamComposer.generatedItems);
 
         assertThatJson(actualJson)

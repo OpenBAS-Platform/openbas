@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 public class Mixins {
+  @JsonIgnoreProperties(
+      ignoreUnknown = true,
+      value = {"listened"})
+  public static class Base {}
+
   @JsonIncludeProperties(
       value = {
         "scenario_id",
