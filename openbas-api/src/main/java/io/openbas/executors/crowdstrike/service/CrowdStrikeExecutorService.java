@@ -9,6 +9,7 @@ import io.openbas.executors.ExecutorService;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
+import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -87,43 +88,39 @@ public class CrowdStrikeExecutorService implements Runnable {
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
     List<CrowdStrikeDevice> devices = this.client.devices().getResources().stream().toList();
-    List<Agent> endpointAgentList = toAgentEndpoint(devices);
-    log.info("CrowdStrike executor provisioning based on " + endpointAgentList.size() + " assets");
+    List<EndpointRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
+    log.info(
+        "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");
 
-    for (Agent agent : endpointAgentList) {
-      endpointService.registerAgentEndpoint(agent, CROWDSTRIKE_EXECUTOR_TYPE);
+    for (EndpointRegisterInput input : endpointRegisterList) {
+      endpointService.registerAgentEndpoint(input, CROWDSTRIKE_EXECUTOR_TYPE);
     }
   }
 
   // -- PRIVATE --
 
-  private List<Agent> toAgentEndpoint(@NotNull final List<CrowdStrikeDevice> devices) {
+  private List<EndpointRegisterInput> toAgentEndpoint(
+      @NotNull final List<CrowdStrikeDevice> devices) {
     return devices.stream()
         .map(
             crowdStrikeDevice -> {
-              Endpoint endpoint = new Endpoint();
-              Agent agent = new Agent();
-
-              agent.setExecutor(this.executor);
-              agent.setExternalReference(crowdStrikeDevice.getDevice_id());
-              agent.setPrivilege(Agent.PRIVILEGE.admin);
-              agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-
-              endpoint.setName(crowdStrikeDevice.getHostname());
-              endpoint.setIps(new String[] {crowdStrikeDevice.getConnection_ip()});
-              endpoint.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
-              endpoint.setHostname(crowdStrikeDevice.getHostname());
-              endpoint.setPlatform(toPlatform(crowdStrikeDevice.getPlatform_name()));
-              endpoint.setArch(toArch("x64"));
-
-              agent.setExecutedByUser(
-                  Endpoint.PLATFORM_TYPE.Windows.equals(endpoint.getPlatform())
+              EndpointRegisterInput input = new EndpointRegisterInput();
+              input.setExecutor(this.executor);
+              input.setExternalReference(crowdStrikeDevice.getDevice_id());
+              input.setElevated(true);
+              input.setService(true);
+              input.setName(crowdStrikeDevice.getHostname());
+              input.setIps(new String[] {crowdStrikeDevice.getConnection_ip()});
+              input.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
+              input.setHostname(crowdStrikeDevice.getHostname());
+              input.setPlatform(toPlatform(crowdStrikeDevice.getPlatform_name()));
+              input.setArch(toArch("x64"));
+              input.setExecutedByUser(
+                  Endpoint.PLATFORM_TYPE.Windows.equals(input.getPlatform())
                       ? Agent.ADMIN_SYSTEM_WINDOWS
                       : Agent.ADMIN_SYSTEM_UNIX);
-              agent.setLastSeen(toInstant(crowdStrikeDevice.getLast_seen()));
-              agent.setAsset(endpoint);
-
-              return agent;
+              input.setLastSeen(toInstant(crowdStrikeDevice.getLast_seen()));
+              return input;
             })
         .collect(Collectors.toList());
   }

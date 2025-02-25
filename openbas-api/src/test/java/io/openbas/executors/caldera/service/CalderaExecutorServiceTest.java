@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -157,9 +156,11 @@ public class CalderaExecutorServiceTest {
   @Test
   void test_run_WITH_2_existing_agents_same_machine() {
     when(client.agents()).thenReturn(List.of(calderaAgent));
-    when(this.endpointService.findEndpointByHostnameAndAtLeastOneIp(
-            calderaEndpoint.getHostname(), calderaEndpoint.getIps()))
-        .thenReturn(Optional.of(calderaEndpoint));
+    when(this.endpointService.findEndpointByHostname(
+            calderaEndpoint.getHostname(),
+            calderaEndpoint.getPlatform(),
+            calderaEndpoint.getArch()))
+        .thenReturn(List.of(calderaEndpoint));
 
     randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);
     randomEndpoint.setIps(new String[] {CALDERA_AGENT_IP});

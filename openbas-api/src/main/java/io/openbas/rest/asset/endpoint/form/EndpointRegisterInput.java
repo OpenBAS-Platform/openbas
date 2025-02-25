@@ -1,9 +1,11 @@
 package io.openbas.rest.asset.endpoint.form;
 
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Agent;
+import io.openbas.database.model.Executor;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,4 +26,16 @@ public class EndpointRegisterInput extends EndpointInput {
 
   @JsonProperty("agent_executed_by_user")
   private String executedByUser = Agent.ADMIN_SYSTEM_WINDOWS;
+
+  @JsonProperty("agent_executor")
+  private Executor executor;
+
+  @JsonProperty("agent_process_name")
+  private String processName;
+
+  @JsonProperty("agent_active")
+  public boolean isActive() {
+    return this.getLastSeen() != null
+        && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < Agent.ACTIVE_THRESHOLD;
+  }
 }

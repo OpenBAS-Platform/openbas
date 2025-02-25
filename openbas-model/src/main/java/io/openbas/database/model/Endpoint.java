@@ -101,25 +101,33 @@ public class Endpoint extends Asset {
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
 
-  public void setMacAddresses(String[] macAddresses) {
-    this.macAddresses =
-        Arrays.stream(macAddresses)
-            .map(macAddress -> macAddress.toLowerCase().replaceAll(REGEX_MAC_ADDRESS, ""))
-            .filter(macAddress -> !BAD_MAC_ADDRESS.equals(macAddress))
-            .distinct()
-            .toArray(String[]::new);
+  public static String[] setMacAddresses(String[] macAddresses) {
+    return Arrays.stream(macAddresses)
+        .map(macAddress -> macAddress.toLowerCase().replaceAll(REGEX_MAC_ADDRESS, ""))
+        .filter(macAddress -> !BAD_MAC_ADDRESS.equals(macAddress))
+        .distinct()
+        .toArray(String[]::new);
   }
 
-  public void setIps(String[] ips) {
-    this.ips =
-        Arrays.stream(ips)
-            .map(String::toLowerCase)
-            .filter(ip -> !BAD_IP_ADDRESSES.contains(ip))
-            .distinct()
-            .toArray(String[]::new);
+  public static String[] setIps(String[] ips) {
+    return Arrays.stream(ips)
+        .map(String::toLowerCase)
+        .filter(ip -> !BAD_IP_ADDRESSES.contains(ip))
+        .distinct()
+        .toArray(String[]::new);
   }
 
   public void addAllMacAddresses(String[] macAddresses) {
+    if (this.macAddresses == null) {
+      this.macAddresses = new String[0];
+    } else {
+      this.macAddresses = setMacAddresses(this.macAddresses);
+    }
+    if (macAddresses == null) {
+      macAddresses = new String[0];
+    } else {
+      macAddresses = setMacAddresses(macAddresses);
+    }
     this.macAddresses =
         Stream.concat(Arrays.stream(macAddresses), Arrays.stream(this.macAddresses))
             .distinct()
@@ -127,6 +135,16 @@ public class Endpoint extends Asset {
   }
 
   public void addAllIpAddresses(String[] ips) {
+    if (this.ips == null) {
+      this.ips = new String[0];
+    } else {
+      this.ips = setIps(this.ips);
+    }
+    if (ips == null) {
+      ips = new String[0];
+    } else {
+      ips = setIps(ips);
+    }
     this.ips =
         Stream.concat(Arrays.stream(ips), Arrays.stream(this.ips))
             .distinct()

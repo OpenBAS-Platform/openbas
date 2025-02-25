@@ -42,4 +42,12 @@ public class EndpointInput extends AssetInput {
   @Schema(nullable = true)
   @JsonProperty("asset_last_seen")
   private Instant lastSeen;
+
+  public void setMacAddresses(String[] macAddresses) {
+    this.macAddresses = Endpoint.setMacAddresses(macAddresses);
+  }
+
+  public void setIps(String[] ips) {
+    this.ips = Endpoint.setIps(ips);
+  }
 }
