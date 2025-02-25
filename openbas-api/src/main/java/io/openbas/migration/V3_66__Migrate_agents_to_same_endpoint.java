@@ -37,6 +37,16 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                                 ))
                     WHERE array_length(endpoint_mac_addresses, 1) > 0;
 
+                    UPDATE ASSETS as ASS
+                    SET endpoint_ips = ARRAY(
+                            SELECT DISTINCT *
+                            FROM unnest(endpoint_ips) AS ip
+                            WHERE ip IS NOT NULL
+                              AND ip NOT IN (
+                                              '127.0.0.1', '::1', '169.254.0.0'
+                                ))
+                    WHERE array_length(endpoint_ips, 1) > 0;
+
                     -- update agent table to add cleared at column from asset table
                     ALTER TABLE agents ADD column agent_cleared_at timestamp default now();
                     UPDATE agents ag set agent_cleared_at = a.asset_cleared_at FROM (SELECT asset_id, asset_cleared_at FROM assets) AS a WHERE ag.agent_asset=a.asset_id;
