@@ -93,7 +93,7 @@ public class CrowdStrikeExecutorService implements Runnable {
         "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");
 
     for (EndpointRegisterInput input : endpointRegisterList) {
-      endpointService.registerAgentEndpoint(input, CROWDSTRIKE_EXECUTOR_TYPE);
+      endpointService.registerAgentEndpoint(input);
     }
   }
 

@@ -143,7 +143,7 @@ public class EndpointService {
   }
 
   // -- INSTALLATION AGENT --
-  public void registerAgentEndpoint(EndpointRegisterInput input, String executorType) {
+  public void registerAgentEndpoint(EndpointRegisterInput input) {
     // Check if agent exists (only 1 agent can be found for Crowdstrike and Tanium)
     List<Agent> optionalAgents = agentService.findByExternalReference(input.getExternalReference());
     if (!optionalAgents.isEmpty()) {

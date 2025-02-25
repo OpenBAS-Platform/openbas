@@ -92,7 +92,7 @@ public class TaniumExecutorService implements Runnable {
     log.info("Tanium executor provisioning based on " + endpointRegisterList.size() + " assets");
 
     for (EndpointRegisterInput input : endpointRegisterList) {
-      endpointService.registerAgentEndpoint(input, TANIUM_EXECUTOR_TYPE);
+      endpointService.registerAgentEndpoint(input);
     }
   }
 
