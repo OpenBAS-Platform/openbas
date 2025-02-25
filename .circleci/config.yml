@@ -177,7 +177,7 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - kubernetes/install-kubectl
+      - kubernetes/install_kubectl
       - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN -n customer-testing rollout restart deployment -l app=openbas
 
   deploy_prerelease:
@@ -185,7 +185,7 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - kubernetes/install-kubectl
+      - kubernetes/install_kubectl
       - run: kubectl --server=https://api.staging.eu-west.filigran.io --token=$K8S_TOKEN_PRE_RELEASE -n customer-prerelease-obas rollout restart deployment -l app=openbas
 
   docker_build_platform:
