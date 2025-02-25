@@ -15,10 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.EndpointRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectorContractRepository;
-import io.openbas.database.repository.TagRepository;
+import io.openbas.database.repository.*;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
@@ -67,6 +64,8 @@ class EndpointApiTest extends IntegrationTest {
         createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(registerInput);
+    endpoint.addAllIpAddresses(registerInput.getIps());
+    endpoint.addAllMacAddresses(registerInput.getMacAddresses());
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(
         new ArrayList<>() {
@@ -112,6 +111,8 @@ class EndpointApiTest extends IntegrationTest {
         createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(registerInput);
+    endpoint.addAllIpAddresses(registerInput.getIps());
+    endpoint.addAllMacAddresses(registerInput.getMacAddresses());
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(List.of(agent));
 
@@ -145,6 +146,8 @@ class EndpointApiTest extends IntegrationTest {
     EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(endpointInput);
+    endpoint.addAllIpAddresses(endpointInput.getIps());
+    endpoint.addAllMacAddresses(endpointInput.getMacAddresses());
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(
         new ArrayList<>() {
@@ -184,6 +187,8 @@ class EndpointApiTest extends IntegrationTest {
     EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(endpointInput);
+    endpoint.addAllIpAddresses(endpointInput.getIps());
+    endpoint.addAllMacAddresses(endpointInput.getMacAddresses());
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(
         new ArrayList<>() {
