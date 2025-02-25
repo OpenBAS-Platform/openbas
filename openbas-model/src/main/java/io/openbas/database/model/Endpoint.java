@@ -25,7 +25,7 @@ public class Endpoint extends Asset {
 
   public static final String ENDPOINT_TYPE = "Endpoint";
   private static final Set<String> BAD_MAC_ADDRESS =
-      new HashSet<>(Arrays.asList("ffffffffffff", "000000000000", "0180C2000000"));
+      new HashSet<>(Arrays.asList("ffffffffffff", "000000000000", "0180c2000000"));
   private static final Set<String> BAD_IP_ADDRESSES =
       new HashSet<>(Arrays.asList("127.0.0.1", "::1", "169.254.0.0"));
   private static final String REGEX_MAC_ADDRESS = "[^a-z0-9]";

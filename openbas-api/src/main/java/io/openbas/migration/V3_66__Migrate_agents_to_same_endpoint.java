@@ -29,7 +29,7 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                             FROM unnest(endpoint_mac_addresses) AS mac
                             WHERE mac IS NOT NULL
                               AND mac NOT IN (
-                                              'ffffffffffff', '000000000000', '0180C2000000'
+                                              'ffffffffffff', '000000000000', '0180c2000000'
                                 ))
                     WHERE array_length(endpoint_mac_addresses, 1) > 0;
 
