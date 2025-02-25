@@ -55,7 +55,7 @@ public class EndpointFixture {
     endpoint.setName("Endpoint test");
     endpoint.setDescription("Endpoint description");
     endpoint.setHostname("Windows Hostname");
-    endpoint.setIps(IPS);
+    endpoint.addAllIpAddresses(IPS);
     endpoint.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
     endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
     return endpoint;

@@ -113,7 +113,7 @@ public class CalderaExecutorServiceTest {
     Endpoint endpoint = new Endpoint();
     endpoint.setName(agent.getHost());
     endpoint.setDescription("Asset collected by Caldera executor context.");
-    endpoint.setIps(agent.getHost_ip_addrs());
+    endpoint.addAllIpAddresses(agent.getHost_ip_addrs());
     endpoint.setHostname(agent.getHost());
     endpoint.setPlatform(toPlatform("windows"));
     endpoint.setArch(toArch("amd64"));
@@ -155,7 +155,7 @@ public class CalderaExecutorServiceTest {
         .thenReturn(List.of(calderaEndpoint));
 
     randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);
-    randomEndpoint.setIps(new String[] {CALDERA_AGENT_IP});
+    randomEndpoint.addAllIpAddresses(new String[] {CALDERA_AGENT_IP});
     calderaExecutorService.run();
     ArgumentCaptor<Endpoint> endpointCaptor = ArgumentCaptor.forClass(Endpoint.class);
     verify(endpointService).updateEndpoint(endpointCaptor.capture());
