@@ -122,16 +122,18 @@ const Tags = () => {
               <ListItemText
                 primary={(
                   <div style={bodyItemsStyles.bodyItems}>
-                    <div  style={{
+                    <div style={{
                       ...bodyItemsStyles.bodyItem,
                       ...inlineStyles.tag_name,
-                      }}
-                  >{tag.tag_name}
+                    }}
+                    >
+                      {tag.tag_name}
                     </div>
                     <div style={{
                       ...bodyItemsStyles.bodyItem,
                       ...inlineStyles.tag_color,
-                    }}>
+                    }}
+                    >
                       {tag.tag_color}
                     </div>
                   </div>

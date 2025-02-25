@@ -145,10 +145,12 @@ const KillChainPhases = () => {
                 primary={(
                   <div style={bodyItemsStyles.bodyItems}>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_kill_chain_name,
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_kill_chain_name,
                     }}
-                  >  <Chip
+                    >
+                      {' '}
+                      <Chip
                         variant="outlined"
                         classes={{ root: classes.chipInList }}
                         color="primary"
@@ -156,21 +158,25 @@ const KillChainPhases = () => {
                       />
                     </div>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_name,
-                  }}>
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_name,
+                    }}
+                    >
                       {killChainPhase.phase_name}
                     </div>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_order,
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_order,
                     }}
-                  >  {killChainPhase.phase_order}
+                    >
+                      {' '}
+                      {killChainPhase.phase_order}
                     </div>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_created_at,
-                  }}>
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_created_at,
+                    }}
+                    >
                       {nsdt(killChainPhase.phase_created_at)}
                     </div>
                   </div>

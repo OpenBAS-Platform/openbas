@@ -148,9 +148,10 @@ const AttackPatterns = () => {
                 primary={(
                   <div style={bodyItemsStyles.bodyItems}>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.kill_chain_phase,
-                  }}>
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.kill_chain_phase,
+                    }}
+                    >
                       {
                         attackPattern.attack_pattern_kill_chain_phases.at(0)
                           ? `[${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_kill_chain_name}] ${killChainPhasesMap[attackPattern.attack_pattern_kill_chain_phases.at(0)]?.phase_name}`
@@ -158,27 +159,32 @@ const AttackPatterns = () => {
                       }
                     </div>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_external_id,
-                  }}>
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.attack_pattern_external_id,
+                    }}
+                    >
                       {attackPattern.attack_pattern_external_id}
                     </div>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_name,
-                  }}>
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.attack_pattern_name,
+                    }}
+                    >
                       {attackPattern.attack_pattern_name}
                     </div>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_created_at,
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.attack_pattern_created_at,
                     }}
-                  >  {nsdt(attackPattern.attack_pattern_created_at)}
+                    >
+                      {' '}
+                      {nsdt(attackPattern.attack_pattern_created_at)}
                     </div>
                     <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.attack_pattern_updated_at,
-                  }}>
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.attack_pattern_updated_at,
+                    }}
+                    >
                       {nsdt(attackPattern.attack_pattern_updated_at)}
                     </div>
                   </div>
