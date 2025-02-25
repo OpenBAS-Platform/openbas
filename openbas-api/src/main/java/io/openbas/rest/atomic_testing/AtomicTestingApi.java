@@ -39,6 +39,7 @@ public class AtomicTestingApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping("/{injectId}")
+  @PreAuthorize("isInjectObserver(#injectId)")
   @Tracing(name = "Get a atomic testing", layer = "api", operation = "GET")
   public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
@@ -93,6 +94,7 @@ public class AtomicTestingApi extends RestBehavior {
   }
 
   @GetMapping("/{injectId}/target_results/{targetId}/types/{targetType}")
+  @PreAuthorize("isInjectObserver(#injectId)")
   public List<InjectExpectation> findTargetResult(
       @PathVariable String injectId,
       @PathVariable String targetId,
