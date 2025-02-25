@@ -1405,7 +1405,7 @@ const i18n = {
       'Security platforms': 'Plateformes de sécurité',
       'Do you want to delete the security platform?': 'Voulez-vous supprimer cette plateforme de sécurité ?',
       // Platform Banner
-      'IMAP service is not responding, your injectors may be impacted.': 'Le service IMAP ne réponds pas, vos injecteurs peuvent être impactés.',
+      'IMAP service is not responding, your injectors may be impacted.': 'Le service IMAP ne répond pas, vos injecteurs peuvent être impactés.',
       'The Caldera executor is not responding, your simulations may be impacted.': 'L\'exécuteur Caldera ne répond pas, vos simulations peuvent être impactés.',
       // Inject test
       'Inject title': 'Titre du stimuli',
@@ -2823,7 +2823,7 @@ const i18n = {
       'Security platforms': '安全平台',
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
-      'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
+      'The Caldera executor is not responding, your simulations may be impacted.': 'Caldera 执行器没有响应，您的模拟可能会受到影响',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
       'Fit view': '适合视图',
       'Increase time interval': '增加时间间隔',
@@ -3059,7 +3059,7 @@ const i18n = {
       'Test for {injectTitle} has been sent': 'Test for {injectTitle} has been sent',
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'IMAP service is not responding, your injectors may be impacted.',
-      'Executor Caldera is not responding, your exercises may be impacted.': 'Executor Caldera is not responding, your exercises may be impacted.',
+      'The Caldera executor is not responding, your simulations may be impacted.': 'The Caldera executor is not responding, your simulations may be impacted.',
       'Value that signifies that all teams are targeted. A regex can be used.': 'Value that signifies that all teams are targeted. A regex can be used.',
       'New simulation successfully created and started. Click {here} to view the simulation.': 'New simulation successfully created and started. Click {here} to view the simulation.',
       'Do you want to launch this atomic testing: {title}?': 'Do you want to launch this atomic testing: {title}?',
