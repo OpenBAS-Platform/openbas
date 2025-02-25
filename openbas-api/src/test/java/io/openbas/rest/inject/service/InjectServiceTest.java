@@ -329,7 +329,7 @@ class InjectServiceTest {
 
   @DisplayName("Test get injects and check is planner with valid input")
   @Test
-  void getInjectsAndCheckIsPlannerWithValidInput() {
+  void getInjectsAndCheckPermissionWithValidInput() {
     // Arrange
     InjectBulkProcessingInput input = new InjectBulkProcessingInput();
     input.setSearchPaginationInput(new SearchPaginationInput());
@@ -342,7 +342,8 @@ class InjectServiceTest {
     when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
-    List<Inject> result = injectService.getInjectsAndCheckIsPlanner(input);
+    List<Inject> result =
+        injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
 
     // Assert
     assertNotNull(result);
@@ -351,7 +352,7 @@ class InjectServiceTest {
 
   @DisplayName("Test get injects and check is planner with inject IDs to process")
   @Test
-  void getInjectsAndCheckIsPlannerWithInjectIDsToProcess() {
+  void getInjectsAndCheckPermissionWithInjectIDsToProcess() {
     // Arrange
     InjectBulkProcessingInput input = new InjectBulkProcessingInput();
     input.setInjectIDsToProcess(List.of("id1", "id2"));
@@ -363,7 +364,8 @@ class InjectServiceTest {
     when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
-    List<Inject> result = injectService.getInjectsAndCheckIsPlanner(input);
+    List<Inject> result =
+        injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
 
     // Assert
     assertNotNull(result);
@@ -372,7 +374,7 @@ class InjectServiceTest {
 
   @DisplayName("Test get injects and check is planner with inject IDs to ignore")
   @Test
-  void getInjectsAndCheckIsPlannerWithInjectIDsToIgnore() {
+  void getInjectsAndCheckPermissionWithInjectIDsToIgnore() {
     // Arrange
     InjectBulkProcessingInput input = new InjectBulkProcessingInput();
     input.setInjectIDsToProcess(List.of("id1", "id2"));
@@ -385,7 +387,8 @@ class InjectServiceTest {
     when(securityExpression.isInjectPlanner(any())).thenReturn(true);
 
     // Act
-    List<Inject> result = injectService.getInjectsAndCheckIsPlanner(input);
+    List<Inject> result =
+        injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER);
 
     // Assert
     assertNotNull(result);
@@ -394,14 +397,15 @@ class InjectServiceTest {
 
   @DisplayName("Test get injects and check is planner with null input")
   @Test
-  void getInjectsAndCheckIsPlannerWithNullInput() {
+  void getInjectsAndCheckPermissionWithNullInput() {
     // Arrange
     InjectBulkProcessingInput input = new InjectBulkProcessingInput();
 
     // Act & assert
     BadRequestException exception =
         assertThrows(
-            BadRequestException.class, () -> injectService.getInjectsAndCheckIsPlanner(input));
+            BadRequestException.class,
+            () -> injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER));
 
     // Assert
     assertEquals(
@@ -411,7 +415,7 @@ class InjectServiceTest {
 
   @DisplayName("Test get injects and check is planner with access denied")
   @Test
-  void getInjectsAndCheckIsPlannerWithAccessDenied() {
+  void getInjectsAndCheckPermissionWithAccessDenied() {
     // Arrange
     InjectBulkProcessingInput input = new InjectBulkProcessingInput();
     input.setSearchPaginationInput(new SearchPaginationInput());
@@ -430,11 +434,12 @@ class InjectServiceTest {
     // Act & assert
     AccessDeniedException exception =
         assertThrows(
-            AccessDeniedException.class, () -> injectService.getInjectsAndCheckIsPlanner(input));
+            AccessDeniedException.class,
+            () -> injectService.getInjectsAndCheckPermission(input, Grant.GRANT_TYPE.PLANNER));
 
     // Assert
     assertEquals(
-        "You are not allowed to delete the injects of ids "
+        "You are not allowed to alter the injects of ids "
             + String.join(", ", injects.stream().map(Inject::getId).toList()),
         exception.getMessage());
   }
