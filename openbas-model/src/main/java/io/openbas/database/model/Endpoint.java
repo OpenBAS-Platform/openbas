@@ -116,36 +116,36 @@ public class Endpoint extends Asset {
         .toArray(String[]::new);
   }
 
-  public void addAllMacAddresses(String[] macAddresses) {
+  public void addAllMacAddresses(String[] newMacAddresses) {
     if (this.macAddresses == null) {
       this.macAddresses = new String[0];
     } else {
       this.macAddresses = setMacAddresses(this.macAddresses);
     }
-    if (macAddresses == null) {
-      macAddresses = new String[0];
+    if (newMacAddresses == null) {
+      newMacAddresses = new String[0];
     } else {
-      macAddresses = setMacAddresses(macAddresses);
+      newMacAddresses = setMacAddresses(newMacAddresses);
     }
     this.macAddresses =
-        Stream.concat(Arrays.stream(macAddresses), Arrays.stream(this.macAddresses))
+        Stream.concat(Arrays.stream(newMacAddresses), Arrays.stream(this.macAddresses))
             .distinct()
             .toArray(String[]::new);
   }
 
-  public void addAllIpAddresses(String[] ips) {
+  public void addAllIpAddresses(String[] newIps) {
     if (this.ips == null) {
       this.ips = new String[0];
     } else {
       this.ips = setIps(this.ips);
     }
-    if (ips == null) {
-      ips = new String[0];
+    if (newIps == null) {
+      newIps = new String[0];
     } else {
-      ips = setIps(ips);
+      newIps = setIps(newIps);
     }
     this.ips =
-        Stream.concat(Arrays.stream(ips), Arrays.stream(this.ips))
+        Stream.concat(Arrays.stream(newIps), Arrays.stream(this.ips))
             .distinct()
             .toArray(String[]::new);
   }
