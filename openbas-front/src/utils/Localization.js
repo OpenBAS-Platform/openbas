@@ -1406,7 +1406,7 @@ const i18n = {
       'Do you want to delete the security platform?': 'Voulez-vous supprimer cette plateforme de sécurité ?',
       // Platform Banner
       'IMAP service is not responding, your injectors may be impacted.': 'Le service IMAP ne réponds pas, vos injecteurs peuvent être impactés.',
-      'Executor Caldera is not responding, your exercises may be impacted.': 'L\'exécuteur Caldera ne réponds pas, vos exercises peuvent être impactés.',
+      'The Caldera executor is not responding, your simulations may be impacted.': 'L\'exécuteur Caldera ne répond pas, vos simulations peuvent être impactés.',
       // Inject test
       'Inject title': 'Titre du stimuli',
       'Test execution time': 'Heure d\'execution du test',
