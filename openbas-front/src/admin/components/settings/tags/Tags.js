@@ -15,10 +15,6 @@ import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    margin: 0,
-    padding: '0 200px 50px 0',
-  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -70,94 +66,94 @@ const Tags = () => {
   };
 
   return (
-    <div className={classes.container}>
-      <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
-          label: t('Tags'),
-          current: true,
-        }]}
-      />
-      <TaxonomiesMenu />
-      <PaginationComponent
-        fetch={searchTags}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setTags}
-        exportProps={exportProps}
-      />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={(
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-              />
-            )}
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {tags.map(tag => (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flexGrow: 1 }}>
+        <Breadcrumbs
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+            label: t('Tags'),
+            current: true,
+          }]}
+        />
+        <PaginationComponent
+          fetch={searchTags}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setTags}
+          exportProps={exportProps}
+        />
+        <List>
           <ListItem
-            key={tag.tag_id}
-            classes={{ root: classes.item }}
-            divider
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
           >
-            <ListItemIcon style={{ color: tag.tag_color }}>
-              <LabelOutlined />
+            <ListItemIcon>
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+              &nbsp;
+              </span>
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div style={bodyItemsStyles.bodyItems}>
-                  <div
-                    style={{
+                <SortHeadersComponent
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  searchPaginationInput={searchPaginationInput}
+                  setSearchPaginationInput={setSearchPaginationInput}
+                />
+              )}
+            />
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+          </ListItem>
+          {tags.map(tag => (
+            <ListItem
+              key={tag.tag_id}
+              classes={{ root: classes.item }}
+              divider
+            >
+              <ListItemIcon style={{ color: tag.tag_color }}>
+                <LabelOutlined />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div style={bodyItemsStyles.bodyItems}>
+                    <div style={{
                       ...bodyItemsStyles.bodyItem,
                       ...inlineStyles.tag_name,
                     }}
-                  >
-                    {tag.tag_name}
-                  </div>
-                  <div
-                    style={{
+                    >
+                      {tag.tag_name}
+                    </div>
+                    <div style={{
                       ...bodyItemsStyles.bodyItem,
                       ...inlineStyles.tag_color,
                     }}
-                  >
-                    {tag.tag_color}
+                    >
+                      {tag.tag_color}
+                    </div>
                   </div>
-                </div>
-              )}
-            />
-            <ListItemSecondaryAction>
-              <TagPopover
-                tag={tag}
-                onUpdate={result => setTags(tags.map(existingTag => (existingTag.tag_id !== result.tag_id ? existingTag : result)))}
-                onDelete={result => setTags(tags.filter(existingTag => (existingTag.tag_id !== result)))}
+                )}
               />
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
-      <CreateTag
-        onCreate={result => setTags([result, ...tags])}
-      />
+              <ListItemSecondaryAction>
+                <TagPopover
+                  tag={tag}
+                  onUpdate={result => setTags(tags.map(existingTag => (existingTag.tag_id !== result.tag_id ? existingTag : result)))}
+                  onDelete={result => setTags(tags.filter(existingTag => (existingTag.tag_id !== result)))}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+        <CreateTag
+          onCreate={result => setTags([result, ...tags])}
+        />
+      </div>
+      <TaxonomiesMenu />
     </div>
   );
 };

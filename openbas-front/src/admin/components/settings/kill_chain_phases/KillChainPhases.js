@@ -15,10 +15,6 @@ import CreateKillChainPhase from './CreateKillChainPhase';
 import KillChainPhasePopover from './KillChainPhasePopover';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    margin: 0,
-    padding: '0 200px 50px 0',
-  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -92,111 +88,115 @@ const KillChainPhases = () => {
   };
 
   return (
-    <div className={classes.container}>
-      <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
-          label: t('Kill chain phases'),
-          current: true,
-        }]}
-      />
-      <TaxonomiesMenu />
-      <PaginationComponent
-        fetch={searchKillChainPhases}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setKillChainPhases}
-        exportProps={exportProps}
-      />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={(
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-              />
-            )}
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {killChainPhases.map(killChainPhase => (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flexGrow: 1 }}>
+        <Breadcrumbs
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Taxonomies') }, {
+            label: t('Kill chain phases'),
+            current: true,
+          }]}
+        />
+        <PaginationComponent
+          fetch={searchKillChainPhases}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setKillChainPhases}
+          exportProps={exportProps}
+        />
+        <List>
           <ListItem
-            key={killChainPhase.phase_id}
-            classes={{ root: classes.item }}
-            divider={true}
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
           >
             <ListItemIcon>
-              <RouteOutlined color="primary" />
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+              &nbsp;
+              </span>
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div style={bodyItemsStyles.bodyItems}>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_kill_chain_name,
-                  }}
-                  >
-                    <Chip
-                      variant="outlined"
-                      classes={{ root: classes.chipInList }}
-                      color="primary"
-                      label={killChainPhase.phase_kill_chain_name}
-                    />
-                  </div>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_name,
-                  }}
-                  >
-                    {killChainPhase.phase_name}
-                  </div>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_order,
-                  }}
-                  >
-                    {killChainPhase.phase_order}
-                  </div>
-                  <div style={{
-                    ...bodyItemsStyles.bodyItem,
-                    ...inlineStyles.phase_created_at,
-                  }}
-                  >
-                    {nsdt(killChainPhase.phase_created_at)}
-                  </div>
-                </div>
+                <SortHeadersComponent
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  searchPaginationInput={searchPaginationInput}
+                  setSearchPaginationInput={setSearchPaginationInput}
+                />
               )}
             />
-            <ListItemSecondaryAction>
-              <KillChainPhasePopover
-                killChainPhase={killChainPhase}
-                onUpdate={result => setKillChainPhases(killChainPhases.map(k => (k.phase_id !== result.phase_id ? k : result)))}
-                onDelete={result => setKillChainPhases(killChainPhases.filter(k => (k.phase_id !== result)))}
-              />
-            </ListItemSecondaryAction>
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-        ))}
-      </List>
-      <CreateKillChainPhase
-        onCreate={result => setKillChainPhases([result, ...killChainPhases])}
-      />
+          {killChainPhases.map(killChainPhase => (
+            <ListItem
+              key={killChainPhase.phase_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <RouteOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div style={bodyItemsStyles.bodyItems}>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_kill_chain_name,
+                    }}
+                    >
+                      {' '}
+                      <Chip
+                        variant="outlined"
+                        classes={{ root: classes.chipInList }}
+                        color="primary"
+                        label={killChainPhase.phase_kill_chain_name}
+                      />
+                    </div>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_name,
+                    }}
+                    >
+                      {killChainPhase.phase_name}
+                    </div>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_order,
+                    }}
+                    >
+                      {' '}
+                      {killChainPhase.phase_order}
+                    </div>
+                    <div style={{
+                      ...bodyItemsStyles.bodyItem,
+                      ...inlineStyles.phase_created_at,
+                    }}
+                    >
+                      {nsdt(killChainPhase.phase_created_at)}
+                    </div>
+                  </div>
+                )}
+              />
+              <ListItemSecondaryAction>
+                <KillChainPhasePopover
+                  killChainPhase={killChainPhase}
+                  onUpdate={result => setKillChainPhases(killChainPhases.map(k => (k.phase_id !== result.phase_id ? k : result)))}
+                  onDelete={result => setKillChainPhases(killChainPhases.filter(k => (k.phase_id !== result)))}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+        <CreateKillChainPhase
+          onCreate={result => setKillChainPhases([result, ...killChainPhases])}
+        />
+      </div>
+      <TaxonomiesMenu />
     </div>
   );
 };

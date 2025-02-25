@@ -20,10 +20,6 @@ import CreateGroup from './CreateGroup';
 import GroupPopover from './GroupPopover';
 
 const useStyles = makeStyles()(() => ({
-  container: {
-    margin: 0,
-    padding: '0 200px 50px 0',
-  },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -138,150 +134,152 @@ const Groups = () => {
   };
 
   return (
-    <div className={classes.container}>
-      <Breadcrumbs
-        variant="list"
-        elements={[{ label: t('Settings') }, { label: t('Security') }, {
-          label: t('Groups'),
-          current: true,
-        }]}
-      />
-      <SecurityMenu />
-      <PaginationComponent
-        fetch={searchGroups}
-        searchPaginationInput={searchPaginationInput}
-        setContent={setGroups}
-        exportProps={exportProps}
-      />
-      <List>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={(
-              <SortHeadersComponent
-                headers={headers}
-                inlineStylesHeaders={inlineStyles}
-                searchPaginationInput={searchPaginationInput}
-                setSearchPaginationInput={setSearchPaginationInput}
-              />
-            )}
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {groups.map(group => (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flexGrow: 1 }}>
+        <Breadcrumbs
+          variant="list"
+          elements={[{ label: t('Settings') }, { label: t('Security') }, {
+            label: t('Groups'),
+            current: true,
+          }]}
+        />
+        <PaginationComponent
+          fetch={searchGroups}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setGroups}
+          exportProps={exportProps}
+        />
+        <List>
           <ListItem
-            key={group.group_id}
-            classes={{ root: classes.item }}
-            divider={true}
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
           >
             <ListItemIcon>
-              <GroupsOutlined color="primary" />
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+              &nbsp;
+              </span>
             </ListItemIcon>
             <ListItemText
               primary={(
-                <div className={classes.bodyItems}>
-                  <div className={classes.bodyItem} style={inlineStyles.group_name}>
-                    {group.group_name}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.group_default_user_assign}>
-                    {group.group_default_user_assign ? (
-                      <Tooltip
-                        title={t(
-                          'The new users will automatically be assigned to this group.',
-                        )}
-                      >
-                        <CheckCircleOutlined fontSize="small" />
-                      </Tooltip>
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_observer}>
-                    {group.group_default_scenario_observer ? (
-                      <Tooltip
-                        title={t(
-                          'This group will have observer permission on new scenarios.',
-                        )}
-                      >
-                        <CheckCircleOutlined fontSize="small" />
-                      </Tooltip>
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_planner}>
-                    {group.group_default_scenario_planner ? (
-                      <Tooltip
-                        title={t(
-                          'This group will have planner permission on new scenarios.',
-                        )}
-                      >
-                        <CheckCircleOutlined fontSize="small" />
-                      </Tooltip>
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_observer}>
-                    {group.group_default_exercise_observer ? (
-                      <Tooltip
-                        title={t(
-                          'This group will have observer permission on new simulations.',
-                        )}
-                      >
-                        <CheckCircleOutlined fontSize="small" />
-                      </Tooltip>
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_planner}>
-                    {group.group_default_exercise_planner ? (
-                      <Tooltip
-                        title={t(
-                          'This group will have planner permission on new simulations.',
-                        )}
-                      >
-                        <CheckCircleOutlined fontSize="small" />
-                      </Tooltip>
-                    ) : (
-                      '-'
-                    )}
-                  </div>
-                  <div className={classes.bodyItem} style={inlineStyles.group_users_number}>
-                    {group.group_users_number}
-                  </div>
-                </div>
+                <SortHeadersComponent
+                  headers={headers}
+                  inlineStylesHeaders={inlineStyles}
+                  searchPaginationInput={searchPaginationInput}
+                  setSearchPaginationInput={setSearchPaginationInput}
+                />
               )}
             />
-            <ListItemSecondaryAction>
-              <GroupPopover
-                group={group}
-                groupUsersIds={group.group_users}
-                onUpdate={result => setGroups(groups.map(g => (g.group_id !== result.group_id ? g : result)))}
-                onDelete={result => setGroups(groups.filter(g => (g.group_id !== result)))}
-              />
-            </ListItemSecondaryAction>
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-        ))}
-      </List>
-      <CreateGroup
-        onCreate={result => setGroups([result, ...groups])}
-      />
+          {groups.map(group => (
+            <ListItem
+              key={group.group_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <GroupsOutlined color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={(
+                  <div className={classes.bodyItems}>
+                    <div className={classes.bodyItem} style={inlineStyles.group_name}>
+                      {group.group_name}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_user_assign}>
+                      {group.group_default_user_assign ? (
+                        <Tooltip
+                          title={t(
+                            'The new users will automatically be assigned to this group.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_observer}>
+                      {group.group_default_scenario_observer ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have observer permission on new scenarios.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_scenario_planner}>
+                      {group.group_default_scenario_planner ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have planner permission on new scenarios.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_observer}>
+                      {group.group_default_exercise_observer ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have observer permission on new simulations.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_default_exercise_planner}>
+                      {group.group_default_exercise_planner ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have planner permission on new simulations.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.group_users_number}>
+                      {group.group_users_number}
+                    </div>
+                  </div>
+                )}
+              />
+              <ListItemSecondaryAction>
+                <GroupPopover
+                  group={group}
+                  groupUsersIds={group.group_users}
+                  onUpdate={result => setGroups(groups.map(g => (g.group_id !== result.group_id ? g : result)))}
+                  onDelete={result => setGroups(groups.filter(g => (g.group_id !== result)))}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+        <CreateGroup
+          onCreate={result => setGroups([result, ...groups])}
+        />
+      </div>
+      <SecurityMenu />
     </div>
   );
 };
