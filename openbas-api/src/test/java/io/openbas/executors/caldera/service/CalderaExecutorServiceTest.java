@@ -14,6 +14,7 @@ import io.openbas.executors.caldera.client.CalderaExecutorClient;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.executors.caldera.model.Agent;
 import io.openbas.integrations.InjectorService;
+import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.service.AgentService;
 import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
@@ -139,18 +140,11 @@ public class CalderaExecutorServiceTest {
     calderaExecutorService.run();
     ArgumentCaptor<io.openbas.database.model.Agent> agentCaptor =
         ArgumentCaptor.forClass(io.openbas.database.model.Agent.class);
-    ArgumentCaptor<Endpoint> endpointCaptor = ArgumentCaptor.forClass(Endpoint.class);
-    verify(endpointService)
-        .createNewEndpointAndAgent(agentCaptor.capture(), endpointCaptor.capture());
+    verify(agentService)
+        .createOrUpdateAgent(agentCaptor.capture());
 
-    Endpoint capturedEndpoint = endpointCaptor.getValue();
-    assertEquals(CALDERA_AGENT_HOSTNAME, capturedEndpoint.getHostname());
-    assertArrayEquals(new String[] {CALDERA_AGENT_IP}, capturedEndpoint.getIps());
-    assertEquals(Endpoint.PLATFORM_TYPE.Windows, capturedEndpoint.getPlatform());
-    assertEquals(Endpoint.PLATFORM_ARCH.x86_64, capturedEndpoint.getArch());
-
-    io.openbas.database.model.Agent capturedAgent = agentCaptor.getValue();
-    assertEquals(CALDERA_AGENT_EXTERNAL_REF, capturedAgent.getExternalReference());
+    io.openbas.database.model.Agent agent = agentCaptor.getValue();
+    assertEquals(CALDERA_AGENT_EXTERNAL_REF, agent.getExternalReference());
   }
 
   @Test
