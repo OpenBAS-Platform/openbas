@@ -34,12 +34,9 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                             WHERE mac IS NOT NULL
                               AND mac NOT IN (
                                               'ffffffffffff', '000000000000', '0180C2000000'
-                                )
-                              AND mac NOT LIKE '01005e%'
-                              AND mac NOT LIKE '02%'
-                              AND mac NOT LIKE 'fe%'
-                                                 )
+                                ))
                     WHERE array_length(endpoint_mac_addresses, 1) > 0;
+
                     -- update agent table to add cleared at column from asset table
                     ALTER TABLE agents ADD column agent_cleared_at timestamp default now();
                     UPDATE agents ag set agent_cleared_at = a.asset_cleared_at FROM (SELECT asset_id, asset_cleared_at FROM assets) AS a WHERE ag.agent_asset=a.asset_id;

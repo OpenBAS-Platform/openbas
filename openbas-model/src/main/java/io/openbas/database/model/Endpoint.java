@@ -10,9 +10,7 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,9 +24,10 @@ import org.hibernate.annotations.Type;
 public class Endpoint extends Asset {
 
   public static final String ENDPOINT_TYPE = "Endpoint";
-  private static final String BAD_MAC_ADDRESS = "000000000000";
-  private static final List<String> BAD_IP_ADDRESSES =
-      Arrays.asList("127.0.0.1", "::1", "169.254.0.0");
+  private static final Set<String> BAD_MAC_ADDRESS =
+      new HashSet<>(Arrays.asList("ffffffffffff", "000000000000", "0180C2000000"));
+  private static final Set<String> BAD_IP_ADDRESSES =
+      new HashSet<>(Arrays.asList("127.0.0.1", "::1", "169.254.0.0"));
   private static final String REGEX_MAC_ADDRESS = "[^a-z0-9]";
 
   public enum PLATFORM_ARCH {
@@ -104,7 +103,7 @@ public class Endpoint extends Asset {
   public static String[] setMacAddresses(String[] macAddresses) {
     return Arrays.stream(macAddresses)
         .map(macAddress -> macAddress.toLowerCase().replaceAll(REGEX_MAC_ADDRESS, ""))
-        .filter(macAddress -> !BAD_MAC_ADDRESS.equals(macAddress))
+        .filter(macAddress -> !BAD_MAC_ADDRESS.contains(macAddress))
         .distinct()
         .toArray(String[]::new);
   }
