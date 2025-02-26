@@ -32,7 +32,8 @@ public class InjectModelHelper {
       @NotNull final List<String> teams,
       @NotNull final List<String> assets,
       @NotNull final List<String> assetGroups) {
-    if (injectorContract == null || (content == null && teams.isEmpty() && assets.isEmpty() && assetGroups.isEmpty())) {
+    if (injectorContract == null
+        || (content == null && teams.isEmpty() && assets.isEmpty() && assetGroups.isEmpty())) {
       return false;
     }
 
