@@ -199,7 +199,7 @@ public class CalderaExecutorService implements Runnable {
 
   private void updateExistingEndpointAndManageAgent(Endpoint endpoint, AgentRegisterInput input) {
     endpoint.setHostname(input.getHostname());
-    endpoint.setIps(EndpointMapper.concatenateArrays(endpoint.getIps(), input.getIps()));
+    endpoint.setIps(EndpointMapper.mergeAddressArrays(endpoint.getIps(), input.getIps()));
     endpointService.updateEndpoint(endpoint);
     createOrUpdateAgent(endpoint, input);
   }
@@ -207,7 +207,7 @@ public class CalderaExecutorService implements Runnable {
   private void updateExistingAgent(Agent agent, AgentRegisterInput input) {
     Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
     endpoint.setHostname(input.getHostname());
-    endpoint.setIps(EndpointMapper.concatenateArrays(endpoint.getIps(), input.getIps()));
+    endpoint.setIps(EndpointMapper.mergeAddressArrays(endpoint.getIps(), input.getIps()));
     endpointService.updateEndpoint(endpoint);
     setUpdatedAgentAttributes(agent, input, endpoint);
     agentService.createOrUpdateAgent(agent);

@@ -260,9 +260,9 @@ public class EndpointService {
     if (!CROWDSTRIKE_EXECUTOR_TYPE.equals(input.getExecutor().getType())) {
       endpoint.setHostname(input.getHostname());
     }
-    endpoint.setIps(EndpointMapper.concatenateArrays(endpoint.getIps(), input.getIps()));
+    endpoint.setIps(EndpointMapper.mergeAddressArrays(endpoint.getIps(), input.getIps()));
     endpoint.setMacAddresses(
-        EndpointMapper.concatenateArrays(endpoint.getMacAddresses(), input.getMacAddresses()));
+        EndpointMapper.mergeAddressArrays(endpoint.getMacAddresses(), input.getMacAddresses()));
   }
 
   private Agent updateExistingAgent(Agent agent, AgentRegisterInput input) {
