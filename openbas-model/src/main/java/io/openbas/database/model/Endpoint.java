@@ -10,8 +10,7 @@ import io.openbas.helper.MultiModelDeserializer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
@@ -24,6 +23,11 @@ import org.hibernate.annotations.Type;
 public class Endpoint extends Asset {
 
   public static final String ENDPOINT_TYPE = "Endpoint";
+  public static final Set<String> BAD_MAC_ADDRESS =
+      new HashSet<>(Arrays.asList("ffffffffffff", "000000000000", "0180c2000000"));
+  public static final Set<String> BAD_IP_ADDRESSES =
+      new HashSet<>(Arrays.asList("127.0.0.1", "::1", "169.254.0.0"));
+  public static final String REGEX_MAC_ADDRESS = "[^a-z0-9]";
 
   public enum PLATFORM_ARCH {
     @JsonProperty("x86_64")
@@ -94,10 +98,6 @@ public class Endpoint extends Asset {
   @JsonProperty("asset_agents")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
-
-  public String getHostname() {
-    return hostname.toLowerCase();
-  }
 
   public void setHostname(String hostname) {
     this.hostname = hostname.toLowerCase();

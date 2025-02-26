@@ -356,7 +356,7 @@ public class CalderaExecutor extends Injector {
       if (!agentsCaldera.isEmpty()) {
         for (Agent agentCaldera : agentsCaldera) {
           // Check in the database if not exist
-          Optional<io.openbas.database.model.Agent> resolvedExistingAgent =
+          List<io.openbas.database.model.Agent> resolvedExistingAgent =
               this.agentService.findByExternalReference(agentCaldera.getPaw());
 
           if (resolvedExistingAgent.isEmpty()) {

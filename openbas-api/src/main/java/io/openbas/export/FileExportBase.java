@@ -30,6 +30,7 @@ public class FileExportBase {
     this.challengeService = challengeService;
     this.articleService = articleService;
 
+    this.objectMapper.addMixIn(Base.class, Mixins.Base.class);
     this.objectMapper.addMixIn(Exercise.class, Mixins.Exercise.class);
     this.objectMapper.addMixIn(Document.class, Mixins.Document.class);
     this.objectMapper.addMixIn(Objective.class, Mixins.Objective.class);

@@ -10,7 +10,7 @@ public class BannerMessage {
     CALDERA_UNAVAILABLE(
         "caldera_unavailable",
         BANNER_LEVEL.ERROR,
-        "Executor Caldera is not responding, your exercises may be impacted.");
+        "The Caldera executor is not responding, your simulations may be impacted.");
 
     private final String key;
     private final BANNER_LEVEL level;

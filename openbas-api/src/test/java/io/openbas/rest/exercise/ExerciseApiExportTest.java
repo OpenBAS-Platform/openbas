@@ -234,6 +234,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Tag.class, Mixins.Tag.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     List<Tag> expectedTags =
         tagComposer.generatedItems.stream()
             .filter(
@@ -269,6 +270,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Objective.class, Mixins.Objective.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String objectiveJson = objectMapper.writeValueAsString(objectiveComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -295,6 +297,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Challenge.class, Mixins.Challenge.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String challengeJson = objectMapper.writeValueAsString(challengeComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -321,6 +324,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Article.class, Mixins.Article.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String articleJson = objectMapper.writeValueAsString(articleComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -347,6 +351,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Channel.class, Mixins.Channel.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String channelJson = objectMapper.writeValueAsString(channelComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -373,6 +378,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Document.class, Mixins.Document.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String documentJson = objectMapper.writeValueAsString(documentComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -399,6 +405,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Exercise.class, Mixins.Exercise.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String exerciseJson = objectMapper.writeValueAsString(ex);
 
     assertThatJson(actualJson)
@@ -425,6 +432,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Variable.class, VariableMixin.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String variableJson = objectMapper.writeValueAsString(variableComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -455,6 +463,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String variableJson = objectMapper.writeValueAsString(variableComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -504,6 +513,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Team.class, Mixins.EmptyTeam.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String teamsJson = objectMapper.writeValueAsString(teamComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -555,6 +565,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(User.class, Mixins.User.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String usersJson = objectMapper.writeValueAsString(userComposer.generatedItems);
 
     assertThatJson(actualJson)
@@ -605,6 +616,7 @@ public class ExerciseApiExportTest extends IntegrationTest {
     String actualJson = getJsonExportFromZip(response, ex.getName());
 
     objectMapper.addMixIn(Organization.class, Mixins.Organization.class);
+    objectMapper.addMixIn(Base.class, Mixins.Base.class);
     String orgJson = objectMapper.writeValueAsString(organizationComposer.generatedItems);
 
     assertThatJson(actualJson)

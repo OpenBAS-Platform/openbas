@@ -1145,6 +1145,28 @@ export interface FilterGroup {
   mode: "and" | "or";
 }
 
+export interface Finding {
+  /** @format date-time */
+  finding_created_at: string;
+  finding_field: string;
+  finding_id: string;
+  finding_inject_id?: string;
+  finding_labels?: string[];
+  finding_type: "text" | "Number" | "port" | "IPv4" | "IPv6" | "Credentials";
+  /** @format date-time */
+  finding_updated_at: string;
+  finding_value: string;
+  listened?: boolean;
+}
+
+export interface FindingInput {
+  finding_field: string;
+  finding_inject_id?: string;
+  finding_labels?: string[];
+  finding_type: "text" | "Number" | "port" | "IPv4" | "IPv6" | "Credentials";
+  finding_value: string;
+}
+
 export interface FlagInput {
   flag_type: string;
   flag_value: string;
@@ -1392,6 +1414,8 @@ export interface InjectExecutionInput {
   /** @format int32 */
   execution_duration?: number;
   execution_message: string;
+  execution_output_raw?: string;
+  execution_output_structured?: string;
   execution_status: string;
 }
 
@@ -1466,6 +1490,14 @@ export interface InjectExpectationUpdateInput {
   is_success: boolean;
   metadata?: Record<string, string>;
   result: string;
+}
+
+export interface InjectExportFromSearchRequestInput {
+  inject_ids_to_ignore?: string[];
+  inject_ids_to_process?: string[];
+  options?: ExportOptionsInput;
+  search_pagination_input?: SearchPaginationInput;
+  simulation_or_scenario_id?: string;
 }
 
 export interface InjectExportRequestInput {
@@ -1782,7 +1814,7 @@ export interface InjectorContractInput {
 
 export interface InjectorContractOutput {
   injector_contract_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  /** Attack pattern Ids */
+  /** Attack pattern IDs */
   injector_contract_attack_patterns?: string[];
   /** Content */
   injector_contract_content: string;
@@ -3530,13 +3562,20 @@ export interface Team {
   /** Description of the team */
   team_description?: string;
   team_exercise_injects?: string[];
-  /** @format int64 */
+  /**
+   * Number of injects of all simulations of the team
+   * @format int64
+   */
   team_exercise_injects_number?: number;
   team_exercises?: string[];
   team_exercises_users?: string[];
+  /** ID of the team */
   team_id: string;
   team_inject_expectations?: string[];
-  /** @format int64 */
+  /**
+   * Number of expectations linked to this team
+   * @format int64
+   */
   team_injects_expectations_number?: number;
   /**
    * Total expected score of expectations linked to this team
@@ -3557,14 +3596,23 @@ export interface Team {
   /** Organization of the team */
   team_organization?: string;
   team_scenario_injects?: string[];
-  /** @format int64 */
+  /**
+   * Number of injects of all scenarios of the team
+   * @format int64
+   */
   team_scenario_injects_number?: number;
   team_scenarios?: string[];
   team_tags?: string[];
-  /** @format date-time */
+  /**
+   * Update date of the team
+   * @format date-time
+   */
   team_updated_at: string;
   team_users?: string[];
-  /** @format int64 */
+  /**
+   * Number of users of the team
+   * @format int64
+   */
   team_users_number?: number;
 }
 

@@ -98,6 +98,28 @@ public class InjectApi extends RestBehavior {
     return this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
   }
 
+  @LogExecutionTime
+  @PostMapping(INJECT_URI + "/search/export")
+  @Tracing(
+      name = "Exports injects based on a search specification",
+      layer = "api",
+      operation = "POST")
+  public void injectsExportFromSearch(
+      @RequestBody @Valid InjectExportFromSearchRequestInput input, HttpServletResponse response)
+      throws IOException {
+
+    // Control and format inputs
+    List<Inject> injects =
+        getInjectsAndCheckInputForBulkProcessing(input, Grant.GRANT_TYPE.OBSERVER);
+    runInjectExport(
+        injects,
+        ExportOptions.mask(
+            input.getExportOptions().isWithPlayers(),
+            input.getExportOptions().isWithTeams(),
+            input.getExportOptions().isWithVariableValues()),
+        response);
+  }
+
   @PostMapping(INJECT_URI + "/export")
   public void injectsExport(
       @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput,
@@ -126,6 +148,12 @@ public class InjectApi extends RestBehavior {
             injectExportRequestInput.getExportOptions().isWithPlayers(),
             injectExportRequestInput.getExportOptions().isWithTeams(),
             injectExportRequestInput.getExportOptions().isWithVariableValues());
+    runInjectExport(injects, exportOptionsMask, response);
+  }
+
+  private void runInjectExport(
+      List<Inject> injects, int exportOptionsMask, HttpServletResponse response)
+      throws IOException {
     byte[] zippedExport = injectExportService.exportInjectsToZip(injects, exportOptionsMask);
     String zipName = injectExportService.getZipFileName(exportOptionsMask);
 
@@ -552,7 +580,8 @@ public class InjectApi extends RestBehavior {
   public List<Inject> bulkUpdateInject(@RequestBody @Valid final InjectBulkUpdateInputs input) {
 
     // Control and format inputs
-    List<Inject> injectsToUpdate = getInjectsAndCheckInputForBulkProcessing(input);
+    List<Inject> injectsToUpdate =
+        getInjectsAndCheckInputForBulkProcessing(input, Grant.GRANT_TYPE.PLANNER);
 
     // Bulk update
     return this.injectService.bulkUpdateInject(injectsToUpdate, input.getUpdateOperations());
@@ -568,7 +597,8 @@ public class InjectApi extends RestBehavior {
   public List<Inject> bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs
-    List<Inject> injectsToDelete = getInjectsAndCheckInputForBulkProcessing(input);
+    List<Inject> injectsToDelete =
+        getInjectsAndCheckInputForBulkProcessing(input, Grant.GRANT_TYPE.PLANNER);
 
     // FIXME: This is a workaround to prevent the GUI from blocking when deleting elements
     injectsToDelete.forEach(inject -> inject.setListened(false));
@@ -586,7 +616,8 @@ public class InjectApi extends RestBehavior {
    * @return The list of injects to process
    * @throws BadRequestException If the input is not correctly formatted
    */
-  private List<Inject> getInjectsAndCheckInputForBulkProcessing(InjectBulkProcessingInput input) {
+  private List<Inject> getInjectsAndCheckInputForBulkProcessing(
+      InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     if ((CollectionUtils.isEmpty(input.getInjectIDsToProcess())
             && (input.getSearchPaginationInput() == null))
@@ -598,7 +629,7 @@ public class InjectApi extends RestBehavior {
 
     // Retrieve injects that match the search input and check that the user is allowed to bulk
     // process them
-    return this.injectService.getInjectsAndCheckIsPlanner(input);
+    return this.injectService.getInjectsAndCheckPermission(input, requested_grant_level);
   }
 
   // -- PRIVATE --
