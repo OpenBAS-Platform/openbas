@@ -35,6 +35,10 @@ public class AgentRegisterInput {
     this.ips = EndpointMapper.setIps(ips);
   }
 
+  public void setHostname(String hostname) {
+    this.hostname = hostname.toLowerCase();
+  }
+
   public boolean isActive() {
     return this.getLastSeen() != null
         && (now().toEpochMilli() - this.getLastSeen().toEpochMilli()) < Agent.ACTIVE_THRESHOLD;

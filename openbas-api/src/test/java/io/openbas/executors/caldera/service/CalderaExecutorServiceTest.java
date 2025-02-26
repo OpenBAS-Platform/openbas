@@ -149,17 +149,12 @@ public class CalderaExecutorServiceTest {
   @Test
   void test_run_WITH_2_existing_agents_same_machine() {
     when(client.agents()).thenReturn(List.of(calderaAgent));
-    when(this.endpointService.findEndpointByHostname(
-            calderaEndpoint.getHostname(),
-            calderaEndpoint.getPlatform(),
-            calderaEndpoint.getArch()))
-        .thenReturn(List.of(calderaEndpoint));
 
     randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);
     randomEndpoint.setIps(EndpointMapper.setIps(new String[] {CALDERA_AGENT_IP}));
     calderaExecutorService.run();
     ArgumentCaptor<Endpoint> endpointCaptor = ArgumentCaptor.forClass(Endpoint.class);
-    verify(endpointService).updateEndpoint(endpointCaptor.capture());
+    verify(endpointService).createEndpoint(endpointCaptor.capture());
 
     Endpoint capturedEndpoint = endpointCaptor.getValue();
     assertEquals(CALDERA_AGENT_HOSTNAME, capturedEndpoint.getHostname());
