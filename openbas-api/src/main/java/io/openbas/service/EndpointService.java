@@ -315,12 +315,6 @@ public class EndpointService {
     }
   }
 
-  public void createNewEndpointAndAgent(Agent agent, Endpoint endpoint) {
-    Endpoint createdEndpoint = this.createEndpoint(endpoint);
-    agent.setAsset(createdEndpoint);
-    this.agentService.createOrUpdateAgent(agent);
-  }
-
   public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken)
       throws IOException {
     String extension =
