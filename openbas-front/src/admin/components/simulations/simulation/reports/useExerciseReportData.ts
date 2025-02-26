@@ -118,7 +118,7 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
             if (dateA === undefined && dateB !== undefined) return 1;
             if (dateA !== undefined && dateB === undefined) return -1;
             if (dateA === undefined && dateB === undefined) return 0;
-            // @ts-expect-error
+            // @ts-expect-error dateA and dateB has been checked for undefined
             return dateA.localeCompare(dateB);
           });
           setInjects(sortedInjects);
