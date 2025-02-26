@@ -37,7 +37,7 @@ public class AgentService {
     this.agentRepository.deleteByAgentId(agentId);
   }
 
-  public Optional<Agent> findByExternalReference(String externalReference) {
+  public List<Agent> findByExternalReference(String externalReference) {
     return agentRepository.findByExternalReference(externalReference);
   }
 }

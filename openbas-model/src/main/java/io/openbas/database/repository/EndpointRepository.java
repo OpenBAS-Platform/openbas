@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -21,10 +22,27 @@ public interface EndpointRepository
       value =
           "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_platform = :platform and e.endpoint_arch = :arch",
       nativeQuery = true)
-  Optional<Endpoint> findByHostnameArchAndPlatform(
+  List<Endpoint> findByHostnameArchAndPlatform(
       @NotBlank final @Param("hostname") String hostname,
       @NotBlank final @Param("platform") String platform,
       @NotBlank final @Param("arch") String arch);
+
+  @Query(
+      value =
+          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_platform = :platform and e.endpoint_arch = :arch and e.endpoint_ips && cast(:ips as text[])",
+      nativeQuery = true)
+  List<Endpoint> findByHostnameAndAtleastOneIp(
+      @NotBlank final @Param("hostname") String hostname,
+      @NotBlank final @Param("platform") String platform,
+      @NotBlank final @Param("arch") String arch,
+      @NotNull final @Param("ips") String[] ips);
+
+  @Query(
+      value =
+          "select e.* from assets e where e.endpoint_mac_addresses && cast(:macAddresses as text[])",
+      nativeQuery = true)
+  Optional<Endpoint> findByAtleastOneMacAddress(
+      @NotNull final @Param("macAddresses") String[] macAddresses);
 
   @Override
   @Query(

@@ -4,6 +4,7 @@ import static io.openbas.utils.Time.toInstant;
 
 import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorService;
+import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.model.NodeEndpoint;
@@ -87,41 +88,39 @@ public class TaniumExecutorService implements Runnable {
     log.info("Running Tanium executor endpoints gathering...");
     List<NodeEndpoint> nodeEndpoints =
         this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
-    List<Agent> endpointAgentList = toAgentEndpoint(nodeEndpoints);
-    log.info("Tanium executor provisioning based on " + endpointAgentList.size() + " assets");
+    List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(nodeEndpoints);
+    log.info("Tanium executor provisioning based on " + endpointRegisterList.size() + " assets");
 
-    for (Agent agent : endpointAgentList) {
-      endpointService.registerAgentEndpoint(agent, TANIUM_EXECUTOR_TYPE);
+    for (AgentRegisterInput input : endpointRegisterList) {
+      endpointService.registerAgentEndpoint(input);
     }
   }
 
   // -- PRIVATE --
 
-  private List<Agent> toAgentEndpoint(@NotNull final List<NodeEndpoint> nodeEndpoints) {
+  private List<AgentRegisterInput> toAgentEndpoint(
+      @NotNull final List<NodeEndpoint> nodeEndpoints) {
     return nodeEndpoints.stream()
         .map(
             nodeEndpoint -> {
               TaniumEndpoint taniumEndpoint = nodeEndpoint.getNode();
-              Endpoint endpoint = new Endpoint();
-              Agent agent = new Agent();
-              agent.setExecutor(this.executor);
-              agent.setExternalReference(taniumEndpoint.getId());
-              agent.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
-              agent.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-              endpoint.setName(taniumEndpoint.getName());
-              endpoint.setDescription("Asset collected by Tanium executor context.");
-              endpoint.setIps(taniumEndpoint.getIpAddresses());
-              endpoint.setMacAddresses(taniumEndpoint.getMacAddresses());
-              endpoint.setHostname(taniumEndpoint.getName());
-              endpoint.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
-              agent.setExecutedByUser(
-                  Endpoint.PLATFORM_TYPE.Windows.equals(endpoint.getPlatform())
+              AgentRegisterInput input = new AgentRegisterInput();
+              input.setExecutor(this.executor);
+              input.setExternalReference(taniumEndpoint.getId());
+              input.setElevated(true);
+              input.setService(true);
+              input.setName(taniumEndpoint.getName());
+              input.setIps(taniumEndpoint.getIpAddresses());
+              input.setMacAddresses(taniumEndpoint.getMacAddresses());
+              input.setHostname(taniumEndpoint.getName());
+              input.setPlatform(toPlatform(taniumEndpoint.getOs().getPlatform()));
+              input.setExecutedByUser(
+                  Endpoint.PLATFORM_TYPE.Windows.equals(input.getPlatform())
                       ? Agent.ADMIN_SYSTEM_WINDOWS
                       : Agent.ADMIN_SYSTEM_UNIX);
-              endpoint.setArch(toArch(taniumEndpoint.getProcessor().getArchitecture()));
-              agent.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
-              agent.setAsset(endpoint);
-              return agent;
+              input.setArch(toArch(taniumEndpoint.getProcessor().getArchitecture()));
+              input.setLastSeen(toInstant(taniumEndpoint.getEidLastSeen()));
+              return input;
             })
         .collect(Collectors.toList());
   }
