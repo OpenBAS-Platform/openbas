@@ -3,7 +3,6 @@ package io.openbas.injectors.caldera;
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
-import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
@@ -409,7 +408,7 @@ public class CalderaExecutor extends Injector {
 
                           // We propagate the asset expectation to agents
                           List<PreventionExpectation> preventionExpectationList =
-                              ExpectationUtils.getPreventionExpectationList(
+                              ExpectationUtils.getPreventionExpectationListForCaldera(
                                   asset, executedAgents, preventionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
@@ -432,7 +431,7 @@ public class CalderaExecutor extends Injector {
                                   expectation.getExpirationTime());
                           // We propagate the asset expectation to agents
                           List<DetectionExpectation> detectionExpectationList =
-                              ExpectationUtils.getDetectionExpectationList(
+                              ExpectationUtils.getDetectionExpectationListForCaldera(
                                   asset, executedAgents, detectionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
@@ -454,7 +453,7 @@ public class CalderaExecutor extends Injector {
                                   expectationGroup);
                           // We propagate the asset expectation to agents
                           List<ManualExpectation> manualExpectationList =
-                              ExpectationUtils.getManualExpectationList(
+                              ExpectationUtils.getManualExpectationListForCaldera(
                                   asset, executedAgents, manualExpectation);
 
                           // If any expectation for agent is created then we create also expectation
