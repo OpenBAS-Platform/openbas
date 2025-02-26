@@ -145,9 +145,9 @@ public class EndpointService {
   // -- INSTALLATION AGENT --
   public void registerAgentEndpoint(EndpointRegisterInput input) {
     // Check if agent exists (only 1 agent can be found for Crowdstrike and Tanium)
-    List<Agent> optionalAgents = agentService.findByExternalReference(input.getExternalReference());
-    if (!optionalAgents.isEmpty()) {
-      Agent existingAgent = optionalAgents.getFirst();
+    List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
+    if (!existingAgents.isEmpty()) {
+      Agent existingAgent = existingAgents.getFirst();
       if (input.isActive()) {
         updateExistingAgent(existingAgent, input);
       } else {
@@ -156,10 +156,10 @@ public class EndpointService {
       }
     } else {
       // Check if endpoint exists
-      Optional<Endpoint> optionalEndpoint =
+      Optional<Endpoint> existingEndpoint =
           findEndpointByAtLeastOneMacAddress(input.getMacAddresses());
-      if (optionalEndpoint.isPresent()) {
-        updateExistingEndpointAndManageAgent(optionalEndpoint.get(), input);
+      if (existingEndpoint.isPresent()) {
+        updateExistingEndpointAndManageAgent(existingEndpoint.get(), input);
       } else {
         createNewEndpointAndAgent(input);
       }
@@ -171,34 +171,34 @@ public class EndpointService {
     input.setLastSeen(Instant.now());
     Agent agent;
     // Check if agents exist (because we can find X openbas agent on an endpoint)
-    List<Agent> optionalAgents = agentService.findByExternalReference(input.getExternalReference());
-    if (!optionalAgents.isEmpty()) {
+    List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
+    if (!existingAgents.isEmpty()) {
       // Check if this specific agent exist
       Agent.DEPLOYMENT_MODE deploymentMode =
           input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session;
       Agent.PRIVILEGE privilege =
           input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard;
-      Optional<Agent> optionalAgent =
-          optionalAgents.stream()
+      Optional<Agent> existingAgent =
+          existingAgents.stream()
               .filter(
                   ag ->
                       ag.getExecutedByUser().equals(input.getExecutedByUser())
                           && ag.getDeploymentMode().equals(deploymentMode)
                           && ag.getPrivilege().equals(privilege))
               .findFirst();
-      if (optionalAgent.isPresent()) {
-        agent = updateExistingAgent(optionalAgent.get(), input);
+      if (existingAgent.isPresent()) {
+        agent = updateExistingAgent(existingAgent.get(), input);
       } else {
         agent =
             updateExistingEndpointAndCreateAgent(
-                (Endpoint) Hibernate.unproxy(optionalAgents.getFirst().getAsset()), input);
+                (Endpoint) Hibernate.unproxy(existingAgents.getFirst().getAsset()), input);
       }
     } else {
       // Check if endpoint exists
-      Optional<Endpoint> optionalEndpoint =
+      Optional<Endpoint> existingEndpoint =
           findEndpointByAtLeastOneMacAddress(input.getMacAddresses());
-      if (optionalEndpoint.isPresent()) {
-        agent = updateExistingEndpointAndManageAgent(optionalEndpoint.get(), input);
+      if (existingEndpoint.isPresent()) {
+        agent = updateExistingEndpointAndManageAgent(existingEndpoint.get(), input);
       } else {
         agent = createNewEndpointAndAgent(input);
       }
@@ -237,7 +237,7 @@ public class EndpointService {
         input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session;
     Agent.PRIVILEGE privilege =
         input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard;
-    Optional<Agent> optionalAgent =
+    Optional<Agent> existingAgent =
         agentService.getAgentForAnAsset(
             endpoint.getId(),
             input.getExecutedByUser(),
@@ -245,8 +245,8 @@ public class EndpointService {
             privilege,
             input.getExecutor().getType());
     Agent agent;
-    if (optionalAgent.isPresent()) {
-      agent = optionalAgent.get();
+    if (existingAgent.isPresent()) {
+      agent = existingAgent.get();
     } else {
       agent = new Agent();
       setNewAgentAttributes(input, agent);

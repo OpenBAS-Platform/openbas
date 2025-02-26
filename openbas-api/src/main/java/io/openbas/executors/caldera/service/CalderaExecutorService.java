@@ -130,10 +130,10 @@ public class CalderaExecutorService implements Runnable {
 
   private void registerAgentEndpoint(EndpointRegisterInput input) {
     // Check if agent exists (only 1 agent can be found for Caldera)
-    List<io.openbas.database.model.Agent> optionalAgents =
+    List<io.openbas.database.model.Agent> existingAgents =
         agentService.findByExternalReference(input.getExternalReference());
-    if (!optionalAgents.isEmpty()) {
-      io.openbas.database.model.Agent existingAgent = optionalAgents.getFirst();
+    if (!existingAgents.isEmpty()) {
+      io.openbas.database.model.Agent existingAgent = existingAgents.getFirst();
       if (input.isActive()) {
         updateExistingAgent(existingAgent, input);
       } else {
@@ -142,17 +142,17 @@ public class CalderaExecutorService implements Runnable {
       }
     } else {
       // Check if endpoint exists
-      List<Endpoint> optionalEndpoints =
+      List<Endpoint> existingEndpoints =
           endpointService.findEndpointByHostname(
               input.getHostname(), input.getPlatform(), input.getArch());
-      if (optionalEndpoints.size() == 1) {
-        updateExistingEndpointAndManageAgent(optionalEndpoints.getFirst(), input);
+      if (existingEndpoints.size() == 1) {
+        updateExistingEndpointAndManageAgent(existingEndpoints.getFirst(), input);
       } else {
-        optionalEndpoints =
+        existingEndpoints =
             endpointService.findEndpointByHostnameAndAtLeastOneIp(
                 input.getHostname(), input.getPlatform(), input.getArch(), input.getIps());
-        if (optionalEndpoints.size() == 1) {
-          updateExistingEndpointAndManageAgent(optionalEndpoints.getFirst(), input);
+        if (existingEndpoints.size() == 1) {
+          updateExistingEndpointAndManageAgent(existingEndpoints.getFirst(), input);
         } else {
           // Nothing exists, create endpoint and agent
           createNewEndpointAndAgent(input);
@@ -180,7 +180,7 @@ public class CalderaExecutorService implements Runnable {
     DEPLOYMENT_MODE deploymentMode =
         input.isService() ? DEPLOYMENT_MODE.service : DEPLOYMENT_MODE.session;
     PRIVILEGE privilege = input.isElevated() ? PRIVILEGE.admin : PRIVILEGE.standard;
-    Optional<io.openbas.database.model.Agent> optionalAgent =
+    Optional<io.openbas.database.model.Agent> existingAgent =
         agentService.getAgentForAnAsset(
             endpoint.getId(),
             input.getExecutedByUser(),
@@ -188,8 +188,8 @@ public class CalderaExecutorService implements Runnable {
             privilege,
             CALDERA_EXECUTOR_TYPE);
     io.openbas.database.model.Agent agent;
-    if (optionalAgent.isPresent()) {
-      agent = optionalAgent.get();
+    if (existingAgent.isPresent()) {
+      agent = existingAgent.get();
     } else {
       agent = new io.openbas.database.model.Agent();
       setNewAgentAttributes(input, agent);
