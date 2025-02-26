@@ -116,9 +116,9 @@ public class ExpectationUtils {
                     asset,
                     preventionExpectation.getExpirationTime(),
                     computeSignatures(
+                        "obas-implant-caldera-",
                         executedAgent.getInject().getId(),
-                        executedAgent.getParent().getId(),
-                        "obas-implant-caldera-")))
+                        executedAgent.getParent().getId())))
         .toList();
   }
 
@@ -135,9 +135,9 @@ public class ExpectationUtils {
                     asset,
                     detectionExpectation.getExpirationTime(),
                     computeSignatures(
+                        "obas-implant-caldera-",
                         executedAgent.getInject().getId(),
-                        executedAgent.getParent().getId(),
-                        "obas-implant-caldera-")))
+                        executedAgent.getParent().getId())))
         .toList();
   }
 
@@ -185,7 +185,7 @@ public class ExpectationUtils {
                     agent,
                     asset,
                     detectionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), "obas-implant-")))
+                    computeSignatures("obas-implant-", inject.getId(), agent.getId())))
         .toList();
   }
 
@@ -201,12 +201,12 @@ public class ExpectationUtils {
                     agent,
                     asset,
                     preventionExpectation.getExpirationTime(),
-                    computeSignatures(inject.getId(), agent.getId(), "obas-implant-")))
+                    computeSignatures("obas-implant-", inject.getId(), agent.getId())))
         .toList();
   }
 
   private static List<InjectExpectationSignature> computeSignatures(
-      String injectId, String agentId, String prefixSignature) {
+      String prefixSignature, String injectId, String agentId) {
     List<InjectExpectationSignature> signatures = new ArrayList<>();
 
     signatures.add(
