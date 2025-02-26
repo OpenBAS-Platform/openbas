@@ -81,7 +81,6 @@ export default ({ mode }: { mode: string }) => {
         'remark-parse',
         'usehooks-ts',
         'uuid',
-        'xlsx',
         'zod',
         'zustand/shallow',
       ],
