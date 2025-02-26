@@ -110,15 +110,15 @@ const useExerciseReportData = (reportId: Report['report_id'], exerciseId: Exerci
       }
 
       if (displayModule(ReportInformationType.INJECT_RESULT)) {
-        fetchPromises.push(exerciseInjectsResultOutput(exerciseId).then(result => {
+        fetchPromises.push(exerciseInjectsResultOutput(exerciseId).then((result) => {
           // Sort the injects by tracking_sent_date
-          const sortedInjects = result.data.sort((a: InjectResultOutput, b:InjectResultOutput) => {
+          const sortedInjects = result.data.sort((a: InjectResultOutput, b: InjectResultOutput) => {
             const dateA = a.inject_status?.tracking_sent_date;
             const dateB = b.inject_status?.tracking_sent_date;
             if (dateA === undefined && dateB !== undefined) return 1;
             if (dateA !== undefined && dateB === undefined) return -1;
             if (dateA === undefined && dateB === undefined) return 0;
-            // @ts-ignore
+            // @ts-expect-error
             return dateA.localeCompare(dateB);
           });
           setInjects(sortedInjects);
