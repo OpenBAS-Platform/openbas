@@ -32,7 +32,7 @@ public class InjectModelHelper {
       @NotNull final List<String> teams,
       @NotNull final List<String> assets,
       @NotNull final List<String> assetGroups) {
-    if (injectorContract == null || content == null) {
+    if (injectorContract == null || (content == null && teams.isEmpty() && assets.isEmpty() && assetGroups.isEmpty())) {
       return false;
     }
 
@@ -210,13 +210,14 @@ public class InjectModelHelper {
       @NotNull final ArrayNode injectContractFields) {
     boolean isSet = true;
     String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
-    switch (key) {
-      case CONTACT_ELEMENT_CONTENT_KEY_TEAMS -> {
+    String type = jsonField.get(CONTACT_ELEMENT_CONTENT_TYPE).asText();
+    switch (type) {
+      case CONTACT_ELEMENT_CONTENT_TYPE_TEAM -> {
         if (teams.isEmpty() && !allTeams) {
           isSet = false;
         }
       }
-      case CONTACT_ELEMENT_CONTENT_KEY_ASSETS -> {
+      case CONTACT_ELEMENT_CONTENT_TYPE_ASSET -> {
         if (assets.isEmpty() && assetGroups.isEmpty()) {
           isSet = false;
         }

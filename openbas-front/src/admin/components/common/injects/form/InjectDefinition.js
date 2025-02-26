@@ -234,13 +234,13 @@ class InjectDefinition extends Component {
   constructor(props) {
     super(props);
     this.builtInFields = [
-      'teams',
-      'assets',
-      'assetgroups',
-      'articles',
-      'challenges',
-      'attachments',
-      'expectations',
+      'team',
+      'asset',
+      'asset-group',
+      'article',
+      'challenge',
+      'attachment',
+      'expectation',
     ];
     this.state = {
       allTeams: props.inject.inject_all_teams,
@@ -251,7 +251,7 @@ class InjectDefinition extends Component {
       articlesIds: props.inject.inject_content?.articles || [],
       challengesIds: props.inject.inject_content?.challenges || [],
       documents: props.inject.inject_documents || [],
-      expectations: props.inject.inject_content?.expectations || props.injectorContract.fields.filter(f => f.key === 'expectations').flatMap(f => f.predefinedExpectations) || [],
+      expectations: props.inject.inject_content?.expectations || props.injectorContract.fields.filter(f => f.type === 'expectation').flatMap(f => f.predefinedExpectations) || [],
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
       articlesSortBy: 'article_name',
@@ -393,7 +393,7 @@ class InjectDefinition extends Component {
   }
 
   getDynamicFields = () => this.props.injectorContract.fields
-    .filter(f => !this.builtInFields.includes(f.key) && !f.expectation)
+    .filter(f => !this.builtInFields.includes(f.type) && !f.expectation)
     .filter(f =>
       f.linkedFields.every((linkedField) => {
         const fieldValue = this.props.getValues(linkedField.key);
@@ -413,7 +413,7 @@ class InjectDefinition extends Component {
 
   resetDefaultvalues(setFieldValue, injectorContract) {
     injectorContract.fields
-      .filter(f => !this.builtInFields.includes(f.key) && !f.expectation)
+      .filter(f => !this.builtInFields.includes(f.type) && !f.expectation)
       .forEach((field) => {
         let defaultValue = field.cardinality === '1' ? R.head(field.defaultValue) : field.defaultValue;
         if (
@@ -475,20 +475,21 @@ class InjectDefinition extends Component {
       challengesIds,
       openVariables,
     } = this.state;
+
     // -- TEAMS --
-    const fieldTeams = injectorContract.fields.filter(n => n.key === 'teams').at(0);
+    const fieldTeams = injectorContract.fields.filter(n => n.type === 'team').at(0);
     const hasTeams = injectorContract.fields
-      .map(f => f.key)
-      .includes('teams');
+      .map(f => f.type)
+      .includes('team');
     // -- ASSETS --
-    const fieldAssets = injectorContract.fields.filter(n => n.key === 'assets').at(0);
+    const fieldAssets = injectorContract.fields.filter(n => n.type === 'asset').at(0);
     const hasAssets = injectorContract.fields
-      .map(f => f.key)
-      .includes('assets');
+      .map(f => f.type)
+      .includes('asset');
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
-      .map(f => f.key)
-      .includes('assetgroups');
+      .map(f => f.type)
+      .includes('asset-group');
     // -- ARTICLES --
     const articles = articlesIds
       .map(a => articlesMap[a])
@@ -504,10 +505,10 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
-    const fieldArticles = injectorContract.fields.filter(n => n.key === 'articles').at(0);
+    const fieldArticles = injectorContract.fields.filter(n => n.type === 'article').at(0);
     const hasArticles = injectorContract.fields
-      .map(f => f.key)
-      .includes('articles');
+      .map(f => f.type)
+      .includes('article');
     // -- CHALLENGES --
     const challenges = challengesIds
       .map(a => challengesMap[a])
@@ -518,10 +519,10 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(challengesSortBy))],
     );
     const sortedChallenges = sortChallenges(challenges);
-    const fieldChallenges = injectorContract.fields.filter(n => n.key === 'challenges').at(0);
+    const fieldChallenges = injectorContract.fields.filter(n => n.type === 'challenge').at(0);
     const hasChallenges = injectorContract.fields
-      .map(f => f.key)
-      .includes('challenges');
+      .map(f => f.type)
+      .includes('challenge');
     // -- DOCUMENTS --
     const docs = documents
       .map(d => (documentsMap[d.document_id]
@@ -538,16 +539,16 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const fieldAttachements = injectorContract.fields.filter(n => n.key === 'attachments').at(0);
+    const fieldAttachements = injectorContract.fields.filter(n => n.type === 'attachment').at(0);
     const hasAttachments = injectorContract.fields
-      .map(f => f.key)
-      .includes('attachments');
+      .map(f => f.type)
+      .includes('attachment');
     // -- EXPECTATIONS --
     const hasExpectations = injectorContract.fields
-      .map(f => f.key)
-      .includes('expectations');
+      .map(f => f.type)
+      .includes('expectation');
     const predefinedExpectations = injectorContract.fields.filter(
-      f => f.key === 'expectations',
+      f => f.type === 'expectation',
     ).flatMap(f => f.predefinedExpectations);
     const expectationsNotManual = injectorContract.fields.filter(
       f => f.expectation === true,
@@ -828,52 +829,57 @@ class InjectDefinition extends Component {
             </List>
           </>
         )}
-        <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
-          <div style={{ float: 'left' }}>
-            <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
-          </div>
-          <div style={{ float: 'left' }}>
-            <Tooltip title={t('Reset to default values')}>
-              <IconButton
-                color="primary"
-                variant="outlined"
-                disabled={submitting || this.props.readOnly}
-                onClick={() => this.resetDefaultvalues(setValue, injectorContract)}
-                size="small"
-                style={{ margin: '-12px 0 0 5px' }}
-              >
-                <RotateLeftOutlined />
-              </IconButton>
-            </Tooltip>
-          </div>
-          <div style={{ float: 'right' }}>
-            <Button
-              color="primary"
-              variant="outlined"
-              size="small"
-              onClick={this.handleOpenVariables.bind(this)}
-              startIcon={<HelpOutlineOutlined />}
-              style={{ marginTop: -10 }}
-            >
-              {t('Available variables')}
-            </Button>
-          </div>
-          <div className="clearfix" />
-        </div>
-        {
-          dynamicFields.map(field => (
-            <InjectContentFieldComponent
-              key={field.key}
-              control={this.props.control}
-              register={this.props.register}
-              field={field}
-              values={values}
-              attachedDocs={attachedDocs}
-              onSelectOrCheckboxFieldChange={() => this.setDynamicFields()}
-              readOnly={this.props.readOnly || field.readOnly}
-            />
-          ))
-        }
+        {dynamicFields.length > 0
+          && (
+            <>
+              <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
+                <div style={{ float: 'left' }}>
+                  <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
+                </div>
+                <div style={{ float: 'left' }}>
+                  <Tooltip title={t('Reset to default values')}>
+                    <IconButton
+                      color="primary"
+                      variant="outlined"
+                      disabled={submitting || this.props.readOnly}
+                      onClick={() => this.resetDefaultvalues(setValue, injectorContract)}
+                      size="small"
+                      style={{ margin: '-12px 0 0 5px' }}
+                    >
+                      <RotateLeftOutlined />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+                <div style={{ float: 'right' }}>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    onClick={this.handleOpenVariables.bind(this)}
+                    startIcon={<HelpOutlineOutlined />}
+                    style={{ marginTop: -10 }}
+                  >
+                    {t('Available variables')}
+                  </Button>
+                </div>
+                <div className="clearfix" />
+              </div>
+              {
+                dynamicFields.map(field => (
+                  <InjectContentFieldComponent
+                    key={field.key}
+                    control={this.props.control}
+                    register={this.props.register}
+                    field={field}
+                    values={values}
+                    attachedDocs={attachedDocs}
+                    onSelectOrCheckboxFieldChange={() => this.setDynamicFields()}
+                    readOnly={this.props.readOnly || field.readOnly}
+                  />
+                ))
+              }
+            </>
+          )}
         {(hasExpectations || expectationsNotManual.length > 0) && (
           <>
             <Typography
