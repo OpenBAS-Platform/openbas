@@ -16,6 +16,9 @@ import java.util.*;
 
 public class ExpectationUtils {
 
+  public static final String OBAS_IMPLANT = "obas-implant-";
+  public static final String OBAS_IMPLANT_CALDERA = "obas-implant-caldera-";
+
   private ExpectationUtils() {}
 
   public static List<InjectExpectation> processByValidationType(
@@ -116,7 +119,7 @@ public class ExpectationUtils {
                     asset,
                     preventionExpectation.getExpirationTime(),
                     computeSignatures(
-                        "obas-implant-caldera-",
+                        OBAS_IMPLANT_CALDERA,
                         executedAgent.getInject().getId(),
                         executedAgent.getParent().getId())))
         .toList();
@@ -135,7 +138,7 @@ public class ExpectationUtils {
                     asset,
                     detectionExpectation.getExpirationTime(),
                     computeSignatures(
-                        "obas-implant-caldera-",
+                        OBAS_IMPLANT_CALDERA,
                         executedAgent.getInject().getId(),
                         executedAgent.getParent().getId())))
         .toList();
@@ -170,7 +173,7 @@ public class ExpectationUtils {
                     agent,
                     asset,
                     preventionExpectation.getExpirationTime(),
-                    computeSignatures("obas-implant-", inject.getId(), agent.getId())))
+                    computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
         .toList();
   }
 
@@ -186,7 +189,7 @@ public class ExpectationUtils {
                     agent,
                     asset,
                     detectionExpectation.getExpirationTime(),
-                    computeSignatures("obas-implant-", inject.getId(), agent.getId())))
+                    computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
         .toList();
   }
 
