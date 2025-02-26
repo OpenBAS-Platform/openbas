@@ -61,7 +61,7 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                                    from assets
                                    WHERE asset_type = 'Endpoint') t
                              group by maca
-                             HAVING count(*) > 1))
+                             HAVING count(*) > 1) as mac)
                     GROUP BY assets.endpoint_mac_addresses
                     HAVING count(asset_id) > 1;
                     -- update the assets table with the aggregated description for the corresponding unique endpoint
