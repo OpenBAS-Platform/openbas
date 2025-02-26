@@ -88,5 +88,5 @@ export const computeColorStyle = (status) => {
 
 export const formatMacAddress = (mac) => {
   const address = mac.toUpperCase();
-  return address.match(/.{1,2}/g)?.join(':') || '';
+  return address.match(/.{1,2}/g)?.join(':') || '-';
 };
