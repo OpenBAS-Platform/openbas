@@ -1,5 +1,6 @@
 package io.openbas.utils;
 
+import static io.openbas.database.model.Endpoint.*;
 import static io.openbas.utils.AgentUtils.isPrimaryAgent;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -13,6 +14,7 @@ import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.ExecutorOutput;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -86,5 +88,35 @@ public class EndpointMapper {
     return endpoint.getAgents().stream()
         .filter(agent -> isPrimaryAgent(agent))
         .collect(Collectors.toList());
+  }
+
+  public static String[] setMacAddresses(String[] macAddresses) {
+    if (macAddresses == null) {
+      return new String[0];
+    } else {
+      return Arrays.stream(macAddresses)
+          .map(macAddress -> macAddress.toLowerCase().replaceAll(REGEX_MAC_ADDRESS, ""))
+          .filter(macAddress -> !BAD_MAC_ADDRESS.contains(macAddress))
+          .distinct()
+          .toArray(String[]::new);
+    }
+  }
+
+  public static String[] setIps(String[] ips) {
+    if (ips == null) {
+      return new String[0];
+    } else {
+      return Arrays.stream(ips)
+          .map(String::toLowerCase)
+          .filter(ip -> !BAD_IP_ADDRESSES.contains(ip))
+          .distinct()
+          .toArray(String[]::new);
+    }
+  }
+
+  public static String[] concateArrays(String[] array1, String[] array2) {
+    return Stream.concat(Arrays.stream(array1), Arrays.stream(array2))
+        .distinct()
+        .toArray(String[]::new);
   }
 }

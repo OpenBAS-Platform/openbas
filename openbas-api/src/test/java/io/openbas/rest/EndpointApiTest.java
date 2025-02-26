@@ -21,6 +21,7 @@ import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.service.EndpointService;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.fixtures.ExerciseFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.util.ArrayList;
@@ -64,8 +65,8 @@ class EndpointApiTest extends IntegrationTest {
         createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(registerInput);
-    endpoint.addAllIpAddresses(registerInput.getIps());
-    endpoint.addAllMacAddresses(registerInput.getMacAddresses());
+    endpoint.setIps(EndpointMapper.setIps(registerInput.getIps()));
+    endpoint.setMacAddresses(EndpointMapper.setMacAddresses(registerInput.getMacAddresses()));
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(
         new ArrayList<>() {
@@ -111,8 +112,8 @@ class EndpointApiTest extends IntegrationTest {
         createWindowsEndpointRegisterInput(List.of(tag.getId()), externalReference);
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(registerInput);
-    endpoint.addAllIpAddresses(registerInput.getIps());
-    endpoint.addAllMacAddresses(registerInput.getMacAddresses());
+    endpoint.setIps(EndpointMapper.setIps(registerInput.getIps()));
+    endpoint.setMacAddresses(EndpointMapper.setMacAddresses(registerInput.getMacAddresses()));
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(List.of(agent));
 
@@ -146,8 +147,8 @@ class EndpointApiTest extends IntegrationTest {
     EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(endpointInput);
-    endpoint.addAllIpAddresses(endpointInput.getIps());
-    endpoint.addAllMacAddresses(endpointInput.getMacAddresses());
+    endpoint.setIps(EndpointMapper.setIps(endpointInput.getIps()));
+    endpoint.setMacAddresses(EndpointMapper.setMacAddresses(endpointInput.getMacAddresses()));
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(
         new ArrayList<>() {
@@ -187,8 +188,8 @@ class EndpointApiTest extends IntegrationTest {
     EndpointInput endpointInput = createWindowsEndpointInput(List.of(tag.getId()));
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(endpointInput);
-    endpoint.addAllIpAddresses(endpointInput.getIps());
-    endpoint.addAllMacAddresses(endpointInput.getMacAddresses());
+    endpoint.setIps(EndpointMapper.setIps(endpointInput.getIps()));
+    endpoint.setMacAddresses(EndpointMapper.setMacAddresses(endpointInput.getMacAddresses()));
     Agent agent = createAgent(endpoint, externalReference);
     endpoint.setAgents(
         new ArrayList<>() {

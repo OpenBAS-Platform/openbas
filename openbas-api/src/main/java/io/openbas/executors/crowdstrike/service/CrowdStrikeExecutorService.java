@@ -9,7 +9,7 @@ import io.openbas.executors.ExecutorService;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
-import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -88,23 +88,22 @@ public class CrowdStrikeExecutorService implements Runnable {
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
     List<CrowdStrikeDevice> devices = this.client.devices().getResources().stream().toList();
-    List<EndpointRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
+    List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
     log.info(
         "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");
 
-    for (EndpointRegisterInput input : endpointRegisterList) {
+    for (AgentRegisterInput input : endpointRegisterList) {
       endpointService.registerAgentEndpoint(input);
     }
   }
 
   // -- PRIVATE --
 
-  private List<EndpointRegisterInput> toAgentEndpoint(
-      @NotNull final List<CrowdStrikeDevice> devices) {
+  private List<AgentRegisterInput> toAgentEndpoint(@NotNull final List<CrowdStrikeDevice> devices) {
     return devices.stream()
         .map(
             crowdStrikeDevice -> {
-              EndpointRegisterInput input = new EndpointRegisterInput();
+              AgentRegisterInput input = new AgentRegisterInput();
               input.setExecutor(this.executor);
               input.setExternalReference(crowdStrikeDevice.getDevice_id());
               input.setElevated(true);

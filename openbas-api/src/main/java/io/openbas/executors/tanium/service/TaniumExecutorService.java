@@ -4,11 +4,11 @@ import static io.openbas.utils.Time.toInstant;
 
 import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorService;
+import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.model.NodeEndpoint;
 import io.openbas.executors.tanium.model.TaniumEndpoint;
-import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -88,23 +88,23 @@ public class TaniumExecutorService implements Runnable {
     log.info("Running Tanium executor endpoints gathering...");
     List<NodeEndpoint> nodeEndpoints =
         this.client.endpoints().getData().getEndpoints().getEdges().stream().toList();
-    List<EndpointRegisterInput> endpointRegisterList = toAgentEndpoint(nodeEndpoints);
+    List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(nodeEndpoints);
     log.info("Tanium executor provisioning based on " + endpointRegisterList.size() + " assets");
 
-    for (EndpointRegisterInput input : endpointRegisterList) {
+    for (AgentRegisterInput input : endpointRegisterList) {
       endpointService.registerAgentEndpoint(input);
     }
   }
 
   // -- PRIVATE --
 
-  private List<EndpointRegisterInput> toAgentEndpoint(
+  private List<AgentRegisterInput> toAgentEndpoint(
       @NotNull final List<NodeEndpoint> nodeEndpoints) {
     return nodeEndpoints.stream()
         .map(
             nodeEndpoint -> {
               TaniumEndpoint taniumEndpoint = nodeEndpoint.getNode();
-              EndpointRegisterInput input = new EndpointRegisterInput();
+              AgentRegisterInput input = new AgentRegisterInput();
               input.setExecutor(this.executor);
               input.setExternalReference(taniumEndpoint.getId());
               input.setElevated(true);

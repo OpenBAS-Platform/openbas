@@ -17,6 +17,7 @@ import io.openbas.integrations.InjectorService;
 import io.openbas.service.AgentService;
 import io.openbas.service.EndpointService;
 import io.openbas.service.PlatformSettingsService;
+import io.openbas.utils.EndpointMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -113,7 +114,7 @@ public class CalderaExecutorServiceTest {
     Endpoint endpoint = new Endpoint();
     endpoint.setName(agent.getHost());
     endpoint.setDescription("Asset collected by Caldera executor context.");
-    endpoint.addAllIpAddresses(agent.getHost_ip_addrs());
+    endpoint.setIps(EndpointMapper.setIps(agent.getHost_ip_addrs()));
     endpoint.setHostname(agent.getHost());
     endpoint.setPlatform(toPlatform("windows"));
     endpoint.setArch(toArch("amd64"));
@@ -155,7 +156,7 @@ public class CalderaExecutorServiceTest {
         .thenReturn(List.of(calderaEndpoint));
 
     randomEndpoint.setHostname(CALDERA_AGENT_HOSTNAME);
-    randomEndpoint.addAllIpAddresses(new String[] {CALDERA_AGENT_IP});
+    randomEndpoint.setIps(EndpointMapper.setIps(new String[] {CALDERA_AGENT_IP}));
     calderaExecutorService.run();
     ArgumentCaptor<Endpoint> endpointCaptor = ArgumentCaptor.forClass(Endpoint.class);
     verify(endpointService).updateEndpoint(endpointCaptor.capture());

@@ -11,7 +11,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import java.util.stream.Stream;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
@@ -24,11 +23,11 @@ import org.hibernate.annotations.Type;
 public class Endpoint extends Asset {
 
   public static final String ENDPOINT_TYPE = "Endpoint";
-  private static final Set<String> BAD_MAC_ADDRESS =
+  public static final Set<String> BAD_MAC_ADDRESS =
       new HashSet<>(Arrays.asList("ffffffffffff", "000000000000", "0180c2000000"));
-  private static final Set<String> BAD_IP_ADDRESSES =
+  public static final Set<String> BAD_IP_ADDRESSES =
       new HashSet<>(Arrays.asList("127.0.0.1", "::1", "169.254.0.0"));
-  private static final String REGEX_MAC_ADDRESS = "[^a-z0-9]";
+  public static final String REGEX_MAC_ADDRESS = "[^a-z0-9]";
 
   public enum PLATFORM_ARCH {
     @JsonProperty("x86_64")
@@ -99,56 +98,6 @@ public class Endpoint extends Asset {
   @JsonProperty("asset_agents")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<Agent> agents = new ArrayList<>();
-
-  public static String[] setMacAddresses(String[] macAddresses) {
-    return Arrays.stream(macAddresses)
-        .map(macAddress -> macAddress.toLowerCase().replaceAll(REGEX_MAC_ADDRESS, ""))
-        .filter(macAddress -> !BAD_MAC_ADDRESS.contains(macAddress))
-        .distinct()
-        .toArray(String[]::new);
-  }
-
-  public static String[] setIps(String[] ips) {
-    return Arrays.stream(ips)
-        .map(String::toLowerCase)
-        .filter(ip -> !BAD_IP_ADDRESSES.contains(ip))
-        .distinct()
-        .toArray(String[]::new);
-  }
-
-  public void addAllMacAddresses(String[] newMacAddresses) {
-    if (this.macAddresses == null) {
-      this.macAddresses = new String[0];
-    } else {
-      this.macAddresses = setMacAddresses(this.macAddresses);
-    }
-    if (newMacAddresses == null) {
-      newMacAddresses = new String[0];
-    } else {
-      newMacAddresses = setMacAddresses(newMacAddresses);
-    }
-    this.macAddresses =
-        Stream.concat(Arrays.stream(newMacAddresses), Arrays.stream(this.macAddresses))
-            .distinct()
-            .toArray(String[]::new);
-  }
-
-  public void addAllIpAddresses(String[] newIps) {
-    if (this.ips == null) {
-      this.ips = new String[0];
-    } else {
-      this.ips = setIps(this.ips);
-    }
-    if (newIps == null) {
-      newIps = new String[0];
-    } else {
-      newIps = setIps(newIps);
-    }
-    this.ips =
-        Stream.concat(Arrays.stream(newIps), Arrays.stream(this.ips))
-            .distinct()
-            .toArray(String[]::new);
-  }
 
   public void setHostname(String hostname) {
     this.hostname = hostname.toLowerCase();
