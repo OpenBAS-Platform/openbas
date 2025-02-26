@@ -129,8 +129,7 @@ public class CalderaExecutorService implements Runnable {
 
   private void registerAgentEndpoint(EndpointRegisterInput input) {
     // Check if agent exists (only 1 agent can be found for Caldera)
-    List<Agent> existingAgents =
-        agentService.findByExternalReference(input.getExternalReference());
+    List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
     if (!existingAgents.isEmpty()) {
       Agent existingAgent = existingAgents.getFirst();
       if (input.isActive()) {
@@ -197,8 +196,7 @@ public class CalderaExecutorService implements Runnable {
     agentService.createOrUpdateAgent(agent);
   }
 
-  private void setNewAgentAttributes(
-      EndpointRegisterInput input, Agent agent) {
+  private void setNewAgentAttributes(EndpointRegisterInput input, Agent agent) {
     agent.setPrivilege(input.isElevated() ? PRIVILEGE.admin : PRIVILEGE.standard);
     agent.setDeploymentMode(input.isService() ? DEPLOYMENT_MODE.service : DEPLOYMENT_MODE.session);
     agent.setExecutedByUser(input.getExecutedByUser());
@@ -213,8 +211,7 @@ public class CalderaExecutorService implements Runnable {
     createOrUpdateAgent(endpoint, input);
   }
 
-  private void updateExistingAgent(
-      Agent agent, EndpointRegisterInput input) {
+  private void updateExistingAgent(Agent agent, EndpointRegisterInput input) {
     Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
     endpoint.setHostname(input.getHostname());
     endpoint.addAllIpAddresses(input.getIps());
@@ -248,7 +245,8 @@ public class CalderaExecutorService implements Runnable {
 
   // -- PRIVATE --
 
-  private List<EndpointRegisterInput> toAgentEndpoint(@NotNull final List<io.openbas.executors.caldera.model.Agent> agentsCaldera) {
+  private List<EndpointRegisterInput> toAgentEndpoint(
+      @NotNull final List<io.openbas.executors.caldera.model.Agent> agentsCaldera) {
     return agentsCaldera.stream()
         .map(
             agent -> {
