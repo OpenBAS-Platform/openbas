@@ -15,6 +15,7 @@ import io.openbas.helper.InjectHelper;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -229,6 +230,7 @@ public class InjectsExecutionJob implements Job {
   }
 
   @Override
+  @Transactional
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     try {
       // Handle starting exercises if needed.
