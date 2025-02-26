@@ -91,7 +91,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       label: 'Kill chain phase',
       isSortable: false,
       value: (_: InjectorContractOutput, killChainPhase: KillChainPhase, __: Record<string, AttackPattern>) => {
-        return <>{(killChainPhase ? killChainPhase.phase_name : t('Unknown'))}</>;
+        return (killChainPhase ? killChainPhase.phase_name : '-');
       },
     },
     {
@@ -100,7 +100,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
       isSortable: false,
       value: (contract: InjectorContractOutput, _: KillChainPhase, __: Record<string, AttackPattern>) => (
         <Tooltip title={tPick(contract.injector_contract_labels)}>
-          <>{tPick(contract.injector_contract_labels)}</>
+          {tPick(contract.injector_contract_labels)}
         </Tooltip>
       ),
     },
