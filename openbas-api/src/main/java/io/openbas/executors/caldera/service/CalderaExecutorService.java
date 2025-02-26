@@ -147,8 +147,8 @@ public class CalderaExecutorService implements Runnable {
       if (existingEndpoints.size() == 1) {
         updateExistingEndpointAndManageAgent(existingEndpoints.getFirst(), input);
       } else {
-          // Nothing exists, create endpoint and agent
-          createNewEndpointAndAgent(input);
+        // Nothing exists, create endpoint and agent
+        createNewEndpointAndAgent(input);
       }
     }
   }
