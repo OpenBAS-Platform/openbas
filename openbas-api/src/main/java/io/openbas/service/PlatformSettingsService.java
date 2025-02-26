@@ -224,6 +224,7 @@ public class PlatformSettingsService {
       platformSettings.setExecutorCalderaEnable(calderaExecutorConfig.isEnable());
       platformSettings.setExecutorCalderaPublicUrl(calderaExecutorConfig.getPublicUrl());
       platformSettings.setExecutorTaniumEnable(false);
+      platformSettings.setTelemetryManagerEnable(true);
 
       // Build admin settings
       if (user.isAdmin()) {
@@ -333,6 +334,9 @@ public class PlatformSettingsService {
   }
 
   // -- UPDATE SETTINGS --
+  public Optional<Setting> setting(String key) {
+    return this.settingRepository.findByKey(key);
+  }
 
   public PlatformSettings updateBasicConfigurationSettings(SettingsUpdateInput input) {
     Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));

@@ -68,6 +68,10 @@ public class UserService {
     this.tokenRepository = tokenRepository;
   }
 
+  public long globalCount() {
+    return userRepository.globalCount();
+  }
+
   // region users
   public boolean isUserPasswordValid(User user, String password) {
     return passwordEncoder.matches(password, user.getPassword());

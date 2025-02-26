@@ -88,6 +88,10 @@ public class PlatformSettings {
   @Schema(description = "Url of OpenCTI")
   private String xtmOpenctiUrl;
 
+  @JsonProperty("telemetry_manager_enable")
+  @Schema(description = "True if telemetry manager enable")
+  private Boolean telemetryManagerEnable;
+
   @JsonProperty("platform_version")
   @Schema(description = "Current version of the platform")
   private String platformVersion;

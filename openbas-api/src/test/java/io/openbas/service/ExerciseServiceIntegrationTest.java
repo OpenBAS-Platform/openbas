@@ -14,6 +14,7 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
@@ -42,6 +43,7 @@ class ExerciseServiceIntegrationTest {
   @Autowired private ExerciseMapper exerciseMapper;
   @Autowired private InjectMapper injectMapper;
   @Autowired private ResultUtils resultUtils;
+  @Autowired private ActionMetricCollector actionMetricCollector;
   @Autowired private ArticleRepository articleRepository;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamRepository teamRepository;
@@ -74,6 +76,7 @@ class ExerciseServiceIntegrationTest {
             exerciseMapper,
             injectMapper,
             resultUtils,
+            actionMetricCollector,
             assetRepository,
             assetGroupRepository,
             injectExpectationRepository,

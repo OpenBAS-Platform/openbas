@@ -14,6 +14,7 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.helper.InjectHelper;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class InjectsExecutionJob implements Job {
   private final InjectExpectationRepository injectExpectationRepository;
   private final InjectStatusService injectStatusService;
   private final io.openbas.executors.Executor executor;
+  private final ActionMetricCollector actionMetricCollector;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
       List.of(
@@ -64,6 +66,10 @@ public class InjectsExecutionJob implements Job {
 
   public void handleAutoStartExercises() {
     List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
+    if (exercises.isEmpty()) {
+      return;
+    }
+    actionMetricCollector.addSimulationPlayedCount(exercises.size());
     exerciseRepository.saveAll(
         exercises.stream()
             .peek(

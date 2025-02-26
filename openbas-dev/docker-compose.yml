@@ -58,6 +58,17 @@ services:
 #    restart: unless-stopped
 #    ports:
 #      - "4040:4040"
+  openbas-telemetry-otlp:
+    container_name: openbas-telemetry-otlp
+    image: otel/opentelemetry-collector-contrib:0.119.0
+    restart: unless-stopped
+    volumes:
+      - "./otlp-config.yaml:/etc/config/otlp-config.yaml"
+      - "./telemetry.json:/telemetry.json"
+    command:
+      - '--config=/etc/config/otlp-config.yaml'
+    ports:
+      - "1010:1010"
   openbas-pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin

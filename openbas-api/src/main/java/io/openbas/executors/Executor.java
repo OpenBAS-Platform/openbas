@@ -12,6 +12,7 @@ import io.openbas.database.repository.InjectorRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionExecutorService;
 import io.openbas.rest.inject.service.InjectStatusService;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -28,10 +29,10 @@ public class Executor {
   private final ApplicationContext context;
 
   private final InjectStatusRepository injectStatusRepository;
-
   private final InjectorRepository injectorRepository;
 
   private final QueueService queueService;
+  private final ActionMetricCollector actionMetricCollector;
 
   private final ExecutionExecutorService executionExecutorService;
   private final InjectStatusService injectStatusService;
@@ -69,6 +70,9 @@ public class Executor {
             .getInjectorContract()
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
+
+    // Telemetry
+    actionMetricCollector.addInjectPlayedCount(injectorContract.getPayload() != null);
 
     // Depending on injector type (internal or external) execution must be done differently
     Injector injector =

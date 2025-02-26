@@ -30,6 +30,7 @@ import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -92,11 +93,10 @@ public class ExerciseApi extends RestBehavior {
   // region services
   private final FileService fileService;
   private final InjectService injectService;
-  private final ChallengeService challengeService;
-  private final VariableService variableService;
   private final ExerciseService exerciseService;
   private final TeamService teamService;
   private final ExportService exportService;
+  private final ActionMetricCollector actionMetricCollector;
 
   // endregion
 
@@ -582,6 +582,7 @@ public class ExerciseApi extends RestBehavior {
         && ExerciseStatus.RUNNING.equals(status)) {
       Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
       exercise.setStart(nextMinute);
+      actionMetricCollector.addSimulationPlayedCount();
     }
     // If exercise move from pause to running state,
     // we log the pause date to be able to recompute inject dates.

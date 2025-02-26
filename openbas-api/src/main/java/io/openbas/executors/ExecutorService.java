@@ -3,12 +3,14 @@ package io.openbas.executors;
 import static io.openbas.service.FileService.EXECUTORS_IMAGES_BASE_PATH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import io.openbas.database.model.Executor;
 import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.io.InputStream;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,10 @@ public class ExecutorService {
   @Autowired
   public void setExecutorRepository(ExecutorRepository executorRepository) {
     this.executorRepository = executorRepository;
+  }
+
+  public List<Executor> executors() {
+    return Lists.newArrayList(this.executorRepository.findAll());
   }
 
   @Transactional
