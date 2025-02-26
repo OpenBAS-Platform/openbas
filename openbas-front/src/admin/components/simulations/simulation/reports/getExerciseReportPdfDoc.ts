@@ -96,7 +96,10 @@ const getExerciseReportPdfDocDefinition = async ({
   modulesImages.forEach((id) => {
     const element = document.getElementById(id);
     if (element) {
-      fetchPromises.push(toPng(element, { backgroundColor: 'white' }).then((img: string) => ({
+      fetchPromises.push(toPng(element, {
+        backgroundColor: 'white',
+        fontEmbedCSS: 'Roboto',
+      }).then((img: string) => ({
         key: id,
         img,
       })));
@@ -106,7 +109,7 @@ const getExerciseReportPdfDocDefinition = async ({
     const element = document.getElementById(`inject_expectations_${inject.inject_id}`);
     if (element) {
       fetchPromises.push(
-        toPng(element).then((img: string) => ({
+        toPng(element, { fontEmbedCSS: 'Roboto' }).then((img: string) => ({
           key: `inject_${inject.inject_id}`,
           img,
         })),
