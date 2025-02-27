@@ -72,15 +72,22 @@ public class InjectorContractFixture {
         injector, payloadCommand, List.of(obfuscatorSelect));
   }
 
-  public static InjectorContract createInjectorContract(
-      Map<String, String> labels, String content) {
+  public static InjectorContract createInjectorContract(Map<String, String> labels, String content)
+      throws JsonProcessingException {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setId(UUID.randomUUID().toString());
     injectorContract.setLabels(labels);
     injectorContract.setContent(content);
+    injectorContract.setConvertedContent(new ObjectMapper().readValue(content, ObjectNode.class));
     injectorContract.setAtomicTesting(true);
     injectorContract.setCreatedAt(Instant.now());
     injectorContract.setUpdatedAt(Instant.now());
     return injectorContract;
+  }
+
+  public static InjectorContract createInjectorContract(Map<String, String> labels)
+      throws JsonProcessingException {
+    String content = "{\"fields\": []}";
+    return createInjectorContract(labels, content);
   }
 }

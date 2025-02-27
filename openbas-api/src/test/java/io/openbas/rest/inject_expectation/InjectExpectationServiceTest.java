@@ -5,6 +5,7 @@ import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_NAME
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -43,9 +44,15 @@ class InjectExpectationServiceTest extends IntegrationTest {
   private static Asset savedAsset;
 
   @BeforeAll
-  void beforeAll() {
+  void beforeAll() throws JsonProcessingException {
     InjectorContract injectorContract =
-        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME), "{}");
+        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME));
+    //    injectorContract.setContent(
+    //        "{\"contract_id\":\""
+    //            + injectorContract.getId()
+    //            + "\",\"label\":{\"en\":\"AMSI Bypass - AMSI InitFailed\",\"fr\":\"AMSI Bypass -
+    // AMSI InitFailed\"},\"fields\":[{\"key\":\"assets\",\"label\":\"Targeted
+    // assets\",\"type\":\"asset\",\"mandatoryGroups\":null,\"linkedFields\":[],\"linkedValues\":[],\"mandatory\":true,\"readOnly\":false,\"cardinality\":\"n\",\"defaultValue\":null}],\"outputs\":[{\"type\":\"port\",\"field\":\"ports\",\"labels\":[\"scan\"],\"isMultiple\":true}],\"config\":{\"type\":\"openbas_nmap\",\"expose\":true,\"label\":{\"en\":\"Nmap Scan\",\"fr\":\"Nmap Scan\"},\"color_dark\":\"#00bcd4\",\"color_light\":\"#00bcd4\"},\"manual\":false,\"variables\":[{\"key\":\"user\",\"label\":\"User that will receive the injection\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[{\"key\":\"user.id\",\"label\":\"Id of the user in the platform\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.email\",\"label\":\"Email of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.firstname\",\"label\":\"Firstname of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.lastname\",\"label\":\"Lastname of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.lang\",\"label\":\"Lang of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]}]},{\"key\":\"exercise\",\"label\":\"Exercise of the current injection\",\"type\":\"Object\",\"cardinality\":\"1\",\"children\":[{\"key\":\"exercise.id\",\"label\":\"Id of the exercise in the platform\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"exercise.name\",\"label\":\"Name of the exercise\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"exercise.description\",\"label\":\"Description of the exercise\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]}]},{\"key\":\"teams\",\"label\":\"List of team name for the injection\",\"type\":\"String\",\"cardinality\":\"n\",\"children\":[]},{\"key\":\"player_uri\",\"label\":\"Player interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"challenges_uri\",\"label\":\"Challenges interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"scoreboard_uri\",\"label\":\"Scoreboard interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"lessons_uri\",\"label\":\"Lessons learned interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]}],\"contract_attack_patterns_external_ids\":[],\"is_atomic_testing\":true,\"platforms\":[]}");
     savedInjector =
         injectorRepository.save(
             InjectorFixture.createInjector(

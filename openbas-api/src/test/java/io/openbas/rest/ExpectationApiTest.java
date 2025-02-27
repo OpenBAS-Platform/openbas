@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
@@ -65,9 +66,9 @@ public class ExpectationApiTest extends IntegrationTest {
   private static Collector savedCollector2;
 
   @BeforeAll
-  void beforeAll() {
+  void beforeAll() throws JsonProcessingException {
     InjectorContract injectorContract =
-        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME), "{}");
+        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME));
     savedInjector =
         injectorRepository.save(
             InjectorFixture.createInjector(
