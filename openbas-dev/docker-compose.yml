@@ -42,7 +42,7 @@ services:
       - "15672:15672"
   openbas-dev-caldera:
     container_name: openbas-dev-caldera
-    image: openbas/caldera-server:5.0.0
+    image: openbas/caldera-server:5.1.0
     restart: unless-stopped
     ports:
       - "8888:8888"
