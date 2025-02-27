@@ -224,6 +224,10 @@ public class InjectModelHelper {
         }
       }
       default -> {
+        if (content == null) {
+          isSet = false;
+          break;
+        }
         if (isTextOrTextarea(jsonField) && !isFieldValid(content, injectContractFields, key)) {
           isSet = false;
         } else if (content.get(key) == null
