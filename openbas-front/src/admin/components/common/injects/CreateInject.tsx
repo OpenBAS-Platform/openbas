@@ -211,7 +211,9 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
     const killChainPhaseForSelection = selectedContractAttackPatterns
       .flatMap((contractAttackPattern: AttackPattern) => contractAttackPattern.attack_pattern_kill_chain_phases ?? [])
       .at(0);
-    selectedContractKillChainPhase = killChainPhaseForSelection && killChainPhasesMap[killChainPhaseForSelection] && killChainPhasesMap[killChainPhaseForSelection].phase_name;
+    selectedContractKillChainPhase = killChainPhaseForSelection && killChainPhasesMap[killChainPhaseForSelection]
+      ? `${killChainPhasesMap[killChainPhaseForSelection].phase_name} / ${selectedContractAttackPatterns.map((attackPattern: AttackPattern) => attackPattern.attack_pattern_external_id).join(', ')}`
+      : null;
   }
 
   return (
@@ -308,7 +310,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
               <HighlightOffOutlined />
             </IconButton>
           )}
-          injectHeaderTitle={selectedContractKillChainPhase || selectedContract?.injector_contract_injector_name}
+          injectHeaderTitle={selectedContractKillChainPhase || selectedContract?.injector_contract_injector_name || ''}
           isAtomic={isAtomic}
           disabled={!selectedContract}
           defaultInject={{
