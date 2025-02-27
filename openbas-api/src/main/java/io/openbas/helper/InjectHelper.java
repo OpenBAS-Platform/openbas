@@ -105,6 +105,7 @@ public class InjectHelper {
             .sorted(Inject.executionComparator)
             .map(
                 inject -> {
+                  // TODO This is inefficient, we need to refactor this loop with our own query
                   Hibernate.initialize(inject.getTags());
                   Hibernate.initialize(inject.getUser());
                   return new ExecutableInject(
@@ -112,7 +113,8 @@ public class InjectHelper {
                       false,
                       inject,
                       getInjectTeams(inject),
-                      inject.getAssets(),
+                      inject.getAssets(), // TODO There is also inefficient lazy loading inside this
+                      // get function
                       inject.getAssetGroups(),
                       usersFromInjection(inject));
                 });
