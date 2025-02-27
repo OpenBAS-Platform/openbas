@@ -58,7 +58,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
 
   const contractPayload = inject?.inject_injector_contract?.injector_contract_payload;
   const injectorContract = inject?.inject_injector_contract;
-  const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} /${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
+  const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} / ${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
 
   return (
     <Drawer
