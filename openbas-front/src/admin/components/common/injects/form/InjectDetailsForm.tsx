@@ -60,6 +60,7 @@ const InjectDetailsForm = ({
   const { permissions } = useContext(PermissionsContext);
   const [defaultValues, setDefaultValues] = useState({});
   const [openDetails, setOpenDetails] = useState(openDetail);
+  const [pristineOpenDetails, setPristineOpenDetails] = useState(true);
   const [injectDetailsState, setInjectDetailsState] = useState({
     allTeams: false,
     teamsIds: defaultInject?.inject_teams,
@@ -73,6 +74,7 @@ const InjectDetailsForm = ({
 
   const { tagsMap } = useHelper((helper: TagHelper) => ({ tagsMap: helper.getTagsMap() }));
   const toggleInjectContent = () => {
+    setPristineOpenDetails(false);
     if (openDetails) {
       if (drawerRef.current) {
         drawerRef.current.scrollTop = 0;
@@ -171,7 +173,7 @@ const InjectDetailsForm = ({
     const hasExpectations = injectorContractContent?.fields
       .map(f => f.key)
       .includes('expectations');
-    if (hasExpectations && injectDetailsState.expectations.length > 0) {
+    if (hasExpectations && !pristineOpenDetails) {
       newContent.expectations = injectDetailsState.expectations;
     }
 
