@@ -4,14 +4,13 @@ import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 import { interval } from 'rxjs';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchInjectResultOverviewOutput } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchAtomicTestingPayload, fetchInjectResultOverviewOutput } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
-import { type InjectResultOverviewOutput } from '../../../../utils/api-types';
-import isInjectWithPayloadInfo from '../../../../utils/inject/injectUtils';
+import { type InjectResultOverviewOutput, type StatusPayloadOutput } from '../../../../utils/api-types';
 import { FIVE_SECONDS } from '../../../../utils/Time';
 import { TeamContext } from '../../common/Context';
 import { InjectResultOverviewOutputContext } from '../InjectResultOverviewOutputContext';
@@ -45,12 +44,21 @@ const Index = () => {
   // Fetching data
   const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
   const [injectResultOverviewOutput, setInjectResultOverviewOutput] = useState<InjectResultOverviewOutput>();
+  const [payloadOutput, setPayloadOutput] = useState<StatusPayloadOutput>();
 
   const updateInjectResultOverviewOutput = () => {
     fetchInjectResultOverviewOutput(injectId).then((result: { data: InjectResultOverviewOutput }) => {
       setInjectResultOverviewOutput(result.data);
     });
   };
+
+  useEffect(() => {
+    if (injectResultOverviewOutput?.inject_id) {
+      fetchAtomicTestingPayload(injectResultOverviewOutput.inject_id).then((result: { data: StatusPayloadOutput }) => {
+        setPayloadOutput(result.data);
+      });
+    }
+  }, [injectResultOverviewOutput?.inject_id]);
 
   useEffect(() => {
     fetchInjectResultOverviewOutput(injectId).then((result: { data: InjectResultOverviewOutput }) => {
@@ -119,7 +127,7 @@ const Index = () => {
                 className={classes.item}
               />
               {
-                isInjectWithPayloadInfo(injectResultOverviewOutput) && (
+                payloadOutput && (
                   <Tab
                     component={Link}
                     to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
@@ -135,7 +143,7 @@ const Index = () => {
             <Routes>
               <Route path="" element={errorWrapper(AtomicTesting)()} />
               <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-              <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
+              <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)({ payloadOutput })} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>

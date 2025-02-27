@@ -168,7 +168,7 @@ public class PayloadMapper {
           .build();
     } catch (NoSuchBeanDefinitionException e) {
       log.info("No executor found for this injector: " + injectorContract.getInjector().getType());
-      return StatusPayloadOutput.builder().build();
+      return null;
     }
   }
 
