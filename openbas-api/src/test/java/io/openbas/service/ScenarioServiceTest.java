@@ -51,7 +51,7 @@ class ScenarioServiceTest {
   @Mock FileService fileService;
   @Autowired private InjectDuplicateService injectDuplicateService;
   @Autowired private ExerciseMapper exerciseMapper;
-  @Autowired private ActionMetricCollector actionMetricCollector;
+  @Mock private ActionMetricCollector actionMetricCollector;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
   @Mock private InjectService injectService;

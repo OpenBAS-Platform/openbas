@@ -43,7 +43,7 @@ class ExerciseServiceIntegrationTest {
   @Autowired private ExerciseMapper exerciseMapper;
   @Autowired private InjectMapper injectMapper;
   @Autowired private ResultUtils resultUtils;
-  @Autowired private ActionMetricCollector actionMetricCollector;
+  @Mock private ActionMetricCollector actionMetricCollector;
   @Autowired private ArticleRepository articleRepository;
   @Autowired private ExerciseRepository exerciseRepository;
   @Autowired private TeamRepository teamRepository;
