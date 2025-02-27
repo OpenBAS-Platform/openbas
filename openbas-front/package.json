@@ -129,9 +129,9 @@
     "i18n-checker": "node i18n-checker.js",
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types",
     "test": "vitest run",
-    "test:e2e": "cross-env SPRING_PROFILES_ACTIVE=test yarn playwright test --workers=1 --retries=2",
-    "test:e2e:ui": "cross-env SPRING_PROFILES_ACTIVE=test yarn playwright test --ui --workers=1",
-    "test:e2e:coverage": "cross-env SPRING_PROFILES_ACTIVE=test E2E_COVERAGE=true yarn playwright test && yarn show-report-e2e",
+    "test:e2e": "yarn playwright test --workers=1 --retries=2",
+    "test:e2e:ui": "yarn playwright test --ui --workers=1",
+    "test:e2e:coverage": "E2E_COVERAGE=true yarn playwright test && yarn show-report-e2e",
     "generate-test-e2e": "yarn playwright codegen http://localhost:3001/",
     "show-report-e2e": "start \"\" test-results/report.html && start \"\" test-results/coverage/index.html"
   },
