@@ -58,8 +58,15 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
 
   const contractPayload = inject?.inject_injector_contract?.injector_contract_payload;
   const injectorContract = inject?.inject_injector_contract;
-  const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} / ${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
-
+  const getInjectHeaderTitle = (): string => {
+    if (injectorContract?.injector_contract_needs_executor && inject?.inject_attack_patterns?.length !== 0) {
+      return `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} / ${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}`;
+    }
+    if (injectorContract?.injector_contract_needs_executor) {
+      return t('TTP Unknown');
+    }
+    return injectorContract?.injector_contract_injector_type_name ? t(injectorContract?.injector_contract_injector_type_name) : '';
+  };
   return (
     <Drawer
       open={open}
@@ -107,7 +114,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
                 )}
               </div>
             )}
-            injectHeaderTitle={injectorContract?.injector_contract_needs_executor ? cardTitle : t(inject?.inject_injector_contract?.injector_contract_injector_type_name)}
+            injectHeaderTitle={getInjectHeaderTitle()}
             disabled={!injectorContractContent}
             isAtomic={isAtomic}
             defaultInject={inject}
