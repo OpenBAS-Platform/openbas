@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.repository.*;
 import io.openbas.service.AssetGroupService;
-import io.openbas.service.PlatformSettingsService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +28,6 @@ class ResultUtilsTest {
   @Mock private AgentRepository agentRepository;
   @Mock private AssetGroupRepository assetGroupRepository;
   @Mock private AssetGroupService assetGroupService;
-  @Mock private PlatformSettingsService platformSettingsService;
 
   private ResultUtils resultUtils;
 
@@ -43,8 +41,7 @@ class ResultUtilsTest {
             assetRepository,
             assetGroupRepository,
             assetGroupService,
-            agentRepository,
-            platformSettingsService);
+            agentRepository);
   }
 
   @Test
