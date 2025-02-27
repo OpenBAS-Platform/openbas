@@ -90,8 +90,6 @@ public class ScenarioService {
   @Resource private OpenBASConfig openBASConfig;
 
   @PersistenceContext private EntityManager entityManager;
-  private final ExerciseMapper exerciseMapper;
-  private final ActionMetricCollector actionMetricCollector;
 
   private final ScenarioRepository scenarioRepository;
   private final TeamRepository teamRepository;
@@ -99,8 +97,9 @@ public class ScenarioService {
   private final DocumentRepository documentRepository;
   private final ScenarioTeamUserRepository scenarioTeamUserRepository;
   private final ArticleRepository articleRepository;
-  private final InjectRepository injectRepository;
-  private final LessonsCategoryRepository lessonsCategoryRepository;
+
+  private final ExerciseMapper exerciseMapper;
+  private final ActionMetricCollector actionMetricCollector;
 
   private final GrantService grantService;
   private final VariableService variableService;
@@ -110,6 +109,9 @@ public class ScenarioService {
   private final InjectDuplicateService injectDuplicateService;
   private final TagRuleService tagRuleService;
   private final InjectService injectService;
+
+  private final InjectRepository injectRepository;
+  private final LessonsCategoryRepository lessonsCategoryRepository;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {

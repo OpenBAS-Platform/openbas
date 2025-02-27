@@ -65,40 +65,39 @@ class ScenarioServiceTest {
   @BeforeEach
   void setUp() {
     scenarioService =
-        new ScenarioService(
-            exerciseMapper,
-            actionMetricCollector,
-            scenarioRepository,
-            teamRepository,
-            userRepository,
-            documentRepository,
-            scenarioTeamUserRepository,
-            articleRepository,
-            injectRepository,
-            lessonsCategoryRepository,
-            grantService,
-            variableService,
-            challengeService,
-            teamService,
-            fileService,
-            injectDuplicateService,
-            tagRuleService,
-            injectService);
+        scenarioService =
+            new ScenarioService(
+                scenarioRepository,
+                teamRepository,
+                userRepository,
+                documentRepository,
+                scenarioTeamUserRepository,
+                articleRepository,
+                exerciseMapper,
+                actionMetricCollector,
+                grantService,
+                variableService,
+                challengeService,
+                teamService,
+                fileService,
+                injectDuplicateService,
+                tagRuleService,
+                injectService,
+                injectRepository,
+                lessonsCategoryRepository);
   }
 
   void setUpWithMockRepository() {
     scenarioService =
         new ScenarioService(
-            exerciseMapper,
-            actionMetricCollector,
-            scenarioRepository,
+            mockScenarioRepository,
             teamRepository,
             userRepository,
             documentRepository,
             scenarioTeamUserRepository,
             articleRepository,
-            injectRepository,
-            lessonsCategoryRepository,
+            exerciseMapper,
+            actionMetricCollector,
             grantService,
             variableService,
             challengeService,
@@ -106,7 +105,9 @@ class ScenarioServiceTest {
             fileService,
             injectDuplicateService,
             tagRuleService,
-            injectService);
+            injectService,
+            injectRepository,
+            lessonsCategoryRepository);
   }
 
   @AfterAll
