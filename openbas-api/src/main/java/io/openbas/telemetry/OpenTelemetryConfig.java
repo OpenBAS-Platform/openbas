@@ -23,11 +23,13 @@ import jakarta.validation.constraints.NotBlank;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
@@ -46,6 +48,9 @@ public class OpenTelemetryConfig {
   @Getter private Duration exportInterval;
   private final Duration DEFAULT_COLLECT_INTERVAL = Duration.ofMinutes(60);
   private final Duration DEFAULT_EXPORT_INTERVAL = Duration.ofMinutes(6 * 60);
+  @Autowired private Environment environment;
+
+  //  https://telemetry.filigran.io/v1/metrics
 
   @PostConstruct
   private void initIntervals() {
@@ -64,7 +69,7 @@ public class OpenTelemetryConfig {
     // Set OTLP Exporter
     OtlpHttpMetricExporter otlpExporter =
         OtlpHttpMetricExporter.builder()
-            .setEndpoint(getRequiredProperty("telemetry.obas.endpoint"))
+            .setEndpoint(getOTELEndpoint())
             .setAggregationTemporalitySelector(instrumentType -> AggregationTemporality.DELTA)
             .build();
 
@@ -88,6 +93,18 @@ public class OpenTelemetryConfig {
   }
 
   // -- PRIVATE --
+  private String getOTELEndpoint() {
+    this.environment.getActiveProfiles();
+
+    if (Arrays.asList(this.environment.getActiveProfiles()).contains("dev")) {
+      return "http://localhost:1010/v1/metrics";
+    }
+
+    String endpoint = env.getProperty("telemetry.obas.endpoint", "http://localhost:2222/staging");
+    log.info("---------- Using telemetry endpoint: " + endpoint);
+    return endpoint;
+  }
+
   private Duration parseDuration(String propertyKey, Duration defaultValue) {
     return Optional.ofNullable(env.getProperty(propertyKey))
         .map(Long::parseLong)
@@ -102,9 +119,7 @@ public class OpenTelemetryConfig {
         this.settingRepository.findByKey(PLATFORM_INSTANCE_CREATION.key()).orElse(new Setting());
     ResourceBuilder resourceBuilder =
         Resource.getDefault().toBuilder()
-            .put(
-                ServiceAttributes.SERVICE_NAME,
-                env.getProperty("telemetry.service.name", "openbas-telemetry"))
+            .put(ServiceAttributes.SERVICE_NAME, "openbas-telemetry")
             .put(ServiceAttributes.SERVICE_VERSION, getRequiredProperty("info.app.version"))
             .put(stringKey("service.instance.id"), instanceId.getValue())
             .put(stringKey("service.instance.creation"), instanceCreationDate.getValue());
