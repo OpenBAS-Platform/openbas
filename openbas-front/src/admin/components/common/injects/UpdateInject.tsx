@@ -107,7 +107,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
                 )}
               </div>
             )}
-            injectHeaderTitle={injectorContract?.injector_contract_needs_executor ? cardTitle : inject?.inject_injector_contract?.injector_contract_injector_type_name}
+            injectHeaderTitle={injectorContract?.injector_contract_needs_executor ? cardTitle : t(inject?.inject_injector_contract?.injector_contract_injector_type_name)}
             disabled={!injectorContractContent}
             isAtomic={isAtomic}
             defaultInject={inject}
