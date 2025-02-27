@@ -102,8 +102,9 @@ const Executors = () => {
 
   // -- Stepper components --
   const buildInstallationUrl = (baseUrl: string) => {
-    if (activeTab === 0) return `${baseUrl}/session-user/${userToken?.token_value} -user USER -pwd PWD`;
-    if (activeTab === 1 && selectedOption === 'user') return `${baseUrl}/service-user/${userToken?.token_value} -user USER -pwd PWD`;
+    if (activeTab === 0) return `${baseUrl}/session-user/${userToken?.token_value} -privilege PRIVILEGE`; //TODO filter platform linux/mac without privilege : | sh
+    if (activeTab === 1 && selectedOption === 'user') return `${baseUrl}/service-user/${userToken?.token_value} -user USER -pwd PWD`; //TODO pour savoir quels sont les params a passer user/pwd
+    //windows user/pwd , linux/mac --user --group
     return `${baseUrl}/${userToken?.token_value}`;
   };
   const buildCalderaInstaller = () => {
@@ -208,8 +209,8 @@ SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd5
         return {
           icon: <Bash />,
           label: 'sh',
-          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? '/opt/openbas-agent' : '/opt/openbas-agent'}
-
+          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? '/opt/openbas-agent' : activeTab === 0? '$HOME/.local/openbas-agent-session' : '/opt/openbas-agent-service-USER'}
+          
 Caldera injector hashes:
 MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
@@ -222,7 +223,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
-          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? '/opt/openbas-agent' : '/opt/openbas-agent'}
+          exclusions: `${agentFolder ?? (activeTab === 1 && selectedOption !== 'user') ? '/opt/openbas-agent' : activeTab === 0? '$HOME/.local/openbas-agent-session' : '/opt/openbas-agent-service-USER'}
+          
 
 Caldera injector hashes:
 MD5: 1132906cc40001f51673108847b88d0c
@@ -300,8 +302,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
       <>
         <p>
           {platform == WINDOWS
-            ? t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an Administrator).')
-            : t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
+            ? t('You can either directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an Administrator and passing the script parameters).') //TODO privileges standard, user/pwd, rien in advanced
+            : t('You can either directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')} //TODO standard delete and executed as root, Advanced oui root console...
         </p>
         {selectedExecutor?.executor_type === OPENBAS_CALDERA && (
           <Alert variant="outlined" severity="warning">
@@ -353,29 +355,37 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               severity="info"
               style={{ marginTop: theme.spacing(1) }}
             >
-              {t('Quick start with openBAS. Install the Agent with your own privilege, this installation requires local administrator privileges.')}
+              {t('Quick start with openBAS. Install the Agent with your own User, this installation requires local administrator privileges.')}
             </Alert>
             <StepOneInstallation />
             <Alert
               variant="outlined"
               severity="warning"
             >
-              {t('The installation is running in the background as a Session. '
+              {t('The Agent is running in the background as a Session. '
                 + 'The Agent will only be executed when the User is logged in and the Session is active. '
-                + 'The script can be executed either as an Administrator or as a standard User.')}
+                + 'The Agent can be executed as Administrator or as a Standard User.')}
             </Alert>
             <InstallationScriptsAndActionButtons />
           </>
         )}
         {platform !== WINDOWS && (
           <>
+            <Alert
+              variant="outlined"
+              severity="info"
+              style={{ marginTop: theme.spacing(1) }}
+            >
+              {t('Quick start with openBAS. Install the Agent with your own User, this installation requires local standard privileges.')}
+            </Alert>
             <StepOneInstallation />
             <Alert
               variant="outlined"
               severity="warning"
             >
-              {t('The installation is running in the background as a Session. '
-                + 'The Agent will only be executed when the User is logged in and the Session is active.')}
+              {t('The Agent is running in the background as a Session. '
+                + 'The Agent will only be executed when the User is logged in and the Session is active. '
+                + 'The Agent can be executed as Administrator or as a Standard User.')}
             </Alert>
             <InstallationScriptsAndActionButtons />
           </>
@@ -391,7 +401,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           severity="info"
           style={{ marginTop: theme.spacing(1) }}
         >
-          {t('Deploy your Agent as a User account or a Service. This installation requires local administrator privileges.')}
+          {t('Deploy your Agent as a User or a System Service. This installation requires local administrator privileges.')}
         </Alert>
         <StepOneInstallation />
         <div>
@@ -417,8 +427,13 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               style={{ marginTop: theme.spacing(1) }}
             >
               {selectedOption === 'user' ? t('Installing as a User will require specific permissions. ')
-              + t('You should add "Log on as a service" policy and add the user/pwd in the script parameters.')
-                : t('Installing as a System will install it with system-wide privileges.')}
+              + t('The Agent is running in the background as a Service. ' +
+                  'The Agent will always be executed when the machine is up. ' +
+                  'The Agent can be executed as Administrator or as a Standard User. ' +
+                  'You should add "Log on as a service" policy.')
+                : t('The Agent is running in the background as a Service. ' +
+                  'The Agent will always be executed when the machine is up. ' +
+                  'Installing as a System will install it with system-wide privileges.')}
             </Alert>
             <InstallationScriptsAndActionButtons />
           </>
@@ -431,8 +446,12 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               style={{ marginTop: theme.spacing(1) }}
             >
               {selectedOption === 'user' ? t('Installing as a User will require specific permissions. ')
-              + t('Add the user/group in the script parameters.')
-                : t('Installing as a System will install it with system-wide privileges.')}
+                + t('The Agent is running in the background as a Service. ' +
+                  'The Agent will always be executed when the machine is up. ' +
+                  'The Agent can be executed as Administrator or as a Standard User. ')
+                : t('The Agent is running in the background as a Service. ' +
+                  'The Agent will always be executed when the machine is up. ' +
+                  'Installing as a System will install it with system-wide privileges.')}
             </Alert>
             <InstallationScriptsAndActionButtons />
           </>
