@@ -37,14 +37,14 @@ const InjectsListButtons: FunctionComponent<Props> = ({
 
   return (
     <div className={classes.container}>
+      {hasImportModesEnabled()
+        && <InjectImportMenu onImportedInjects={onImportedInjects} />}
       <ToggleButtonGroup
         size="small"
         exclusive
         style={{ float: 'right' }}
         aria-label="Change view mode"
       >
-        {hasImportModesEnabled()
-          && <InjectImportMenu onImportedInjects={onImportedInjects} />}
         {(!!setViewMode && availableButtons.includes('list'))
           && (
             <Tooltip title={t('List view')}>
