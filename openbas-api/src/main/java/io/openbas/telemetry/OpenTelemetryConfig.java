@@ -28,13 +28,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Log
 @Service
+@Profile("!test")
 @RequiredArgsConstructor
 public class OpenTelemetryConfig {
 
@@ -54,7 +55,6 @@ public class OpenTelemetryConfig {
   }
 
   @Bean
-  @ConditionalOnMissingBean(OpenTelemetry.class)
   public OpenTelemetry openTelemetry() {
     log.info("Start telemetry");
     log.info("Using collect interval: " + collectInterval);
@@ -83,7 +83,6 @@ public class OpenTelemetryConfig {
   }
 
   @Bean
-  @ConditionalOnMissingBean(Meter.class)
   public Meter meter(@NotNull final OpenTelemetry openTelemetry) {
     return openTelemetry.getMeter("openbas-api-meter");
   }
