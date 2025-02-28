@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Profile("test")
 @Configuration
@@ -48,7 +49,9 @@ public class NoOpOpenTelemetryConfig {
 
   @Bean
   public OpenTelemetryConfig openTelemetryConfig(
-      Environment environment, SettingRepository settingRepository) {
-    return new OpenTelemetryConfig(environment, settingRepository);
+      Environment environment,
+      SettingRepository settingRepository,
+      ThreadPoolTaskScheduler taskScheduler) {
+    return new OpenTelemetryConfig(environment, settingRepository, taskScheduler);
   }
 }
