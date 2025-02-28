@@ -10,29 +10,31 @@ import io.opentelemetry.sdk.metrics.internal.data.ImmutableGaugeData;
 import io.opentelemetry.sdk.metrics.internal.data.ImmutableMetricData;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Log
 public class CustomMetricReader implements MetricReader {
   private final OtlpHttpMetricExporter otlpExporter;
+  private final ThreadPoolTaskScheduler taskScheduler;
   private final Duration collectInterval;
   private final Duration exportInterval;
-  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
   Map<String, MetricData> groupedMetrics = new HashMap<>();
 
   private final AtomicReference<CollectionRegistration> collectionRef =
       new AtomicReference<>(CollectionRegistration.noop());
+  private final AtomicLong collectMetricCount = new AtomicLong(0);
 
   public CustomMetricReader(
       @NotNull OtlpHttpMetricExporter otlpExporter,
+      @NotNull ThreadPoolTaskScheduler taskScheduler,
       @NotNull Duration collectIntervalInput,
       @NotNull Duration exportIntervalInput) {
     this.otlpExporter = otlpExporter;
+    this.taskScheduler = taskScheduler;
     this.collectInterval = collectIntervalInput;
     this.exportInterval = exportIntervalInput;
   }
@@ -40,10 +42,16 @@ public class CustomMetricReader implements MetricReader {
   @Override
   public void register(@NotNull CollectionRegistration collectionRegistration) {
     collectionRef.set(collectionRegistration);
-    scheduler.scheduleAtFixedRate(
-        this::collectMetrics, 0, this.collectInterval.toSeconds(), TimeUnit.SECONDS);
-    scheduler.scheduleAtFixedRate(
-        this::exportData, 0, this.exportInterval.toSeconds(), TimeUnit.SECONDS);
+    this.taskScheduler.scheduleAtFixedRate(this::collectAndExportMetrics, this.collectInterval);
+  }
+
+  private void collectAndExportMetrics() {
+    collectMetrics();
+    collectMetricCount.incrementAndGet();
+    if (exportInterval.toSeconds() / collectInterval.toSeconds() == collectMetricCount.get()) {
+      exportData();
+      collectMetricCount.set(0);
+    }
   }
 
   private void collectMetrics() {
@@ -82,16 +90,16 @@ public class CustomMetricReader implements MetricReader {
                   }
                 });
       } else {
-        log.severe("CollectionRegistration not initialized");
+        log.severe("Telemetry - CollectionRegistration not initialized");
       }
     } catch (Exception e) {
-      log.severe("Error during metric collection: " + e);
+      log.severe("Telemetry - Error during metric collection: " + e);
     }
   }
 
   private void exportData() {
     if (!groupedMetrics.isEmpty()) {
-      // Export the collected data to OTLP exporter
+      log.info("Telemetry - Export the collected data to OTLP exporter");
       otlpExporter.export(new ArrayList<>(groupedMetrics.values()));
       groupedMetrics.clear();
     }
@@ -99,17 +107,16 @@ public class CustomMetricReader implements MetricReader {
 
   @Override
   public CompletableResultCode forceFlush() {
-    // Export any records which have been queued up but not yet exported.
-    log.info("flushing");
+    log.info(
+        "Telemetry - Flushing and exporting any queued records that have not yet been exported.");
     exportData();
     return CompletableResultCode.ofSuccess();
   }
 
   @Override
   public CompletableResultCode shutdown() {
-    // Shutdown the exporter and cleanup any resources.
-    log.info("shutting down");
-    scheduler.shutdownNow();
+    log.info("Telemetry - Shutdown the exporter and cleanup any resources");
+    taskScheduler.shutdown();
     groupedMetrics.clear();
     return CompletableResultCode.ofSuccess();
   }

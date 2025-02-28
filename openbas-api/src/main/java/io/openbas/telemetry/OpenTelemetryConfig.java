@@ -18,13 +18,11 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.semconv.ServerAttributes;
 import io.opentelemetry.semconv.ServiceAttributes;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotBlank;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -33,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 @Log
@@ -43,25 +42,17 @@ public class OpenTelemetryConfig {
 
   private final Environment env;
   private final SettingRepository settingRepository;
+  private final ThreadPoolTaskScheduler taskScheduler;
 
-  @Getter private Duration collectInterval;
-  @Getter private Duration exportInterval;
-  private final Duration DEFAULT_COLLECT_INTERVAL = Duration.ofMinutes(60);
-  private final Duration DEFAULT_EXPORT_INTERVAL = Duration.ofMinutes(6 * 60);
+  @Getter private final Duration collectInterval = Duration.ofMinutes(60);
+  @Getter private final Duration exportInterval = Duration.ofMinutes(6 * 60);
   @Autowired private Environment environment;
-
-  @PostConstruct
-  private void initIntervals() {
-    collectInterval =
-        parseDuration("telemetry.collect.intervall.minutes", DEFAULT_COLLECT_INTERVAL);
-    exportInterval = parseDuration("telemetry.export.intervall.minutes", DEFAULT_EXPORT_INTERVAL);
-  }
 
   @Bean
   public OpenTelemetry openTelemetry() {
     log.info("Start telemetry");
-    log.info("Using collect interval: " + collectInterval);
-    log.info("Using export interval: " + exportInterval);
+    log.info("Telemetry - Using collect interval: " + collectInterval);
+    log.info("Telemetry - Using export interval: " + exportInterval);
     Resource resource = buildResource();
 
     // Set OTLP Exporter
@@ -73,7 +64,7 @@ public class OpenTelemetryConfig {
 
     // Set Metric Reader
     MetricReader customMetricReader =
-        new CustomMetricReader(otlpExporter, collectInterval, exportInterval);
+        new CustomMetricReader(otlpExporter, taskScheduler, collectInterval, exportInterval);
 
     // Create MeterProvider
     SdkMeterProvider meterProvider =
@@ -92,22 +83,15 @@ public class OpenTelemetryConfig {
 
   // -- PRIVATE --
   private String getOTELEndpoint() {
-    String endpoint =
-        environment.getProperty("telemetry.obas.endpoint", "https://telemetry/io/v1/metrics");
+    String endpoint = "https://telemetry.filigran.io/v1/metrics";
 
-    if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
-      endpoint = "http://localhost:1010/v1/metrics";
+    if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
+        || Arrays.asList(environment.getActiveProfiles()).contains("ci")) {
+      endpoint = "https://telemetry.staging.filigran.io/v1/metrics";
     }
 
-    log.info("Using telemetry endpoint: " + endpoint);
+    log.info("Telemetry - Using telemetry endpoint: " + endpoint);
     return endpoint;
-  }
-
-  private Duration parseDuration(String propertyKey, Duration defaultValue) {
-    return Optional.ofNullable(env.getProperty(propertyKey))
-        .map(Long::parseLong)
-        .map(Duration::ofMinutes)
-        .orElse(defaultValue);
   }
 
   private Resource buildResource() {
@@ -126,7 +110,7 @@ public class OpenTelemetryConfig {
       String hostAddress = InetAddress.getLocalHost().getHostAddress();
       resourceBuilder.putAll(Attributes.of(ServerAttributes.SERVER_ADDRESS, hostAddress));
     } catch (UnknownHostException e) {
-      log.severe("Failed to get host address: " + e.getMessage());
+      log.severe("Telemetry - Failed to get host address: " + e.getMessage());
     }
 
     return resourceBuilder.build();

@@ -87,11 +87,15 @@ public class ActionMetricCollector {
   }
 
   public void addInjectPlayedCount(String injectorType) {
-    if (CalderaContract.TYPE.equals(injectorType)
-        || OpenBASImplantContract.TYPE.equals(injectorType)) {
-      addInjectsPlayedByAgentCount();
-    } else {
-      addInjectPlayedWithoutAgentsCount();
+    try {
+      if (CalderaContract.TYPE.equals(injectorType)
+          || OpenBASImplantContract.TYPE.equals(injectorType)) {
+        addInjectsPlayedByAgentCount();
+      } else {
+        addInjectPlayedWithoutAgentsCount();
+      }
+    } catch (Exception e) {
+      log.severe("Error during incrementing inject played count: " + e);
     }
   }
 }

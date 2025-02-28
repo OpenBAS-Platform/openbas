@@ -58,51 +58,15 @@ public class AgentService {
 
     selections.add(
         cb.count(cb.selectCase().when(cb.isNull(root.get("parent")), 1)).alias("total_agents"));
-    selections.add(
-        cb.count(
-                cb.selectCase()
-                    .when(
-                        cb.and(
-                            cb.isNull(root.get("parent")),
-                            cb.equal(root.get("deploymentMode"), "session")),
-                        1))
-            .alias("session_agents"));
-    selections.add(
-        cb.count(
-                cb.selectCase()
-                    .when(
-                        cb.and(
-                            cb.isNull(root.get("parent")),
-                            cb.equal(root.get("deploymentMode"), "service")),
-                        1))
-            .alias("service_agents"));
-    selections.add(
-        cb.count(
-                cb.selectCase()
-                    .when(
-                        cb.and(
-                            cb.isNull(root.get("parent")),
-                            cb.equal(root.get("privilege"), "standard")),
-                        1))
-            .alias("user_agents"));
-    selections.add(
-        cb.count(
-                cb.selectCase()
-                    .when(
-                        cb.and(
-                            cb.isNull(root.get("parent")),
-                            cb.equal(root.get("privilege"), "admin")),
-                        1))
-            .alias("admin_agents"));
+    selections.add(countAgentsByField(cb, root, "deploymentMode", "session", "session_agents"));
+    selections.add(countAgentsByField(cb, root, "deploymentMode", "service", "service_agents"));
+    selections.add(countAgentsByField(cb, root, "privilege", "standard", "user_agents"));
+    selections.add(countAgentsByField(cb, root, "privilege", "admin", "admin_agents"));
 
     // Dynamically add COUNT for each Executor
     for (Executor executor : agentExecutors) {
-      Predicate executorPredicate =
-          cb.and(cb.isNull(root.get("parent")), cb.equal(root.get("executor"), executor));
-
-      Selection<Long> executorCount =
-          cb.count(cb.selectCase().when(executorPredicate, 1)).alias("agent_" + executor.getType());
-      selections.add(executorCount);
+      selections.add(
+          countAgentsByField(cb, root, "executor", executor, "agent_" + executor.getType()));
     }
 
     cq.multiselect(selections);
@@ -110,5 +74,13 @@ public class AgentService {
     // Execute the query
     TypedQuery<Tuple> query = entityManager.createQuery(cq);
     return query.getSingleResult();
+  }
+
+  private Selection<Long> countAgentsByField(
+      CriteriaBuilder cb, Root<Agent> root, String field, Object value, String alias) {
+    return cb.count(
+            cb.selectCase()
+                .when(cb.and(cb.isNull(root.get("parent")), cb.equal(root.get(field), value)), 1))
+        .alias(alias);
   }
 }
