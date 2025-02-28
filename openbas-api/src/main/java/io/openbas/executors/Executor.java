@@ -72,7 +72,7 @@ public class Executor {
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
     // Telemetry
-    actionMetricCollector.addInjectPlayedCount(injectorContract.getPayload() != null);
+    actionMetricCollector.addInjectPlayedCount(injectorContract.getInjector().getType());
 
     // Depending on injector type (internal or external) execution must be done differently
     Injector injector =

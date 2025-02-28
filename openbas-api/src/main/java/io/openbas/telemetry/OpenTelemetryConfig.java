@@ -50,8 +50,6 @@ public class OpenTelemetryConfig {
   private final Duration DEFAULT_EXPORT_INTERVAL = Duration.ofMinutes(6 * 60);
   @Autowired private Environment environment;
 
-  //  https://telemetry.filigran.io/v1/metrics
-
   @PostConstruct
   private void initIntervals() {
     collectInterval =
@@ -94,14 +92,14 @@ public class OpenTelemetryConfig {
 
   // -- PRIVATE --
   private String getOTELEndpoint() {
-    this.environment.getActiveProfiles();
+    String endpoint =
+        environment.getProperty("telemetry.obas.endpoint", "https://telemetry/io/v1/metrics");
 
-    if (Arrays.asList(this.environment.getActiveProfiles()).contains("dev")) {
-      return "http://localhost:1010/v1/metrics";
+    if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+      endpoint = "http://localhost:1010/v1/metrics";
     }
 
-    String endpoint = env.getProperty("telemetry.obas.endpoint", "http://localhost:2222/staging");
-    log.info("---------- Using telemetry endpoint: " + endpoint);
+    log.info("Using telemetry endpoint: " + endpoint);
     return endpoint;
   }
 

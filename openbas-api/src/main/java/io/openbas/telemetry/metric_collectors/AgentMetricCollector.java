@@ -26,7 +26,7 @@ public class AgentMetricCollector {
 
   private final AtomicReference<Tuple> metrics = new AtomicReference<>(null);
   private volatile Instant lastFetchTime = Instant.MIN;
-  private List<Executor> executors = new ArrayList<>();
+  private Iterable<Executor> executors = new ArrayList<>();
 
   @PostConstruct
   public void init() {

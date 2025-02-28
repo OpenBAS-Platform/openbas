@@ -1,5 +1,7 @@
 package io.openbas.telemetry.metric_collectors;
 
+import io.openbas.injectors.caldera.CalderaContract;
+import io.openbas.injectors.openbas.OpenBASImplantContract;
 import jakarta.annotation.PostConstruct;
 import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,8 @@ public class ActionMetricCollector {
   private final AtomicLong simulationCreatedCount = new AtomicLong(0);
   private final AtomicLong atomicTestingCreatedCount = new AtomicLong(0);
   private final AtomicLong simulationPlayedCount = new AtomicLong(0);
-  private final AtomicLong injectWithPayloadPlayedCount = new AtomicLong(0);
-  private final AtomicLong injectWithoutPayloadPlayedCount = new AtomicLong(0);
+  private final AtomicLong injectsPlayedByAgentCount = new AtomicLong(0);
+  private final AtomicLong injectPlayedWithoutAgentsCount = new AtomicLong(0);
 
   @PostConstruct
   public void init() {
@@ -40,13 +42,13 @@ public class ActionMetricCollector {
         "Number of simulations played",
         () -> simulationPlayedCount.getAndSet(0));
     metricRegistry.registerGauge(
-        "inject_with_payload_played_count",
-        "Number of inject with payload played",
-        () -> injectWithPayloadPlayedCount.getAndSet(0));
+        "injects_played_requiring_agents_count",
+        "Number of injects played with agents required",
+        () -> injectsPlayedByAgentCount.getAndSet(0));
     metricRegistry.registerGauge(
-        "inject_without_payload_played_count",
-        "Number of inject without payload played",
-        () -> injectWithoutPayloadPlayedCount.getAndSet(0));
+        "injects_played_without_agents_count",
+        "Number of injects played without requiring agents",
+        () -> injectPlayedWithoutAgentsCount.getAndSet(0));
   }
 
   public void addScenarioCreatedCount() {
@@ -74,21 +76,22 @@ public class ActionMetricCollector {
     log.info("Increment Simulation Played Counter");
   }
 
-  private void addInjectWithPayloadPlayedCount() {
-    injectWithPayloadPlayedCount.incrementAndGet();
-    log.info("Increment Inject Played with payload Counter");
+  private void addInjectsPlayedByAgentCount() {
+    injectsPlayedByAgentCount.incrementAndGet();
+    log.info("Increment Inject Played by agents Counter");
   }
 
-  private void addInjectWithoutPayloadPlayedCount() {
-    injectWithoutPayloadPlayedCount.incrementAndGet();
-    log.info("Increment Inject Played without payload Counter");
+  private void addInjectPlayedWithoutAgentsCount() {
+    injectPlayedWithoutAgentsCount.incrementAndGet();
+    log.info("Increment Inject Played without agents Counter");
   }
 
-  public void addInjectPlayedCount(boolean hasPayload) {
-    if (hasPayload) {
-      addInjectWithPayloadPlayedCount();
+  public void addInjectPlayedCount(String injectorType) {
+    if (CalderaContract.TYPE.equals(injectorType)
+        || OpenBASImplantContract.TYPE.equals(injectorType)) {
+      addInjectsPlayedByAgentCount();
     } else {
-      addInjectWithoutPayloadPlayedCount();
+      addInjectPlayedWithoutAgentsCount();
     }
   }
 }

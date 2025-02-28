@@ -49,7 +49,7 @@ public class AgentService {
     return agentRepository.findByExternalReference(externalReference);
   }
 
-  public Tuple getAgentMetrics(List<Executor> agentExecutors) {
+  public Tuple getAgentMetrics(Iterable<Executor> agentExecutors) {
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
 

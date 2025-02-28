@@ -3,7 +3,6 @@ package io.openbas.executors;
 import static io.openbas.service.FileService.EXECUTORS_IMAGES_BASE_PATH;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import io.openbas.database.model.Executor;
 import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.service.FileService;
@@ -33,8 +32,8 @@ public class ExecutorService {
     this.executorRepository = executorRepository;
   }
 
-  public List<Executor> executors() {
-    return Lists.newArrayList(this.executorRepository.findAll());
+  public Iterable<Executor> executors() {
+    return this.executorRepository.findAll();
   }
 
   @Transactional
