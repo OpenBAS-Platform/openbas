@@ -25,7 +25,7 @@ public class ActionMetricCollector {
   @PostConstruct
   public void init() {
     metricRegistry.registerGauge(
-        "scenarios_created_count ",
+        "scenarios_created_count",
         "Number of scenarios created",
         () -> scenarioCreatedCount.getAndSet(0));
     metricRegistry.registerGauge(
