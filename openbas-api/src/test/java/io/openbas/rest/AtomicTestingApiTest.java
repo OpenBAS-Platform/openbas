@@ -193,6 +193,27 @@ public class AtomicTestingApiTest extends IntegrationTest {
         .andExpect(status().is2xxSuccessful());
   }
 
+  @Test
+  @DisplayName("Get the payload of an atomic testing")
+  @WithMockAdminUser
+  void findPayloadOutputByInjectId() throws Exception {
+    String response =
+        mvc.perform(
+                get(ATOMIC_TESTINGS_URI
+                        + "/"
+                        + INJECT_WITH_STATUS_AND_COMMAND_LINES.getId()
+                        + "/payload")
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    // -- ASSERT --
+    assertNotNull(response);
+    assertEquals(
+        INJECT_WITH_STATUS_AND_COMMAND_LINES.getId(), JsonPath.read(response, "$.inject_id"));
+  }
+
   @AfterAll
   void afterAll() {
     injectStatusRepository.deleteAll();
