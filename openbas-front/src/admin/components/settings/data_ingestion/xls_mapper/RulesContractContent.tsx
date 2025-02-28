@@ -17,17 +17,16 @@ import {
   Typography,
 } from '@mui/material';
 import { CogOutline, InformationOutline } from 'mdi-material-ui';
-import { useEffect, useState } from 'react';
-import * as React from 'react';
-import { Controller, FieldArrayWithId, useFieldArray, UseFieldArrayRemove, UseFormReturn } from 'react-hook-form';
+import { type FunctionComponent, useEffect, useState } from 'react';
+import { Controller, type FieldArrayWithId, useFieldArray, type UseFieldArrayRemove, type UseFormReturn } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
-import type { ContractElement, InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
+import { type ContractElement, type InjectorContractConverted } from '../../../../../actions/injector_contracts/InjectorContract';
 import { directFetchInjectorContract } from '../../../../../actions/InjectorContracts';
 import { useFormatter } from '../../../../../components/i18n';
 import InjectContractComponent from '../../../../../components/InjectContractComponent';
 import RegexComponent from '../../../../../components/RegexComponent';
-import type { ImportMapperAddInput } from '../../../../../utils/api-types';
+import { type ImportMapperAddInput } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles()(() => ({
   rulesArray: {
@@ -46,9 +45,7 @@ const useStyles = makeStyles()(() => ({
     color: 'rgb(244, 67, 54)',
     marginLeft: '2px',
   },
-  red: {
-    borderColor: 'rgb(244, 67, 54)',
-  },
+  red: { borderColor: 'rgb(244, 67, 54)' },
 }));
 
 interface Props {
@@ -58,7 +55,7 @@ interface Props {
   remove: UseFieldArrayRemove;
 }
 
-const RulesContractContent: React.FC<Props> = ({
+const RulesContractContent: FunctionComponent<Props> = ({
   field,
   methods,
   index,
@@ -126,9 +123,7 @@ const RulesContractContent: React.FC<Props> = ({
 
   useEffect(() => {
     if (methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)) {
-      directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: {
-        data: InjectorContractConverted;
-      }) => {
+      directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: { data: InjectorContractConverted }) => {
         const injectorContract = result.data;
         setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
         const tmp = injectorContract?.convertedContent?.fields
@@ -139,9 +134,7 @@ const RulesContractContent: React.FC<Props> = ({
   }, []);
 
   const onChangeInjectorContractId = () => {
-    directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: {
-      data: InjectorContractConverted;
-    }) => {
+    directFetchInjectorContract(methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_injector_contract`)).then((result: { data: InjectorContractConverted }) => {
       const injectorContract = result.data;
       setInjectorContractLabel(tPick(injectorContract.injector_contract_labels));
       const tmp = injectorContract?.convertedContent?.fields
@@ -161,7 +154,7 @@ const RulesContractContent: React.FC<Props> = ({
     setCurrentRuleIndex(null);
   };
 
-  const [openAlertDelete, setOpenAlertDelete] = React.useState(false);
+  const [openAlertDelete, setOpenAlertDelete] = useState(false);
 
   const handleClickOpenAlertDelete = () => {
     setOpenAlertDelete(true);
@@ -176,10 +169,11 @@ const RulesContractContent: React.FC<Props> = ({
       <Accordion
         key={field.id}
         variant="outlined"
-        style={{ width: '100%', marginBottom: '10px' }}
-        className={cx({
-          [classes.red]: !!errors.import_mapper_inject_importers?.[index],
-        })}
+        style={{
+          width: '100%',
+          marginBottom: '10px',
+        }}
+        className={cx({ [classes.red]: !!errors.import_mapper_inject_importers?.[index] })}
       >
         <AccordionSummary
           expandIcon={<ExpandMore />}
@@ -199,7 +193,12 @@ const RulesContractContent: React.FC<Props> = ({
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'end',
+            gap: '8px',
+          }}
+          >
             <TextField
               variant="standard"
               fullWidth
@@ -246,8 +245,8 @@ const RulesContractContent: React.FC<Props> = ({
                   color="secondary"
                   variant="dot"
                   invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`) || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
-                  && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
-                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
+                    && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.timePattern`)
+                      || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.timePattern?.length === 0)}
                 >
                   <CogOutline />
                 </Badge>
@@ -258,8 +257,8 @@ const RulesContractContent: React.FC<Props> = ({
                   color="secondary"
                   variant="dot"
                   invisible={(!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`) || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0)
-                  && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
-                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
+                    && (!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config.allTeamsValue`)
+                      || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_additional_config`)?.allTeamsValue?.length === 0)}
                 >
                   <CogOutline />
                 </Badge>
@@ -270,7 +269,7 @@ const RulesContractContent: React.FC<Props> = ({
                   color="secondary"
                   variant="dot"
                   invisible={!methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)
-                  || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
+                    || methods.getValues(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${rulesIndex}.rule_attribute_default_value`)?.length === 0}
                 >
                   <CogOutline />
                 </Badge>
@@ -286,7 +285,7 @@ const RulesContractContent: React.FC<Props> = ({
                   >
                     {t(ruleField.rule_attribute_name[0].toUpperCase() + ruleField.rule_attribute_name.slice(1))}
                     {isMandatoryField(ruleField.rule_attribute_name)
-                    && <span className={classes.redStar}>*</span>}
+                      && <span className={classes.redStar}>*</span>}
                   </Typography>
                   <Controller
                     control={control}
@@ -308,74 +307,84 @@ const RulesContractContent: React.FC<Props> = ({
                   </IconButton>
                 </div>
                 {currentRuleIndex !== null
-                && (
-                  <Dialog
-                    open
-                    PaperProps={{ elevation: 1 }}
-                    BackdropProps={{ style: { backgroundColor: 'transparent' } }}
-                    onClose={handleDefaultValueClose}
-                  >
-                    <DialogTitle>
-                      {t('Attribute mapping configuration')}
-                    </DialogTitle>
-                    <DialogContent>
-                      <TextField
-                        fullWidth
-                        label={t('Default value')}
-                        inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
-                      />
-                      {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'trigger_time')
-                      && (
-                        <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
-                          <TextField
-                            label={t('Time pattern')}
-                            fullWidth
-                            style={{ marginTop: 10 }}
-                            inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.timePattern`)}
-                          />
-                          <Tooltip
-                            title={t(
-                              'By default we accept iso date (YYYY-MM-DD hh:mm:ss[.mmm]TZD), but you can specify your own date format in ISO notation (for instance DD.MM.YYYY hh\'h\'mm)',
-                            )}
-                          >
-                            <InformationOutline
-                              fontSize="medium"
-                              color="primary"
-                              style={{ cursor: 'default' }}
-                            />
-                          </Tooltip>
-                        </div>
-                      )}
-                      {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'teams')
-                      && (
-                        <div style={{ display: 'flex', alignItems: 'end', gap: '8px' }}>
-                          <TextField
-                            label={t('All teams value')}
-                            fullWidth
-                            style={{ marginTop: 10 }}
-                            inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.allTeamsValue`)}
-                          />
-                          <Tooltip
-                            title={t(
-                              'Value that signifies all teams are targeted. A regex can be used.',
-                            )}
-                          >
-                            <InformationOutline
-                              fontSize="medium"
-                              color="primary"
-                              style={{ cursor: 'default' }}
-                            />
-                          </Tooltip>
-                        </div>
-                      )}
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={handleDefaultValueClose} autoFocus>
-                        {t('Close')}
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
-                )}
+                  && (
+                    <Dialog
+                      open
+                      PaperProps={{ elevation: 1 }}
+                      BackdropProps={{ style: { backgroundColor: 'transparent' } }}
+                      onClose={handleDefaultValueClose}
+                    >
+                      <DialogTitle>
+                        {t('Attribute mapping configuration')}
+                      </DialogTitle>
+                      <DialogContent>
+                        <TextField
+                          fullWidth
+                          label={t('Default value')}
+                          inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_default_value`)}
+                        />
+                        {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'trigger_time')
+                          && (
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'end',
+                              gap: '8px',
+                            }}
+                            >
+                              <TextField
+                                label={t('Time pattern')}
+                                fullWidth
+                                style={{ marginTop: 10 }}
+                                inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.timePattern`)}
+                              />
+                              <Tooltip
+                                title={t(
+                                  'By default we accept iso date (YYYY-MM-DD hh:mm:ss[.mmm]TZD), but you can specify your own date format in ISO notation (for instance DD.MM.YYYY hh\'h\'mm)',
+                                )}
+                              >
+                                <InformationOutline
+                                  fontSize="medium"
+                                  color="primary"
+                                  style={{ cursor: 'default' }}
+                                />
+                              </Tooltip>
+                            </div>
+                          )}
+                        {currentRuleIndex === rulesFields.findIndex(r => r.rule_attribute_name === 'teams')
+                          && (
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'end',
+                              gap: '8px',
+                            }}
+                            >
+                              <TextField
+                                label={t('All teams value')}
+                                fullWidth
+                                style={{ marginTop: 10 }}
+                                inputProps={methods.register(`import_mapper_inject_importers.${index}.inject_importer_rule_attributes.${currentRuleIndex}.rule_attribute_additional_config.allTeamsValue`)}
+                              />
+                              <Tooltip
+                                title={t(
+                                  'Value that signifies all teams are targeted. A regex can be used.',
+                                )}
+                              >
+                                <InformationOutline
+                                  fontSize="medium"
+                                  color="primary"
+                                  style={{ cursor: 'default' }}
+                                />
+                              </Tooltip>
+                            </div>
+                          )}
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleDefaultValueClose} autoFocus>
+                          {t('Close')}
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  )}
               </div>
             );
           })}

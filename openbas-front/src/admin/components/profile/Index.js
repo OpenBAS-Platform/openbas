@@ -73,7 +73,11 @@ const Index = () => {
   )(user);
   const userToken = tokens.length > 0 ? R.head(tokens) : undefined;
   return (
-    <div style={{ width: 800, margin: '0 auto' }}>
+    <div style={{
+      width: 800,
+      margin: '0 auto',
+    }}
+    >
       <Paper>
         <Typography variant="h1" style={{ marginBottom: 20 }}>
           {t('Profile')}

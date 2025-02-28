@@ -1,17 +1,16 @@
 import { AttachmentOutlined, ControlPointOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
-import { CSSProperties, useEffect, useState } from 'react';
-import * as React from 'react';
+import { type CSSProperties, type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../actions/Document';
-import type { DocumentHelper } from '../../actions/helper';
+import { type DocumentHelper } from '../../actions/helper';
 import DocumentType from '../../admin/components/components/documents/DocumentType';
 import { useHelper } from '../../store';
-import type { RawDocument } from '../../utils/api-types';
+import { type RawDocument } from '../../utils/api-types';
 import { useAppDispatch } from '../../utils/hooks';
 import useDataLoader from '../../utils/hooks/useDataLoader';
-import ButtonPopover, { PopoverEntry } from '../common/ButtonPopover';
+import ButtonPopover, { type PopoverEntry } from '../common/ButtonPopover';
 import { useFormatter } from '../i18n';
 import ItemTags from '../ItemTags';
 import FileTransferDialog from './FileTransferDialog';
@@ -25,9 +24,7 @@ const useStyles = makeStyles()(theme => ({
     'paddingLeft': 10,
     'height': 50,
     'cursor': 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action?.hover,
-    },
+    '&:hover': { backgroundColor: theme.palette.action?.hover },
   },
   text: {
     fontSize: 15,
@@ -41,17 +38,13 @@ const useStyles = makeStyles()(theme => ({
     marginTop: 20,
     marginBottom: 5,
   },
-  errorText: {
-    color: theme.palette.error.main,
-  },
+  errorText: { color: theme.palette.error.main },
   errorMessage: {
     color: theme.palette.error.main,
     fontSize: '0.75rem',
     marginTop: 4,
   },
-  errorDivider: {
-    borderColor: theme.palette.error.main,
-  },
+  errorDivider: { borderColor: theme.palette.error.main },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
@@ -79,17 +72,23 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  initialValue?: { id?: string; label?: string };
+  initialValue?: {
+    id?: string;
+    label?: string;
+  };
   extensions?: string[];
   label: string;
   name: string;
-  setFieldValue: (field: string, value: { id?: string; label?: string } | undefined) => void;
+  setFieldValue: (field: string, value: {
+    id?: string;
+    label?: string;
+  } | undefined) => void;
   /* For mandatory fields */
   InputLabelProps?: { required: boolean };
   error?: boolean;
 }
 
-const FileLoader: React.FC<Props> = ({
+const FileLoader: FunctionComponent<Props> = ({
   initialValue,
   extensions = [],
   label,
@@ -108,11 +107,7 @@ const FileLoader: React.FC<Props> = ({
   const [firstInteraction, setFirstInteraction] = useState(false);
 
   // Fetching data
-  const { documents }: {
-    documents: [RawDocument];
-  } = useHelper((helper: DocumentHelper) => ({
-    documents: helper.getDocuments(),
-  }));
+  const { documents }: { documents: [RawDocument] } = useHelper((helper: DocumentHelper) => ({ documents: helper.getDocuments() }));
   useDataLoader(() => {
     dispatch(fetchDocuments());
   });
@@ -129,7 +124,10 @@ const FileLoader: React.FC<Props> = ({
   useEffect(() => {
     if (firstInteraction) {
       if (selectedDocument) {
-        setFieldValue(name, { id: selectedDocument.document_id, label: selectedDocument.document_name });
+        setFieldValue(name, {
+          id: selectedDocument.document_id,
+          label: selectedDocument.document_name,
+        });
       } else {
         setFieldValue(name, undefined);
       }
@@ -156,9 +154,18 @@ const FileLoader: React.FC<Props> = ({
 
   // Button Popover entries
   const entries: PopoverEntry[] = [
-    { label: 'Update', action: handleOpen },
-    { label: 'Remove', action: handleRemove },
-    { label: 'Download', action: () => handleDownload(selectedDocument?.document_id) },
+    {
+      label: 'Update',
+      action: handleOpen,
+    },
+    {
+      label: 'Remove',
+      action: handleRemove,
+    },
+    {
+      label: 'Download',
+      action: () => handleDownload(selectedDocument?.document_id),
+    },
   ];
 
   return (
@@ -169,7 +176,11 @@ const FileLoader: React.FC<Props> = ({
         {label}
         {InputLabelProps?.required && <span className={error ? classes.errorText : ''}> *</span>}
       </Typography>
-      <List style={{ marginTop: 0, paddingTop: 0 }}>
+      <List style={{
+        marginTop: 0,
+        paddingTop: 0,
+      }}
+      >
         {!selectedDocument && (
           <ListItem
             className={`${classes.item} ${InputLabelProps?.required && error ? classes.errorDivider : ''}`}

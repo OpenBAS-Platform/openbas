@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Endpoint;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -18,15 +19,30 @@ public interface EndpointRepository
         JpaSpecificationExecutor<Endpoint> {
 
   @Query(
-      value = "select e.* from assets e where e.endpoint_hostname = :hostname",
+      value =
+          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_platform = :platform and e.endpoint_arch = :arch",
       nativeQuery = true)
-  List<Endpoint> findByHostname(@NotBlank final @Param("hostname") String hostname);
+  List<Endpoint> findByHostnameArchAndPlatform(
+      @NotBlank final @Param("hostname") String hostname,
+      @NotBlank final @Param("platform") String platform,
+      @NotBlank final @Param("arch") String arch);
 
   @Query(
       value =
-          "select e.* from assets e left join agents a on e.asset_id = a.agent_asset where a.agent_external_reference = :externalReference",
+          "select e.* from assets e where e.endpoint_hostname = :hostname and e.endpoint_platform = :platform and e.endpoint_arch = :arch and e.endpoint_ips && cast(:ips as text[])",
       nativeQuery = true)
-  Optional<Endpoint> findByExternalReference(@Param("externalReference") String externalReference);
+  List<Endpoint> findByHostnameAndAtleastOneIp(
+      @NotBlank final @Param("hostname") String hostname,
+      @NotBlank final @Param("platform") String platform,
+      @NotBlank final @Param("arch") String arch,
+      @NotNull final @Param("ips") String[] ips);
+
+  @Query(
+      value =
+          "select e.* from assets e where e.endpoint_mac_addresses && cast(:macAddresses as text[])",
+      nativeQuery = true)
+  Optional<Endpoint> findByAtleastOneMacAddress(
+      @NotNull final @Param("macAddresses") String[] macAddresses);
 
   @Override
   @Query(
@@ -42,13 +58,13 @@ public interface EndpointRepository
   @Query("select count(distinct e) from Endpoint e where e.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
 
-  /* For some agents (e.g. Caldera), we have the behavior that secondary agents are created to run the implants, so with this query we only get the first level of the agent and not the secondary ones*/ @Query(
-      value =
-          "select asset.* from assets asset "
-              + "left join agents agent on asset.asset_id = agent.agent_asset "
-              + "where agent.agent_parent is null "
-              + "AND agent.agent_inject is null "
-              + "AND asset.asset_id = :endpointId",
-      nativeQuery = true)
-  Optional<Endpoint> findByEndpointIdWithFirstLevelOfAgents(@NotBlank String endpointId);
+  @Query(
+      "SELECT a FROM Inject i"
+          + " JOIN i.assets a"
+          + " WHERE ("
+          + "   :simulationOrScenarioId is NULL AND i.exercise.id is NULL AND i.scenario.id IS NULL"
+          + "   OR (i.exercise.id = :simulationOrScenarioId"
+          + "   OR i.scenario.id = :simulationOrScenarioId)"
+          + " ) AND (:name IS NULL OR lower(a.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
+  List<Endpoint> findAllBySimulationOrScenarioIdAndName(String simulationOrScenarioId, String name);
 }

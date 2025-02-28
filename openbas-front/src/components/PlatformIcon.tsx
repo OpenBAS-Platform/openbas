@@ -1,6 +1,6 @@
-import { PaletteMode, Tooltip } from '@mui/material';
+import { type PaletteMode, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 
 import browserDark from '../static/images/platforms/browser-dark.png';
 import browserLight from '../static/images/platforms/browser-light.png';
@@ -22,24 +22,55 @@ interface PlatformIconProps {
   width?: number;
   borderRadius?: number;
   tooltip?: boolean;
-  marginRight?: number;
+  marginRight?: string;
 }
 
 const platformIcons: Record<PlatformIconProps['platform'], Record<PaletteMode, string>> = {
-  Windows: { dark: windowsDark, light: windowsLight },
-  Linux: { dark: linuxDark, light: linuxLight },
-  MacOS: { dark: macosDark, light: macosLight },
-  Browser: { dark: browserDark, light: browserLight },
-  Service: { dark: serviceDark, light: serviceLight },
-  Internal: { dark: internalDark, light: internalLight },
-  Unknown: { dark: unknownDark, light: unknownLight },
+  Windows: {
+    dark: windowsDark,
+    light: windowsLight,
+  },
+  Linux: {
+    dark: linuxDark,
+    light: linuxLight,
+  },
+  MacOS: {
+    dark: macosDark,
+    light: macosLight,
+  },
+  Browser: {
+    dark: browserDark,
+    light: browserLight,
+  },
+  Service: {
+    dark: serviceDark,
+    light: serviceLight,
+  },
+  Internal: {
+    dark: internalDark,
+    light: internalLight,
+  },
+  Unknown: {
+    dark: unknownDark,
+    light: unknownLight,
+  },
 };
 
-const renderIcon = (platform: string, width: number | undefined = 40, borderRadius: number | undefined = 0, marginRight: number | undefined = 0) => {
+const renderIcon = (platform: string, width: number | undefined = 40, borderRadius: number | undefined = 0, marginRight: string | undefined = '') => {
   const theme = useTheme();
   const { mode } = theme.palette;
   const src = platformIcons[platform]?.[mode] || platformIcons.Unknown[mode];
-  return <img style={{ width, borderRadius, marginRight }} src={src} alt={platform} />;
+  return (
+    <img
+      style={{
+        width,
+        borderRadius,
+        marginRight,
+      }}
+      src={src}
+      alt={platform}
+    />
+  );
 };
 const PlatformIcon: FunctionComponent<PlatformIconProps> = ({ platform, width, borderRadius, marginRight, tooltip = false }) => {
   if (tooltip) {

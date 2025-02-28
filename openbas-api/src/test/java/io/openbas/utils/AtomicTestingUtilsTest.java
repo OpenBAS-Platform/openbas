@@ -48,7 +48,14 @@ class AtomicTestingUtilsTest {
     // -- EXECUTE --
     List<InjectTargetWithResult> result =
         AtomicTestingUtils.getTargetsWithResultsFromRaw(
-            emptyList(), injectAssets, emptyMap(), emptyMap(), assets, assetGroups, emptyMap());
+            emptyList(),
+            injectAssets,
+            emptyMap(),
+            emptyMap(),
+            emptyMap(),
+            assets,
+            emptyMap(),
+            assetGroups);
 
     // -- ASSERT --
     assertEquals(3, result.size(), "The result should contain three targets");

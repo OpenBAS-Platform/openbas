@@ -1,13 +1,11 @@
 import { type Edge, type Node, useNodesInitialized, useReactFlow, useStore } from '@xyflow/react';
 import { useEffect } from 'react';
 
-import type { InjectExpectationsStore } from '../../admin/components/common/injects/expectations/Expectation';
+import { type InjectExpectationsStore } from '../../admin/components/common/injects/expectations/Expectation';
 import layoutAlgorithms, { type LayoutAlgorithmOptions } from './algorithms';
 import { getSourceHandlePosition, getTargetHandlePosition } from './utils';
 
-export type LayoutOptions = {
-  algorithm: keyof typeof layoutAlgorithms;
-} & LayoutAlgorithmOptions;
+export type LayoutOptions = { algorithm: keyof typeof layoutAlgorithms } & LayoutAlgorithmOptions;
 
 function useAutoLayout(options: LayoutOptions, targetResults: InjectExpectationsStore[]) {
   const { getNodes, getEdges, setNodes, setEdges } = useReactFlow();
@@ -46,12 +44,18 @@ function useAutoLayout(options: LayoutOptions, targetResults: InjectExpectations
       // Mutating the nodes and edges directly here is fine because we expect our
       // layouting algorithms to return a new array of nodes/edges.
       for (const node of nextNodes) {
-        node.style = { ...node.style, opacity: 1 };
+        node.style = {
+          ...node.style,
+          opacity: 1,
+        };
         node.sourcePosition = getSourceHandlePosition(options.direction);
         node.targetPosition = getTargetHandlePosition(options.direction);
       }
       for (const edge of edges) {
-        edge.style = { ...edge.style, opacity: 1 };
+        edge.style = {
+          ...edge.style,
+          opacity: 1,
+        };
       }
       setNodes(nextNodes);
       setEdges(nextEdges);

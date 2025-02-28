@@ -1,11 +1,12 @@
 import { Checkbox, Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
-import { CSSProperties, FunctionComponent, useContext, useMemo, useState } from 'react';
-import * as React from 'react';
+import { type CSSProperties, type FunctionComponent, type SyntheticEvent, useContext, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { InjectorContractConvertedContent, InjectOutputType, InjectStore } from '../../../../actions/injects/Inject';
+import { type InjectorContractConvertedContent, type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
+import { exportInjectSearch } from '../../../../actions/injects/inject-action';
 import ChainedTimeline from '../../../../components/ChainedTimeline';
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { buildEmptyFilter } from '../../../../components/common/queryable/filter/FilterUtils';
@@ -19,19 +20,20 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import type {
-  Article,
-  FilterGroup,
-  Inject,
-  InjectBulkUpdateOperation,
-  InjectTestStatusOutput,
-  Team,
-  Variable,
+import {
+  type Article,
+  type FilterGroup,
+  type Inject,
+  type InjectBulkUpdateOperation, type InjectExportFromSearchRequestInput,
+  type InjectInput,
+  type InjectTestStatusOutput,
+  type Team,
+  type Variable,
 } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import useEntityToggle from '../../../../utils/hooks/useEntityToggle';
 import { splitDuration } from '../../../../utils/Time';
-import { isNotEmptyField } from '../../../../utils/utils';
+import { download, isNotEmptyField } from '../../../../utils/utils';
 import { InjectContext, PermissionsContext, ViewModeContext } from '../Context';
 import ToolBar from '../ToolBar';
 import CreateInject from './CreateInject';
@@ -58,15 +60,9 @@ const useStyles = makeStyles()(() => ({
     color: '#00b1ff',
     border: '1px solid #00b1ff',
   },
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+  bodyItems: { display: 'flex' },
   bodyItem: {
     height: 20,
     fontSize: 13,
@@ -78,24 +74,12 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  inject_type: {
-    width: '15%',
-  },
-  inject_title: {
-    width: '25%',
-  },
-  inject_depends_duration: {
-    width: '18%',
-  },
-  inject_platforms: {
-    width: '10%',
-  },
-  inject_enabled: {
-    width: '12%',
-  },
-  inject_tags: {
-    width: '20%',
-  },
+  inject_type: { width: '15%' },
+  inject_title: { width: '25%' },
+  inject_depends_duration: { width: '18%' },
+  inject_platforms: { width: '10%' },
+  inject_enabled: { width: '12%' },
+  inject_tags: { width: '20%' },
 };
 
 interface Props {
@@ -126,6 +110,7 @@ const Injects: FunctionComponent<Props> = ({
   // Standard hooks
   const { classes } = useStyles();
   const { t, tPick } = useFormatter();
+  const theme = useTheme();
   const injectContext = useContext(InjectContext);
   const viewModeContext = useContext(ViewModeContext);
   const { permissions } = useContext(PermissionsContext);
@@ -187,7 +172,7 @@ const Injects: FunctionComponent<Props> = ({
                   key={platform}
                   width={20}
                   platform={platform}
-                  marginRight={10}
+                  marginRight={theme.spacing(2)}
                 />
               ),
             )
@@ -232,6 +217,9 @@ const Injects: FunctionComponent<Props> = ({
     'inject_injector_contract',
     'inject_type',
     'inject_title',
+    'inject_assets',
+    'inject_asset_groups',
+    'inject_teams',
   ];
 
   const quickFilter: FilterGroup = {
@@ -258,7 +246,10 @@ const Injects: FunctionComponent<Props> = ({
   const [reloadInjectCount, setReloadInjectCount] = useState(0);
 
   // Optimistic update
-  const onCreate = (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+  const onCreate = (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => {
     if (result.entities) {
       const created = result.entities.injects[result.result];
       setInjects([created as InjectOutputType, ...injects]);
@@ -266,7 +257,10 @@ const Injects: FunctionComponent<Props> = ({
     }
   };
 
-  const onUpdate = (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+  const onUpdate = (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => {
     if (result.entities) {
       const updatedResults = result.entities.injects[result.result];
       setInjects(injects.map(i => i.inject_id !== updatedResults.inject_id ? i : updatedResults as InjectOutputType));
@@ -286,15 +280,21 @@ const Injects: FunctionComponent<Props> = ({
     }
   };
 
-  const onCreateInject = async (data: Inject) => {
-    await injectContext.onAddInject(data).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+  const onCreateInject = async (data: InjectInput) => {
+    await injectContext.onAddInject(data as Inject).then((result: {
+      result: string;
+      entities: { injects: Record<string, InjectStore> };
+    }) => {
       onCreate(result);
     });
   };
 
   const onUpdateInject = async (data: Inject) => {
     if (selectedInjectId) {
-      await injectContext.onUpdateInject(selectedInjectId, data).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+      await injectContext.onUpdateInject(selectedInjectId, data).then((result: {
+        result: string;
+        entities: { injects: Record<string, InjectStore> };
+      }) => {
         onUpdate(result);
         return result;
       });
@@ -304,7 +304,10 @@ const Injects: FunctionComponent<Props> = ({
   const massUpdateInject = async (data: Inject[]) => {
     const promises: Promise<InjectStore | undefined>[] = [];
     data.forEach((inject) => {
-      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+      promises.push(injectContext.onUpdateInject(inject.inject_id, inject).then((result: {
+        result: string;
+        entities: { injects: Record<string, InjectStore> };
+      }) => {
         if (result.entities) {
           return result.entities.injects[result.result];
         }
@@ -324,19 +327,11 @@ const Injects: FunctionComponent<Props> = ({
   };
 
   const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
-  const [presetCreationValues, setPresetCreationValues] = useState<{
-    inject_depends_duration_days?: number;
-    inject_depends_duration_hours?: number;
-    inject_depends_duration_minutes?: number;
-  }>();
 
-  const openCreateInjectDrawer = (data: {
-    inject_depends_duration_days?: number;
-    inject_depends_duration_hours?: number;
-    inject_depends_duration_minutes?: number;
-  }) => {
+  const [presetInjectDuration, setPresetInjectDuration] = useState<number>(0);
+  const openCreateInjectDrawer = (duration: number) => {
     setOpenCreateDrawer(true);
-    setPresetCreationValues(data);
+    setPresetInjectDuration(duration);
   };
 
   // Toolbar
@@ -349,7 +344,7 @@ const Injects: FunctionComponent<Props> = ({
     onToggleEntity,
     numberOfSelectedElements,
   } = useEntityToggle<InjectOutputType>('inject', injects, queryableHelpers.paginationHelpers.getTotalElements());
-  const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: React.SyntheticEvent | null = null) => {
+  const onRowShiftClick = (currentIndex: number, currentEntity: { inject_id: string }, event: SyntheticEvent | null = null) => {
     if (event) {
       event.stopPropagation();
       event.preventDefault();
@@ -461,26 +456,44 @@ const Injects: FunctionComponent<Props> = ({
       inject_ids_to_process: selectAll ? undefined : testIds,
       inject_ids_to_ignore: ignoreIds,
       simulation_or_scenario_id: exerciseOrScenarioId,
-    }).then((result: { uri: string; data: InjectTestStatusOutput[] }) => {
+    }).then((result: {
+      uri: string;
+      data: InjectTestStatusOutput[];
+    }) => {
       if (numberOfSelectedElements === 1) {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
-          itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link>,
-        }));
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${result.uri}/${result.data[0].status_id}`}>{t('its dedicated page')}</Link> }));
       } else {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
-          itsDedicatedPage: <Link to={`${result.uri}`}>{t('its dedicated page')}</Link>,
-        }));
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`${result.uri}`}>{t('its dedicated page')}</Link> }));
       }
     }).finally(() => {
       setIsBulkLoading(false);
     });
   };
 
-  const selectedInjects = () => {
-    return Object.values(selectedElements);
+  const handleExport = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
+    setIsBulkLoading(true);
+    const testIds = injectIdsToProcess(selectAll);
+    const ignoreIds = injectIdsToIgnore(selectAll);
+    const data: InjectExportFromSearchRequestInput = {
+      search_pagination_input: selectAll ? searchPaginationInput : undefined,
+      inject_ids_to_process: selectAll ? undefined : testIds,
+      inject_ids_to_ignore: ignoreIds,
+      simulation_or_scenario_id: exerciseOrScenarioId,
+      options: {
+        with_players: withPlayers,
+        with_teams: withTeams,
+        with_variable_values: withVariableValues,
+      },
+    };
+    exportInjectSearch(data).then((result) => {
+      const contentDisposition = result.headers['content-disposition'];
+      const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
+      const filename = match[1];
+      download(result.data, filename, result.headers['content-type']);
+    }).finally(() => {
+      setIsBulkLoading(false);
+    });
   };
-
-  const atLeastOneValidInject = injects.some(inject => !inject.inject_injector_contract?.injector_contract_content_parsed);
 
   if (isBulkLoading) {
     return <Loader />;
@@ -497,13 +510,12 @@ const Injects: FunctionComponent<Props> = ({
         reloadContentCount={reloadInjectCount}
         topBarButtons={(
           <InjectsListButtons
-            selectedInjects={selectedInjects()}
             availableButtons={availableButtons}
             setViewMode={setViewMode}
             onImportedInjects={() => setReloadInjectCount(prev => prev + 1)}
-            isAtLeastOneValidInject={atLeastOneValidInject}
           />
         )}
+        contextId={exerciseOrScenarioId}
       />
       {viewModeContext === 'chain' && (
         <div style={{ marginBottom: 10 }}>
@@ -512,7 +524,7 @@ const Injects: FunctionComponent<Props> = ({
               injects={injects}
               exerciseOrScenarioId={exerciseOrScenarioId}
               onUpdateInject={massUpdateInject}
-              openCreateInjectDrawer={openCreateInjectDrawer}
+              onTimelineClick={openCreateInjectDrawer}
               onSelectedInject={(inject) => {
                 const injectContract = inject?.inject_injector_contract.convertedContent;
                 const isContractExposed = injectContract?.config.expose;
@@ -641,27 +653,27 @@ const Injects: FunctionComponent<Props> = ({
       {permissions.canWrite && (
         <>
           {selectedInjectId !== null
-          && (
-            <UpdateInject
-              open
-              handleClose={() => setSelectedInjectId(null)}
-              onUpdateInject={onUpdateInject}
-              massUpdateInject={massUpdateInject}
-              injectId={selectedInjectId}
-              // @ts-expect-error typing
-              articlesFromExerciseOrScenario={articles}
-              variablesFromExerciseOrScenario={variables}
-              exerciseOrScenarioId={exerciseOrScenarioId}
-              uriVariable={uriVariable}
-              allUsersNumber={allUsersNumber}
-              usersNumber={usersNumber}
-              teamsUsers={teamsUsers}
-              injects={injects}
-            />
-          )}
+            && (
+              <UpdateInject
+                open
+                handleClose={() => setSelectedInjectId(null)}
+                onUpdateInject={onUpdateInject}
+                massUpdateInject={massUpdateInject}
+                injectId={selectedInjectId}
+                // @ts-expect-error typing
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                exerciseOrScenarioId={exerciseOrScenarioId}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+                injects={injects}
+              />
+            )}
           <ButtonCreate onClick={() => {
             setOpenCreateDrawer(true);
-            setPresetCreationValues(undefined);
+            setPresetInjectDuration(0);
           }}
           />
           <ToolBar
@@ -676,13 +688,14 @@ const Injects: FunctionComponent<Props> = ({
             handleUpdate={massUpdateInjects}
             handleBulkDelete={bulkDeleteInjects}
             handleBulkTest={massTestInjects}
+            handleExport={handleExport}
           />
           <CreateInject
             title={t('Create a new inject')}
             open={openCreateDrawer}
             handleClose={() => setOpenCreateDrawer(false)}
             onCreateInject={onCreateInject}
-            presetValues={presetCreationValues}
+            presetInjectDuration={presetInjectDuration}
             // @ts-expect-error typing
             teamsFromExerciseOrScenario={teams}
             articlesFromExerciseOrScenario={articles}

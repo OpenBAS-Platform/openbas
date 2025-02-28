@@ -9,6 +9,7 @@ import { fetchChallenges } from '../../../../actions/Challenge';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchExercises } from '../../../../actions/Exercise';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
+import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -41,10 +42,6 @@ const useStyles = makeStyles()(() => ({
     paddingLeft: 10,
     height: 50,
   },
-  bodyItem: {
-    height: '100%',
-    fontSize: 13,
-  },
   exercise: {
     fontSize: 12,
     height: 20,
@@ -62,81 +59,43 @@ const headerStyles = {
     top: '0px',
   },
   challenge_name: {
-    float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
   challenge_category: {
-    float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   challenge_score: {
-    float: 'left',
     width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   challenge_exercises: {
-    float: 'left',
     width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   challenge_tags: {
-    float: 'left',
     fontSize: 12,
     fontWeight: '700',
   },
 };
 
 const inlineStyles = {
-  challenge_name: {
-    float: 'left',
-    width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  challenge_category: {
-    float: 'left',
-    width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  challenge_score: {
-    float: 'left',
-    width: '10%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  challenge_exercises: {
-    float: 'left',
-    width: '20%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  challenge_tags: {
-    float: 'left',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
+  challenge_name: { width: '25%' },
+  challenge_category: { width: '20%' },
+  challenge_score: { width: '10%' },
+  challenge_exercises: { width: '20%' },
+  challenge_tags: { height: 20 },
 };
 
 const Challenges = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
 
@@ -157,7 +116,13 @@ const Challenges = () => {
   const sortedChallenges = filtering.filterAndSort(challenges);
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Components') }, { label: t('Challenges'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{ label: t('Components') }, {
+          label: t('Challenges'),
+          current: true,
+        }]}
+      />
       <div className={classes.parameters}>
         <div className={classes.filters}>
           <SearchFilter
@@ -182,14 +147,18 @@ const Challenges = () => {
         >
           <ListItemIcon>
             <span
-              style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
             >
               &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
             primary={(
-              <div>
+              <div style={bodyItemsStyles.bodyItems}>
                 {filtering.buildHeader(
                   'challenge_name',
                   'Name',
@@ -240,28 +209,36 @@ const Challenges = () => {
               </ListItemIcon>
               <ListItemText
                 primary={(
-                  <div>
+                  <div style={bodyItemsStyles.bodyItems}>
                     <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.challenge_name}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_name,
+                      }}
                     >
                       {challenge.challenge_name}
                     </div>
                     <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.challenge_category}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_category,
+                      }}
                     >
                       {challenge.challenge_category}
                     </div>
                     <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.challenge_score}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_score,
+                      }}
                     >
                       {challenge.challenge_score}
                     </div>
                     <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.challenge_exercises}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_exercises,
+                      }}
                     >
                       {R.take(3, challenge.challenge_exercises).map((e) => {
                         const exercise = exercisesMap[e] || {};
@@ -284,8 +261,10 @@ const Challenges = () => {
                       })}
                     </div>
                     <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.challenge_tags}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles.challenge_tags,
+                      }}
                     >
                       <ItemTags
                         variant="list"

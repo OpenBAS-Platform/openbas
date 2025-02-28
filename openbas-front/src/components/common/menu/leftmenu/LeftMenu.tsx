@@ -11,9 +11,7 @@ import MenuItemSingle from './MenuItemSingle';
 import MenuItemToggle from './MenuItemToggle';
 import useLeftMenu from './useLeftMenu';
 
-const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
-  entries = [],
-}) => {
+const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries = [] }) => {
   // Standard hooks
   const theme = useTheme();
   const { settings } = useAuth();
@@ -46,21 +44,21 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({
               {idxList !== 0 && <Divider />}
               <MenuList component="nav">
                 {(entry.userRight ?? true)
-                && entry.items.map((item) => {
-                  if (hasHref(item)) {
+                  && entry.items.map((item) => {
+                    if (hasHref(item)) {
+                      return (
+                        <MenuItemGroup
+                          key={item.label}
+                          item={item}
+                          state={state}
+                          helpers={helpers}
+                        />
+                      );
+                    }
                     return (
-                      <MenuItemGroup
-                        key={item.label}
-                        item={item}
-                        state={state}
-                        helpers={helpers}
-                      />
+                      <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
                     );
-                  }
-                  return (
-                    <MenuItemSingle key={item.label} item={item} navOpen={state.navOpen} />
-                  );
-                })}
+                  })}
               </MenuList>
             </Fragment>
           );

@@ -1,5 +1,8 @@
 package io.openbas.utils.fixtures;
 
+import static io.openbas.database.model.InjectorContract.CONTACT_CONTENT_FIELDS;
+import static io.openbas.utils.fixtures.InjectorFixture.createDefaultPayloadInjector;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,11 +12,19 @@ import io.openbas.database.model.Payload;
 import io.openbas.injector_contract.ContractCardinality;
 import io.openbas.injector_contract.fields.ContractSelect;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.SneakyThrows;
 
 public class InjectorContractFixture {
+
+  private static ObjectNode createDefaultContent(ObjectMapper objectMapper) {
+    ObjectNode node = objectMapper.createObjectNode();
+    node.set(CONTACT_CONTENT_FIELDS, objectMapper.valueToTree(new ArrayList<>()));
+    return node;
+  }
 
   private static InjectorContract createPayloadInjectorContractInternal(
       Injector injector, Payload payloadCommand, List<ContractSelect> customContent)
@@ -24,12 +35,25 @@ public class InjectorContractFixture {
     injectorContract.setId(UUID.randomUUID().toString());
 
     ObjectMapper objectMapper = new ObjectMapper();
-    ObjectNode content = objectMapper.createObjectNode();
-    content.set("fields", objectMapper.valueToTree(customContent));
+    ObjectNode content = createDefaultContent(objectMapper);
+    content.set(CONTACT_CONTENT_FIELDS, objectMapper.valueToTree(customContent));
 
     injectorContract.setContent(objectMapper.writeValueAsString(content));
     injectorContract.setConvertedContent(content);
 
+    return injectorContract;
+  }
+
+  @SneakyThrows
+  public static InjectorContract createDefaultInjectorContract() {
+    InjectorContract injectorContract = new InjectorContract();
+    injectorContract.setInjector(createDefaultPayloadInjector());
+    injectorContract.setId(UUID.randomUUID().toString());
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectNode content = createDefaultContent(objectMapper);
+    injectorContract.setContent(objectMapper.writeValueAsString(content));
+    injectorContract.setConvertedContent(content);
     return injectorContract;
   }
 
@@ -48,15 +72,22 @@ public class InjectorContractFixture {
         injector, payloadCommand, List.of(obfuscatorSelect));
   }
 
-  public static InjectorContract createInjectorContract(
-      Map<String, String> labels, String content) {
+  public static InjectorContract createInjectorContract(Map<String, String> labels, String content)
+      throws JsonProcessingException {
     InjectorContract injectorContract = new InjectorContract();
     injectorContract.setId(UUID.randomUUID().toString());
     injectorContract.setLabels(labels);
     injectorContract.setContent(content);
+    injectorContract.setConvertedContent(new ObjectMapper().readValue(content, ObjectNode.class));
     injectorContract.setAtomicTesting(true);
     injectorContract.setCreatedAt(Instant.now());
     injectorContract.setUpdatedAt(Instant.now());
     return injectorContract;
+  }
+
+  public static InjectorContract createInjectorContract(Map<String, String> labels)
+      throws JsonProcessingException {
+    String content = "{\"fields\": []}";
+    return createInjectorContract(labels, content);
   }
 }

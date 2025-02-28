@@ -1,11 +1,11 @@
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { storeXlsFile } from '../../../../../actions/mapper/mapper-actions';
 import Dialog from '../../../../../components/common/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
-import type { ImportMapperAddInput, ImportPostSummary } from '../../../../../utils/api-types';
+import { type ImportMapperAddInput, type ImportPostSummary } from '../../../../../utils/api-types';
+import ImportFileSelector from '../../../common/injects/ImportFileSelector';
 import ImportUploaderInjectFromInjectsTest from '../../../common/injects/ImportUploaderInjectFromInjectsTest';
-import ImportUploaderInjectFromXlsFile from '../../../common/injects/ImportUploaderInjectFromXlsFile';
 
 interface IngestionCsvMapperTestDialogProps {
   open: boolean;
@@ -47,21 +47,24 @@ const XlsMapperTestDialog: FunctionComponent<IngestionCsvMapperTestDialogProps> 
     >
       <>
         {importId === null
-        && (
-          <ImportUploaderInjectFromXlsFile
-            handleClose={handleClose}
-            handleSubmit={onSubmitImportFile}
-          />
-        )}
+          && (
+            <ImportFileSelector
+              label={t('Your file should be a XLS')}
+              mimeTypes="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              submitActionLabel={t('Next')}
+              handleClose={handleClose}
+              handleSubmit={onSubmitImportFile}
+            />
+          )}
         {importId !== null
-        && (
-          <ImportUploaderInjectFromInjectsTest
-            importId={importId}
-            sheets={sheets}
-            importMapperValues={importMapperValues}
-            handleClose={handleClose}
-          />
-        )}
+          && (
+            <ImportUploaderInjectFromInjectsTest
+              importId={importId}
+              sheets={sheets}
+              importMapperValues={importMapperValues}
+              handleClose={handleClose}
+            />
+          )}
       </>
     </Dialog>
   );

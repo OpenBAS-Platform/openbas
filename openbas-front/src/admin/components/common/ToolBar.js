@@ -5,7 +5,7 @@ import {
   ClearOutlined,
   CloseOutlined,
   DeleteOutlined,
-  DevicesOtherOutlined,
+  DevicesOtherOutlined, FileDownloadOutlined,
   ForwardToInbox,
   GroupsOutlined,
 } from '@mui/icons-material';
@@ -37,6 +37,7 @@ import { fetchEndpoints } from '../../../actions/assets/endpoint-actions';
 import { storeHelper } from '../../../actions/Schema';
 import DialogDelete from '../../../components/common/DialogDelete';
 import DialogTest from '../../../components/common/DialogTest';
+import ExportOptionsDialog from '../../../components/common/export/ExportOptionsDialog.js';
 import inject18n from '../../../components/i18n';
 import { MESSAGING$ } from '../../../utils/Environment';
 
@@ -86,29 +87,19 @@ const styles = theme => ({
     marginTop: 20,
     textAlign: 'right',
   },
-  button: {
-    marginLeft: theme.spacing(2),
-  },
+  button: { marginLeft: theme.spacing(2) },
   buttonAdd: {
     width: '100%',
     height: 20,
   },
-  container: {
-    padding: '10px 20px 20px 20px',
-  },
-  aliases: {
-    margin: '0 7px 7px 0',
-  },
+  container: { padding: '10px 20px 20px 20px' },
+  aliases: { margin: '0 7px 7px 0' },
   title: {
     flex: '1 1 100%',
     fontSize: '12px',
   },
-  chipValue: {
-    margin: 0,
-  },
-  filter: {
-    margin: '5px 10px 5px 0',
-  },
+  chipValue: { margin: 0 },
+  filter: { margin: '5px 10px 5px 0' },
   operator: {
     fontFamily: 'Consolas, monaco, monospace',
     backgroundColor: theme.palette.background.accent,
@@ -124,9 +115,7 @@ const styles = theme => ({
     borderRadius: 4,
     display: 'flex',
   },
-  formControl: {
-    width: '100%',
-  },
+  formControl: { width: '100%' },
   stepType: {
     margin: 0,
     paddingRight: 20,
@@ -155,9 +144,7 @@ const styles = theme => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
   numberOfSelectedElements: {
     padding: '2px 5px 2px 5px',
     marginRight: 5,
@@ -174,6 +161,7 @@ class ToolBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      displayExport: false,
       displayUpdate: false,
       displayBulkDelete: false,
       displayBulkTest: false,
@@ -186,9 +174,7 @@ class ToolBar extends Component {
   componentDidMount() {
     this.props.fetchEndpoints();
     this.props.fetchAssetGroups();
-    this.subscription = MESSAGING$.toggleNav.subscribe({
-      next: () => this.setState({ navOpen: localStorage.getItem('navOpen') === 'true' }),
-    });
+    this.subscription = MESSAGING$.toggleNav.subscribe({ next: () => this.setState({ navOpen: localStorage.getItem('navOpen') === 'true' }) });
   }
 
   componentWillUnmount() {
@@ -200,7 +186,27 @@ class ToolBar extends Component {
   }
 
   handleCloseUpdate() {
-    this.setState({ displayUpdate: false, actionsInputs: [{}] });
+    this.setState({
+      displayUpdate: false,
+      actionsInputs: [{}],
+    });
+  }
+
+  handleOpenExport() {
+    this.setState({ displayExport: true });
+  }
+
+  handleCloseExport() {
+    this.setState({
+      displayExport: false,
+      actionsInputs: [{}],
+    });
+  }
+
+  handleSubmitExport(withPlayers, withTeams, withVariableValues) {
+    this.handleCloseExport();
+    this.props.handleClearSelectedElements();
+    this.props.handleExport(withPlayers, withTeams, withVariableValues);
   }
 
   handleOpenBulkTest() {
@@ -208,7 +214,10 @@ class ToolBar extends Component {
   }
 
   handleCloseBulkTest() {
-    this.setState({ displayBulkTest: false, actionsInputs: [{}] });
+    this.setState({
+      displayBulkTest: false,
+      actionsInputs: [{}],
+    });
   }
 
   handleSubmitBulkTest = () => {
@@ -298,21 +307,48 @@ class ToolBar extends Component {
     let options = [];
     if (actionsInputs[i]?.type === 'ADD') {
       options = [
-        { label: t('Assets'), value: 'assets' },
-        { label: t('Asset Groups'), value: 'asset_groups' },
-        { label: t('Teams'), value: 'teams' },
+        {
+          label: t('Assets'),
+          value: 'assets',
+        },
+        {
+          label: t('Asset Groups'),
+          value: 'asset_groups',
+        },
+        {
+          label: t('Teams'),
+          value: 'teams',
+        },
       ];
     } else if (actionsInputs[i]?.type === 'REPLACE') {
       options = [
-        { label: t('Assets'), value: 'assets' },
-        { label: t('Asset Groups'), value: 'asset_groups' },
-        { label: t('Teams'), value: 'teams' },
+        {
+          label: t('Assets'),
+          value: 'assets',
+        },
+        {
+          label: t('Asset Groups'),
+          value: 'asset_groups',
+        },
+        {
+          label: t('Teams'),
+          value: 'teams',
+        },
       ];
     } else if (actionsInputs[i]?.type === 'REMOVE') {
       options = [
-        { label: t('Assets'), value: 'assets' },
-        { label: t('Asset Groups'), value: 'asset_groups' },
-        { label: t('Teams'), value: 'teams' },
+        {
+          label: t('Assets'),
+          value: 'assets',
+        },
+        {
+          label: t('Asset Groups'),
+          value: 'asset_groups',
+        },
+        {
+          label: t('Teams'),
+          value: 'teams',
+        },
       ];
     }
     return (
@@ -494,7 +530,10 @@ class ToolBar extends Component {
   };
 
   handleCloseBulkDelete = () => {
-    this.setState({ displayBulkDelete: false, actionsInputs: [{}] });
+    this.setState({
+      displayBulkDelete: false,
+      actionsInputs: [{}],
+    });
   };
 
   handleSubmitBulkDelete = () => {
@@ -571,6 +610,22 @@ class ToolBar extends Component {
                 <ClearOutlined fontSize="small" />
               </IconButton>
             </Typography>
+            <Tooltip title={t('Export')}>
+              <span>
+                <IconButton
+                  aria-label="export"
+                  disabled={
+                    numberOfSelectedElements === 0
+                    || this.state.processing
+                  }
+                  onClick={this.handleOpenExport.bind(this)}
+                  color="primary"
+                  size="small"
+                >
+                  <FileDownloadOutlined fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
             <Tooltip title={t('Update')}>
               <span>
                 <IconButton
@@ -713,6 +768,13 @@ class ToolBar extends Component {
             </div>
           </Drawer>
         </Drawer>
+        <ExportOptionsDialog
+          title={t('inject_export_json_selection')}
+          open={this.state.displayExport}
+          onCancel={this.handleCloseExport.bind(this)}
+          onClose={this.handleCloseExport.bind(this)}
+          onSubmit={this.handleSubmitExport.bind(this)}
+        />
         <DialogDelete
           open={this.state.displayBulkDelete}
           handleClose={this.handleCloseBulkDelete.bind(this)}
@@ -754,19 +816,35 @@ ToolBar.propTypes = {
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const endpoints = helper.getEndpoints()
-    .map(n => ({ label: n.asset_name, value: n.asset_id }))
+    .map(n => ({
+      label: n.asset_name,
+      value: n.asset_id,
+    }))
     .sort((a, b) => a.label.localeCompare(b.label));
   const assetGroups = helper.getAssetGroups()
-    .map(n => ({ label: n.asset_group_name, value: n.asset_group_id }))
+    .map(n => ({
+      label: n.asset_group_name,
+      value: n.asset_group_id,
+    }))
     .sort((a, b) => a.label.localeCompare(b.label));
   const teams = ownProps.teamsFromExerciseOrScenario
-    .map(n => ({ label: n.team_name, value: n.team_id }))
+    .map(n => ({
+      label: n.team_name,
+      value: n.team_id,
+    }))
     .sort((a, b) => a.label.localeCompare(b.label));
-  return { endpoints, assetGroups, teams };
+  return {
+    endpoints,
+    assetGroups,
+    teams,
+  };
 };
 
 export default R.compose(
-  connect(select, { fetchEndpoints, fetchAssetGroups }),
+  connect(select, {
+    fetchEndpoints,
+    fetchAssetGroups,
+  }),
   inject18n,
   Component => withStyles(Component, styles),
 )(ToolBar);

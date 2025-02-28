@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.injector_contract.ContractType;
+import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectService;
@@ -157,7 +157,7 @@ public class AtomicTestingService {
                         contractElement
                             .get("type")
                             .asText()
-                            .equals(ContractType.Expectation.name().toLowerCase()))
+                            .equals(ContractFieldType.Expectation.name().toLowerCase()))
                 .toList();
         if (!contractElements.isEmpty()) {
           JsonNode contractElement = contractElements.getFirst();

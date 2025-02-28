@@ -1,68 +1,42 @@
-import { HelpOutlineOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CSSProperties, FunctionComponent, useMemo, useState } from 'react';
+import { CloudUploadOutlined, HelpOutlineOutlined } from '@mui/icons-material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButton, Tooltip } from '@mui/material';
+import { type CSSProperties, type FunctionComponent, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import { importInjects } from '../../../actions/injects/inject-action';
 import { type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
-import { QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
+import { type QueryableHelpers } from '../../../components/common/queryable/QueryableHelpers';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
-import { Header } from '../../../components/common/SortHeadersList';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
+import { type Header } from '../../../components/common/SortHeadersList';
 import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import type { InjectResultOutput, SearchPaginationInput } from '../../../utils/api-types';
+import { type InjectResultOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { isNotEmptyField } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
+import InjectImportJsonDialog from '../common/injects/InjectImportJsonDialog';
 import InjectorContract from '../common/injects/InjectorContract';
 import AtomicTestingPopover from './atomic_testing/AtomicTestingPopover';
 import AtomicTestingResult from './atomic_testing/AtomicTestingResult';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  'inject_type': {
-    width: '10%',
-  },
-  'inject_title': {
-    width: '20%',
-  },
-  'inject_status.tracking_sent_date': {
-    width: '15%',
-  },
-  'inject_status': {
-    width: '10%',
-  },
-  'inject_targets': {
-    width: '20%',
-  },
-  'inject_expectations': {
-    width: '10%',
-  },
-  'inject_updated_at': {
-    width: '15%',
-  },
+  'inject_type': { width: '10%' },
+  'inject_title': { width: '20%' },
+  'inject_status.tracking_sent_date': { width: '15%' },
+  'inject_status': { width: '10%' },
+  'inject_targets': { width: '20%' },
+  'inject_expectations': { width: '10%' },
+  'inject_updated_at': { width: '15%' },
 };
 
 interface Props {
@@ -72,6 +46,7 @@ interface Props {
   queryableHelpers: QueryableHelpers;
   searchPaginationInput: SearchPaginationInput;
   availableFilterNames?: string[];
+  contextId?: string;
 }
 
 const InjectResultList: FunctionComponent<Props> = ({
@@ -80,12 +55,16 @@ const InjectResultList: FunctionComponent<Props> = ({
   goTo,
   queryableHelpers,
   searchPaginationInput,
+  contextId,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, fldt, tPick, nsdt } = useFormatter();
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [openJsonImportDialog, setOpenJsonImportDialog] = useState(false);
+  const [reloadCount, setReloadCount] = useState(0);
 
   // Filter and sort hook
   const availableFilterNames = [
@@ -94,6 +73,9 @@ const InjectResultList: FunctionComponent<Props> = ({
     'inject_title',
     'inject_type',
     'inject_updated_at',
+    'inject_assets',
+    'inject_asset_groups',
+    'inject_teams',
   ];
   const [injects, setInjects] = useState<InjectResultOutput[]>([]);
 
@@ -169,6 +151,19 @@ const InjectResultList: FunctionComponent<Props> = ({
     return fetchInjects(input).finally(() => setLoading(false));
   };
 
+  const handleOpenJsonImportDialog = () => {
+    setOpenJsonImportDialog(true);
+  };
+  const handleCloseJsonImportDialog = () => {
+    setOpenJsonImportDialog(false);
+  };
+  const handleSubmitJsonImportFile = (values: { file: File }) => {
+    importInjects(values.file, { target: { type: 'ATOMIC_TESTING' } }).then(() => {
+      handleCloseJsonImportDialog();
+      setReloadCount(prev => prev + 1);
+    });
+  };
+
   return (
     <>
       <PaginationComponentV2
@@ -178,7 +173,25 @@ const InjectResultList: FunctionComponent<Props> = ({
         entityPrefix="inject"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
+        contextId={contextId}
+        reloadContentCount={reloadCount}
+        topBarButtons={(
+          <Tooltip title={t('inject_import_json_action')}>
+            <ToggleButton
+              value="import"
+              aria-label="import"
+              size="small"
+              onClick={handleOpenJsonImportDialog}
+            >
+              <CloudUploadOutlined
+                color="primary"
+                fontSize="small"
+              />
+            </ToggleButton>
+          </Tooltip>
+        )}
       />
+      <InjectImportJsonDialog open={openJsonImportDialog} handleClose={handleCloseJsonImportDialog} handleSubmit={handleSubmitJsonImportFile} />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
@@ -209,7 +222,7 @@ const InjectResultList: FunctionComponent<Props> = ({
                     secondaryAction={showActions ? (
                       <AtomicTestingPopover
                         atomic={injectResultOutput}
-                        actions={['Duplicate', 'Delete']}
+                        actions={['Duplicate', 'Export', 'Delete']}
                         onDelete={result => setInjects(injects.filter(e => e.inject_id !== result))}
                         inList
                       />
@@ -234,12 +247,14 @@ const InjectResultList: FunctionComponent<Props> = ({
                       </ListItemIcon>
                       <ListItemText
                         primary={(
-                          <div className={classes.bodyItems}>
+                          <div style={bodyItemsStyles.bodyItems}>
                             {headers.map(header => (
                               <div
                                 key={header.field}
-                                className={classes.bodyItem}
-                                style={inlineStyles[header.field]}
+                                style={{
+                                  ...bodyItemsStyles.bodyItem,
+                                  ...inlineStyles[header.field],
+                                }}
                               >
                                 {header.value?.(injectResultOutput)}
                               </div>

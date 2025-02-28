@@ -1,17 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
-import { FunctionComponent } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { type FunctionComponent } from 'react';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import TextField from '../../../../../components/fields/TextField';
 import { useFormatter } from '../../../../../components/i18n';
-import type { LessonsTemplateCategoryInput } from '../../../../../utils/api-types';
+import { type LessonsTemplateCategoryInput } from '../../../../../utils/api-types';
 import { zodImplement } from '../../../../../utils/Zod';
 
-export type LessonsTemplateCategoryInputForm = Omit<LessonsTemplateCategoryInput, 'lessons_template_category_order'> & {
-  lessons_template_category_order: string;
-};
+export type LessonsTemplateCategoryInputForm = Omit<LessonsTemplateCategoryInput, 'lessons_template_category_order'> & { lessons_template_category_order: string };
 
 interface Props {
   onSubmit: SubmitHandler<LessonsTemplateCategoryInputForm>;
@@ -81,7 +79,11 @@ const LessonsTemplateCategoryForm: FunctionComponent<Props> = ({
         type="number"
         InputLabelProps={{ required: true }}
       />
-      <div style={{ float: 'right', marginTop: 20 }}>
+      <div style={{
+        float: 'right',
+        marginTop: 20,
+      }}
+      >
         <Button
           variant="contained"
           onClick={handleClose}

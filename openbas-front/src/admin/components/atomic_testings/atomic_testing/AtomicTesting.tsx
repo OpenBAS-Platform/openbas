@@ -1,9 +1,10 @@
-import { Chip, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { Chip, Divider, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchDocuments } from '../../../../actions/Document';
-import { DocumentHelper } from '../../../../actions/helper';
+import { type DocumentHelper } from '../../../../actions/helper';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
@@ -12,14 +13,14 @@ import Loader from '../../../../components/Loader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useHelper } from '../../../../store';
-import { AttackPatternSimple, InjectTargetWithResult, KillChainPhaseSimple } from '../../../../utils/api-types';
+import { type AttackPatternSimple, type InjectTargetWithResult, type KillChainPhaseSimple } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectIcon from '../../common/injects/InjectIcon';
 import ResponsePie from '../../common/injects/ResponsePie';
-import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import TargetListItem from './TargetListItem';
 import TargetResultsDetail from './TargetResultsDetail';
 
@@ -32,15 +33,21 @@ const useStyles = makeStyles()(() => ({
     borderRadius: 4,
     width: 180,
   },
-  gridContainer: {
-    marginBottom: 20,
-  },
+  gridContainer: { marginBottom: 20 },
   paper: {
     height: '100%',
     minHeight: '100%',
     margin: '10px 0 0 0',
     padding: 15,
     borderRadius: 4,
+  },
+  dividerL: {
+    position: 'absolute',
+    backgroundColor: 'rgba(105, 103, 103, 0.45)',
+    width: '2px',
+    bottom: '0',
+    height: '99%',
+    left: '-10px',
   },
 }));
 
@@ -49,13 +56,12 @@ const AtomicTesting = () => {
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t, tPick, fldt } = useFormatter();
+  const theme = useTheme();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
-  const { documentMap } = useHelper((helper: DocumentHelper) => ({
-    documentMap: helper.getDocumentsMap(),
-  }));
+  const { documentMap } = useHelper((helper: DocumentHelper) => ({ documentMap: helper.getDocumentsMap() }));
   useDataLoader(() => {
     dispatch(fetchDocuments());
   });
@@ -69,9 +75,32 @@ const AtomicTesting = () => {
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
 
   // Handles
+
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult) => {
     setSelectedTarget(target);
     setCurrentParentTarget(currentParent);
+  };
+
+  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined) => {
+    return (
+      <>
+        <TargetListItem
+          onClick={() => handleTargetClick(target, parent)}
+          target={target}
+          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id}
+        />
+        {target?.children && target.children.length > 0 && (
+          <List disablePadding style={{ marginLeft: 15 }}>
+            {target.children.map(child => (
+              <Fragment key={child?.id}>
+                {renderTargetItem(child, target)}
+              </Fragment>
+            ))}
+            <Divider className={classes.dividerL} />
+          </List>
+        )}
+      </>
+    );
   };
 
   if (!injectResultOverviewOutput) {
@@ -188,10 +217,21 @@ const AtomicTesting = () => {
               >
                 {t('Platforms')}
               </Typography>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+              >
                 {injectResultOverviewOutput.inject_injector_contract?.injector_contract_platforms?.map((platform: string) => (
-                  <div key={platform} style={{ display: 'flex', marginRight: 15 }}>
-                    <PlatformIcon width={20} platform={platform} marginRight={5} />
+                  <div
+                    key={platform}
+                    style={{
+                      display: 'flex',
+                      marginRight: 15,
+                    }}
+                  >
+                    <PlatformIcon width={20} platform={platform} marginRight={theme.spacing(1)} />
                     {platform}
                   </div>
                 ))}
@@ -243,7 +283,14 @@ const AtomicTesting = () => {
         <Typography variant="h4" gutterBottom>
           {t('Results')}
         </Typography>
-        <Paper classes={{ root: classes.paper }} variant="outlined" style={{ display: 'flex', alignItems: 'center' }}>
+        <Paper
+          classes={{ root: classes.paper }}
+          variant="outlined"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
           <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
         </Paper>
       </Grid>
@@ -251,7 +298,11 @@ const AtomicTesting = () => {
         <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
           {t('Targets')}
         </Typography>
-        <div style={{ float: 'right', marginTop: -15 }}>
+        <div style={{
+          float: 'right',
+          marginTop: -15,
+        }}
+        >
           <SearchFilter
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
@@ -263,23 +314,8 @@ const AtomicTesting = () => {
           {sortedTargets.length > 0 ? (
             <List>
               {sortedTargets.map(target => (
-                <div key={target?.id} style={{ marginBottom: 15 }}>
-                  <TargetListItem
-                    onClick={() => handleTargetClick(target, undefined)}
-                    target={target}
-                    selected={selectedTarget?.id === target.id && currentParentTarget?.id === undefined}
-                  />
-                  <List component="div" disablePadding>
-                    {target?.children?.map(child => (
-                      <TargetListItem
-                        key={child?.id}
-                        isChild
-                        onClick={() => handleTargetClick(child, target)}
-                        target={child}
-                        selected={selectedTarget?.id === child.id && currentParentTarget?.id === target.id}
-                      />
-                    ))}
-                  </List>
+                <div key={target?.id}>
+                  {renderTargetItem(target, undefined)}
                 </div>
               ))}
             </List>
@@ -308,7 +344,8 @@ const AtomicTesting = () => {
         </Paper>
       </Grid>
     </Grid>
-  );
+  )
+  ;
 };
 
 export default AtomicTesting;

@@ -1,33 +1,30 @@
 import { Grid, List, Paper, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { EndpointHelper } from '../../../../../actions/assets/asset-helper';
+import { type EndpointHelper } from '../../../../../actions/assets/asset-helper';
 import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
-import type { EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
+import { type EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
+import { formatMacAddress } from '../../../../../utils/String';
 import AgentList from './AgentList';
 
-const useStyles = makeStyles()(() => ({
-  paper: {
-    padding: 20,
-  },
-}));
+const useStyles = makeStyles()(() => ({ paper: { padding: 20 } }));
 
 const Endpoint = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { endpointId } = useParams() as { endpointId: EndpointType['asset_id'] };
   const { t } = useFormatter();
+  const theme = useTheme();
 
   // Fetching data
-  const { endpoint } = useHelper((helper: EndpointHelper) => ({
-    endpoint: helper.getEndpoint(endpointId),
-  }));
+  const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
   return (
     <div>
       <Grid
@@ -48,7 +45,11 @@ const Endpoint = () => {
                 >
                   {t('Description')}
                 </Typography>
-                <div style={{ display: 'flex', paddingTop: 5 }}>
+                <div style={{
+                  display: 'flex',
+                  paddingTop: 5,
+                }}
+                >
                   <ExpandableMarkdown
                     source={endpoint.asset_description}
                     limit={300}
@@ -63,7 +64,11 @@ const Endpoint = () => {
                 >
                   {t('Hostname')}
                 </Typography>
-                <div style={{ display: 'flex', paddingTop: 5 }}>
+                <div style={{
+                  display: 'flex',
+                  paddingTop: 5,
+                }}
+                >
                   {endpoint.endpoint_hostname}
                 </div>
               </Grid>
@@ -75,8 +80,12 @@ const Endpoint = () => {
                 >
                   {t('Platform')}
                 </Typography>
-                <div style={{ display: 'flex', paddingTop: 5 }}>
-                  <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={10} />
+                <div style={{
+                  display: 'flex',
+                  paddingTop: 5,
+                }}
+                >
+                  <PlatformIcon platform={endpoint.endpoint_platform} width={20} marginRight={theme.spacing(2)} />
                   {' '}
                   {endpoint.endpoint_platform}
                 </div>
@@ -89,7 +98,11 @@ const Endpoint = () => {
                 >
                   {t('Architecture')}
                 </Typography>
-                <div style={{ display: 'flex', paddingTop: 5 }}>
+                <div style={{
+                  display: 'flex',
+                  paddingTop: 5,
+                }}
+                >
                   {endpoint.endpoint_arch}
                 </div>
               </Grid>
@@ -101,7 +114,13 @@ const Endpoint = () => {
                 >
                   {t('IP Addresses')}
                 </Typography>
-                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10, paddingTop: 5 }}>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  marginBottom: 10,
+                  paddingTop: 5,
+                }}
+                >
                   {endpoint.endpoint_ips?.map((ip: string, index: number) => (
                     <div key={index} style={{ marginRight: 10 }}>
                       {ip}
@@ -117,10 +136,16 @@ const Endpoint = () => {
                 >
                   {t('MAC Addresses')}
                 </Typography>
-                <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 10, paddingTop: 5 }}>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  marginBottom: 10,
+                  paddingTop: 5,
+                }}
+                >
                   {endpoint.endpoint_mac_addresses?.map((mac: string, index: number) => (
                     <div key={index} style={{ marginRight: 10 }}>
-                      {mac}
+                      {formatMacAddress(mac)}
                     </div>
                   ))}
                 </div>
@@ -133,7 +158,11 @@ const Endpoint = () => {
                 >
                   {t('Tags')}
                 </Typography>
-                <div style={{ display: 'flex', paddingTop: 5 }}>
+                <div style={{
+                  display: 'flex',
+                  paddingTop: 5,
+                }}
+                >
                   <ItemTags variant="list" tags={endpoint.asset_tags} />
                 </div>
               </Grid>

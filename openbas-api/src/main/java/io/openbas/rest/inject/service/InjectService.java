@@ -1,6 +1,9 @@
 package io.openbas.rest.inject.service;
 
-import static io.openbas.utils.FilterUtilsJpa.*;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+import static io.openbas.utils.AgentUtils.isPrimaryAgent;
+import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
 
@@ -9,39 +12,42 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.specification.InjectSpecification;
-import io.openbas.injector_contract.ContractType;
+import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
+import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
 import io.openbas.rest.inject.form.InjectBulkUpdateSupportedOperations;
+import io.openbas.rest.inject.form.InjectInput;
+import io.openbas.rest.injector_contract.InjectorContractService;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
-import io.openbas.service.AssetGroupService;
-import io.openbas.service.AssetService;
+import io.openbas.rest.tag.TagService;
+import io.openbas.service.*;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -61,8 +67,94 @@ public class InjectService {
   private final InjectStatusRepository injectStatusRepository;
   private final InjectMapper injectMapper;
   private final MethodSecurityExpressionHandler methodSecurityExpressionHandler;
+  private final UserService userService;
+  private final InjectorContractService injectorContractService;
+  private final TagRuleService tagRuleService;
+  private final TagService tagService;
+  private final DocumentService documentService;
 
   @Resource protected ObjectMapper mapper;
+
+  private SecurityExpression getAmbientSecurityExpression() {
+    return ((SecurityExpressionHandler) methodSecurityExpressionHandler).getSecurityExpression();
+  }
+
+  public Inject createInject(
+      @Nullable final Exercise exercise,
+      @Nullable final Scenario scenario,
+      @NotNull final InjectInput input) {
+    if (exercise == null && scenario == null || exercise != null && scenario != null) {
+      throw new IllegalArgumentException("Exactly one of exercise or scenario should be present");
+    }
+
+    InjectorContract injectorContract =
+        this.injectorContractService.injectorContract(input.getInjectorContract());
+    // Get common attributes
+    Inject inject = input.toInject(injectorContract);
+    inject.setUser(this.userService.currentUser());
+    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
+    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
+    inject.setTags(iterableToSet(tagService.tags(input.getTagIds())));
+    List<InjectDocument> injectDocuments =
+        input.getDocuments().stream()
+            .map(i -> i.toDocument(documentService.document(i.getDocumentId()), inject))
+            .toList();
+    inject.setDocuments(injectDocuments);
+    // Set dependencies
+    if (input.getDependsOn() != null) {
+      inject
+          .getDependsOn()
+          .addAll(
+              input.getDependsOn().stream()
+                  .map(
+                      injectDependencyInput ->
+                          injectDependencyInput.toInjectDependency(
+                              inject,
+                              this.inject(
+                                  injectDependencyInput.getRelationship().getInjectParentId())))
+                  .toList());
+    }
+
+    Set<Tag> tags = new HashSet<>();
+    // EXERCISE
+    if (exercise != null) {
+      tags = exercise.getTags();
+      inject.setExercise(exercise);
+      // Linked documents directly to the exercise
+      inject
+          .getDocuments()
+          .forEach(
+              document -> {
+                if (!document.getDocument().getExercises().contains(exercise)) {
+                  exercise.getDocuments().add(document.getDocument());
+                }
+              });
+    }
+    // SCENARIO
+    if (scenario != null) {
+      tags = scenario.getTags();
+      inject.setScenario(scenario);
+      // Linked documents directly to the scenario
+      inject
+          .getDocuments()
+          .forEach(
+              document -> {
+                if (!document.getDocument().getScenarios().contains(scenario)) {
+                  scenario.getDocuments().add(document.getDocument());
+                }
+              });
+    }
+
+    // verify if inject is not manual/sms/emails...
+    if (this.canApplyAssetGroupToInject(inject)) {
+      // add default asset groups
+      inject.setAssetGroups(
+          this.tagRuleService.applyTagRuleToInjectCreation(
+              tags.stream().map(Tag::getId).toList(),
+              assetGroupService.assetGroups(input.getAssetGroups())));
+    }
+    return injectRepository.save(inject);
+  }
 
   public Inject inject(@NotBlank final String injectId) {
     return this.injectRepository
@@ -227,7 +319,7 @@ public class InjectService {
     return !StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
         .filter(
             contractElement ->
-                contractElement.get("type").asText().equals(ContractType.AssetGroup.label))
+                contractElement.get("type").asText().equals(ContractFieldType.AssetGroup.label))
         .toList()
         .isEmpty();
   }
@@ -306,7 +398,9 @@ public class InjectService {
     Set<String> assetsIDs = new HashSet<>();
     Set<String> assetGroupsIDs = new HashSet<>();
     for (var operation : operations) {
-      if (CollectionUtils.isEmpty(operation.getValues())) continue;
+      if (CollectionUtils.isEmpty(operation.getValues())) {
+        continue;
+      }
 
       switch (operation.getField()) {
         case TEAMS -> teamsIDs.addAll(operation.getValues());
@@ -344,7 +438,8 @@ public class InjectService {
    * @return the injects to update/delete
    * @throws AccessDeniedException if the user is not allowed to update/delete the injects
    */
-  public List<Inject> getInjectsAndCheckIsPlanner(InjectBulkProcessingInput input) {
+  public List<Inject> getInjectsAndCheckPermission(
+      InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     // Specification building
     Specification<Inject> filterSpecifications = getInjectSpecification(input);
@@ -356,8 +451,13 @@ public class InjectService {
     // Assert that the user is allowed to delete the injects
     // Can't use PreAuthorized as we don't have the data about involved scenarios and simulations
 
-    isPlanner(injectsToProcess, Inject::getScenario, SecurityExpression::isScenarioPlanner);
-    isPlanner(injectsToProcess, Inject::getExercise, SecurityExpression::isSimulationPlanner);
+    switch (requested_grant_level) {
+      case OBSERVER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectObserver);
+      case PLANNER -> authoriseWithThrow(injectsToProcess, SecurityExpression::isInjectPlanner);
+      default ->
+          throw new AccessDeniedException(
+              "No specified behaviour for grant %s".formatted(requested_grant_level.toString()));
+    }
     return injectsToProcess;
   }
 
@@ -365,31 +465,40 @@ public class InjectService {
    * Check if the user is allowed to delete the injects from the scenario or exercise
    *
    * @param injects the injects to check
-   * @param scenarioOrExercise the function to get the scenario or exercise from the inject
-   * @param isPlannerFunction the function to check if the user is a planner for the scenario or
+   * @param authoriseFunction the function to check if the user is a planner for the scenario or
    *     exercise
    * @throws AccessDeniedException if the user is not allowed to delete the injects from the
    *     scenario or exercise
    */
-  public <T extends Base> void isPlanner(
-      List<Inject> injects,
-      Function<Inject, T> scenarioOrExercise,
-      BiFunction<SecurityExpression, String, Boolean> isPlannerFunction) {
-    Set<String> scenarioOrExerciseIds =
-        injects.stream()
-            .filter(inject -> scenarioOrExercise.apply(inject) != null)
-            .map(inject -> scenarioOrExercise.apply(inject).getId())
-            .collect(Collectors.toSet());
+  public <T extends Base> void authoriseWithThrow(
+      List<Inject> injects, BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
+    InjectAuthorisationResult result = this.authorise(injects, authoriseFunction);
+    if (!result.getUnauthorised().isEmpty()) {
+      throw new AccessDeniedException(
+          "You are not allowed to alter the injects of ids "
+              + String.join(", ", result.getUnauthorised().stream().map(Inject::getId).toList()));
+    }
+  }
 
-    for (String scenarioOrExerciseId : scenarioOrExerciseIds) {
-      if (!isPlannerFunction.apply(
-          ((SecurityExpressionHandler) methodSecurityExpressionHandler).getSecurityExpression(),
-          scenarioOrExerciseId)) {
-        throw new AccessDeniedException(
-            "You are not allowed to delete the injects from the scenario or exercise "
-                + scenarioOrExerciseId);
+  /**
+   * Check if the user is allowed to operate on the injects based on security challenge
+   *
+   * @param injects the injects to check
+   * @param authoriseFunction the function to check if the user has the relevant privilege on
+   *     injects
+   * @return List of all authorised Injects
+   */
+  public InjectAuthorisationResult authorise(
+      List<Inject> injects, BiFunction<SecurityExpression, String, Boolean> authoriseFunction) {
+    InjectAuthorisationResult result = new InjectAuthorisationResult();
+    for (Inject inject : injects) {
+      if (authoriseFunction.apply(getAmbientSecurityExpression(), inject.getId())) {
+        result.addAuthorised(inject);
+      } else {
+        result.addUnauthorised(inject);
       }
     }
+    return result;
   }
 
   /**
@@ -407,7 +516,9 @@ public class InjectService {
       Map<String, Team> teamsFromDB,
       Map<String, Asset> assetsFromDB,
       Map<String, AssetGroup> assetGroupsFromDB) {
-    if (CollectionUtils.isEmpty(operations)) return;
+    if (CollectionUtils.isEmpty(operations)) {
+      return;
+    }
 
     for (var operation : operations) {
       switch (operation.getField()) {
@@ -449,7 +560,9 @@ public class InjectService {
       List<String> newValuesIDs,
       Map<String, T> entitiesFromDB,
       InjectBulkUpdateSupportedOperations operation) {
-    if (operation == InjectBulkUpdateSupportedOperations.REPLACE) injectEntities.clear();
+    if (operation == InjectBulkUpdateSupportedOperations.REPLACE) {
+      injectEntities.clear();
+    }
     newValuesIDs.forEach(
         id -> {
           T entity = entitiesFromDB.get(id);
@@ -460,7 +573,9 @@ public class InjectService {
 
           switch (operation) {
             case REPLACE, ADD -> {
-              if (!injectEntities.contains(entity)) injectEntities.add(entity);
+              if (!injectEntities.contains(entity)) {
+                injectEntities.add(entity);
+              }
             }
             case REMOVE -> injectEntities.remove(entity);
             default ->
@@ -468,5 +583,25 @@ public class InjectService {
                     "Invalid operation to update inject entities: " + operation);
           }
         });
+  }
+
+  public final List<Agent> getAgentsByInject(Inject inject) {
+    List<Agent> agents = new ArrayList<>();
+    Set<String> agentIds = new HashSet<>();
+
+    resolveAllAssetsToExecute(inject).keySet().stream()
+        .map(asset -> (Endpoint) Hibernate.unproxy(asset))
+        .flatMap(
+            endpoint -> Optional.ofNullable(endpoint.getAgents()).stream().flatMap(List::stream))
+        .filter(agent -> isPrimaryAgent(agent))
+        .forEach(
+            agent -> {
+              if (!agentIds.contains(agent.getId())) {
+                agents.add(agent);
+                agentIds.add(agent.getId());
+              }
+            });
+
+    return agents;
   }
 }

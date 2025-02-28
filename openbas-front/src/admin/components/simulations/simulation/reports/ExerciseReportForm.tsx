@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
-import * as React from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { z, ZodBoolean } from 'zod';
+import { type FunctionComponent } from 'react';
+import { type SubmitHandler, useForm } from 'react-hook-form';
+import { z, type ZodBoolean } from 'zod';
 
 import { useFormatter } from '../../../../../components/i18n';
-import type { Report, ReportInformationInput, ReportInput } from '../../../../../utils/api-types';
+import { type Report, type ReportInformationInput, type ReportInput } from '../../../../../utils/api-types';
 import ReportInformationType from './ReportInformationType';
 
 interface ExerciseReportFormInput {
@@ -63,7 +63,7 @@ interface Props {
   editing?: boolean;
   initialValues?: Report;
 }
-const ExerciseReportForm: React.FC<Props> = ({
+const ExerciseReportForm: FunctionComponent<Props> = ({
   onSubmit,
   handleCancel,
   editing,
@@ -77,7 +77,7 @@ const ExerciseReportForm: React.FC<Props> = ({
   };
 
   const initialModulesValues: Record<string, boolean> = {};
-  const modulesFormInput: Record<string, ZodBoolean > = {};
+  const modulesFormInput: Record<string, ZodBoolean> = {};
   exerciseReportModulesConfig.forEach((moduleConfig) => {
     initialModulesValues[moduleConfig.name] = findReportInfo(moduleConfig.type);
     modulesFormInput[moduleConfig.name] = z.boolean();
@@ -106,14 +106,21 @@ const ExerciseReportForm: React.FC<Props> = ({
         report_informations_display: !!data[moduleConfig.name],
       };
     });
-    onSubmit({ ...initialValues, report_name: data.report_name, report_informations: reportInformationList });
+    onSubmit({
+      ...initialValues,
+      report_name: data.report_name,
+      report_informations: reportInformationList,
+    });
   };
 
   return (
     <form
       id="reportExerciseForm"
       onSubmit={handleSubmit(onSubmitHandler)}
-      style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+      }}
     >
       <TextField
         variant="standard"
@@ -127,7 +134,10 @@ const ExerciseReportForm: React.FC<Props> = ({
       <Typography
         variant="h4"
         gutterBottom
-        sx={{ gridColumn: 'span 2', marginTop: '30px' }}
+        sx={{
+          gridColumn: 'span 2',
+          marginTop: '30px',
+        }}
       >
         {t('Modules')}
       </Typography>
@@ -145,7 +155,12 @@ const ExerciseReportForm: React.FC<Props> = ({
           />
         );
       })}
-      <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex' }}>
+      <div style={{
+        gridColumn: 'span 2',
+        marginTop: '20px',
+        display: 'flex',
+      }}
+      >
         <Button
           style={{ marginLeft: 'auto' }}
           onClick={handleCancel}

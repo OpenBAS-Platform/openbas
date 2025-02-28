@@ -1,7 +1,7 @@
-import { Dispatch } from 'redux';
+import { type Dispatch } from 'redux';
 
 import { delReferential, getReferential, postReferential, putReferential, simpleCall, simplePostCall } from '../utils/Action';
-import type { AttackPattern, AttackPatternCreateInput, AttackPatternUpdateInput, SearchPaginationInput } from '../utils/api-types';
+import { type AttackPattern, type AttackPatternCreateInput, type AttackPatternUpdateInput, type SearchPaginationInput } from '../utils/api-types';
 import * as schema from './Schema';
 
 const ATTACK_PATTERN_URI = '/api/attack_patterns';
@@ -34,7 +34,7 @@ export const deleteAttackPattern = (attackPatternId: AttackPattern['attack_patte
 
 export const searchAttackPatternsByNameAsOption = (searchText: string = '') => {
   const params = { searchText };
-  return simpleCall(`${ATTACK_PATTERN_URI}/options`, params);
+  return simpleCall(`${ATTACK_PATTERN_URI}/options`, { params });
 };
 
 export const searchAttackPatternsByIdAsOption = (ids: string[]) => {

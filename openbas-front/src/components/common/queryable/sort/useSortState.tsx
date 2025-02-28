@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import type { SortField } from '../../../../utils/api-types';
-import { SortHelpers } from './SortHelpers';
+import { type SortField } from '../../../../utils/api-types';
+import { type SortHelpers } from './SortHelpers';
 
 const computeDirection = (direction?: string) => {
   if (direction) {
@@ -24,7 +24,10 @@ const useSortState = (initSorts: SortField[] = [], onChange?: (sorts: SortField[
   };
 
   useEffect(() => {
-    onChange?.([{ property: sortBy, direction: sortAsc ? 'ASC' : 'DESC' }]);
+    onChange?.([{
+      property: sortBy,
+      direction: sortAsc ? 'ASC' : 'DESC',
+    }]);
   }, [sortBy, sortAsc]);
 
   return helpers;

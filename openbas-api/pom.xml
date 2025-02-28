@@ -23,7 +23,7 @@
         <cron-utils.version>9.2.1</cron-utils.version>
         <apache-poi.version>5.4.0</apache-poi.version>
         <opentelemetry.version>1.47.0</opentelemetry.version>
-        <opentelemetry-semconv.version>1.27.0-alpha</opentelemetry-semconv.version>
+        <opentelemetry-semconv.version>1.30.0</opentelemetry-semconv.version>
     </properties>
 
     <profiles>

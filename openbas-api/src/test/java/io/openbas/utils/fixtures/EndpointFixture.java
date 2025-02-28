@@ -3,6 +3,7 @@ package io.openbas.utils.fixtures;
 import io.openbas.database.model.Endpoint;
 import io.openbas.rest.asset.endpoint.form.EndpointInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.utils.EndpointMapper;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -55,7 +56,7 @@ public class EndpointFixture {
     endpoint.setName("Endpoint test");
     endpoint.setDescription("Endpoint description");
     endpoint.setHostname("Windows Hostname");
-    endpoint.setIps(IPS);
+    endpoint.setIps(EndpointMapper.setIps(IPS));
     endpoint.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
     endpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
     return endpoint;

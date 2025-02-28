@@ -1,33 +1,20 @@
 import { HelpOutlined } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader } from '@mui/material';
+import { Avatar, Button } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import arrayMutators from 'final-form-arrays';
-import * as React from 'react';
+import { type FunctionComponent } from 'react';
 import { Form } from 'react-final-form';
-import { makeStyles } from 'tss-react/mui';
 
-import type { InjectOutputType } from '../../../../actions/injects/Inject';
-import type { InjectHelper } from '../../../../actions/injects/inject-helper';
+import { type InjectOutputType } from '../../../../actions/injects/Inject';
+import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectDependency } from '../../../../utils/api-types';
+import { type AttackPattern, type Inject, type InjectDependency, type KillChainPhase } from '../../../../utils/api-types';
+import { isNotEmptyField } from '../../../../utils/utils';
+import InjectCardComponent from './InjectCardComponent';
 import InjectChainsForm from './InjectChainsForm';
-
-const useStyles = makeStyles()(theme => ({
-  injectorContract: {
-    margin: '10px 0 20px 0',
-    width: '100%',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 4,
-  },
-  injectorContractContent: {
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  injectorContractHeader: {
-    backgroundColor: theme.palette.background.default,
-  },
-}));
+import InjectIcon from './InjectIcon';
 
 interface Props {
   inject: Inject;
@@ -36,13 +23,11 @@ interface Props {
   injects?: InjectOutputType[];
 }
 
-const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
-  const { t, tPick } = useFormatter();
-  const { classes } = useStyles();
+const UpdateInjectLogicalChains: FunctionComponent<Props> = ({ inject, handleClose, onUpdateInject, injects }) => {
+  const { t } = useFormatter();
+  const theme = useTheme();
 
-  const { injectsMap } = useHelper((helper: InjectHelper) => ({
-    injectsMap: helper.getInjectsMap(),
-  }));
+  const { injectsMap } = useHelper((helper: InjectHelper) => ({ injectsMap: helper.getInjectsMap() }));
 
   const initialValues = {
     ...inject,
@@ -112,26 +97,42 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
     handleClose();
   };
   const injectorContractContent = inject.inject_injector_contract?.injector_contract_content ? JSON.parse(inject.inject_injector_contract?.injector_contract_content) : undefined;
+  const contractPayload = inject.inject_injector_contract?.injector_contract_payload;
+  const injectorContract = inject?.inject_injector_contract;
+  const cardTitle = inject?.inject_attack_patterns?.length !== 0 ? `${inject?.inject_kill_chain_phases?.map((value: KillChainPhase) => value.phase_name)?.join(', ')} /${inject?.inject_attack_patterns?.map((value: AttackPattern) => value.attack_pattern_external_id)?.join(', ')}` : t('TTP Unknown');
+
   return (
     <>
-      <Card elevation={0} classes={{ root: classes.injectorContract }}>
-        <CardHeader
-          classes={{ root: classes.injectorContractHeader }}
-          avatar={injectorContractContent?.config?.type ? <Avatar sx={{ width: 24, height: 24 }} src={`/api/images/injectors/${injectorContractContent.config.type}`} />
-            : <Avatar sx={{ width: 24, height: 24 }}><HelpOutlined /></Avatar>}
-          title={inject?.inject_attack_patterns?.map(value => value.attack_pattern_external_id)?.join(', ')}
-          action={(
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-                platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={10} />,
-              )}
-            </div>
-          )}
-        />
-        <CardContent classes={{ root: classes.injectorContractContent }}>
-          {tPick(inject?.inject_injector_contract?.injector_contract_labels)}
-        </CardContent>
-      </Card>
+      <InjectCardComponent
+        avatar={injectorContractContent
+          ? (
+              <InjectIcon
+                type={contractPayload ? (contractPayload.payload_collector_type ?? contractPayload.payload_type) : injectorContract?.injector_contract_injector_type}
+                isPayload={isNotEmptyField(contractPayload?.payload_collector_type ?? contractPayload?.payload_type)}
+              />
+            ) : (
+              <Avatar sx={{
+                width: 24,
+                height: 24,
+              }}
+              >
+                <HelpOutlined />
+              </Avatar>
+            )}
+        title={injectorContract?.injector_contract_needs_executor ? cardTitle : inject?.inject_injector_contract?.injector_contract_injector_type_name}
+        action={(
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          >
+            {inject?.inject_injector_contract?.injector_contract_platforms?.map(
+              platform => <PlatformIcon key={platform} width={20} platform={platform} marginRight={theme.spacing(2)} />,
+            )}
+          </div>
+        )}
+        content={inject?.inject_title}
+      />
       <Form
         keepDirtyOnReinitialize={true}
         initialValues={initialValues}
@@ -151,7 +152,11 @@ const UpdateInjectLogicalChains: React.FC<Props> = ({ inject, handleClose, onUpd
                 values={values}
                 injects={injects}
               />
-              <div style={{ float: 'right', marginTop: 20 }}>
+              <div style={{
+                float: 'right',
+                marginTop: 20,
+              }}
+              >
                 <Button
                   variant="contained"
                   onClick={handleClose}

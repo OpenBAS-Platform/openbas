@@ -23,7 +23,7 @@ export const bulkDeleteInjects = data => (dispatch) => {
 
 export const bulkDeleteInjectsSimple = (data) => {
   const uri = `/api/injects`;
-  return simpleDelCall(uri, data);
+  return simpleDelCall(uri, { data });
 };
 
 export const bulkUpdateInject = data => (dispatch) => {
@@ -88,7 +88,10 @@ export const executeInject = (exerciseId, values, files) => (dispatch) => {
 };
 
 export const injectDone = (exerciseId, injectId) => (dispatch) => {
-  const data = { status: 'SUCCESS', message: 'Manual validation' };
+  const data = {
+    status: 'SUCCESS',
+    message: 'Manual validation',
+  };
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}/status`;
   return postReferential(schema.inject, uri, data)(dispatch);
 };

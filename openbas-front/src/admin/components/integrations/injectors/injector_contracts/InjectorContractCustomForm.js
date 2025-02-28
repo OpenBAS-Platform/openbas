@@ -34,7 +34,10 @@ const InjectorContractForm = (props) => {
               <CKEditor
                 data={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
                 onChange={(_, editor) => {
-                  setFields({ ...fields, [field.key]: { defaultValue: editor.getData() } });
+                  setFields({
+                    ...fields,
+                    [field.key]: { defaultValue: editor.getData() },
+                  });
                 }}
               />
             )
@@ -46,7 +49,10 @@ const InjectorContractForm = (props) => {
                 rows={10}
                 style={{ marginTop: 5 }}
                 value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
-                onChange={event => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
+                onChange={event => setFields({
+                  ...fields,
+                  [field.key]: { defaultValue: event.target.value },
+                })}
               />
             );
       case 'number':
@@ -57,7 +63,10 @@ const InjectorContractForm = (props) => {
             type="number"
             style={{ marginTop: 5 }}
             value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
-            onChange={event => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
+            onChange={event => setFields({
+              ...fields,
+              [field.key]: { defaultValue: event.target.value },
+            })}
           />
         );
       default:
@@ -67,7 +76,10 @@ const InjectorContractForm = (props) => {
             fullWidth={true}
             style={{ marginTop: 5 }}
             value={!R.isNil(fields[field.key]?.defaultValue) ? fields[field.key].defaultValue : field.defaultValue}
-            onChange={event => setFields({ ...fields, [field.key]: { defaultValue: event.target.value } })}
+            onChange={event => setFields({
+              ...fields,
+              [field.key]: { defaultValue: event.target.value },
+            })}
           />
         );
     }
@@ -101,7 +113,15 @@ const InjectorContractForm = (props) => {
           />
           {contract.fields.map((field) => {
             return (
-              <div key={field.key} style={{ border: `1px solid ${theme.palette.action.hover}`, padding: 10, borderRadius: 4, marginTop: 20 }}>
+              <div
+                key={field.key}
+                style={{
+                  border: `1px solid ${theme.palette.action.hover}`,
+                  padding: 10,
+                  borderRadius: 4,
+                  marginTop: 20,
+                }}
+              >
                 <Typography
                   variant="h5"
                   gutterBottom={true}
@@ -130,7 +150,10 @@ const InjectorContractForm = (props) => {
                     <Switch
                       size="small"
                       checked={!R.isNil(fields[field.key]?.readOnly) ? fields[field.key].readOnly : field.readOnly}
-                      onChange={event => setFields({ ...fields, [field.key]: { readOnly: event.target.checked } })}
+                      onChange={event => setFields({
+                        ...fields,
+                        [field.key]: { readOnly: event.target.checked },
+                      })}
                     />
                   </Grid>
                 </Grid>
@@ -145,7 +168,11 @@ const InjectorContractForm = (props) => {
               </div>
             );
           })}
-          <div style={{ float: 'right', marginTop: 20 }}>
+          <div style={{
+            float: 'right',
+            marginTop: 20,
+          }}
+          >
             <Button
               onClick={handleClose}
               style={{ marginRight: 10 }}

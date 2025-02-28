@@ -1,10 +1,10 @@
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
-import * as React from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
-import type { ExpectationResultsByType, InjectResultOutput } from '../../../../utils/api-types';
+import { type ExpectationResultsByType, type InjectResultOutput } from '../../../../utils/api-types';
 
 const useStyles = makeStyles()(() => ({
   inline: {
@@ -19,7 +19,7 @@ interface Props {
   injectId?: InjectResultOutput['inject_id'];
 }
 
-const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
+const AtomicTestingResult: FunctionComponent<Props> = ({ expectations, injectId }) => {
   const { t } = useFormatter();
   let tooltipLabel: string = '';
   const { classes } = useStyles();
@@ -36,9 +36,24 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
   if (!expectations || expectations.length === 0) {
     return (
       <div className={classes.inline}>
-        <ShieldOutlined style={{ color: getColor('PENDING'), marginRight: 10, fontSize: 22 }} />
-        <TrackChangesOutlined style={{ color: getColor('PENDING'), marginRight: 10, fontSize: 22 }} />
-        <SensorOccupiedOutlined style={{ color: getColor('PENDING'), marginRight: 10, fontSize: 22 }} />
+        <ShieldOutlined style={{
+          color: getColor('PENDING'),
+          marginRight: 10,
+          fontSize: 22,
+        }}
+        />
+        <TrackChangesOutlined style={{
+          color: getColor('PENDING'),
+          marginRight: 10,
+          fontSize: 22,
+        }}
+        />
+        <SensorOccupiedOutlined style={{
+          color: getColor('PENDING'),
+          marginRight: 10,
+          fontSize: 22,
+        }}
+        />
       </div>
     );
   }
@@ -62,7 +77,12 @@ const AtomicTestingResult: React.FC<Props> = ({ expectations, injectId }) => {
         }
         return (
           <Tooltip key={index} title={tooltipLabel}>
-            <IconComponent style={{ color, marginRight: 10, fontSize: 22 }} />
+            <IconComponent style={{
+              color,
+              marginRight: 10,
+              fontSize: 22,
+            }}
+            />
           </Tooltip>
         );
       })}

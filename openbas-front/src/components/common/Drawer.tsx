@@ -1,7 +1,6 @@
 import { Close } from '@mui/icons-material';
 import { Drawer as DrawerMUI, IconButton, type PaperProps, Typography } from '@mui/material';
-import { CSSProperties, FunctionComponent } from 'react';
-import * as React from 'react';
+import { cloneElement, type CSSProperties, type FunctionComponent, type ReactElement } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { computeBannerSettings } from '../../public/components/systembanners/utils';
@@ -49,8 +48,8 @@ interface DrawerProps {
   handleClose: () => void;
   title: string;
   children:
-  (() => React.ReactElement)
-  | React.ReactElement
+  (() => ReactElement)
+  | ReactElement
   | null;
   variant?: 'full' | 'half';
   PaperProps?: PaperProps;
@@ -77,7 +76,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
     if (typeof children === 'function') {
       component = children();
     } else {
-      component = React.cloneElement(children as React.ReactElement);
+      component = cloneElement(children as ReactElement);
     }
   }
   return (
@@ -89,9 +88,7 @@ const Drawer: FunctionComponent<DrawerProps> = ({
       classes={{ paper: variant === 'full' ? classes.drawerPaperFull : classes.drawerPaperHalf }}
       onClose={handleClose}
       PaperProps={PaperProps}
-      ModalProps={{
-        disableEnforceFocus,
-      }}
+      ModalProps={{ disableEnforceFocus }}
     >
       <div className={variant === 'full' ? classes.headerFull : classes.header} style={{ marginTop: bannerHeightNumber }}>
         <IconButton
@@ -104,7 +101,13 @@ const Drawer: FunctionComponent<DrawerProps> = ({
         </IconButton>
         <Typography variant="subtitle2">{title}</Typography>
       </div>
-      <div style={{ padding: '10px 20px 20px 20px', ...containerStyle }}>{component}</div>
+      <div style={{
+        padding: '10px 20px 20px 20px',
+        ...containerStyle,
+      }}
+      >
+        {component}
+      </div>
     </DrawerMUI>
   );
 };

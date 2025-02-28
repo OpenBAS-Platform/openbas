@@ -1,31 +1,47 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.createFinding;
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
-import io.openbas.database.model.InjectStatus;
+import io.openbas.database.model.Finding;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.injector_contract.outputs.ContractOutputElement;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionAction;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Nullable;
+import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class InjectStatusService {
+
   private final InjectRepository injectRepository;
   private final AgentRepository agentRepository;
+  private final InjectService injectService;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
-  private final InjectService injectService;
+  private final FindingService findingService;
+
+  @Resource private ObjectMapper mapper;
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
@@ -86,14 +102,17 @@ public class InjectStatusService {
   private int getCompleteTrace(Inject inject) {
     return inject.getStatus().map(InjectStatus::getTraces).orElse(Collections.emptyList()).stream()
         .filter(trace -> ExecutionTraceAction.COMPLETE.equals(trace.getAction()))
+        .filter(trace -> trace.getAgent() != null)
+        .map(trace -> trace.getAgent().getId())
+        .distinct()
         .toList()
         .size();
   }
 
-  public boolean isAllInjectAssetsExecuted(Inject inject) {
+  public boolean isAllInjectAgentsExecuted(Inject inject) {
     int totalCompleteTrace = getCompleteTrace(inject);
-    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
-    return assets.size() == totalCompleteTrace;
+    List<Agent> agents = this.injectService.getAgentsByInject(inject);
+    return agents.size() == totalCompleteTrace;
   }
 
   public void updateFinalInjectStatus(InjectStatus injectStatus) {
@@ -123,6 +142,7 @@ public class InjectStatusService {
           convertExecutionStatus(
               computeStatus(
                   injectStatus.getTraces().stream()
+                      .filter(t -> t.getAgent() != null)
                       .filter(t -> t.getAgent().getId().equals(agentId))
                       .toList()));
       executionTraces.setStatus(traceStatus);
@@ -143,9 +163,46 @@ public class InjectStatusService {
     injectStatus.addTrace(executionTraces);
 
     if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
-        && (agentId == null || isAllInjectAssetsExecuted(inject))) {
+        && (agentId == null || isAllInjectAgentsExecuted(inject))) {
       updateFinalInjectStatus(injectStatus);
     }
+
+    // -- FINDINGS --
+    // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
+    if (input.getOutputStructured() != null) {
+      try {
+        List<Finding> findings = new ArrayList<>();
+        // Get the contract
+        InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
+        List<ContractOutputElement> contractOutputs =
+            getContractOutputs(injectorContract.getConvertedContent(), mapper);
+        ObjectNode values = mapper.readValue(input.getOutputStructured(), ObjectNode.class);
+        if (!contractOutputs.isEmpty()) {
+          contractOutputs.forEach(
+              contractOutput -> {
+                if (contractOutput.isMultiple()) {
+                  JsonNode jsonNodes = values.get(contractOutput.getField());
+                  if (jsonNodes != null && jsonNodes.isArray()) {
+                    for (JsonNode jsonNode : jsonNodes) {
+                      Finding finding = createFinding(contractOutput);
+                      finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
+                      findings.add(finding);
+                    }
+                  }
+                } else {
+                  JsonNode jsonNode = values.get(contractOutput.getField());
+                  Finding finding = createFinding(contractOutput);
+                  finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
+                  findings.add(finding);
+                }
+              });
+        }
+        this.findingService.createFindings(findings, injectId);
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     return injectRepository.save(inject);
   }
 
@@ -157,7 +214,7 @@ public class InjectStatusService {
       switch (trace.getStatus()) {
         case SUCCESS, WARNING -> successCount++;
         case PARTIAL -> partialCount++;
-        case ERROR, COMMAND_NOT_FOUND, ASSET_INACTIVE -> errorCount++;
+        case ERROR, COMMAND_NOT_FOUND, AGENT_INACTIVE -> errorCount++;
         case MAYBE_PREVENTED, MAYBE_PARTIAL_PREVENTED, COMMAND_CANNOT_BE_EXECUTED ->
             maybePreventedCount++;
       }

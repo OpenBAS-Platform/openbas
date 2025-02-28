@@ -1,7 +1,6 @@
 import { Edit } from '@mui/icons-material';
 import { Button, IconButton, Paper } from '@mui/material';
-import { useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import Dialog from '../../../../components/common/Dialog';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
@@ -14,20 +13,24 @@ interface Props {
   canEditComment?: boolean;
 }
 
-const ReportComment: React.FC<Props> = ({ initialComment, saveComment, canEditComment = false }) => {
+const ReportComment: FunctionComponent<Props> = ({ initialComment, saveComment, canEditComment = false }) => {
   const { t } = useFormatter();
   const [comment, setComment] = useState<string>(initialComment);
   const [openEdit, setOpenEdit] = useState<boolean>(false);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'flex-start',
+    }}
+    >
       <ExpandableMarkdown showAll source={comment} />
       { canEditComment
-      && (
-        <IconButton sx={{ marginLeft: 'auto' }} color="primary" onClick={() => setOpenEdit(true)}>
-          <Edit />
-        </IconButton>
-      )}
+        && (
+          <IconButton sx={{ marginLeft: 'auto' }} color="primary" onClick={() => setOpenEdit(true)}>
+            <Edit />
+          </IconButton>
+        )}
 
       <Dialog
         title={t('Update inject comment')}
@@ -41,7 +44,12 @@ const ReportComment: React.FC<Props> = ({ initialComment, saveComment, canEditCo
               initialValue={comment}
             />
           </Paper>
-          <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex' }}>
+          <div style={{
+            gridColumn: 'span 2',
+            marginTop: '20px',
+            display: 'flex',
+          }}
+          >
             <Button
               style={{ marginLeft: 'auto' }}
               onClick={() => setOpenEdit(false)}

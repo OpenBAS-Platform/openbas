@@ -42,7 +42,11 @@ class UserPasswordForm extends Component {
               label={t('Confirmation')}
               style={{ marginTop: 20 }}
             />
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div style={{
+              float: 'right',
+              marginTop: 20,
+            }}
+            >
               <Button
                 variant="contained"
                 onClick={handleClose.bind(this)}

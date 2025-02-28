@@ -21,15 +21,16 @@ const styles = () => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 });
 
 class OrganizationField extends Component {
   constructor(props) {
     super(props);
-    this.state = { organizationCreation: false, organizationInput: '' };
+    this.state = {
+      organizationCreation: false,
+      organizationInput: '',
+    };
   }
 
   componentDidMount() {
@@ -115,13 +116,14 @@ class OrganizationField extends Component {
 
 const select = (state) => {
   const helper = storeHelper(state);
-  return {
-    organizations: helper.getOrganizations(),
-  };
+  return { organizations: helper.getOrganizations() };
 };
 
 export default R.compose(
-  connect(select, { fetchOrganizations, addOrganization }),
+  connect(select, {
+    fetchOrganizations,
+    addOrganization,
+  }),
   inject18n,
   Component => withStyles(Component, styles),
 )(OrganizationField);

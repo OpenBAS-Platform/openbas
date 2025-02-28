@@ -12,12 +12,8 @@ import TruncatedText from '../../../../../components/TruncatedText';
 import { resolveUserNames, truncate } from '../../../../../utils/String';
 
 const useStyles = makeStyles()(() => ({
-  card: {
-    margin: '0 0 20px 0',
-  },
-  cardNested: {
-    margin: '0 0 20px 20px',
-  },
+  card: { margin: '0 0 20px 0' },
+  cardNested: { margin: '0 0 20px 20px' },
 }));
 
 const Communication = (props) => {
@@ -70,17 +66,13 @@ const Communication = (props) => {
           communication.communication_animation ? (
             <span>
               <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
+                style={{ color: theme.palette.text.secondary }}
               >
                 {t('To')}
               </span>
               &nbsp;
               <span
-                style={{
-                  color: theme.palette.secondary.main,
-                }}
+                style={{ color: theme.palette.secondary.main }}
               >
                 <TruncatedText
                   content={resolveUserNames(communicationUsers, true)}
@@ -89,9 +81,7 @@ const Communication = (props) => {
               </span>
               ,&nbsp;
               <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
+                style={{ color: theme.palette.text.secondary }}
               >
                 {t('on')}
                 {' '}
@@ -102,17 +92,13 @@ const Communication = (props) => {
             <span>
               {' '}
               <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
+                style={{ color: theme.palette.text.secondary }}
               >
                 {t('From')}
               </span>
               &nbsp;
               <span
-                style={{
-                  color: theme.palette.secondary.main,
-                }}
+                style={{ color: theme.palette.secondary.main }}
               >
                 <TruncatedText
                   content={communication.communication_from}
@@ -121,9 +107,7 @@ const Communication = (props) => {
               </span>
               ,&nbsp;
               <span
-                style={{
-                  color: theme.palette.text.secondary,
-                }}
+                style={{ color: theme.palette.text.secondary }}
               >
                 {nsdt(communication.communication_sent_at)}
               </span>
@@ -139,7 +123,11 @@ const Communication = (props) => {
               : parse(purify.sanitize(truncate(content, limit)))}
           </div>
         ) : (
-          <div style={{ marginTop: -5, whiteSpace: 'pre-line' }}>
+          <div style={{
+            marginTop: -5,
+            whiteSpace: 'pre-line',
+          }}
+          >
             {expand ? content : truncate(content, limit)}
           </div>
         )}
@@ -150,7 +138,10 @@ const Communication = (props) => {
                 <a key={a} href={`/api/communications/attachment?file=${a}`}>
                   <Button
                     variant="contained"
-                    style={{ marginRight: 10, fontSize: 10 }}
+                    style={{
+                      marginRight: 10,
+                      fontSize: 10,
+                    }}
                     startIcon={<AttachFileRounded style={{ fontSize: 14 }} />}
                     color="secondary"
                   >

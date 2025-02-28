@@ -25,7 +25,13 @@ const TabPanel = (props) => {
       {...other}
     >
       {value === index && (
-        <Box style={{ padding: 0, marginTop: 20 }} sx={{ p: 3 }}>
+        <Box
+          style={{
+            padding: 0,
+            marginTop: 20,
+          }}
+          sx={{ p: 3 }}
+        >
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -79,7 +85,10 @@ class GroupPopover extends Component {
   }
 
   handleOpenUsers() {
-    this.setState({ openUsers: true, usersIds: this.props.groupUsersIds });
+    this.setState({
+      openUsers: true,
+      usersIds: this.props.groupUsersIds,
+    });
     this.handlePopoverClose();
   }
 
@@ -90,13 +99,14 @@ class GroupPopover extends Component {
   }
 
   handleCloseUsers() {
-    this.setState({ openUsers: false, keyword: '' });
+    this.setState({
+      openUsers: false,
+      keyword: '',
+    });
   }
 
   submitUpdateUsers(userIds) {
-    this.props.updateGroupUsers(this.props.group.group_id, {
-      group_users: userIds,
-    }).then(this.fetchAndUpdateGroup.bind(this));
+    this.props.updateGroupUsers(this.props.group.group_id, { group_users: userIds }).then(this.fetchAndUpdateGroup.bind(this));
     this.handleCloseUsers();
   }
 
@@ -156,9 +166,7 @@ class GroupPopover extends Component {
     const isChecked = event.target.checked;
     if (isChecked) {
       this.props
-        .addGroupOrganization(this.props.group.group_id, {
-          organization_id: organizationId,
-        })
+        .addGroupOrganization(this.props.group.group_id, { organization_id: organizationId })
         .then(() => {
           this.props.fetchGroup(this.props.group.group_id);
         });
@@ -326,7 +334,11 @@ class GroupPopover extends Component {
                     return (
                       <TableRow key={scenario.scenario_id}>
                         <TableCell style={{ width: '60%' }}>{scenario.scenario_name}</TableCell>
-                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
+                        <TableCell style={{
+                          width: '20%',
+                          textAlign: 'center',
+                        }}
+                        >
                           <Checkbox
                             checked={grantPlannerId !== null}
                             onChange={this.handleGrantScenarioCheck.bind(
@@ -337,7 +349,11 @@ class GroupPopover extends Component {
                             )}
                           />
                         </TableCell>
-                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
+                        <TableCell style={{
+                          width: '20%',
+                          textAlign: 'center',
+                        }}
+                        >
                           <Checkbox
                             checked={
                               grantObserverId !== null
@@ -394,7 +410,11 @@ class GroupPopover extends Component {
                     return (
                       <TableRow key={exercise.exercise_id}>
                         <TableCell style={{ width: '60%' }}>{exercise.exercise_name}</TableCell>
-                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
+                        <TableCell style={{
+                          width: '20%',
+                          textAlign: 'center',
+                        }}
+                        >
                           <Checkbox
                             checked={grantPlannerId !== null}
                             onChange={this.handleGrantExerciseCheck.bind(
@@ -405,7 +425,11 @@ class GroupPopover extends Component {
                             )}
                           />
                         </TableCell>
-                        <TableCell style={{ width: '20%', textAlign: 'center' }}>
+                        <TableCell style={{
+                          width: '20%',
+                          textAlign: 'center',
+                        }}
+                        >
                           <Checkbox
                             checked={
                               grantObserverId !== null
@@ -459,7 +483,11 @@ class GroupPopover extends Component {
                 </TableBody>
               </Table>
             </TabPanel>
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div style={{
+              float: 'right',
+              marginTop: 20,
+            }}
+            >
               <Button variant="contained" onClick={this.handleCloseGrants.bind(this)}>
                 {t('Close')}
               </Button>

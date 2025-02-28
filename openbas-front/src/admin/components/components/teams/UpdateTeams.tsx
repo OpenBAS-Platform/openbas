@@ -1,38 +1,24 @@
 import { Add, GroupsOutlined } from '@mui/icons-material';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import { useContext, useEffect, useMemo, useState } from 'react';
-import * as React from 'react';
-import { makeStyles } from 'tss-react/mui';
+import { type FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 
 import { findTeams } from '../../../../actions/teams/team-actions';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
-import SelectList, { SelectListElements } from '../../../../components/common/SelectList';
+import SelectList, { type SelectListElements } from '../../../../components/common/SelectList';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
-import type { Team, TeamOutput } from '../../../../utils/api-types';
+import { type Team, type TeamOutput } from '../../../../utils/api-types';
 import { TeamContext } from '../../common/Context';
 import CreateTeam from './CreateTeam';
 
-const useStyles = makeStyles()(() => ({
-  createButton: {
-    float: 'left',
-    marginTop: -15,
-  },
-}));
+interface Props { addedTeamIds: Team['team_id'][] }
 
-interface Props {
-  addedTeamIds: Team['team_id'][];
-}
-
-const UpdateTeams: React.FC<Props> = ({
-  addedTeamIds,
-}) => {
+const UpdateTeams: FunctionComponent<Props> = ({ addedTeamIds }) => {
   // Standard hooks
   const { t } = useFormatter();
-  const { classes } = useStyles();
   const { searchTeams, onReplaceTeam } = useContext(TeamContext);
 
   const [teamValues, setTeamValues] = useState<TeamOutput[]>([]);
@@ -63,9 +49,7 @@ const UpdateTeams: React.FC<Props> = ({
 
   // Headers
   const elements: SelectListElements<TeamOutput> = useMemo(() => ({
-    icon: {
-      value: () => <GroupsOutlined />,
-    },
+    icon: { value: () => <GroupsOutlined /> },
     headers: [
       {
         field: 'team_name',
@@ -102,8 +86,7 @@ const UpdateTeams: React.FC<Props> = ({
         color="primary"
         aria-label="Add"
         onClick={() => setOpen(true)}
-        classes={{ root: classes.createButton }}
-        size="large"
+        size="small"
       >
         <Add fontSize="small" />
       </IconButton>

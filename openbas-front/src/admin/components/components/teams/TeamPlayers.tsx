@@ -1,26 +1,25 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, CloseRounded, EmailOutlined, KeyOutlined, PersonOutlined, SmartphoneOutlined } from '@mui/icons-material';
 import { IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography } from '@mui/material';
 import * as R from 'ramda';
-import { CSSProperties, useContext, useState } from 'react';
-import * as React from 'react';
+import { type CSSProperties, type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { OrganizationHelper, UserHelper } from '../../../../actions/helper';
+import { type OrganizationHelper, type UserHelper } from '../../../../actions/helper';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import { fetchTeam, fetchTeamPlayers } from '../../../../actions/teams/team-actions';
-import type { TeamsHelper } from '../../../../actions/teams/team-helper';
+import { type TeamsHelper } from '../../../../actions/teams/team-helper';
 import { useFormatter } from '../../../../components/i18n';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useHelper } from '../../../../store';
-import type { Organization, Team } from '../../../../utils/api-types';
+import { type Organization, type Team } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import type { Option } from '../../../../utils/Option';
+import { type Option } from '../../../../utils/Option';
 import { PermissionsContext, TeamContext } from '../../common/Context';
 import TagsFilter from '../../common/filters/TagsFilter';
-import type { UserStore } from '../../teams/players/Player';
+import { type UserStore } from '../../teams/players/Player';
 import PlayerPopover from '../../teams/players/PlayerPopover';
 import TeamAddPlayers from './TeamAddPlayers';
 
@@ -35,38 +34,28 @@ const useStyles = makeStyles()(theme => ({
     left: 5,
     color: 'inherit',
   },
-  title: {
-    float: 'left',
-  },
+  title: { float: 'left' },
   search: {
     float: 'right',
     width: 200,
     marginRight: 20,
   },
-  tags: {
-    float: 'right',
-  },
+  tags: { float: 'right' },
   parameters: {
     float: 'right',
     marginTop: -8,
   },
-  container: {
-    marginTop: 10,
-  },
+  container: { marginTop: 10 },
   itemHead: {
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
-  item: {
-    height: 50,
-  },
+  item: { height: 50 },
   bodyItem: {
     height: '100%',
     fontSize: 13,
   },
-  icon: {
-    marginRight: 10,
-  },
+  icon: { marginRight: 10 },
 }));
 
 const inlineStylesHeaders: Record<string, CSSProperties> = {
@@ -157,11 +146,9 @@ interface Props {
   handleClose: () => void;
 }
 
-type UserStoreExtended = UserStore & {
-  user_enabled: boolean;
-};
+type UserStoreExtended = UserStore & { user_enabled: boolean };
 
-const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
+const TeamPlayers: FunctionComponent<Props> = ({ teamId, handleClose }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -354,7 +341,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                     style={inlineStyles.user_options}
                   >
                     {R.isNil(user.user_email)
-                    || R.isEmpty(user.user_email) ? (
+                      || R.isEmpty(user.user_email) ? (
                           <EmailOutlined
                             color="warning"
                             fontSize="small"
@@ -368,7 +355,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                           />
                         )}
                     {R.isNil(user.user_pgp_key)
-                    || R.isEmpty(user.user_pgp_key) ? (
+                      || R.isEmpty(user.user_pgp_key) ? (
                           <KeyOutlined
                             color="warning"
                             fontSize="small"
@@ -382,7 +369,7 @@ const TeamPlayers: React.FC<Props> = ({ teamId, handleClose }) => {
                           />
                         )}
                     {R.isNil(user.user_phone)
-                    || R.isEmpty(user.user_phone) ? (
+                      || R.isEmpty(user.user_phone) ? (
                           <SmartphoneOutlined
                             color="warning"
                             fontSize="small"

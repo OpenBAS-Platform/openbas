@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
+import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
@@ -19,6 +20,7 @@ import io.openbas.utils.fixtures.AtomicTestingInputFixture;
 import io.openbas.utils.fixtures.InjectFixture;
 import io.openbas.utils.fixtures.InjectStatusFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -39,6 +41,8 @@ public class AtomicTestingApiTest extends IntegrationTest {
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private InjectStatusRepository injectStatusRepository;
 
+  @Resource private RabbitmqConfig rabbitmqConfig; // TODO Remove when #1860 is merged
+
   @BeforeAll
   void beforeAll() {
     INJECTOR_CONTRACT = injectorContractRepository.findById(EMAIL_DEFAULT).orElseThrow();
@@ -50,6 +54,9 @@ public class AtomicTestingApiTest extends IntegrationTest {
     InjectStatus injectStatus = InjectStatusFixture.createDefaultInjectStatus();
     injectStatus.setInject(injectWithPayload);
     INJECT_STATUS = injectStatusRepository.save(injectStatus);
+
+    rabbitmqConfig.setUser("admin"); // TODO Remove when #1860 is merged
+    rabbitmqConfig.setPass("pass");
   }
 
   @Test

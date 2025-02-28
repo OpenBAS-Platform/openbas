@@ -1,6 +1,8 @@
 package io.openbas.utils;
 
+import static io.openbas.rest.settings.PreviewFeature.AGENT_EXPECTATION_UI;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 
 import io.openbas.database.model.AttackPattern;
 import io.openbas.database.model.Endpoint;
@@ -9,7 +11,9 @@ import io.openbas.database.raw.*;
 import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
+import io.openbas.rest.settings.response.PlatformSettings;
 import io.openbas.service.AssetGroupService;
+import io.openbas.service.PlatformSettingsService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -28,6 +32,8 @@ public class ResultUtils {
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
   private final AssetGroupService assetGroupService;
+  private final AgentRepository agentRepository;
+  private final PlatformSettingsService platformSettingsService;
 
   // -- UTILS --
   public List<ExpectationResultsByType> getResultsByTypes(Set<String> injectIds) {
@@ -135,6 +141,7 @@ public class ResultUtils {
             .distinct()
             .toList());
 
+    // Assets from inject or asset group
     List<RawAsset> rawAssets = assetRepository.rawByIdsOrInjectIds(assetIds, injectIds);
     Map<String, RawAsset> assetMap =
         rawAssets.stream().collect(Collectors.toMap(RawAsset::getAsset_id, rawAsset -> rawAsset));
@@ -150,19 +157,35 @@ public class ResultUtils {
                     Collectors.mapping(
                         injectAsset -> (String) injectAsset[1], Collectors.toList())));
 
+    // -- Agent Map --
+    Set<String> agentIds =
+        rawInjectExpectations.stream()
+            .map(RawInjectExpectation::getAgent_id)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+    Set<RawAgent> rawAgents = agentRepository.rawAgentByIds(agentIds);
+    Map<String, RawAgent> agentMap =
+        rawAgents.stream().collect(Collectors.toMap(RawAgent::getAgent_id, rawAgent -> rawAgent));
+
+    PlatformSettings settings =
+        platformSettingsService.findSettings(); // TODO Remove when #1860 is merged
+
     return injectIds.stream()
         .flatMap(
-            injectId -> {
-              return AtomicTestingUtils.getTargetsWithResultsFromRaw(
-                  expectationMap.getOrDefault(injectId, emptyList()),
-                  injectAssetMap.getOrDefault(injectId, emptyList()),
-                  teamMap,
-                  userMap,
-                  assetMap,
-                  assetGroupMap,
-                  dynamicForAssetGroupMap)
-                  .stream();
-            })
+            injectId ->
+                AtomicTestingUtils.getTargetsWithResultsFromRaw(
+                    expectationMap.getOrDefault(injectId, emptyList()),
+                    injectAssetMap.getOrDefault(injectId, emptyList()),
+                    teamMap,
+                    userMap,
+                    settings.getEnabledDevFeatures().contains(AGENT_EXPECTATION_UI)
+                        ? agentMap
+                        : emptyMap(), // TODO Remove when #1860 is merged
+                    assetMap,
+                    dynamicForAssetGroupMap,
+                    assetGroupMap)
+                    .stream())
         .distinct()
         .toList();
   }

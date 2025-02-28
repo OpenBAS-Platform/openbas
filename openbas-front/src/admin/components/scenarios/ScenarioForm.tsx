@@ -1,16 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Autocomplete, Box, Button, Chip, Grid, MenuItem, Tab, Tabs, TextField as MuiTextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import * as React from 'react';
-import { FunctionComponent, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import SelectField from '../../../components/fields/SelectField';
 import TagField from '../../../components/fields/TagField';
 import TextField from '../../../components/fields/TextField';
 import { useFormatter } from '../../../components/i18n';
-import type { ScenarioInput } from '../../../utils/api-types';
+import { type ScenarioInput } from '../../../utils/api-types';
 import { zodImplement } from '../../../utils/Zod';
 import { scenarioCategories } from './constants';
 
@@ -33,8 +32,8 @@ const ScenarioForm: FunctionComponent<Props> = ({
   const theme = useTheme();
   const { t } = useFormatter();
   const [inputValue, setInputValue] = useState('');
-  const [currentTab, setCurrentTab] = React.useState(0);
-  const handleChangeTab = (_: React.SyntheticEvent, newValue: number) => {
+  const [currentTab, setCurrentTab] = useState(0);
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
   };
   const {
@@ -66,7 +65,11 @@ const ScenarioForm: FunctionComponent<Props> = ({
   });
   return (
     <>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Box sx={{
+        borderBottom: 1,
+        borderColor: 'divider',
+      }}
+      >
         <Tabs value={currentTab} onChange={handleChangeTab} aria-label="basic tabs example">
           <Tab label={t('General')} />
           <Tab label={t('Emails and SMS')} />
@@ -283,7 +286,11 @@ const ScenarioForm: FunctionComponent<Props> = ({
             />
           </>
         )}
-        <div style={{ float: 'right', marginTop: 20 }}>
+        <div style={{
+          float: 'right',
+          marginTop: 20,
+        }}
+        >
           <Button
             variant="contained"
             onClick={handleClose}

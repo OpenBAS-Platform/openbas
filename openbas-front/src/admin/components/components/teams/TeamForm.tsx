@@ -1,17 +1,17 @@
 import { Button } from '@mui/material';
-import { FunctionComponent, useContext } from 'react';
+import { type FunctionComponent, useContext } from 'react';
 import { Form } from 'react-final-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
-import { TeamInputForm } from '../../../../actions/teams/Team';
+import { type TeamInputForm } from '../../../../actions/teams/Team';
 import CheckboxField from '../../../../components/CheckboxField';
 import OldTextField from '../../../../components/fields/OldTextField';
 import { useFormatter } from '../../../../components/i18n';
 import OrganizationField from '../../../../components/OrganizationField';
 import TagField from '../../../../components/TagField';
 import { schemaValidator } from '../../../../utils/Zod';
-import { TeamContext, TeamContextType } from '../../common/Context';
+import { TeamContext, type TeamContextType } from '../../common/Context';
 
 const useStyles = makeStyles()(theme => ({
   container: {
@@ -37,9 +37,7 @@ const TeamForm: FunctionComponent<TeamFormProps> = ({
   const { classes } = useStyles();
   const { t } = useFormatter();
   const { onCreateTeam } = useContext<TeamContextType>(TeamContext);
-  const teamFormSchemaValidation = z.object({
-    team_name: z.string().min(2, t('This field is mandatory')),
-  });
+  const teamFormSchemaValidation = z.object({ team_name: z.string().min(2, t('This field is mandatory')) });
   return (
     <Form
       keepDirtyOnReinitialize={true}

@@ -1,18 +1,17 @@
 import { InfoOutlined, SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
-import { Box, Button, Grid2 as Grid, Theme } from '@mui/material';
+import { Box, Button, Grid2 as Grid, type Theme } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { FunctionComponent, useCallback, useMemo } from 'react';
+import { type FunctionComponent, useCallback, useMemo } from 'react';
 import Chart from 'react-apexcharts';
 import { Link } from 'react-router';
 
 import { useFormatter } from '../../../../components/i18n';
-import type { ExpectationResultsByType, ResultDistribution } from '../../../../utils/api-types';
+import { type ExpectationResultsByType, type ResultDistribution } from '../../../../utils/api-types';
 import { donutChartOptions } from '../../../../utils/Charts';
 
 interface Props {
   expectationResultsByTypes?: ExpectationResultsByType[] | null;
   humanValidationLink?: string;
-  immutable?: boolean;
   disableChartAnimation?: boolean;
 }
 
@@ -43,7 +42,6 @@ const iconOverlay = {
 const ResponsePie: FunctionComponent<Props> = ({
   expectationResultsByTypes,
   humanValidationLink,
-  immutable,
   disableChartAnimation,
 }) => {
   // Standard hooks
@@ -66,25 +64,31 @@ const ResponsePie: FunctionComponent<Props> = ({
     }
   };
 
-  const Pie = useCallback(({ title, expectationResultsByType, type }: { title: string; expectationResultsByType?: ExpectationResultsByType; type: string }) => {
+  const Pie = useCallback(({ title, expectationResultsByType, type }: {
+    title: string;
+    expectationResultsByType?: ExpectationResultsByType;
+    type: string;
+  }) => {
     const hasDistribution = expectationResultsByType && expectationResultsByType.distribution && expectationResultsByType.distribution.length > 0;
     const labels = hasDistribution
       ? expectationResultsByType.distribution.map(e => `${t(e.label)} (${(((e.value!) / getTotal(expectationResultsByType.distribution!)) * 100).toFixed(1)}%)`)
       : [`${t('No expectation for')} ${title}`];
-    let colors = [];
-    if (immutable) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      colors = hasDistribution ? expectationResultsByType.distribution.map(e => getColor(theme, e.label)).asMutable() : ['rgba(202, 203, 206, 0.18)'];
-    } else {
-      colors = hasDistribution ? expectationResultsByType.distribution.map(e => getColor(theme, e.label)) : ['rgba(202, 203, 206, 0.18)'];
-    }
+    const colors = hasDistribution ? expectationResultsByType.distribution.map(e => getColor(theme, e.label)) : ['rgba(202, 203, 206, 0.18)'];
     const data = useMemo(() => (hasDistribution ? expectationResultsByType.distribution.map(e => e.value) : [1]), [expectationResultsByType]);
 
     return (
       <Grid size={4}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Box sx={{ position: 'relative', height: 120 }}>
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+        >
+          <Box sx={{
+            position: 'relative',
+            height: 120,
+          }}
+          >
             {renderIcon(type, hasDistribution)}
             <Chart
               options={
@@ -107,7 +111,11 @@ const ResponsePie: FunctionComponent<Props> = ({
             />
           </Box>
           <span
-            style={{ ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}), fontWeight: 500, paddingTop: 24 }}
+            style={{
+              ...(!hasDistribution ? { color: theme.palette.text?.disabled } : {}),
+              fontWeight: 500,
+              paddingTop: 24,
+            }}
           >
             {title}
           </span>
@@ -125,7 +133,7 @@ const ResponsePie: FunctionComponent<Props> = ({
         </Box>
       </Grid>
     );
-  }, [immutable, theme, displayHumanValidationBtn, humanValidationLink, pending]);
+  }, [theme, displayHumanValidationBtn, humanValidationLink, pending]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

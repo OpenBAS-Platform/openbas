@@ -7,11 +7,7 @@ import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import CKEditor from '../CKEditor';
 import { useFormatter } from '../i18n';
 
-const useStyles = makeStyles()(theme => ({
-  errorColor: {
-    color: theme.palette.error.main,
-  },
-}));
+const useStyles = makeStyles()(theme => ({ errorColor: { color: theme.palette.error.main } }));
 
 const RichTextFieldBase = ({
   label,
@@ -27,14 +23,16 @@ const RichTextFieldBase = ({
   const { classes, cx } = useStyles();
   return (
     (
-      <div style={{ ...style, position: 'relative' }}>
+      <div style={{
+        ...style,
+        position: 'relative',
+      }}
+      >
         <InputLabel
           variant="standard"
           shrink={true}
           disabled={disabled}
-          className={cx({
-            [classes.errorColor]: touched && invalid,
-          })}
+          className={cx({ [classes.errorColor]: touched && invalid })}
         >
           {label}
         </InputLabel>
@@ -47,11 +45,11 @@ const RichTextFieldBase = ({
           disabled={disabled}
         />
         {touched && invalid
-        && (
-          <FormHelperText error>
-            {(error && t(error)) || (submitError && t(submitError))}
-          </FormHelperText>
-        )}
+          && (
+            <FormHelperText error>
+              {(error && t(error)) || (submitError && t(submitError))}
+            </FormHelperText>
+          )}
         {askAi && (
           <TextFieldAskAI
             currentValue={value ?? ''}

@@ -30,9 +30,7 @@ const useStyles = makeStyles()(() => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
   itemHead: {
     paddingLeft: 10,
     textTransform: 'uppercase',
@@ -141,12 +139,19 @@ const ArticleForm = ({
   const handleRemoveDocument = docId => setDocuments(documents.filter(n => n !== docId));
   // Preparing data
   const sortedChannels = R.sortWith([R.ascend(R.prop('channel_name'))], channels).map(
-    n => ({ id: n.channel_id, label: n.channel_name, type: n.channel_type }),
+    n => ({
+      id: n.channel_id,
+      label: n.channel_name,
+      type: n.channel_type,
+    }),
   );
   const currentChannel = sortedChannels.find(
     m => m.id === initialValues.article_channel,
   );
-  const formData = { ...initialValues, article_channel: currentChannel };
+  const formData = {
+    ...initialValues,
+    article_channel: currentChannel,
+  };
 
   const documentsReverseBy = (field) => {
     setDocumentsSortBy(field);
@@ -180,7 +185,10 @@ const ArticleForm = ({
   };
 
   const submitForm = (data) => {
-    return onSubmit({ ...data, article_documents: documents });
+    return onSubmit({
+      ...data,
+      article_documents: documents,
+    });
   };
 
   // Rendering
@@ -364,7 +372,11 @@ const ArticleForm = ({
                 />
               )}
             </List>
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div style={{
+              float: 'right',
+              marginTop: 20,
+            }}
+            >
               <Button
                 onClick={handleClose}
                 style={{ marginRight: 10 }}

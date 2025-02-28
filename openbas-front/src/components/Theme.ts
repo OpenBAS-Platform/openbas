@@ -1,29 +1,19 @@
-import {
-  PaletteColorOptions,
-} from '@mui/material';
+import { type PaletteColorOptions } from '@mui/material';
 
 declare module '@mui/material/IconButton' {
-  interface IconButtonPropsColorOverrides {
-    ee: true;
-  }
+  interface IconButtonPropsColorOverrides { ee: true }
 }
 
 declare module '@mui/material/Button' {
-  interface ButtonPropsColorOverrides {
-    ee: true;
-  }
+  interface ButtonPropsColorOverrides { ee: true }
 }
 
 declare module '@mui/material/Button' {
-  interface ChipPropsColorOverrides {
-    ee: true;
-  }
+  interface ChipPropsColorOverrides { ee: true }
 }
 
 declare module '@mui/material/SvgIcon' {
-  interface SvgIconPropsColorOverrides {
-    ee: true;
-  }
+  interface SvgIconPropsColorOverrides { ee: true }
 }
 
 declare module '@mui/material/styles' {

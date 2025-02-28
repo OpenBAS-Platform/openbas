@@ -46,7 +46,10 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
             id: data.instance[data.attribute_id],
             type: data.attribute_schema,
           };
-          const deleteEvent = { type: DATA_DELETE_SUCCESS, payload };
+          const deleteEvent = {
+            type: DATA_DELETE_SUCCESS,
+            payload,
+          };
           store.dispatch(deleteEvent);
         } else {
           const schemaInfo = { idAttribute: data.attribute_id };
@@ -56,7 +59,10 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
             schemaInfo,
           );
           const dataNormalize = normalize(data.instance, schemas);
-          const storeEvent = { type: data.event_type, payload: dataNormalize };
+          const storeEvent = {
+            type: data.event_type,
+            payload: dataNormalize,
+          };
           store.dispatch(storeEvent);
         }
       }

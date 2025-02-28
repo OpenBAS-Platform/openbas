@@ -1,10 +1,11 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
-import { CSSProperties, FunctionComponent } from 'react';
+import { type CSSProperties, type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../i18n';
-import { Header } from '../../SortHeadersList';
-import { SortHelpers } from './SortHelpers';
+import { type Header } from '../../SortHeadersList';
+import useBodyItemsStyles from '../style/style';
+import { type SortHelpers } from './SortHelpers';
 
 const useStyles = makeStyles()(() => ({
   sortableHeaderItem: {
@@ -13,15 +14,6 @@ const useStyles = makeStyles()(() => ({
     fontWeight: '700',
     cursor: 'pointer',
     paddingRight: 10,
-    alignItems: 'center',
-  },
-  headerItems: {
-    display: 'flex',
-  },
-  headerItem: {
-    display: 'flex',
-    fontSize: 12,
-    fontWeight: 700,
     alignItems: 'center',
   },
   headerItemText: {
@@ -45,6 +37,7 @@ const SortHeadersComponentV2: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
 
   const sortComponent = (asc: boolean) => {
     return asc ? (<ArrowDropUpOutlined />) : (<ArrowDropDownOutlined />);
@@ -60,14 +53,20 @@ const SortHeadersComponentV2: FunctionComponent<Props> = ({
       );
     }
     return (
-      <div key={header.field} className={classes.headerItem} style={style}>
+      <div
+        key={header.field}
+        style={{
+          ...bodyItemsStyles.bodyItem,
+          ...style,
+        }}
+      >
         <div className={classes.headerItemText}>{t(header.label)}</div>
       </div>
     );
   };
 
   return (
-    <div className={classes.headerItems}>
+    <div style={bodyItemsStyles.bodyItems}>
       {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
     </div>
   );

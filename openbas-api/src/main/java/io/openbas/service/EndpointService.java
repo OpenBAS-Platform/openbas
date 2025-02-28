@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
@@ -16,9 +17,11 @@ import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ExecutorRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.database.specification.EndpointSpecification;
+import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -32,17 +35,21 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Log
 public class EndpointService {
+
+  public static final int DELETE_TTL = 86400000; // 24 hours
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
@@ -64,6 +71,7 @@ public class EndpointService {
   private final ExecutorRepository executorRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
   private final TagRepository tagRepository;
+  private final AgentService agentService;
 
   // -- CRUD --
   public Endpoint createEndpoint(@NotNull final Endpoint endpoint) {
@@ -72,18 +80,30 @@ public class EndpointService {
 
   public Endpoint endpoint(@NotBlank final String endpointId) {
     return this.endpointRepository
-        .findByEndpointIdWithFirstLevelOfAgents(endpointId)
+        .findById(endpointId)
         .orElseThrow(() -> new ElementNotFoundException("Endpoint not found"));
   }
 
-  @Transactional(readOnly = true)
-  public List<Endpoint> findAssetsForInjectionByHostname(@NotBlank final String hostname) {
-    return endpoints(EndpointSpecification.findEndpointsForInjectionByHostname(hostname));
+  public List<Endpoint> findEndpointByHostname(
+      @NotBlank final String hostname,
+      @NotNull final Endpoint.PLATFORM_TYPE platform,
+      @NotNull final Endpoint.PLATFORM_ARCH arch) {
+    return this.endpointRepository.findByHostnameArchAndPlatform(
+        hostname.toLowerCase(), platform.name(), arch.name());
   }
 
-  @Transactional(readOnly = true)
-  public Optional<Endpoint> findByExternalReference(@NotBlank final String externalReference) {
-    return this.endpointRepository.findByExternalReference(externalReference);
+  public List<Endpoint> findEndpointByHostnameAndAtLeastOneIp(
+      @NotBlank final String hostname,
+      @NotNull final Endpoint.PLATFORM_TYPE platform,
+      @NotNull final Endpoint.PLATFORM_ARCH arch,
+      @NotNull final String[] ips) {
+    return this.endpointRepository.findByHostnameAndAtleastOneIp(
+        hostname, platform.name(), arch.name(), ips);
+  }
+
+  public Optional<Endpoint> findEndpointByAtLeastOneMacAddress(
+      @NotNull final String[] macAddresses) {
+    return this.endpointRepository.findByAtleastOneMacAddress(macAddresses);
   }
 
   public List<Endpoint> endpoints() {
@@ -125,62 +145,192 @@ public class EndpointService {
   }
 
   // -- INSTALLATION AGENT --
+  public void registerAgentEndpoint(AgentRegisterInput input) {
+    // Check if agent exists (only 1 agent can be found for Crowdstrike and Tanium)
+    List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
+    if (!existingAgents.isEmpty()) {
+      Agent existingAgent = existingAgents.getFirst();
+      if (input.isActive()) {
+        updateExistingAgent(existingAgent, input);
+      } else {
+        // Delete inactive agent
+        handleInactiveAgent(existingAgent);
+      }
+    } else {
+      // Check if endpoint exists
+      Optional<Endpoint> existingEndpoint =
+          findEndpointByAtLeastOneMacAddress(input.getMacAddresses());
+      if (existingEndpoint.isPresent()) {
+        updateExistingEndpointAndManageAgent(existingEndpoint.get(), input);
+      } else {
+        createNewEndpointAndAgent(input);
+      }
+    }
+  }
 
   public Endpoint register(final EndpointRegisterInput input) throws IOException {
-    Optional<Endpoint> optionalEndpoint = findByExternalReference(input.getExternalReference());
-    Endpoint endpoint;
-    if (optionalEndpoint.isPresent()) {
-      endpoint = optionalEndpoint.get();
-      endpoint.setIps(input.getIps());
-      endpoint.setMacAddresses(input.getMacAddresses());
-      endpoint.setHostname(input.getHostname());
-      endpoint.setPlatform(input.getPlatform());
-      endpoint.setArch(input.getArch());
-      endpoint.setName(input.getName());
-      endpoint.getAgents().getFirst().setVersion(input.getAgentVersion());
-      endpoint.setDescription(input.getDescription());
-      endpoint.getAgents().getFirst().setLastSeen(Instant.now());
-      endpoint
-          .getAgents()
-          .getFirst()
-          .setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
-      endpoint
-          .getAgents()
-          .getFirst()
-          .setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
-      endpoint
-          .getAgents()
-          .getFirst()
-          .setDeploymentMode(
-              input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
-      endpoint.getAgents().getFirst().setExecutedByUser(input.getExecutedByUser());
+    AgentRegisterInput agentInput = toAgentEndpoint(input);
+    Agent agent;
+    // Check if agents exist (because we can find X openbas agent on an endpoint)
+    List<Agent> existingAgents =
+        agentService.findByExternalReference(agentInput.getExternalReference());
+    if (!existingAgents.isEmpty()) {
+      // Check if this specific agent exist
+      Agent.DEPLOYMENT_MODE deploymentMode =
+          agentInput.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session;
+      Agent.PRIVILEGE privilege =
+          agentInput.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard;
+      Optional<Agent> existingAgent =
+          existingAgents.stream()
+              .filter(
+                  ag ->
+                      ag.getExecutedByUser().equals(agentInput.getExecutedByUser())
+                          && ag.getDeploymentMode().equals(deploymentMode)
+                          && ag.getPrivilege().equals(privilege))
+              .findFirst();
+      if (existingAgent.isPresent()) {
+        agent = updateExistingAgent(existingAgent.get(), agentInput);
+      } else {
+        agent =
+            updateExistingEndpointAndCreateAgent(
+                (Endpoint) Hibernate.unproxy(existingAgents.getFirst().getAsset()), agentInput);
+      }
     } else {
-      endpoint = new Endpoint();
-      Agent agent = new Agent();
-      agent.setVersion(input.getAgentVersion());
-      agent.setExternalReference(input.getExternalReference());
-      endpoint.setUpdateAttributes(input);
-      agent.setLastSeen(Instant.now());
-      agent.setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
-      agent.setDeploymentMode(
-          input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
-      agent.setExecutedByUser(input.getExecutedByUser());
-      endpoint.setTags(iterableToSet(this.tagRepository.findAllById(input.getTagIds())));
-      agent.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
-      agent.setAsset(endpoint);
-      endpoint.setAgents(List.of(agent));
+      // Check if endpoint exists
+      Optional<Endpoint> existingEndpoint =
+          findEndpointByAtLeastOneMacAddress(agentInput.getMacAddresses());
+      if (existingEndpoint.isPresent()) {
+        agent = updateExistingEndpointAndManageAgent(existingEndpoint.get(), agentInput);
+      } else {
+        agent = createNewEndpointAndAgent(agentInput);
+      }
     }
-    Endpoint updatedEndpoint = updateEndpoint(endpoint);
     // If agent is not temporary and not the same version as the platform => Create an upgrade task
     // for the agent
-    if (updatedEndpoint.getAgents().getFirst().getParent() == null
-        && !updatedEndpoint.getAgents().getFirst().getVersion().equals(version)) {
+    Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
-      assetAgentJob.setCommand(generateUpgradeCommand(updatedEndpoint.getPlatform().name()));
-      assetAgentJob.setAgent(updatedEndpoint.getAgents().getFirst());
+      assetAgentJob.setCommand(generateUpgradeCommand(endpoint.getPlatform().name()));
+      assetAgentJob.setAgent(agent);
       assetAgentJobRepository.save(assetAgentJob);
     }
-    return updatedEndpoint;
+    return endpoint;
+  }
+
+  private Agent updateExistingEndpointAndManageAgent(Endpoint endpoint, AgentRegisterInput input) {
+    setUpdatedEndpointAttributes(endpoint, input);
+    updateEndpoint(endpoint);
+    return createOrUpdateAgent(endpoint, input);
+  }
+
+  private Agent updateExistingEndpointAndCreateAgent(Endpoint endpoint, AgentRegisterInput input) {
+    setUpdatedEndpointAttributes(endpoint, input);
+    updateEndpoint(endpoint);
+    Agent agent = new Agent();
+    setNewAgentAttributes(input, agent);
+    setUpdatedAgentAttributes(agent, input, endpoint);
+    return agentService.createOrUpdateAgent(agent);
+  }
+
+  private Agent createOrUpdateAgent(Endpoint endpoint, AgentRegisterInput input) {
+    Agent.DEPLOYMENT_MODE deploymentMode =
+        input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session;
+    Agent.PRIVILEGE privilege =
+        input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard;
+    Optional<Agent> existingAgent =
+        agentService.getAgentForAnAsset(
+            endpoint.getId(),
+            input.getExecutedByUser(),
+            deploymentMode,
+            privilege,
+            input.getExecutor().getType());
+    Agent agent;
+    if (existingAgent.isPresent()) {
+      agent = existingAgent.get();
+    } else {
+      agent = new Agent();
+      setNewAgentAttributes(input, agent);
+    }
+    setUpdatedAgentAttributes(agent, input, endpoint);
+    return agentService.createOrUpdateAgent(agent);
+  }
+
+  private void setUpdatedEndpointAttributes(Endpoint endpoint, AgentRegisterInput input) {
+    // Hostname not updated by Crowdstrike because Crowdstrike hostname is 15 length max
+    if (!CROWDSTRIKE_EXECUTOR_TYPE.equals(input.getExecutor().getType())) {
+      endpoint.setHostname(input.getHostname());
+    }
+    endpoint.setIps(EndpointMapper.mergeAddressArrays(endpoint.getIps(), input.getIps()));
+    endpoint.setMacAddresses(
+        EndpointMapper.mergeAddressArrays(endpoint.getMacAddresses(), input.getMacAddresses()));
+  }
+
+  private Agent updateExistingAgent(Agent agent, AgentRegisterInput input) {
+    Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    setUpdatedEndpointAttributes(endpoint, input);
+    updateEndpoint(endpoint);
+    setUpdatedAgentAttributes(agent, input, endpoint);
+    return agentService.createOrUpdateAgent(agent);
+  }
+
+  private void setUpdatedAgentAttributes(Agent agent, AgentRegisterInput input, Endpoint endpoint) {
+    agent.setAsset(endpoint);
+    agent.setLastSeen(input.getLastSeen());
+    agent.setExternalReference(input.getExternalReference());
+    // For OpenBAS agent
+    agent.setVersion(input.getAgentVersion());
+  }
+
+  private Agent createNewEndpointAndAgent(AgentRegisterInput input) {
+    Endpoint endpoint = new Endpoint();
+    endpoint.setUpdateAttributes(input);
+    endpoint.setIps(input.getIps());
+    endpoint.setMacAddresses(input.getMacAddresses());
+    createEndpoint(endpoint);
+    Agent agent = new Agent();
+    setUpdatedAgentAttributes(agent, input, endpoint);
+    setNewAgentAttributes(input, agent);
+    return agentService.createOrUpdateAgent(agent);
+  }
+
+  private void setNewAgentAttributes(AgentRegisterInput input, Agent agent) {
+    agent.setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
+    agent.setDeploymentMode(
+        input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
+    agent.setExecutedByUser(input.getExecutedByUser());
+    agent.setExecutor(input.getExecutor());
+  }
+
+  private void handleInactiveAgent(Agent existingAgent) {
+    if ((now().toEpochMilli() - existingAgent.getLastSeen().toEpochMilli()) > DELETE_TTL) {
+      log.info(
+          "Found stale endpoint "
+              + existingAgent.getAsset().getName()
+              + ", deleting the "
+              + existingAgent.getExecutor().getType()
+              + " agent "
+              + existingAgent.getExecutedByUser()
+              + " in it...");
+      this.agentService.deleteAgent(existingAgent.getId());
+    }
+  }
+
+  private AgentRegisterInput toAgentEndpoint(EndpointRegisterInput input) {
+    AgentRegisterInput agentInput = new AgentRegisterInput();
+    agentInput.setExecutor(executorRepository.findById(OPENBAS_EXECUTOR_ID).orElse(null));
+    agentInput.setLastSeen(Instant.now());
+    agentInput.setExternalReference(input.getExternalReference());
+    agentInput.setIps(input.getIps());
+    agentInput.setMacAddresses(input.getMacAddresses());
+    agentInput.setHostname(input.getHostname());
+    agentInput.setAgentVersion(input.getAgentVersion());
+    agentInput.setName(input.getName());
+    agentInput.setPlatform(input.getPlatform());
+    agentInput.setArch(input.getArch());
+    agentInput.setService(input.isService());
+    agentInput.setElevated(input.isElevated());
+    agentInput.setExecutedByUser(input.getExecutedByUser());
+    return agentInput;
   }
 
   public String getFileOrDownloadFromJfrog(String platform, String file, String adminToken)

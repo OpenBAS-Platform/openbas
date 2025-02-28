@@ -13,6 +13,8 @@ export interface Agent {
   agent_active?: boolean;
   agent_asset: string;
   /** @format date-time */
+  agent_cleared_at?: string;
+  /** @format date-time */
   agent_created_at: string;
   agent_deployment_mode: "service" | "session";
   agent_executed_by_user: string;
@@ -31,7 +33,7 @@ export interface Agent {
   listened?: boolean;
 }
 
-/** List of agents */
+/** List of primary agents */
 export interface AgentOutput {
   /** Indicates whether the endpoint is active. The endpoint is considered active if it was seen in the last 3 minutes. */
   agent_active?: boolean;
@@ -290,8 +292,6 @@ export interface AttackPatternUpsertInput {
 
 interface BasePayload {
   listened?: boolean;
-  /** @format int32 */
-  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -358,6 +358,7 @@ export interface ChallengeFlag {
 
 export interface ChallengeInformation {
   challenge_detail?: PublicChallenge;
+  /** List of expectations id linked to this team */
   challenge_expectation?: InjectExpectation;
 }
 
@@ -423,9 +424,11 @@ export interface ChannelCreateInput {
 
 export interface ChannelReader {
   channel_articles?: Article[];
+  /** IDs of the simulations linked to the team */
   channel_exercise?: Exercise;
   channel_id?: string;
   channel_information?: Channel;
+  /** IDs of the scenarios linked to the team */
   channel_scenario?: Scenario;
 }
 
@@ -540,8 +543,6 @@ export interface Command {
   command_content: string;
   command_executor: string;
   listened?: boolean;
-  /** @format int32 */
-  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -624,8 +625,6 @@ export interface DirectInjectInput {
 export interface DnsResolution {
   dns_resolution_hostname: string;
   listened?: boolean;
-  /** @format int32 */
-  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -684,8 +683,6 @@ export interface DocumentUpdateInput {
 export interface Endpoint {
   asset_agents?: Agent[];
   /** @format date-time */
-  asset_cleared_at?: string;
-  /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
   asset_id: string;
@@ -727,7 +724,7 @@ export interface EndpointOutput {
 
 export interface EndpointOverviewOutput {
   /**
-   * List of agents
+   * List of primary agents
    * @uniqueItems true
    */
   asset_agents: AgentOutput[];
@@ -809,8 +806,6 @@ export interface EvaluationInput {
 export interface Executable {
   executable_file?: string;
   listened?: boolean;
-  /** @format int32 */
-  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -858,7 +853,7 @@ export interface ExecutionTraces {
     | "WARNING"
     | "PARTIAL"
     | "MAYBE_PARTIAL_PREVENTED"
-    | "ASSET_INACTIVE"
+    | "AGENT_INACTIVE"
     | "INFO";
   /** @format date-time */
   execution_time?: string;
@@ -898,7 +893,7 @@ export interface ExecutionTracesOutput {
     | "WARNING"
     | "PARTIAL"
     | "MAYBE_PARTIAL_PREVENTED"
-    | "ASSET_INACTIVE"
+    | "AGENT_INACTIVE"
     | "INFO";
   /** @format date-time */
   execution_time: string;
@@ -939,6 +934,7 @@ export interface ExecutorUpdateInput {
   executor_last_execution?: string;
 }
 
+/** IDs of the simulations linked to the team */
 export interface Exercise {
   /** @format int64 */
   exercise_all_users_number?: number;
@@ -997,55 +993,6 @@ export interface Exercise {
   listened?: boolean;
 }
 
-export interface ExerciseDetails {
-  /** @format int64 */
-  exercise_all_users_number?: number;
-  exercise_category?: string;
-  /** @format int64 */
-  exercise_communications_number?: number;
-  /** @format date-time */
-  exercise_created_at?: string;
-  exercise_description?: string;
-  /** @format date-time */
-  exercise_end_date?: string;
-  exercise_id: string;
-  exercise_kill_chain_phases?: KillChainPhase[];
-  exercise_lessons_anonymized?: boolean;
-  /** @format int64 */
-  exercise_lessons_answers_number?: number;
-  /** @format int64 */
-  exercise_logs_number?: number;
-  exercise_mail_from: string;
-  exercise_mails_reply_to?: string[];
-  exercise_main_focus?: string;
-  exercise_message_footer?: string;
-  exercise_message_header?: string;
-  exercise_name: string;
-  /** @uniqueItems true */
-  exercise_observers?: string[];
-  /** @uniqueItems true */
-  exercise_planners?: string[];
-  exercise_platforms?: string[];
-  exercise_scenario?: string;
-  /** @format double */
-  exercise_score?: number;
-  exercise_severity?: "low" | "medium" | "high" | "critical";
-  /** @format date-time */
-  exercise_start_date?: string;
-  exercise_status: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
-  exercise_subtitle?: string;
-  /** @uniqueItems true */
-  exercise_tags?: string[];
-  /** @uniqueItems true */
-  exercise_teams_users?: ExerciseTeamUser[];
-  /** @format date-time */
-  exercise_updated_at?: string;
-  /** @uniqueItems true */
-  exercise_users?: string[];
-  /** @format int64 */
-  exercise_users_number?: number;
-}
-
 export interface ExerciseInput {
   exercise_category?: string;
   exercise_description?: string;
@@ -1082,6 +1029,7 @@ export interface ExerciseTeamPlayersEnableInput {
   exercise_team_players?: string[];
 }
 
+/** List of 3-tuple linking simulation IDs and user IDs to this team ID */
 export interface ExerciseTeamUser {
   exercise_id?: string;
   team_id?: string;
@@ -1138,11 +1086,15 @@ export interface ExportMapperInput {
   ids_to_export: string[];
 }
 
+export interface ExportOptionsInput {
+  with_players?: boolean;
+  with_teams?: boolean;
+  with_variable_values?: boolean;
+}
+
 export interface FileDrop {
   file_drop_file?: string;
   listened?: boolean;
-  /** @format int32 */
-  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -1193,6 +1145,28 @@ export interface FilterGroup {
   mode: "and" | "or";
 }
 
+export interface Finding {
+  /** @format date-time */
+  finding_created_at: string;
+  finding_field: string;
+  finding_id: string;
+  finding_inject_id?: string;
+  finding_labels?: string[];
+  finding_type: "text" | "Number" | "port" | "IPv4" | "IPv6" | "Credentials";
+  /** @format date-time */
+  finding_updated_at: string;
+  finding_value: string;
+  listened?: boolean;
+}
+
+export interface FindingInput {
+  finding_field: string;
+  finding_inject_id?: string;
+  finding_labels?: string[];
+  finding_type: "text" | "Number" | "port" | "IPv4" | "IPv6" | "Credentials";
+  finding_value: string;
+}
+
 export interface FlagInput {
   flag_type: string;
   flag_value: string;
@@ -1229,6 +1203,7 @@ export interface Grant {
   listened?: boolean;
 }
 
+/** Group IDs of the user */
 export interface Group {
   group_default_exercise_assign?: ("OBSERVER" | "PLANNER")[];
   group_default_exercise_observer?: boolean;
@@ -1317,6 +1292,7 @@ export interface ImportTestSummary {
   total_injects?: number;
 }
 
+/** List of inject IDs from all scenarios of the team */
 export interface Inject {
   footer?: string;
   header?: string;
@@ -1438,9 +1414,12 @@ export interface InjectExecutionInput {
   /** @format int32 */
   execution_duration?: number;
   execution_message: string;
+  execution_output_raw?: string;
+  execution_output_structured?: string;
   execution_status: string;
 }
 
+/** List of expectations id linked to this team */
 export interface InjectExpectation {
   inject_expectation_agent?: string;
   inject_expectation_article?: string;
@@ -1511,6 +1490,32 @@ export interface InjectExpectationUpdateInput {
   is_success: boolean;
   metadata?: Record<string, string>;
   result: string;
+}
+
+export interface InjectExportFromSearchRequestInput {
+  inject_ids_to_ignore?: string[];
+  inject_ids_to_process?: string[];
+  options?: ExportOptionsInput;
+  search_pagination_input?: SearchPaginationInput;
+  simulation_or_scenario_id?: string;
+}
+
+export interface InjectExportRequestInput {
+  injects?: InjectExportTarget[];
+  options?: ExportOptionsInput;
+}
+
+export interface InjectExportTarget {
+  inject_id?: string;
+}
+
+export interface InjectImportInput {
+  target: InjectImportTargetDefinition;
+}
+
+export interface InjectImportTargetDefinition {
+  id?: string;
+  type: "ATOMIC_TESTING" | "SIMULATION" | "SCENARIO";
 }
 
 export interface InjectImporter {
@@ -1688,11 +1693,12 @@ export interface InjectStatusSimple {
 /** Results of expectations for each target */
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
+  executorType?: string;
   expectationResultsByTypes?: ExpectationResultsByType[];
   id: string;
   name?: string;
   platformType?: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  targetType?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
+  targetType: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
 export interface InjectTeamsInput {
@@ -1762,6 +1768,7 @@ export interface InjectorContract {
   injector_contract_import_available?: boolean;
   injector_contract_injector: string;
   injector_contract_injector_type?: string;
+  injector_contract_injector_type_name?: string;
   injector_contract_labels?: Record<string, string>;
   injector_contract_manual?: boolean;
   injector_contract_needs_executor?: boolean;
@@ -1807,12 +1814,14 @@ export interface InjectorContractInput {
 
 export interface InjectorContractOutput {
   injector_contract_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  /** Attack pattern Ids */
+  /** Attack pattern IDs */
   injector_contract_attack_patterns?: string[];
   /** Content */
   injector_contract_content: string;
   /** Injector contract Id */
   injector_contract_id: string;
+  /** Injector name */
+  injector_contract_injector_name?: string;
   /** Injector type */
   injector_contract_injector_type?: string;
   /** Labels */
@@ -2191,8 +2200,6 @@ export interface NetworkTraffic {
   /** @format int32 */
   network_traffic_port_src: number;
   network_traffic_protocol: string;
-  /** @format int32 */
-  numberOfActions?: number;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
   payload_cleanup_command?: string;
@@ -3183,6 +3190,7 @@ export interface RuleAttributeUpdateInput {
   rule_attribute_name: string;
 }
 
+/** IDs of the scenarios linked to the team */
 export interface Scenario {
   listened?: boolean;
   /** @format int64 */
@@ -3311,8 +3319,6 @@ export interface SearchTerm {
 
 export interface SecurityPlatform {
   /** @format date-time */
-  asset_cleared_at?: string;
-  /** @format date-time */
   asset_created_at: string;
   asset_description?: string;
   asset_external_reference?: string;
@@ -3364,6 +3370,55 @@ export interface SettingsUpdateInput {
   platform_name: string;
   /** Theme of the platform */
   platform_theme: string;
+}
+
+export interface SimulationDetails {
+  /** @format int64 */
+  exercise_all_users_number?: number;
+  exercise_category?: string;
+  /** @format int64 */
+  exercise_communications_number?: number;
+  /** @format date-time */
+  exercise_created_at?: string;
+  exercise_description?: string;
+  /** @format date-time */
+  exercise_end_date?: string;
+  exercise_id: string;
+  exercise_kill_chain_phases?: KillChainPhase[];
+  exercise_lessons_anonymized?: boolean;
+  /** @format int64 */
+  exercise_lessons_answers_number?: number;
+  /** @format int64 */
+  exercise_logs_number?: number;
+  exercise_mail_from: string;
+  exercise_mails_reply_to?: string[];
+  exercise_main_focus?: string;
+  exercise_message_footer?: string;
+  exercise_message_header?: string;
+  exercise_name: string;
+  /** @uniqueItems true */
+  exercise_observers?: string[];
+  /** @uniqueItems true */
+  exercise_planners?: string[];
+  exercise_platforms?: string[];
+  exercise_scenario?: string;
+  /** @format double */
+  exercise_score?: number;
+  exercise_severity?: "low" | "medium" | "high" | "critical";
+  /** @format date-time */
+  exercise_start_date?: string;
+  exercise_status: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
+  exercise_subtitle?: string;
+  /** @uniqueItems true */
+  exercise_tags?: string[];
+  /** @uniqueItems true */
+  exercise_teams_users?: ExerciseTeamUser[];
+  /** @format date-time */
+  exercise_updated_at?: string;
+  /** @uniqueItems true */
+  exercise_users?: string[];
+  /** @format int64 */
+  exercise_users_number?: number;
 }
 
 export interface SimulationsResultsLatest {
@@ -3445,6 +3500,7 @@ export interface StatusPayloadOutput {
   payload_type?: string;
 }
 
+/** Tag IDs of the user */
 export interface Tag {
   listened?: boolean;
   /** Color of the tag */
@@ -3491,6 +3547,7 @@ export interface TargetSimple {
   target_type?: "AGENT" | "ASSETS" | "ASSETS_GROUPS" | "PLAYER" | "TEAMS";
 }
 
+/** Team IDs of the user */
 export interface Team {
   listened?: boolean;
   /** List of communications of this team */
@@ -3760,6 +3817,7 @@ export interface User {
   user_admin?: boolean;
   /** City of the user */
   user_city?: string;
+  /** Country of the user */
   user_communications?: string[];
   /** Country of the user */
   user_country?: string;

@@ -6,15 +6,15 @@ import Chart from 'react-apexcharts';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchStatistics } from '../../actions/Application';
-import type { AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
+import { type AttackPatternHelper } from '../../actions/attack_patterns/attackpattern-helper';
 import { searchExercises } from '../../actions/Exercise';
-import type { StatisticsHelper } from '../../actions/statistics/statistics-helper';
+import { type StatisticsHelper } from '../../actions/statistics/statistics-helper';
 import { initSorting, type Page } from '../../components/common/queryable/Page';
 import Empty from '../../components/Empty';
 import { useFormatter } from '../../components/i18n';
 import Loader from '../../components/Loader';
 import { useHelper } from '../../store';
-import { AttackPattern, ExerciseSimple, type InjectExpectationResultsByAttackPattern, PlatformStatistic } from '../../utils/api-types';
+import { type AttackPattern, type ExerciseSimple, type InjectExpectationResultsByAttackPattern, type PlatformStatistic } from '../../utils/api-types';
 import { horizontalBarsChartOptions, polarAreaChartOptions, verticalBarsChartOptions } from '../../utils/Charts';
 import { attackPatternsFakeData, categoriesDataFakeData, categoriesLabelsFakeData, exercisesTimeSeriesFakeData } from '../../utils/fakeData';
 import { useAppDispatch } from '../../utils/hooks';
@@ -22,7 +22,7 @@ import useDataLoader from '../../utils/hooks/useDataLoader';
 import ResponsePie from './common/injects/ResponsePie';
 import MitreMatrix from './common/matrix/MitreMatrix';
 import PaperMetric from './common/simulate/PaperMetric';
-import ExerciseList from './simulations/ExerciseList';
+import SimulationList from './simulations/SimulationList';
 
 // Deprecated - https://mui.com/system/styles/basics/
 // Do not use it for new code.
@@ -87,7 +87,10 @@ const Dashboard = () => {
     statistics: PlatformStatistic;
     attackPatternsMap: Record<string, AttackPattern>;
   } = useHelper((helper: StatisticsHelper & AttackPatternHelper) => {
-    return { statistics: helper.getStatistics(), attackPatternsMap: helper.getAttackPatternsMap() };
+    return {
+      statistics: helper.getStatistics(),
+      attackPatternsMap: helper.getAttackPatternsMap(),
+    };
   });
   const [loading, setLoading] = useState(true);
   useDataLoader(() => {
@@ -192,7 +195,7 @@ const Dashboard = () => {
         <Paper variant="outlined" classes={{ root: classes.paperWithChart }}>
           {loading
             ? <Loader variant="inElement" />
-            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} immutable={true} />}
+            : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} />}
         </Paper>
       </Grid>
       <Grid item={true} xs={6}>
@@ -278,7 +281,7 @@ const Dashboard = () => {
         <Typography variant="h4">{t('Last simulations')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperList }}>
           {exercises.length === 0 && <Empty message={t('No simulation in this platform yet')} />}
-          <ExerciseList
+          <SimulationList
             exercises={exercises}
             hasHeader={false}
             variant="reduced-view"
@@ -288,7 +291,13 @@ const Dashboard = () => {
       </Grid>
       <Grid item xs={12}>
         <Typography variant="h4">{t('MITRE ATT&CK Coverage')}</Typography>
-        <Paper variant="outlined" style={{ minWidth: '100%', padding: 16 }}>
+        <Paper
+          variant="outlined"
+          style={{
+            minWidth: '100%',
+            padding: 16,
+          }}
+        >
           {
             loading
               ? <Loader variant="inElement" />

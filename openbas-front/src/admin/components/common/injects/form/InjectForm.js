@@ -48,9 +48,7 @@ const styles = theme => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 });
 
 class InjectForm extends Component {
@@ -64,7 +62,7 @@ class InjectForm extends Component {
       isAtomic = false,
     } = this.props;
     return (
-      <>
+      <div>
         <TextField
           variant="standard"
           inputProps={register('inject_title')}
@@ -99,39 +97,39 @@ class InjectForm extends Component {
           )}
         />
         {!isAtomic
-        && (
-          <div className={disabled ? classes.durationDisabled : classes.duration}>
-            <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
-            <TextField
-              variant="standard"
-              inputProps={register('inject_depends_duration_days')}
-              type="number"
-              label={t('Days')}
-              style={{ width: '20%' }}
-              disabled={disabled}
-              control={control}
-            />
-            <TextField
-              variant="standard"
-              inputProps={register('inject_depends_duration_hours')}
-              type="number"
-              label={t('Hours')}
-              style={{ width: '20%' }}
-              disabled={disabled}
-              control={control}
-            />
-            <TextField
-              variant="standard"
-              inputProps={register('inject_depends_duration_minutes')}
-              type="number"
-              label={t('Minutes')}
-              style={{ width: '20%' }}
-              disabled={disabled}
-              control={control}
-            />
-          </div>
-        )}
-      </>
+          && (
+            <div className={disabled ? classes.durationDisabled : classes.duration}>
+              <div className={disabled ? classes.triggerDisabled : classes.trigger}>{t('Trigger after')}</div>
+              <TextField
+                variant="standard"
+                inputProps={register('inject_depends_duration_days')}
+                type="number"
+                label={t('Days')}
+                style={{ width: '20%' }}
+                disabled={disabled}
+                control={control}
+              />
+              <TextField
+                variant="standard"
+                inputProps={register('inject_depends_duration_hours')}
+                type="number"
+                label={t('Hours')}
+                style={{ width: '20%' }}
+                disabled={disabled}
+                control={control}
+              />
+              <TextField
+                variant="standard"
+                inputProps={register('inject_depends_duration_minutes')}
+                type="number"
+                label={t('Minutes')}
+                style={{ width: '20%' }}
+                disabled={disabled}
+                control={control}
+              />
+            </div>
+          )}
+      </div>
     );
   }
 }

@@ -1,5 +1,5 @@
-import { Box, Chip, SelectChangeEvent, Tooltip } from '@mui/material';
-import { FunctionComponent, useRef, useState } from 'react';
+import { Box, Chip, type SelectChangeEvent, Tooltip } from '@mui/material';
+import { type FunctionComponent, useRef, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../i18n';
@@ -14,9 +14,7 @@ const useStyles = makeStyles()(theme => ({
     margin: '0 4px',
     padding: '0 4px',
   },
-  modeTooltip: {
-    margin: '0 4px',
-  },
+  modeTooltip: { margin: '0 4px' },
   container: {
     gap: '4px',
     display: 'flex',
@@ -29,9 +27,7 @@ const useStyles = makeStyles()(theme => ({
   },
   interactive: {
     'cursor': 'pointer',
-    '&:hover': {
-      textDecorationLine: 'underline',
-    },
+    '&:hover': { textDecorationLine: 'underline' },
   },
 }));
 
@@ -149,14 +145,22 @@ const ClickableChip: FunctionComponent<Props> = ({
           {t(selectedElement.key)}
         </strong>
         <Box
-          sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            overflow: 'hidden',
+          }}
           className={availableOperators.length > 1 ? classes.interactive : undefined}
           onClick={() => handleClickOpen(availableOperators, 'operator', selectedElement.operator)}
         >
           {convertOperatorToIcon(t, selectedElement.operator)}
         </Box>
         <Box
-          sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            overflow: 'hidden',
+          }}
           className={availableValues.length > 1 ? classes.interactive : undefined}
           onClick={() => handleClickOpen(availableValues, 'value', selectedElement.value)}
         >
@@ -182,16 +186,16 @@ const ClickableChip: FunctionComponent<Props> = ({
         />
       </Tooltip>
       {chipRef?.current
-      && (
-        <ClickableChipPopover
-          handleChangeValue={handleChange}
-          open={open}
-          onClose={handleClose}
-          anchorEl={chipRef.current}
-          availableValues={availableOptions}
-          element={selectedValue}
-        />
-      )}
+        && (
+          <ClickableChipPopover
+            handleChangeValue={handleChange}
+            open={open}
+            onClose={handleClose}
+            anchorEl={chipRef.current}
+            availableValues={availableOptions}
+            element={selectedValue}
+          />
+        )}
     </>
   );
 };

@@ -1,13 +1,12 @@
 import { MoreVert } from '@mui/icons-material';
-import { IconButton, Menu, MenuItem, ToggleButton, ToggleButtonProps } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
-import * as React from 'react';
+import { IconButton, Menu, MenuItem, ToggleButton, type ToggleButtonProps } from '@mui/material';
+import { type Dispatch, type FunctionComponent, type SetStateAction, useState } from 'react';
 
 import { useFormatter } from '../i18n';
 
 export interface PopoverEntry {
   label: string;
-  action: () => void | React.Dispatch<React.SetStateAction<boolean>>;
+  action: () => void | Dispatch<SetStateAction<boolean>>;
   disabled?: boolean;
 }
 
@@ -34,37 +33,37 @@ const ButtonPopover: FunctionComponent<Props> = ({
   return (
     <>
       {variant === 'toggle'
-      && (
-        <ToggleButton
-          value="popover"
-          size="small"
-          color="primary"
-          onClick={(ev) => {
-            ev.stopPropagation();
-            setAnchorEl(ev.currentTarget);
-          }}
-          style={{ ...buttonProps }}
-          disabled={disabled}
-        >
-          <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
-        </ToggleButton>
-      )}
+        && (
+          <ToggleButton
+            value="popover"
+            size="small"
+            color="primary"
+            onClick={(ev) => {
+              ev.stopPropagation();
+              setAnchorEl(ev.currentTarget);
+            }}
+            style={{ ...buttonProps }}
+            disabled={disabled}
+          >
+            <MoreVert fontSize="small" color={disabled ? 'disabled' : 'primary'} />
+          </ToggleButton>
+        )}
       {variant === 'icon'
-      && (
-        <IconButton
-          value="popover"
-          size="large"
-          color="primary"
-          onClick={(ev) => {
-            ev.stopPropagation();
-            setAnchorEl(ev.currentTarget);
-          }}
-          style={{ ...buttonProps }}
-          disabled={disabled}
-        >
-          <MoreVert color={disabled ? 'disabled' : 'primary'} />
-        </IconButton>
-      )}
+        && (
+          <IconButton
+            value="popover"
+            size="large"
+            color="primary"
+            onClick={(ev) => {
+              ev.stopPropagation();
+              setAnchorEl(ev.currentTarget);
+            }}
+            style={{ ...buttonProps }}
+            disabled={disabled}
+          >
+            <MoreVert color={disabled ? 'disabled' : 'primary'} />
+          </IconButton>
+        )}
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

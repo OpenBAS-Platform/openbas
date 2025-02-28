@@ -16,6 +16,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +47,16 @@ public class InjectorContractService {
 
   @Value("${openbas.xls.import.sms.enable}")
   private boolean smsImportEnabled;
+
+  // -- CRUD --
+
+  public InjectorContract injectorContract(@NotBlank final String id) {
+    return injectorContractRepository
+        .findById(id)
+        .orElseThrow(() -> new ElementNotFoundException("Injector contract not found"));
+  }
+
+  // -- OTHERS --
 
   @EventListener(ApplicationReadyEvent.class)
   public void initImportAvailableOnStartup() {
@@ -149,6 +160,7 @@ public class InjectorContractService {
             injectorContractPayloadJoin.get("type").alias("payload_type"),
             payloadCollectorJoin.get("type").alias("collector_type"),
             injectorContractInjectorJoin.get("type").alias("injector_contract_injector_type"),
+            injectorContractInjectorJoin.get("name").alias("injector_contract_injector_name"),
             attackPatternIdsExpression.alias("injector_contract_attack_patterns"),
             injectorContractRoot.get("updatedAt").alias("injector_contract_updated_at"),
             injectorContractPayloadJoin.get("executionArch").alias("payload_execution_arch"))
@@ -173,6 +185,7 @@ public class InjectorContractService {
                     tuple.get("injector_contract_content", String.class),
                     tuple.get("injector_contract_platforms", Endpoint.PLATFORM_TYPE[].class),
                     tuple.get("payload_type", String.class),
+                    tuple.get("injector_contract_injector_name", String.class),
                     tuple.get("collector_type", String.class),
                     tuple.get("injector_contract_injector_type", String.class),
                     tuple.get("injector_contract_attack_patterns", String[].class),

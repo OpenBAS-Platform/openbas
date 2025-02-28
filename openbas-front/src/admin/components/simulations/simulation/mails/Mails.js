@@ -14,7 +14,7 @@ import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../../utils/SortingFiltering';
 import { TeamContext } from '../../../common/Context';
 import TagsFilter from '../../../common/filters/TagsFilter';
-import InjectIcon from '../../../common/injects/InjectIcon';
+import InjectIcon from '../../../common/injects/InjectIcon.tsx';
 import AnimationMenu from '../AnimationMenu';
 import CreateQuickInject from '../injects/CreateQuickInject';
 import teamContextForExercise from '../teams/teamContextForExercise';
@@ -45,9 +45,7 @@ const useStyles = makeStyles()(() => ({
     height: '100%',
     fontSize: 13,
   },
-  goIcon: {
-    paddingTop: 3,
-  },
+  goIcon: { paddingTop: 3 },
   coms: {
     fontSize: 12,
     height: 20,
@@ -284,14 +282,22 @@ const Mails = () => {
       )}
       {viewMode === 'list' && (
         <>
-          <div style={{ float: 'left', marginRight: 10 }}>
+          <div style={{
+            float: 'left',
+            marginRight: 10,
+          }}
+          >
             <SearchFilter
               variant="small"
               onChange={filtering.handleSearch}
               keyword={filtering.keyword}
             />
           </div>
-          <div style={{ float: 'left', marginRight: 10 }}>
+          <div style={{
+            float: 'left',
+            marginRight: 10,
+          }}
+          >
             <TagsFilter
               onAddTag={filtering.handleAddTag}
               onRemoveTag={filtering.handleRemoveTag}

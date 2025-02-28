@@ -132,6 +132,11 @@ public class InjectorContract implements Base {
     return this.getInjector() != null ? this.getInjector().getType() : null;
   }
 
+  @JsonProperty("injector_contract_injector_type_name")
+  private String getInjectorName() {
+    return this.getInjector() != null ? this.getInjector().getName() : null;
+  }
+
   @JsonIgnore
   @JsonProperty("injector_contract_kill_chain_phases")
   @Queryable(filterable = true, dynamicValues = true, path = "attackPatterns.killChainPhases.id")
@@ -150,8 +155,12 @@ public class InjectorContract implements Base {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || !Base.class.isAssignableFrom(o.getClass())) {
+      return false;
+    }
     Base base = (Base) o;
     return id.equals(base.getId());
   }
@@ -165,13 +174,16 @@ public class InjectorContract implements Base {
 
   public static final String CONTACT_CONTENT_FIELDS = "fields";
   public static final String CONTACT_ELEMENT_CONTENT_KEY = "key";
+  public static final String CONTACT_ELEMENT_CONTENT_TYPE = "type";
   public static final String CONTACT_ELEMENT_CONTENT_MANDATORY = "mandatory";
   public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_GROUPS = "mandatoryGroups";
   public static final String CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL =
       "mandatoryConditionField";
 
   public static final String CONTACT_ELEMENT_CONTENT_KEY_ASSETS = "assets";
-  public static final String CONTACT_ELEMENT_CONTENT_KEY_TEAMS = "teams";
+
+  public static final String CONTACT_ELEMENT_CONTENT_TYPE_ASSET = "asset";
+  public static final String CONTACT_ELEMENT_CONTENT_TYPE_TEAM = "team";
 
   public static final String DEFAULT_VALUE_FIELD = "defaultValue";
 }

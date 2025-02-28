@@ -10,11 +10,7 @@ const Players = lazy(() => import('./Players'));
 const Teams = lazy(() => import('./Teams'));
 const Organizations = lazy(() => import('./Organizations'));
 
-const useStyles = makeStyles()(() => ({
-  root: {
-    flexGrow: 1,
-  },
-}));
+const useStyles = makeStyles()(() => ({ root: { flexGrow: 1 } }));
 
 const Index = () => {
   const { classes } = useStyles();

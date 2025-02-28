@@ -5,7 +5,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 
 import { fetchMe, fetchPlatformParameters } from './actions/Application';
-import type { LoggedHelper } from './actions/helper';
+import { type LoggedHelper } from './actions/helper';
 import ConnectedIntlProvider from './components/AppIntlProvider';
 import ConnectedThemeProvider from './components/AppThemeProvider';
 import { errorWrapper } from './components/Error';
@@ -21,14 +21,18 @@ const IndexPrivate = lazy(() => import('./private/Index'));
 const IndexAdmin = lazy(() => import('./admin/Index'));
 const Comcheck = lazy(() => import('./public/components/comcheck/Comcheck'));
 const Channel = lazy(() => import('./public/components/channels/Channel'));
-const ExerciseReport = lazy(() => import('./admin/components/simulations/simulation/reports/ExerciseReportPage'));
+const SimulationReport = lazy(() => import('./admin/components/simulations/simulation/reports/SimulationReportPage'));
 const Challenges = lazy(() => import('./public/components/challenges/Challenges'));
 const ExerciseViewLessons = lazy(() => import('./public/components/lessons/ExerciseViewLessons'));
 const ScenarioViewLessons = lazy(() => import('./public/components/lessons/ScenarioViewLessons'));
 
 const Root = () => {
   const { logged, me, settings } = useHelper((helper: LoggedHelper) => {
-    return { logged: helper.logged(), me: helper.getMe(), settings: helper.getPlatformSettings() };
+    return {
+      logged: helper.logged(),
+      me: helper.getMe(),
+      settings: helper.getPlatformSettings(),
+    };
   });
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -74,7 +78,7 @@ const Root = () => {
                 <Route path="challenges/:exerciseId" element={errorWrapper(Challenges)()} />
                 <Route path="lessons/simulation/:exerciseId" element={errorWrapper(ExerciseViewLessons)()} />
                 <Route path="lessons/scenario/:scenarioId" element={errorWrapper(ScenarioViewLessons)()} />
-                <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(ExerciseReport)()} />
+                <Route path="reports/:reportId/exercise/:exerciseId" element={errorWrapper(SimulationReport)()} />
                 {/* Not found */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

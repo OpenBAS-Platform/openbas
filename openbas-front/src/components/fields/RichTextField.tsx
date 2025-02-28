@@ -1,6 +1,6 @@
 import { FormHelperText, InputLabel } from '@mui/material';
-import { CSSProperties } from 'react';
-import { Control, Controller } from 'react-hook-form';
+import { type CSSProperties } from 'react';
+import { type Control, Controller } from 'react-hook-form';
 
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import CKEditor from '../CKEditor';
@@ -26,7 +26,11 @@ const RichTextField = ({
   inInject,
 }: Props) => {
   return (
-    <div style={{ ...style, position: 'relative' }}>
+    <div style={{
+      ...style,
+      position: 'relative',
+    }}
+    >
       <InputLabel
         variant="standard"
         shrink={true}

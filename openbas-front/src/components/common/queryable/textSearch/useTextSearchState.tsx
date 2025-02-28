@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { TextSearchHelpers } from './TextSearchHelpers';
+import { type TextSearchHelpers } from './TextSearchHelpers';
 
 const useTextSearchState = (initTextSearch: string = '', onChange?: (textSearch: string, page: number) => void): TextSearchHelpers => {
   const [textSearch, setTextSearch] = useState<string>(initTextSearch);
-  const helpers: TextSearchHelpers = {
-    handleTextSearch: (value?: string) => setTextSearch(value ?? ''),
-  };
+  const helpers: TextSearchHelpers = { handleTextSearch: (value?: string) => setTextSearch(value ?? '') };
 
   useEffect(() => {
     onChange?.(textSearch, 0);

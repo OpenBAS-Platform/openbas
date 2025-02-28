@@ -8,28 +8,23 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
+import io.openbas.export.FileExportBase;
+import io.openbas.service.ArticleService;
 import io.openbas.service.ChallengeService;
-import io.openbas.service.VariableService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
-public class ExerciseFileExport {
-
-  @JsonIgnore private ChallengeService challengeService;
-  @JsonIgnore private VariableService variableService;
-  @JsonIgnore private ObjectMapper objectMapper;
-
-  @JsonProperty("export_version")
-  private int version = 1;
-
+public class ExerciseFileExport extends FileExportBase {
   @JsonProperty("exercise_information")
-  private Exercise exercise;
+  private final Exercise exercise;
 
   @JsonProperty("exercise_teams")
   private List<Team> teams;
@@ -77,13 +72,21 @@ public class ExerciseFileExport {
 
   public List<Organization> getOrganizations() {
     if (organizations == null) {
-      return this.exercise == null
-          ? new ArrayList<>()
-          : this.exercise.getUsers().stream()
-              .map(User::getOrganization)
+      if (this.exercise == null) {
+        return new ArrayList<>();
+      }
+      List<Organization> orgs = new ArrayList<>();
+      orgs.addAll(
+          this.exercise.getUsers().stream()
+              .map(user -> (Organization) Hibernate.unproxy(user.getOrganization()))
               .filter(Objects::nonNull)
-              .distinct()
-              .toList();
+              .toList());
+      orgs.addAll(
+          this.exercise.getTeams().stream()
+              .map(team -> (Organization) Hibernate.unproxy(team.getOrganization()))
+              .filter(Objects::nonNull)
+              .toList());
+      return orgs;
     }
     return organizations;
   }
@@ -145,7 +148,25 @@ public class ExerciseFileExport {
 
   public List<Document> getDocuments() {
     if (documents == null) {
-      return this.exercise == null ? new ArrayList<>() : this.exercise.getDocuments();
+      if (this.exercise == null) {
+        return new ArrayList<>();
+      }
+      List<Document> docs = new ArrayList<>();
+      docs.addAll(this.exercise.getDocuments());
+      docs.addAll(
+          this.exercise.getInjects().stream()
+              .flatMap(
+                  inject -> {
+                    if (inject.getPayload().isEmpty()) {
+                      return Stream.of();
+                    }
+                    if (inject.getPayload().get().getAttachedDocument().isPresent()) {
+                      return Stream.of(inject.getPayload().get().getAttachedDocument().get());
+                    }
+                    return Stream.of();
+                  })
+              .toList());
+      return docs;
     }
     return documents;
   }
@@ -205,7 +226,7 @@ public class ExerciseFileExport {
     if (lessonsQuestions == null) {
       return this.exercise == null
           ? new ArrayList<>()
-          : this.exercise.getLessonsCategories().stream()
+          : this.getLessonsCategories().stream()
               .flatMap(category -> category.getQuestions().stream())
               .toList();
     }
@@ -243,61 +264,25 @@ public class ExerciseFileExport {
     return documentIds;
   }
 
-  @JsonIgnore private int exportOptionsMask = 0;
-
-  private ExerciseFileExport(ObjectMapper objectMapper, ChallengeService challengeService) {
-    this.objectMapper = objectMapper;
-    this.challengeService = challengeService;
-
-    this.objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
-    this.objectMapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
-    this.objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
-    this.objectMapper.addMixIn(LessonsCategory.class, ExerciseExportMixins.LessonsCategory.class);
-    this.objectMapper.addMixIn(LessonsQuestion.class, ExerciseExportMixins.LessonsQuestion.class);
-    this.objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
-    this.objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
-    this.objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
-    this.objectMapper.addMixIn(Article.class, ExerciseExportMixins.Article.class);
-    this.objectMapper.addMixIn(Channel.class, ExerciseExportMixins.Channel.class);
-    this.objectMapper.addMixIn(Challenge.class, ExerciseExportMixins.Challenge.class);
-    this.objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
-
-    // default options
-    // variables with no value
-    this.objectMapper.addMixIn(Variable.class, VariableMixin.class);
-    // empty teams
-    this.objectMapper.addMixIn(Team.class, ExerciseExportMixins.EmptyTeam.class);
+  private ExerciseFileExport(
+      Exercise exercise,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    super(objectMapper, challengeService, articleService);
+    this.exercise = exercise;
   }
 
-  public static final ExerciseFileExport fromExercise(
-      Exercise exercise, ObjectMapper objectMapper, ChallengeService challengeService) {
-    ExerciseFileExport efe = new ExerciseFileExport(objectMapper, challengeService);
-    efe.setExercise(exercise);
-    return efe;
+  public static ExerciseFileExport fromExercise(
+      Exercise exercise,
+      ObjectMapper objectMapper,
+      ChallengeService challengeService,
+      ArticleService articleService) {
+    return new ExerciseFileExport(exercise, objectMapper, challengeService, articleService);
   }
 
+  @Override
   public ExerciseFileExport withOptions(int exportOptionsMask) {
-    this.exportOptionsMask = exportOptionsMask;
-
-    // disable users if not requested; note negation
-    if (!ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)) {
-      this.objectMapper.addMixIn(
-          ExerciseFileExport.class, ExerciseExportMixins.ExerciseFileExport.class);
-    }
-
-    if (ExportOptions.has(ExportOptions.WITH_TEAMS, this.exportOptionsMask)) {
-      this.objectMapper.addMixIn(
-          Team.class,
-          ExportOptions.has(ExportOptions.WITH_PLAYERS, this.exportOptionsMask)
-              ? ExerciseExportMixins.Team.class
-              : ExerciseExportMixins.EmptyTeam.class);
-    }
-    if (ExportOptions.has(ExportOptions.WITH_VARIABLE_VALUES, this.exportOptionsMask)) {
-      this.objectMapper.addMixIn(Variable.class, VariableWithValueMixin.class);
-    } else {
-      this.objectMapper.addMixIn(Variable.class, VariableMixin.class);
-    }
-
-    return this;
+    return (ExerciseFileExport) super.withOptions(exportOptionsMask);
   }
 }

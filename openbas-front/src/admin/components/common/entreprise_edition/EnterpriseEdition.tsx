@@ -30,7 +30,10 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-const EnterpriseEdition = ({ message }: { message?: string; feature?: string }) => {
+const EnterpriseEdition = ({ message }: {
+  message?: string;
+  feature?: string;
+}) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   return (
@@ -42,7 +45,11 @@ const EnterpriseEdition = ({ message }: { message?: string; feature?: string }) 
         variant="outlined"
         style={{ position: 'relative' }}
       >
-        <AlertTitle style={{ marginBottom: 0, fontWeight: 400 }}>
+        <AlertTitle style={{
+          marginBottom: 0,
+          fontWeight: 400,
+        }}
+        >
           {t(message ?? 'You need to activate OpenBAS enterprise edition to use this feature.')}
           <EnterpriseEditionButton />
         </AlertTitle>

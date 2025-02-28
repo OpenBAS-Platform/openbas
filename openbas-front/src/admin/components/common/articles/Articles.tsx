@@ -2,26 +2,26 @@ import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, NewspaperOutlined, S
 import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import { green, orange } from '@mui/material/colors';
 import * as R from 'ramda';
-import { Fragment, FunctionComponent, useContext, useState } from 'react';
+import { Fragment, type FunctionComponent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import type { FullArticleStore } from '../../../../actions/channels/Article';
+import { type FullArticleStore } from '../../../../actions/channels/Article';
 import { fetchChannels } from '../../../../actions/channels/channel-action';
-import type { ChannelsHelper } from '../../../../actions/channels/channel-helper';
+import { type ChannelsHelper } from '../../../../actions/channels/channel-helper';
 import { fetchDocuments } from '../../../../actions/Document';
-import type { DocumentHelper } from '../../../../actions/helper';
+import { type DocumentHelper } from '../../../../actions/helper';
 import Empty from '../../../../components/Empty';
 import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../components/i18n';
 import ChannelColor from '../../../../public/components/channels/ChannelColor';
 import { useHelper } from '../../../../store';
-import { Article } from '../../../../utils/api-types';
+import { type Article } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ChannelIcon from '../../components/channels/ChannelIcon';
-import type { ChannelOption } from '../../components/channels/ChannelOption';
+import { type ChannelOption } from '../../components/channels/ChannelOption';
 import ChannelsFilter from '../../components/channels/ChannelsFilter';
 import { ArticleContext, PermissionsContext } from '../Context';
 import ArticlePopover from './ArticlePopover';
@@ -35,9 +35,7 @@ const useStyles = makeStyles()(() => ({
     maxWidth: 300,
     borderRadius: 4,
   },
-  card: {
-    position: 'relative',
-  },
+  card: { position: 'relative' },
   footer: {
     width: '100%',
     position: 'absolute',
@@ -45,14 +43,10 @@ const useStyles = makeStyles()(() => ({
     left: 0,
     bottom: 10,
   },
-  button: {
-    cursor: 'default',
-  },
+  button: { cursor: 'default' },
 }));
 
-interface Props {
-  articles: Article[];
-}
+interface Props { articles: Article[] }
 
 const Articles: FunctionComponent<Props> = ({ articles }) => {
   // Standard hooks
@@ -101,7 +95,10 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
   const { permissions } = useContext(PermissionsContext);
 
   return (
-    <>
+    <div>
+      <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
+        {t('Media pressure')}
+      </Typography>
       {permissions.canWrite && (
         <CreateArticle
           openCreate={openCreate}
@@ -165,7 +162,10 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
-                sx={{ width: '100%', height: '100%' }}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                }}
               >
                 <CardHeader
                   avatar={(
@@ -231,7 +231,10 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
                     gutterBottom
                     variant="h1"
                     component="div"
-                    style={{ margin: '0 auto', textAlign: 'center' }}
+                    style={{
+                      margin: '0 auto',
+                      textAlign: 'center',
+                    }}
                   >
                     {article.article_name}
                   </Typography>
@@ -290,7 +293,7 @@ const Articles: FunctionComponent<Props> = ({ articles }) => {
           );
         })}
       </Grid>
-    </>
+    </div>
   );
 };
 

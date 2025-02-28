@@ -2,11 +2,11 @@ import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router';
-import { CSSObject } from 'tss-react';
+import { type CSSObject } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchAttackPatterns } from '../actions/AttackPattern';
-import type { LoggedHelper } from '../actions/helper';
+import { type LoggedHelper } from '../actions/helper';
 import { fetchKillChainPhases } from '../actions/KillChainPhase';
 import { fetchTags } from '../actions/Tag';
 import { errorWrapper } from '../components/Error';
@@ -24,7 +24,7 @@ import InjectIndex from './components/simulations/simulation/injects/InjectIndex
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
-const Exercises = lazy(() => import('./components/simulations/Exercises'));
+const Exercises = lazy(() => import('./components/simulations/Simulations'));
 const IndexExercise = lazy(() => import('./components/simulations/simulation/Index'));
 const AtomicTestings = lazy(() => import('./components/atomic_testings/AtomicTestings'));
 const IndexAtomicTesting = lazy(() => import('./components/atomic_testings/atomic_testing/Index'));
@@ -38,9 +38,7 @@ const IndexAgents = lazy(() => import('./components/agents/Agents'));
 const Payloads = lazy(() => import('./components/payloads/Payloads'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
 
-const useStyles = makeStyles()(theme => ({
-  toolbar: theme.mixins.toolbar as CSSObject,
-}));
+const useStyles = makeStyles()(theme => ({ toolbar: theme.mixins.toolbar as CSSObject }));
 
 const Index = () => {
   const theme = useTheme();
@@ -48,7 +46,10 @@ const Index = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { logged, settings } = useHelper((helper: LoggedHelper) => {
-    return { logged: helper.logged(), settings: helper.getPlatformSettings() };
+    return {
+      logged: helper.logged(),
+      settings: helper.getPlatformSettings(),
+    };
   });
 
   useEffect(() => {
@@ -64,8 +65,6 @@ const Index = () => {
       easing: theme.transitions.easing.easeInOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    overflowX: 'hidden',
-    overflowY: 'hidden',
   };
   // load taxonomics one time at login
   useDataLoader(() => {

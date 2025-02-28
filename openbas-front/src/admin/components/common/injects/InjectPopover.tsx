@@ -1,21 +1,22 @@
 import { MoreVert } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Menu, MenuItem } from '@mui/material';
-import { FunctionComponent, useContext, useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useContext, useState } from 'react';
 import { Link } from 'react-router';
 
-import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { duplicateInjectForExercise, duplicateInjectForScenario } from '../../../../actions/Inject';
-import type { InjectStore } from '../../../../actions/injects/Inject';
-import { testInject } from '../../../../actions/injects/inject-action';
+import { type InjectStore } from '../../../../actions/injects/Inject';
+import { exportInjects, testInject } from '../../../../actions/injects/inject-action';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
 import DialogTest from '../../../../components/common/DialogTest';
+import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import type { Inject, InjectStatus, InjectTestStatusOutput } from '../../../../utils/api-types';
+import type { Inject, InjectExportRequestInput, InjectStatus, InjectTestStatusOutput } from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { download } from '../../../../utils/utils';
 import { InjectContext, PermissionsContext } from '../Context';
 
 type InjectPopoverType = {
@@ -38,8 +39,14 @@ interface Props {
   canDone?: boolean;
   canTriggerNow?: boolean;
   exerciseOrScenarioId?: string;
-  onCreate?: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
-  onUpdate?: (result: { result: string; entities: { injects: Record<string, InjectStore> } }) => void;
+  onCreate?: (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => void;
+  onUpdate?: (result: {
+    result: string;
+    entities: { injects: Record<string, InjectStore> };
+  }) => void;
   onDelete?: (result: string) => void;
 }
 
@@ -74,10 +81,11 @@ const InjectPopover: FunctionComponent<Props> = ({
   const [openDone, setOpenDone] = useState(false);
   const [openTrigger, setOpenTrigger] = useState(false);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [openExportDialog, setOpenExportDialog] = useState(false);
 
   const isExercise = useHelper((helper: ExercisesHelper) => helper.getExercisesMap()[exerciseOrScenarioId!] !== undefined);
 
-  const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePopoverOpen = (event: ReactMouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };
@@ -92,12 +100,18 @@ const InjectPopover: FunctionComponent<Props> = ({
 
   const submitDuplicate = () => {
     if (inject.inject_exercise) {
-      dispatch(duplicateInjectForExercise(inject.inject_exercise, inject.inject_id)).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+      dispatch(duplicateInjectForExercise(inject.inject_exercise, inject.inject_id)).then((result: {
+        result: string;
+        entities: { injects: Record<string, InjectStore> };
+      }) => {
         onCreate?.(result);
       });
     }
     if (inject.inject_scenario) {
-      dispatch(duplicateInjectForScenario(inject.inject_scenario, inject.inject_id)).then((result: { result: string; entities: { injects: Record<string, InjectStore> } }) => {
+      dispatch(duplicateInjectForScenario(inject.inject_scenario, inject.inject_id)).then((result: {
+        result: string;
+        entities: { injects: Record<string, InjectStore> };
+      }) => {
         onCreate?.(result);
       });
     }
@@ -123,16 +137,35 @@ const InjectPopover: FunctionComponent<Props> = ({
   };
   const handleCloseTest = () => setOpenTest(false);
 
+  const handleExportOpen = () => setOpenExportDialog(true);
+  const handleExportClose = () => setOpenExportDialog(false);
+
+  const handleExportJsonSingle = (withPlayers: boolean, withTeams: boolean, withVariableValues: boolean) => {
+    const exportData: InjectExportRequestInput = {
+      injects: [
+        { inject_id: inject.inject_id },
+      ],
+      options: {
+        with_players: withPlayers,
+        with_teams: withTeams,
+        with_variable_values: withVariableValues,
+      },
+    };
+    exportInjects(exportData).then((result) => {
+      const contentDisposition = result.headers['content-disposition'];
+      const match = contentDisposition.match(/filename\s*=\s*(.*)/i);
+      const filename = match[1];
+      download(result.data, filename, result.headers['content-type']);
+    });
+    handleExportClose();
+  };
+
   const submitTest = () => {
     testInject(inject.inject_id).then((result: { data: InjectTestStatusOutput }) => {
       if (isExercise) {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
-          itsDedicatedPage: <Link to={`/admin/simulations/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link>,
-        }));
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`/admin/simulations/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link> }));
       } else {
-        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', {
-          itsDedicatedPage: <Link to={`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link>,
-        }));
+        MESSAGING$.notifySuccess(t('Inject test has been sent, you can view test logs details on {itsDedicatedPage}.', { itsDedicatedPage: <Link to={`/admin/scenarios/${exerciseOrScenarioId}/tests/${result.data.status_id}`}>{t('its dedicated page')}</Link> }));
       }
     });
     handleCloseTest();
@@ -211,6 +244,9 @@ const InjectPopover: FunctionComponent<Props> = ({
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
+        <MenuItem onClick={handleExportOpen} disabled={isDisabled}>
+          {t('inject_export_json_single')}
+        </MenuItem>
         <MenuItem onClick={handleOpenDuplicate} disabled={isDisabled}>
           {t('Duplicate')}
         </MenuItem>
@@ -392,6 +428,13 @@ const InjectPopover: FunctionComponent<Props> = ({
           </Button>
         </DialogActions>
       </Dialog>
+      <ExportOptionsDialog
+        title={t('inject_export_prompt')}
+        open={openExportDialog}
+        onCancel={handleExportClose}
+        onClose={handleExportClose}
+        onSubmit={handleExportJsonSingle}
+      />
     </>
   );
 };

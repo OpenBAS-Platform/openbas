@@ -7,6 +7,7 @@ import io.openbas.database.model.*;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import org.hibernate.Hibernate;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
@@ -39,8 +40,11 @@ public class ExecutableInject {
     this.direct = direct;
     this.users = users;
     this.teams = teams;
+    this.teams.forEach(team -> Hibernate.initialize(team.getTags()));
     this.assets = assets;
+    this.assets.forEach(asset -> Hibernate.initialize(asset.getTags()));
     this.assetGroups = assetGroups;
+    this.assetGroups.forEach(assetGroup -> Hibernate.initialize(assetGroup.getTags()));
     this.teamSize = teams.size();
     this.documentSize = injection.getInject().getDocuments().size();
   }

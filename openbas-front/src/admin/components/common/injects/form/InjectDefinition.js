@@ -81,19 +81,13 @@ const styles = theme => ({
     height: '100%',
     fontSize: 13,
   },
-  itemIcon: {
-    color: theme.palette.primary.main,
-  },
-  title: {
-    float: 'left',
-  },
+  itemIcon: { color: theme.palette.primary.main },
+  title: { float: 'left' },
   allTeams: {
     float: 'right',
     marginTop: -10,
   },
-  errorColor: {
-    color: theme.palette.error.main,
-  },
+  errorColor: { color: theme.palette.error.main },
   inline: {
     display: 'flex',
     flexDirection: 'row',
@@ -240,13 +234,13 @@ class InjectDefinition extends Component {
   constructor(props) {
     super(props);
     this.builtInFields = [
-      'teams',
-      'assets',
-      'assetgroups',
-      'articles',
-      'challenges',
-      'attachments',
-      'expectations',
+      'team',
+      'asset',
+      'asset-group',
+      'article',
+      'challenge',
+      'attachment',
+      'expectation',
     ];
     this.state = {
       allTeams: props.inject.inject_all_teams,
@@ -257,7 +251,7 @@ class InjectDefinition extends Component {
       articlesIds: props.inject.inject_content?.articles || [],
       challengesIds: props.inject.inject_content?.challenges || [],
       documents: props.inject.inject_documents || [],
-      expectations: props.inject.inject_content?.expectations || [],
+      expectations: props.inject.inject_content?.expectations || props.injectorContract.fields.filter(f => f.type === 'expectation').flatMap(f => f.predefinedExpectations) || [],
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
       articlesSortBy: 'article_name',
@@ -314,15 +308,11 @@ class InjectDefinition extends Component {
 
   // Teams
   handleModifyTeams(teamsIds) {
-    this.setState({
-      teamsIds: [...teamsIds],
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ teamsIds: [...teamsIds] }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveTeam(teamId) {
-    this.setState({
-      teamsIds: this.state.teamsIds.filter(a => a !== teamId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ teamsIds: this.state.teamsIds.filter(a => a !== teamId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Assets
@@ -332,9 +322,7 @@ class InjectDefinition extends Component {
   }
 
   async setAssetIdsState(assetIds) {
-    this.setState({
-      assetIds: assetIds,
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ assetIds: assetIds }, () => this.props.setInjectDetailsState(this.state));
 
     // also force update resolved endpoints at the cost of a backend call
     this.setState({ endpoints: await this.refreshEndpoints(assetIds) });
@@ -350,48 +338,34 @@ class InjectDefinition extends Component {
 
   // Asset Groups
   handleAddAssetGroups(assetGroupIds) {
-    this.setState({
-      assetGroupIds,
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ assetGroupIds }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveAssetGroup(assetGroupId) {
-    this.setState({
-      assetGroupIds: this.state.assetGroupIds.filter(a => a !== assetGroupId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ assetGroupIds: this.state.assetGroupIds.filter(a => a !== assetGroupId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Articles
   handleAddArticles(articlesIds) {
-    this.setState({
-      articlesIds: [...this.state.articlesIds, ...articlesIds],
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ articlesIds: [...this.state.articlesIds, ...articlesIds] }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveArticle(articleId) {
-    this.setState({
-      articlesIds: this.state.articlesIds.filter(a => a !== articleId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ articlesIds: this.state.articlesIds.filter(a => a !== articleId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Challenges
   handleAddChallenges(challengesIds) {
-    this.setState({
-      challengesIds: [...this.state.challengesIds, ...challengesIds],
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ challengesIds: [...this.state.challengesIds, ...challengesIds] }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveChallenge(challengeId) {
-    this.setState({
-      challengesIds: this.state.challengesIds.filter(a => a !== challengeId),
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ challengesIds: this.state.challengesIds.filter(a => a !== challengeId) }, () => this.props.setInjectDetailsState(this.state));
   }
 
   // Documents
   handleAddDocuments(documents) {
-    this.setState({
-      documents,
-    }, () => this.props.setInjectDetailsState(this.state));
+    this.setState({ documents }, () => this.props.setInjectDetailsState(this.state));
   }
 
   handleRemoveDocument(documentId) {
@@ -419,7 +393,7 @@ class InjectDefinition extends Component {
   }
 
   getDynamicFields = () => this.props.injectorContract.fields
-    .filter(f => !this.builtInFields.includes(f.key) && !f.expectation)
+    .filter(f => !this.builtInFields.includes(f.type) && !f.expectation)
     .filter(f =>
       f.linkedFields.every((linkedField) => {
         const fieldValue = this.props.getValues(linkedField.key);
@@ -439,7 +413,7 @@ class InjectDefinition extends Component {
 
   resetDefaultvalues(setFieldValue, injectorContract) {
     injectorContract.fields
-      .filter(f => !this.builtInFields.includes(f.key) && !f.expectation)
+      .filter(f => !this.builtInFields.includes(f.type) && !f.expectation)
       .forEach((field) => {
         let defaultValue = field.cardinality === '1' ? R.head(field.defaultValue) : field.defaultValue;
         if (
@@ -501,20 +475,21 @@ class InjectDefinition extends Component {
       challengesIds,
       openVariables,
     } = this.state;
+
     // -- TEAMS --
-    const fieldTeams = injectorContract.fields.filter(n => n.key === 'teams').at(0);
+    const fieldTeams = injectorContract.fields.filter(n => n.type === 'team').at(0);
     const hasTeams = injectorContract.fields
-      .map(f => f.key)
-      .includes('teams');
+      .map(f => f.type)
+      .includes('team');
     // -- ASSETS --
-    const fieldAssets = injectorContract.fields.filter(n => n.key === 'assets').at(0);
+    const fieldAssets = injectorContract.fields.filter(n => n.type === 'asset').at(0);
     const hasAssets = injectorContract.fields
-      .map(f => f.key)
-      .includes('assets');
+      .map(f => f.type)
+      .includes('asset');
     // -- ASSET GROUPS --
     const hasAssetGroups = injectorContract.fields
-      .map(f => f.key)
-      .includes('assetgroups');
+      .map(f => f.type)
+      .includes('asset-group');
     // -- ARTICLES --
     const articles = articlesIds
       .map(a => articlesMap[a])
@@ -530,10 +505,10 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
-    const fieldArticles = injectorContract.fields.filter(n => n.key === 'articles').at(0);
+    const fieldArticles = injectorContract.fields.filter(n => n.type === 'article').at(0);
     const hasArticles = injectorContract.fields
-      .map(f => f.key)
-      .includes('articles');
+      .map(f => f.type)
+      .includes('article');
     // -- CHALLENGES --
     const challenges = challengesIds
       .map(a => challengesMap[a])
@@ -544,10 +519,10 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(challengesSortBy))],
     );
     const sortedChallenges = sortChallenges(challenges);
-    const fieldChallenges = injectorContract.fields.filter(n => n.key === 'challenges').at(0);
+    const fieldChallenges = injectorContract.fields.filter(n => n.type === 'challenge').at(0);
     const hasChallenges = injectorContract.fields
-      .map(f => f.key)
-      .includes('challenges');
+      .map(f => f.type)
+      .includes('challenge');
     // -- DOCUMENTS --
     const docs = documents
       .map(d => (documentsMap[d.document_id]
@@ -564,16 +539,16 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const fieldAttachements = injectorContract.fields.filter(n => n.key === 'attachments').at(0);
+    const fieldAttachements = injectorContract.fields.filter(n => n.type === 'attachment').at(0);
     const hasAttachments = injectorContract.fields
-      .map(f => f.key)
-      .includes('attachments');
+      .map(f => f.type)
+      .includes('attachment');
     // -- EXPECTATIONS --
     const hasExpectations = injectorContract.fields
-      .map(f => f.key)
-      .includes('expectations');
+      .map(f => f.type)
+      .includes('expectation');
     const predefinedExpectations = injectorContract.fields.filter(
-      f => f.key === 'expectations',
+      f => f.type === 'expectation',
     ).flatMap(f => f.predefinedExpectations);
     const expectationsNotManual = injectorContract.fields.filter(
       f => f.expectation === true,
@@ -583,7 +558,13 @@ class InjectDefinition extends Component {
       <>
         {hasTeams && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, float: 'left' }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                float: 'left',
+              }}
+            >
               {t('Targeted teams')}
             </Typography>
             <FormGroup row={true} classes={{ root: classes.allTeams }}>
@@ -594,7 +575,7 @@ class InjectDefinition extends Component {
                     onChange={this.toggleAll.bind(this)}
                     color="primary"
                     size="small"
-                    disabled={this.props.permissions.readOnly || fieldTeams.readOnly}
+                    disabled={this.props.readOnly || fieldTeams.readOnly}
                   />
                 )}
                 label={<strong>{t('All teams')}</strong>}
@@ -660,7 +641,13 @@ class InjectDefinition extends Component {
         )}
         {hasAssets && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams ? 20 : 0,
+              }}
+            >
               {t('Targeted assets')}
             </Typography>
             <EndpointsList
@@ -682,7 +669,13 @@ class InjectDefinition extends Component {
         )}
         {hasAssetGroups && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams || hasAssets ? 20 : 0,
+              }}
+            >
               {t('Targeted asset groups')}
             </Typography>
             <AssetGroupsList
@@ -698,7 +691,13 @@ class InjectDefinition extends Component {
         )}
         {hasArticles && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0,
+              }}
+            >
               {t('Media pressure to publish')}
             </Typography>
             <List>
@@ -748,7 +747,7 @@ class InjectDefinition extends Component {
                     <ArticlePopover
                       article={article}
                       onRemoveArticle={this.handleRemoveArticle.bind(this)}
-                      disabled={this.props.permissions.readOnly || fieldArticles.readOnly}
+                      disabled={this.props.readOnly || fieldArticles.readOnly}
                     />
                   </ListItemSecondaryAction>
                 </ListItem>
@@ -763,7 +762,13 @@ class InjectDefinition extends Component {
         )}
         {hasChallenges && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0,
+              }}
+            >
               {t('Challenges to publish')}
             </Typography>
             <List>
@@ -810,7 +815,7 @@ class InjectDefinition extends Component {
                       onRemoveChallenge={this.handleRemoveChallenge.bind(
                         this,
                       )}
-                      disabled={this.props.permissions.readOnly || fieldChallenges.readOnly}
+                      disabled={this.props.readOnly || fieldChallenges.readOnly}
                     />
                   </ListItemSecondaryAction>
                 </ListItem>
@@ -824,55 +829,66 @@ class InjectDefinition extends Component {
             </List>
           </>
         )}
-        <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
-          <div style={{ float: 'left' }}>
-            <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
-          </div>
-          <div style={{ float: 'left' }}>
-            <Tooltip title={t('Reset to default values')}>
-              <IconButton
-                color="primary"
-                variant="outlined"
-                disabled={submitting || this.props.permissions.readOnly}
-                onClick={() => this.resetDefaultvalues(setValue, injectorContract)}
-                size="small"
-                style={{ margin: '-12px 0 0 5px' }}
-              >
-                <RotateLeftOutlined />
-              </IconButton>
-            </Tooltip>
-          </div>
-          <div style={{ float: 'right' }}>
-            <Button
-              color="primary"
-              variant="outlined"
-              size="small"
-              onClick={this.handleOpenVariables.bind(this)}
-              startIcon={<HelpOutlineOutlined />}
-              style={{ marginTop: -10 }}
-            >
-              {t('Available variables')}
-            </Button>
-          </div>
-          <div className="clearfix" />
-        </div>
-        {
-          dynamicFields.map(field => (
-            <InjectContentFieldComponent
-              key={field.key}
-              control={this.props.control}
-              register={this.props.register}
-              field={field}
-              values={values}
-              attachedDocs={attachedDocs}
-              onSelectOrCheckboxFieldChange={() => this.setDynamicFields()}
-              readOnly={this.props.permissions.readOnly || field.readOnly}
-            />
-          ))
-        }
+        {dynamicFields.length > 0
+          && (
+            <>
+              <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
+                <div style={{ float: 'left' }}>
+                  <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
+                </div>
+                <div style={{ float: 'left' }}>
+                  <Tooltip title={t('Reset to default values')}>
+                    <IconButton
+                      color="primary"
+                      variant="outlined"
+                      disabled={submitting || this.props.readOnly}
+                      onClick={() => this.resetDefaultvalues(setValue, injectorContract)}
+                      size="small"
+                      style={{ margin: '-12px 0 0 5px' }}
+                    >
+                      <RotateLeftOutlined />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+                <div style={{ float: 'right' }}>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                    onClick={this.handleOpenVariables.bind(this)}
+                    startIcon={<HelpOutlineOutlined />}
+                    style={{ marginTop: -10 }}
+                  >
+                    {t('Available variables')}
+                  </Button>
+                </div>
+                <div className="clearfix" />
+              </div>
+              {
+                dynamicFields.map(field => (
+                  <InjectContentFieldComponent
+                    key={field.key}
+                    control={this.props.control}
+                    register={this.props.register}
+                    field={field}
+                    values={values}
+                    attachedDocs={attachedDocs}
+                    onSelectOrCheckboxFieldChange={() => this.setDynamicFields()}
+                    readOnly={this.props.readOnly || field.readOnly}
+                  />
+                ))
+              }
+            </>
+          )}
         {(hasExpectations || expectationsNotManual.length > 0) && (
           <>
-            <Typography variant="h5" style={{ marginTop: 20, fontWeight: 500 }}>
+            <Typography
+              variant="h5"
+              style={{
+                marginTop: 20,
+                fontWeight: 500,
+              }}
+            >
               {t('Inject expectations')}
             </Typography>
             {expectationsNotManual.length > 0 && (
@@ -901,7 +917,7 @@ class InjectDefinition extends Component {
             {hasExpectations && (
               <InjectExpectations
                 predefinedExpectationDatas={predefinedExpectations}
-                expectationDatas={(expectations && expectations.length > 0) ? expectations : predefinedExpectations}
+                expectationDatas={expectations}
                 handleExpectations={this.handleExpectations.bind(this)}
               />
             )}
@@ -909,7 +925,13 @@ class InjectDefinition extends Component {
         )}
         {!isAtomic && (
           <>
-            <Typography variant="h5" style={{ fontWeight: 500, marginTop: 20 }}>
+            <Typography
+              variant="h5"
+              style={{
+                fontWeight: 500,
+                marginTop: 20,
+              }}
+            >
               {t('Inject documents')}
             </Typography>
             <List>
@@ -963,7 +985,7 @@ class InjectDefinition extends Component {
                               event.preventDefault();
                               this.toggleAttachment(document.document_id);
                             }}
-                            disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly) || !hasAttachments}
+                            disabled={this.props.readOnly || (hasAttachments && fieldAttachements.readOnly) || !hasAttachments}
                           />
                         </div>
                       </>
@@ -976,7 +998,7 @@ class InjectDefinition extends Component {
                       onRemoveDocument={this.handleRemoveDocument.bind(this)}
                       onToggleAttach={hasAttachments ? this.toggleAttachment.bind(this) : null}
                       attached={document.document_attached}
-                      disabled={this.props.permissions.readOnly || (hasAttachments && fieldAttachements.readOnly)}
+                      disabled={this.props.readOnly || (hasAttachments && fieldAttachements.readOnly)}
                     />
                   </ListItemSecondaryAction>
                 </ListItemButton>
@@ -1015,9 +1037,7 @@ InjectDefinition.propTypes = {
   tagsMap: PropTypes.object,
   articlesFromExerciseOrScenario: PropTypes.array,
   variablesFromExerciseOrScenario: PropTypes.array,
-  permissions: PropTypes.object,
-  onUpdateInject: PropTypes.func,
-  onCreateInject: PropTypes.func,
+  readOnly: PropTypes.bool,
   uriVariable: PropTypes.string,
   allUsersNumber: PropTypes.number,
   usersNumber: PropTypes.number,

@@ -713,7 +713,7 @@ public class ExerciseApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/import")
   @Secured(ROLE_ADMIN)
   public void exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
-    importService.handleFileImport(file);
+    importService.handleFileImport(file, null, null);
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/check-rules")

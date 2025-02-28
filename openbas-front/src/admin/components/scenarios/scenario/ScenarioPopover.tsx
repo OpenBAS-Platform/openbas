@@ -1,17 +1,17 @@
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import type { TagHelper, UserHelper } from '../../../../actions/helper';
+import { type TagHelper, type UserHelper } from '../../../../actions/helper';
 import { deleteScenario, duplicateScenario, exportScenarioUri } from '../../../../actions/scenarios/scenario-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogDuplicate from '../../../../components/common/DialogDuplicate';
+import ExportOptionsDialog from '../../../../components/common/export/ExportOptionsDialog';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import { Scenario } from '../../../../utils/api-types';
+import { type Scenario } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useScenarioPermissions from '../../../../utils/Scenario';
-import ScenarioExportDialog from './ScenarioExportDialog';
 import ScenarioUpdate from './ScenarioUpdate';
 
 type ScenarioActionType = 'Duplicate' | 'Update' | 'Delete' | 'Export';
@@ -36,16 +36,17 @@ const ScenarioPopover: FunctionComponent<Props> = ({
   const permissions = useScenarioPermissions(scenario.scenario_id);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   // Duplicate
   const [duplicate, setDuplicate] = useState(false);
   const handleOpenDuplicate = () => setDuplicate(true);
   const handleCloseDuplicate = () => setDuplicate(false);
   const submitDuplicate = () => {
-    dispatch(duplicateScenario(scenario.scenario_id)).then((result: { result: string; entities: { scenarios: Record<string, Scenario> } }) => {
+    dispatch(duplicateScenario(scenario.scenario_id)).then((result: {
+      result: string;
+      entities: { scenarios: Record<string, Scenario> };
+    }) => {
       handleCloseDuplicate();
       navigate(`/admin/scenarios/${result.result}`);
     });
@@ -79,48 +80,64 @@ const ScenarioPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Duplicate')) entries.push({ label: 'Duplicate', action: () => handleOpenDuplicate() });
-  if (actions.includes('Update')) entries.push({ label: 'Update', action: () => handleOpenEdit(), disabled: !permissions.canWrite });
-  if (actions.includes('Delete')) entries.push({ label: 'Delete', action: () => handleOpenDelete(), disabled: !userAdmin });
-  if (actions.includes('Export')) entries.push({ label: 'Export', action: () => handleOpenExport() });
+  if (actions.includes('Duplicate')) entries.push({
+    label: 'Duplicate',
+    action: () => handleOpenDuplicate(),
+  });
+  if (actions.includes('Update')) entries.push({
+    label: 'Update',
+    action: () => handleOpenEdit(),
+    disabled: !permissions.canWrite,
+  });
+  if (actions.includes('Delete')) entries.push({
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+    disabled: !userAdmin,
+  });
+  if (actions.includes('Export')) entries.push({
+    label: 'Export',
+    action: () => handleOpenExport(),
+  });
 
   return (
     <>
       {actions.length > 0 && <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />}
       {actions.includes('Duplicate')
-      && (
-        <DialogDuplicate
-          open={duplicate}
-          handleClose={handleCloseDuplicate}
-          handleSubmit={submitDuplicate}
-          text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
-        />
-      )}
+        && (
+          <DialogDuplicate
+            open={duplicate}
+            handleClose={handleCloseDuplicate}
+            handleSubmit={submitDuplicate}
+            text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
+          />
+        )}
       {actions.includes(('Update'))
-      && (
-        <ScenarioUpdate
-          scenario={scenario}
-          open={edition}
-          handleClose={handleCloseEdit}
-        />
-      )}
+        && (
+          <ScenarioUpdate
+            scenario={scenario}
+            open={edition}
+            handleClose={handleCloseEdit}
+          />
+        )}
       {actions.includes('Delete')
-      && (
-        <DialogDelete
-          open={deletion}
-          handleClose={handleCloseDelete}
-          handleSubmit={submitDelete}
-          text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
-        />
-      )}
+        && (
+          <DialogDelete
+            open={deletion}
+            handleClose={handleCloseDelete}
+            handleSubmit={submitDelete}
+            text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
+          />
+        )}
       {actions.includes('Export')
-      && (
-        <ScenarioExportDialog
-          open={exportation}
-          handleClose={handleCloseExport}
-          handleSubmit={submitExport}
-        />
-      )}
+        && (
+          <ExportOptionsDialog
+            title={t('Export the scenario')}
+            open={exportation}
+            onCancel={handleCloseExport}
+            onClose={handleCloseExport}
+            onSubmit={submitExport}
+          />
+        )}
     </>
   );
 };

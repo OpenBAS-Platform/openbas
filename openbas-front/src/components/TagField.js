@@ -21,15 +21,16 @@ const styles = () => ({
     flexGrow: 1,
     marginLeft: 10,
   },
-  autoCompleteIndicator: {
-    display: 'none',
-  },
+  autoCompleteIndicator: { display: 'none' },
 });
 
 class TagField extends Component {
   constructor(props) {
     super(props);
-    this.state = { tagCreation: false, tagInput: '' };
+    this.state = {
+      tagCreation: false,
+      tagInput: '',
+    };
   }
 
   handleOpenTagCreation() {

@@ -1,6 +1,6 @@
 import { ControlPointOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { FunctionComponent, useState } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { addAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
@@ -8,9 +8,9 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Dialog from '../../../../components/common/Dialog';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { AssetGroup, AssetGroupInput } from '../../../../utils/api-types';
+import { type AssetGroup, type AssetGroupInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import type { UserStore } from '../../teams/players/Player';
+import { type UserStore } from '../../teams/players/Player';
 import AssetGroupForm from './AssetGroupForm';
 
 const useStyles = makeStyles()(theme => ({
@@ -38,7 +38,10 @@ const AssetGroupCreation: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
   const onSubmit = (data: AssetGroupInput) => {
     dispatch(addAssetGroup(data)).then(
-      (result: { result: string; entities: { asset_groups: Record<string, UserStore> } }) => {
+      (result: {
+        result: string;
+        entities: { asset_groups: Record<string, UserStore> };
+      }) => {
         if (result.result) {
           if (onCreate) {
             const created = result.entities.asset_groups[result.result];

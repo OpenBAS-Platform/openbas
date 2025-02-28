@@ -11,9 +11,9 @@ import {
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import type { InjectResultOverviewOutput } from '../../../../utils/api-types';
+import { type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import { truncate } from '../../../../utils/String';
-import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
 
@@ -167,7 +167,7 @@ const AtomicTestingHeader = () => {
         {getActionButton(injectResultOverviewOutput)}
         <AtomicTestingPopover
           atomic={injectResultOverviewOutput}
-          actions={['Update', 'Duplicate', 'Delete']}
+          actions={['Export', 'Update', 'Duplicate', 'Delete']}
           onDelete={() => navigate('/admin/atomic_testings')}
         />
       </div>

@@ -1,18 +1,17 @@
 import { MoreVert } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem } from '@mui/material';
-import { useState } from 'react';
-import * as React from 'react';
+import { type FunctionComponent, useState } from 'react';
 
 import { deleteSecurityPlatform, updateSecurityPlatform } from '../../../../actions/assets/securityPlatform-actions';
 import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { SecurityPlatform, SecurityPlatformInput } from '../../../../utils/api-types';
+import { type SecurityPlatform, type SecurityPlatformInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import SecurityPlatformForm from './SecurityPlatformForm';
 
-export type SecurityPlatformStoreWithType = SecurityPlatform & { type: string };
+type SecurityPlatformStoreWithType = SecurityPlatform & { type: string };
 
 interface Props {
   inline?: boolean;
@@ -27,7 +26,7 @@ interface Props {
   disabled?: boolean;
 }
 
-const SecurityPlatformPopover: React.FC<Props> = ({
+const SecurityPlatformPopover: FunctionComponent<Props> = ({
   inline,
   securityPlatform,
   openEditOnInit = false,
@@ -66,7 +65,10 @@ const SecurityPlatformPopover: React.FC<Props> = ({
   };
   const submitEdit = (data: SecurityPlatformInput) => {
     dispatch(updateSecurityPlatform(securityPlatform.asset_id, data)).then(
-      (result: { result: string; entities: { securityplatforms: Record<string, SecurityPlatform> } }) => {
+      (result: {
+        result: string;
+        entities: { securityplatforms: Record<string, SecurityPlatform> };
+      }) => {
         if (result.entities) {
           if (onUpdate) {
             const securityPlatformUpdated = result.entities.securityplatforms[result.result];

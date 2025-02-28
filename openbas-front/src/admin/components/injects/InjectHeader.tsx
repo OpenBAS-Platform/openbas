@@ -1,16 +1,12 @@
 import { Tooltip, Typography } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 
 import { type InjectResultOverviewOutput } from '../../../utils/api-types';
 import { truncate } from '../../../utils/String';
 
-interface Props {
-  inject: InjectResultOverviewOutput;
-}
+interface Props { inject: InjectResultOverviewOutput }
 
-const InjectHeader: FunctionComponent<Props> = ({
-  inject,
-}) => {
+const InjectHeader: FunctionComponent<Props> = ({ inject }) => {
   return (
     <Tooltip title={inject.inject_title}>
       <Typography variant="h1" gutterBottom>

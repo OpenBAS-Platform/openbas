@@ -1,4 +1,4 @@
-import { ThemeOptions } from '@mui/material';
+import { type ThemeOptions } from '@mui/material';
 
 import LogoCollapsed from '../static/images/logo_dark.png';
 import LogoText from '../static/images/logo_text_dark.png';
@@ -39,7 +39,12 @@ const ThemeDark = (
     primary: { main: primary || THEME_DARK_DEFAULT_PRIMARY },
     secondary: { main: secondary || THEME_DARK_DEFAULT_SECONDARY },
     chip: { main: '#ffffff' },
-    ai: { main: '#9575cd', light: '#d1c4e9', dark: '#673ab7', contrastText: '#000000' },
+    ai: {
+      main: '#9575cd',
+      light: '#d1c4e9',
+      dark: '#673ab7',
+      contrastText: '#000000',
+    },
     ee: {
       main: EE_COLOR,
       contrastText: '#ffffff',
@@ -56,21 +61,15 @@ const ThemeDark = (
   },
   typography: {
     fontFamily: '"IBM Plex Sans", sans-serif',
-    body2: {
-      fontSize: '0.8rem',
-    },
-    body1: {
-      fontSize: '0.9rem',
-    },
-    overline: {
-      fontWeight: 500,
-    },
+    body2: { fontSize: '0.8rem' },
+    body1: { fontSize: '0.9rem' },
+    overline: { fontWeight: 500 },
     h1: {
       margin: '0 0 10px 0',
       padding: 0,
       fontWeight: 400,
       fontSize: 22,
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
     h2: {
       margin: '0 0 10px 0',
@@ -78,7 +77,7 @@ const ThemeDark = (
       fontWeight: 500,
       fontSize: 16,
       textTransform: 'uppercase',
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
     h3: {
       margin: '0 0 10px 0',
@@ -86,7 +85,7 @@ const ThemeDark = (
       color: '#bebebe',
       fontWeight: 400,
       fontSize: 13,
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
     h4: {
       margin: '0 0 10px 0',
@@ -106,7 +105,7 @@ const ThemeDark = (
       fontWeight: 400,
       fontSize: 18,
       color: primary || THEME_DARK_DEFAULT_PRIMARY,
-      fontFamily: '"Geoligica", sans-serif',
+      fontFamily: '"Geologica", sans-serif',
     },
     subtitle2: {
       fontWeight: 400,
@@ -115,38 +114,16 @@ const ThemeDark = (
     },
   },
   components: {
-    MuiAccordion: {
-      defaultProps: {
-        TransitionProps: {
-          unmountOnExit: true,
-        },
-      },
-    },
+    MuiAccordion: { defaultProps: { TransitionProps: { unmountOnExit: true } } },
     MuiTooltip: {
       styleOverrides: {
-        tooltip: {
-          backgroundColor: 'rgba(0,0,0,0.7)',
-        },
-        arrow: {
-          color: 'rgba(0,0,0,0.7)',
-        },
+        tooltip: { backgroundColor: 'rgba(0,0,0,0.7)' },
+        arrow: { color: 'rgba(0,0,0,0.7)' },
       },
     },
-    MuiFormControl: {
-      defaultProps: {
-        variant: 'standard',
-      },
-    },
-    MuiTextField: {
-      defaultProps: {
-        variant: 'standard',
-      },
-    },
-    MuiSelect: {
-      defaultProps: {
-        variant: 'standard',
-      },
-    },
+    MuiFormControl: { defaultProps: { variant: 'standard' } },
+    MuiTextField: { defaultProps: { variant: 'standard' } },
+    MuiSelect: { defaultProps: { variant: 'standard' } },
     MuiCssBaseline: {
       styleOverrides: {
         html: {
@@ -156,12 +133,8 @@ const ThemeDark = (
         body: {
           'scrollbarColor': `${background || THEME_DARK_DEFAULT_BACKGROUND} ${accent || THEME_DARK_DEFAULT_ACCENT}`,
           'scrollbarWidth': 'thin',
-          'html': {
-            WebkitFontSmoothing: 'auto',
-          },
-          'a': {
-            color: primary || THEME_DARK_DEFAULT_PRIMARY,
-          },
+          'html': { WebkitFontSmoothing: 'auto' },
+          'a': { color: primary || THEME_DARK_DEFAULT_PRIMARY },
           'input:-webkit-autofill': {
             WebkitAnimation: 'autofill 0s forwards',
             animation: 'autofill 0s forwards',
@@ -190,12 +163,8 @@ const ThemeDark = (
             'background': 'transparent',
             'borderBottom': '1px solid rgba(255, 255, 255, 0.7) !important',
             'transition': 'borderBottom .3s',
-            '&:hover': {
-              borderBottom: '2px solid #ffffff !important',
-            },
-            '&:focus-within': {
-              borderBottom: `2px solid #${primary || THEME_DARK_DEFAULT_PRIMARY} !important`,
-            },
+            '&:hover': { borderBottom: '2px solid #ffffff !important' },
+            '&:focus-within': { borderBottom: `2px solid #${primary || THEME_DARK_DEFAULT_PRIMARY} !important` },
           },
           '.error .w-md-editor': {
             'border': '0 !important',
@@ -214,40 +183,28 @@ const ThemeDark = (
             backgroundColor: 'transparent !important',
             color: '#ffffff !important',
           },
-          '.w-md-editor-toolbar li button': {
-            color: '#ffffff !important',
-          },
+          '.w-md-editor-toolbar li button': { color: '#ffffff !important' },
           '.w-md-editor-text textarea': {
             fontFamily: '"IBM Plex Sans", sans-serif',
             fontSize: 13,
             color: '#ffffff',
           },
-          '.w-md-editor-preview': {
-            boxShadow: 'inset 1px 0 0 0 rgba(255, 255, 255, 0.5)',
-          },
+          '.w-md-editor-preview': { boxShadow: 'inset 1px 0 0 0 rgba(255, 255, 255, 0.5)' },
           '.wmde-markdown': {
             background: 'transparent',
             fontFamily: '"IBM Plex Sans", sans-serif',
             fontSize: 13,
             color: '#ffffff',
           },
-          '.wmde-markdown tr': {
-            background: 'transparent !important',
-          },
-          '.react-grid-placeholder': {
-            backgroundColor: `${accent || '#01478d'} !important`,
-          },
+          '.wmde-markdown tr': { background: 'transparent !important' },
+          '.react-grid-placeholder': { backgroundColor: `${accent || '#01478d'} !important` },
           '.react_time_range__track': {
             backgroundColor: 'rgba(1, 226, 255, 0.1) !important',
             borderLeft: '1px solid #00bcd4 !important',
             borderRight: '1px solid #00bcd4 !important',
           },
-          '.react_time_range__handle_marker': {
-            backgroundColor: '#00bcd4 !important',
-          },
-          '.leaflet-container': {
-            backgroundColor: `${paper || THEME_DARK_DEFAULT_PAPER} !important`,
-          },
+          '.react_time_range__handle_marker': { backgroundColor: '#00bcd4 !important' },
+          '.leaflet-container': { backgroundColor: `${paper || THEME_DARK_DEFAULT_PAPER} !important` },
           '.react-grid-item .react-resizable-handle::after': {
             borderRight: '2px solid rgba(255, 255, 255, 0.4) !important',
             borderBottom: '2px solid rgba(255, 255, 255, 0.4) !important',
@@ -257,9 +214,7 @@ const ThemeDark = (
     },
     MuiTableCell: {
       styleOverrides: {
-        head: {
-          borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-        },
+        head: { borderBottom: '1px solid rgba(255, 255, 255, 0.15)' },
         body: {
           borderTop: '1px solid rgba(255, 255, 255, 0.15)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
@@ -269,12 +224,8 @@ const ThemeDark = (
     MuiMenuItem: {
       styleOverrides: {
         root: {
-          '&.Mui-selected': {
-            boxShadow: `2px 0 ${primary || THEME_DARK_DEFAULT_PRIMARY} inset`,
-          },
-          '&.Mui-selected:hover': {
-            boxShadow: `2px 0 ${primary || THEME_DARK_DEFAULT_PRIMARY} inset`,
-          },
+          '&.Mui-selected': { boxShadow: `2px 0 ${primary || THEME_DARK_DEFAULT_PRIMARY} inset` },
+          '&.Mui-selected:hover': { boxShadow: `2px 0 ${primary || THEME_DARK_DEFAULT_PRIMARY} inset` },
         },
       },
     },

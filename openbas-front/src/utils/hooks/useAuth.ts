@@ -1,10 +1,8 @@
 import { createContext, useContext } from 'react';
 
-import type { PlatformSettings } from '../api-types';
+import { type PlatformSettings } from '../api-types';
 
-export interface User {
-  id?: string | null;
-}
+export interface User { id?: string | null }
 
 export interface UserContextType {
   me: User;
@@ -22,7 +20,10 @@ const useAuth = () => {
   if (!me || !settings) {
     throw new Error('Invalid user context !');
   }
-  return { me, settings };
+  return {
+    me,
+    settings,
+  };
 };
 
 export default useAuth;

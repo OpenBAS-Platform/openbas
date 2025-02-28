@@ -3,20 +3,19 @@ import { Alert, Button, Card, CardActionArea, CardContent, Dialog, DialogContent
 import { useTheme } from '@mui/material/styles';
 import { Bash, DownloadCircleOutline, Powershell } from 'mdi-material-ui';
 import * as R from 'ramda';
-import * as React from 'react';
-import { useState } from 'react';
+import { type SyntheticEvent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../actions/Executor';
-import type { ExecutorHelper } from '../../../actions/executors/executor-helper';
-import type { MeTokensHelper } from '../../../actions/helper';
+import { type ExecutorHelper } from '../../../actions/executors/executor-helper';
+import { type MeTokensHelper } from '../../../actions/helper';
 import { meTokens } from '../../../actions/User';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import type { Executor } from '../../../utils/api-types';
+import { type Executor } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useAuth from '../../../utils/hooks/useAuth';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
@@ -37,9 +36,7 @@ const useStyles = makeStyles()(() => ({
     padding: 20,
     textAlign: 'center',
   },
-  icon: {
-    padding: 0,
-  },
+  icon: { padding: 0 },
 }));
 
 const Executors = () => {
@@ -70,15 +67,20 @@ const Executors = () => {
     openbas_caldera: 2,
     openbas_tanium: 3,
   };
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-  const sortedExecutors = executors.map((executor: Executor) => ({ ...executor, order: order[executor.executor_type] })).sort(({ order: a }, { order: b }) => a - b);
+  const sortedExecutors = executors.map((executor: Executor) => ({
+    ...executor,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    order: order[executor.executor_type],
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+  })).sort(({ order: a }, { order: b }) => a - b);
   const windowsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Windows'));
   const linuxExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Linux'));
   const macOsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('MacOS'));
 
   // Selection
-  const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (_: SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
   };
   const openInstall = (selectedPlatform: string, openExecutors: Executor[]) => {
@@ -115,11 +117,14 @@ get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files 
 rm -force '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ea ignore;
 New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}' | Out-Null;
 [io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe',$data) | Out-Null;
+$data=$wc.DownloadData($url + "/ps1");
+rm -force 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' -ea ignore;
+[io.file]::WriteAllBytes('C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1',$data) | Out-Null;
 New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;
 New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;
 Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;
-schtasks /create /tn OpenBAS /sc onstart /ru system /tr "Powershell -ExecutionPolicy Bypass -Command \\\`"Start-Process -FilePath \\\\\\\`"${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe\\\\\\\`" -ArgumentList \\\\\\\`"-server $server -group red\\\\\\\`" -WindowStyle hidden;\\\`"";`,
-          code: `$server="${settings.executor_caldera_public_url}";$url="${settings.platform_base_url}/api/implant/caldera/windows/${arch}";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe'} | stop-process -f;rm -force '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ea ignore;New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}' | Out-Null;[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe',$data) | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;schtasks /create /tn OpenBAS /sc onstart /ru system /tr "Powershell -NoProfile -ExecutionPolicy Bypass -Command \\\`"Start-Process -FilePath \\\\\\\`"${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe\\\\\\\`" -ArgumentList \\\\\\\`"-server $server -group red\\\\\\\`" -WindowStyle hidden; \\\`"";`,
+schtasks /create /tn OpenBASCaldera /sc onlogon /rl highest /tr "Powershell -ExecutionPolicy Bypass -NoProfile -WindowStyle hidden -File 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' $server";`,
+          code: `$server="${settings.executor_caldera_public_url}";$url="${settings.platform_base_url}/api/implant/caldera/windows/${arch}";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe'} | stop-process -f;rm -force '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ea ignore;New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}' | Out-Null;[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe',$data) | Out-Null;$data=$wc.DownloadData($url + "/ps1");rm -force 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' -ea ignore;[io.file]::WriteAllBytes('C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1',$data) | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;schtasks /create /tn OpenBASCaldera /sc onlogon /rl highest /tr "Powershell -ExecutionPolicy Bypass -NoProfile -WindowStyle hidden -File 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' $server";`,
         };
       case 'linux':
         return {
@@ -243,7 +248,13 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
   };
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Agents'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{
+          label: t('Agents'),
+          current: true,
+        }]}
+      />
       <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
         {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.')}
         <br />
@@ -276,14 +287,28 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   {' '}
                   {t('Install Windows Agent')}
                 </Typography>
-                <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{
+                  position: 'absolute',
+                  width: '100%',
+                  right: 0,
+                  bottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                >
                   {windowsExecutors.map((executor: Executor) => {
                     return (
                       <img
                         key={executor.executor_id}
                         src={`/api/images/executors/${executor.executor_type}`}
                         alt={executor.executor_type}
-                        style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 4,
+                          margin: '0 10px 0 10px',
+                        }}
                       />
                     );
                   })}
@@ -314,14 +339,28 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   {' '}
                   {t('Install Linux Agent')}
                 </Typography>
-                <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{
+                  position: 'absolute',
+                  width: '100%',
+                  right: 0,
+                  bottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                >
                   {linuxExecutors.map((executor: Executor) => {
                     return (
                       <img
                         key={executor.executor_id}
                         src={`/api/images/executors/${executor.executor_type}`}
                         alt={executor.executor_type}
-                        style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 4,
+                          margin: '0 10px 0 10px',
+                        }}
                       />
                     );
                   })}
@@ -352,14 +391,28 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   {' '}
                   {t('Install MacOS Agent')}
                 </Typography>
-                <div style={{ position: 'absolute', width: '100%', right: 0, bottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{
+                  position: 'absolute',
+                  width: '100%',
+                  right: 0,
+                  bottom: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                >
                   {macOsExecutors.map((executor: Executor) => {
                     return (
                       <img
                         key={executor.executor_id}
                         src={`/api/images/executors/${executor.executor_type}`}
                         alt={executor.executor_type}
-                        style={{ width: 30, height: 30, borderRadius: 4, margin: '0 10px 0 10px' }}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 4,
+                          margin: '0 10px 0 10px',
+                        }}
                       />
                     );
                   })}
@@ -414,7 +467,12 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                         {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
                       </p>
                       <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 8,
+                      }}
+                      >
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
                       </div>
@@ -429,7 +487,12 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                         {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
                       </Alert>
                       <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 8,
+                      }}
+                      >
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
                       </div>
@@ -457,7 +520,12 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                         {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
                       </p>
                       <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 8,
+                      }}
+                      >
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
                       </div>
@@ -469,7 +537,12 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                         {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
                       </p>
                       <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 8 }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 8,
+                      }}
+                      >
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
                         <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
                       </div>

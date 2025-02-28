@@ -1,27 +1,19 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined } from '@mui/icons-material';
-import { CSSProperties, FunctionComponent, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import type { SearchPaginationInput } from '../../../utils/api-types';
+import { type SearchPaginationInput } from '../../../utils/api-types';
 import { useFormatter } from '../../i18n';
+import useBodyItemsStyles from '../queryable/style/style';
 
 const useStyles = makeStyles()(() => ({
   sortableHeaderItem: {
     display: 'flex',
+    height: 20,
     fontSize: 12,
     fontWeight: '700',
     cursor: 'pointer',
     paddingRight: 10,
-    alignItems: 'center',
-  },
-  headerItems: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  headerItem: {
-    display: 'flex',
-    fontSize: 12,
-    fontWeight: 700,
     alignItems: 'center',
   },
   headerItemText: {
@@ -31,7 +23,7 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-export interface Header {
+interface Header {
   field: string;
   label: string;
   isSortable: boolean;
@@ -58,6 +50,7 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
 
   const [sortBy, setSortBy] = useState(searchPaginationInput.sorts?.[0].property ?? '');
   const [sortAsc, setSortAsc] = useState(defaultSortAsc);
@@ -91,14 +84,20 @@ const SortHeadersComponent: FunctionComponent<Props> = ({
       );
     }
     return (
-      <div key={header.field} className={classes.headerItem} style={style}>
+      <div
+        key={header.field}
+        style={{
+          ...bodyItemsStyles.bodyItem,
+          ...style,
+        }}
+      >
         <div className={classes.headerItemText}>{t(header.label)}</div>
       </div>
     );
   };
 
   return (
-    <div className={classes.headerItems}>
+    <div style={bodyItemsStyles.bodyItems}>
       {headers.map((header: Header) => (sortHeader(header, inlineStylesHeaders[header.field])))}
     </div>
   );

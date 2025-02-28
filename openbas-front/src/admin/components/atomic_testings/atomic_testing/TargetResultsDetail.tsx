@@ -22,9 +22,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
-import { FunctionComponent, useContext, useEffect, useState } from 'react';
-import * as React from 'react';
+import { type Edge, MarkerType, ReactFlow, ReactFlowProvider, useEdgesState, useNodesState, useReactFlow } from '@xyflow/react';
+import { type FunctionComponent, type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
@@ -32,20 +31,20 @@ import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
-import { type InjectExpectation, InjectExpectationResult, InjectResultOverviewOutput, InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectExpectation, type InjectExpectationResult, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
 import { splitDuration } from '../../../../utils/Time';
 import { isNotEmptyField } from '../../../../utils/utils';
-import type { InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
+import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
 import InjectIcon from '../../common/injects/InjectIcon';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
-import { InjectResultOverviewOutputContext, InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import nodeTypes from './types/nodes';
-import { NodeResultStep } from './types/nodes/NodeResultStep';
+import { type NodeResultStep } from './types/nodes/NodeResultStep';
 
 interface Steptarget {
   label: string;
@@ -59,9 +58,7 @@ const useStyles = makeStyles()(theme => ({
     margin: '20px 0 0 0',
     overflow: 'hidden',
   },
-  tabs: {
-    marginLeft: 'auto',
-  },
+  tabs: { marginLeft: 'auto' },
   target: {
     display: 'flex',
     alignItems: 'center',
@@ -100,9 +97,7 @@ const useStyles = makeStyles()(theme => ({
     color: '#00b1ff',
     border: '1px solid #00b1ff',
   },
-  cardHeaderContent: {
-    overflow: 'hidden',
-  },
+  cardHeaderContent: { overflow: 'hidden' },
 }));
 
 interface Props {
@@ -125,15 +120,32 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const theme = useTheme();
   const { nsdt, t } = useFormatter();
   const [anchorEls, setAnchorEls] = useState<Record<string, Element | null>>({});
-  const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<{ injectExpectation: InjectExpectationsStore; sourceIds: string[] } | null>(null);
-  const [selectedResultEdition, setSelectedResultEdition] = useState<{ injectExpectation: InjectExpectationsStore; expectationResult: InjectExpectationResult } | null>(null);
-  const [selectedResultDeletion, setSelectedResultDeletion] = useState<{ injectExpectation: InjectExpectationsStore; expectationResult: InjectExpectationResult } | null>(null);
+  const [selectedExpectationForCreation, setSelectedExpectationForCreation] = useState<{
+    injectExpectation: InjectExpectationsStore;
+    sourceIds: string[];
+  } | null>(null);
+  const [selectedResultEdition, setSelectedResultEdition] = useState<{
+    injectExpectation: InjectExpectationsStore;
+    expectationResult: InjectExpectationResult;
+  } | null>(null);
+  const [selectedResultDeletion, setSelectedResultDeletion] = useState<{
+    injectExpectation: InjectExpectationsStore;
+    expectationResult: InjectExpectationResult;
+  } | null>(null);
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeResultStep>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const initialSteps = [{ label: t('Attack started'), type: '', key: 'attack-started' }, { label: t('Attack ended'), type: '', key: 'attack-ended' }];
+  const initialSteps = [{
+    label: t('Attack started'),
+    type: '',
+    key: 'attack-started',
+  }, {
+    label: t('Attack ended'),
+    type: '',
+    key: 'attack-ended',
+  }];
   const sortOrder = ['PREVENTION', 'DETECTION', 'MANUAL'];
   // Flow
   const layoutOptions: LayoutOptions = {
@@ -148,12 +160,24 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   }, [nodes, fitView]);
 
   const handleOpenResultEdition = (injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult) => {
-    setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null });
-    setSelectedResultEdition({ injectExpectation, expectationResult });
+    setAnchorEls({
+      ...anchorEls,
+      [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
+    });
+    setSelectedResultEdition({
+      injectExpectation,
+      expectationResult,
+    });
   };
   const handleOpenResultDeletion = (injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult) => {
-    setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null });
-    setSelectedResultDeletion({ injectExpectation, expectationResult });
+    setAnchorEls({
+      ...anchorEls,
+      [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
+    });
+    setSelectedResultDeletion({
+      injectExpectation,
+      expectationResult,
+    });
   };
   const getColor = (status: string | undefined) => {
     let color;
@@ -184,16 +208,25 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         background = theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
         break;
     }
-    return { color, background };
+    return {
+      color,
+      background,
+    };
   };
 
   const computeInitialSteps = (currentInitialSteps: Steptarget[]) => {
     return currentInitialSteps.map((step, index) => {
       if (index === 0) {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary
-        return { ...step, status: injectResultOverviewOutput?.inject_status?.status_name === 'QUEUING' ? 'QUEUING' : lastExecutionStartDate ? 'SUCCESS' : 'PENDING' };
+        return {
+          ...step,
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define,no-nested-ternary
+          status: injectResultOverviewOutput?.inject_status?.status_name === 'QUEUING' ? 'QUEUING' : lastExecutionStartDate ? 'SUCCESS' : 'PENDING',
+        };
       }
-      return { ...step, status: lastExecutionEndDate ? 'SUCCESS' : 'PENDING' };
+      return {
+        ...step,
+        status: lastExecutionEndDate ? 'SUCCESS' : 'PENDING',
+      };
     });
   };
 
@@ -212,7 +245,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   useEffect(() => {
     if (target) {
       setInitialized(false);
-      const steps = [...computeInitialSteps(initialSteps), ...[{ label: t('Unknown result'), type: '', status: 'PENDING' }]];
+      const steps = [...computeInitialSteps(initialSteps), ...[{
+        label: t('Unknown result'),
+        type: '',
+        status: 'PENDING',
+      }]];
       setNodes(steps.map((step: Steptarget, index) => ({
         id: `result-${index}`,
         type: 'result',
@@ -225,7 +262,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           color: getColor(step.status).color,
           background: getColor(step.status).background,
         },
-        position: { x: 0, y: 0 },
+        position: {
+          x: 0,
+          y: 0,
+        },
       })));
       setEdges([...Array(steps.length - 1)].map((_, i) => ({
         id: `result-${i}->result-${i + 1}`,
@@ -233,7 +273,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         target: `result-${i + 1}`,
         label: i === 0 ? nsdt(lastExecutionStartDate) : nsdt(lastExecutionEndDate),
         labelShowBg: false,
-        labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+        labelStyle: {
+          fill: theme.palette.text?.primary,
+          fontSize: 9,
+        },
       })));
       fetchTargetResult(inject.inject_id, target.id!, target.targetType!, parentTargetId).then(
         (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
@@ -296,7 +339,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         <img
           src={`/api/images/collectors/id/${expectationResult.sourceId}`}
           alt={expectationResult.sourceId}
-          style={{ width: 25, height: 25, borderRadius: 4 }}
+          style={{
+            width: 25,
+            height: 25,
+            borderRadius: 4,
+          }}
         />
       );
     }
@@ -305,7 +352,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         <img
           src={`/api/images/security_platforms/id/${expectationResult.sourceId}/${theme.palette.mode}`}
           alt={expectationResult.sourceId}
-          style={{ width: 25, height: 25, borderRadius: 4 }}
+          style={{
+            width: 25,
+            height: 25,
+            borderRadius: 4,
+          }}
         />
       );
     }
@@ -396,7 +447,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           color: getColor(step.status).color,
           background: getColor(step.status).background,
         },
-        position: { x: 0, y: 0 },
+        position: {
+          x: 0,
+          y: 0,
+        },
 
       })));
       setEdges([...Array(mergedSteps.length - 1)].map((_, i) => ({
@@ -405,7 +459,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         target: `result-${i + 1}`,
         label: i === 0 ? nsdt(lastExecutionStartDate) : nsdt(lastExecutionEndDate),
         labelShowBg: false,
-        labelStyle: { fill: theme.palette.text?.primary, fontSize: 9 },
+        labelStyle: {
+          fill: theme.palette.text?.primary,
+          fontSize: 9,
+        },
       })));
     }
   }, [targetResults, initialized]);
@@ -426,10 +483,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   sortedKeys.forEach((key) => {
     sortedGroupedResults[key] = groupedResults[key];
   });
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
-  const proOptions = { account: 'paid-pro', hideAttribution: true };
+  const proOptions = {
+    account: 'paid-pro',
+    hideAttribution: true,
+  };
   const defaultEdgeOptions = {
     type: 'straight',
     markerEnd: { type: MarkerType.ArrowClosed },
@@ -467,7 +527,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           {target.platformType ?? t('N/A')}
         </div>
       </div>
-      <div className={classes.container} style={{ width: '100%', height: 150 }}>
+      <div
+        className={classes.container}
+        style={{
+          width: '100%',
+          height: 150,
+        }}
+      >
         <ReactFlow
           colorMode={theme.palette.mode}
           nodes={nodes}
@@ -489,7 +555,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         />
       </div>
       {Object.keys(sortedGroupedResults).length > 0 && (
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
+        >
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -550,9 +620,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       <Grid key={index} item xs={4}>
                         <Card key={injectExpectation.inject_expectation_id}>
                           <CardHeader
-                            classes={{
-                              content: classes.cardHeaderContent,
-                            }}
+                            classes={{ content: classes.cardHeaderContent }}
                             avatar={getAvatar(injectExpectation, expectationResult)}
                             action={(
                               <>
@@ -560,7 +628,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                   color="primary"
                                   onClick={(ev) => {
                                     ev.stopPropagation();
-                                    setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget });
+                                    setAnchorEls({
+                                      ...anchorEls,
+                                      [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget,
+                                    });
                                   }}
                                   aria-haspopup="true"
                                   size="large"
@@ -571,7 +642,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                 <Menu
                                   anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
                                   open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
-                                  onClose={() => setAnchorEls({ ...anchorEls, [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null })}
+                                  onClose={() => setAnchorEls({
+                                    ...anchorEls,
+                                    [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
+                                  })}
                                 >
                                   <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
                                     {t('Update')}
@@ -600,7 +674,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               </>
                             )}
                           />
-                          <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+                          <CardContent sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                          >
                             <ItemResult label={expectationResult.result} status={expectationResult.result} />
                             <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
                           </CardContent>
@@ -643,15 +721,15 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               {selectedExpectationForCreation && (
                 <>
                   {selectedExpectationForCreation.injectExpectation.inject_expectation_type === 'MANUAL'
-                  && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
+                    && <ManualExpectationsValidationForm expectation={selectedExpectationForCreation.injectExpectation} onUpdate={onUpdateValidation} />}
                   {['DETECTION', 'PREVENTION'].includes(selectedExpectationForCreation.injectExpectation.inject_expectation_type)
-                  && (
-                    <DetectionPreventionExpectationsValidationForm
-                      expectation={selectedExpectationForCreation.injectExpectation}
-                      sourceIds={selectedExpectationForCreation.sourceIds}
-                      onUpdate={onUpdateValidation}
-                    />
-                  )}
+                    && (
+                      <DetectionPreventionExpectationsValidationForm
+                        expectation={selectedExpectationForCreation.injectExpectation}
+                        sourceIds={selectedExpectationForCreation.sourceIds}
+                        onUpdate={onUpdateValidation}
+                      />
+                    )}
                 </>
               )}
             </DialogContent>
@@ -668,20 +746,20 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               {selectedResultEdition && selectedResultEdition.injectExpectation && (
                 <>
                   {selectedResultEdition.injectExpectation.inject_expectation_type === 'MANUAL'
-                  && (
-                    <ManualExpectationsValidationForm
-                      expectation={selectedResultEdition.injectExpectation}
-                      onUpdate={onUpdateValidation}
-                    />
-                  )}
+                    && (
+                      <ManualExpectationsValidationForm
+                        expectation={selectedResultEdition.injectExpectation}
+                        onUpdate={onUpdateValidation}
+                      />
+                    )}
                   {['DETECTION', 'PREVENTION'].includes(selectedResultEdition.injectExpectation.inject_expectation_type)
-                  && (
-                    <DetectionPreventionExpectationsValidationForm
-                      expectation={selectedResultEdition.injectExpectation}
-                      result={selectedResultEdition.expectationResult}
-                      onUpdate={onUpdateValidation}
-                    />
-                  )}
+                    && (
+                      <DetectionPreventionExpectationsValidationForm
+                        expectation={selectedResultEdition.injectExpectation}
+                        result={selectedResultEdition.expectationResult}
+                        onUpdate={onUpdateValidation}
+                      />
+                    )}
                 </>
               )}
             </DialogContent>

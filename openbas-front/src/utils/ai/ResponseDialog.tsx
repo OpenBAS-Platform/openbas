@@ -6,7 +6,7 @@ import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextF
 import MDEditor, { commands } from '@uiw/react-md-editor/nohighlight';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { FunctionComponent, useEffect, useRef } from 'react';
+import { type FunctionComponent, useEffect, useRef } from 'react';
 
 // eslint-disable-next-line import/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
@@ -76,7 +76,13 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
       >
         <DialogTitle>{t('Ask AI')}</DialogTitle>
         <DialogContent>
-          <div style={{ width: '100%', minHeight: height, height, position: 'relative' }}>
+          <div style={{
+            width: '100%',
+            minHeight: height,
+            height,
+            position: 'relative',
+          }}
+          >
             {(format === 'text' || format === 'json') && (
               <TextField
                 inputRef={textFieldRef}
@@ -117,25 +123,59 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
             { format === 'markdown' && (
               <MDEditor
                 value={content}
-                textareaProps={{
-                  disabled: isDisabled,
-                }}
+                textareaProps={{ disabled: isDisabled }}
                 preview="edit"
                 onChange={data => setContent(data ?? '')}
                 commands={[
-                  { ...commands.title, buttonProps: { disabled: isDisabled } },
-                  { ...commands.bold, buttonProps: { disabled: isDisabled } },
-                  { ...commands.italic, buttonProps: { disabled: isDisabled } },
-                  { ...commands.strikethrough, buttonProps: { disabled: isDisabled } },
+                  {
+                    ...commands.title,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.bold,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.italic,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.strikethrough,
+                    buttonProps: { disabled: isDisabled },
+                  },
                   { ...commands.divider },
-                  { ...commands.link, buttonProps: { disabled: isDisabled } },
-                  { ...commands.quote, buttonProps: { disabled: isDisabled } },
-                  { ...commands.code, buttonProps: { disabled: isDisabled } },
-                  { ...commands.image, buttonProps: { disabled: isDisabled } },
-                  { ...commands.divider, buttonProps: { disabled: isDisabled } },
-                  { ...commands.unorderedListCommand, buttonProps: { disabled: isDisabled } },
-                  { ...commands.orderedListCommand, buttonProps: { disabled: isDisabled } },
-                  { ...commands.checkedListCommand, buttonProps: { disabled: isDisabled } },
+                  {
+                    ...commands.link,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.quote,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.code,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.image,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.divider,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.unorderedListCommand,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.orderedListCommand,
+                    buttonProps: { disabled: isDisabled },
+                  },
+                  {
+                    ...commands.checkedListCommand,
+                    buttonProps: { disabled: isDisabled },
+                  },
                 ]}
                 extraCommands={[]}
               />
@@ -149,7 +189,11 @@ const ResponseDialog: FunctionComponent<ResponseDialogProps> = ({
                 format={format}
                 variant={format}
                 disabled={isDisabled}
-                style={format === 'html' ? { position: 'absolute', top: 40, right: 18 } : undefined}
+                style={format === 'html' ? {
+                  position: 'absolute',
+                  top: 40,
+                  right: 18,
+                } : undefined}
               />
             )}
           </div>

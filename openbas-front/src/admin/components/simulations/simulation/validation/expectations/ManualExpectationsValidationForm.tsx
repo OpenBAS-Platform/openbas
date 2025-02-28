@@ -1,32 +1,28 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Chip, Grid, MenuItem, Select, Slider, TextField as MuiTextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { FunctionComponent, useEffect } from 'react';
+import { type FunctionComponent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 import { z } from 'zod';
 
 import { updateInjectExpectation } from '../../../../../../actions/Exercise';
-import type { UserHelper } from '../../../../../../actions/helper';
+import { type UserHelper } from '../../../../../../actions/helper';
 import { fetchTeams } from '../../../../../../actions/teams/team-actions';
-import type { TeamsHelper } from '../../../../../../actions/teams/team-helper';
+import { type TeamsHelper } from '../../../../../../actions/teams/team-helper';
 import { fetchUsers } from '../../../../../../actions/User';
 import { useFormatter } from '../../../../../../components/i18n';
 import { useHelper } from '../../../../../../store';
-import type { Team, User } from '../../../../../../utils/api-types';
+import { type Team, type User } from '../../../../../../utils/api-types';
 import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
 import { zodImplement } from '../../../../../../utils/Zod';
-import type { InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { type InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
 
 const useStyles = makeStyles()(theme => ({
-  marginTop_2: {
-    marginTop: theme.spacing(2),
-  },
-  scoreAcc: {
-    marginTop: theme.spacing(0),
-  },
+  marginTop_2: { marginTop: theme.spacing(2) },
+  scoreAcc: { marginTop: theme.spacing(0) },
   buttons: {
     display: 'flex',
     placeContent: 'end',
@@ -85,17 +81,11 @@ const ManualExpectationsValidationForm: FunctionComponent<FormProps> = ({ expect
     formState: { errors, isSubmitting },
   } = useForm<{ expectation_score: number }>({
     mode: 'onTouched',
-    resolver: zodResolver(zodImplement<{ expectation_score: number }>().with({
-      expectation_score: z.coerce.number(),
-    })),
-    defaultValues: {
-      expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0,
-    },
+    resolver: zodResolver(zodImplement<{ expectation_score: number }>().with({ expectation_score: z.coerce.number() })),
+    defaultValues: { expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0 },
   });
   useEffect(() => {
-    reset({
-      expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0,
-    });
+    reset({ expectation_score: expectation.inject_expectation_score ?? expectation.inject_expectation_expected_score ?? 0 });
   }, [expectation, reset]);
 
   const targetLabel = (expectationToProcess: InjectExpectationsStore) => {

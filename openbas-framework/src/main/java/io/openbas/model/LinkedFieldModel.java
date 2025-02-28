@@ -1,15 +1,15 @@
 package io.openbas.model;
 
-import io.openbas.injector_contract.ContractType;
 import io.openbas.injector_contract.fields.ContractElement;
+import io.openbas.injector_contract.fields.ContractFieldType;
 
 public class LinkedFieldModel {
 
   private String key;
 
-  private ContractType type;
+  private ContractFieldType type;
 
-  private LinkedFieldModel(String key, ContractType type) {
+  private LinkedFieldModel(String key, ContractFieldType type) {
     this.key = key;
     this.type = type;
   }
@@ -26,11 +26,11 @@ public class LinkedFieldModel {
     this.key = key;
   }
 
-  public ContractType getType() {
+  public ContractFieldType getType() {
     return type;
   }
 
-  public void setType(ContractType type) {
+  public void setType(ContractFieldType type) {
     this.type = type;
   }
 }

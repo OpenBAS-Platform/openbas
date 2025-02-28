@@ -1,14 +1,15 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
+import { type AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
 import { useFormatter } from '../../../components/i18n';
 import ItemCopy from '../../../components/ItemCopy';
 import ItemTags from '../../../components/ItemTags';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import { AttackPattern, Command, DnsResolution, Executable, FileDrop, Payload as PayloadType, PayloadArgument, PayloadPrerequisite } from '../../../utils/api-types';
+import { type AttackPattern, type Command, type DnsResolution, type Executable, type FileDrop, type Payload as PayloadType, type PayloadArgument, type PayloadPrerequisite } from '../../../utils/api-types';
 import { emptyFilled } from '../../../utils/String';
 
 const useStyles = makeStyles()(() => ({
@@ -22,20 +23,15 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-interface Props {
-  selectedPayload: PayloadType | null;
-}
+interface Props { selectedPayload: PayloadType | null }
 
-const PayloadComponent: FunctionComponent<Props> = ({
-  selectedPayload,
-}) => {
+const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme();
 
-  const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({
-    attackPatternsMap: helper.getAttackPatternsMap(),
-  }));
+  const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({ attackPatternsMap: helper.getAttackPatternsMap() }));
 
   const getAttackCommand = (payload: PayloadType | null): string => {
     if (!payload) return '';
@@ -85,7 +81,7 @@ const PayloadComponent: FunctionComponent<Props> = ({
         {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
           <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
         ) : selectedPayload?.payload_platforms?.map(
-          platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={10} />,
+          platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
         )}
         {(selectedPayload?.payload_execution_arch) && (
           <>
@@ -172,7 +168,11 @@ const PayloadComponent: FunctionComponent<Props> = ({
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 650 }}>
                     <TableHead>
-                      <TableRow sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>
+                      <TableRow sx={{
+                        textTransform: 'uppercase',
+                        fontWeight: 'bold',
+                      }}
+                      >
                         <TableCell width="30%">{t('Type')}</TableCell>
                         <TableCell width="30%">{t('Key')}</TableCell>
                         <TableCell width="30%">{t('Default value')}</TableCell>
@@ -217,9 +217,17 @@ const PayloadComponent: FunctionComponent<Props> = ({
           selectedPayload?.payload_prerequisites && selectedPayload?.payload_prerequisites.length === 0 ? '-'
             : (
                 <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650, justifyContent: 'center' }}>
+                  <Table sx={{
+                    minWidth: 650,
+                    justifyContent: 'center',
+                  }}
+                  >
                     <TableHead>
-                      <TableRow sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}>
+                      <TableRow sx={{
+                        textTransform: 'uppercase',
+                        fontWeight: 'bold',
+                      }}
+                      >
                         <TableCell width="30%">{t('Command executor')}</TableCell>
                         <TableCell width="30%">{t('Get command')}</TableCell>
                         <TableCell width="30%">{t('Check command')}</TableCell>

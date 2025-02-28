@@ -1,11 +1,12 @@
 import { MovieFilterOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ToggleButtonGroup } from '@mui/material';
-import { CSSProperties, useMemo, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { type CSSProperties, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchStatistics } from '../../../actions/Application';
-import type { TagHelper, UserHelper } from '../../../actions/helper';
+import { type TagHelper, type UserHelper } from '../../../actions/helper';
 import { searchScenarios } from '../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import ExportButton from '../../../components/common/ExportButton';
@@ -14,6 +15,7 @@ import { initSorting } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
+import useBodyItemsStyles from '../../../components/common/queryable/style/style';
 import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../components/i18n';
 import ItemCategory from '../../../components/ItemCategory';
@@ -22,67 +24,38 @@ import ItemTags from '../../../components/ItemTags';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
-import type { FilterGroup, Scenario, SearchPaginationInput } from '../../../utils/api-types';
+import { type FilterGroup, type Scenario, type SearchPaginationInput } from '../../../utils/api-types';
 import ImportUploaderScenario from './ImportUploaderScenario';
 import ScenarioPopover from './scenario/ScenarioPopover';
 import ScenarioStatus from './scenario/ScenarioStatus';
 import ScenarioCreation from './ScenarioCreation';
 
 const useStyles = makeStyles()(() => ({
-  itemHead: {
-    textTransform: 'uppercase',
-  },
-  item: {
-    height: 50,
-  },
-  bodyItems: {
-    display: 'flex',
-  },
-  bodyItem: {
-    height: 20,
-    fontSize: 13,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingRight: 10,
-  },
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  scenario_name: {
-    width: '25%',
-  },
-  scenario_severity: {
-    width: '8%',
-  },
-  scenario_category: {
-    width: '12%',
-  },
-  scenario_recurrence: {
-    width: '12%',
-  },
-  scenario_platforms: {
-    width: '10%',
-  },
-  scenario_tags: {
-    width: '18%',
-  },
-  scenario_updated_at: {
-    width: '10%',
-  },
+  scenario_name: { width: '25%' },
+  scenario_severity: { width: '8%' },
+  scenario_category: { width: '12%' },
+  scenario_recurrence: { width: '12%' },
+  scenario_platforms: { width: '10%' },
+  scenario_tags: { width: '18%' },
+  scenario_updated_at: { width: '10%' },
 };
 
 const Scenarios = () => {
   // Standard hooks
   const { classes } = useStyles();
+  const bodyItemsStyles = useBodyItemsStyles();
   const { t, nsdt } = useFormatter();
+  const theme = useTheme();
 
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
-  }));
+  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
 
   // Headers
   const headers = useMemo(() => [
@@ -134,7 +107,7 @@ const Scenarios = () => {
         return (
           <>
             {platforms.map(
-              (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={10} />,
+              (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={20} marginRight={theme.spacing(2)} />,
             )}
           </>
         );
@@ -205,7 +178,13 @@ const Scenarios = () => {
 
   return (
     <>
-      <Breadcrumbs variant="list" elements={[{ label: t('Scenarios'), current: true }]} />
+      <Breadcrumbs
+        variant="list"
+        elements={[{
+          label: t('Scenarios'),
+          current: true,
+        }]}
+      />
       <PaginationComponentV2
         fetch={search}
         searchPaginationInput={searchPaginationInput}
@@ -266,12 +245,14 @@ const Scenarios = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={(
-                          <div className={classes.bodyItems}>
+                          <div style={bodyItemsStyles.bodyItems}>
                             {headers.map(header => (
                               <div
                                 key={header.field}
-                                className={classes.bodyItem}
-                                style={inlineStyles[header.field]}
+                                style={{
+                                  ...bodyItemsStyles.bodyItem,
+                                  ...inlineStyles[header.field],
+                                }}
                               >
                                 {header.value(scenario)}
                               </div>

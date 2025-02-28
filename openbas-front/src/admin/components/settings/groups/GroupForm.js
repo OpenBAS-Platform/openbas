@@ -153,7 +153,11 @@ class GroupForm extends Component {
                 </Grid>
               </Grid>
             </Grid>
-            <div style={{ float: 'right', marginTop: 20 }}>
+            <div style={{
+              float: 'right',
+              marginTop: 20,
+            }}
+            >
               <Button
                 variant="contained"
                 onClick={handleClose.bind(this)}

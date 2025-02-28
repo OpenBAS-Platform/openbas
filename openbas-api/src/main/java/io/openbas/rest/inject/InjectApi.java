@@ -9,11 +9,8 @@ import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
 import static io.openbas.rest.scenario.ScenarioApi.SCENARIO_URI;
 import static java.time.Instant.now;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.aop.LogExecutionTime;
+import io.openbas.authorisation.AuthorisationService;
 import io.openbas.database.model.*;
 import io.openbas.database.model.InjectStatus;
 import io.openbas.database.repository.*;
@@ -22,35 +19,35 @@ import io.openbas.execution.ExecutableInject;
 import io.openbas.execution.ExecutionContext;
 import io.openbas.execution.ExecutionContextService;
 import io.openbas.executors.Executor;
-import io.openbas.injector_contract.ContractType;
 import io.openbas.rest.atomic_testing.form.InjectResultOutput;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.UnprocessableContentException;
+import io.openbas.rest.exercise.exports.ExportOptions;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.*;
-import io.openbas.rest.inject.service.ExecutableInjectService;
-import io.openbas.rest.inject.service.InjectDuplicateService;
-import io.openbas.rest.inject.service.InjectService;
-import io.openbas.rest.inject.service.InjectStatusService;
-import io.openbas.service.AssetGroupService;
-import io.openbas.service.AssetService;
-import io.openbas.service.InjectSearchService;
-import io.openbas.service.ScenarioService;
-import io.openbas.service.TagRuleService;
+import io.openbas.rest.inject.service.*;
+import io.openbas.rest.security.SecurityExpression;
+import io.openbas.service.*;
 import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,12 +86,143 @@ public class InjectApi extends RestBehavior {
   private final TagRuleService tagRuleService;
   private final InjectStatusService injectStatusService;
   private final ExecutableInjectService executableInjectService;
+  private final ImportService importService;
+  private final InjectExportService injectExportService;
+  private final ScenarioRepository scenarioRepository;
+  private final AuthorisationService authorisationService;
 
   // -- INJECTS --
 
   @GetMapping(INJECT_URI + "/{injectId}")
   public Inject inject(@PathVariable @NotBlank final String injectId) {
     return this.injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+  }
+
+  @LogExecutionTime
+  @PostMapping(INJECT_URI + "/search/export")
+  @Tracing(
+      name = "Exports injects based on a search specification",
+      layer = "api",
+      operation = "POST")
+  public void injectsExportFromSearch(
+      @RequestBody @Valid InjectExportFromSearchRequestInput input, HttpServletResponse response)
+      throws IOException {
+
+    // Control and format inputs
+    List<Inject> injects =
+        getInjectsAndCheckInputForBulkProcessing(input, Grant.GRANT_TYPE.OBSERVER);
+    runInjectExport(
+        injects,
+        ExportOptions.mask(
+            input.getExportOptions().isWithPlayers(),
+            input.getExportOptions().isWithTeams(),
+            input.getExportOptions().isWithVariableValues()),
+        response);
+  }
+
+  @PostMapping(INJECT_URI + "/export")
+  public void injectsExport(
+      @RequestBody @Valid final InjectExportRequestInput injectExportRequestInput,
+      HttpServletResponse response)
+      throws IOException {
+    List<String> targetIds = injectExportRequestInput.getTargetsIds();
+    List<Inject> injects = injectRepository.findAllById(targetIds);
+
+    List<String> foundIds = injects.stream().map(Inject::getId).toList();
+    List<String> missedIds =
+        new ArrayList<>(targetIds.stream().filter(id -> !foundIds.contains(id)).toList());
+    missedIds.addAll(
+        injectService
+            .authorise(injects, SecurityExpression::isInjectObserver)
+            .getUnauthorised()
+            .stream()
+            .map(Inject::getId)
+            .toList());
+
+    if (!missedIds.isEmpty()) {
+      throw new ElementNotFoundException(String.join(", ", missedIds));
+    }
+
+    int exportOptionsMask =
+        ExportOptions.mask(
+            injectExportRequestInput.getExportOptions().isWithPlayers(),
+            injectExportRequestInput.getExportOptions().isWithTeams(),
+            injectExportRequestInput.getExportOptions().isWithVariableValues());
+    runInjectExport(injects, exportOptionsMask, response);
+  }
+
+  private void runInjectExport(
+      List<Inject> injects, int exportOptionsMask, HttpServletResponse response)
+      throws IOException {
+    byte[] zippedExport = injectExportService.exportInjectsToZip(injects, exportOptionsMask);
+    String zipName = injectExportService.getZipFileName(exportOptionsMask);
+
+    response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
+    response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
+    response.setStatus(HttpServletResponse.SC_OK);
+    ServletOutputStream outputStream = response.getOutputStream();
+    outputStream.write(zippedExport);
+    outputStream.close();
+  }
+
+  @PostMapping(
+      path = INJECT_URI + "/import",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public void injectsImport(
+      @RequestPart("file") MultipartFile file,
+      @RequestPart("input") InjectImportInput input,
+      HttpServletResponse response)
+      throws Exception {
+    // find target
+    if (input == null || input.getTarget() == null) {
+      throw new UnprocessableContentException("Insufficient input: target must not be null");
+    }
+    if (!List.of(InjectImportTargetType.values()).contains(input.getTarget().getType())) {
+      throw new UnprocessableContentException(
+          "Invalid target type: must be one of %s"
+              .formatted(
+                  String.join(
+                      ", ",
+                      Arrays.stream(InjectImportTargetType.values())
+                          .map(Enum::toString)
+                          .toList())));
+    }
+
+    Exercise targetExercise = null;
+    Scenario targetScenario = null;
+
+    if (input.getTarget().getType().equals(InjectImportTargetType.SIMULATION)) {
+      targetExercise =
+          exerciseRepository
+              .findById(input.getTarget().getId())
+              .orElseThrow(ElementNotFoundException::new);
+      if (!authorisationService
+          .getSecurityExpression()
+          .isSimulationPlanner(targetExercise.getId())) {
+        throw new AccessDeniedException(
+            "Insufficient privileges to act on simulation id#%s".formatted(targetExercise.getId()));
+      }
+    }
+
+    if (input.getTarget().getType().equals(InjectImportTargetType.SCENARIO)) {
+      targetScenario =
+          scenarioRepository
+              .findById(input.getTarget().getId())
+              .orElseThrow(ElementNotFoundException::new);
+      if (!authorisationService.getSecurityExpression().isScenarioPlanner(targetScenario.getId())) {
+        throw new AccessDeniedException(
+            "Insufficient privileges to act on scenario id#%s".formatted(targetScenario.getId()));
+      }
+    }
+
+    if (input.getTarget().getType().equals(InjectImportTargetType.ATOMIC_TESTING)) {
+      if (!authorisationService.getSecurityExpression().isAdmin()) {
+        throw new AccessDeniedException(
+            "Insufficient privileges: must be admin to act on atomic testing");
+      }
+    }
+
+    this.importService.handleFileImport(file, targetExercise, targetScenario);
   }
 
   @Secured(ROLE_ADMIN)
@@ -229,116 +357,7 @@ public class InjectApi extends RestBehavior {
       @PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
     Exercise exercise =
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
-    InjectorContract injectorContract =
-        injectorContractRepository
-            .findById(input.getInjectorContract())
-            .orElseThrow(ElementNotFoundException::new);
-    // Set expectations
-    ObjectNode finalContent = input.getContent();
-    if (input.getContent() == null
-        || input.getContent().get(EXPECTATIONS) == null
-        || input.getContent().get(EXPECTATIONS).isEmpty()) {
-      try {
-        JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
-        List<JsonNode> contractElements =
-            StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
-                .filter(
-                    contractElement ->
-                        contractElement
-                            .get("type")
-                            .asText()
-                            .equals(ContractType.Expectation.name().toLowerCase()))
-                .toList();
-        if (!contractElements.isEmpty()) {
-          JsonNode contractElement = contractElements.getFirst();
-          if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull()
-              && !contractElement.get(PREDEFINE_EXPECTATIONS).isEmpty()) {
-            finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
-            ArrayNode predefinedExpectations = mapper.createArrayNode();
-            StreamSupport.stream(contractElement.get(PREDEFINE_EXPECTATIONS).spliterator(), false)
-                .forEach(
-                    predefinedExpectation -> {
-                      ObjectNode newExpectation = predefinedExpectation.deepCopy();
-                      newExpectation.put("expectation_score", 100);
-                      predefinedExpectations.add(newExpectation);
-                    });
-            finalContent.put(EXPECTATIONS, predefinedExpectations);
-          }
-        }
-      } catch (JsonProcessingException e) {
-        log.severe("Cannot open injector contract");
-      }
-    }
-    input.setContent(finalContent);
-    // Get common attributes
-    Inject inject = input.toInject(injectorContract);
-    inject.setUser(
-        userRepository
-            .findById(currentUser().getId())
-            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
-    inject.setExercise(exercise);
-    // Set dependencies
-    if (input.getDependsOn() != null) {
-      inject
-          .getDependsOn()
-          .addAll(
-              input.getDependsOn().stream()
-                  .map(
-                      injectDependencyInput -> {
-                        InjectDependency dependency = new InjectDependency();
-                        dependency.setInjectDependencyCondition(
-                            injectDependencyInput.getConditions());
-                        dependency.setCompositeId(new InjectDependencyId());
-                        dependency.getCompositeId().setInjectChildren(inject);
-                        dependency
-                            .getCompositeId()
-                            .setInjectParent(
-                                injectRepository
-                                    .findById(
-                                        injectDependencyInput.getRelationship().getInjectParentId())
-                                    .orElse(null));
-                        return dependency;
-                      })
-                  .toList());
-    }
-    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
-
-    // verify if the inject is not manual/sms/emails...
-    if (this.injectService.canApplyAssetGroupToInject(inject)) {
-      // add default asset groups
-      inject.setAssetGroups(
-          this.tagRuleService.applyTagRuleToInjectCreation(
-              exercise.getTags().stream().map(Tag::getId).toList(),
-              assetGroupService.assetGroups(input.getAssetGroups())));
-    }
-
-    inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    List<InjectDocument> injectDocuments =
-        input.getDocuments().stream()
-            .map(
-                i -> {
-                  InjectDocument injectDocument = new InjectDocument();
-                  injectDocument.setInject(inject);
-                  injectDocument.setDocument(
-                      documentRepository
-                          .findById(i.getDocumentId())
-                          .orElseThrow(ElementNotFoundException::new));
-                  injectDocument.setAttached(i.isAttached());
-                  return injectDocument;
-                })
-            .toList();
-    inject.setDocuments(injectDocuments);
-    // Linked documents directly to the exercise
-    inject
-        .getDocuments()
-        .forEach(
-            document -> {
-              if (!document.getDocument().getExercises().contains(exercise)) {
-                exercise.getDocuments().add(document.getDocument());
-              }
-            });
-    return injectRepository.save(inject);
+    return this.injectService.createInject(exercise, null, input);
   }
 
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/{injectId}")
@@ -477,116 +496,7 @@ public class InjectApi extends RestBehavior {
   public Inject createInjectForScenario(
       @PathVariable @NotBlank final String scenarioId, @Valid @RequestBody InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
-    InjectorContract injectorContract =
-        injectorContractRepository
-            .findById(input.getInjectorContract())
-            .orElseThrow(ElementNotFoundException::new);
-    // Set expectations
-    ObjectNode finalContent = input.getContent();
-    if (input.getContent() == null
-        || input.getContent().get(EXPECTATIONS) == null
-        || input.getContent().get(EXPECTATIONS).isEmpty()) {
-      try {
-        JsonNode jsonNode = mapper.readTree(injectorContract.getContent());
-        List<JsonNode> contractElements =
-            StreamSupport.stream(jsonNode.get("fields").spliterator(), false)
-                .filter(
-                    contractElement ->
-                        contractElement
-                            .get("type")
-                            .asText()
-                            .equals(ContractType.Expectation.name().toLowerCase()))
-                .toList();
-        if (!contractElements.isEmpty()) {
-          JsonNode contractElement = contractElements.getFirst();
-          if (!contractElement.get(PREDEFINE_EXPECTATIONS).isNull()
-              && !contractElement.get(PREDEFINE_EXPECTATIONS).isEmpty()) {
-            finalContent = finalContent != null ? finalContent : mapper.createObjectNode();
-            ArrayNode predefinedExpectations = mapper.createArrayNode();
-            StreamSupport.stream(contractElement.get(PREDEFINE_EXPECTATIONS).spliterator(), false)
-                .forEach(
-                    predefinedExpectation -> {
-                      ObjectNode newExpectation = predefinedExpectation.deepCopy();
-                      newExpectation.put("expectation_score", 100);
-                      predefinedExpectations.add(newExpectation);
-                    });
-            finalContent.put(EXPECTATIONS, predefinedExpectations);
-          }
-        }
-      } catch (JsonProcessingException e) {
-        log.severe("Cannot open injector contract");
-      }
-    }
-    input.setContent(finalContent);
-    // Get common attributes
-    Inject inject = input.toInject(injectorContract);
-    inject.setUser(
-        this.userRepository
-            .findById(currentUser().getId())
-            .orElseThrow(() -> new ElementNotFoundException("Current user not found")));
-    inject.setScenario(scenario);
-    // Set dependencies
-    if (input.getDependsOn() != null) {
-      inject
-          .getDependsOn()
-          .addAll(
-              input.getDependsOn().stream()
-                  .map(
-                      injectDependencyInput -> {
-                        InjectDependency dependency = new InjectDependency();
-                        dependency.setInjectDependencyCondition(
-                            injectDependencyInput.getConditions());
-                        dependency.setCompositeId(new InjectDependencyId());
-                        dependency.getCompositeId().setInjectChildren(inject);
-                        dependency
-                            .getCompositeId()
-                            .setInjectParent(
-                                injectRepository
-                                    .findById(
-                                        injectDependencyInput.getRelationship().getInjectParentId())
-                                    .orElse(null));
-                        return dependency;
-                      })
-                  .toList());
-    }
-    inject.setTeams(fromIterable(teamRepository.findAllById(input.getTeams())));
-    inject.setAssets(fromIterable(assetService.assets(input.getAssets())));
-
-    // verify if the inject is not manual/sms/emails...
-    if (this.injectService.canApplyAssetGroupToInject(inject)) {
-      // add default asset groups
-      inject.setAssetGroups(
-          this.tagRuleService.applyTagRuleToInjectCreation(
-              scenario.getTags().stream().map(Tag::getId).toList(),
-              assetGroupService.assetGroups(input.getAssetGroups())));
-    }
-
-    inject.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-    List<InjectDocument> injectDocuments =
-        input.getDocuments().stream()
-            .map(
-                i -> {
-                  InjectDocument injectDocument = new InjectDocument();
-                  injectDocument.setInject(inject);
-                  injectDocument.setDocument(
-                      documentRepository
-                          .findById(i.getDocumentId())
-                          .orElseThrow(ElementNotFoundException::new));
-                  injectDocument.setAttached(i.isAttached());
-                  return injectDocument;
-                })
-            .toList();
-    inject.setDocuments(injectDocuments);
-    // Linked documents directly to the exercise
-    inject
-        .getDocuments()
-        .forEach(
-            document -> {
-              if (!document.getDocument().getScenarios().contains(scenario)) {
-                scenario.getDocuments().add(document.getDocument());
-              }
-            });
-    return injectRepository.save(inject);
+    return this.injectService.createInject(null, scenario, input);
   }
 
   @PostMapping(SCENARIO_URI + "/{scenarioId}/injects/{injectId}")
@@ -670,7 +580,8 @@ public class InjectApi extends RestBehavior {
   public List<Inject> bulkUpdateInject(@RequestBody @Valid final InjectBulkUpdateInputs input) {
 
     // Control and format inputs
-    List<Inject> injectsToUpdate = getInjectsAndCheckInputForBulkProcessing(input);
+    List<Inject> injectsToUpdate =
+        getInjectsAndCheckInputForBulkProcessing(input, Grant.GRANT_TYPE.PLANNER);
 
     // Bulk update
     return this.injectService.bulkUpdateInject(injectsToUpdate, input.getUpdateOperations());
@@ -686,7 +597,8 @@ public class InjectApi extends RestBehavior {
   public List<Inject> bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs
-    List<Inject> injectsToDelete = getInjectsAndCheckInputForBulkProcessing(input);
+    List<Inject> injectsToDelete =
+        getInjectsAndCheckInputForBulkProcessing(input, Grant.GRANT_TYPE.PLANNER);
 
     // FIXME: This is a workaround to prevent the GUI from blocking when deleting elements
     injectsToDelete.forEach(inject -> inject.setListened(false));
@@ -704,7 +616,8 @@ public class InjectApi extends RestBehavior {
    * @return The list of injects to process
    * @throws BadRequestException If the input is not correctly formatted
    */
-  private List<Inject> getInjectsAndCheckInputForBulkProcessing(InjectBulkProcessingInput input) {
+  private List<Inject> getInjectsAndCheckInputForBulkProcessing(
+      InjectBulkProcessingInput input, Grant.GRANT_TYPE requested_grant_level) {
     // Control and format inputs
     if ((CollectionUtils.isEmpty(input.getInjectIDsToProcess())
             && (input.getSearchPaginationInput() == null))
@@ -716,7 +629,7 @@ public class InjectApi extends RestBehavior {
 
     // Retrieve injects that match the search input and check that the user is allowed to bulk
     // process them
-    return this.injectService.getInjectsAndCheckIsPlanner(input);
+    return this.injectService.getInjectsAndCheckPermission(input, requested_grant_level);
   }
 
   // -- PRIVATE --

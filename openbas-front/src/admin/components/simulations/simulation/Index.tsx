@@ -1,10 +1,10 @@
 import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
-import { FunctionComponent, lazy, Suspense, useState } from 'react';
+import { type FunctionComponent, lazy, Suspense, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExercise } from '../../../../actions/Exercise';
-import type { ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
+import { type ExercisesHelper } from '../../../../actions/exercises/exercise-helper';
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
@@ -12,19 +12,19 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { useHelper } from '../../../../store';
-import type { Exercise as ExerciseType } from '../../../../utils/api-types';
+import { type Exercise as ExerciseType } from '../../../../utils/api-types';
 import { usePermissions } from '../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import { DocumentContext, DocumentContextType, InjectContext, PermissionsContext, PermissionsContextType } from '../../common/Context';
+import { DocumentContext, type DocumentContextType, InjectContext, PermissionsContext, type PermissionsContextType } from '../../common/Context';
 import injectContextForExercise from './ExerciseContext';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import ExerciseHeader from './ExerciseHeader';
 
-const Exercise = lazy(() => import('./overview/ExerciseComponent'));
+const Simulation = lazy(() => import('./overview/SimulationComponent'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
-const Lessons = lazy(() => import('./lessons/ExerciseLessons'));
-const ExerciseDefinition = lazy(() => import('./ExerciseDefinition'));
+const Lessons = lazy(() => import('./lessons/SimulationLessons'));
+const SimulationDefinition = lazy(() => import('./SimulationDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Tests = lazy(() => import('./tests/ExerciseTests'));
 const TimelineOverview = lazy(() => import('./timeline/TimelineOverview'));
@@ -43,20 +43,21 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
-  exercise,
-}) => {
+const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercise }) => {
   const { t, fldt } = useFormatter();
   const location = useLocation();
   const { classes } = useStyles();
-  const permissionsContext: PermissionsContextType = {
-    permissions: usePermissions(exercise.exercise_id),
-  };
+  const permissionsContext: PermissionsContextType = { permissions: usePermissions(exercise.exercise_id) };
   const documentContext: DocumentContextType = {
     onInitDocument: () => ({
       document_tags: [],
       document_scenarios: [],
-      document_exercises: exercise ? [{ id: exercise.exercise_id, label: exercise.exercise_name }] : [],
+      document_exercises: exercise
+        ? [{
+            id: exercise.exercise_id,
+            label: exercise.exercise_name,
+          }]
+        : [],
     }),
   };
   let tabValue = location.pathname;
@@ -76,8 +77,14 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
           <Breadcrumbs
             variant="object"
             elements={[
-              { label: t('Simulations'), link: '/admin/simulations' },
-              { label: exercise.exercise_name, current: true },
+              {
+                label: t('Simulations'),
+                link: '/admin/simulations',
+              },
+              {
+                label: exercise.exercise_name,
+                current: true,
+              },
             ]}
           />
           <ExerciseHeader />
@@ -85,7 +92,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
             sx={{
               borderBottom: 1,
               borderColor: 'divider',
-              marginBottom: 4,
+              marginBottom: 2,
             }}
           >
             <Tabs value={tabValue}>
@@ -133,9 +140,9 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({
           </Box>
           <Suspense fallback={<Loader />}>
             <Routes>
-              <Route path="" element={errorWrapper(Exercise)()} />
+              <Route path="" element={errorWrapper(Simulation)()} />
               <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
-              <Route path="definition" element={errorWrapper(ExerciseDefinition)()} />
+              <Route path="definition" element={errorWrapper(SimulationDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
               <Route path="animation" element={<Navigate to="timeline" replace={true} />} />

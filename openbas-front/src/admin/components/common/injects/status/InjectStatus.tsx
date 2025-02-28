@@ -3,8 +3,8 @@ import { Paper, Typography } from '@mui/material';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemStatus from '../../../../../components/ItemStatus';
 import {
-  AgentStatusOutput,
-  EndpointOutput, InjectStatusOutput,
+  type AgentStatusOutput,
+  type EndpointOutput, type InjectStatusOutput,
 } from '../../../../../utils/api-types';
 import EndpointTraces from './traces/EndpointTraces';
 import ExecutionTime from './traces/ExecutionTime';
@@ -35,21 +35,34 @@ const InjectStatus = ({ injectStatus = null, endpointsMap = new Map() }: Props) 
             {t('Execution status')}
           </Typography>
           {injectStatus.status_name
-          && (
-            <ItemStatus
-              isInject
-              status={injectStatus.status_name}
-              label={t(injectStatus.status_name)}
-            />
-          )}
+            && (
+              <ItemStatus
+                isInject
+                status={injectStatus.status_name}
+                label={t(injectStatus.status_name)}
+              />
+            )}
           <ExecutionTime style={{ marginTop: '16px' }} startDate={injectStatus.tracking_sent_date ?? null} endDate={injectStatus.tracking_end_date ?? null} />
-          <Typography variant="subtitle1" style={{ fontWeight: 'bold', marginTop: 20 }} gutterBottom>
+          <Typography
+            variant="subtitle1"
+            style={{
+              fontWeight: 'bold',
+              marginTop: 20,
+            }}
+            gutterBottom
+          >
             {t('Traces')}
           </Typography>
           {(injectStatus.status_main_traces || []).length > 0 && <TraceMessage traces={injectStatus.status_main_traces || []} />}
-          {Array.from(orderedTracesByAsset.entries()).map(([assetId, tracesByAgent]) => (
-            <EndpointTraces key={assetId} endpoint={endpointsMap.get(assetId) as EndpointOutput} tracesByAgent={tracesByAgent || []} />
-          ))}
+          {Array.from(orderedTracesByAsset.entries())
+            .sort(([assetIdA], [assetIdB]) => assetIdA.localeCompare(assetIdB))
+            .map(([assetId, tracesByAgent]) => (
+              <EndpointTraces
+                key={assetId}
+                endpoint={endpointsMap.get(assetId) as EndpointOutput}
+                tracesByAgent={tracesByAgent || []}
+              />
+            ))}
         </Paper>
       ) : (
         <Paper variant="outlined" style={{ padding: '20px' }}>

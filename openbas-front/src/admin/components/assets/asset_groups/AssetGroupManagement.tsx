@@ -1,22 +1,23 @@
 import { CloseRounded } from '@mui/icons-material';
 import { IconButton, Typography } from '@mui/material';
-import { FunctionComponent } from 'react';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
-import type { AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
-import type { EndpointHelper } from '../../../../actions/assets/asset-helper';
+import { type AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
+import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
 import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
-import type { UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import SearchFilter from '../../../../components/SearchFilter';
 import { useHelper } from '../../../../store';
-import type { AssetGroup, Endpoint } from '../../../../utils/api-types';
+import { type AssetGroup, type Endpoint } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import TagsFilter from '../../common/filters/TagsFilter';
+import { type EndpointStoreWithType } from '../endpoints/endpoint';
 import EndpointPopover from '../endpoints/EndpointPopover';
-import EndpointsList, { EndpointStoreWithType } from '../endpoints/EndpointsList';
+import EndpointsList from '../endpoints/EndpointsList';
 import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
 
 const useStyles = makeStyles()(theme => ({
@@ -39,9 +40,7 @@ const useStyles = makeStyles()(theme => ({
     float: 'right',
     marginTop: -8,
   },
-  tags: {
-    float: 'right',
-  },
+  tags: { float: 'right' },
   search: {
     float: 'right',
     width: 200,
@@ -82,8 +81,14 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const getAssetFromMap = (assets: string[]) => assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
 
   const filteringAssets = useSearchAnFilter('asset', 'name', ['name']);
-  const assets = getAssetFromMap(assetGroup?.asset_group_assets ?? [])?.map(a => ({ ...a, type: 'static' }))
-    .concat(getAssetFromMap(assetGroup?.asset_group_dynamic_assets ?? [])?.map(a => ({ ...a, type: 'dynamic' })));
+  const assets = getAssetFromMap(assetGroup?.asset_group_assets ?? [])?.map(a => ({
+    ...a,
+    type: 'static',
+  }))
+    .concat(getAssetFromMap(assetGroup?.asset_group_dynamic_assets ?? [])?.map(a => ({
+      ...a,
+      type: 'dynamic',
+    })));
   const sortedAsset: EndpointStoreWithType[] = filteringAssets.filterAndSort(assets);
 
   return (
@@ -135,13 +140,13 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
           : <span> &nbsp; </span>}
       />
       {userAdmin
-      && (
-        <AssetGroupAddEndpoints
-          assetGroupId={assetGroup?.asset_group_id}
-          assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-          onUpdate={onUpdate}
-        />
-      )}
+        && (
+          <AssetGroupAddEndpoints
+            assetGroupId={assetGroup?.asset_group_id}
+            assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
+            onUpdate={onUpdate}
+          />
+        )}
     </>
   );
 };
