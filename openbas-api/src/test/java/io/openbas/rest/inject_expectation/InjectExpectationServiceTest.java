@@ -5,6 +5,7 @@ import static io.openbas.injectors.openbas.OpenBASInjector.OPENBAS_INJECTOR_NAME
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -43,9 +44,9 @@ class InjectExpectationServiceTest extends IntegrationTest {
   private static Asset savedAsset;
 
   @BeforeAll
-  void beforeAll() {
+  void beforeAll() throws JsonProcessingException {
     InjectorContract injectorContract =
-        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME), "{}");
+        InjectorContractFixture.createInjectorContract(Map.of("en", INJECTION_NAME));
     savedInjector =
         injectorRepository.save(
             InjectorFixture.createInjector(
