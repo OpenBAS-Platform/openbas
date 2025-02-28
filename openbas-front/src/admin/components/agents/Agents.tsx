@@ -224,8 +224,8 @@ MD5: 68c1795fb45cb9b522d6cf48443fdc37
 SHA1: 5f87d06f818ff8cba9e11e8cd1c6f9d990eca0f8
 SHA256: 6b180913acb8cdac3fb8d3154a2f6a0bed13c056a477f4f94c4679414ec13b9f
 SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd58d36058d7cde405bc8c5084f3ac060a6080bfc18a843738d3bee87fd`,
-          displayedCode: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD', '-privilege PRIVILEGE', '')}).Content`,
-          code: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD', '-privilege PRIVILEGE', '')}).Content`,
+          displayedCode: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD TODO', '-privilege PRIVILEGE TODO', '')}).Content`, // todo
+          code: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD TODO', '-privilege PRIVILEGE TODO', '')}).Content`, // TODO
         };
       case 'Linux':
         return {
@@ -238,8 +238,8 @@ MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user --group', '| sh', '| sudo sh')}`,
-          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user --group', '| sh', '| sudo sh')}`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
         };
       case 'MacOS':
         return {
@@ -252,8 +252,8 @@ MD5: 1132906cc40001f51673108847b88d0c
 SHA1: 3177df4a8fa13a2e13ce63670c579955ad55df3f
 SHA256: 2b4397160925bf6b9dcca0949073fd9b2fc590ab641ea1d1c3d7d36048ed674a
 SHA512: f1c8cf0c41c7d193bcb2aad21d7a739c785902c3231e15986b2eb37f911824a802f50cb2dbb509deba1c7a2a535fb7b34cf100303c61a6087102948628133747`,
-          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams('--user --group', '| sh', '| sudo sh')}`,
-          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams('--user --group', '| sh', '| sudo sh')}`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
         };
       default:
         return {
@@ -266,8 +266,8 @@ MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user --group', '| sh', '| sudo sh')}`,
-          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user --group', '| sh', '| sudo sh')}`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
         };
     }
   };
@@ -306,10 +306,10 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
       <>
         <Typography variant="h2" style={{ marginTop: 20 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
         <Alert variant="outlined" severity="info">
-          {t('The Agent will never execute directly any payload.')}
+          {t('The agent will never execute directly any payload.')}
         </Alert>
         <p>
-          {t('You will need to add proper antivirus exclusions for this Agent (to ensure injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
+          {t('You will need to add proper antivirus exclusions for this agent (to ensure injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
         </p>
         <pre style={{ margin: '20px 0 10px 0' }}>{exclusions}</pre>
       </>
@@ -322,21 +322,33 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
 
     const buildInstallationMessage = () => {
       let message = '';
-      if (activeTab === 0) {
-        if (platform === WINDOWS) {
-          message = t('You can either directly copy and paste the following Powershell snippet into an standard prompt or download the .ps1 script (make sure to replace the script parameters).');
+      if (selectedExecutor?.executor_type === OPENBAS_AGENT) {
+        if (activeTab === 0) {
+          if (platform === WINDOWS) {
+            message = t('You can either directly copy and paste the following Powershell snippet into an standard prompt or download the .ps1 script (make sure to replace the script parameters: TODO).'); // TODO
+          } else {
+            message = t('You can either directly copy and paste the following bash snippet into a terminal or download the .sh script.');
+          }
         } else {
-          message = t('You can either directly copy and paste the following bash snippet into a terminal or download the .sh script.');
+          if (platform === WINDOWS) {
+            if (selectedOption === 'user') {
+              message = t('You can either directly copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and execute it with administrator privileges (don’t forget to replace the script parameters: TODO).'); // TODO
+            } else {
+              message = t('You can either directly copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and execute it with administrator privileges.');
+            }
+          } else {
+            if (selectedOption === 'user') {
+              message = t('You can either directly copy and paste the following bash snippet into a terminal with root privileges or download the .sh script and run it as root (don’t forget to replace the script parameters: TODO).'); // TODO
+            } else {
+              message = t('You can either directly copy and paste the following bash snippet into a terminal with root privileges or download the .sh script and run it as root.');
+            }
+          }
         }
       } else {
         if (platform === WINDOWS) {
-          if (selectedOption === 'user') {
-            message = t('You can either directly copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and execute it with administrator privileges (don’t forget to replace the script parameters).');
-          } else {
-            message = t('You can either directly copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and execute it with administrator privileges.');
-          }
+          message = t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).');
         } else {
-          message = t('You can either directly copy and paste the following bash snippet into a terminal with root privileges or download the .sh script and run it as root.');
+          message = t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).');
         }
       }
       return (
@@ -350,7 +362,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
     return (
       <>
         {buildInstallationMessage()}
-        {selectedExecutor?.executor_type === OPENBAS_CALDERA && (
+        {selectedExecutor?.executor_type === OPENBAS_CALDERA && platform !== WINDOWS && (
           <Alert variant="outlined" severity="warning">
             {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
           </Alert>
@@ -400,16 +412,16 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               severity="info"
               style={{ marginTop: theme.spacing(1) }}
             >
-              {t('Quick start with openBAS: Install the agent using your own user account. This installation requires only standard local privileges.')}
+              {t('Quick start with openBAS: Install the agent using your own user account. This installation requires only local standard privileges.')}
             </Alert>
             <StepOneInstallation />
             <Alert
               variant="outlined"
               severity="warning"
             >
-              {t('The agent runs in the background as a session. '
-                + 'It will only execute when the user is logged in and the session is active. '
-                + 'The agent can be run as an administrator or a standard user.')}
+              {t('The agent runs in the background as a session. ')
+                + t('It will only execute when the user is logged in and the session is active. ')
+                + t('The agent can be run as an administrator or a standard user.')}
             </Alert>
             <InstallationScriptsAndActionButtons />
           </>
@@ -447,20 +459,19 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <Alert variant="outlined" severity="warning" style={{ marginTop: theme.spacing(1) }}>
               {selectedOption === 'user' ? (
                 <>
-                  {t(`The agent runs in the background as a service and automatically starts when the machine powers on. 
-                    It can be executed either as an administrator or as a standard user.
-                    Installing as a user requires specific permissions.`)}
+                  {t(`The agent runs in the background as a service and automatically starts when the machine powers on.`)
+                    + t(`It can be run as administrator or as a standard user depending on the user rights used in the script parameters.`)}
                   {platform === WINDOWS && (
                     <>
                       {' '}
-                      {t('You should add "Log on as a service" policy.')}
+                      {t('Installing as a user requires specific permissions: You should add "Log on as a service" policy.')}
                       {' '}
                     </>
                   )}
                 </>
               ) : (
-                t(`The agent runs in the background as a service and automatically starts when the machine powers on.
-                Installing it as a system grants system-wide privileges.`)
+                t(`The agent runs in the background as a service and automatically starts when the machine powers on.`)
+                + t(`Installing it as a system grants system-wide privileges.`)
               )}
             </Alert>
             <InstallationScriptsAndActionButtons />
@@ -571,7 +582,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               marginBottom: theme.spacing(4),
             }}
           >
-            {t('Choose your platform : ')}
+            {t('Choose your platform')}
           </Typography>
           <Grid container spacing={1}>
             {selectedExecutor?.executor_platforms
@@ -637,7 +648,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                   <ArchitectureFormControl />
                   <StepOneInstallation />
                   <Alert variant="outlined" severity="info">
-                    {t('Installing the Agent is requiring local administrator privileges.')}
+                    {t('Installing the agent is requiring local administrator privileges.')}
                   </Alert>
                   <PlatformInstallationForCaldera />
                   <StepTwoExclusions />
