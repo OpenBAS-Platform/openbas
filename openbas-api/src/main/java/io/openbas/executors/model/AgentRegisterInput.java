@@ -14,6 +14,7 @@ public class AgentRegisterInput {
 
   private String name;
   private String[] ips;
+  private String seenIp;
   private String hostname;
   private String agentVersion;
   private Endpoint.PLATFORM_TYPE platform;

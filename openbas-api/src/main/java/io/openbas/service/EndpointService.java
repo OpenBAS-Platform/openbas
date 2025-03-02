@@ -261,6 +261,7 @@ public class EndpointService {
       endpoint.setHostname(input.getHostname());
     }
     endpoint.setIps(EndpointMapper.mergeAddressArrays(endpoint.getIps(), input.getIps()));
+    endpoint.setSeenIp(input.getSeenIp());
     endpoint.setMacAddresses(
         EndpointMapper.mergeAddressArrays(endpoint.getMacAddresses(), input.getMacAddresses()));
   }
@@ -285,6 +286,7 @@ public class EndpointService {
     Endpoint endpoint = new Endpoint();
     endpoint.setUpdateAttributes(input);
     endpoint.setIps(input.getIps());
+    endpoint.setSeenIp(input.getSeenIp());
     endpoint.setMacAddresses(input.getMacAddresses());
     createEndpoint(endpoint);
     Agent agent = new Agent();
@@ -321,6 +323,7 @@ public class EndpointService {
     agentInput.setLastSeen(Instant.now());
     agentInput.setExternalReference(input.getExternalReference());
     agentInput.setIps(input.getIps());
+    agentInput.setSeenIp(input.getSeenIp());
     agentInput.setMacAddresses(input.getMacAddresses());
     agentInput.setHostname(input.getHostname());
     agentInput.setAgentVersion(input.getAgentVersion());

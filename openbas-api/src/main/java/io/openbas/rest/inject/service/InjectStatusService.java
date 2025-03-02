@@ -9,9 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Finding;
-import io.openbas.database.repository.AgentRepository;
-import io.openbas.database.repository.InjectRepository;
-import io.openbas.database.repository.InjectStatusRepository;
+import io.openbas.database.repository.*;
 import io.openbas.injector_contract.outputs.ContractOutputElement;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
@@ -27,6 +25,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +38,9 @@ public class InjectStatusService {
   private final InjectService injectService;
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
+  private final AssetRepository assetRepository;
+  private final TeamRepository teamRepository;
+  private final UserRepository userRepository;
   private final FindingService findingService;
 
   @Resource private ObjectMapper mapper;
@@ -180,20 +182,30 @@ public class InjectStatusService {
         if (!contractOutputs.isEmpty()) {
           contractOutputs.forEach(
               contractOutput -> {
-                if (contractOutput.isMultiple()) {
-                  JsonNode jsonNodes = values.get(contractOutput.getField());
-                  if (jsonNodes != null && jsonNodes.isArray()) {
-                    for (JsonNode jsonNode : jsonNodes) {
-                      Finding finding = createFinding(contractOutput);
-                      finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
-                      findings.add(finding);
+                if (contractOutput.isFindingCompatible()) {
+                  if (contractOutput.isMultiple()) {
+                    JsonNode jsonNodes = values.get(contractOutput.getField());
+                    if (jsonNodes != null && jsonNodes.isArray()) {
+                      for (JsonNode jsonNode : jsonNodes) {
+                        if (!contractOutput.getType().validate.apply(jsonNode)) {
+                          throw new IllegalArgumentException("Finding not correctly formatted");
+                        }
+                        Finding finding = createFinding(contractOutput);
+                        finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
+                        Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
+                        findings.add(linkedFinding);
+                      }
                     }
+                  } else {
+                    JsonNode jsonNode = values.get(contractOutput.getField());
+                    if (!contractOutput.getType().validate.apply(jsonNode)) {
+                      throw new IllegalArgumentException("Finding not correctly formatted");
+                    }
+                    Finding finding = createFinding(contractOutput);
+                    finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
+                    Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
+                    findings.add(linkedFinding);
                   }
-                } else {
-                  JsonNode jsonNode = values.get(contractOutput.getField());
-                  Finding finding = createFinding(contractOutput);
-                  finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
-                  findings.add(finding);
                 }
               });
         }
@@ -290,5 +302,35 @@ public class InjectStatusService {
     injectStatus.setTrackingSentDate(Instant.now());
     injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     return injectStatusRepository.save(injectStatus);
+  }
+
+  public Finding linkFindings(
+      ContractOutputElement contractOutput, JsonNode jsonNode, Finding finding) {
+    // Create links with assets
+    if (contractOutput.getType().toFindingAssets != null) {
+      List<String> assetsIds = contractOutput.getType().toFindingAssets.apply(jsonNode);
+      List<Optional<Asset>> assets =
+          assetsIds.stream().map(this.assetRepository::findById).toList();
+      if (!assets.isEmpty()) {
+        finding.setAssets(assets.stream().filter(Optional::isPresent).map(Optional::get).toList());
+      }
+    }
+    // Create links with teams
+    if (contractOutput.getType().toFindingTeams != null) {
+      List<String> teamsIds = contractOutput.getType().toFindingTeams.apply(jsonNode);
+      List<Optional<Team>> teams = teamsIds.stream().map(this.teamRepository::findById).toList();
+      if (!teams.isEmpty()) {
+        finding.setTeams(teams.stream().filter(Optional::isPresent).map(Optional::get).toList());
+      }
+    }
+    // Create links with users
+    if (contractOutput.getType().toFindingUsers != null) {
+      List<String> usersIds = contractOutput.getType().toFindingUsers.apply(jsonNode);
+      List<Optional<User>> users = usersIds.stream().map(this.userRepository::findById).toList();
+      if (!users.isEmpty()) {
+        finding.setUsers(users.stream().filter(Optional::isPresent).map(Optional::get).toList());
+      }
+    }
+    return finding;
   }
 }

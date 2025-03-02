@@ -66,6 +66,11 @@ public class Endpoint extends Asset {
   private String[] ips;
 
   @Queryable(filterable = true, sortable = true)
+  @Column(name = "endpoint_seen_ip")
+  @JsonProperty("endpoint_seen_ip")
+  private String seenIp;
+
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "endpoint_hostname")
   @JsonProperty("endpoint_hostname")
   private String hostname;

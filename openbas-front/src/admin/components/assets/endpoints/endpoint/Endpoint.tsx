@@ -37,7 +37,7 @@ const Endpoint = () => {
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
             <Grid container spacing={3}>
-              <Grid item xs={4} style={{ paddingTop: 20 }}>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -78,6 +78,22 @@ const Endpoint = () => {
                   gutterBottom
                   style={{ marginTop: 5 }}
                 >
+                  {t('Seen IP address')}
+                </Typography>
+                <div style={{
+                  display: 'flex',
+                  paddingTop: 5,
+                }}
+                >
+                  {endpoint.endpoint_seen_ip}
+                </div>
+              </Grid>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
+                <Typography
+                  variant="h3"
+                  gutterBottom
+                  style={{ marginTop: 5 }}
+                >
                   {t('Platform')}
                 </Typography>
                 <div style={{
@@ -90,7 +106,7 @@ const Endpoint = () => {
                   {endpoint.endpoint_platform}
                 </div>
               </Grid>
-              <Grid item xs={2} style={{ paddingTop: 20 }}>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -106,7 +122,7 @@ const Endpoint = () => {
                   {endpoint.endpoint_arch}
                 </div>
               </Grid>
-              <Grid item xs={4} style={{ paddingTop: 20 }}>
+              <Grid item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom

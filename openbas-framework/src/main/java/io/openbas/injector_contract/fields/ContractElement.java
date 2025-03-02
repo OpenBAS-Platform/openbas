@@ -22,6 +22,8 @@ public abstract class ContractElement {
 
   private String mandatoryConditionField;
 
+  private String mandatoryConditionValue;
+
   private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 
   private List<String> linkedValues = new ArrayList<>();

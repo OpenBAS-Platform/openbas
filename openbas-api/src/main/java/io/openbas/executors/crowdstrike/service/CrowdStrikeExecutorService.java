@@ -109,7 +109,11 @@ public class CrowdStrikeExecutorService implements Runnable {
               input.setElevated(true);
               input.setService(true);
               input.setName(crowdStrikeDevice.getHostname());
-              input.setIps(new String[] {crowdStrikeDevice.getConnection_ip()});
+              input.setSeenIp(crowdStrikeDevice.getExternal_ip());
+              input.setIps(
+                  new String[] {
+                    crowdStrikeDevice.getConnection_ip(), crowdStrikeDevice.getLocal_ip()
+                  });
               input.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
               input.setHostname(crowdStrikeDevice.getHostname());
               input.setPlatform(toPlatform(crowdStrikeDevice.getPlatform_name()));

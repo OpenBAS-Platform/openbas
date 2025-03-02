@@ -43,6 +43,7 @@ public class EndpointMapper {
         .hostname(endpoint.getHostname())
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
+        .seenIp(endpoint.getSeenIp())
         .ips(
             endpoint.getIps() != null
                 ? new HashSet<>(Arrays.asList(endpoint.getIps()))

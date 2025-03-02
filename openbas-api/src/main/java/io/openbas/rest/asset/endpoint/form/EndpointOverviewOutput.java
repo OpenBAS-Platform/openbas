@@ -49,6 +49,10 @@ public class EndpointOverviewOutput {
   @JsonProperty("endpoint_ips")
   private Set<String> ips;
 
+  @Schema(description = "Seen IP")
+  @JsonProperty("endpoint_seen_ip")
+  private String seenIp;
+
   @Schema(description = "List of MAC addresses")
   @JsonProperty("endpoint_mac_addresses")
   private Set<String> macAddresses;

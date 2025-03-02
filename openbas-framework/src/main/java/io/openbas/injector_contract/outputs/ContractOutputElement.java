@@ -19,4 +19,7 @@ public class ContractOutputElement {
 
   @JsonProperty("isMultiple")
   boolean isMultiple;
+
+  @JsonProperty("isFindingCompatible")
+  boolean isFindingCompatible;
 }
