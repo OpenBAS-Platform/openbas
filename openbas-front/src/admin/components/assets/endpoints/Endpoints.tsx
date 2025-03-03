@@ -234,8 +234,8 @@ const Endpoints = () => {
                           src={`/api/images/executors/${executorType}`}
                           alt={executorType}
                           style={{
-                            width: 25,
-                            height: 25,
+                            width: 20,
+                            height: 20,
                             borderRadius: 4,
                             marginRight: 10,
                           }}

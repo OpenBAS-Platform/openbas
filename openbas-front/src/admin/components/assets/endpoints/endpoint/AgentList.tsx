@@ -74,8 +74,8 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
                 src={`/api/images/executors/${executor.executor_type}`}
                 alt={executor.executor_type}
                 style={{
-                  width: 25,
-                  height: 25,
+                  width: 20,
+                  height: 20,
                   borderRadius: 4,
                   marginRight: 10,
                 }}
