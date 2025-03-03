@@ -16,7 +16,6 @@ import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.inject.output.InjectOutput;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.TargetType;
@@ -53,7 +52,6 @@ public class InjectSearchService {
 
   // -- LIST INJECTOUTPUT --
 
-  @Tracing(name = "Fetch injects with criteria builder", layer = "service", operation = "GET")
   public List<InjectOutput> injects(Specification<Inject> specification) {
     CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
 

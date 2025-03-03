@@ -10,7 +10,6 @@ import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.InjectTestStatusService;
-import io.openbas.telemetry.Tracing;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -54,7 +53,6 @@ public class InjectTestStatusApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PostMapping("/api/injects/test")
   @LogExecutionTime
-  @Tracing(name = "Bulk tests of injects", layer = "api", operation = "PUT")
   public List<InjectTestStatusOutput> bulkTestInject(
       @RequestBody @Valid final InjectBulkProcessingInput input) {
 

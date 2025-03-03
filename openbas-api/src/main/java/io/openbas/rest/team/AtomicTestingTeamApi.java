@@ -8,7 +8,6 @@ import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.TeamService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ public class AtomicTestingTeamApi extends RestBehavior {
 
   @PostMapping(ATOMIC_TESTING_URI + "/teams/search")
   @Transactional(readOnly = true)
-  @Tracing(name = "Paginate teams for atomic testings", layer = "api", operation = "POST")
   public Page<TeamOutput> searchTeams(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     final Specification<Team> teamSpecification = contextual(false);

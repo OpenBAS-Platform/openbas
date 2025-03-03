@@ -16,7 +16,6 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.statistic.response.PlatformStatistic;
 import io.openbas.rest.statistic.response.StatisticElement;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +64,6 @@ public class StatisticApi extends RestBehavior {
             mediaType = "application/json",
             schema = @Schema(implementation = PlatformStatistic.class))
       })
-  @Tracing(name = "Get statistics fo platform", layer = "api", operation = "GET")
   public PlatformStatistic platformStatistic() {
     Instant now = Instant.now();
     PlatformStatistic statistic = new PlatformStatistic();
