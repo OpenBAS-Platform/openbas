@@ -27,11 +27,11 @@ public class PayloadMapper {
 
   public StatusPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
 
-    if (inject.isEmpty()) return StatusPayloadOutput.builder().build();
+    if (inject.isEmpty()) return null;
 
     Inject injectObj = inject.get();
     Optional<InjectorContract> injectorContractOpt = injectObj.getInjectorContract();
-    if (injectorContractOpt.isEmpty()) return StatusPayloadOutput.builder().build();
+    if (injectorContractOpt.isEmpty()) return null;
 
     InjectorContract injectorContract = injectorContractOpt.get();
     StatusPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
@@ -65,7 +65,7 @@ public class PayloadMapper {
             statusPayload ->
                 populateExecutedPayload(
                     statusPayloadOutputBuilder, statusPayload, injectorContract))
-        .orElse(StatusPayloadOutput.builder().build());
+        .orElse(null);
   }
 
   private void populatePayloadDetails(
@@ -168,7 +168,7 @@ public class PayloadMapper {
           .build();
     } catch (NoSuchBeanDefinitionException e) {
       log.info("No executor found for this injector: " + injectorContract.getInjector().getType());
-      return StatusPayloadOutput.builder().build();
+      return null;
     }
   }
 

@@ -1,11 +1,8 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type Props } from 'html-react-parser/lib/attributes-to-props';
-import { type FunctionComponent, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchAtomicTestingPayload } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { useFormatter } from '../../../../components/i18n';
 import ItemCopy from '../../../../components/ItemCopy';
 import ItemTags from '../../../../components/ItemTags';
@@ -30,21 +27,12 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
+interface Props { payloadOutput?: StatusPayloadOutput }
+
+const AtomicTestingPayloadInfo: FunctionComponent<Props> = ({ payloadOutput }) => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
-  const { injectId } = useParams();
-  const [payloadOutput, setPayloadOutput] = useState<StatusPayloadOutput>();
-
-  // Fetching data
-  useEffect(() => {
-    if (injectId) {
-      fetchAtomicTestingPayload(injectId).then((result: { data: StatusPayloadOutput }) => {
-        setPayloadOutput(result.data);
-      });
-    }
-  }, [injectId]);
 
   return (
     <Grid container spacing={3}>

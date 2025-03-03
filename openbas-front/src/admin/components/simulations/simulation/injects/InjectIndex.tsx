@@ -3,7 +3,7 @@ import { type FunctionComponent, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchInjectResultOverviewOutput } from '../../../../../actions/atomic_testings/atomic-testing-actions';
+import { fetchAtomicTestingPayload, fetchInjectResultOverviewOutput } from '../../../../../actions/atomic_testings/atomic-testing-actions';
 import { fetchExercise } from '../../../../../actions/Exercise';
 import { type ExercisesHelper } from '../../../../../actions/exercises/exercise-helper';
 import Breadcrumbs, { BACK_LABEL, BACK_URI, type BreadcrumbsElement } from '../../../../../components/Breadcrumbs';
@@ -12,11 +12,10 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import NotFound from '../../../../../components/NotFound';
 import { useHelper } from '../../../../../store';
-import { type Exercise as ExerciseType, type InjectResultOverviewOutput } from '../../../../../utils/api-types';
+import { type Exercise as ExerciseType, type InjectResultOverviewOutput, type StatusPayloadOutput } from '../../../../../utils/api-types';
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import isInjectWithPayloadInfo from '../../../../../utils/inject/injectUtils';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
 import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/AtomicTestingPayloadInfo';
@@ -57,10 +56,19 @@ const InjectIndexComponent: FunctionComponent<{
   const tabValue = location.pathname;
 
   const [injectResultOverviewOutput, setInjectResultOverviewOutput] = useState<InjectResultOverviewOutput>(injectResult);
+  const [payloadOutput, setPayloadOutput] = useState<StatusPayloadOutput>();
 
   const updateInjectResultOverviewOutput = (newData: InjectResultOverviewOutput) => {
     setInjectResultOverviewOutput(newData);
   };
+
+  useEffect(() => {
+    if (injectResult.inject_id) {
+      fetchAtomicTestingPayload(injectResult.inject_id).then((result: { data: StatusPayloadOutput }) => {
+        setPayloadOutput(result.data);
+      });
+    }
+  }, [injectResult.inject_id]);
 
   const breadcrumbs: BreadcrumbsElement[] = [
     {
@@ -123,7 +131,7 @@ const InjectIndexComponent: FunctionComponent<{
               className={classes.item}
             />
             {
-              isInjectWithPayloadInfo(injectResultOverviewOutput) && (
+              payloadOutput && (
                 <Tab
                   component={Link}
                   to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`)}
@@ -139,7 +147,7 @@ const InjectIndexComponent: FunctionComponent<{
           <Routes>
             <Route path="" element={errorWrapper(AtomicTesting)()} />
             <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-            <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
+            <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)({ payloadOutput })} />
             {/* Not found */}
             <Route path="*" element={<NotFound />} />
           </Routes>
