@@ -136,7 +136,7 @@ public enum ContractOutputType {
       Function<JsonNode, List<String>> toFindingTeams) {
     this.label = label;
     this.technicalType = technicalType;
-    this.fields = fields;
+    this.fields = fields; // used only for object, to declare the composition of the object
     this.isFindingCompatible = isFindingCompatible;
     this.validate = validate;
     this.toFindingValue = toFindingValue;
