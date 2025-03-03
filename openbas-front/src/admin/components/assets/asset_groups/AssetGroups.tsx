@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { searchAssetGroups } from '../../../../actions/asset_groups/assetgroup-action';
 import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
-import { type TagHelper, type UserHelper } from '../../../../actions/helper';
+import { type LoggedHelper, type TagHelper, type UserHelper } from '../../../../actions/helper';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ExportButton from '../../../../components/common/ExportButton';
@@ -20,6 +20,7 @@ import { useQueryableWithLocalStorage } from '../../../../components/common/quer
 import { type Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
+import { computeBannerSettings } from '../../../../public/components/systembanners/utils';
 import { useHelper } from '../../../../store';
 import { type AssetGroup, type AssetGroupOutput } from '../../../../utils/api-types';
 import AssetGroupCreation from './AssetGroupCreation';
@@ -111,6 +112,11 @@ const AssetGroups = () => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
   const { t } = useFormatter();
+
+  const { settings } = useHelper((helper: LoggedHelper) => {
+    return { settings: helper.getPlatformSettings() };
+  });
+  const { bannerHeight } = computeBannerSettings(settings);
 
   const [selectedAssetGroupId, setSelectedAssetGroupId] = useState<AssetGroup['asset_group_id'] | undefined>(undefined);
 
@@ -270,6 +276,7 @@ const AssetGroups = () => {
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedAssetGroupId(undefined)}
         elevation={1}
+        PaperProps={{ style: { marginTop: bannerHeight } }}
       >
         {selectedAssetGroupId !== undefined && (
           <AssetGroupManagement
