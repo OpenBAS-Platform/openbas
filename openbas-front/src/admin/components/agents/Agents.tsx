@@ -410,7 +410,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <Alert
               variant="outlined"
               severity="info"
-              style={{ marginTop: theme.spacing(1) }}
+              style={{ marginTop: theme.spacing(3) }}
             >
               {t('Quick start with openBAS: Install the agent using your own user account. This installation requires only local standard privileges.')}
             </Alert>
@@ -435,7 +435,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         <Alert
           variant="outlined"
           severity="info"
-          style={{ marginTop: theme.spacing(1) }}
+          style={{ marginTop: theme.spacing(3) }}
         >
           {t('Deploy your agent as a user or a system service. This installation requires local administrator privileges.')}
         </Alert>
