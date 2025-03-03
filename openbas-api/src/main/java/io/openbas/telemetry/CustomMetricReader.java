@@ -8,6 +8,7 @@ import io.opentelemetry.sdk.metrics.export.CollectionRegistration;
 import io.opentelemetry.sdk.metrics.export.MetricReader;
 import io.opentelemetry.sdk.metrics.internal.data.ImmutableGaugeData;
 import io.opentelemetry.sdk.metrics.internal.data.ImmutableMetricData;
+import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
