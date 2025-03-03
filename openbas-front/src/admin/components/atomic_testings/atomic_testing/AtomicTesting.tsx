@@ -186,7 +186,7 @@ const AtomicTesting = () => {
                 {t('Last execution date')}
               </Typography>
               <div style={{ display: 'flex' }}>
-                {fldt(injectResultOverviewOutput.inject_updated_at)}
+                {fldt(injectResultOverviewOutput?.inject_status?.tracking_end_date)}
               </div>
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>
