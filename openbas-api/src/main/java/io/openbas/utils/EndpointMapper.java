@@ -116,6 +116,12 @@ public class EndpointMapper {
   }
 
   public static String[] mergeAddressArrays(String[] array1, String[] array2) {
+    if (array1 == null) {
+      return array2;
+    }
+    if (array2 == null) {
+      return array1;
+    }
     return Stream.concat(Arrays.stream(array1), Arrays.stream(array2))
         .distinct()
         .toArray(String[]::new);
