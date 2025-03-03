@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router';
 import { type CSSObject } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
@@ -15,6 +15,7 @@ import NotFound from '../components/NotFound';
 import SystemBanners from '../public/components/systembanners/SystemBanners';
 import { computeBannerSettings } from '../public/components/systembanners/utils';
 import { useHelper } from '../store';
+import { MESSAGING$ } from '../utils/Environment';
 import { useAppDispatch } from '../utils/hooks';
 import useDataLoader from '../utils/hooks/useDataLoader';
 import LeftBar from './components/nav/LeftBar';
@@ -57,6 +58,16 @@ const Index = () => {
       navigate('/');
     }
   }, [logged]);
+  const [navOpen, setNavOpen] = useState(
+    localStorage.getItem('navOpen') === 'true',
+  );
+
+  useEffect(() => {
+    const sub = MESSAGING$.toggleNav.subscribe({ next: () => setNavOpen(localStorage.getItem('navOpen') === 'true') });
+    return () => {
+      sub.unsubscribe();
+    };
+  });
 
   const boxSx = {
     flexGrow: 1,
@@ -65,7 +76,7 @@ const Index = () => {
       easing: theme.transitions.easing.easeInOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    width: 'calc(100% - 55px)',
+    width: navOpen ? 'calc(100% - 180px)' : 'calc(100% - 55px)',
   };
   // load taxonomics one time at login
   useDataLoader(() => {
