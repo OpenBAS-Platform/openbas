@@ -108,6 +108,14 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
+      {actions.includes(('Update'))
+        && (
+          <AtomicTestingUpdate
+            open={edition}
+            handleClose={handleCloseEdit}
+            atomic={atomic}
+          />
+        )}
       {actions.includes('Duplicate')
         && (
           <DialogDuplicate
@@ -115,14 +123,6 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
             handleClose={handleCloseDuplicate}
             handleSubmit={submitDuplicate}
             text={`${t('Do you want to duplicate this atomic testing:')} ${atomic.inject_title} ?`}
-          />
-        )}
-      {actions.includes(('Update'))
-        && (
-          <AtomicTestingUpdate
-            open={edition}
-            handleClose={handleCloseEdit}
-            atomic={atomic}
           />
         )}
       {actions.includes('Delete')
