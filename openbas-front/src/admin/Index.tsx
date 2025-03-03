@@ -65,6 +65,7 @@ const Index = () => {
       easing: theme.transitions.easing.easeInOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
+    width: 'calc(100% - 55px)',
   };
   // load taxonomics one time at login
   useDataLoader(() => {
