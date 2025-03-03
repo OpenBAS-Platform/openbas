@@ -103,6 +103,13 @@ public class CrowdStrikeExecutorService implements Runnable {
     return devices.stream()
         .map(
             crowdStrikeDevice -> {
+              List<String> ips = new ArrayList<>();
+              if (crowdStrikeDevice.getConnection_ip() != null) {
+                ips.add(crowdStrikeDevice.getConnection_ip());
+              }
+              if (crowdStrikeDevice.getLocal_ip() != null) {
+                ips.add(crowdStrikeDevice.getLocal_ip());
+              }
               AgentRegisterInput input = new AgentRegisterInput();
               input.setExecutor(this.executor);
               input.setExternalReference(crowdStrikeDevice.getDevice_id());
@@ -110,10 +117,7 @@ public class CrowdStrikeExecutorService implements Runnable {
               input.setService(true);
               input.setName(crowdStrikeDevice.getHostname());
               input.setSeenIp(crowdStrikeDevice.getExternal_ip());
-              input.setIps(
-                  new String[] {
-                    crowdStrikeDevice.getConnection_ip(), crowdStrikeDevice.getLocal_ip()
-                  });
+              input.setIps(ips.toArray(new String[0]));
               input.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
               input.setHostname(crowdStrikeDevice.getHostname());
               input.setPlatform(toPlatform(crowdStrikeDevice.getPlatform_name()));
