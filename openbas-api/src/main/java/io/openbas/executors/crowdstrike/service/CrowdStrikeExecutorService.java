@@ -110,6 +110,10 @@ public class CrowdStrikeExecutorService implements Runnable {
               if (crowdStrikeDevice.getLocal_ip() != null) {
                 ips.add(crowdStrikeDevice.getLocal_ip());
               }
+              List<String> macAddresses = new ArrayList<>();
+              if (crowdStrikeDevice.getMac_address() != null) {
+                macAddresses.add(crowdStrikeDevice.getMac_address());
+              }
               AgentRegisterInput input = new AgentRegisterInput();
               input.setExecutor(this.executor);
               input.setExternalReference(crowdStrikeDevice.getDevice_id());
@@ -118,7 +122,7 @@ public class CrowdStrikeExecutorService implements Runnable {
               input.setName(crowdStrikeDevice.getHostname());
               input.setSeenIp(crowdStrikeDevice.getExternal_ip());
               input.setIps(ips.toArray(new String[0]));
-              input.setMacAddresses(new String[] {crowdStrikeDevice.getMac_address()});
+              input.setMacAddresses(macAddresses.toArray(new String[0]));
               input.setHostname(crowdStrikeDevice.getHostname());
               input.setPlatform(toPlatform(crowdStrikeDevice.getPlatform_name()));
               input.setArch(toArch("x64"));
