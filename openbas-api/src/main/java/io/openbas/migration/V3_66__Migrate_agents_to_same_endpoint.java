@@ -129,8 +129,6 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                     FROM (SELECT array_asset_id, uniq_asset_id FROM temp_assets) AS ta
                     WHERE ta.array_asset_id LIKE concat('%',injects_expectation.asset_id,'%');
 
-                    -- ALTER TABLE injects_expectations ADD COLUMN asset_id varchar(256) constraint fk_asset references assets on delete cascade;
-
                     -- drop temp asset table
                     DROP TABLE temp_assets;
                     -- delete old endpoints which are unused now
