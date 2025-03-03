@@ -67,19 +67,6 @@ class FindingServiceTest extends IntegrationTest {
     assertThrows(EntityNotFoundException.class, () -> findingService.finding("id"));
   }
 
-  @Test
-  void given_finding_field_should_return_finding() {
-    // -- PREPARE --
-    createFindingComposer();
-
-    // -- EXECUTE --
-    Finding result = findingService.findingByField(TEXT_FIELD);
-
-    // -- ASSERT --
-    assertNotNull(result);
-    assertEquals(TEXT_FIELD, result.getField());
-  }
-
   @Nested
   class CreateFinding {
 

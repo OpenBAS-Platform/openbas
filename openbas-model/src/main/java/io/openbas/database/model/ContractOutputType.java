@@ -99,7 +99,10 @@ public enum ContractOutputType {
   Credentials(
       "credentials",
       ContractOutputTechnicalType.Object,
-      null,
+      new ArrayList<>(
+          List.of(
+              new ContractOutputField("username", ContractOutputTechnicalType.Text, true),
+              new ContractOutputField("password", ContractOutputTechnicalType.Text, true))),
       true,
       (JsonNode jsonNode) -> jsonNode.get("username") != null && jsonNode.get("password") != null,
       (JsonNode jsonNode) -> {

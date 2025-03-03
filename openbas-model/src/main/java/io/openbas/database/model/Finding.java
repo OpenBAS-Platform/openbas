@@ -5,6 +5,7 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
@@ -41,12 +42,14 @@ public class Finding implements Base {
   @NotBlank
   private String field;
 
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "finding_type", updatable = false, nullable = false)
   @Enumerated(EnumType.STRING)
   @JsonProperty("finding_type")
   @NotNull
   protected ContractOutputType type;
 
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "finding_value", nullable = false)
   @JsonProperty("finding_value")
   @NotBlank
@@ -59,6 +62,7 @@ public class Finding implements Base {
 
   // -- RELATION --
 
+  @Queryable(filterable = true, sortable = true)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "finding_inject_id")
   @JsonProperty("finding_inject_id")
@@ -68,12 +72,14 @@ public class Finding implements Base {
 
   // -- AUDIT --
 
+  @Queryable(filterable = true, sortable = true)
   @CreationTimestamp
   @Column(name = "finding_created_at", updatable = false, nullable = false)
   @JsonProperty("finding_created_at")
   @NotNull
   private Instant creationDate = now();
 
+  @Queryable(filterable = true, sortable = true)
   @UpdateTimestamp
   @Column(name = "finding_updated_at", nullable = false)
   @JsonProperty("finding_updated_at")

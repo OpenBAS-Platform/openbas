@@ -34,12 +34,6 @@ public class FindingService {
         .orElseThrow(() -> new EntityNotFoundException("Finding not found with id: " + id));
   }
 
-  public Finding findingByField(@NotNull final String field) {
-    return this.findingRepository
-        .findByField(field)
-        .orElseThrow(() -> new EntityNotFoundException("Finding not found with field: " + field));
-  }
-
   public Finding createFinding(@NotNull final Finding finding, @NotBlank final String injectId) {
     Inject inject = this.injectService.inject(injectId);
     finding.setInject(inject);

@@ -35,6 +35,7 @@ const useStyles = makeStyles()(() => ({
 
 const AtomicTesting = lazy(() => import('./AtomicTesting'));
 const AtomicTestingDetail = lazy(() => import('./AtomicTestingDetail'));
+const AtomicTestingFindings = lazy(() => import('./AtomicTestingFindings'));
 
 const Index = () => {
   const { classes } = useStyles();
@@ -113,6 +114,13 @@ const Index = () => {
               />
               <Tab
                 component={Link}
+                to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
+                value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
+                label={t('Findings')}
+                className={classes.item}
+              />
+              <Tab
+                component={Link}
                 to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
                 value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
                 label={t('Execution details')}
@@ -135,6 +143,7 @@ const Index = () => {
             <Routes>
               <Route path="" element={errorWrapper(AtomicTesting)()} />
               <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
+              <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />
               <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
