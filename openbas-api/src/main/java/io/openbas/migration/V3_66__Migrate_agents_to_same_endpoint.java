@@ -101,7 +101,7 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                     DROP TABLE asset_groups_assets;
                     ALTER TABLE asset_groups_assets_temp RENAME TO asset_groups_assets;
 
-                    ALTER TABLE asset_groups_assets ADD CONSTRAINT assets_tags_pkey PRIMARY KEY (asset_group_id, asset_id);
+                    ALTER TABLE asset_groups_assets ADD CONSTRAINT asset_groups_assets_pkey PRIMARY KEY (asset_group_id, asset_id);
                     ALTER TABLE asset_groups_assets ADD CONSTRAINT asset_id_fk FOREIGN KEY (asset_id) REFERENCES assets(asset_id) ON DELETE CASCADE;
                     ALTER TABLE asset_groups_assets ADD CONSTRAINT asset_group_id_fk FOREIGN KEY (asset_group_id) REFERENCES asset_groups(asset_group_id) ON DELETE CASCADE;
                     CREATE INDEX IF NOT EXISTS idx_asset_groups_assets_asset_group on asset_groups_assets (asset_group_id);
