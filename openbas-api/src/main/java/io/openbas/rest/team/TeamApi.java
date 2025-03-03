@@ -29,7 +29,6 @@ import io.openbas.rest.team.form.TeamUpdateInput;
 import io.openbas.rest.team.form.UpdateUsersTeamInput;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.TeamService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -78,7 +77,6 @@ public class TeamApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(TEAM_URI)
   @PreAuthorize("isObserver()")
-  @Tracing(name = "Get teams", layer = "api", operation = "GET")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
   @Operation(summary = "List teams", description = "Return the teams")
   public Iterable<TeamSimple> getTeams() {
@@ -108,7 +106,6 @@ public class TeamApi extends RestBehavior {
   @PostMapping("/api/teams/search")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-  @Tracing(name = "Get a page of teams", layer = "api", operation = "POST")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
   @Operation(
       summary = "Search teams",
@@ -123,7 +120,6 @@ public class TeamApi extends RestBehavior {
   @PostMapping("/api/teams/find")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-  @Tracing(name = "Get a list of teams", layer = "api", operation = "POST")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of teams")})
   @Operation(description = "Find a list of teams based on their ids", summary = "Find teams")
   public List<TeamOutput> findTeams(@RequestBody @Valid @NotNull final List<String> teamIds) {

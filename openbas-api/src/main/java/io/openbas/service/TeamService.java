@@ -16,7 +16,6 @@ import io.openbas.database.model.User;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.CopyObjectListUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
@@ -53,7 +52,6 @@ public class TeamService {
     return newTeam;
   }
 
-  @Tracing(name = "Paginate teams", layer = "service")
   public Page<TeamOutput> teamPagination(
       @NotNull SearchPaginationInput searchPaginationInput,
       @NotNull final Specification<Team> teamSpecification) {

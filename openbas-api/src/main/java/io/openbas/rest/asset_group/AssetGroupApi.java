@@ -15,7 +15,6 @@ import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AssetGroupService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
@@ -61,7 +60,6 @@ public class AssetGroupApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(ASSET_GROUP_URI + "/search")
   @PreAuthorize("isObserver()")
-  @Tracing(name = "Get a page of assetgroups", layer = "api", operation = "POST")
   public Page<AssetGroupOutput> assetGroups(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.assetGroupCriteriaBuilderService.assetGroupPagination(searchPaginationInput);
@@ -70,7 +68,6 @@ public class AssetGroupApi extends RestBehavior {
   @PostMapping(ASSET_GROUP_URI + "/find")
   @PreAuthorize("isObserver()")
   @Transactional(readOnly = true)
-  @Tracing(name = "Find asset groups", layer = "api", operation = "POST")
   public List<AssetGroupOutput> findAssetGroups(
       @RequestBody @Valid @NotNull final List<String> assetGroupIds) {
     return this.assetGroupCriteriaBuilderService.find(fromIds(assetGroupIds));

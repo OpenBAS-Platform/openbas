@@ -30,7 +30,6 @@ import io.openbas.rest.inject.form.InjectExpectationResultsByAttackPattern;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -170,7 +169,6 @@ public class ExerciseApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/teams")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @Tracing(name = "Get teams of the exercise", layer = "api", operation = "GET")
   public List<TeamOutput> getExerciseTeams(@PathVariable String exerciseId) {
     return this.teamService.find(fromExercise(exerciseId));
   }
@@ -475,14 +473,12 @@ public class ExerciseApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/results")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @Tracing(name = "Get the global result for an exercise", layer = "api", operation = "GET")
   public List<ExpectationResultsByType> globalResults(@NotBlank @PathVariable String exerciseId) {
     return exerciseService.getGlobalResults(exerciseId);
   }
 
   @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/global-scores")
-  @Tracing(name = "Get the global scores for exercises", layer = "api", operation = "POST")
   public ExercisesGlobalScoresOutput getExercisesGlobalScores(
       @Valid @RequestBody ExercisesGlobalScoresInput input) {
     return exerciseService.getExercisesGlobalScores(input);
@@ -491,7 +487,6 @@ public class ExerciseApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results-by-attack-patterns")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @Tracing(name = "Get a list of inject results for an exercise", layer = "api", operation = "GET")
   public List<InjectExpectationResultsByAttackPattern> injectResults(
       @NotBlank final @PathVariable String exerciseId) {
     return exerciseRepository
@@ -617,14 +612,12 @@ public class ExerciseApi extends RestBehavior {
 
   @LogExecutionTime
   @GetMapping(EXERCISE_URI)
-  @Tracing(name = "Get a list of exercises", layer = "api", operation = "GET")
   public List<ExerciseSimple> exercises() {
     return exerciseService.exercises();
   }
 
   @LogExecutionTime
   @PostMapping(EXERCISE_URI + "/search")
-  @Tracing(name = "Get a page of exercises", layer = "api", operation = "POST")
   public Page<ExerciseSimple> exercises(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     Map<String, Join<Base, Base>> joinMap = new HashMap<>();

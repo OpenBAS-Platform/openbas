@@ -17,7 +17,6 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.user.form.player.PlayerInput;
 import io.openbas.rest.user.form.player.PlayerOutput;
 import io.openbas.service.UserService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
@@ -72,7 +71,6 @@ public class PlayerApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(PLAYER_URI + "/search")
-  @Tracing(name = "Get a page of players", layer = "api", operation = "POST")
   public Page<PlayerOutput> players(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.playerService.playerPagination(searchPaginationInput);

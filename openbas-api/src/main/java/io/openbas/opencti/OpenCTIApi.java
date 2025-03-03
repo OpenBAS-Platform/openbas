@@ -5,7 +5,6 @@ import static io.openbas.database.model.User.ROLE_USER;
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.service.ScenarioService;
-import io.openbas.telemetry.Tracing;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +42,6 @@ public class OpenCTIApi {
       })
   @LogExecutionTime
   @GetMapping(OPENCTI_URI + "/exercises/latest/{externalReferenceId}")
-  @Tracing(name = "Get latest exercise by external reference", layer = "api", operation = "GET")
   public ExerciseSimple latestExerciseByExternalReference(
       @PathVariable @NotBlank final String externalReferenceId) {
     return scenarioService.latestExerciseByExternalReference(externalReferenceId);

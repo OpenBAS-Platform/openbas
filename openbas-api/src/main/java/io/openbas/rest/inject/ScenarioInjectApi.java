@@ -11,7 +11,6 @@ import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.service.InjectSearchService;
 import io.openbas.service.InjectTestStatusService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.Valid;
@@ -36,7 +35,6 @@ public class ScenarioInjectApi extends RestBehavior {
   @GetMapping(SCENARIO_URI + "/{scenarioId}/injects/simple")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   @Transactional(readOnly = true)
-  @Tracing(name = "Fetch injects for scenario", layer = "api", operation = "GET")
   public Iterable<InjectOutput> scenarioInjectsSimple(
       @PathVariable @NotBlank final String scenarioId) {
     return injectSearchService.injects(fromScenario(scenarioId));

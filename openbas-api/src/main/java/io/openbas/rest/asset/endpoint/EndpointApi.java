@@ -19,7 +19,6 @@ import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EndpointService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -109,14 +108,12 @@ public class EndpointApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(ENDPOINT_URI + "/{endpointId}")
   @PreAuthorize("isPlanner()")
-  @Tracing(name = "Endpoint overview", layer = "api", operation = "POST")
   public EndpointOverviewOutput endpoint(@PathVariable @NotBlank final String endpointId) {
     return endpointMapper.toEndpointOverviewOutput(this.endpointService.getEndpoint(endpointId));
   }
 
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/search")
-  @Tracing(name = "Get a page of endpoints", layer = "api", operation = "POST")
   public Page<EndpointOutput> endpoints(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     Page<Endpoint> endpointPage = endpointService.searchEndpoints(searchPaginationInput);
@@ -130,7 +127,6 @@ public class EndpointApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping(ENDPOINT_URI + "/find")
   @Transactional(readOnly = true)
-  @Tracing(name = "Find assets", layer = "api", operation = "POST")
   public List<Endpoint> findEndpoints(@RequestBody @Valid @NotNull final List<String> endpointIds) {
     return this.endpointRepository.findAll(fromIds(endpointIds));
   }

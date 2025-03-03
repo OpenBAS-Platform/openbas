@@ -9,7 +9,6 @@ import io.openbas.database.model.Team;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.TeamService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -31,7 +30,6 @@ public class ExerciseTeamApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/teams/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  @Tracing(name = "Paginate teams for exercise", layer = "api", operation = "POST")
   public Page<TeamOutput> searchTeams(
       @PathVariable @NotBlank final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput,
