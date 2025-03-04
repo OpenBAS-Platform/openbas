@@ -307,7 +307,7 @@ public class ExecutorApi extends RestBehavior {
               required = true)
           @PathVariable
           String token,
-      @Parameter(description = "Installation Mode.", required = true) @PathVariable
+      @Parameter(description = "Installation Mode: session, user or system service", required = true) @PathVariable
           String installationMode)
       throws IOException {
     platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
