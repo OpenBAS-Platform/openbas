@@ -288,7 +288,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
     return (
       <FormControl style={{
         width: '100%',
-        margin: '20px 0 30px 0',
+        margin: theme.spacing(1, 0),
       }}
       >
         <InputLabel id="arch">{t('Architecture')}</InputLabel>
@@ -307,7 +307,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
   const StepOneInstallation = () => {
     return (
       <Typography variant="h2" style={{ marginTop: theme.spacing(3) }}>
-        {t('Step 1 - Install the Agent')}
+        {t('Step 1 - Install the agent')}
       </Typography>
     );
   };
@@ -423,10 +423,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               severity="info"
               style={{ marginTop: theme.spacing(2) }}
             >
-              {t(
-                'The agent runs in the background as a session and only executes when the user is logged in and active. It can run as an administrator or a standard user. ',
-              )}
-              {t('For further details, refer to the ')}
+              {t('The agent runs in the background as a session and only executes when the user is logged in and active. It can run as an administrator or a standard user.')}
+              {' '}
+              {t('For further details, refer to the')}
               {' '}
               <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
                 {selectedExecutor?.executor_name}
@@ -452,8 +451,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           severity="info"
           style={{ marginTop: theme.spacing(2) }}
         >
-          {t('The agent runs in the background as a service and starts automatically when the machine powers on. ')}
-          {t('For further details, refer to the ')}
+          {t('The agent runs in the background as a service and starts automatically when the machine powers on.')}
+          {' '}
+          {t('For further details, refer to the')}
           {' '}
           <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
             {selectedExecutor?.executor_name}
@@ -538,7 +538,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                           color: platforms.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                         }}
                       >
-                        {t(`Install ${executor.executor_name}`)}
+                        {t('Install')}
+                        {' '}
+                        {executor.executor_name}
                       </Typography>
                       <div
                         style={{
@@ -646,7 +648,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                                     }}
                                   >
                                     <DownloadingOutlined style={{ marginRight: theme.spacing(1) }} />
-                                    {t(`Install ${platform} agent`)}
+                                    {t('Install')}
                                   </Typography>
                                 </CardContent>
                               </CardActionArea>
