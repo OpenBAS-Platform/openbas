@@ -346,7 +346,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             if (selectedOption === 'user') {
               message = t('It can be run as an administrator or a standard user, depending on the script parameters. ')
                 + t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script '
-                  + 'and run it as root. (Don’t forget to replace the script parameters: TODO).');
+                  + 'and run it as root. (Don’t forget to replace the script parameters).');
             } else {
               message = t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script and run it as root. ')
                 + t(`Installing it as a system grants system-wide privileges.`);
