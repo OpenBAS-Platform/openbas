@@ -114,7 +114,7 @@ const Executors = () => {
   // -- Stepper components --
   const buildInstallationUrl = (baseUrl: string) => {
     if (activeTab === 0) return `${baseUrl}/session-user/${userToken?.token_value}`;
-    if (activeTab === 1 && selectedOption === USER) return `${baseUrl}/service-user/${userToken?.token_value}`; // TODO pour savoir quels sont les params a passer user/pwd
+    if (activeTab === 1 && selectedOption === USER) return `${baseUrl}/service-user/${userToken?.token_value}`;
     return `${baseUrl}/service/${userToken?.token_value}`;
   };
   const buildCalderaInstaller = () => {
@@ -235,8 +235,8 @@ MD5: 68c1795fb45cb9b522d6cf48443fdc37
 SHA1: 5f87d06f818ff8cba9e11e8cd1c6f9d990eca0f8
 SHA256: 6b180913acb8cdac3fb8d3154a2f6a0bed13c056a477f4f94c4679414ec13b9f
 SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd58d36058d7cde405bc8c5084f3ac060a6080bfc18a843738d3bee87fd`,
-          displayedCode: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD TODO', '-privilege PRIVILEGE TODO', '')}).Content`, // todo
-          code: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD TODO', '-privilege PRIVILEGE TODO', '')}).Content`, // TODO
+          displayedCode: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-User USER -Password PASSWORD', '', '')}).Content`,
+          code: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-User USER -Password PASSWORD', '', '')}).Content`,
         };
       case LINUX:
         return {
@@ -333,7 +333,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
       if (selectedExecutor?.executor_type === OPENBAS_AGENT) {
         if (activeTab === 0) {
           message = platform === WINDOWS
-            ? t('Run the following PowerShell snippet in a standard prompt or download the .ps1 script (update parameters as needed).') // todo
+            ? t('Run the following PowerShell snippet in a standard prompt or download the .ps1 script.')
             : t('Run the following bash snippet in a terminal or download the .sh script.');
         } else {
           if (platform === WINDOWS) {
@@ -434,7 +434,10 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               </a>
             </Alert>
             <p>
-              {t('Install the agent using your own user account. This installation requires only local standard privileges.')}
+              {t('Install the agent using your own user account.')}
+              {' '}
+              {platform === WINDOWS && t('It can be run as administrator or as a standard user, depending on the PowerShell elevation.')}
+              {platform !== WINDOWS && t('This installation requires only local standard privileges.')}
             </p>
             <StepOneInstallation />
             <InstallationScriptsAndActionButtons />
@@ -648,7 +651,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                                     }}
                                   >
                                     <DownloadingOutlined style={{ marginRight: theme.spacing(1) }} />
-                                    {t('Install {platform} agent', {platform})}
+                                    {t('Install {platform} agent', { platform })}
                                   </Typography>
                                 </CardContent>
                               </CardActionArea>
