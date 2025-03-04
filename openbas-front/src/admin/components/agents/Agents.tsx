@@ -115,7 +115,7 @@ const Executors = () => {
   const buildInstallationUrl = (baseUrl: string) => {
     if (activeTab === 0) return `${baseUrl}/session-user/${userToken?.token_value}`;
     if (activeTab === 1 && selectedOption === USER) return `${baseUrl}/service-user/${userToken?.token_value}`; // TODO pour savoir quels sont les params a passer user/pwd
-    return `${baseUrl}/${userToken?.token_value}`;
+    return `${baseUrl}/service/${userToken?.token_value}`;
   };
   const buildCalderaInstaller = () => {
     switch (platform) {
@@ -249,8 +249,8 @@ MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
-          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
         };
       case MACOS:
         return {
@@ -263,8 +263,8 @@ MD5: 1132906cc40001f51673108847b88d0c
 SHA1: 3177df4a8fa13a2e13ce63670c579955ad55df3f
 SHA256: 2b4397160925bf6b9dcca0949073fd9b2fc590ab641ea1d1c3d7d36048ed674a
 SHA512: f1c8cf0c41c7d193bcb2aad21d7a739c785902c3231e15986b2eb37f911824a802f50cb2dbb509deba1c7a2a535fb7b34cf100303c61a6087102948628133747`,
-          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
-          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
         };
       default:
         return {
@@ -277,8 +277,8 @@ MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
-          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
         };
     }
   };

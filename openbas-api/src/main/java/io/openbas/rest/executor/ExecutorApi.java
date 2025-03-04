@@ -294,7 +294,7 @@ public class ExecutorApi extends RestBehavior {
         @ApiResponse(responseCode = "400", description = "Invalid platform specified."),
         @ApiResponse(responseCode = "404", description = "Token not found."),
       })
-  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{installation-mode}/{token}")
+  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{installationMode}/{token}")
   public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(
       @Parameter(
               description =
