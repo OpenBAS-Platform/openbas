@@ -648,7 +648,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                                     }}
                                   >
                                     <DownloadingOutlined style={{ marginRight: theme.spacing(1) }} />
-                                    {t('Install')}
+                                    {t('Install {platform} agent', {platform})}
                                   </Typography>
                                 </CardContent>
                               </CardActionArea>
