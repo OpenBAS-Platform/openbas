@@ -39,9 +39,12 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
+const USER = 'user';
 const OPENBAS_CALDERA = 'openbas_caldera';
 const OPENBAS_AGENT = 'openbas_agent';
 const WINDOWS = 'Windows';
+const MACOS = 'MacOS';
+const LINUX = 'Linux';
 
 const Executors = () => {
   // Standard hooks
@@ -53,7 +56,7 @@ const Executors = () => {
   const [arch, setArch] = useState<string>('x86_64');
   const [activeStep, setActiveStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedOption, setSelectedOption] = useState('user');
+  const [selectedOption, setSelectedOption] = useState(USER);
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
@@ -103,7 +106,7 @@ const Executors = () => {
     setSelectedExecutor(null);
     setActiveStep(0);
     setActiveTab(0);
-    setSelectedOption('user');
+    setSelectedOption(USER);
     setAgentFolder(null);
     setArch('x86_64');
   };
@@ -111,7 +114,7 @@ const Executors = () => {
   // -- Stepper components --
   const buildInstallationUrl = (baseUrl: string) => {
     if (activeTab === 0) return `${baseUrl}/session-user/${userToken?.token_value}`;
-    if (activeTab === 1 && selectedOption === 'user') return `${baseUrl}/service-user/${userToken?.token_value}`; // TODO pour savoir quels sont les params a passer user/pwd
+    if (activeTab === 1 && selectedOption === USER) return `${baseUrl}/service-user/${userToken?.token_value}`; // TODO pour savoir quels sont les params a passer user/pwd
     return `${baseUrl}/${userToken?.token_value}`;
   };
   const buildCalderaInstaller = () => {
@@ -144,7 +147,7 @@ Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OB
 schtasks /create /tn OpenBASCaldera /sc onlogon /rl highest /tr "Powershell -ExecutionPolicy Bypass -NoProfile -WindowStyle hidden -File 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' $server";`,
           code: `$server="${settings.executor_caldera_public_url}";$url="${settings.platform_base_url}/api/implant/caldera/windows/${arch}";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe'} | stop-process -f;rm -force '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ea ignore;New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}' | Out-Null;[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe',$data) | Out-Null;$data=$wc.DownloadData($url + "/ps1");rm -force 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' -ea ignore;[io.file]::WriteAllBytes('C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1',$data) | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;schtasks /create /tn OpenBASCaldera /sc onlogon /rl highest /tr "Powershell -ExecutionPolicy Bypass -NoProfile -WindowStyle hidden -File 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' $server";`,
         };
-      case 'Linux':
+      case LINUX:
         return {
           icon: <Bash />,
           label: 'sh',
@@ -162,7 +165,7 @@ chmod +x ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent;
 nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -server $server -group red &`,
           code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas-caldera-agent'};curl -s -X GET ${settings.platform_base_url}/api/implant/caldera/linux/${arch} > ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent;chmod +x ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent;nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -server $server -group red &`,
         };
-      case 'MacOS':
+      case MACOS:
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
@@ -199,7 +202,7 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
   const buildOpenBASInstaller = () => {
     const buildExtraParams = (advanced: string, standard: string, other: string) => {
       let result = other;
-      if (activeTab === 1 && selectedOption === 'user') {
+      if (activeTab === 1 && selectedOption === USER) {
         result = advanced;
       } else if (activeTab === 0) {
         result = standard;
@@ -212,7 +215,7 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
       if (agentFolder) {
         return agentFolder; // If agentFolder is truthy, return it immediately
       }
-      if (activeTab === 1 && selectedOption !== 'user') {
+      if (activeTab === 1 && selectedOption !== USER) {
         result = advanced;
       } else if (activeTab === 0) {
         result = standard;
@@ -235,7 +238,7 @@ SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd5
           displayedCode: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD TODO', '-privilege PRIVILEGE TODO', '')}).Content`, // todo
           code: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-user USER -pwd PWD TODO', '-privilege PRIVILEGE TODO', '')}).Content`, // TODO
         };
-      case 'Linux':
+      case LINUX:
         return {
           icon: <Bash />,
           label: 'sh',
@@ -249,7 +252,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
           code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams('--user USER --group GROUP | sudo sh', '| sh', '| sudo sh')}`,
         };
-      case 'MacOS':
+      case MACOS:
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
@@ -280,7 +283,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
     }
   };
   const ArchitectureFormControl = () => {
-    if (platform !== 'MacOS') return null;
+    if (platform !== MACOS) return null;
 
     return (
       <FormControl style={{
@@ -334,21 +337,20 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             : t('Run the following bash snippet in a terminal or download the .sh script.');
         } else {
           if (platform === WINDOWS) {
-            if (selectedOption === 'user') {
-              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and run it with administrator privileges. ')
-                + t('It can be run as an administrator or a standard user, depending on the script parameters. ')
-                + t('If installing as a user, make sure to add the "Log on as a service" policy.');
+            if (selectedOption === USER) {
+              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script.') + (' ')
+                + t('It can be run as administrator or as a standard user depending on the user rights used in the script parameters.');
             } else {
-              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and run it with administrator privileges. ')
+              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and run it with administrator privileges.') + (' ')
                 + t('Installing it as a system grants system-wide privileges.');
             }
           } else {
-            if (selectedOption === 'user') {
-              message = t('It can be run as an administrator or a standard user, depending on the script parameters. ')
-                + t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script '
-                  + 'and run it as root. (Don’t forget to replace the script parameters).');
+            if (selectedOption === USER) {
+              message = t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script and run it as root.')
+                + (' ')
+                + t('It can be run as administrator or as a standard user depending on the user rights used in the script parameters.');
             } else {
-              message = t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script and run it as root. ')
+              message = t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script and run it as root.') + (' ')
                 + t(`Installing it as a system grants system-wide privileges.`);
             }
           }
@@ -419,11 +421,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <Alert
               variant="outlined"
               severity="info"
-              style={{ marginTop: theme.spacing(3) }}
+              style={{ marginTop: theme.spacing(2) }}
             >
-              {t('Quick start with openBAS: Install the agent using your own user account. This installation requires only local standard privileges.')}
-            </Alert>
-            <p>
               {t(
                 'The agent runs in the background as a session and only executes when the user is logged in and active. It can run as an administrator or a standard user. ',
               )}
@@ -434,6 +433,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 {' '}
                 {t('documentation.')}
               </a>
+            </Alert>
+            <p>
+              {t('Install the agent using your own user account. This installation requires only local standard privileges.')}
             </p>
             <StepOneInstallation />
             <InstallationScriptsAndActionButtons />
@@ -448,11 +450,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         <Alert
           variant="outlined"
           severity="info"
-          style={{ marginTop: theme.spacing(3) }}
+          style={{ marginTop: theme.spacing(2) }}
         >
-          {t('Deploy your agent as a user or a system service. This installation requires local administrator privileges.')}
-        </Alert>
-        <p>
           {t('The agent runs in the background as a service and starts automatically when the machine powers on. ')}
           {t('For further details, refer to the ')}
           {' '}
@@ -461,6 +460,9 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             {' '}
             {t('documentation.')}
           </a>
+        </Alert>
+        <p>
+          {t('Install the agent as a user or a system service. This installation requires local administrator privileges.')}
         </p>
         <StepOneInstallation />
         <div>
@@ -477,6 +479,15 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             <FormControlLabel value="system" control={<Radio />} label={t('Install Agent as System')} />
           </RadioGroup>
         </div>
+        {selectedOption === USER && platform === WINDOWS && (
+          <Alert
+            variant="outlined"
+            severity="info"
+            style={{ marginTop: theme.spacing(1) }}
+          >
+            {t('You should add "Log on as a service" policy if you are installing as a user.')}
+          </Alert>
+        )}
         {platform && (
           <InstallationScriptsAndActionButtons />
         )}
