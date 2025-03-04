@@ -581,7 +581,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           {(selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA)
             && (
               <>
-                <Stepper activeStep={activeStep} style={{ paddingBottom: theme.spacing(3) }}>
+                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 2) }}>
                   {steps.map((label, index) => (
                     <Step key={label}>
                       <StepButton color="inherit" onClick={() => setActiveStep(index)}>{label}</StepButton>
