@@ -333,6 +333,7 @@ public class EndpointService {
     agentInput.setService(input.isService());
     agentInput.setElevated(input.isElevated());
     agentInput.setExecutedByUser(input.getExecutedByUser());
+    agentInput.setInstallationMode(input.getInstallationMode());
     return agentInput;
   }
 
