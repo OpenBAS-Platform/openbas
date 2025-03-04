@@ -73,12 +73,6 @@ const LessonsTemplateQuestionPopover: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonPopover entries={entries} variant="icon" />
-      <DialogDelete
-        open={openDelete}
-        handleClose={handleCloseDelete}
-        handleSubmit={submitDelete}
-        text={t('Do you want to delete this lessons learned question?')}
-      />
       <Drawer
         open={openEdit}
         handleClose={handleCloseEdit}
@@ -91,6 +85,12 @@ const LessonsTemplateQuestionPopover: FunctionComponent<Props> = ({
           editing
         />
       </Drawer>
+      <DialogDelete
+        open={openDelete}
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={t('Do you want to delete this lessons learned question?')}
+      />
     </>
   );
 };
