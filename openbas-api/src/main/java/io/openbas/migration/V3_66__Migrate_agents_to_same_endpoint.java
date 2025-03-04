@@ -72,6 +72,41 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                     UPDATE agents a SET agent_asset=ta.uniq_asset_id
                     FROM (SELECT array_asset_id, uniq_asset_id FROM temp_assets) AS ta
                     WHERE ta.array_asset_id LIKE concat('%',a.agent_asset,'%');
+
+                    -- update the relation injects_assets
+                    ALTER TABLE injects_assets DROP CONSTRAINT injects_assets_pkey;
+
+                    UPDATE injects_assets injects_asset SET asset_id=ta.uniq_asset_id
+                    FROM (SELECT array_asset_id, uniq_asset_id FROM temp_assets) AS ta
+                    WHERE ta.array_asset_id LIKE concat('%',injects_asset.asset_id,'%');
+
+                    CREATE TABLE injects_assets_temp AS SELECT DISTINCT * FROM injects_assets;
+                    DROP TABLE injects_assets;
+                    ALTER TABLE injects_assets_temp RENAME TO injects_assets;
+
+                    ALTER TABLE injects_assets ADD CONSTRAINT injects_assets_pkey PRIMARY KEY (inject_id, asset_id);
+                    ALTER TABLE injects_assets ADD CONSTRAINT asset_id_fk FOREIGN KEY (asset_id) REFERENCES assets(asset_id) ON DELETE CASCADE;
+                    ALTER TABLE injects_assets ADD CONSTRAINT inject_id_fk FOREIGN KEY (inject_id) REFERENCES injects(inject_id) ON DELETE CASCADE;
+                    CREATE INDEX IF NOT EXISTS idx_injects_assets_inject on injects_assets (inject_id);
+                    CREATE INDEX IF NOT EXISTS idx_injects_assets_asset on injects_assets (asset_id);
+
+                    -- update the relation asset_groups_assets
+                    ALTER TABLE asset_groups_assets DROP CONSTRAINT asset_groups_assets_pkey;
+
+                    UPDATE asset_groups_assets asset_groups_asset SET asset_id=ta.uniq_asset_id
+                    FROM (SELECT array_asset_id, uniq_asset_id FROM temp_assets) AS ta
+                    WHERE ta.array_asset_id LIKE concat('%',asset_groups_asset.asset_id,'%');
+
+                    CREATE TABLE asset_groups_assets_temp AS SELECT DISTINCT * FROM asset_groups_assets;
+                    DROP TABLE asset_groups_assets;
+                    ALTER TABLE asset_groups_assets_temp RENAME TO asset_groups_assets;
+
+                    ALTER TABLE asset_groups_assets ADD CONSTRAINT asset_groups_assets_pkey PRIMARY KEY (asset_group_id, asset_id);
+                    ALTER TABLE asset_groups_assets ADD CONSTRAINT asset_id_fk FOREIGN KEY (asset_id) REFERENCES assets(asset_id) ON DELETE CASCADE;
+                    ALTER TABLE asset_groups_assets ADD CONSTRAINT asset_group_id_fk FOREIGN KEY (asset_group_id) REFERENCES asset_groups(asset_group_id) ON DELETE CASCADE;
+                    CREATE INDEX IF NOT EXISTS idx_asset_groups_assets_asset_group on asset_groups_assets (asset_group_id);
+                    CREATE INDEX IF NOT EXISTS idx_asset_groups_assets_asset on asset_groups_assets (asset_id);
+
                     -- update the relation assets_tags
                     ALTER TABLE assets_tags DROP CONSTRAINT assets_tags_pkey;
 
@@ -82,7 +117,16 @@ public class V3_66__Migrate_agents_to_same_endpoint extends BaseJavaMigration {
                     CREATE TABLE assets_tags_temp AS SELECT DISTINCT * FROM assets_tags;
                     DROP TABLE assets_tags;
                     ALTER TABLE assets_tags_temp RENAME TO assets_tags;
+
                     ALTER TABLE assets_tags ADD CONSTRAINT assets_tags_pkey PRIMARY KEY (asset_id, tag_id);
+                    CREATE INDEX IF NOT EXISTS idx_assets_tags_asset on assets_tags (asset_id);
+                    CREATE INDEX IF NOT EXISTS idx_assets_tags_tag on assets_tags (tag_id);
+
+                    -- update the relation inject_expectations
+                    UPDATE injects_expectations injects_expectation SET asset_id=ta.uniq_asset_id
+                    FROM (SELECT array_asset_id, uniq_asset_id FROM temp_assets) AS ta
+                    WHERE ta.array_asset_id LIKE concat('%',injects_expectation.asset_id,'%');
+
                     -- drop temp asset table
                     DROP TABLE temp_assets;
                     -- delete old endpoints which are unused now

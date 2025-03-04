@@ -12,6 +12,7 @@ public class CrowdStrikeDevice {
   private String platform_name;
   private String os_version;
   private String external_ip;
+  private String local_ip;
   private String connection_ip;
   private String mac_address;
   private String os_product_name;

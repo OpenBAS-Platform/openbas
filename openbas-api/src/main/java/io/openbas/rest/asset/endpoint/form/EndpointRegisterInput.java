@@ -24,4 +24,6 @@ public class EndpointRegisterInput extends EndpointInput {
 
   @JsonProperty("agent_executed_by_user")
   private String executedByUser = Agent.ADMIN_SYSTEM_WINDOWS;
+
+  private String seenIp;
 }

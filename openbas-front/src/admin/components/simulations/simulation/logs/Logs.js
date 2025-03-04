@@ -77,7 +77,7 @@ const Logs = () => {
     });
   };
   return (
-    <div style={{ marginTop: -13 }}>
+    <div>
       <AnimationMenu exerciseId={exerciseId} />
       <div>
         <Typography variant="h4" style={{ float: 'left' }}>

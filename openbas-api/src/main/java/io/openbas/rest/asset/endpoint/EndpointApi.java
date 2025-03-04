@@ -21,6 +21,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.HttpReqRespUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -54,6 +55,7 @@ public class EndpointApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   public Endpoint upsertEndpoint(@Valid @RequestBody final EndpointRegisterInput input)
       throws IOException {
+    input.setSeenIp(HttpReqRespUtils.getClientIpAddressIfServletRequestExist());
     return this.endpointService.register(input);
   }
 

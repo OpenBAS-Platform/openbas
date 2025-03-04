@@ -5,13 +5,18 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
+import io.openbas.helper.MultiIdListDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -37,12 +42,14 @@ public class Finding implements Base {
   @NotBlank
   private String field;
 
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "finding_type", updatable = false, nullable = false)
   @Enumerated(EnumType.STRING)
   @JsonProperty("finding_type")
   @NotNull
   protected ContractOutputType type;
 
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "finding_value", nullable = false)
   @JsonProperty("finding_value")
   @NotBlank
@@ -55,6 +62,7 @@ public class Finding implements Base {
 
   // -- RELATION --
 
+  @Queryable(filterable = true, sortable = true)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "finding_inject_id")
   @JsonProperty("finding_inject_id")
@@ -64,15 +72,48 @@ public class Finding implements Base {
 
   // -- AUDIT --
 
+  @Queryable(filterable = true, sortable = true)
   @CreationTimestamp
   @Column(name = "finding_created_at", updatable = false, nullable = false)
   @JsonProperty("finding_created_at")
   @NotNull
   private Instant creationDate = now();
 
+  @Queryable(filterable = true, sortable = true)
   @UpdateTimestamp
   @Column(name = "finding_updated_at", nullable = false)
   @JsonProperty("finding_updated_at")
   @NotNull
   private Instant updateDate = now();
+
+  // Relation
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "findings_assets",
+      joinColumns = @JoinColumn(name = "finding_id"),
+      inverseJoinColumns = @JoinColumn(name = "asset_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("finding_assets")
+  private List<Asset> assets = new ArrayList<>();
+
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "findings_teams",
+      joinColumns = @JoinColumn(name = "finding_id"),
+      inverseJoinColumns = @JoinColumn(name = "team_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("finding_teams")
+  private List<Team> teams = new ArrayList<>();
+
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "findings_users",
+      joinColumns = @JoinColumn(name = "finding_id"),
+      inverseJoinColumns = @JoinColumn(name = "user_id"))
+  @JsonSerialize(using = MultiIdListDeserializer.class)
+  @JsonProperty("finding_users")
+  private List<User> users = new ArrayList<>();
 }

@@ -29,8 +29,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -54,8 +52,7 @@ public class PayloadApi extends RestBehavior {
   public Page<Payload> payloads(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<Payload> specification, Pageable pageable) ->
-            this.payloadRepository.findAll(specification, pageable),
+        this.payloadRepository::findAll,
         handleArchitectureFilter(searchPaginationInput),
         Payload.class);
   }

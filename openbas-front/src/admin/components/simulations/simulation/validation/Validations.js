@@ -128,7 +128,7 @@ const Validations = () => {
   // Rendering
   if (exercise && injectExpectations) {
     return (
-      <div style={{ marginTop: -12 }}>
+      <div>
         <AnimationMenu exerciseId={exerciseId} />
         <div style={{
           float: 'left',

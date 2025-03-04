@@ -1,13 +1,15 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Finding;
-import java.util.Optional;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FindingRepository extends CrudRepository<Finding, String> {
+public interface FindingRepository
+    extends CrudRepository<Finding, String>, JpaSpecificationExecutor<Finding> {
 
-  Optional<Finding> findByField(@NotNull final String field);
+  List<Finding> findAllByInjectId(@NotNull final String injectId);
 }

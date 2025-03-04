@@ -1,13 +1,21 @@
 package io.openbas.rest.finding;
 
+import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
+import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
+import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
+
 import io.openbas.database.model.Finding;
+import io.openbas.database.repository.FindingRepository;
+import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.FindingInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,23 +24,36 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class FindingApi extends RestBehavior {
 
+  private final FindingRepository findingRepository;
+
   private final FindingService findingService;
 
   // -- CRUD --
 
-  @GetMapping
-  public ResponseEntity<List<Finding>> findings() {
-    return ResponseEntity.ok(this.findingService.findings());
+  @PostMapping("/search")
+  public Page<Finding> findings(
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        this.findingRepository::findAll,
+        handleArchitectureFilter(searchPaginationInput),
+        Finding.class);
+  }
+
+  @PostMapping("/injects/{injectId}/search")
+  public Page<Finding> findingsByInject(
+      @PathVariable @NotNull final String injectId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+        (Specification<Finding> specification, Pageable pageable) ->
+            this.findingRepository.findAll(
+                FindingSpecification.findFindingsForInject(injectId).and(specification), pageable),
+        handleEndpointFilter(searchPaginationInput),
+        Finding.class);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<Finding> finding(@PathVariable @NotNull final String id) {
     return ResponseEntity.ok(this.findingService.finding(id));
-  }
-
-  @GetMapping("/field/{field}")
-  public ResponseEntity<Finding> findingByField(@PathVariable @NotBlank final String field) {
-    return ResponseEntity.ok(this.findingService.findingByField(field));
   }
 
   @PostMapping

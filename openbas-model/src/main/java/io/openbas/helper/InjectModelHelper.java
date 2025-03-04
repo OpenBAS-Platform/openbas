@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
@@ -85,7 +86,34 @@ public class InjectModelHelper {
                         mandatoryOnConditionFieldKey.equals(
                             jsonNode.get(CONTACT_ELEMENT_CONTENT_KEY).asText()))
                 .findFirst();
-        if (mandatoryOnConditionField.isPresent()) {
+        // if field is mandatory conditional on a specific value and this value is equals, check the
+        // field is set
+        if (jsonField.hasNonNull(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE)) {
+          if (mandatoryOnConditionField.isEmpty()
+              || content == null
+              || Objects.equals(
+                  getFieldValue(mandatoryOnConditionField.get(), content),
+                  jsonField.get(CONTACT_ELEMENT_CONTENT_MANDATORY_CONDITIONAL_VALUE).asText())) {
+            if (isFieldSet(
+                    allTeams,
+                    teams,
+                    assets,
+                    assetGroups,
+                    mandatoryOnConditionField.get(),
+                    content,
+                    injectContractFields)
+                && !isFieldSet(
+                    allTeams,
+                    teams,
+                    assets,
+                    assetGroups,
+                    jsonField,
+                    content,
+                    injectContractFields)) {
+              isReady = false;
+            }
+          }
+        } else if (mandatoryOnConditionField.isPresent()) {
           if (isFieldSet(
                   allTeams,
                   teams,
@@ -243,5 +271,11 @@ public class InjectModelHelper {
       }
     }
     return isSet;
+  }
+
+  public static String getFieldValue(
+      @NotNull final JsonNode jsonField, @NotNull final ObjectNode content) {
+    String key = jsonField.get(CONTACT_ELEMENT_CONTENT_KEY).asText();
+    return content.get(key).asText();
   }
 }

@@ -205,7 +205,7 @@ const Mails = () => {
 
   // Rendering
   return (
-    <div style={{ marginTop: -13 }}>
+    <div>
       <AnimationMenu exerciseId={exerciseId} />
       <ToggleButtonGroup
         size="small"
