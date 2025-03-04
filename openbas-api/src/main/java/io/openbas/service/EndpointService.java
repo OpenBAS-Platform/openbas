@@ -210,7 +210,7 @@ public class EndpointService {
     Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
     if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
-      assetAgentJob.setCommand(generateUpgradeCommand(endpoint.getPlatform().name()));
+      assetAgentJob.setCommand(generateUpgradeCommand(endpoint.getPlatform().name(), input.getInstallationMode()));
       assetAgentJob.setAgent(agent);
       assetAgentJobRepository.save(assetAgentJob);
     }
@@ -373,10 +373,10 @@ public class EndpointService {
   public String generateInstallCommand(String platform, String token, String installationMode)
       throws IOException {
     return getFileOrDownloadFromJfrog(
-        platform, "openbas-agent-installer-".concat(installationMode), token);
+        platform, installationMode == null || installationMode.equals("service") ? "openbas-agent-installer" : "openbas-agent-installer-".concat(installationMode), token);
   }
 
-  public String generateUpgradeCommand(String platform) throws IOException {
-    return getFileOrDownloadFromJfrog(platform, "openbas-agent-upgrade", adminToken);
+  public String generateUpgradeCommand(String platform, String installationMode) throws IOException {
+    return getFileOrDownloadFromJfrog(platform, installationMode == null || installationMode.equals("service") ? "openbas-agent-upgrade" : "openbas-agent-upgrade-".concat(installationMode), adminToken);
   }
 }
