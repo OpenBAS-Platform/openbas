@@ -1227,7 +1227,7 @@ const i18n = {
       'Main focus': 'Focus principal',
       'All categories': 'Toutes les catégories',
       // Agent installation
-      'Instalaltion': 'Installation',
+      'Installation': 'Installation',
       'Installation Instructions': 'Instructions d\'installation',
       'To install the agent please follow the': 'Pour installer l\'agent, veuillez suivre le',
       'Step 1 - Install the agent': 'Étape 1 - Installer l\'agent',
