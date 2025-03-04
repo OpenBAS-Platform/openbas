@@ -5,7 +5,10 @@ import { Link, useLocation } from 'react-router';
 import { type CSSObject } from 'tss-react';
 import { makeStyles } from 'tss-react/mui';
 
+import type { LoggedHelper } from '../../../../actions/helper';
 import { useFormatter } from '../../../../components/i18n';
+import { computeBannerSettings } from '../../../../public/components/systembanners/utils';
+import { useHelper } from '../../../../store';
 import { type Exercise } from '../../../../utils/api-types';
 
 const useStyles = makeStyles()(theme => ({
@@ -29,6 +32,10 @@ const AnimationMenu: FunctionComponent<Props> = ({ exerciseId }) => {
   const location = useLocation();
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const { settings } = useHelper((helper: LoggedHelper) => {
+    return { settings: helper.getPlatformSettings() };
+  });
+  const { bannerHeight } = computeBannerSettings(settings);
 
   return (
     <Drawer
@@ -36,7 +43,10 @@ const AnimationMenu: FunctionComponent<Props> = ({ exerciseId }) => {
       anchor="right"
       classes={{ paper: classes.drawer }}
     >
-      <div className={classes.toolbar} />
+      <div
+        className={classes.toolbar}
+        style={{ marginTop: bannerHeight }}
+      />
       <MenuList component="nav">
         <MenuItem
           component={Link}

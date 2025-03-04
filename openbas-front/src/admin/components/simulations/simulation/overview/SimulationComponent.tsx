@@ -105,10 +105,7 @@ const SimulationComponent = () => {
           <Paper
             variant="outlined"
             classes={{ root: classes.paper }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-            }}
+            style={{ minWidth: '100%' }}
           >
             <MitreMatrix goToLink={goToLink} injectResults={injectResults} />
           </Paper>
