@@ -1,5 +1,5 @@
 import { ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
-import { Alert, Button, Card, CardActionArea, CardContent, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Tab, Tabs, Typography } from '@mui/material';
+import { Alert, Button, Card, CardActionArea, CardContent, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Step, StepButton, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Bash, DownloadCircleOutline, Powershell } from 'mdi-material-ui';
 import { useState } from 'react';
@@ -51,6 +51,7 @@ const Executors = () => {
   const [selectedExecutor, setSelectedExecutor] = useState<null | Executor>(null);
   const [agentFolder, setAgentFolder] = useState<null | string>(null);
   const [arch, setArch] = useState<string>('x86_64');
+  const [activeStep, setActiveStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedOption, setSelectedOption] = useState('user');
   const { classes } = useStyles();
@@ -68,21 +69,27 @@ const Executors = () => {
   });
   const userToken = tokens.length > 0 ? tokens[0] : undefined;
   const order = {
-    openbas_agent: 1,
-    openbas_caldera: 2,
-    openbas_tanium: 3,
+    openbas_agent: 0,
+    openbas_caldera: 1,
+    openbas_tanium: 2,
+    openbas_crowdstrike: 3,
   };
-  const sortedExecutors = executors.map((executor: Executor) => ({
-    ...executor,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    order: order[executor.executor_type],
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-  })).sort(({ order: a }, { order: b }) => a - b);
 
-  // --
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const sortedExecutors = executors
+    .map((executor: Executor) => ({
+      ...executor,
+      order: order[executor.executor_type as keyof typeof order],
+    }))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .sort((a: any, b: any) => a.order - b.order);
+
+  // -- Manage Dialogs
+  const steps = [t('Choose Platform'), t('Installation Instructions')];
+  const handlePlatformSelection = (platformSelected: string) => {
+    setPlatform(platformSelected);
+    setActiveStep(1);
+  };
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
   const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +101,7 @@ const Executors = () => {
   const closeInstall = () => {
     setPlatform(null);
     setSelectedExecutor(null);
+    setActiveStep(0);
     setActiveTab(0);
     setSelectedOption('user');
     setAgentFolder(null);
@@ -305,9 +313,6 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
     return (
       <>
         <Typography variant="h2" style={{ marginTop: 20 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
-        <Alert variant="outlined" severity="info">
-          {t('The agent will never execute directly any payload.')}
-        </Alert>
         <p>
           {t('You will need to add proper antivirus exclusions for this agent (to ensure injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
         </p>
@@ -324,23 +329,27 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
       let message = '';
       if (selectedExecutor?.executor_type === OPENBAS_AGENT) {
         if (activeTab === 0) {
-          if (platform === WINDOWS) {
-            message = t('You can either directly copy and paste the following Powershell snippet into an standard prompt or download the .ps1 script (make sure to replace the script parameters: TODO).'); // TODO
-          } else {
-            message = t('You can either directly copy and paste the following bash snippet into a terminal or download the .sh script.');
-          }
+          message = platform === WINDOWS
+            ? t('Run the following PowerShell snippet in a standard prompt or download the .ps1 script (update parameters as needed).') // todo
+            : t('Run the following bash snippet in a terminal or download the .sh script.');
         } else {
           if (platform === WINDOWS) {
             if (selectedOption === 'user') {
-              message = t('You can either directly copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and execute it with administrator privileges (don’t forget to replace the script parameters: TODO).'); // TODO
+              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and run it with administrator privileges. ')
+                + t('It can be run as an administrator or a standard user, depending on the script parameters. ')
+                + t('If installing as a user, make sure to add the "Log on as a service" policy.');
             } else {
-              message = t('You can either directly copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and execute it with administrator privileges.');
+              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and run it with administrator privileges. ')
+                + t('Installing it as a system grants system-wide privileges.');
             }
           } else {
             if (selectedOption === 'user') {
-              message = t('You can either directly copy and paste the following bash snippet into a terminal with root privileges or download the .sh script and run it as root (don’t forget to replace the script parameters: TODO).'); // TODO
+              message = t('It can be run as an administrator or a standard user, depending on the script parameters. ')
+                + t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script '
+                  + 'and run it as root. (Don’t forget to replace the script parameters: TODO).');
             } else {
-              message = t('You can either directly copy and paste the following bash snippet into a terminal with root privileges or download the .sh script and run it as root.');
+              message = t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script and run it as root. ')
+                + t(`Installing it as a system grants system-wide privileges.`);
             }
           }
         }
@@ -414,15 +423,19 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
             >
               {t('Quick start with openBAS: Install the agent using your own user account. This installation requires only local standard privileges.')}
             </Alert>
+            <p>
+              {t(
+                'The agent runs in the background as a session and only executes when the user is logged in and active. It can run as an administrator or a standard user. ',
+              )}
+              {t('For further details, refer to the ')}
+              {' '}
+              <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
+                {selectedExecutor?.executor_name}
+                {' '}
+                {t('documentation.')}
+              </a>
+            </p>
             <StepOneInstallation />
-            <Alert
-              variant="outlined"
-              severity="warning"
-            >
-              {t('The agent runs in the background as a session. ')
-                + t('It will only execute when the user is logged in and the session is active. ')
-                + t('The agent can be run as an administrator or a standard user.')}
-            </Alert>
             <InstallationScriptsAndActionButtons />
           </>
         )}
@@ -439,6 +452,16 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         >
           {t('Deploy your agent as a user or a system service. This installation requires local administrator privileges.')}
         </Alert>
+        <p>
+          {t('The agent runs in the background as a service and starts automatically when the machine powers on. ')}
+          {t('For further details, refer to the ')}
+          {' '}
+          <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
+            {selectedExecutor?.executor_name}
+            {' '}
+            {t('documentation.')}
+          </a>
+        </p>
         <StepOneInstallation />
         <div>
           <RadioGroup
@@ -455,27 +478,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           </RadioGroup>
         </div>
         {platform && (
-          <>
-            <Alert variant="outlined" severity="warning" style={{ marginTop: theme.spacing(1) }}>
-              {selectedOption === 'user' ? (
-                <>
-                  {t(`The agent runs in the background as a service and automatically starts when the machine powers on.`)
-                    + t(`It can be run as administrator or as a standard user depending on the user rights used in the script parameters.`)}
-                  {platform === WINDOWS && (
-                    <>
-                      {' '}
-                      {t('Installing as a user requires specific permissions: You should add "Log on as a service" policy.')}
-                      {' '}
-                    </>
-                  )}
-                </>
-              ) : (
-                t(`The agent runs in the background as a service and automatically starts when the machine powers on.`)
-                + t(`Installing it as a system grants system-wide privileges.`)
-              )}
-            </Alert>
-            <InstallationScriptsAndActionButtons />
-          </>
+          <InstallationScriptsAndActionButtons />
         )}
       </>
     );
@@ -562,7 +565,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         })}
       </Grid>
       <Dialog
-        open={selectedExecutor !== null && platform === null}
+        open={selectedExecutor !== null}
         TransitionComponent={Transition}
         onClose={closeInstall}
         slotProps={{ paper: { elevation: 1 } }}
@@ -575,102 +578,110 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           {t('Installation')}
         </DialogTitle>
         <DialogContent>
-          <Typography
-            style={{
-              fontSize: 15,
-              padding: '10px 18px',
-              marginBottom: theme.spacing(4),
-            }}
-          >
-            {t('Choose your platform')}
-          </Typography>
-          <Grid container spacing={1}>
-            {selectedExecutor?.executor_platforms
-              && selectedExecutor?.executor_platforms.map(platform => (
-                <Grid item xs={4} key={platform}>
-                  <Card
-                    variant="outlined"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: '300px',
-                      margin: '0 15px 80px',
-                    }}
-                  >
-                    <CardActionArea onClick={() => setPlatform(platform)} classes={{ root: classes.area }}>
-                      <CardContent>
-                        <div
-                          key={platform}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <PlatformIcon platform={platform} width={30} />
-                        </div>
-                        <Typography
-                          style={{
-                            fontSize: 15,
-                            padding: '15px 0',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <DownloadingOutlined style={{ marginRight: theme.spacing(1) }} />
-                          {t(`Install ${platform} agent`)}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              ))}
-          </Grid>
-        </DialogContent>
-      </Dialog>
-      <Dialog
-        open={selectedExecutor !== null && platform !== null}
-        TransitionComponent={Transition}
-        onClose={closeInstall}
-        fullWidth
-        maxWidth="md"
-        slotProps={{ paper: { elevation: 1 } }}
-      >
-        <DialogTitle><Typography variant="h6" style={{ padding: '20px 20px 0' }}>{t(`Installation ${selectedExecutor?.executor_name} - ${platform}`)}</Typography></DialogTitle>
-        <DialogContent>
-          {selectedExecutor && (
-            <div style={{ padding: '0 20px 20px' }}>
-              {/* Caldera */}
-              {selectedExecutor.executor_type === OPENBAS_CALDERA && (
-                <div>
-                  <ArchitectureFormControl />
-                  <StepOneInstallation />
-                  <Alert variant="outlined" severity="info">
-                    {t('Installing the agent is requiring local administrator privileges.')}
-                  </Alert>
-                  <PlatformInstallationForCaldera />
-                  <StepTwoExclusions />
-                </div>
-              )}
+          {(selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA)
+            && (
+              <>
+                <Stepper activeStep={activeStep} style={{ paddingBottom: theme.spacing(3) }}>
+                  {steps.map((label, index) => (
+                    <Step key={label}>
+                      <StepButton color="inherit" onClick={() => setActiveStep(index)}>{label}</StepButton>
+                    </Step>
+                  ))}
+                </Stepper>
+                {activeStep === 0 && (
+                  <div>
+                    <Typography
+                      style={{
+                        fontSize: 15,
+                        padding: '10px 18px',
+                        marginBottom: theme.spacing(4),
+                      }}
+                    >
+                      {t('Choose your platform')}
+                    </Typography>
+                    <Grid container spacing={1}>
+                      {selectedExecutor?.executor_platforms
+                        && selectedExecutor?.executor_platforms.map(platform => (
+                          <Grid item xs={4} key={platform}>
+                            <Card
+                              variant="outlined"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '300px',
+                                margin: '0 15px 80px',
+                              }}
+                            >
+                              <CardActionArea onClick={() => handlePlatformSelection(platform)} classes={{ root: classes.area }}>
+                                <CardContent>
+                                  <div
+                                    key={platform}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <PlatformIcon platform={platform} width={30} />
+                                  </div>
+                                  <Typography
+                                    style={{
+                                      fontSize: 15,
+                                      padding: '15px 0',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <DownloadingOutlined style={{ marginRight: theme.spacing(1) }} />
+                                    {t(`Install ${platform} agent`)}
+                                  </Typography>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </Grid>
+                        ))}
+                    </Grid>
+                  </div>
+                )}
+                {activeStep === 1 && platform && (
+                  <div>
+                    {selectedExecutor && (
+                      <div style={{ padding: '0 20px 20px' }}>
+                        {/* Caldera */}
+                        {selectedExecutor.executor_type === OPENBAS_CALDERA && (
+                          <div>
+                            <ArchitectureFormControl />
+                            <StepOneInstallation />
+                            <Alert variant="outlined" severity="info">
+                              {t('Installing the agent is requiring local administrator privileges.')}
+                            </Alert>
+                            <PlatformInstallationForCaldera />
+                            <StepTwoExclusions />
+                          </div>
+                        )}
 
-              {/* OBAS */}
-              {selectedExecutor && selectedExecutor.executor_type === OPENBAS_AGENT && (
-                <div>
-                  <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
-                    <Tab label={t('Standard Installation')} />
-                    <Tab label={t('Advanced Installation')} />
-                  </Tabs>
-                  {activeTab === 0 && (<StandardInstallation />)}
-                  {activeTab === 1 && (<AdvancedInstallation />)}
-                  <StepTwoExclusions />
-                </div>
-              )}
-
-              {/* Others */}
-              <ExecutorDocumentationLink executor={selectedExecutor} />
-            </div>
+                        {/* OBAS */}
+                        {selectedExecutor && selectedExecutor.executor_type === OPENBAS_AGENT && (
+                          <div>
+                            <Tabs value={activeTab} onChange={handleTabChange}>
+                              <Tab label={t('Standard Installation')} />
+                              <Tab label={t('Advanced Installation')} />
+                            </Tabs>
+                            {activeTab === 0 && (<StandardInstallation />)}
+                            {activeTab === 1 && (<AdvancedInstallation />)}
+                            <StepTwoExclusions />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          {selectedExecutor?.executor_type !== OPENBAS_AGENT && selectedExecutor?.executor_type !== OPENBAS_CALDERA && selectedExecutor && (
+            <ExecutorDocumentationLink executor={selectedExecutor} />
           )}
         </DialogContent>
       </Dialog>
