@@ -87,7 +87,7 @@ const Executors = () => {
     .sort((a: any, b: any) => a.order - b.order);
 
   // -- Manage Dialogs
-  const steps = [t('Choose Platform'), t('Installation Instructions')];
+  const steps = [t('Choose your platform'), t('Installation Instructions')];
   const handlePlatformSelection = (platformSelected: string) => {
     setPlatform(platformSelected);
     setActiveStep(1);
