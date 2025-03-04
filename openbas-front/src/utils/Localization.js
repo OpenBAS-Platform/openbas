@@ -1249,7 +1249,7 @@ const i18n = {
       'For further details, refer to the': 'Pour plus de détails, reportez-vous à',
       'documentation.': 'documentation.',
       'Install the agent using your own user account.': 'Installez l\'agent en utilisant votre propre compte utilisateur.',
-      'This installation requires only local standard privileges.':  'Cette installation nécessite uniquement des privilèges locaux standard.',
+      'This installation requires only local standard privileges.': 'Cette installation nécessite uniquement des privilèges locaux standard.',
       'Install Agent as User': 'Installer l\'agent en tant qu\'utilisateur',
       'Install Agent as System': 'Installer l\'agent en tant que système',
       'It can be run as administrator or as a standard user, depending on the PowerShell elevation.': 'Il peut être exécuté en tant qu\'administrateur ou en tant qu\'utilisateur standard, en fonction des élévations PowerShell.',
