@@ -2759,9 +2759,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stylistic/eslint-plugin@npm:4.0.1":
-  version: 4.0.1
-  resolution: "@stylistic/eslint-plugin@npm:4.0.1"
+"@stylistic/eslint-plugin@npm:4.2.0":
+  version: 4.2.0
+  resolution: "@stylistic/eslint-plugin@npm:4.2.0"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.23.0"
     eslint-visitor-keys: "npm:^4.2.0"
@@ -2770,7 +2770,7 @@ __metadata:
     picomatch: "npm:^4.0.2"
   peerDependencies:
     eslint: ">=9.0.0"
-  checksum: 10c0/a1a875eaa43a494ce34d490f93f1e61e1b1dfb4d6fafaef54f1ad6db768a8758714e1e826946bd0e8d403af13d0d63820a50f089383f868199a44cd57bddc137
+  checksum: 10c0/d9b2b08635dc4a98ceb59b3768e58e31ecd65f3e727ca8ed2e3538027d9d3d649d43d62631688cda9087f39b3893950b2a11557ccae11cf55b783b20d3f19e4e
   languageName: node
   linkType: hard
 
@@ -8854,7 +8854,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:7.27.0"
     "@playwright/test": "npm:1.50.1"
     "@redux-devtools/extension": "npm:3.3.0"
-    "@stylistic/eslint-plugin": "npm:4.0.1"
+    "@stylistic/eslint-plugin": "npm:4.2.0"
     "@testing-library/dom": "npm:10.4.0"
     "@testing-library/react": "npm:16.2.0"
     "@types/d3-hierarchy": "npm:3.1.7"
