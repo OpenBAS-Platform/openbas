@@ -17,6 +17,8 @@ public class OpenBASExecutor {
   public static final String OPENBAS_EXECUTOR_ID = "2f9a0936-c327-4e95-b406-d161d32a2501";
   public static final String OPENBAS_EXECUTOR_TYPE = "openbas_agent";
   public static final String OPENBAS_EXECUTOR_NAME = "OpenBAS Agent";
+  public static final String OPENBAS_EXECUTOR_DOCUMENTATION_LINK =
+      "https://docs.openbas.io/latest/usage/openbas-agent/";
 
   @PostConstruct
   public void init() {
@@ -25,7 +27,7 @@ public class OpenBASExecutor {
           OPENBAS_EXECUTOR_ID,
           OPENBAS_EXECUTOR_TYPE,
           OPENBAS_EXECUTOR_NAME,
-          null,
+          OPENBAS_EXECUTOR_DOCUMENTATION_LINK,
           getClass().getResourceAsStream("/img/icon-openbas.png"),
           new String[] {
             Endpoint.PLATFORM_TYPE.Windows.name(),
