@@ -3149,6 +3149,7 @@ const i18n = {
       'EXECUTION': 'Attack command',
       'CLEANUP_EXECUTION': 'Cleanup command',
       'COMPLETE': 'Final Trace',
+      'Install {platform} agent': 'Install {platform} agent',
     },
   },
 };
