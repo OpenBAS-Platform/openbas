@@ -60,7 +60,7 @@ const InjectDetailsForm = ({
   const { permissions } = useContext(PermissionsContext);
   const [defaultValues, setDefaultValues] = useState({});
   const [openDetails, setOpenDetails] = useState(openDetail);
-  const [pristineOpenDetails, setPristineOpenDetails] = useState(true);
+  const [pristineOpenDetails, setPristineOpenDetails] = useState(!openDetail);
   const [injectDetailsState, setInjectDetailsState] = useState({
     allTeams: false,
     teamsIds: defaultInject?.inject_teams,
