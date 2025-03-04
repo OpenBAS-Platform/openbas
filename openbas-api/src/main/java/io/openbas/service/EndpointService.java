@@ -50,6 +50,9 @@ import org.springframework.stereotype.Service;
 public class EndpointService {
 
   public static final int DELETE_TTL = 86400000; // 24 hours
+  public static final String OPENBAS_AGENT_INSTALLER = "openbas-agent-installer";
+  public static final String OPENBAS_AGENT_UPGRADE = "openbas-agent-upgrade";
+  public static final String SERVICE = "service";
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
@@ -374,21 +377,22 @@ public class EndpointService {
 
   public String generateInstallCommand(String platform, String token, String installationMode)
       throws IOException {
-    return getFileOrDownloadFromJfrog(
-        platform,
-        installationMode == null || installationMode.equals("service")
-            ? "openbas-agent-installer"
-            : "openbas-agent-installer-".concat(installationMode),
-        token);
+    if (token == null || token.isEmpty()) {
+      throw new IllegalArgumentException("Token must not be null or empty.");
+    }
+    String installerName = OPENBAS_AGENT_INSTALLER;
+    if (installationMode != null && !installationMode.equals(SERVICE)) {
+      installerName = installerName.concat("-").concat(installationMode);
+    }
+    return getFileOrDownloadFromJfrog(platform, installerName, token);
   }
 
   public String generateUpgradeCommand(String platform, String installationMode)
       throws IOException {
-    return getFileOrDownloadFromJfrog(
-        platform,
-        installationMode == null || installationMode.equals("service")
-            ? "openbas-agent-upgrade"
-            : "openbas-agent-upgrade-".concat(installationMode),
-        adminToken);
+    String upgradeName = OPENBAS_AGENT_UPGRADE;
+    if (installationMode != null && !installationMode.equals(SERVICE)) {
+      upgradeName = upgradeName.concat("-").concat(installationMode);
+    }
+    return getFileOrDownloadFromJfrog(platform, upgradeName, adminToken);
   }
 }
