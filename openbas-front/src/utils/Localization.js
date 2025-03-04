@@ -1227,6 +1227,7 @@ const i18n = {
       'Main focus': 'Focus principal',
       'All categories': 'Toutes les catégories',
       // Agent installation
+      'Instalaltion': 'Installation',
       'Installation Instructions': 'Instructions d\'installation',
       'To install the agent please follow the': 'Pour installer l\'agent, veuillez suivre le',
       'Step 1 - Install the agent': 'Étape 1 - Installer l\'agent',
@@ -2683,6 +2684,7 @@ const i18n = {
       'Main focus': '重点',
       'All categories': '所有分类',
       // Agent Installation
+      'Installation': '安装',
       'Installation Instructions': '安装说明',
       'To install the agent please follow the': '请按照以下步骤安装代理',
       'Step 1 - Install the agent': '步骤 1 - 安装代理',
