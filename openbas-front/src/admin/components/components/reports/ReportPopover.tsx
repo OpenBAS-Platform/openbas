@@ -53,12 +53,6 @@ const ReportPopover: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonPopover entries={entries} variant={variant} />
-      <DialogDelete
-        open={openDelete}
-        handleClose={() => setOpenDelete(false)}
-        handleSubmit={submitDelete}
-        text={t('Do you want to delete this report ?')}
-      />
       <Dialog
         title={t('Update the report')}
         open={openEdit}
@@ -66,6 +60,12 @@ const ReportPopover: FunctionComponent<Props> = ({
       >
         {renderReportForm(submitUpdate, handleCloseEdit, report)}
       </Dialog>
+      <DialogDelete
+        open={openDelete}
+        handleClose={() => setOpenDelete(false)}
+        handleSubmit={submitDelete}
+        text={t('Do you want to delete this report ?')}
+      />
     </>
   );
 };

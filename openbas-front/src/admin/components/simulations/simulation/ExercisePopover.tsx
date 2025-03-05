@@ -120,19 +120,14 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Duplicate')) entries.push({
-    label: 'Duplicate',
-    action: () => handleOpenDuplicate(),
-  });
   if (actions.includes('Update')) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
     disabled: !permissions.canWriteBypassStatus,
   });
-  if (actions.includes('Delete')) entries.push({
-    label: 'Delete',
-    action: () => handleOpenDelete(),
-    disabled: !userAdmin,
+  if (actions.includes('Duplicate')) entries.push({
+    label: 'Duplicate',
+    action: () => handleOpenDuplicate(),
   });
   if (actions.includes('Export')) entries.push({
     label: 'Export',
@@ -141,6 +136,11 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
   if (actions.includes('Access reports')) entries.push({
     label: 'Access reports',
     action: () => handleOpenReports(),
+  });
+  if (actions.includes('Delete')) entries.push({
+    label: 'Delete',
+    action: () => handleOpenDelete(),
+    disabled: !userAdmin,
   });
 
   const submitExerciseUpdate = (data: UpdateExerciseInput) => {
@@ -214,12 +214,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       >
         <ExerciseReports exerciseId={exercise.exercise_id} exerciseName={exercise.exercise_name} />
       </Drawer>
-      <DialogDelete
-        open={openDelete}
-        handleClose={handleCloseDelete}
-        handleSubmit={submitDelete}
-        text={`${t('Do you want to delete this simulation:')} ${exercise.exercise_name} ?`}
-      />
       <DialogDuplicate
         open={openDuplicate}
         handleClose={handleCloseDuplicate}
@@ -232,6 +226,12 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
         onCancel={handleCloseExport}
         onClose={handleCloseExport}
         onSubmit={submitExport}
+      />
+      <DialogDelete
+        open={openDelete}
+        handleClose={handleCloseDelete}
+        handleSubmit={submitDelete}
+        text={`${t('Do you want to delete this simulation:')} ${exercise.exercise_name} ?`}
       />
     </>
   );

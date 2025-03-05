@@ -80,37 +80,28 @@ const ScenarioPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Duplicate')) entries.push({
-    label: 'Duplicate',
-    action: () => handleOpenDuplicate(),
-  });
   if (actions.includes('Update')) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
     disabled: !permissions.canWrite,
+  });
+  if (actions.includes('Duplicate')) entries.push({
+    label: 'Duplicate',
+    action: () => handleOpenDuplicate(),
+  });
+  if (actions.includes('Export')) entries.push({
+    label: 'Export',
+    action: () => handleOpenExport(),
   });
   if (actions.includes('Delete')) entries.push({
     label: 'Delete',
     action: () => handleOpenDelete(),
     disabled: !userAdmin,
   });
-  if (actions.includes('Export')) entries.push({
-    label: 'Export',
-    action: () => handleOpenExport(),
-  });
 
   return (
     <>
       {actions.length > 0 && <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />}
-      {actions.includes('Duplicate')
-        && (
-          <DialogDuplicate
-            open={duplicate}
-            handleClose={handleCloseDuplicate}
-            handleSubmit={submitDuplicate}
-            text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
-          />
-        )}
       {actions.includes(('Update'))
         && (
           <ScenarioUpdate
@@ -119,13 +110,13 @@ const ScenarioPopover: FunctionComponent<Props> = ({
             handleClose={handleCloseEdit}
           />
         )}
-      {actions.includes('Delete')
+      {actions.includes('Duplicate')
         && (
-          <DialogDelete
-            open={deletion}
-            handleClose={handleCloseDelete}
-            handleSubmit={submitDelete}
-            text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
+          <DialogDuplicate
+            open={duplicate}
+            handleClose={handleCloseDuplicate}
+            handleSubmit={submitDuplicate}
+            text={`${t('Do you want to duplicate this scenario:')} ${scenario.scenario_name} ?`}
           />
         )}
       {actions.includes('Export')
@@ -136,6 +127,15 @@ const ScenarioPopover: FunctionComponent<Props> = ({
             onCancel={handleCloseExport}
             onClose={handleCloseExport}
             onSubmit={submitExport}
+          />
+        )}
+      {actions.includes('Delete')
+        && (
+          <DialogDelete
+            open={deletion}
+            handleClose={handleCloseDelete}
+            handleSubmit={submitDelete}
+            text={`${t('Do you want to delete this scenario:')} ${scenario.scenario_name} ?`}
           />
         )}
     </>

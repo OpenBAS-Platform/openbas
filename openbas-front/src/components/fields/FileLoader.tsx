@@ -159,12 +159,12 @@ const FileLoader: FunctionComponent<Props> = ({
       action: handleOpen,
     },
     {
-      label: 'Remove',
-      action: handleRemove,
-    },
-    {
       label: 'Download',
       action: () => handleDownload(selectedDocument?.document_id),
+    },
+    {
+      label: 'Remove',
+      action: handleRemove,
     },
   ];
 
