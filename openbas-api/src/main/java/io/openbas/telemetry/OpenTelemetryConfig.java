@@ -19,8 +19,9 @@ import io.opentelemetry.sdk.resources.ResourceBuilder;
 import io.opentelemetry.semconv.ServerAttributes;
 import io.opentelemetry.semconv.ServiceAttributes;
 import jakarta.validation.constraints.NotBlank;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.IOException;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Arrays;
 import lombok.Getter;
@@ -53,6 +54,11 @@ public class OpenTelemetryConfig {
     log.info("Start telemetry");
     log.info("Telemetry - Using collect interval: " + collectInterval);
     log.info("Telemetry - Using export interval: " + exportInterval);
+
+    if (!isEndpointReachable(getOTELEndpoint())) {
+      return OpenTelemetry.noop();
+    }
+
     Resource resource = buildResource();
 
     // Set OTLP Exporter
@@ -84,14 +90,42 @@ public class OpenTelemetryConfig {
   // -- PRIVATE --
   private String getOTELEndpoint() {
     String endpoint = "https://telemetry.filigran.io/v1/metrics";
-
     if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
         || Arrays.asList(environment.getActiveProfiles()).contains("ci")) {
       endpoint = "https://telemetry.staging.filigran.io/v1/metrics";
     }
-
-    log.info("Telemetry - Using telemetry endpoint: " + endpoint);
     return endpoint;
+  }
+
+  private boolean isEndpointReachable(String url) {
+    try {
+      URL endpoint = new URL(url);
+      HttpURLConnection req = (HttpURLConnection) endpoint.openConnection();
+      req.setRequestMethod("POST");
+      req.setDoOutput(true);
+      req.setConnectTimeout(3000);
+      req.setReadTimeout(3000);
+      req.setRequestProperty("Content-Type", "application/json");
+      req.getOutputStream().write("{}".getBytes(StandardCharsets.UTF_8)); // Send empty JSON body
+
+      int responseCode = req.getResponseCode();
+
+      if (responseCode != 200) {
+        log.severe(
+            "Telemetry - Failed to reach OTLP endpoint: "
+                + url
+                + " with response code: "
+                + responseCode);
+        return false;
+      } else {
+        log.info("Telemetry - Successfully reached OTLP endpoint: " + url);
+        return true;
+      }
+
+    } catch (IOException e) {
+      log.severe("Telemetry - Failed to reach OTLP endpoint: " + url);
+      return false;
+    }
   }
 
   private Resource buildResource() {
