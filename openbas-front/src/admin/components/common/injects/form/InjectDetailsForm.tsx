@@ -230,7 +230,7 @@ const InjectDetailsForm = ({
           newContent[field.key] = data[field.key];
         }
       });
-    return isEmptyField(newContent) ? null : newContent;
+    return isEmptyField(newContent) ? {} : newContent;
   };
 
   const onSubmit = async (data: Record<string, FieldValue>) => {
