@@ -1,9 +1,8 @@
 import { ContentCopyOutlined, DownloadingOutlined, TerminalOutlined } from '@mui/icons-material';
-import { Alert, Button, Card, CardActionArea, CardContent, Dialog, DialogContent, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Select, Tab, Tabs, Typography } from '@mui/material';
+import { Alert, Button, Card, CardActionArea, CardContent, Dialog, DialogContent, DialogTitle, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Radio, RadioGroup, Select, Step, StepButton, Stepper, Tab, Tabs, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Bash, DownloadCircleOutline, Powershell } from 'mdi-material-ui';
-import * as R from 'ramda';
-import { type SyntheticEvent, useState } from 'react';
+import { useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchExecutors } from '../../../actions/Executor';
@@ -12,6 +11,7 @@ import { type MeTokensHelper } from '../../../actions/helper';
 import { meTokens } from '../../../actions/User';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Transition from '../../../components/common/Transition';
+import ExecutorBanner from '../../../components/ExecutorBanner';
 import { useFormatter } from '../../../components/i18n';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { useHelper } from '../../../store';
@@ -28,26 +28,35 @@ const useStyles = makeStyles()(() => ({
     height: 250,
   },
   area: {
-    width: '100%',
     height: '100%',
+    width: '100%',
   },
   content: {
     position: 'relative',
-    padding: 20,
+    padding: 0,
     textAlign: 'center',
+    height: '100%',
   },
-  icon: { padding: 0 },
 }));
+
+const USER = 'user';
+const OPENBAS_CALDERA = 'openbas_caldera';
+const OPENBAS_AGENT = 'openbas_agent';
+const WINDOWS = 'Windows';
+const MACOS = 'MacOS';
+const LINUX = 'Linux';
 
 const Executors = () => {
   // Standard hooks
   const theme = useTheme();
   const { t } = useFormatter();
   const [platform, setPlatform] = useState<null | string>(null);
-  const [selectedExecutors, setSelectedExecutors] = useState<null | Executor[]>(null);
-  const [activeTab, setActiveTab] = useState<null | string>(null);
+  const [selectedExecutor, setSelectedExecutor] = useState<null | Executor>(null);
   const [agentFolder, setAgentFolder] = useState<null | string>(null);
   const [arch, setArch] = useState<string>('x86_64');
+  const [activeStep, setActiveStep] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(USER);
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
 
@@ -61,44 +70,56 @@ const Executors = () => {
     dispatch(fetchExecutors());
     dispatch(meTokens());
   });
-  const userToken = tokens.length > 0 ? R.head(tokens) : undefined;
+  const userToken = tokens.length > 0 ? tokens[0] : undefined;
   const order = {
-    openbas_agent: 1,
-    openbas_caldera: 2,
-    openbas_tanium: 3,
+    openbas_agent: 0,
+    openbas_caldera: 1,
+    openbas_tanium: 2,
+    openbas_crowdstrike: 3,
   };
-  const sortedExecutors = executors.map((executor: Executor) => ({
-    ...executor,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    order: order[executor.executor_type],
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-  })).sort(({ order: a }, { order: b }) => a - b);
-  const windowsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Windows'));
-  const linuxExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('Linux'));
-  const macOsExecutors = sortedExecutors.filter((executor: Executor) => executor.executor_platforms?.includes('MacOS'));
 
-  // Selection
-  const handleTabChange = (_: SyntheticEvent, newValue: string) => {
+  const sortedExecutors = executors
+    .map((executor: Executor) => ({
+      ...executor,
+      order: order[executor.executor_type as keyof typeof order],
+    }))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .sort((a: any, b: any) => a.order - b.order);
+
+  // -- Manage Dialogs
+  const steps = [t('Choose your platform'), t('Installation Instructions')];
+  const handlePlatformSelection = (platformSelected: string) => {
+    setPlatform(platformSelected);
+    setActiveStep(1);
+  };
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
-  const openInstall = (selectedPlatform: string, openExecutors: Executor[]) => {
-    setPlatform(selectedPlatform);
-    setSelectedExecutors(openExecutors);
-    setActiveTab((openExecutors ?? []).at(0)?.executor_type ?? null);
+  const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedOption(event.target.value);
+  };
+  const openInstall = (executor: Executor) => {
+    setSelectedExecutor(executor);
   };
   const closeInstall = () => {
     setPlatform(null);
-    setSelectedExecutors(null);
-    setActiveTab(null);
+    setSelectedExecutor(null);
+    setActiveStep(0);
+    setActiveTab(0);
+    setSelectedOption(USER);
     setAgentFolder(null);
     setArch('x86_64');
   };
-  const currentSelectedExecutor = (selectedExecutors ?? []).filter(executor => executor.executor_type === activeTab).at(0);
-  const platformSelector = () => {
+
+  // -- Stepper components --
+  const buildInstallationUrl = (baseUrl: string) => {
+    if (activeTab === 0) return `${baseUrl}/session-user/${userToken?.token_value}`;
+    if (activeTab === 1 && selectedOption === USER) return `${baseUrl}/service-user/${userToken?.token_value}`;
+    return `${baseUrl}/service/${userToken?.token_value}`;
+  };
+  const buildCalderaInstaller = () => {
     switch (platform) {
-      case 'windows':
+      case WINDOWS:
         return {
           icon: <Powershell />,
           label: 'powershell',
@@ -126,7 +147,7 @@ Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OB
 schtasks /create /tn OpenBASCaldera /sc onlogon /rl highest /tr "Powershell -ExecutionPolicy Bypass -NoProfile -WindowStyle hidden -File 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' $server";`,
           code: `$server="${settings.executor_caldera_public_url}";$url="${settings.platform_base_url}/api/implant/caldera/windows/${arch}";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);get-process | ? {$_.modules.filename -like '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe'} | stop-process -f;rm -force '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ea ignore;New-Item -ItemType Directory -Force -Path '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}' | Out-Null;[io.file]::WriteAllBytes('${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe',$data) | Out-Null;$data=$wc.DownloadData($url + "/ps1");rm -force 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' -ea ignore;[io.file]::WriteAllBytes('C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1',$data) | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Inbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;New-NetFirewallRule -DisplayName "Allow OpenBAS" -Direction Outbound -Program '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -Action Allow | Out-Null;Start-Process -FilePath '${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera'}\\obas-agent-caldera.exe' -ArgumentList "-server $server -group red" -WindowStyle hidden;schtasks /create /tn OpenBASCaldera /sc onlogon /rl highest /tr "Powershell -ExecutionPolicy Bypass -NoProfile -WindowStyle hidden -File 'C:\\Program Files (x86)\\Filigran\\OBAS Caldera\\obas-agent-caldera.ps1' $server";`,
         };
-      case 'linux':
+      case LINUX:
         return {
           icon: <Bash />,
           label: 'sh',
@@ -144,7 +165,7 @@ chmod +x ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent;
 nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -server $server -group red &`,
           code: `server="${settings.executor_caldera_public_url}";mkdir -p ${agentFolder ?? '/opt/openbas-caldera-agent'};curl -s -X GET ${settings.platform_base_url}/api/implant/caldera/linux/${arch} > ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent;chmod +x ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent;nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -server $server -group red &`,
         };
-      case 'macos':
+      case MACOS:
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
@@ -178,74 +199,305 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
         };
     }
   };
-  const platformAgentSelector = () => {
+  const buildOpenBASInstaller = () => {
+    const buildExtraParams = (advanced: string, standard: string, other: string) => {
+      let result = other;
+      if (activeTab === 1 && selectedOption === USER) {
+        result = advanced;
+      } else if (activeTab === 0) {
+        result = standard;
+      }
+      return result;
+    };
+
+    const buildExclusionPath = (advanced: string, standard: string, other: string) => {
+      let result = other;
+      if (agentFolder) {
+        return agentFolder; // If agentFolder is truthy, return it immediately
+      }
+      if (activeTab === 1 && selectedOption !== USER) {
+        result = advanced;
+      } else if (activeTab === 0) {
+        result = standard;
+      }
+      return result;
+    };
+
     switch (platform) {
-      case 'windows':
+      case WINDOWS:
         return {
           icon: <Powershell />,
           label: 'powershell',
-          defaultAgentFolder: 'C:\\Program Files (x86)\\Filigran\\OBAS Agent',
-          exclusions: `${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Agent'}
-${agentFolder ?? 'C:\\Program Files (x86)\\Filigran\\OBAS Agent'}\\openbas-agent.exe
+          exclusions: `${buildExclusionPath('C:\\Program Files (x86)\\Filigran\\OBAS Agent', 'C:\\Filigran', 'C:\\Filigran')}
 
 Caldera injector hashes:
 MD5: 68c1795fb45cb9b522d6cf48443fdc37
 SHA1: 5f87d06f818ff8cba9e11e8cd1c6f9d990eca0f8
 SHA256: 6b180913acb8cdac3fb8d3154a2f6a0bed13c056a477f4f94c4679414ec13b9f
 SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd58d36058d7cde405bc8c5084f3ac060a6080bfc18a843738d3bee87fd`,
-          displayedCode: `iex (iwr "${settings.platform_base_url}/api/agent/installer/openbas/windows/${userToken?.token_value}").Content`,
-          code: `iex (iwr "${settings.platform_base_url}/api/agent/installer/openbas/windows/${userToken?.token_value}").Content`,
+          displayedCode: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-User USER -Password PASSWORD', '', '')}).Content`,
+          code: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}${buildExtraParams('-User USER -Password PASSWORD', '', '')}).Content`,
         };
-      case 'linux':
+      case LINUX:
         return {
           icon: <Bash />,
           label: 'sh',
-          defaultAgentFolder: '/opt/openbas-agent',
-          exclusions: `${agentFolder ?? '/opt/openbas-agent'}
-${agentFolder ?? '/opt/openbas-agent/openbas-agent'}
-
+          exclusions: `${buildExclusionPath('/opt/openbas-agent', '$HOME/.local/openbas-agent-session', '/opt/openbas-agent-service-USER')}
+          
 Caldera injector hashes:
 MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${settings.platform_agent_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
-          code: `curl -s ${settings.platform_agent_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
         };
-      case 'macos':
+      case MACOS:
         return {
           icon: <TerminalOutlined />,
           label: 'sh',
-          defaultAgentFolder: '/opt/openbas-agent',
-          exclusions: `${agentFolder ?? '/opt/openbas-agent'}
-${agentFolder ?? '/opt/openbas-agent/openbas-agent'}
-
+          exclusions: `${buildExclusionPath('/opt/openbas-agent', '$HOME/.local/openbas-agent-session', '/opt/openbas-agent-service-USER')}
+          
 Caldera injector hashes:
 MD5: 1132906cc40001f51673108847b88d0c
 SHA1: 3177df4a8fa13a2e13ce63670c579955ad55df3f
 SHA256: 2b4397160925bf6b9dcca0949073fd9b2fc590ab641ea1d1c3d7d36048ed674a
 SHA512: f1c8cf0c41c7d193bcb2aad21d7a739c785902c3231e15986b2eb37f911824a802f50cb2dbb509deba1c7a2a535fb7b34cf100303c61a6087102948628133747`,
-          displayedCode: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/macos/${userToken?.token_value} | sudo sh`,
-          code: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/macos/${userToken?.token_value} | sudo sh`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/macos')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
         };
       default:
         return {
           icon: <Bash />,
           label: 'sh',
-          defaultAgentFolder: '/opt/openbas-agent',
-          exclusions: `${agentFolder ?? '/opt/openbas-agent'}
-${agentFolder ?? '/opt/openbas-agent/openbas-agent'}
+          exclusions: `${buildExclusionPath('/opt/openbas-agent', '$HOME/.local/openbas-agent-session', '/opt/openbas-agent-service-USER')}
 
 Caldera injector hashes:
 MD5: d604c952bb3c6d96621594d39992c499
 SHA1: 5b6087f87f5f2ae129f888bba799611836eb39a2
 SHA256: 98d1e64445bbef46a36d4724699a386646de78881a1b6f2b346122c76d696c12
 SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518a2be40f1a42226c68cbf5e779382a37ee5baa7dd7c538ec73ce059e8`,
-          displayedCode: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
-          code: `curl -s ${settings.platform_base_url}/api/agent/installer/openbas/linux/${userToken?.token_value} | sudo sh`,
+          displayedCode: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
+          code: `curl -s ${buildInstallationUrl(settings.platform_agent_url + '/api/agent/installer/openbas/linux')} ${buildExtraParams(' | sudo sh -s -- --user USER --group GROUP', '| sh', '| sudo sh')}`,
         };
     }
   };
+  const ArchitectureFormControl = () => {
+    if (platform !== MACOS) return null;
+
+    return (
+      <FormControl style={{
+        width: '100%',
+        margin: theme.spacing(1, 0),
+      }}
+      >
+        <InputLabel id="arch">{t('Architecture')}</InputLabel>
+        <Select
+          labelId="arch"
+          value={arch}
+          onChange={event => setArch(event.target.value ?? 'x86_64')}
+          fullWidth
+        >
+          <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
+          <MenuItem value="arm64">{t('arm64')}</MenuItem>
+        </Select>
+      </FormControl>
+    );
+  };
+  const StepOneInstallation = () => {
+    return (
+      <Typography variant="h2" style={{ marginTop: theme.spacing(3) }}>
+        {t('Step 1 - Install the agent')}
+      </Typography>
+    );
+  };
+  const StepTwoExclusions = () => {
+    const exclusions = selectedExecutor?.executor_type === OPENBAS_CALDERA ? buildCalderaInstaller().exclusions : buildOpenBASInstaller().exclusions;
+    return (
+      <>
+        <Typography variant="h2" style={{ marginTop: 20 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
+        <p>
+          {t('You will need to add proper antivirus exclusions for this agent (to ensure injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
+        </p>
+        <pre style={{ margin: '20px 0 10px 0' }}>{exclusions}</pre>
+      </>
+    );
+  };
+  const InstallationScriptsAndActionButtons = () => {
+    const fileExtension = platform === WINDOWS ? 'ps1' : 'sh';
+    const code = selectedExecutor?.executor_type === OPENBAS_CALDERA ? buildCalderaInstaller().code : buildOpenBASInstaller().code;
+    const displayedCode = selectedExecutor?.executor_type === OPENBAS_CALDERA ? buildCalderaInstaller().displayedCode : buildOpenBASInstaller().displayedCode;
+
+    const buildInstallationMessage = () => {
+      let message = '';
+      if (selectedExecutor?.executor_type === OPENBAS_AGENT) {
+        if (activeTab === 0) {
+          message = platform === WINDOWS
+            ? t('Run the following PowerShell snippet in a standard prompt or download the .ps1 script.')
+            : t('Run the following bash snippet in a terminal or download the .sh script.');
+        } else {
+          if (platform === WINDOWS) {
+            if (selectedOption === USER) {
+              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script.') + (' ')
+                + t('It can be run as administrator or as a standard user depending on the user rights used in the script parameters.');
+            } else {
+              message = t('To install, copy and paste the following PowerShell snippet into an elevated prompt or download the .ps1 script and run it with administrator privileges.') + (' ')
+                + t('Installing it as a system grants system-wide privileges.');
+            }
+          } else {
+            if (selectedOption === USER) {
+              message = t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script and run it as root.')
+                + (' ')
+                + t('It can be run as administrator or as a standard user depending on the user rights used in the script parameters.');
+            } else {
+              message = t('To install, copy and paste the following bash snippet into a terminal with root privileges, or download the .sh script and run it as root.') + (' ')
+                + t(`Installing it as a system grants system-wide privileges.`);
+            }
+          }
+        }
+      } else {
+        if (platform === WINDOWS) {
+          message = t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).');
+        } else {
+          message = t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).');
+        }
+      }
+      return (
+        <p>
+          {message}
+          {' '}
+        </p>
+      );
+    };
+
+    return (
+      <>
+        {buildInstallationMessage()}
+        {selectedExecutor?.executor_type === OPENBAS_CALDERA && platform !== WINDOWS && (
+          <Alert variant="outlined" severity="warning">
+            {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
+          </Alert>
+        )}
+        <pre style={{ margin: '20px 0 10px 0' }}>{displayedCode}</pre>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 8,
+        }}
+        >
+          <Button
+            variant="outlined"
+            style={{ marginBottom: theme.spacing(2) }}
+            startIcon={<ContentCopyOutlined />}
+            onClick={() => copyToClipboard(t, code)}
+          >
+            {t('Copy')}
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ marginBottom: theme.spacing(2) }}
+            startIcon={<DownloadCircleOutline />}
+            onClick={() => download(displayedCode, `openbas.${fileExtension}`, 'text/plain')}
+          >
+            {t('Download')}
+          </Button>
+        </div>
+      </>
+    );
+  };
+  const PlatformInstallationForCaldera = () => {
+    return (
+      <>
+        {platform === WINDOWS && (<InstallationScriptsAndActionButtons />)}
+        {platform !== WINDOWS && (<InstallationScriptsAndActionButtons />)}
+      </>
+    );
+  };
+  const StandardInstallation = () => {
+    return (
+      <>
+        {platform && (
+          <>
+            <Alert
+              variant="outlined"
+              severity="info"
+              style={{ marginTop: theme.spacing(2) }}
+            >
+              {t('The agent runs in the background as a session and only executes when the user is logged in and active. It can run as an administrator or a standard user.')}
+              {' '}
+              {t('For further details, refer to the')}
+              {' '}
+              <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
+                {selectedExecutor?.executor_name}
+                {' '}
+                {t('documentation.')}
+              </a>
+            </Alert>
+            <p>
+              {t('Install the agent using your own user account.')}
+              {' '}
+              {platform === WINDOWS && t('It can be run as administrator or as a standard user, depending on the PowerShell elevation.')}
+              {platform !== WINDOWS && t('This installation requires only local standard privileges.')}
+            </p>
+            <StepOneInstallation />
+            <InstallationScriptsAndActionButtons />
+          </>
+        )}
+      </>
+    );
+  };
+  const AdvancedInstallation = () => {
+    return (
+      <>
+        <Alert
+          variant="outlined"
+          severity="info"
+          style={{ marginTop: theme.spacing(2) }}
+        >
+          {t('The agent runs in the background as a service and starts automatically when the machine powers on.')}
+          {' '}
+          {t('For further details, refer to the')}
+          {' '}
+          <a target="_blank" href={selectedExecutor?.executor_doc} rel="noreferrer">
+            {selectedExecutor?.executor_name}
+            {' '}
+            {t('documentation.')}
+          </a>
+        </Alert>
+        <p>
+          {t('Install the agent as a user or a system service. This installation requires local administrator privileges.')}
+        </p>
+        <StepOneInstallation />
+        <div>
+          <RadioGroup
+            value={selectedOption}
+            onChange={handleOptionChange}
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: '20px',
+            }}
+          >
+            <FormControlLabel value="user" control={<Radio />} label={t('Install Agent as User')} />
+            <FormControlLabel value="system" control={<Radio />} label={t('Install Agent as System')} />
+          </RadioGroup>
+        </div>
+        {selectedOption === USER && platform === WINDOWS && (
+          <Alert
+            variant="outlined"
+            severity="info"
+            style={{ marginTop: theme.spacing(1) }}
+          >
+            {t('You should add "Log on as a service" policy if you are installing as a user.')}
+          </Alert>
+        )}
+        {platform && (
+          <InstallationScriptsAndActionButtons />
+        )}
+      </>
+    );
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -255,7 +507,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           current: true,
         }]}
       />
-      <Alert variant="outlined" severity="info" style={{ marginBottom: 30 }}>
+      <Alert variant="outlined" severity="info" style={{ marginBottom: theme.spacing(2) }}>
         {t('Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.')}
         <br />
         <br />
@@ -264,302 +516,179 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">{t('in the documentation')}</a>
         .
       </Alert>
-      <Grid container={true} spacing={3}>
-        <Grid item={true} xs={4}>
-          <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('windows', windowsExecutors)} disabled={windowsExecutors.length === 0}>
-              <CardContent className={classes.content}>
-                <div className={classes.icon}>
-                  <PlatformIcon platform="Windows" />
-                </div>
-                <Typography
-                  variant="h6"
-                  style={{
-                    fontSize: 15,
-                    margin: '20px 0 40px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: windowsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
-                  }}
+      <Grid container spacing={3}>
+        {sortedExecutors.map((executor: Executor) => {
+          const platforms = executor.executor_platforms || [];
+          return (
+            <Grid item xs={3} key={executor.executor_id}>
+              <Card classes={{ root: classes.card }} variant="outlined">
+                <CardActionArea
+                  classes={{ root: classes.area }}
+                  onClick={() => openInstall(executor)}
+                  disabled={platforms.length === 0}
                 >
-                  <DownloadingOutlined style={{ marginRight: 10 }} />
-                  {' '}
-                  {t('Install Windows Agent')}
-                </Typography>
-                <div style={{
-                  position: 'absolute',
-                  width: '100%',
-                  right: 0,
-                  bottom: 10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                >
-                  {windowsExecutors.map((executor: Executor) => {
-                    return (
-                      <img
-                        key={executor.executor_id}
-                        src={`/api/images/executors/${executor.executor_type}`}
-                        alt={executor.executor_type}
+                  <CardContent classes={{ root: classes.content }}>
+                    <ExecutorBanner executor={executor.executor_type} label={executor.executor_name} height={150} />
+                    <div>
+                      <Typography
+                        variant="h6"
                         style={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: 4,
-                          margin: '0 10px 0 10px',
+                          fontSize: 15,
+                          padding: theme.spacing(2, 0, 1),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: platforms.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
                         }}
-                      />
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-        <Grid item={true} xs={4}>
-          <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('linux', linuxExecutors)} disabled={linuxExecutors.length === 0}>
-              <CardContent className={classes.content}>
-                <div className={classes.icon}>
-                  <PlatformIcon platform="Linux" />
-                </div>
-                <Typography
-                  variant="h6"
-                  style={{
-                    fontSize: 15,
-                    margin: '20px 0 40px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: linuxExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
-                  }}
-                >
-                  <DownloadingOutlined style={{ marginRight: 10 }} />
-                  {' '}
-                  {t('Install Linux Agent')}
-                </Typography>
-                <div style={{
-                  position: 'absolute',
-                  width: '100%',
-                  right: 0,
-                  bottom: 10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                >
-                  {linuxExecutors.map((executor: Executor) => {
-                    return (
-                      <img
-                        key={executor.executor_id}
-                        src={`/api/images/executors/${executor.executor_type}`}
-                        alt={executor.executor_type}
+                      >
+                        {t('Install')}
+                        {' '}
+                        {executor.executor_name}
+                      </Typography>
+                      <div
                         style={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: 4,
-                          margin: '0 10px 0 10px',
+                          position: 'absolute',
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                         }}
-                      />
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-        <Grid item={true} xs={4}>
-          <Card classes={{ root: classes.card }} variant="outlined">
-            <CardActionArea classes={{ root: classes.area }} onClick={() => openInstall('macos', macOsExecutors)} disabled={macOsExecutors.length === 0}>
-              <CardContent className={classes.content}>
-                <div className={classes.icon}>
-                  <PlatformIcon platform="MacOS" />
-                </div>
-                <Typography
-                  variant="h6"
-                  style={{
-                    fontSize: 15,
-                    margin: '20px 0 40px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: macOsExecutors.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
-                  }}
-                >
-                  <DownloadingOutlined style={{ marginRight: 10 }} />
-                  {' '}
-                  {t('Install MacOS Agent')}
-                </Typography>
-                <div style={{
-                  position: 'absolute',
-                  width: '100%',
-                  right: 0,
-                  bottom: 10,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                >
-                  {macOsExecutors.map((executor: Executor) => {
-                    return (
-                      <img
-                        key={executor.executor_id}
-                        src={`/api/images/executors/${executor.executor_type}`}
-                        alt={executor.executor_type}
-                        style={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: 4,
-                          margin: '0 10px 0 10px',
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
+                      >
+                        {platforms.map(platform => (
+                          <div
+                            key={platform}
+                            style={{
+                              margin: theme.spacing(0, 1),
+                              padding: theme.spacing(1),
+                              border: '1px solid',
+                              borderRadius: '4px',
+                              borderColor: '#292D39',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <PlatformIcon platform={platform} width={20} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
       <Dialog
-        open={platform !== null}
+        open={selectedExecutor !== null}
         TransitionComponent={Transition}
         onClose={closeInstall}
-        PaperProps={{ elevation: 1 }}
-        fullWidth={true}
+        slotProps={{ paper: { elevation: 1 } }}
+        fullWidth
         maxWidth="md"
       >
-        <DialogTitle>{t('Install a simulation agent')}</DialogTitle>
+        <DialogTitle style={{ padding: theme.spacing(6, 4, 5, 5) }}>
+          {selectedExecutor?.executor_name}
+          {' '}
+          {t('Installation')}
+        </DialogTitle>
         <DialogContent>
-          <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
-            {(selectedExecutors ?? []).map((executor) => {
-              return (
-                <Tab key={executor.executor_id} label={executor.executor_name} value={executor.executor_type} />
-              );
-            })}
-          </Tabs>
-          {currentSelectedExecutor && (
-            <div style={{ marginTop: 20 }}>
-              {currentSelectedExecutor.executor_type === 'openbas_caldera' && (
-                <div style={{ marginTop: 20 }}>
-                  {platform === 'macos' && (
-                    <FormControl style={{ width: '100%' }}>
-                      <InputLabel id="arch">{t('Architecture')}</InputLabel>
-                      <Select
-                        labelId="arch"
-                        value={arch}
-                        onChange={event => setArch(event.target.value ?? 'x86_64')}
-                        fullWidth={true}
-                      >
-                        <MenuItem value="x86_64">{t('x86_64')}</MenuItem>
-                        <MenuItem value="arm64">{t('arm64')}</MenuItem>
-                      </Select>
-                    </FormControl>
-                  )}
-                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
-                  <Alert variant="outlined" severity="info">
-                    {t('Installing the agent is requiring local administrator privileges.')}
-                  </Alert>
-                  {platform === 'windows' && (
-                    <>
-                      <p>
-                        {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
-                      </p>
-                      <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                      >
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
+          {(selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA)
+            && (
+              <>
+                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 3) }}>
+                  {steps.map((label, index) => (
+                    <Step key={label}>
+                      <StepButton color="inherit" onClick={() => setActiveStep(index)}>{label}</StepButton>
+                    </Step>
+                  ))}
+                </Stepper>
+                {activeStep === 0 && (
+                  <div>
+                    <Grid container spacing={1}>
+                      {selectedExecutor?.executor_platforms
+                        && selectedExecutor?.executor_platforms.map(platform => (
+                          <Grid item xs={4} key={platform}>
+                            <Card
+                              variant="outlined"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: '300px',
+                                margin: '0 15px 80px',
+                              }}
+                            >
+                              <CardActionArea onClick={() => handlePlatformSelection(platform)} classes={{ root: classes.area }}>
+                                <CardContent>
+                                  <div
+                                    key={platform}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <PlatformIcon platform={platform} width={30} />
+                                  </div>
+                                  <Typography
+                                    style={{
+                                      fontSize: 15,
+                                      padding: theme.spacing(3, 0),
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    <DownloadingOutlined style={{ marginRight: theme.spacing(1) }} />
+                                    {t('Install {platform} agent', { platform })}
+                                  </Typography>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </Grid>
+                        ))}
+                    </Grid>
+                  </div>
+                )}
+                {activeStep === 1 && platform && (
+                  <div>
+                    {selectedExecutor && (
+                      <div style={{ padding: theme.spacing(0, 2, 1, 2) }}>
+                        {/* Caldera */}
+                        {selectedExecutor.executor_type === OPENBAS_CALDERA && (
+                          <div>
+                            <ArchitectureFormControl />
+                            <StepOneInstallation />
+                            <Alert variant="outlined" severity="info">
+                              {t('Installing the agent is requiring local administrator privileges.')}
+                            </Alert>
+                            <PlatformInstallationForCaldera />
+                            <StepTwoExclusions />
+                          </div>
+                        )}
+
+                        {/* OBAS */}
+                        {selectedExecutor && selectedExecutor.executor_type === OPENBAS_AGENT && (
+                          <div>
+                            <Tabs value={activeTab} onChange={handleTabChange}>
+                              <Tab label={t('Standard Installation')} />
+                              <Tab label={t('Advanced Installation')} />
+                            </Tabs>
+                            {activeTab === 0 && (<StandardInstallation />)}
+                            {activeTab === 1 && (<AdvancedInstallation />)}
+                            <StepTwoExclusions />
+                          </div>
+                        )}
                       </div>
-                    </>
-                  )}
-                  {platform !== 'windows' && (
-                    <>
-                      <p>
-                        {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
-                      </p>
-                      <Alert variant="outlined" severity="warning">
-                        {t('For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.')}
-                      </Alert>
-                      <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().displayedCode}</pre>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                      >
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformSelector().code)}>{t('Copy')}</Button>
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
-                      </div>
-                    </>
-                  )}
-                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
-                  <Alert variant="outlined" severity="info">
-                    {t('The agent will never execute directly any payload.')}
-                  </Alert>
-                  <p>
-                    {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
-                  </p>
-                  <pre style={{ margin: '20px 0 10px 0' }}>{platformSelector().exclusions}</pre>
-                </div>
-              )}
-              {currentSelectedExecutor.executor_type === 'openbas_agent' && (
-                <div style={{ marginTop: 20 }}>
-                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 1 - Install the agent')}</Typography>
-                  <Alert variant="outlined" severity="info">
-                    {t('Installing the agent is requiring local administrator privileges.')}
-                  </Alert>
-                  {platform === 'windows' && (
-                    <>
-                      <p>
-                        {t('You can whether directly copy and paste the following Powershell snippet in an elevated prompt or download the .ps1 script (and execute it as an administrator).')}
-                      </p>
-                      <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                      >
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.ps1', 'text/plain')}>{t('Download')}</Button>
-                      </div>
-                    </>
-                  )}
-                  {platform !== 'windows' && (
-                    <>
-                      <p>
-                        {t('You can whether directly copy and paste the following bash snippet in a root console or download the .sh script (and execute it as root).')}
-                      </p>
-                      <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().displayedCode}</pre>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        gap: 8,
-                      }}
-                      >
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<ContentCopyOutlined />} onClick={() => copyToClipboard(t, platformAgentSelector().code)}>{t('Copy')}</Button>
-                        <Button variant="outlined" style={{ marginBottom: 20 }} startIcon={<DownloadCircleOutline />} onClick={() => download(platformAgentSelector().displayedCode, 'openbas.sh', 'text/plain')}>{t('Download')}</Button>
-                      </div>
-                    </>
-                  )}
-                  <Typography variant="h2" style={{ marginTop: 30 }}>{t('Step 2 - Add antivirus exclusions')}</Typography>
-                  <Alert variant="outlined" severity="info">
-                    {t('The agent will never execute directly any payload.')}
-                  </Alert>
-                  <p>
-                    {t('You will need to add proper antivirus exclusions for this agent (to ensure Caldera injects execution to work properly). It may not be necessary in the future but this is generally a good practice to ensure the agent will be always available.')}
-                  </p>
-                  <pre style={{ margin: '20px 0 10px 0' }}>{platformAgentSelector().exclusions}</pre>
-                </div>
-              )}
-              <ExecutorDocumentationLink executor={currentSelectedExecutor} />
-            </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          {selectedExecutor?.executor_type !== OPENBAS_AGENT && selectedExecutor?.executor_type !== OPENBAS_CALDERA && selectedExecutor && (
+            <ExecutorDocumentationLink executor={selectedExecutor} />
           )}
         </DialogContent>
       </Dialog>
