@@ -534,7 +534,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                         variant="h6"
                         style={{
                           fontSize: 15,
-                          padding: '10px 0',
+                          padding: theme.spacing(2, 0, 1),
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -558,8 +558,8 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                           <div
                             key={platform}
                             style={{
-                              margin: '0 5px',
-                              padding: '5px',
+                              margin: theme.spacing(0, 1),
+                              padding: theme.spacing(1),
                               border: '1px solid',
                               borderRadius: '4px',
                               borderColor: '#292D39',
@@ -588,7 +588,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
         fullWidth
         maxWidth="md"
       >
-        <DialogTitle style={{ padding: '40px 40px 30px' }}>
+        <DialogTitle style={{ padding: theme.spacing(6, 4, 5, 5) }}>
           {selectedExecutor?.executor_name}
           {' '}
           {t('Installation')}
@@ -597,7 +597,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           {(selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA)
             && (
               <>
-                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 4) }}>
+                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 3) }}>
                   {steps.map((label, index) => (
                     <Step key={label}>
                       <StepButton color="inherit" onClick={() => setActiveStep(index)}>{label}</StepButton>
@@ -635,7 +635,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                                   <Typography
                                     style={{
                                       fontSize: 15,
-                                      padding: '15px 0',
+                                      padding: theme.spacing(3, 0),
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
@@ -655,7 +655,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 {activeStep === 1 && platform && (
                   <div>
                     {selectedExecutor && (
-                      <div style={{ padding: theme.spacing(0, 1, 1) }}>
+                      <div style={{ padding: theme.spacing(0, 2, 1, 2) }}>
                         {/* Caldera */}
                         {selectedExecutor.executor_type === OPENBAS_CALDERA && (
                           <div>
