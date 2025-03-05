@@ -25,13 +25,7 @@ const MenuItemGroup: FunctionComponent<Props> = ({ item, state, helpers }) => {
   const { navOpen, selectedMenu, anchors } = state;
   const { handleSelectedMenuOpen, handleSelectedMenuClose, handleSelectedMenuToggle, handleGoToPage } = helpers;
 
-  let isCurrentTab;
-  if (navOpen) {
-    isCurrentTab = location.pathname === item.path;
-  } else {
-    const parentPathname = location.pathname.split('/').slice(0, -1).join('/');
-    isCurrentTab = parentPathname === item.path;
-  }
+  const isCurrentTab = navOpen ? location.pathname === item.path : location.pathname.startsWith(item.path);
 
   return (
     <>
