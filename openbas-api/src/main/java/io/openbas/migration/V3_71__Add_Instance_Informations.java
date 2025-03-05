@@ -12,7 +12,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_69__Add_Instance_Informations extends BaseJavaMigration {
+public class V3_71__Add_Instance_Informations extends BaseJavaMigration {
   @Override
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
