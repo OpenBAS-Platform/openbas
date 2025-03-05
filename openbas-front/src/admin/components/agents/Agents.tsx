@@ -597,7 +597,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
           {(selectedExecutor?.executor_type === OPENBAS_AGENT || selectedExecutor?.executor_type === OPENBAS_CALDERA)
             && (
               <>
-                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 2) }}>
+                <Stepper activeStep={activeStep} style={{ padding: theme.spacing(0, 1, 4) }}>
                   {steps.map((label, index) => (
                     <Step key={label}>
                       <StepButton color="inherit" onClick={() => setActiveStep(index)}>{label}</StepButton>
@@ -606,15 +606,6 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 </Stepper>
                 {activeStep === 0 && (
                   <div>
-                    <Typography
-                      style={{
-                        fontSize: 15,
-                        padding: '10px 18px',
-                        marginBottom: theme.spacing(4),
-                      }}
-                    >
-                      {t('Choose your platform')}
-                    </Typography>
                     <Grid container spacing={1}>
                       {selectedExecutor?.executor_platforms
                         && selectedExecutor?.executor_platforms.map(platform => (
@@ -664,7 +655,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
                 {activeStep === 1 && platform && (
                   <div>
                     {selectedExecutor && (
-                      <div style={{ padding: '0 20px 20px' }}>
+                      <div style={{ padding: theme.spacing(0, 1, 1) }}>
                         {/* Caldera */}
                         {selectedExecutor.executor_type === OPENBAS_CALDERA && (
                           <div>
