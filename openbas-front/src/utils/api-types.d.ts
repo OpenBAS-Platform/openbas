@@ -2920,6 +2920,8 @@ export interface PlatformSettings {
   postgre_version?: string;
   /** Current version of RabbitMQ */
   rabbitmq_version?: string;
+  /** True if telemetry manager enable */
+  telemetry_manager_enable?: boolean;
   /** True if connection with OpenCTI is enabled */
   xtm_opencti_enable?: boolean;
   /** Url of OpenCTI */

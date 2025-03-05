@@ -45,6 +45,7 @@ steps:
       OPENBAS_ADMIN_EMAIL: admin@openbas.io
       OPENBAS_ADMIN_PASSWORD: admin
       OPENBAS_ADMIN_TOKEN: 0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f
+      SPRING_PROFILES_ACTIVE: ci
     commands:
       - apt update && apt install -y gnupg
       - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -

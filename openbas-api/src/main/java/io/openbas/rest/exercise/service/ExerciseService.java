@@ -31,6 +31,7 @@ import io.openbas.service.GrantService;
 import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.openbas.utils.ExerciseMapper;
@@ -79,6 +80,7 @@ public class ExerciseService {
   private final ExerciseMapper exerciseMapper;
   private final InjectMapper injectMapper;
   private final ResultUtils resultUtils;
+  private final ActionMetricCollector actionMetricCollector;
 
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
@@ -117,6 +119,7 @@ public class ExerciseService {
     }
 
     this.grantService.computeGrant(exercise);
+    actionMetricCollector.addSimulationCreatedCount();
     return exerciseRepository.save(exercise);
   }
 
@@ -139,6 +142,7 @@ public class ExerciseService {
     Exercise exerciseOrigin = exerciseRepository.findById(exerciseId).orElseThrow();
     Exercise exercise = copyExercice(exerciseOrigin);
     Exercise exerciseDuplicate = exerciseRepository.save(exercise);
+    actionMetricCollector.addSimulationCreatedCount();
     getListOfDuplicatedInjects(exerciseDuplicate, exerciseOrigin);
     getListOfExerciseTeams(exerciseDuplicate, exerciseOrigin);
     getListOfArticles(exerciseDuplicate, exerciseOrigin);

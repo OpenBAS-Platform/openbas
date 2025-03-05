@@ -31,6 +31,10 @@ public class ExecutorService {
     this.executorRepository = executorRepository;
   }
 
+  public Iterable<Executor> executors() {
+    return this.executorRepository.findAll();
+  }
+
   @Transactional
   public Executor register(
       String id,

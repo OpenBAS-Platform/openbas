@@ -14,6 +14,7 @@ import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.fixtures.AssetGroupFixture;
 import io.openbas.utils.fixtures.ScenarioFixture;
@@ -50,6 +51,7 @@ class ScenarioServiceTest {
   @Mock FileService fileService;
   @Autowired private InjectDuplicateService injectDuplicateService;
   @Autowired private ExerciseMapper exerciseMapper;
+  @Mock private ActionMetricCollector actionMetricCollector;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
   @Mock private InjectService injectService;
@@ -63,24 +65,26 @@ class ScenarioServiceTest {
   @BeforeEach
   void setUp() {
     scenarioService =
-        new ScenarioService(
-            scenarioRepository,
-            teamRepository,
-            userRepository,
-            documentRepository,
-            scenarioTeamUserRepository,
-            articleRepository,
-            exerciseMapper,
-            grantService,
-            variableService,
-            challengeService,
-            teamService,
-            fileService,
-            injectDuplicateService,
-            tagRuleService,
-            injectService,
-            injectRepository,
-            lessonsCategoryRepository);
+        scenarioService =
+            new ScenarioService(
+                scenarioRepository,
+                teamRepository,
+                userRepository,
+                documentRepository,
+                scenarioTeamUserRepository,
+                articleRepository,
+                exerciseMapper,
+                actionMetricCollector,
+                grantService,
+                variableService,
+                challengeService,
+                teamService,
+                fileService,
+                injectDuplicateService,
+                tagRuleService,
+                injectService,
+                injectRepository,
+                lessonsCategoryRepository);
   }
 
   void setUpWithMockRepository() {
@@ -93,6 +97,7 @@ class ScenarioServiceTest {
             scenarioTeamUserRepository,
             articleRepository,
             exerciseMapper,
+            actionMetricCollector,
             grantService,
             variableService,
             challengeService,

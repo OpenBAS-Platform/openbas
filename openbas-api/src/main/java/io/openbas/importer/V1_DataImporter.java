@@ -27,6 +27,7 @@ import io.openbas.rest.payload.service.PayloadCreationService;
 import io.openbas.service.FileService;
 import io.openbas.service.ImportEntry;
 import io.openbas.service.ScenarioService;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.Constants;
 import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.annotation.Resource;
@@ -50,6 +51,7 @@ public class V1_DataImporter implements Importer {
   // region variables
   @Resource protected ObjectMapper mapper;
   private final FileService documentService;
+  private final ActionMetricCollector actionMetricCollector;
   private final DocumentRepository documentRepository;
   private final TagRepository tagRepository;
   private final ExerciseRepository exerciseRepository;
@@ -212,7 +214,7 @@ public class V1_DataImporter implements Importer {
             .map(baseIds::get)
             .map(Tag.class::cast)
             .collect(Collectors.toSet()));
-
+    actionMetricCollector.addSimulationCreatedCount();
     return exerciseRepository.save(exercise);
   }
 
