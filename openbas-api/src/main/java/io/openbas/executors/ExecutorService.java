@@ -82,8 +82,8 @@ public class ExecutorService {
 
   @Transactional
   public void removeFromType(String type) {
-        executorRepository
-            .findByType(type)
-            .ifPresent(executor -> executorRepository.deleteById(executor.getId()));
+    executorRepository
+        .findByType(type)
+        .ifPresent(executor -> executorRepository.deleteById(executor.getId()));
   }
 }
