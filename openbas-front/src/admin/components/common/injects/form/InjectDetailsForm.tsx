@@ -60,7 +60,7 @@ const InjectDetailsForm = ({
   const { permissions } = useContext(PermissionsContext);
   const [defaultValues, setDefaultValues] = useState({});
   const [openDetails, setOpenDetails] = useState(openDetail);
-  const [pristineOpenDetails, setPristineOpenDetails] = useState(true);
+  const [pristineOpenDetails, setPristineOpenDetails] = useState(!openDetail);
   const [injectDetailsState, setInjectDetailsState] = useState({
     allTeams: false,
     teamsIds: defaultInject?.inject_teams,
@@ -230,7 +230,7 @@ const InjectDetailsForm = ({
           newContent[field.key] = data[field.key];
         }
       });
-    return isEmptyField(newContent) ? null : newContent;
+    return isEmptyField(newContent) ? {} : newContent;
   };
 
   const onSubmit = async (data: Record<string, FieldValue>) => {
