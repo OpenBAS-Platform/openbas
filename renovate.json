@@ -10,7 +10,7 @@
   "ignorePaths": [
     "**/node_modules/**"
   ],
-  "prConcurrentLimit": 2,
+  "prConcurrentLimit": 10,
   "baseBranches": ["release/current", "master"],
   "packageRules": [
     {
@@ -22,7 +22,6 @@
     {
       "matchDatasources": [
         "npm",
-        "gitea-tags",
         "node-version"
       ],
       "commitMessagePrefix": "[frontend]"
@@ -47,10 +46,6 @@
       "commitMessagePrefix": "[DANGER]"
     },
     {
-      "matchBaseBranches": ["release/current"],
-      "commitMessageSuffix": null
-    },
-    {
       "matchJsonata": ["$exists(isVulnerabilityAlert)"],
       "matchBaseBranches": ["release/current"],
       "enabled": false
@@ -59,20 +54,6 @@
       "matchJsonata": ["$not($exists(isVulnerabilityAlert))"],
       "matchBaseBranches": ["master"],
       "enabled": false
-    }
-  ],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "fileMatch": [
-        "openbas-front/package.json"
-      ],
-      "matchStrings": [
-        "xlsx\": \"https://cdn\\.sheetjs\\.com/xlsx-(?<currentValue>[\\d.]+)/xlsx"
-      ],
-      "registryUrlTemplate": "https://git.sheetjs.com",
-      "depNameTemplate": "sheetjs/sheetjs",
-      "datasourceTemplate": "gitea-tags"
     }
   ],
   "schedule": [
