@@ -2,6 +2,7 @@ package io.openbas.rest.executor;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.service.EndpointService.JFROG_BASE;
+import static io.openbas.service.EndpointService.SERVICE;
 import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
 import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
 
@@ -223,7 +224,7 @@ public class ExecutorApi extends RestBehavior {
             description = "Invalid platform or architecture specified."),
       })
   @GetMapping(
-      value = "/api/agent/package/openbas/{platform}/{architecture}",
+      value = "/api/agent/package/openbas/{platform}/{architecture}/{installationMode}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(
       @Parameter(
@@ -237,7 +238,12 @@ public class ExecutorApi extends RestBehavior {
                   "Target architecture for the agent package (e.g., x86, x64, arm). Case insensitive.",
               required = true)
           @PathVariable
-          String architecture)
+          String architecture,
+      @Parameter(
+              description = "Installation Mode: session, user or system service",
+              required = true)
+          @PathVariable
+          String installationMode)
       throws IOException {
     platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
     architecture = Optional.ofNullable(architecture).map(String::toLowerCase).orElse("");
@@ -255,12 +261,18 @@ public class ExecutorApi extends RestBehavior {
     if (platform.equals("windows")) {
       InputStream in = null;
       String resourcePath = "/openbas-agent/windows/" + architecture + "/";
+
+      filename = "openbas-agent-installer-";
+      if (installationMode != null && !installationMode.equals(SERVICE)) {
+        filename = filename.concat(installationMode).concat("-");
+      }
+
       if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
-        filename = "openbas-agent-installer-" + version + ".exe";
+        filename = filename.concat(version).concat(".exe");
         in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
       } else if (executorOpenbasBinariesOrigin.equals(
           "repository")) { // if we want a specific version from artifactory
-        filename = "openbas-agent-installer-" + executorOpenbasBinariesVersion + ".exe";
+        filename = filename.concat(executorOpenbasBinariesVersion).concat(".exe");
         in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
       }
       if (in == null) {
