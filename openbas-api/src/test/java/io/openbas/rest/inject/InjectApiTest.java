@@ -45,6 +45,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -875,6 +879,56 @@ class InjectApiTest extends IntegrationTest {
         input2.setStatus("INFO");
         performCallbackRequest(firstAgentId, inject.getId(), input2);
         performCallbackRequest(secondAgentId, inject.getId(), input2);
+
+        // -- ASSERT --
+        Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
+        InjectStatus injectStatusSaved = injectSaved.getStatus().orElseThrow();
+        // Check inject status
+        assertEquals(ExecutionStatus.PARTIAL, injectStatusSaved.getName());
+      }
+
+      @DisplayName("Should update inject status when two agent is calling in the same time")
+      @Test
+      void shouldUpdateInjectStatusWhenAllAgentsFinish() throws Exception {
+        // -- PREPARE --
+        InjectExecutionInput input = new InjectExecutionInput();
+        input.setMessage("First log received");
+        input.setAction(InjectExecutionAction.command_execution);
+        input.setStatus("COMMAND_NOT_FOUND");
+        Inject inject = getPendingInjectWithAssets();
+
+        // -- EXECUTE --
+        String firstAgentId =
+            ((Endpoint) inject.getAssets().getFirst()).getAgents().getFirst().getId();
+        String secondAgentId =
+            ((Endpoint) inject.getAssets().getFirst()).getAgents().getLast().getId();
+        performCallbackRequest(firstAgentId, inject.getId(), input);
+        input.setStatus("SUCCESS");
+        performCallbackRequest(secondAgentId, inject.getId(), input);
+
+        InjectExecutionInput input2 = new InjectExecutionInput();
+        String lastLogMessage = "Complete log received";
+        input2.setMessage(lastLogMessage);
+        input2.setAction(InjectExecutionAction.complete);
+        input2.setStatus("INFO");
+
+        ExecutorService thread = Executors.newFixedThreadPool(2);
+        List<Callable<Void>> tasks =
+            Arrays.asList(
+                () -> {
+                  performCallbackRequest(firstAgentId, inject.getId(), input2);
+                  return null;
+                },
+                () -> {
+                  performCallbackRequest(secondAgentId, inject.getId(), input2);
+                  return null;
+                });
+        thread.invokeAll(tasks);
+        thread.shutdown();
+        thread.awaitTermination(60, TimeUnit.SECONDS);
+        //
+        //        performCallbackRequest(firstAgentId, inject.getId(), input2);
+        //        performCallbackRequest(secondAgentId, inject.getId(), input2);
 
         // -- ASSERT --
         Inject injectSaved = injectRepository.findById(inject.getId()).orElseThrow();
