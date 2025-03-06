@@ -224,7 +224,7 @@ public class PlatformSettingsService {
       platformSettings.setExecutorCalderaEnable(calderaExecutorConfig.isEnable());
       platformSettings.setExecutorCalderaPublicUrl(calderaExecutorConfig.getPublicUrl());
       platformSettings.setExecutorTaniumEnable(false);
-      platformSettings.setTelemetryManagerEnable(!openBASConfig.isFeatureEnabled("telemetry"));
+      platformSettings.setTelemetryManagerEnable(openBASConfig.isFeatureEnabled("telemetry"));
 
       // Build admin settings
       if (user.isAdmin()) {

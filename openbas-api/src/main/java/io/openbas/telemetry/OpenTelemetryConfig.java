@@ -57,7 +57,7 @@ public class OpenTelemetryConfig {
     log.info("Telemetry - Using collect interval: " + collectInterval);
     log.info("Telemetry - Using export interval: " + exportInterval);
 
-    if (openBASConfig.isFeatureEnabled("telemetry") || !isEndpointReachable(getOTELEndpoint())) {
+    if (!openBASConfig.isFeatureEnabled("telemetry") || !isEndpointReachable(getOTELEndpoint())) {
       return OpenTelemetry.noop();
     }
     Resource resource = buildResource();
