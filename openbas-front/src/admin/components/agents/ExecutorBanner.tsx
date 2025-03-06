@@ -1,10 +1,10 @@
 import { type FunctionComponent } from 'react';
 
-import calderaLogo from '../static/images/executors/logo_caldera.png';
-import crowdstrikeLogo from '../static/images/executors/logo_crowdstrike.png';
-import openBasLogo from '../static/images/executors/logo_openbas.png';
-import taniumLogo from '../static/images/executors/logo_tanium.png';
-import unknownDark from '../static/images/platforms/unknown-dark.png';
+import calderaLogo from '../../../static/images/executors/logo_caldera.png';
+import crowdstrikeLogo from '../../../static/images/executors/logo_crowdstrike.png';
+import openBasLogo from '../../../static/images/executors/logo_openbas.png';
+import taniumLogo from '../../../static/images/executors/logo_tanium.png';
+import unknownDark from '../../../static/images/platforms/unknown-dark.png';
 
 interface ExecutorBannerProps {
   executor: string;
@@ -38,7 +38,7 @@ const executorBanners: Record<string, {
   },
 };
 
-const renderExecutorBanner = (executor: string, label: string, height: number | undefined = 150) => {
+const ExecutorBanner: FunctionComponent<ExecutorBannerProps> = ({ executor, label, height }) => {
   const executorData = executorBanners[executor] || executorBanners.Unknown;
   return (
     <div
@@ -60,9 +60,6 @@ const renderExecutorBanner = (executor: string, label: string, height: number | 
       />
     </div>
   );
-};
-const ExecutorBanner: FunctionComponent<ExecutorBannerProps> = ({ executor, label, height }) => {
-  return renderExecutorBanner(executor, label, height);
 };
 
 export default ExecutorBanner;
