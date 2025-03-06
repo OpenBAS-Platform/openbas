@@ -4,6 +4,7 @@ import static io.openbas.database.model.SettingKeys.*;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static java.util.Objects.requireNonNull;
 
+import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Setting;
 import io.openbas.database.repository.SettingRepository;
 import io.opentelemetry.api.OpenTelemetry;
@@ -44,6 +45,7 @@ public class OpenTelemetryConfig {
   private final Environment env;
   private final SettingRepository settingRepository;
   private final ThreadPoolTaskScheduler taskScheduler;
+  @jakarta.annotation.Resource private final OpenBASConfig openBASConfig;
 
   @Getter private final Duration collectInterval = Duration.ofMinutes(60);
   @Getter private final Duration exportInterval = Duration.ofMinutes(6 * 60);
@@ -55,10 +57,9 @@ public class OpenTelemetryConfig {
     log.info("Telemetry - Using collect interval: " + collectInterval);
     log.info("Telemetry - Using export interval: " + exportInterval);
 
-    if (!isEndpointReachable(getOTELEndpoint())) {
+    if (openBASConfig.isFeatureEnabled("telemetry") || !isEndpointReachable(getOTELEndpoint())) {
       return OpenTelemetry.noop();
     }
-
     Resource resource = buildResource();
 
     // Set OTLP Exporter
