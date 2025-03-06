@@ -71,7 +71,7 @@ public class CalderaExecutor extends Injector {
 
     Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
 
-    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    Map<Asset, AssetGroup> assets = this.injectService.resolveAllAssetsToExecute(inject);
 
     // Execute inject for all assets
     if (assets.isEmpty()) {

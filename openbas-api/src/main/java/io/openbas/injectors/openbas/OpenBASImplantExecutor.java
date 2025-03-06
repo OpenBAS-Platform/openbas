@@ -39,7 +39,7 @@ public class OpenBASImplantExecutor extends Injector {
       throws Exception {
     Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
 
-    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    Map<Asset, AssetGroup> assets = this.injectService.resolveAllAssetsToExecute(inject);
 
     // Check assets target
     if (assets.isEmpty()) {
@@ -76,8 +76,9 @@ public class OpenBASImplantExecutor extends Injector {
       @NotNull final List<Expectation> expectations,
       @NotNull final OpenBASImplantInjectContent content,
       @NotNull final Asset asset,
-      final boolean expectationGroup,
-      final Inject inject) {
+      final AssetGroup assetGroup,
+      final Inject inject,
+      final String payloadType) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
           content.getExpectations().stream()
@@ -91,7 +92,7 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getName(),
                                   expectation.getDescription(),
                                   asset,
-                                  expectationGroup, // expectationGroup usefully in front-end
+                                  assetGroup, // assetGroup usefully in front-end
                                   expectation.getExpirationTime());
 
                           // We propagate the asset expectation to agents
@@ -114,7 +115,7 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getName(),
                                   expectation.getDescription(),
                                   asset,
-                                  expectationGroup,
+                                  assetGroup,
                                   expectation.getExpirationTime());
 
                           // We propagate the asset expectation to agents
@@ -137,7 +138,7 @@ public class OpenBASImplantExecutor extends Injector {
                                   expectation.getDescription(),
                                   asset,
                                   expectation.getExpirationTime(),
-                                  expectationGroup);
+                                  assetGroup);
 
                           // We propagate the asset expectation to agents
                           List<ManualExpectation> manualExpectationList =

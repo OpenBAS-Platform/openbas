@@ -181,9 +181,9 @@ public class InjectService {
     }
   }
 
-  public Map<Asset, Boolean> resolveAllAssetsToExecute(@NotNull final Inject inject) {
-    Map<Asset, Boolean> assets =
-        inject.getAssets().stream().collect(Collectors.toMap(asset -> asset, asset -> false));
+  public Map<Asset, AssetGroup> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    Map<Asset, AssetGroup> assets =
+        inject.getAssets().stream().collect(Collectors.toMap(asset -> asset, asset -> null)); //false
     inject
         .getAssetGroups()
         .forEach(
@@ -191,7 +191,7 @@ public class InjectService {
               List<Asset> assetsFromGroup =
                   this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
               // Verify asset validity
-              assetsFromGroup.forEach((asset) -> assets.put(asset, true));
+              assetsFromGroup.forEach((asset) -> assets.put(asset, assetGroup)); //true
             }));
     return assets;
   }
