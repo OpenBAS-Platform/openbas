@@ -1,6 +1,6 @@
 package io.openbas.executors;
 
-import static io.openbas.service.FileService.EXECUTORS_IMAGES_BASE_PATH;
+import static io.openbas.service.FileService.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Executor;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutorService {
 
+  public static final String EXTENSION = ".png";
   @Resource protected ObjectMapper mapper;
 
   private FileService fileService;
@@ -41,7 +42,9 @@ public class ExecutorService {
       String type,
       String name,
       String documentationUrl,
+      String backgroundColor,
       InputStream iconData,
+      InputStream bannerData,
       String[] platforms)
       throws Exception {
     // Sanity checks
@@ -50,7 +53,10 @@ public class ExecutorService {
     }
 
     if (iconData != null) {
-      fileService.uploadStream(EXECUTORS_IMAGES_BASE_PATH, type + ".png", iconData);
+      fileService.uploadStream(EXECUTORS_IMAGES_ICONS_BASE_PATH, type + EXTENSION, iconData);
+    }
+    if (bannerData != null) {
+      fileService.uploadStream(EXECUTORS_IMAGES_BANNERS_BASE_PATH, type + EXTENSION, iconData);
     }
     Executor executor = executorRepository.findById(id).orElse(null);
     if (executor == null) {
@@ -69,6 +75,7 @@ public class ExecutorService {
     executor.setName(name);
     executor.setType(type);
     executor.setDoc(documentationUrl);
+    executor.setBackgroundColor(documentationUrl);
     executor.setPlatforms(platforms);
 
     executorRepository.save(executor);
