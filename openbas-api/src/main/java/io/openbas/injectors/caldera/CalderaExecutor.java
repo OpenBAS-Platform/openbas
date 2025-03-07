@@ -3,7 +3,6 @@ package io.openbas.injectors.caldera;
 import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.database.model.ExecutionTraces.getNewInfoTrace;
-import static io.openbas.database.model.InjectExpectationSignature.*;
 import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
@@ -192,7 +191,7 @@ public class CalderaExecutor extends Injector {
                                                     List.of(exploitResult.getLinkId())));
                                             execution.addTrace(
                                                 getNewInfoTrace(
-                                                    "Caldera executed the ability on agent"
+                                                    "Caldera executed the ability on agent "
                                                         + executionAgent.getExecutedByUser()
                                                         + " using "
                                                         + executionAgent.getProcessName()
@@ -258,8 +257,7 @@ public class CalderaExecutor extends Injector {
                             content,
                             asset,
                             isInGroup,
-                            executedAgentByEndpoint.get(asset.getId()),
-                            injectorContract.getPayload());
+                            executedAgentByEndpoint.get(asset.getId()));
                       });
             },
             () ->
@@ -390,8 +388,7 @@ public class CalderaExecutor extends Injector {
       @NotNull final CalderaInjectContent content,
       @NotNull final Asset asset,
       final boolean expectationGroup,
-      final List<io.openbas.database.model.Agent> executedAgents,
-      final Payload payload) {
+      final List<io.openbas.database.model.Agent> executedAgents) {
 
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
@@ -411,8 +408,8 @@ public class CalderaExecutor extends Injector {
 
                           // We propagate the asset expectation to agents
                           List<PreventionExpectation> preventionExpectationList =
-                              ExpectationUtils.getPreventionExpectationList(
-                                  asset, executedAgents, payload, preventionExpectation);
+                              ExpectationUtils.getPreventionExpectationListForCaldera(
+                                  asset, executedAgents, preventionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
@@ -434,8 +431,8 @@ public class CalderaExecutor extends Injector {
                                   expectation.getExpirationTime());
                           // We propagate the asset expectation to agents
                           List<DetectionExpectation> detectionExpectationList =
-                              ExpectationUtils.getDetectionExpectationList(
-                                  asset, executedAgents, payload, detectionExpectation);
+                              ExpectationUtils.getDetectionExpectationListForCaldera(
+                                  asset, executedAgents, detectionExpectation);
 
                           // If any expectation for agent is created then we create also expectation
                           // for asset
@@ -456,7 +453,7 @@ public class CalderaExecutor extends Injector {
                                   expectationGroup);
                           // We propagate the asset expectation to agents
                           List<ManualExpectation> manualExpectationList =
-                              ExpectationUtils.getManualExpectationList(
+                              ExpectationUtils.getManualExpectationListForCaldera(
                                   asset, executedAgents, manualExpectation);
 
                           // If any expectation for agent is created then we create also expectation
