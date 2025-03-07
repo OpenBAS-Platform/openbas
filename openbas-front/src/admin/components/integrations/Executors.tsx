@@ -88,7 +88,7 @@ const Executors = () => {
                   <div style={{ display: 'flex' }}>
                     <div className={classes.icon}>
                       <img
-                        src={`/api/images/executors/${executor.executor_type}`}
+                        src={`/api/images/executors/icons/${executor.executor_type}`}
                         alt={executor.executor_type}
                         style={{
                           width: 50,

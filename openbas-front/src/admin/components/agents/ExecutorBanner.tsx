@@ -1,49 +1,17 @@
 import { type FunctionComponent } from 'react';
 
-import calderaLogo from '../../../../../openbas-api/src/main/resources/img/banner_caldera.png';
-import crowdstrikeLogo from '../../../../../openbas-api/src/main/resources/img/banner_crowdstrike.png';
-import openBasLogo from '../../../../../openbas-api/src/main/resources/img/banner_openbas.png';
-import taniumLogo from '../../../../../openbas-api/src/main/resources/img/banner_tanium.png';
-import unknownDark from '../../../static/images/platforms/unknown-dark.png';
+import { type Executor } from '../../../utils/api-types';
 
 interface ExecutorBannerProps {
-  executor: string;
-  label: string;
+  executor: Executor;
   height?: number;
 }
 
-const executorBanners: Record<string, {
-  img: string;
-  backgroundColor: string;
-}> = {
-  openbas_agent: {
-    img: openBasLogo,
-    backgroundColor: '#001BDB',
-  },
-  openbas_crowdstrike: {
-    img: crowdstrikeLogo,
-    backgroundColor: '#E12E37',
-  },
-  openbas_tanium: {
-    img: taniumLogo,
-    backgroundColor: '#E03E41',
-  },
-  openbas_caldera: {
-    img: calderaLogo,
-    backgroundColor: '#8B1316',
-  },
-  Unknown: {
-    img: unknownDark,
-    backgroundColor: '#b6b7b7',
-  },
-};
-
-const ExecutorBanner: FunctionComponent<ExecutorBannerProps> = ({ executor, label, height }) => {
-  const executorData = executorBanners[executor] || executorBanners.Unknown;
+const ExecutorBanner: FunctionComponent<ExecutorBannerProps> = ({ executor, height }) => {
   return (
     <div
       style={{
-        backgroundColor: executorData.backgroundColor,
+        backgroundColor: executor.executor_background_color,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -54,8 +22,8 @@ const ExecutorBanner: FunctionComponent<ExecutorBannerProps> = ({ executor, labe
       }}
     >
       <img
-        src={`/api/images/executors/${executor.executor_type}`}
-        alt={label}
+        src={`/api/images/executors/banners/${executor.executor_type}`}
+        alt={executor.executor_name}
         style={{ objectFit: 'cover' }}
       />
     </div>
