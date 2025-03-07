@@ -998,9 +998,7 @@
   "The element has been successfully deleted": "The element has been successfully deleted",
   "The element has been successfully updated": "The element has been successfully updated",
   "The element has been updated": "The element has been updated.",
-  "The imported file contains absolute dates (ex.": {
-    " 9h30). A starting date must be provided for the Scenario to be build": "The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build"
-  },
+  "The imported file contains absolute dates (ex. 9h30). A starting date must be provided for the Scenario to be build": "The imported file contains absolute dates (ex.: 9h30). A starting date must be provided for the Scenario to be build",
   "The inject will only be sent to you.": "The inject will only be sent to you.",
   "The new users will automatically be assigned to this group.": "The new users will automatically be assigned to this group.",
   "The score set for the team will also be applied to all players in the team": "The score set for the team will also be applied to all players in the team",
@@ -1022,9 +1020,7 @@
   "This file type is not accepted here.": "This file type is not accepted here.",
   "This group will have observer permission on new simulations.": "This group will have observer permission on new simulations.",
   "This group will have planner permission on new simulations.": "This group will have planner permission on new simulations.",
-  "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message": {
-    " <a href=${'comcheck.url}'>${comcheck.url}</a>.": "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message: <a href='${comcheck.url}'>${comcheck.url}</a>."
-  },
+  "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message <a href=${'comcheck.url}'>${comcheck.url}</a>.": "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message: <a href='${comcheck.url}'>${comcheck.url}</a>.",
   "This page is coming soon": "This page is coming soon",
   "This page is not found on this OpenBAS application.": "This page is not found on this OpenBAS application.",
   "This report is not available": "This report is not available",
