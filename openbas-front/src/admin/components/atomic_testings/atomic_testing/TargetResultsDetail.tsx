@@ -1,5 +1,6 @@
-import { AddBoxOutlined, MoreVertOutlined } from '@mui/icons-material';
+import { Add, AddBoxOutlined, AddModerator, AddModeratorOutlined, ExpandMore, MoreVertOutlined } from '@mui/icons-material';
 import {
+  Accordion, AccordionDetails, AccordionSummary,
   Box,
   Button,
   Card,
@@ -16,6 +17,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Paper,
   Tab,
   Tabs,
   Tooltip,
@@ -31,7 +33,7 @@ import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
-import { type InjectExpectation, type InjectExpectationResult, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectExpectation, type InjectExpectationResult, type InjectExpectationTrace, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
@@ -43,6 +45,7 @@ import InjectIcon from '../../common/injects/InjectIcon';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
 import nodeTypes from './types/nodes';
 import { type NodeResultStep } from './types/nodes/NodeResultStep';
 
@@ -98,6 +101,8 @@ const useStyles = makeStyles()(theme => ({
     border: '1px solid #00b1ff',
   },
   cardHeaderContent: { overflow: 'hidden' },
+  flexContainer: { display: 'flex' },
+  flexItem: { margin: theme.spacing(0.5) },
 }));
 
 interface Props {
@@ -137,6 +142,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
+  const [expectationTraces, setExpectationTraces] = useState<InjectExpectationTrace[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeResultStep>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
@@ -596,6 +602,23 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                 <Grid container={true} spacing={2}>
                   <Grid item={true} xs={4}>
                     <Typography variant="h4">
+                      {t('Validation rule')}
+                    </Typography>
+                    {emptyFilled(getLabelOfValidationType(injectExpectation))}
+                  </Grid>
+                  <Grid item={true} xs={4}>
+                    {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                      return (
+                        <div key={index}>
+                          <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                        </div>
+
+                      );
+                    })}
+
+                  </Grid>
+                  {/* <Grid item={true} xs={4}>
+                    <Typography variant="h4">
                       {t('Name')}
                     </Typography>
                     {emptyFilled(injectExpectation.inject_expectation_name)}
@@ -611,17 +634,116 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       {t('Description')}
                     </Typography>
                     {emptyFilled(injectExpectation.inject_expectation_description)}
-                  </Grid>
+                  </Grid> */}
                 </Grid>
-                <Typography variant="h4" style={{ marginTop: 20 }}>
-                  {t('Results')}
-                </Typography>
-                <Grid container={true} spacing={2}>
+                <Grid
+                  container={true}
+                  spacing={2}
+                  style={{
+                    marginTop: theme.spacing(3),
+                    marginBottom: theme.spacing(3),
+                  }}
+                >
+                  <Grid item={true} xs={6}>
+                    <Typography
+                      variant="h2"
+                    >
+                      {t('Security platforms')}
+                    </Typography>
+                  </Grid>
+
+                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
+                    || (injectExpectation.inject_expectation_type === 'MANUAL'
+                      && injectExpectation.inject_expectation_results
+                      && injectExpectation.inject_expectation_results.length === 0))
+                    && (
+                      <Grid item={true} xs={6} style={{ textAlign: 'end' }}>
+                        <IconButton
+                          aria-label="Add"
+                          onClick={() => setSelectedExpectationForCreation({
+                            injectExpectation,
+                            sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
+                          })}
+                        >
+                          <AddModeratorOutlined fontSize="medium" />
+                        </IconButton>
+                      </Grid>
+                    )}
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
                     const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
+                    // getTraces(injectExpectation.inject_expectation_id, expectationResult.sourceId);
                     return (
-                      <Grid key={index} item xs={4}>
-                        <Card key={injectExpectation.inject_expectation_id}>
+                      <Grid key={index} item xs={12}>
+                        <Accordion variant="outlined" key={injectExpectation.inject_expectation_id}>
+                          <AccordionSummary
+                            expandIcon={<ExpandMore />}
+                            aria-controls="accord1-content"
+                            id="accord1-header"
+                          >
+                            <div className={classes.flexContainer}>
+                              <div className={classes.flexItem}>
+                                {getAvatar(injectExpectation, expectationResult)}
+                              </div>
+                              <div className={classes.flexItem}>
+                                <Typography
+                                  variant="h2"
+                                >
+                                  {expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
+                                </Typography>
+                              </div>
+                              <div className={classes.flexItem}>
+                                <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                              </div>
+                              <div className={classes.flexItem}>
+                                <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
+                              </div>
+                              <div className={classes.flexItem}>
+                                <IconButton
+                                  color="primary"
+                                  onClick={(ev) => {
+                                    ev.stopPropagation();
+                                    setAnchorEls({
+                                      ...anchorEls,
+                                      [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget,
+                                    });
+                                  }}
+                                  aria-haspopup="true"
+                                  size="large"
+                                  disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
+                                >
+                                  <MoreVertOutlined />
+                                </IconButton>
+                                <Menu
+                                  anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
+                                  open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
+                                  onClose={() => setAnchorEls({
+                                    ...anchorEls,
+                                    [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
+                                  })}
+                                >
+                                  <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
+                                    {t('Update')}
+                                  </MenuItem>
+                                  <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
+                                    {t('Delete')}
+                                  </MenuItem>
+                                </Menu>
+                              </div>
+                            </div>
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            {
+                              expectationResult.sourceId && (
+                                <TargetResultsSecurityPlatform
+                                  injectExpectationId={injectExpectation.inject_expectation_id}
+                                  collectorId={expectationResult.sourceId}
+                                  expectationResult={expectationResult.result}
+                                />
+                              )
+                            }
+                          </AccordionDetails>
+                        </Accordion>
+                        {/* <Card key={injectExpectation.inject_expectation_id}>
                           <CardHeader
                             classes={{ content: classes.cardHeaderContent }}
                             avatar={getAvatar(injectExpectation, expectationResult)}
@@ -685,11 +807,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                             <ItemResult label={expectationResult.result} status={expectationResult.result} />
                             <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
                           </CardContent>
-                        </Card>
+                        </Card> */}
                       </Grid>
                     );
                   })}
-                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
+                  {/* {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
                     || (injectExpectation.inject_expectation_type === 'MANUAL'
                       && injectExpectation.inject_expectation_results
                       && injectExpectation.inject_expectation_results.length === 0))
@@ -707,9 +829,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           </CardActionArea>
                         </Card>
                       </Grid>
-                    )}
+                    )} */}
                 </Grid>
-                <Divider style={{ marginTop: 20 }} />
               </div>
             ))}
           <Dialog

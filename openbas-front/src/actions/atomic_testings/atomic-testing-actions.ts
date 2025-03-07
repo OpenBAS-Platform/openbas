@@ -62,3 +62,9 @@ export const searchAtomicTestingTeams = (paginationInput: SearchPaginationInput,
   const uri = `${ATOMIC_TESTING_URI}/teams/search?contextualOnly=${contextualOnly}`;
   return simplePostCall(uri, paginationInput);
 };
+
+// -- EXPECTATIONS --
+export const fetchExpectationTraces = (injectExpectationId: string, collectorId: string) => {
+  const uri = `/api/inject-expectations-traces?injectExpectationId=${injectExpectationId}&collectorId=${collectorId}`;
+  return simpleCall(uri);
+};
