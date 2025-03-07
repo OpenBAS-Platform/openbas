@@ -1,4 +1,3 @@
-import { type Props } from 'html-react-parser/lib/attributes-to-props';
 import { type FunctionComponent, useContext, useEffect, useState } from 'react';
 
 import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
@@ -9,7 +8,7 @@ import { type EndpointOutput, type InjectResultOverviewOutput } from '../../../.
 import InjectStatus from '../../common/injects/status/InjectStatus';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
-const AtomicTestingDetail: FunctionComponent<Props> = () => {
+const AtomicTestingDetail: FunctionComponent = () => {
   // Fetching data
   const [loading, setLoading] = useState(true);
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
