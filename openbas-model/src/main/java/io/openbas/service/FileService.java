@@ -25,6 +25,7 @@ public class FileService {
   public static final String COLLECTORS_IMAGES_BASE_PATH = "/collectors/images/";
   public static final String EXECUTORS_IMAGES_ICONS_BASE_PATH = "/executors/images/icons/";
   public static final String EXECUTORS_IMAGES_BANNERS_BASE_PATH = "/executors/images/banners/";
+  public static final String EXT_PNG = ".png";
   private MinioConfig minioConfig;
   private MinioClient minioClient;
 
@@ -118,19 +119,19 @@ public class FileService {
   }
 
   public Optional<InputStream> getInjectorImage(String injectType) {
-    return getFilePath(INJECTORS_IMAGES_BASE_PATH + injectType + ".png");
+    return getFilePath(INJECTORS_IMAGES_BASE_PATH + injectType + EXT_PNG);
   }
 
   public Optional<InputStream> getCollectorImage(String collectorId) {
-    return getFilePath(COLLECTORS_IMAGES_BASE_PATH + collectorId + ".png");
+    return getFilePath(COLLECTORS_IMAGES_BASE_PATH + collectorId + EXT_PNG);
   }
 
   public Optional<InputStream> getExecutorIconImage(String executorId) {
-    return getFilePath(EXECUTORS_IMAGES_ICONS_BASE_PATH + executorId + ".png");
+    return getFilePath(EXECUTORS_IMAGES_ICONS_BASE_PATH + executorId + EXT_PNG);
   }
 
   public Optional<InputStream> getExecutorBannerImage(String executorId) {
-    return getFilePath(EXECUTORS_IMAGES_BANNERS_BASE_PATH + executorId + ".png");
+    return getFilePath(EXECUTORS_IMAGES_BANNERS_BASE_PATH + executorId + EXT_PNG);
   }
 
   public Optional<FileContainer> getFileContainer(String fileTarget) {
