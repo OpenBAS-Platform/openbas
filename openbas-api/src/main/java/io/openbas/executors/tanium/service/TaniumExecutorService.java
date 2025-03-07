@@ -29,6 +29,7 @@ public class TaniumExecutorService implements Runnable {
   public static final String TANIUM_EXECUTOR_NAME = "Tanium";
   private static final String TANIUM_EXECUTOR_DOCUMENTATION_LINK =
       "https://docs.openbas.io/latest/deployment/ecosystem/executors/#tanium-agent";
+  private static final String TANIUM_EXECUTOR_BACKGROUND_COLOR = "#E03E41";
 
   private final TaniumExecutorClient client;
 
@@ -69,7 +70,9 @@ public class TaniumExecutorService implements Runnable {
                 TANIUM_EXECUTOR_TYPE,
                 TANIUM_EXECUTOR_NAME,
                 TANIUM_EXECUTOR_DOCUMENTATION_LINK,
+                TANIUM_EXECUTOR_BACKGROUND_COLOR,
                 getClass().getResourceAsStream("/img/icon-tanium.png"),
+                getClass().getResourceAsStream("/img/banner-tanium.png"),
                 new String[] {
                   Endpoint.PLATFORM_TYPE.Windows.name(),
                   Endpoint.PLATFORM_TYPE.Linux.name(),

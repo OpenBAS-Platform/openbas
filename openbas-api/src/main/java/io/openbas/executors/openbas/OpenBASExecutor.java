@@ -19,6 +19,7 @@ public class OpenBASExecutor {
   public static final String OPENBAS_EXECUTOR_NAME = "OpenBAS Agent";
   public static final String OPENBAS_EXECUTOR_DOCUMENTATION_LINK =
       "https://docs.openbas.io/latest/usage/openbas-agent/";
+  private static final String OPENBAS_EXECUTOR_BACKGROUND_COLOR = "#001BDB";
 
   @PostConstruct
   public void init() {
@@ -28,7 +29,9 @@ public class OpenBASExecutor {
           OPENBAS_EXECUTOR_TYPE,
           OPENBAS_EXECUTOR_NAME,
           OPENBAS_EXECUTOR_DOCUMENTATION_LINK,
+          OPENBAS_EXECUTOR_BACKGROUND_COLOR,
           getClass().getResourceAsStream("/img/icon-openbas.png"),
+          getClass().getResourceAsStream("/img/banner-openbas.png"),
           new String[] {
             Endpoint.PLATFORM_TYPE.Windows.name(),
             Endpoint.PLATFORM_TYPE.Linux.name(),

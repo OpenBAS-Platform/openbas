@@ -110,12 +110,19 @@ public class ExecutorApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   public Executor registerExecutor(
       @Valid @RequestPart("input") ExecutorCreateInput input,
-      @RequestPart("icon") Optional<MultipartFile> file) {
+      @RequestPart("icon") Optional<MultipartFile> icon,
+      @RequestPart("banner") Optional<MultipartFile> banner) {
     try {
       // Upload icon
-      if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
+      if (icon.isPresent() && "image/png".equals(icon.get().getContentType())) {
         fileService.uploadFile(
-            FileService.EXECUTORS_IMAGES_BASE_PATH + input.getType() + ".png", file.get());
+            FileService.EXECUTORS_IMAGES_ICONS_BASE_PATH + input.getType() + ".png", icon.get());
+      }
+      // Upload icon
+      if (banner.isPresent() && "image/png".equals(banner.get().getContentType())) {
+        fileService.uploadFile(
+            FileService.EXECUTORS_IMAGES_BANNERS_BASE_PATH + input.getType() + ".png",
+            banner.get());
       }
       // We need to support upsert for registration
       Executor executor = executorRepository.findById(input.getId()).orElse(null);

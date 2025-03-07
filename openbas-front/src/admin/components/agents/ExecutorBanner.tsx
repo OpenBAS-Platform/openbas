@@ -1,9 +1,9 @@
 import { type FunctionComponent } from 'react';
 
-import calderaLogo from '../../../static/images/executors/logo_caldera.png';
-import crowdstrikeLogo from '../../../static/images/executors/logo_crowdstrike.png';
-import openBasLogo from '../../../static/images/executors/logo_openbas.png';
-import taniumLogo from '../../../static/images/executors/logo_tanium.png';
+import calderaLogo from '../../../../../openbas-api/src/main/resources/img/banner_caldera.png';
+import crowdstrikeLogo from '../../../../../openbas-api/src/main/resources/img/banner_crowdstrike.png';
+import openBasLogo from '../../../../../openbas-api/src/main/resources/img/banner_openbas.png';
+import taniumLogo from '../../../../../openbas-api/src/main/resources/img/banner_tanium.png';
 import unknownDark from '../../../static/images/platforms/unknown-dark.png';
 
 interface ExecutorBannerProps {
@@ -54,7 +54,7 @@ const ExecutorBanner: FunctionComponent<ExecutorBannerProps> = ({ executor, labe
       }}
     >
       <img
-        src={executorData.img}
+        src={`/api/images/executors/${executor.executor_type}`}
         alt={label}
         style={{ objectFit: 'cover' }}
       />
