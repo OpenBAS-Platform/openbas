@@ -48,7 +48,7 @@ const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelect
         disabled={platforms.length === 0}
       >
         <CardContent classes={{ root: classes.content }}>
-          <ExecutorBanner executor={executor.executor_type} label={executor.executor_name} height={140} />
+          <ExecutorBanner executor={executor} height={140} />
           <Typography
             variant="h6"
             sx={{

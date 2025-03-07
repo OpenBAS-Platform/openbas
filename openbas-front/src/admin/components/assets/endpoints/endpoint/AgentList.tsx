@@ -71,7 +71,7 @@ const AgentList: FunctionComponent<Props> = ({ agents }) => {
           <>
             {executor && (
               <img
-                src={`/api/images/executors/${executor.executor_type}`}
+                src={`/api/images/executors/icons/${executor.executor_type}`}
                 alt={executor.executor_type}
                 style={{
                   width: 20,

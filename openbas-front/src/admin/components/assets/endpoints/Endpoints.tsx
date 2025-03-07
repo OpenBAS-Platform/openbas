@@ -231,7 +231,7 @@ const Endpoints = () => {
                       }}
                       >
                         <img
-                          src={`/api/images/executors/${executorType}`}
+                          src={`/api/images/executors/icons/${executorType}`}
                           alt={executorType}
                           style={{
                             width: 20,
