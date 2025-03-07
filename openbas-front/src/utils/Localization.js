@@ -1252,7 +1252,7 @@ const i18n = {
       'Install Agent as User': 'Installer l\'agent en tant qu\'utilisateur',
       'Install Agent as System': 'Installer l\'agent en tant que système',
       'It can be run as administrator or as a standard user, depending on the PowerShell elevation.': 'Il peut être exécuté en tant qu\'administrateur ou en tant qu\'utilisateur standard, en fonction des élévations PowerShell.',
-      'You should add "Log on as a service" policy if you are installing as a user.': 'Vous devez ajouter la politique "Se connecter en tant que service" si vous installez en tant qu\'utilisateur.',
+      'You should add "Log on as a service" policy if you are installing as a user.': 'Vous devez ajouter la politique "Ouvrir une session en tant que service" si vous installez en tant qu\'utilisateur.',
       'The agent runs in the background as a service and starts automatically when the machine powers on.': 'L\'agent fonctionne en arrière-plan en tant que service et démarre automatiquement lorsque la machine s\'allume.',
       'Install the agent as a user or a system service. This installation requires local administrator privileges.': 'Installez l\'agent en tant qu\'utilisateur ou service système. Cette installation nécessite des privilèges d\'administrateur locaux.',
       'Choose your platform': 'Choisissez votre plateforme',
