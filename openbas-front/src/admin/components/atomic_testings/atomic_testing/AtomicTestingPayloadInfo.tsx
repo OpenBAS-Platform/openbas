@@ -1,6 +1,5 @@
 import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { type Props } from 'html-react-parser/lib/attributes-to-props';
 import { type FunctionComponent, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -30,7 +29,7 @@ const useStyles = makeStyles()(() => ({
   },
 }));
 
-const AtomicTestingPayloadInfo: FunctionComponent<Props> = () => {
+const AtomicTestingPayloadInfo: FunctionComponent = () => {
   const { classes } = useStyles();
   const { t } = useFormatter();
   const theme = useTheme();
