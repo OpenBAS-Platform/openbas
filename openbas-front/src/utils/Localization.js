@@ -725,8 +725,8 @@ const i18n = {
       'Error': 'Erreur',
       'This page is not found on this OpenBAS application.': 'Cette page est introuvable sur l\'application OpenBAS.',
       'You must be logged to access this page': 'Vous devez être connecté pour accéder à cette page',
-      // Validation Type
-      'Validation type': 'Type de validation',
+      // Validation rule
+      'Validation rule': 'Règle de validation',
       'User input': 'Entrée utilisateur',
       'Player Manual Validation': 'Validation manuelle du joueur',
       'Team Manual Validation': 'Validation manuelle de l\'équipe',
@@ -2839,7 +2839,7 @@ const i18n = {
       'This scenario has never run, schedule or run it now!': '此场景从未运行，立即安排或运行它吧！',
       'Something went wrong. Please refresh the page or try again later.': '发生错误。请刷新页面或稍后再试。',
       'Unknown result': '未知结果',
-      'Validation type': '验证类型',
+      'Validation rule': '驗證規則',
       'Targeting Players only': '仅定位玩家',
       'This expectation is handled automatically by the platform and triggered when target reads the articles': '该预期由平台自动处理，并在目标阅读文章时触发',
       'This expectation is handled automatically by the platform and triggered when the target completes the challenges': '该预期由平台自动处理，并在目标完成挑战时触发',
