@@ -36,7 +36,7 @@ const TargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
       ASSETS: <PlatformIcon platform={target?.platformType ?? 'Unknown'} width={20} marginRight={theme.spacing(2)} />,
       AGENT: (
         <img
-          src={`/api/images/executors/${target.executorType}`}
+          src={`/api/images/executors/icons/${target.executorType}`}
           alt={target.executorType}
           style={{
             width: 20,

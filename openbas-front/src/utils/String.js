@@ -90,3 +90,7 @@ export const formatMacAddress = (mac) => {
   const address = mac.toUpperCase();
   return address.match(/.{1,2}/g)?.join(':') || '-';
 };
+
+export const formatIp = (ip) => {
+  return ip.toUpperCase();
+};

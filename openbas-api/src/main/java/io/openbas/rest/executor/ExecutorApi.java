@@ -2,6 +2,7 @@ package io.openbas.rest.executor;
 
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.service.EndpointService.JFROG_BASE;
+import static io.openbas.service.EndpointService.SERVICE;
 import static io.openbas.utils.AgentUtils.AVAILABLE_ARCHITECTURES;
 import static io.openbas.utils.AgentUtils.AVAILABLE_PLATFORMS;
 
@@ -109,12 +110,19 @@ public class ExecutorApi extends RestBehavior {
   @Transactional(rollbackOn = Exception.class)
   public Executor registerExecutor(
       @Valid @RequestPart("input") ExecutorCreateInput input,
-      @RequestPart("icon") Optional<MultipartFile> file) {
+      @RequestPart("icon") Optional<MultipartFile> icon,
+      @RequestPart("banner") Optional<MultipartFile> banner) {
     try {
       // Upload icon
-      if (file.isPresent() && "image/png".equals(file.get().getContentType())) {
+      if (icon.isPresent() && "image/png".equals(icon.get().getContentType())) {
         fileService.uploadFile(
-            FileService.EXECUTORS_IMAGES_BASE_PATH + input.getType() + ".png", file.get());
+            FileService.EXECUTORS_IMAGES_ICONS_BASE_PATH + input.getType() + ".png", icon.get());
+      }
+      // Upload icon
+      if (banner.isPresent() && "image/png".equals(banner.get().getContentType())) {
+        fileService.uploadFile(
+            FileService.EXECUTORS_IMAGES_BANNERS_BASE_PATH + input.getType() + ".png",
+            banner.get());
       }
       // We need to support upsert for registration
       Executor executor = executorRepository.findById(input.getId()).orElse(null);
@@ -223,7 +231,7 @@ public class ExecutorApi extends RestBehavior {
             description = "Invalid platform or architecture specified."),
       })
   @GetMapping(
-      value = "/api/agent/package/openbas/{platform}/{architecture}",
+      value = "/api/agent/package/openbas/{platform}/{architecture}/{installationMode}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasAgentPackage(
       @Parameter(
@@ -237,7 +245,12 @@ public class ExecutorApi extends RestBehavior {
                   "Target architecture for the agent package (e.g., x86, x64, arm). Case insensitive.",
               required = true)
           @PathVariable
-          String architecture)
+          String architecture,
+      @Parameter(
+              description = "Installation Mode: session, user or system service",
+              required = true)
+          @PathVariable
+          String installationMode)
       throws IOException {
     platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
     architecture = Optional.ofNullable(architecture).map(String::toLowerCase).orElse("");
@@ -255,12 +268,18 @@ public class ExecutorApi extends RestBehavior {
     if (platform.equals("windows")) {
       InputStream in = null;
       String resourcePath = "/openbas-agent/windows/" + architecture + "/";
+
+      filename = "openbas-agent-installer-";
+      if (installationMode != null && !installationMode.equals(SERVICE)) {
+        filename = filename.concat(installationMode).concat("-");
+      }
+
       if (executorOpenbasBinariesOrigin.equals("local")) { // if we want the local binaries
-        filename = "openbas-agent-installer-" + version + ".exe";
+        filename = filename.concat(version).concat(".exe");
         in = getClass().getResourceAsStream("/agents" + resourcePath + filename);
       } else if (executorOpenbasBinariesOrigin.equals(
           "repository")) { // if we want a specific version from artifactory
-        filename = "openbas-agent-installer-" + executorOpenbasBinariesVersion + ".exe";
+        filename = filename.concat(executorOpenbasBinariesVersion).concat(".exe");
         in = new BufferedInputStream(new URL(JFROG_BASE + resourcePath + filename).openStream());
       }
       if (in == null) {
@@ -285,7 +304,7 @@ public class ExecutorApi extends RestBehavior {
   @Operation(
       summary = "Retrieve OpenBAS Agent Installer Command",
       description =
-          "Generates the installation command for the OpenBAS agent for the specified platform and token.")
+          "Generates the installation command for the OpenBAS agent for the specified platform, installation mode and token.")
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -294,7 +313,7 @@ public class ExecutorApi extends RestBehavior {
         @ApiResponse(responseCode = "400", description = "Invalid platform specified."),
         @ApiResponse(responseCode = "404", description = "Token not found."),
       })
-  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{token}")
+  @GetMapping(value = "/api/agent/installer/openbas/{platform}/{installationMode}/{token}")
   public @ResponseBody ResponseEntity<String> getOpenBasAgentInstaller(
       @Parameter(
               description =
@@ -306,7 +325,12 @@ public class ExecutorApi extends RestBehavior {
               description = "Unique token associated with the agent installation.",
               required = true)
           @PathVariable
-          String token)
+          String token,
+      @Parameter(
+              description = "Installation Mode: session, user or system service",
+              required = true)
+          @PathVariable
+          String installationMode)
       throws IOException {
     platform = Optional.ofNullable(platform).map(String::toLowerCase).orElse("");
 
@@ -317,7 +341,8 @@ public class ExecutorApi extends RestBehavior {
     if (resolvedToken.isEmpty()) {
       throw new UnsupportedOperationException("Invalid token");
     }
-    String installCommand = this.endpointService.generateInstallCommand(platform, token);
+    String installCommand =
+        this.endpointService.generateInstallCommand(platform, token, installationMode);
     return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(installCommand);
   }
 }

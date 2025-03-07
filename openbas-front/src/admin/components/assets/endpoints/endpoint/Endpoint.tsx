@@ -11,7 +11,7 @@ import ItemTags from '../../../../../components/ItemTags';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
 import { type EndpointOverviewOutput as EndpointType } from '../../../../../utils/api-types';
-import { formatMacAddress } from '../../../../../utils/String';
+import { formatIp, formatMacAddress } from '../../../../../utils/String';
 import AgentList from './AgentList';
 
 const useStyles = makeStyles()(() => ({ paper: { padding: 20 } }));
@@ -139,7 +139,7 @@ const Endpoint = () => {
                 >
                   {endpoint.endpoint_ips?.map((ip: string, index: number) => (
                     <div key={index} style={{ marginRight: 10 }}>
-                      {ip}
+                      {formatIp(ip)}
                     </div>
                   ))}
                 </div>

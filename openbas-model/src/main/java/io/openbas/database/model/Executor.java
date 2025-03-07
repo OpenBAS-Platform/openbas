@@ -47,6 +47,10 @@ public class Executor implements Base {
   @JsonProperty("executor_doc")
   private String doc;
 
+  @Column(name = "executor_background_color")
+  @JsonProperty("executor_background_color")
+  private String backgroundColor;
+
   @Column(name = "executor_created_at")
   @JsonProperty("executor_created_at")
   @NotNull

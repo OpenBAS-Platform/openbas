@@ -50,6 +50,9 @@ import org.springframework.stereotype.Service;
 public class EndpointService {
 
   public static final int DELETE_TTL = 86400000; // 24 hours
+  public static final String OPENBAS_AGENT_INSTALLER = "openbas-agent-installer";
+  public static final String OPENBAS_AGENT_UPGRADE = "openbas-agent-upgrade";
+  public static final String SERVICE = "service";
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
@@ -210,7 +213,8 @@ public class EndpointService {
     Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
     if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
-      assetAgentJob.setCommand(generateUpgradeCommand(endpoint.getPlatform().name()));
+      assetAgentJob.setCommand(
+          generateUpgradeCommand(endpoint.getPlatform().name(), input.getInstallationMode()));
       assetAgentJob.setAgent(agent);
       assetAgentJobRepository.save(assetAgentJob);
     }
@@ -333,6 +337,7 @@ public class EndpointService {
     agentInput.setService(input.isService());
     agentInput.setElevated(input.isElevated());
     agentInput.setExecutedByUser(input.getExecutedByUser());
+    agentInput.setInstallationMode(input.getInstallationMode());
     return agentInput;
   }
 
@@ -370,11 +375,24 @@ public class EndpointService {
         .replace("${OPENBAS_WITH_PROXY}", String.valueOf(openBASConfig.isWithProxy()));
   }
 
-  public String generateInstallCommand(String platform, String token) throws IOException {
-    return getFileOrDownloadFromJfrog(platform, "openbas-agent-installer", token);
+  public String generateInstallCommand(String platform, String token, String installationMode)
+      throws IOException {
+    if (token == null || token.isEmpty()) {
+      throw new IllegalArgumentException("Token must not be null or empty.");
+    }
+    String installerName = OPENBAS_AGENT_INSTALLER;
+    if (installationMode != null && !installationMode.equals(SERVICE)) {
+      installerName = installerName.concat("-").concat(installationMode);
+    }
+    return getFileOrDownloadFromJfrog(platform, installerName, token);
   }
 
-  public String generateUpgradeCommand(String platform) throws IOException {
-    return getFileOrDownloadFromJfrog(platform, "openbas-agent-upgrade", adminToken);
+  public String generateUpgradeCommand(String platform, String installationMode)
+      throws IOException {
+    String upgradeName = OPENBAS_AGENT_UPGRADE;
+    if (installationMode != null && !installationMode.equals(SERVICE)) {
+      upgradeName = upgradeName.concat("-").concat(installationMode);
+    }
+    return getFileOrDownloadFromJfrog(platform, upgradeName, adminToken);
   }
 }
