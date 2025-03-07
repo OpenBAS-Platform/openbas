@@ -52,12 +52,14 @@ public class ExecutorService {
       throw new IllegalArgumentException("Executor ID must not be null or empty.");
     }
 
+    // Save imgs
     if (iconData != null) {
       fileService.uploadStream(EXECUTORS_IMAGES_ICONS_BASE_PATH, type + EXTENSION, iconData);
     }
     if (bannerData != null) {
-      fileService.uploadStream(EXECUTORS_IMAGES_BANNERS_BASE_PATH, type + EXTENSION, iconData);
+      fileService.uploadStream(EXECUTORS_IMAGES_BANNERS_BASE_PATH, type + EXTENSION, bannerData);
     }
+
     Executor executor = executorRepository.findById(id).orElse(null);
     if (executor == null) {
       Executor executorChecking = executorRepository.findByType(type).orElse(null);
