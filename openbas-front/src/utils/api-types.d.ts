@@ -476,6 +476,7 @@ export interface Collector {
   /** @format int32 */
   collector_period?: number;
   collector_security_platform?: SecurityPlatform;
+  collector_traces?: InjectExpectationTrace[];
   collector_type: string;
   /** @format date-time */
   collector_updated_at: string;
@@ -1441,6 +1442,7 @@ export interface InjectExpectation {
   inject_expectation_signatures?: InjectExpectationSignature[];
   inject_expectation_status?: "FAILED" | "PENDING" | "PARTIAL" | "UNKNOWN" | "SUCCESS";
   inject_expectation_team?: string;
+  inject_expectation_traces?: InjectExpectationTrace[];
   inject_expectation_type: "TEXT" | "DOCUMENT" | "ARTICLE" | "CHALLENGE" | "MANUAL" | "PREVENTION" | "DETECTION";
   /** @format date-time */
   inject_expectation_updated_at?: string;
@@ -1482,6 +1484,30 @@ export interface InjectExpectationSignature {
 export interface InjectExpectationSimple {
   inject_expectation_id: string;
   inject_expectation_name?: string;
+}
+
+export interface InjectExpectationTrace {
+  inject_expectation_trace_alert_link?: string;
+  inject_expectation_trace_alert_name?: string;
+  inject_expectation_trace_collector?: string;
+  /** @format date-time */
+  inject_expectation_trace_created_at: string;
+  /** @format date-time */
+  inject_expectation_trace_date?: string;
+  inject_expectation_trace_expectation?: string;
+  inject_expectation_trace_id: string;
+  /** @format date-time */
+  inject_expectation_trace_updated_at: string;
+  listened?: boolean;
+}
+
+export interface InjectExpectationTraceInput {
+  inject_expectation_trace_alert_link: string;
+  inject_expectation_trace_alert_name: string;
+  inject_expectation_trace_collector: string;
+  /** @format date-time */
+  inject_expectation_trace_date: string;
+  inject_expectation_trace_expectation: string;
 }
 
 export interface InjectExpectationUpdateInput {
@@ -2351,6 +2377,25 @@ export interface PageEndpointOutput {
 
 export interface PageExerciseSimple {
   content?: ExerciseSimple[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageFinding {
+  content?: Finding[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

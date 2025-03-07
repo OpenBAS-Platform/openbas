@@ -19,7 +19,7 @@ public class V3_71__Add_table_injects_expectations_traces extends BaseJavaMigrat
                     CREATE TABLE injects_expectations_traces(
                         inject_expectation_trace_id VARCHAR(255) NOT NULL CONSTRAINT injects_expectations_traces_pkey PRIMARY KEY,
                         inject_expectation_trace_expectation VARCHAR(255) NOT NULL CONSTRAINT injects_expectations_traces_expectation_fkey REFERENCES injects_expectations (inject_expectation_id) ON DELETE CASCADE,
-                        inject_expectation_trace_collector VARCHAR(255) CONSTRAINT inject_expectation_trace_collector_fk REFERENCES collectors ON DELETE CASCADE,
+                        inject_expectation_trace_collector VARCHAR(255) NOT NULL CONSTRAINT inject_expectation_trace_collector_fk REFERENCES collectors (collector_id) ON DELETE CASCADE,
                         inject_expectation_trace_alert_name text,
                         inject_expectation_trace_alert_link text,
                         inject_expectation_trace_date timestamp,
