@@ -72,11 +72,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Background color')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.background_color}
         helperText={errors.background_color && errors.background_color?.message}
         control={control}
@@ -88,11 +84,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Paper color')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.paper_color}
         helperText={errors.paper_color && errors.paper_color?.message}
         control={control}
@@ -104,11 +96,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Navigation color')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.navigation_color}
         helperText={errors.navigation_color && errors.navigation_color?.message}
         control={control}
@@ -120,11 +108,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Primary color')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.primary_color}
         helperText={errors.primary_color && errors.primary_color?.message}
         control={control}
@@ -136,11 +120,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Secondary color')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.secondary_color}
         helperText={errors.secondary_color && errors.secondary_color?.message}
         control={control}
@@ -152,11 +132,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Accent color')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.accent_color}
         helperText={errors.accent_color && errors.accent_color?.message}
         control={control}
@@ -168,11 +144,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Logo URL')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.logo_url}
         helperText={errors.logo_url && errors.logo_url?.message}
         inputProps={register('logo_url')}
@@ -183,11 +155,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Logo URL (collapsed)')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.logo_url_collapsed}
         helperText={errors.logo_url_collapsed && errors.logo_url_collapsed?.message}
         inputProps={register('logo_url_collapsed')}
@@ -197,11 +165,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Logo URL (login)')}
         placeholder={t('Default')}
-        slotProps={{
-          inputLabel : {
-            shrink: true,
-          }
-        }}
+        slotProps={{ inputLabel: { shrink: true } }}
         error={!!errors.logo_login_url}
         helperText={errors.logo_login_url && errors.logo_login_url?.message}
         inputProps={register('logo_login_url')}
