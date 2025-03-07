@@ -7,7 +7,7 @@ import PlatformIcon from '../../../components/PlatformIcon';
 import { type Executor } from '../../../utils/api-types';
 import ExecutorBanner from './ExecutorBanner';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   card: {
     overflow: 'hidden',
     height: 250,
@@ -18,18 +18,18 @@ const useStyles = makeStyles()(() => ({
   },
   content: {
     position: 'relative',
-    padding: 0,
+    padding: theme.spacing(0),
     textAlign: 'center',
     height: '100%',
   },
 }));
 
-interface PlatformInstallerSelectorProps {
+interface ExecutorSelectorProps {
   executor: Executor;
   setSelectedExecutor: (executor: Executor) => void;
 }
 
-const PlatformInstallerSelector: React.FC<PlatformInstallerSelectorProps> = ({ executor, setSelectedExecutor }) => {
+const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelectedExecutor }) => {
   const theme = useTheme();
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -48,7 +48,7 @@ const PlatformInstallerSelector: React.FC<PlatformInstallerSelectorProps> = ({ e
         disabled={platforms.length === 0}
       >
         <CardContent classes={{ root: classes.content }}>
-          <ExecutorBanner executor={executor.executor_type} label={executor.executor_name} height={150} />
+          <ExecutorBanner executor={executor.executor_type} label={executor.executor_name} height={140} />
           <Typography
             variant="h6"
             sx={{
@@ -73,14 +73,11 @@ const PlatformInstallerSelector: React.FC<PlatformInstallerSelectorProps> = ({ e
               <Card
                 key={index}
                 sx={{
-                  margin: theme.spacing(0, 1),
+                  marginLeft: theme.spacing(1),
                   padding: theme.spacing(1),
                   border: '1px solid',
-                  borderRadius: '4px',
                   borderColor: '#292D39',
                   display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
                 }}
               >
                 <PlatformIcon platform={platform} width={20} />
@@ -93,4 +90,4 @@ const PlatformInstallerSelector: React.FC<PlatformInstallerSelectorProps> = ({ e
   );
 };
 
-export default PlatformInstallerSelector;
+export default ExecutorSelector;
