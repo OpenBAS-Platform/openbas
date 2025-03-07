@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
+
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -37,6 +39,7 @@ public class InjectExpectationTrace implements Base {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "inject_expectation_trace_collector")
+  @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("inject_expectation_trace_collector")
   @Schema(type = "string")
   private Collector collector;
