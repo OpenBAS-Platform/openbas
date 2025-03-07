@@ -10,10 +10,9 @@ import io.openbas.service.InjectExpectationTraceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -40,4 +39,14 @@ public class InjectExpectationTraceApi extends RestBehavior {
             .orElseThrow(() -> new ElementNotFoundException("Collector not found")));
     return this.injectExpectationTraceService.createInjectExpectationTrace(injectExpectationTrace);
   }
+
+  @GetMapping("")
+  public List<InjectExpectationTrace> getInjectExpectationTracesByExpectationAndCollector(
+      @RequestParam String injectExpectationId,
+      @RequestParam String collectorId) {
+    return this.injectExpectationTraceService.getInjectExpectationTracesByExpectationAndCollector(injectExpectationId,
+        collectorId);
+  }
+
+
 }
