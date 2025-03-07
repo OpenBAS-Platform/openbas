@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutorService {
 
-  public static final String EXTENSION = ".png";
+  public static final String EXT_PNG = ".png";
   @Resource protected ObjectMapper mapper;
 
   private FileService fileService;
@@ -54,10 +54,10 @@ public class ExecutorService {
 
     // Save imgs
     if (iconData != null) {
-      fileService.uploadStream(EXECUTORS_IMAGES_ICONS_BASE_PATH, type + EXTENSION, iconData);
+      fileService.uploadStream(EXECUTORS_IMAGES_ICONS_BASE_PATH, type + EXT_PNG, iconData);
     }
     if (bannerData != null) {
-      fileService.uploadStream(EXECUTORS_IMAGES_BANNERS_BASE_PATH, type + EXTENSION, bannerData);
+      fileService.uploadStream(EXECUTORS_IMAGES_BANNERS_BASE_PATH, type + EXT_PNG, bannerData);
     }
 
     Executor executor = executorRepository.findById(id).orElse(null);
