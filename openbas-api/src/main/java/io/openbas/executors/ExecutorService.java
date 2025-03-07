@@ -75,7 +75,7 @@ public class ExecutorService {
     executor.setName(name);
     executor.setType(type);
     executor.setDoc(documentationUrl);
-    executor.setBackgroundColor(documentationUrl);
+    executor.setBackgroundColor(backgroundColor);
     executor.setPlatforms(platforms);
 
     executorRepository.save(executor);
