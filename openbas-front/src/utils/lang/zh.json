@@ -998,9 +998,7 @@
   "The element has been successfully deleted": "元素已成功删除",
   "The element has been successfully updated": "元素已成功更新",
   "The element has been updated": "元素已更新",
-  "The imported file contains absolute dates (ex.": {
-    " 9h30). A starting date must be provided for the Scenario to be build": "导入的文件包含绝对日期（例如：9h30）。必须提供起始日期，以便构建情景"
-  },
+  "The imported file contains absolute dates (ex. 9h30). A starting date must be provided for the Scenario to be build": "导入的文件包含绝对日期（例如：9h30）。必须提供起始日期，以便构建情景",
   "The inject will only be sent to you.": "注入只会发送给你.",
   "The new users will automatically be assigned to this group.": "新用户会自动分配到这个组.",
   "The score set for the team will also be applied to all players in the team": "为团队设置的分数也将应用于团队中的所有玩家",
@@ -1022,9 +1020,7 @@
   "This file type is not accepted here.": "该文件类型此处不适用",
   "This group will have observer permission on new simulations.": "这个组有新模拟的观察权限.",
   "This group will have planner permission on new simulations.": "这个组有新模拟的计划权限.",
-  "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message": {
-    " <a href=${'comcheck.url}'>${comcheck.url}</a>.": "这是模拟开始前的通信检查。请点击以下链接以确认您已成功收到此信息：<a href='${comcheck.url}'>${comcheck.url}</a>."
-  },
+  "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message <a href=${'comcheck.url}'>${comcheck.url}</a>.": "这是模拟开始前的通信检查。请点击以下链接以确认您已成功收到此信息：<a href='${comcheck.url}'>${comcheck.url}</a>.",
   "This page is coming soon": "该页面即将推出",
   "This page is not found on this OpenBAS application.": "OpenBAS应用程序中未找到该页.",
   "This report is not available": "该报告不可用",

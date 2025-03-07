@@ -998,9 +998,7 @@
   "The element has been successfully deleted": "L'élément a été supprimé avec succès",
   "The element has been successfully updated": "L'élément a été mis à jour avec succès",
   "The element has been updated": "L'élément a été modifié.",
-  "The imported file contains absolute dates (ex.": {
-    " 9h30). A starting date must be provided for the Scenario to be build": "Le fichier importé contient des dates absolues (ex.: 9h30). Une date de début doit être fournie pour que le scénario puisse être créé"
-  },
+  "The imported file contains absolute dates (ex. 9h30). A starting date must be provided for the Scenario to be build": "Le fichier importé contient des dates absolues (ex.: 9h30). Une date de début doit être fournie pour que le scénario puisse être créé",
   "The inject will only be sent to you.": "Le stimuli sera uniquement envoyé à vous même.",
   "The new users will automatically be assigned to this group.": "Les nouveaux utilisateurs seront automatiquement assignés à ce groupe.",
   "The score set for the team will also be applied to all players in the team": "Le score attribué à l'équipe sera également appliqué à tous les joueurs de l'équipe",
@@ -1022,9 +1020,7 @@
   "This file type is not accepted here.": "Ce type de fichier n'est pas accepté ici",
   "This group will have observer permission on new simulations.": "Ce groupe aura la permission d'observateur sur les nouvelles simulations.",
   "This group will have planner permission on new simulations.": "Ce groupe aura la permission de planificateur sur les nouvelles simulations.",
-  "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message": {
-    " <a href=${'comcheck.url}'>${comcheck.url}</a>.": "Il s'agit d'un contrôle de communication avant le début de la simulation. Veuillez cliquer sur le lien suivant pour confirmer que vous avez bien reçu ce message : <a href='${comcheck.url}'>${comcheck.url}</a>."
-  },
+  "This is a communication check before the beginning of the simulation. Please click on the following link in order to confirm you successfully received this message <a href=${'comcheck.url}'>${comcheck.url}</a>.": "Il s'agit d'un contrôle de communication avant le début de la simulation. Veuillez cliquer sur le lien suivant pour confirmer que vous avez bien reçu ce message : <a href='${comcheck.url}'>${comcheck.url}</a>.",
   "This page is coming soon": "Cette page arrive bientôt",
   "This page is not found on this OpenBAS application.": "Cette page est introuvable sur l'application OpenBAS.",
   "This report is not available": "Ce rapport n'est pas disponible",
