@@ -508,7 +508,7 @@ public class DocumentApi extends RestBehavior {
   @GetMapping(value = "/api/images/executors/{executorId}", produces = MediaType.IMAGE_PNG_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getExecutorImage(@PathVariable String executorId)
       throws IOException {
-    Optional<InputStream> fileStream = fileService.getExecutorImage(executorId);
+    Optional<InputStream> fileStream = fileService.getExecutorIconImage(executorId);
     if (fileStream.isPresent()) {
       return ResponseEntity.ok()
           .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES))

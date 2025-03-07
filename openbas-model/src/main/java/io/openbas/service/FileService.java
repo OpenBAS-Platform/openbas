@@ -23,7 +23,8 @@ public class FileService {
   private static final Logger LOGGER = Logger.getLogger(FileService.class.getName());
   public static final String INJECTORS_IMAGES_BASE_PATH = "/injectors/images/";
   public static final String COLLECTORS_IMAGES_BASE_PATH = "/collectors/images/";
-  public static final String EXECUTORS_IMAGES_BASE_PATH = "/executors/images/";
+  public static final String EXECUTORS_IMAGES_ICONS_BASE_PATH = "/executors/images/icons/";
+  public static final String EXECUTORS_IMAGES_BANNERS_BASE_PATH = "/executors/images/banners/";
   private MinioConfig minioConfig;
   private MinioClient minioClient;
 
@@ -124,8 +125,12 @@ public class FileService {
     return getFilePath(COLLECTORS_IMAGES_BASE_PATH + collectorId + ".png");
   }
 
-  public Optional<InputStream> getExecutorImage(String executorId) {
-    return getFilePath(EXECUTORS_IMAGES_BASE_PATH + executorId + ".png");
+  public Optional<InputStream> getExecutorIconImage(String executorId) {
+    return getFilePath(EXECUTORS_IMAGES_ICONS_BASE_PATH + executorId + ".png");
+  }
+
+  public Optional<InputStream> getExecutorBannerImage(String executorId) {
+    return getFilePath(EXECUTORS_IMAGES_BANNERS_BASE_PATH + executorId + ".png");
   }
 
   public Optional<FileContainer> getFileContainer(String fileTarget) {
