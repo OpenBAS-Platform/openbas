@@ -151,9 +151,7 @@ public class InjectStatusService {
     }
   }
 
-  public Inject handleInjectExecutionCallback(
-      String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+  private void updateInjectStatus(String agentId, Inject inject, InjectExecutionInput input) {
     Agent agent =
         agentId == null
             ? null
@@ -164,10 +162,21 @@ public class InjectStatusService {
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTraces, agentId);
     injectStatus.addTrace(executionTraces);
 
-    if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
-        && (agentId == null || isAllInjectAgentsExecuted(inject))) {
-      updateFinalInjectStatus(injectStatus);
+    synchronized (this) {
+      if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
+          && (agentId == null || isAllInjectAgentsExecuted(inject))) {
+        updateFinalInjectStatus(injectStatus);
+      }
+
+      injectRepository.save(inject);
     }
+  }
+
+  public void handleInjectExecutionCallback(
+      String injectId, String agentId, InjectExecutionInput input) {
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+
+    updateInjectStatus(agentId, inject, input);
 
     // -- FINDINGS --
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
@@ -214,8 +223,6 @@ public class InjectStatusService {
         throw new RuntimeException(e);
       }
     }
-
-    return injectRepository.save(inject);
   }
 
   public ExecutionStatus computeStatus(List<ExecutionTraces> traces) {
