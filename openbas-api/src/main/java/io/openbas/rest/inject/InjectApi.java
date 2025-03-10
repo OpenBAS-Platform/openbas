@@ -232,19 +232,19 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
-  public Inject injectExecutionCallback(
+  public void injectExecutionCallback(
       @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
-    return injectExecutionCallback(null, injectId, input);
+    injectExecutionCallback(null, injectId, input);
   }
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
-  public Inject injectExecutionCallback(
+  public void injectExecutionCallback(
       @PathVariable
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-    return injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+    injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
   @Secured(ROLE_ADMIN)
