@@ -1,12 +1,17 @@
 import { ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
 import { Alert, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { type Control, type FieldValues, type UseFormRegisterReturn, useWatch } from 'react-hook-form';
+import {
+  Controller,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
 
 import FieldArray from '../../../../../components/fields/FieldArray';
 import RichTextField from '../../../../../components/fields/RichTextField';
 import SelectField from '../../../../../components/fields/SelectField';
 import SwitchField from '../../../../../components/fields/SwitchField';
+import TagField from '../../../../../components/fields/TagField';
 import TextField from '../../../../../components/fields/TextField';
 import { useFormatter } from '../../../../../components/i18n';
 import { type Document } from '../../../../../utils/api-types';
@@ -16,42 +21,42 @@ type choiceItem = {
   value: string;
   information: string;
 };
-type InjectField = {
+export type InjectField = {
   key: string;
-  richText: boolean;
+  richText?: boolean;
   cardinality?: string;
-  mandatory: boolean;
-  defaultValue: string | string[];
-  choices: Record<string, string> | choiceItem[];
+  mandatory?: boolean;
+  defaultValue?: string | string[];
+  choices?: Record<string, string> | choiceItem[];
   label: string;
-  contractAttachment: {
+  contractAttachment?: {
     key: string;
     label: string;
   }[];
-  type: 'textarea' | 'text' | 'select' | 'number' | 'tuple' | 'checkbox' | 'dependency-select' | 'choice';
-  dependencyField: string;
+  type: 'textarea' | 'text' | 'select' | 'number' | 'tuple' | 'checkbox' | 'dependency-select' | 'choice' | 'tags';
+  dependencyField?: string;
+  settings?: { rows: number };
 };
 
 interface Props {
-  control: Control;
-  attachedDocs: Document[];
+  attachedDocs?: Document[];
   field: InjectField;
-  register: (name: string) => UseFormRegisterReturn;
-  values: FieldValues;
   readOnly: boolean;
-  onSelectOrCheckboxFieldChange: () => void;
+  onSelectOrCheckboxFieldChange?: () => void;
 }
 
+// TODO all the field should not have marginTop to 20
+// it should be the parent to set this kind of setting
 const InjectContentFieldComponent = ({
-  control,
-  register,
   field,
-  values,
-  attachedDocs,
+  attachedDocs = [],
   readOnly,
-  onSelectOrCheckboxFieldChange,
+  onSelectOrCheckboxFieldChange = () => {},
 }: Props) => {
   const { t } = useFormatter();
+  const { control, register, getValues } = useFormContext();
+  const values = getValues(); // TODO rework that
+
   const selectedValue = useWatch({
     control,
     name: field.key,
@@ -65,7 +70,7 @@ const InjectContentFieldComponent = ({
   useEffect(() => {
     const findInformation = (value: string) => (field.choices as choiceItem[]).find(c => c.value === value)?.information || '';
     if (!selectedValue && field.type === 'choice') {
-      setInformationToDisplay(findInformation(values[field.key]) ?? findInformation(field.defaultValue[0]));
+      setInformationToDisplay(findInformation(values[field.key]) ?? findInformation((field.defaultValue || [])[0]));
     }
     if (selectedValue && field.type === 'choice') {
       setInformationToDisplay(findInformation(selectedValue));
@@ -77,16 +82,31 @@ const InjectContentFieldComponent = ({
 
   const fieldComponent = () => {
     switch (fieldType) {
+      case 'tags':
+        return (
+          <Controller
+            key={field.key}
+            control={control}
+            name={field.key}
+            render={({ field: { onChange, value } }) => (
+              <TagField
+                name={field.key}
+                label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
+                fieldValue={value ?? []}
+                fieldOnChange={onChange}
+                errors={{}}
+                disabled={readOnly}
+              />
+            )}
+          />
+        );
       case 'richText':
         return (
           <RichTextField
             key={field.key}
             name={field.key}
             label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-            style={{
-              marginTop: 20,
-              height: 250,
-            }}
+            style={{ height: 250 }}
             disabled={readOnly}
             askAi={true}
             inInject={true}
@@ -102,7 +122,6 @@ const InjectContentFieldComponent = ({
             fullWidth={true}
             type="number"
             label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-            style={{ marginTop: 20 }}
             disabled={readOnly}
             control={control}
           />
@@ -113,7 +132,6 @@ const InjectContentFieldComponent = ({
             key={field.key}
             name={field.key}
             label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-            style={{ marginTop: 20 }}
             disabled={readOnly}
             control={control}
           />
@@ -198,9 +216,9 @@ const InjectContentFieldComponent = ({
                         control={control}
                       />
                       {values
-                        && values[field.key]
-                        && values[field.key][index]
-                        && values[field.key][index].type === 'attachment' ? (
+                      && values[field.key]
+                      && values[field.key][index]
+                      && values[field.key][index].type === 'attachment' ? (
                             <TextField
                               variant="standard"
                               fullWidth={true}
@@ -267,7 +285,6 @@ const InjectContentFieldComponent = ({
             renderValue={(v: string | string[]) => renderValueFct(v)}
             name={field.key}
             fullWidth={true}
-            style={{ marginTop: 20 }}
             control={control}
             disabled={readOnly}
             defaultValue={field.defaultValue}
@@ -300,7 +317,6 @@ const InjectContentFieldComponent = ({
             renderValue={(v: string | string[]) => renderValueFct(v)}
             name={field.key}
             fullWidth={true}
-            style={{ marginTop: 20 }}
             control={control}
             disabled={readOnly}
             defaultValue={field.defaultValue}
@@ -313,7 +329,7 @@ const InjectContentFieldComponent = ({
         );
       }
       case 'dependency-select': {
-        const depValue = values[field.dependencyField];
+        const depValue = values[field.dependencyField ?? ''];
         const choices = ((field.choices as Record<string, string>)[depValue]) as unknown as Record<string, string> ?? {};
         const renderMultipleValuesFct = (v: string[]) => v.map(a => choices[a]).join(', ');
         const renderSingleValueFct = (v: string) => (t(choices[v] || 'Unknown'));
@@ -331,7 +347,6 @@ const InjectContentFieldComponent = ({
             name={field.key}
             fullWidth={true}
             control={control}
-            style={{ marginTop: 20 }}
           >
             {Object.entries(choices)
               .sort((a, b) => a[1].localeCompare(b[1]))
@@ -353,9 +368,8 @@ const InjectContentFieldComponent = ({
             inputProps={register(field.key)}
             fullWidth={true}
             multiline={field.type == 'textarea'}
-            rows={field.type == 'textarea' ? 10 : 1}
+            rows={field.type == 'textarea' ? (field.settings?.rows ?? 10) : 1}
             label={`${t(field.label)}${field.mandatory ? '*' : ''}`}
-            style={{ marginTop: 20 }}
             disabled={readOnly}
             control={control}
           />
