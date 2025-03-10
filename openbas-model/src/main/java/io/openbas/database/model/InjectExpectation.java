@@ -223,6 +223,14 @@ public class InjectExpectation implements Base {
   @Schema(type = "string")
   private Challenge challenge;
 
+  @OneToMany(
+      mappedBy = "injectExpectation",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @JsonProperty("inject_expectation_traces")
+  private List<InjectExpectationTrace> traces = new ArrayList<>();
+
   public void setArticle(Article article) {
     this.type = EXPECTATION_TYPE.ARTICLE;
     this.article = article;
