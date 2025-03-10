@@ -32,7 +32,7 @@ import {
 } from '../../../../utils/api-types';
 import computeAttackPatterns from '../../../../utils/injector_contract/InjectorContractUtils';
 import { isNotEmptyField } from '../../../../utils/utils';
-import InjectDetailsForm from './form/InjectDetailsForm';
+import InjectForm from './form/InjectForm';
 import InjectIcon from './InjectIcon';
 
 const useStyles = makeStyles()(theme => ({
@@ -297,7 +297,7 @@ const CreateInject: FunctionComponent<Props> = ({ title, onCreateInject, open = 
             })}
           </List>
         </div>
-        <InjectDetailsForm
+        <InjectForm
           injectorContractLabel={selectedContract?.injector_contract_labels ? tPick(selectedContract?.injector_contract_labels) : t('Select an inject in the left panel')}
           injectContractIcon={selectedContract ? (
             <InjectIcon
