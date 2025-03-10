@@ -1,18 +1,25 @@
+/* eslint-disable no-underscore-dangle */
 import fs from 'node:fs';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const filename = fileURLToPath(import.meta.url);
-const dirname = `${path.dirname(filename)}/src`;
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = `${path.dirname(__filename)}/src`;
 
 // -- Retrieve i18n lang keys --
 
 const computeLangKeys = (lang) => {
-  const data = fs.readFileSync(`${dirname}/utils/Localization.js`, { encoding: 'utf8' });
-  const regexp = `${lang}: ({[\\s\\S]*?},)`;
-  const matches = data.match(regexp);
-  return matches[1];
+  let data;
+  if (lang === 'en') {
+    data = fs.readFileSync(`${__dirname}/utils/lang/en.json`, { encoding: 'utf8' });
+  } else if (lang === 'fr') {
+    data = fs.readFileSync(`${__dirname}/utils/lang/fr.json`, { encoding: 'utf8' });
+  } else if (lang === 'zh') {
+    data = fs.readFileSync(`${__dirname}/utils/lang/zh.json`, { encoding: 'utf8' });
+  }
+  return data;
 };
 
 // -- Match missing keys --
@@ -27,7 +34,7 @@ const checkLanguageSupport = (lang) => {
       const regexp = /(?<![a-zA-Z])t\('([\w\s]+)'\)/g;
       const matches = [...data.matchAll(regexp)];
       matches.forEach((m) => {
-        const regexWithQuote = `'${m[1]}':`;
+        const regexWithQuote = `"${m[1]}":`;
         const regexWithoutQuote = `${m[1]}:`;
         if (!langI18n.match(regexWithQuote) && !langI18n.match(regexWithoutQuote)) {
           results.push(m[1]);
@@ -50,12 +57,12 @@ const checkLanguageSupport = (lang) => {
       }
     });
   };
-  read(dirname);
+  read(__dirname);
   return results;
 };
 
 const run = () => {
-  const languages = ['fr', 'zh'];
+  const languages = ['en', 'fr', 'zh'];
   const missingKeys = {};
 
   languages.forEach((lang) => {

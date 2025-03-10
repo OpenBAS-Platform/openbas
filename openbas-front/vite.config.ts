@@ -57,6 +57,7 @@ export default ({ mode }: { mode: string }) => {
         'cronstrue',
         'd3-hierarchy',
         'date-fns',
+        'date-fns/locale',
         'dompurify',
         'final-form-arrays',
         'html-react-parser',
