@@ -49,7 +49,8 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ selectedExecutor, s
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}>
+                }}
+              >
                 <PlatformIcon platform={platform} width={30} />
                 <Typography
                   style={{

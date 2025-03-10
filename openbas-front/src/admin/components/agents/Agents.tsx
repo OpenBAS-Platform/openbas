@@ -90,7 +90,7 @@ const Executors = () => {
       </Grid2>
       <Dialog
         open={selectedExecutor !== null}
-        TransitionComponent={Transition}
+        slots={{ transition: Transition }}
         onClose={closeInstall}
         slotProps={{ paper: { elevation: 1 } }}
         maxWidth="md"
