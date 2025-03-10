@@ -132,7 +132,7 @@
     "lint": "cross-env DEBUG=eslint:eslint TIMING=1 eslint --max-warnings 0 --cache --rule \"{'import/namespace': 'error', 'import/no-cycle': ['error', {'ignoreExternal': true, 'disableScc': true}]}\" .",
     "control": "yarn audit --groups dependencies --summary",
     "check-ts": "tsc",
-    "i18n-checker": "node scripts/i18n-checker.js",
+    "i18n-checker": "node i18n-checker.js",
     "generate-types-from-api": "swagger-typescript-api --no-client -p http://localhost:8080/api-docs -o src/utils -n api-types.d.ts --sort-types",
     "test": "vitest run",
     "test:e2e": "yarn playwright test --workers=1 --retries=2",
