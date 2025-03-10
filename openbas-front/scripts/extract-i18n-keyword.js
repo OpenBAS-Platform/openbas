@@ -10,14 +10,14 @@ const writeFile = util.promisify(fs.writeFile);
 const srcDirectory = 'src';
 const englishTranslationFiles = 'src/utils/lang/en.json';
 const jsxTsxFileExtensions = ['.jsx', '.tsx'];
-const searchPattern = /t\('[^']+'\)/g;
+const searchPattern = /t\('[\w\s]+'\)/g;
 const extractedValues = {};
 
 // extract all translation in the t() formatter from frontend
 // and add them in lang/en.json
 
 function extractValueFromPattern(pattern) {
-  const match = /t\('([^']+)'\)/.exec(pattern);
+  const match = /t\('([\w\s]+)'\)/.exec(pattern);
   return match ? match[1] : null;
 }
 
