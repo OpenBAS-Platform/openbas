@@ -38,31 +38,24 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ selectedExecutor, s
             key={platform}
             variant="outlined"
             style={{
-              alignItems: 'center',
-              justifyContent: 'center',
               height: '300px',
               margin: theme.spacing(2),
             }}
           >
             <CardActionArea onClick={() => handlePlatformSelection(platform)} classes={{ root: classes.area }}>
-              <CardContent>
-                <div
-                  key={platform}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <PlatformIcon platform={platform} width={30} />
-                </div>
+              <CardContent
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <PlatformIcon platform={platform} width={30} />
                 <Typography
                   style={{
                     fontSize: 14,
                     padding: theme.spacing(3, 0),
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                   }}
                 >
                   <DownloadingOutlined style={{ marginRight: theme.spacing(1) }} />
