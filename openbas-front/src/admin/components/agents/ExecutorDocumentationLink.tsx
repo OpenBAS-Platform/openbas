@@ -25,7 +25,7 @@ const ExecutorDocumentationLink: FunctionComponent<Props> = ({ executor }) => {
       )}
       {!executor.executor_doc && (
         <Typography variant="body1">
-          {t('No documentation available.')}
+          {t('No documentation available')}
         </Typography>
       )}
     </div>
