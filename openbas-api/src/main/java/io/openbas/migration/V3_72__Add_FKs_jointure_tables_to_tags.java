@@ -20,6 +20,7 @@ public class V3_72__Add_FKs_jointure_tables_to_tags extends BaseJavaMigration {
       cleanOrphanedReferences(statement, "exercises_tags", "exercise_id", "exercises");
       cleanOrphanedReferences(statement, "injects_tags", "inject_id", "injects");
       cleanOrphanedReferences(statement, "logs_tags", "log_id", "logs");
+      cleanOrphanedReferences(statement, "organizations_tags", "organization_id", "organizations");
       cleanOrphanedReferences(statement, "scenarios_tags", "scenario_id", "scenarios");
       cleanOrphanedReferences(statement, "teams_tags", "team_id", "teams");
       cleanOrphanedReferences(statement, "users_tags", "user_id", "users");
@@ -32,6 +33,7 @@ public class V3_72__Add_FKs_jointure_tables_to_tags extends BaseJavaMigration {
       cleanOrphanedReferences(statement, "exercises_tags", "tag_id", "tags");
       cleanOrphanedReferences(statement, "injects_tags", "tag_id", "tags");
       cleanOrphanedReferences(statement, "logs_tags", "tag_id", "tags");
+      cleanOrphanedReferences(statement, "organizations_tags", "tag_id", "tags");
       cleanOrphanedReferences(statement, "scenarios_tags", "tag_id", "tags");
       cleanOrphanedReferences(statement, "teams_tags", "tag_id", "tags");
       cleanOrphanedReferences(statement, "users_tags", "tag_id", "tags");
@@ -44,6 +46,8 @@ public class V3_72__Add_FKs_jointure_tables_to_tags extends BaseJavaMigration {
       recreateForeignConstraints(statement, "exercises_tags", "exercise_id", "exercises");
       recreateForeignConstraints(statement, "injects_tags", "inject_id", "injects");
       recreateForeignConstraints(statement, "logs_tags", "log_id", "logs");
+      recreateForeignConstraints(
+          statement, "organizations_tags", "organization_id", "organizations");
       recreateForeignConstraints(statement, "scenarios_tags", "scenario_id", "scenarios");
       recreateForeignConstraints(statement, "teams_tags", "team_id", "teams");
       recreateForeignConstraints(statement, "users_tags", "user_id", "users");
@@ -56,6 +60,7 @@ public class V3_72__Add_FKs_jointure_tables_to_tags extends BaseJavaMigration {
       recreateForeignConstraints(statement, "exercises_tags", "tag_id", "tags");
       recreateForeignConstraints(statement, "injects_tags", "tag_id", "tags");
       recreateForeignConstraints(statement, "logs_tags", "tag_id", "tags");
+      recreateForeignConstraints(statement, "organizations_tags", "tag_id", "tags");
       recreateForeignConstraints(statement, "scenarios_tags", "tag_id", "tags");
       recreateForeignConstraints(statement, "teams_tags", "tag_id", "tags");
       recreateForeignConstraints(statement, "users_tags", "tag_id", "tags");
