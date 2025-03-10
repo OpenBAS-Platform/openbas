@@ -18,7 +18,8 @@ import {
   Menu,
   MenuItem,
   Paper,
-  Tab,
+  Tab, Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow,
   Tabs,
   Tooltip,
   Typography,
@@ -100,8 +101,17 @@ const useStyles = makeStyles()(theme => ({
     color: '#00b1ff',
     border: '1px solid #00b1ff',
   },
+  paper: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+  },
   cardHeaderContent: { overflow: 'hidden' },
-  flexContainer: { display: 'flex' },
+  flexContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
   flexItem: { margin: theme.spacing(0.5) },
 }));
 
@@ -598,44 +608,90 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
             })
             .map(injectExpectation => (
-              <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
-                <Grid container={true} spacing={2}>
-                  <Grid item={true} xs={4}>
+              <Paper variant="outlined" key={injectExpectation.inject_expectation_id} className={classes.paper} style={{ marginTop: 20 }}>
+                {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                  return (
+                    <div key={index} className={classes.flexContainer}>
+                      <div>
+                        <Typography variant="subtitle1">
+                          {injectExpectation.inject_expectation_type}
+                        </Typography>
+                      </div>
+                      <div>
+                        <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                      </div>
+                      <div>
+                        <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
+                      </div>
+                      <div>
+                        {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
+                          || (injectExpectation.inject_expectation_type === 'MANUAL'
+                            && injectExpectation.inject_expectation_results
+                            && injectExpectation.inject_expectation_results.length === 0))
+                          && (
+                            <Grid item={true} xs={6} style={{ textAlign: 'end' }}>
+                              <IconButton
+                                aria-label="Add"
+                                onClick={() => setSelectedExpectationForCreation({
+                                  injectExpectation,
+                                  sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
+                                })}
+                              >
+                                <AddModeratorOutlined fontSize="medium" />
+                              </IconButton>
+                            </Grid>
+                          )}
+                      </div>
+                    </div>
+                  );
+                })}
+                <div className={classes.flexContainer}>
+                  <div>
                     <Typography variant="h4">
                       {t('Validation rule')}
                     </Typography>
+                  </div>
+                  <div>
                     {emptyFilled(getLabelOfValidationType(injectExpectation))}
-                  </Grid>
-                  <Grid item={true} xs={4}>
-                    {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
-                      return (
-                        <div key={index}>
-                          <ItemResult label={expectationResult.result} status={expectationResult.result} />
-                        </div>
+                  </div>
+                </div>
 
-                      );
-                    })}
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{t('Security platforms')}</TableCell>
+                        <TableCell>{t('Status')}</TableCell>
+                        <TableCell>{t('Detection time')}</TableCell>
+                        <TableCell>{t('Alerts')}</TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                        return (
+                          <TableRow
+                            key={index}
+                          >
+                            <TableCell>
+                              {getAvatar(injectExpectation, expectationResult)}
+                            </TableCell>
+                            <TableCell>
+                              {expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
+                            </TableCell>
+                            <TableCell>
+                              <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                            </TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
 
-                  </Grid>
-                  {/* <Grid item={true} xs={4}>
-                    <Typography variant="h4">
-                      {t('Name')}
-                    </Typography>
-                    {emptyFilled(injectExpectation.inject_expectation_name)}
-                  </Grid>
-                  <Grid item={true} xs={4}>
-                    <Typography variant="h4">
-                      {t('Validation type')}
-                    </Typography>
-                    {emptyFilled(getLabelOfValidationType(injectExpectation))}
-                  </Grid>
-                  <Grid item={true} xs={4}>
-                    <Typography variant="h4">
-                      {t('Description')}
-                    </Typography>
-                    {emptyFilled(injectExpectation.inject_expectation_description)}
-                  </Grid> */}
-                </Grid>
                 <Grid
                   container={true}
                   spacing={2}
@@ -652,97 +708,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     </Typography>
                   </Grid>
 
-                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
-                    || (injectExpectation.inject_expectation_type === 'MANUAL'
-                      && injectExpectation.inject_expectation_results
-                      && injectExpectation.inject_expectation_results.length === 0))
-                    && (
-                      <Grid item={true} xs={6} style={{ textAlign: 'end' }}>
-                        <IconButton
-                          aria-label="Add"
-                          onClick={() => setSelectedExpectationForCreation({
-                            injectExpectation,
-                            sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
-                          })}
-                        >
-                          <AddModeratorOutlined fontSize="medium" />
-                        </IconButton>
-                      </Grid>
-                    )}
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
                     const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
                     // getTraces(injectExpectation.inject_expectation_id, expectationResult.sourceId);
                     return (
                       <Grid key={index} item xs={12}>
-                        <Accordion variant="outlined" key={injectExpectation.inject_expectation_id}>
-                          <AccordionSummary
-                            expandIcon={<ExpandMore />}
-                            aria-controls="accord1-content"
-                            id="accord1-header"
-                          >
-                            <div className={classes.flexContainer}>
-                              <div className={classes.flexItem}>
-                                {getAvatar(injectExpectation, expectationResult)}
-                              </div>
-                              <div className={classes.flexItem}>
-                                <Typography
-                                  variant="h2"
-                                >
-                                  {expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
-                                </Typography>
-                              </div>
-                              <div className={classes.flexItem}>
-                                <ItemResult label={expectationResult.result} status={expectationResult.result} />
-                              </div>
-                              <div className={classes.flexItem}>
-                                <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
-                              </div>
-                              <div className={classes.flexItem}>
-                                <IconButton
-                                  color="primary"
-                                  onClick={(ev) => {
-                                    ev.stopPropagation();
-                                    setAnchorEls({
-                                      ...anchorEls,
-                                      [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget,
-                                    });
-                                  }}
-                                  aria-haspopup="true"
-                                  size="large"
-                                  disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
-                                >
-                                  <MoreVertOutlined />
-                                </IconButton>
-                                <Menu
-                                  anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
-                                  open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
-                                  onClose={() => setAnchorEls({
-                                    ...anchorEls,
-                                    [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
-                                  })}
-                                >
-                                  <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
-                                    {t('Update')}
-                                  </MenuItem>
-                                  <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
-                                    {t('Delete')}
-                                  </MenuItem>
-                                </Menu>
-                              </div>
-                            </div>
-                          </AccordionSummary>
-                          <AccordionDetails>
-                            {
-                              expectationResult.sourceId && (
-                                <TargetResultsSecurityPlatform
-                                  injectExpectationId={injectExpectation.inject_expectation_id}
-                                  collectorId={expectationResult.sourceId}
-                                  expectationResult={expectationResult.result}
-                                />
-                              )
-                            }
-                          </AccordionDetails>
-                        </Accordion>
                         {/* <Card key={injectExpectation.inject_expectation_id}>
                           <CardHeader
                             classes={{ content: classes.cardHeaderContent }}
@@ -831,7 +801,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       </Grid>
                     )} */}
                 </Grid>
-              </div>
+              </Paper>
             ))}
           <Dialog
             open={selectedExpectationForCreation !== null}
