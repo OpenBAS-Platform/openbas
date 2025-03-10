@@ -5,7 +5,6 @@
   ",": ",",
   ".": ".",
   "(last 180 days)": "(180 derniers jours)",
-  "[${exercise.name}] Communication check": "[${exercise.name}] Vérification des moyens de communication",
   "[${exercise.name}] Lessons learned questionnaire": "[${exercise.name}] Questionnaire de retour d'expérience",
   "&": "& ;",
   "|": "|",
