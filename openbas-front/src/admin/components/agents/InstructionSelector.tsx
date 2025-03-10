@@ -137,7 +137,12 @@ nohup ${agentFolder ?? '/opt/openbas-caldera-agent'}/openbas-caldera-agent -serv
       }
       return result;
     };
-
+    const buildUrlScript2Windows = () => {
+      if (activeTab === 1 && selectedOption === USER) {
+        return `&([scriptblock]::Create((iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}))) ${buildExtraParams('-User USER -Password PASSWORD', '', '')}`;
+      }
+      return `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')}).Content`;
+    };
     const buildExclusionPath = (advanced: string, standard: string, other: string) => {
       let result = other;
       if (agentFolder) {
@@ -163,8 +168,8 @@ MD5: 68c1795fb45cb9b522d6cf48443fdc37
 SHA1: 5f87d06f818ff8cba9e11e8cd1c6f9d990eca0f8
 SHA256: 6b180913acb8cdac3fb8d3154a2f6a0bed13c056a477f4f94c4679414ec13b9f
 SHA512: 6185b7253eedfa6253f26cd85c4bcfaf05195219b6ab06b43d9b07279d7d0cdd3c957bd58d36058d7cde405bc8c5084f3ac060a6080bfc18a843738d3bee87fd`,
-          displayedCode: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')} ${buildExtraParams('-User USER -Password PASSWORD', '', '')}).Content`,
-          code: `iex (iwr ${buildInstallationUrl(settings.platform_base_url + '/api/agent/installer/openbas/windows')} ${buildExtraParams('-User USER -Password PASSWORD', '', '')}).Content`,
+          displayedCode: buildUrlScript2Windows(),
+          code: buildUrlScript2Windows(),
         };
       case LINUX:
         return {
