@@ -72,11 +72,10 @@ const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelect
             {platforms.map((platform, index) => (
               <Card
                 key={index}
+                variant="outlined"
                 sx={{
                   marginLeft: theme.spacing(1),
                   padding: theme.spacing(1),
-                  border: '1px solid',
-                  borderColor: '#292D39',
                   display: 'flex',
                 }}
               >

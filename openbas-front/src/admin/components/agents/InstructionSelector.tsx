@@ -399,7 +399,7 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
   return (
     <div>
       {selectedExecutor && (
-        <div style={{ padding: theme.spacing(0, 2, 1, 2) }}>
+        <div style={{ padding: theme.spacing(0, 2, 1) }}>
           {/* Caldera */}
           {selectedExecutor.executor_type === OPENBAS_CALDERA && (
             <div>

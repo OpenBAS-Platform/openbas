@@ -80,7 +80,7 @@ const Executors = () => {
       </Alert>
       <Grid2 container spacing={3}>
         {sortedExecutors.map((executor: Executor) => (
-          <Grid2 key={executor.executor_id} style={{ width: '23%' }}>
+          <Grid2 key={executor.executor_id} style={{ width: '20%' }}>
             <ExecutorSelector
               executor={executor}
               setSelectedExecutor={setSelectedExecutor}
