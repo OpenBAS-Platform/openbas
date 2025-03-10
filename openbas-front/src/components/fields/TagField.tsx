@@ -32,7 +32,8 @@ interface Props {
   fieldValue: string[];
   fieldOnChange: (values: string[]) => void;
   errors: FieldErrors;
-  style: CSSProperties;
+  style?: CSSProperties;
+  disabled?: boolean;
 }
 
 const TagField: FunctionComponent<Props> = ({
@@ -41,7 +42,8 @@ const TagField: FunctionComponent<Props> = ({
   fieldValue,
   fieldOnChange,
   errors,
-  style,
+  style = {},
+  disabled = false,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -103,6 +105,7 @@ const TagField: FunctionComponent<Props> = ({
         autoHighlight
         clearOnBlur={false}
         clearOnEscape={false}
+        disabled={disabled}
         options={tagsOptions}
         onChange={(_, value) => {
           fieldOnChange(value.map(v => v.id));
@@ -124,21 +127,30 @@ const TagField: FunctionComponent<Props> = ({
             fullWidth
             style={style}
             error={!!errors[name]}
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    <IconButton
+                      style={{
+                        position: 'absolute',
+                        right: '35px',
+                      }}
+                      disabled={disabled}
+                      onClick={() => handleOpenTagCreation()}
+                    >
+                      <AddOutlined />
+                    </IconButton>
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              },
+            }}
           />
         )}
         classes={{ clearIndicator: classes.autoCompleteIndicator }}
       />
-      <IconButton
-        onClick={() => handleOpenTagCreation()}
-        edge="end"
-        style={{
-          position: 'absolute',
-          top: 30,
-          right: 35,
-        }}
-      >
-        <AddOutlined />
-      </IconButton>
       {userAdmin && (
         <Dialog
           open={tagCreation}

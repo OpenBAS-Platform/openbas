@@ -14,7 +14,7 @@ import { type AttackPattern, type Inject, type InjectInput, type InjectorContrac
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isNotEmptyField } from '../../../../utils/utils';
-import InjectDetailsForm from './form/InjectDetailsForm';
+import InjectForm from './form/InjectForm';
 import InjectIcon from './InjectIcon';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
 
@@ -86,7 +86,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
           </Tabs>
         )}
         {!isInjectLoading && (isAtomic || activeTab === 'Inject details') && (
-          <InjectDetailsForm
+          <InjectForm
             injectorContractLabel={inject?.inject_title}
             injectContractIcon={
               injectorContractContent ? (

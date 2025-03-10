@@ -3,7 +3,7 @@ import { ArrowDropDownOutlined, ArrowDropUpOutlined, HelpOutlined } from '@mui/i
 import { Avatar, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useContext, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import type { TagHelper } from '../../../../../actions/helper';
@@ -20,8 +20,9 @@ import { splitDuration } from '../../../../../utils/Time';
 import { isEmptyField } from '../../../../../utils/utils';
 import { PermissionsContext } from '../../Context';
 import InjectCardComponent from '../InjectCardComponent';
+import InjectContentForm from './InjectContentForm';
 import InjectDefinition from './InjectDefinition';
-import InjectForm from './InjectForm';
+import InjectGlobalInfosForm from './InjectGlobalInfosForm';
 
 interface Props {
   injectContractIcon: React.ReactNode | undefined;
@@ -39,7 +40,7 @@ interface Props {
   injectorContractContent?: InjectorContractConverted['convertedContent'];
 }
 
-const InjectDetailsForm = ({
+const InjectForm = ({
   injectContractIcon,
   injectHeaderAction,
   injectHeaderTitle,
@@ -258,15 +259,7 @@ const InjectDetailsForm = ({
     handleClose();
   };
 
-  const {
-    reset,
-    control,
-    register,
-    handleSubmit,
-    getValues,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm({
+  const methods = useForm({
     mode: 'onTouched',
     resolver: zodResolver(
       z.object({
@@ -281,6 +274,7 @@ const InjectDetailsForm = ({
       })),
     defaultValues: defaultValues,
   });
+  const { control, register, handleSubmit, getValues, setValue, reset, formState: { errors, isSubmitting } } = methods;
 
   useEffect(() => {
     const initialValues = getInitialValues();
@@ -293,58 +287,59 @@ const InjectDetailsForm = ({
   }
 
   return (
-    <form
-      id="injectContentForm"
-      onSubmit={handleSubmit(onSubmit)}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: theme.spacing(2),
-      }}
-    >
-      <InjectCardComponent
-        avatar={injectContractIcon ?? (
-          <Avatar sx={{
-            width: 24,
-            height: 24,
-          }}
-          >
-            <HelpOutlined />
-          </Avatar>
-        )}
-        title={injectHeaderTitle}
-        action={injectHeaderAction}
-        content={injectorContractLabel}
-        disabled={disabled}
-      />
-      <InjectForm control={control} disabled={disabled} isAtomic={isAtomic} register={register} />
-      {injectorContractContent && (
-        <div style={{ width: '100%' }}>
-          {openDetails && (
-            <InjectDefinition
-              control={control}
-              register={register}
-              values={getValues()}
-              setValue={setValue}
-              getValues={(key: keyof typeof defaultValues) => getValues(key)}
-              submitting={isSubmitting}
-              inject={defaultValues}
-              injectorContract={{ ...injectorContractContent }}
-              handleClose={handleClose}
-              tagsMap={tagsMap}
-              readOnly={permissions.readOnly}
-              articlesFromExerciseOrScenario={[]}
-              variablesFromExerciseOrScenario={[]}
-              setInjectDetailsState={setInjectDetailsState}
-              uriVariable=""
-              allUsersNumber={0}
-              usersNumber={0}
-              teamsUsers={[]}
-              isAtomic={isAtomic}
-              {...props}
-            />
+    <FormProvider {...methods}>
+      <form
+        id="injectForm"
+        onSubmit={handleSubmit(onSubmit)}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(2),
+        }}
+      >
+        <InjectCardComponent
+          avatar={injectContractIcon ?? (
+            <Avatar sx={{
+              width: 24,
+              height: 24,
+            }}
+            >
+              <HelpOutlined />
+            </Avatar>
           )}
+          title={injectHeaderTitle}
+          action={injectHeaderAction}
+          content={injectorContractLabel}
+          disabled={disabled}
+        />
+        <InjectGlobalInfosForm isAtomic={isAtomic} readOnly={disabled} />
+        {injectorContractContent && openDetails && (
+          <InjectContentForm />
+          // <InjectDefinition
+          //   control={control}
+          //   register={register}
+          //   values={getValues()}
+          //   setValue={setValue}
+          //   getValues={(key: keyof typeof defaultValues) => getValues(key)}
+          //   submitting={isSubmitting}
+          //   inject={defaultValues}
+          //   injectorContract={{ ...injectorContractContent }}
+          //   handleClose={handleClose}
+          //   tagsMap={tagsMap}
+          //   readOnly={permissions.readOnly}
+          //   articlesFromExerciseOrScenario={[]}
+          //   variablesFromExerciseOrScenario={[]}
+          //   setInjectDetailsState={setInjectDetailsState}
+          //   uriVariable=""
+          //   allUsersNumber={0}
+          //   usersNumber={0}
+          //   teamsUsers={[]}
+          //   isAtomic={isAtomic}
+          //   {...props}
+          // />
 
+        )}
+        { injectorContractContent && (
           <Button
             variant="outlined"
             onClick={toggleInjectContent}
@@ -356,32 +351,32 @@ const InjectDetailsForm = ({
             {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}
             {t('Inject content')}
           </Button>
+        )}
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row-reverse',
+          gap: theme.spacing(1),
+        }}
+        >
+          <Button
+            variant="contained"
+            color="secondary"
+            type="submit"
+            disabled={isSubmitting || Object.keys(errors).length > 0 || disabled}
+          >
+            {isCreation ? t('Create') : t('Update')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
+            {t('Cancel')}
+          </Button>
         </div>
-      )}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row-reverse',
-        gap: theme.spacing(1),
-      }}
-      >
-        <Button
-          variant="contained"
-          color="secondary"
-          type="submit"
-          disabled={isSubmitting || Object.keys(errors).length > 0 || disabled}
-        >
-          {isCreation ? t('Create') : t('Update')}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleClose}
-          disabled={isSubmitting}
-        >
-          {t('Cancel')}
-        </Button>
-      </div>
-    </form>
+      </form>
+    </FormProvider>
   );
 };
 
-export default InjectDetailsForm;
+export default InjectForm;
