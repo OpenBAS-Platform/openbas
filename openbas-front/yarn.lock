@@ -2413,14 +2413,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@napi-rs/wasm-runtime@npm:^0.2.6":
-  version: 0.2.6
-  resolution: "@napi-rs/wasm-runtime@npm:0.2.6"
+"@napi-rs/wasm-runtime@npm:^0.2.7":
+  version: 0.2.7
+  resolution: "@napi-rs/wasm-runtime@npm:0.2.7"
   dependencies:
     "@emnapi/core": "npm:^1.3.1"
     "@emnapi/runtime": "npm:^1.3.1"
     "@tybys/wasm-util": "npm:^0.9.0"
-  checksum: 10c0/f921676c1d5c75494bd704c6c0837fd05fe95f5d1cb7373e32987ef5e00c3a1e90b5052352bd4b60ee20c3fe592af2dbba3b0de0c637218c25590828dbc4067e
+  checksum: 10c0/04a5edd79144bfa4e821a373fb6d4939f10c578c5f3633b5e67a57d0f5e36a593f595834d26654ea757bba7cd80b6c42d0d1405d6a8460c5d774e8cd5c9548a4
   languageName: node
   linkType: hard
 
@@ -2473,81 +2473,81 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-darwin-arm64@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-darwin-arm64@npm:4.2.0"
+"@oxc-resolver/binding-darwin-arm64@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-darwin-arm64@npm:5.0.0"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-darwin-x64@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-darwin-x64@npm:4.2.0"
+"@oxc-resolver/binding-darwin-x64@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-darwin-x64@npm:5.0.0"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-freebsd-x64@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-freebsd-x64@npm:4.2.0"
+"@oxc-resolver/binding-freebsd-x64@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-freebsd-x64@npm:5.0.0"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-arm-gnueabihf@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-linux-arm-gnueabihf@npm:4.2.0"
+"@oxc-resolver/binding-linux-arm-gnueabihf@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-linux-arm-gnueabihf@npm:5.0.0"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-arm64-gnu@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-linux-arm64-gnu@npm:4.2.0"
+"@oxc-resolver/binding-linux-arm64-gnu@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-linux-arm64-gnu@npm:5.0.0"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-arm64-musl@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-linux-arm64-musl@npm:4.2.0"
+"@oxc-resolver/binding-linux-arm64-musl@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-linux-arm64-musl@npm:5.0.0"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-x64-gnu@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-linux-x64-gnu@npm:4.2.0"
+"@oxc-resolver/binding-linux-x64-gnu@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-linux-x64-gnu@npm:5.0.0"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-x64-musl@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-linux-x64-musl@npm:4.2.0"
+"@oxc-resolver/binding-linux-x64-musl@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-linux-x64-musl@npm:5.0.0"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-wasm32-wasi@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-wasm32-wasi@npm:4.2.0"
+"@oxc-resolver/binding-wasm32-wasi@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-wasm32-wasi@npm:5.0.0"
   dependencies:
-    "@napi-rs/wasm-runtime": "npm:^0.2.6"
+    "@napi-rs/wasm-runtime": "npm:^0.2.7"
   conditions: cpu=wasm32
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-win32-arm64-msvc@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-win32-arm64-msvc@npm:4.2.0"
+"@oxc-resolver/binding-win32-arm64-msvc@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-win32-arm64-msvc@npm:5.0.0"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-win32-x64-msvc@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@oxc-resolver/binding-win32-x64-msvc@npm:4.2.0"
+"@oxc-resolver/binding-win32-x64-msvc@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@oxc-resolver/binding-win32-x64-msvc@npm:5.0.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -5771,11 +5771,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-import-resolver-oxc@npm:0.12.0":
-  version: 0.12.0
-  resolution: "eslint-import-resolver-oxc@npm:0.12.0"
+"eslint-import-resolver-oxc@npm:0.13.0":
+  version: 0.13.0
+  resolution: "eslint-import-resolver-oxc@npm:0.13.0"
   dependencies:
-    oxc-resolver: "npm:^4.2.0"
+    oxc-resolver: "npm:^5.0.0"
   peerDependencies:
     "@rspack/cli": "*"
     "@rspack/core": "*"
@@ -5803,7 +5803,7 @@ __metadata:
       optional: true
     webpack-merge:
       optional: true
-  checksum: 10c0/695a78656ec1da430c86354092743b837a1d976a80be77438f7f9b614a9e5d1c586614e7b802a13c86f15f7f64b7a1657193cec1ef0d0971a878a390360cb24a
+  checksum: 10c0/9cda321f95ee3c7af37716c7879a87bcb33a2fe7aba449d2a3613140bd8c9cc8d61be18f438048594ea19449cea20e4b3b4f2241053c39242042767a85517ae0
   languageName: node
   linkType: hard
 
@@ -9466,7 +9466,7 @@ __metadata:
     dompurify: "npm:3.2.4"
     esbuild: "npm:0.25.0"
     eslint: "npm:9.22.0"
-    eslint-import-resolver-oxc: "npm:0.12.0"
+    eslint-import-resolver-oxc: "npm:0.13.0"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
     eslint-plugin-i18next: "npm:6.1.1"
     eslint-plugin-import: "npm:2.31.0"
@@ -9553,21 +9553,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oxc-resolver@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "oxc-resolver@npm:4.2.0"
+"oxc-resolver@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "oxc-resolver@npm:5.0.0"
   dependencies:
-    "@oxc-resolver/binding-darwin-arm64": "npm:4.2.0"
-    "@oxc-resolver/binding-darwin-x64": "npm:4.2.0"
-    "@oxc-resolver/binding-freebsd-x64": "npm:4.2.0"
-    "@oxc-resolver/binding-linux-arm-gnueabihf": "npm:4.2.0"
-    "@oxc-resolver/binding-linux-arm64-gnu": "npm:4.2.0"
-    "@oxc-resolver/binding-linux-arm64-musl": "npm:4.2.0"
-    "@oxc-resolver/binding-linux-x64-gnu": "npm:4.2.0"
-    "@oxc-resolver/binding-linux-x64-musl": "npm:4.2.0"
-    "@oxc-resolver/binding-wasm32-wasi": "npm:4.2.0"
-    "@oxc-resolver/binding-win32-arm64-msvc": "npm:4.2.0"
-    "@oxc-resolver/binding-win32-x64-msvc": "npm:4.2.0"
+    "@oxc-resolver/binding-darwin-arm64": "npm:5.0.0"
+    "@oxc-resolver/binding-darwin-x64": "npm:5.0.0"
+    "@oxc-resolver/binding-freebsd-x64": "npm:5.0.0"
+    "@oxc-resolver/binding-linux-arm-gnueabihf": "npm:5.0.0"
+    "@oxc-resolver/binding-linux-arm64-gnu": "npm:5.0.0"
+    "@oxc-resolver/binding-linux-arm64-musl": "npm:5.0.0"
+    "@oxc-resolver/binding-linux-x64-gnu": "npm:5.0.0"
+    "@oxc-resolver/binding-linux-x64-musl": "npm:5.0.0"
+    "@oxc-resolver/binding-wasm32-wasi": "npm:5.0.0"
+    "@oxc-resolver/binding-win32-arm64-msvc": "npm:5.0.0"
+    "@oxc-resolver/binding-win32-x64-msvc": "npm:5.0.0"
   dependenciesMeta:
     "@oxc-resolver/binding-darwin-arm64":
       optional: true
@@ -9591,7 +9591,7 @@ __metadata:
       optional: true
     "@oxc-resolver/binding-win32-x64-msvc":
       optional: true
-  checksum: 10c0/73c0d1e48924dd459806f66e88fcf2dbadd1ec966d58e32ab58d116434e46c2552dbaeafeb0872906fa0b5f3756152c51389bf8600d849c92f8842b8fe9d44f5
+  checksum: 10c0/aafe3e51ff4356e915dd2ec81dbbf02585a8832551bdf566fae598d52709d98f218d3b36f9db2d90d623b12e0b25c5c8babe5dbcd71991eafd734719ed478752
   languageName: node
   linkType: hard
 
