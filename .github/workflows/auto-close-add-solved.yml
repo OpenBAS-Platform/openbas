@@ -1,0 +1,57 @@
+name: Auto close issue and add solved
+
+on:
+  pull_request:
+    branches:
+      - release/*
+      - master
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract issue numbers from PR description
+        id: extract_issues
+        run: |
+          ISSUES=$(echo "${{ github.event.pull_request.body }}" | grep -oiE '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #[0-9]+' | awk '{print $2}' | tr -d '#' | sort -u | tr '\n' ' ')
+          if [ -z "$ISSUES" ]; then
+            echo "No issue references found. Skipping."
+            exit 0
+          fi
+          echo "ISSUE_NUMBERS=$ISSUES" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Add "solved" label to issues
+        if: env.ISSUE_NUMBERS != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumbers = process.env.ISSUE_NUMBERS.split(' ');
+            for (const issueNumber of issueNumbers) {
+              github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: ["solved"]
+              });
+            }
+
+      - name: Close the issues
+        if: env.ISSUE_NUMBERS != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumbers = process.env.ISSUE_NUMBERS.split(' ');
+            for (const issueNumber of issueNumbers) {
+              github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                state: "closed"
+              });
+            }
