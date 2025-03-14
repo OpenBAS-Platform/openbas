@@ -57,7 +57,6 @@ public class LogApi extends RestBehavior {
               "Details of the log message, including level, message, and stacktrace.",
           required = true)
       @Valid @RequestBody LogDetailsInput logDetailsInput) {
-
     LogLevel level = LogLevel.fromString(logDetailsInput.getLevel());
 
     // Log the message based on the provided level
