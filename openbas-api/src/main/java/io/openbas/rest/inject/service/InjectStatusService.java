@@ -162,7 +162,7 @@ public class InjectStatusService {
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTraces, agentId);
     injectStatus.addTrace(executionTraces);
 
-    synchronized (this) {
+    synchronized (inject.getId()) {
       if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
           && (agentId == null || isAllInjectAgentsExecuted(inject))) {
         updateFinalInjectStatus(injectStatus);
