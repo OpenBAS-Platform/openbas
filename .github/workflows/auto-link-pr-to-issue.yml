@@ -1,0 +1,53 @@
+name: Auto link PR to Issues
+
+on:
+  pull_request:
+    branches:
+      - release/*
+    types: [opened, edited]
+
+jobs:
+  link_issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract issue numbers from PR description
+        id: extract_issues
+        run: |
+          ISSUES=$(echo "${{ github.event.pull_request.body }}" | grep -oiE '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #[0-9]+' | awk '{print $2}' | tr -d '#' | sort -u | tr '\n' ' ')
+          if [ -z "$ISSUES" ]; then
+            echo "No issue references found. Skipping."
+            exit 0
+          fi
+          echo "ISSUE_NUMBERS=$ISSUES" >> $GITHUB_ENV
+
+      - name: Link PR to Issues in Development Tab
+        if: env.ISSUE_NUMBERS != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for issue in $ISSUE_NUMBERS; do
+            ISSUE_ID=$(gh api graphql -f query='
+              query {
+                repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {
+                  issue(number: '"$issue"') {
+                    id
+                  }
+                }
+              }' --jq '.data.repository.issue.id')
+
+            PR_ID=$(gh api graphql -f query='
+              query {
+                repository(owner: "${{ github.repository_owner }}", name: "${{ github.event.repository.name }}") {
+                  pullRequest(number: ${{ github.event.pull_request.number }}) {
+                    id
+                  }
+                }
+              }' --jq '.data.repository.pullRequest.id')
+
+            gh api graphql -f query='
+              mutation {
+                addPullRequestToIssue(input: {pullRequestId: "'"$PR_ID"'", issueId: "'"$ISSUE_ID"'"}) {
+                  clientMutationId
+                }
+              }'
+          done
