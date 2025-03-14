@@ -34,6 +34,7 @@ public class CalderaExecutorService implements Runnable {
   private static final int CLEAR_TTL = 1800000; // 30 minutes
   private static final String CALDERA_EXECUTOR_TYPE = "openbas_caldera";
   public static final String CALDERA_EXECUTOR_NAME = "Caldera";
+  public static final String CALDERA_BACKGROUND_COLOR = "#8B1316";
 
   private final CalderaExecutorClient client;
 
@@ -88,7 +89,9 @@ public class CalderaExecutorService implements Runnable {
                 CALDERA_EXECUTOR_TYPE,
                 CALDERA_EXECUTOR_NAME,
                 null,
+                CALDERA_BACKGROUND_COLOR,
                 getClass().getResourceAsStream("/img/icon-caldera.png"),
+                getClass().getResourceAsStream("/img/banner-caldera.png"),
                 new String[] {
                   Endpoint.PLATFORM_TYPE.Windows.name(),
                   Endpoint.PLATFORM_TYPE.Linux.name(),
