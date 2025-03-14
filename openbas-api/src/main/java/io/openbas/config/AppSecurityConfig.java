@@ -18,6 +18,7 @@ import io.openbas.security.SsoRefererAuthenticationSuccessHandler;
 import io.openbas.security.TokenAuthenticationFilter;
 import io.openbas.service.UserService;
 import jakarta.annotation.Resource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -73,7 +75,8 @@ public class AppSecurityConfig {
   private OpenBASConfig openBASConfig;
   private Environment env;
 
-  @Resource protected ObjectMapper mapper;
+  @Resource
+  protected ObjectMapper mapper;
 
   @Autowired
   public void setEnv(Environment env) {
@@ -102,7 +105,7 @@ public class AppSecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         .requestCache(Customizer.withDefaults())
-        /**/ .requestCache((cache) -> cache.requestCache(new HttpSessionRequestCache()))
+        /**/.requestCache((cache) -> cache.requestCache(new HttpSessionRequestCache()))
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .securityContext((securityContext) -> securityContext.requireExplicitSave(false))
@@ -134,7 +137,9 @@ public class AppSecurityConfig {
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID", openBASConfig.getCookieName())
                     .logoutSuccessUrl(
-                        env.getProperty("openbas.logout-success-url", String.class, "/")));
+                        env.getProperty("openbas.base-url", String.class, "/") +
+                        env.getProperty("openbas.logout-success-url", String.class, "/")
+                    ));
 
     if (openBASConfig.isAuthOpenidEnable()) {
       http.oauth2Login(
@@ -176,7 +181,8 @@ public class AppSecurityConfig {
   }
 
   private List<String> extractRolesFromToken(OAuth2AccessToken accessToken, String registrationId) {
-    ObjectReader listReader = mapper.readerFor(new TypeReference<List<String>>() {});
+    ObjectReader listReader = mapper.readerFor(new TypeReference<List<String>>() {
+    });
     if (accessToken != null) {
       String rolesPathConfig = "openbas.provider." + registrationId + ".roles_path";
       //noinspection unchecked
