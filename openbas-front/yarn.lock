@@ -5762,11 +5762,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-import-resolver-oxc@npm:0.13.0":
-  version: 0.13.0
-  resolution: "eslint-import-resolver-oxc@npm:0.13.0"
+"eslint-import-resolver-oxc@npm:0.13.1":
+  version: 0.13.1
+  resolution: "eslint-import-resolver-oxc@npm:0.13.1"
   dependencies:
     oxc-resolver: "npm:^5.0.0"
+    stable-hash: "npm:0.0.5"
   peerDependencies:
     "@rspack/cli": "*"
     "@rspack/core": "*"
@@ -5794,7 +5795,7 @@ __metadata:
       optional: true
     webpack-merge:
       optional: true
-  checksum: 10c0/9cda321f95ee3c7af37716c7879a87bcb33a2fe7aba449d2a3613140bd8c9cc8d61be18f438048594ea19449cea20e4b3b4f2241053c39242042767a85517ae0
+  checksum: 10c0/7b8ff5a193acf97a001ea66e2e2fdd04e068e793f63a299f05350332394e7341d494b5d2fc290c6d85fe05a4fb5d64ea1709cb42ee008d0e27d4a3efe256459a
   languageName: node
   linkType: hard
 
@@ -9457,7 +9458,7 @@ __metadata:
     dompurify: "npm:3.2.4"
     esbuild: "npm:0.25.0"
     eslint: "npm:9.22.0"
-    eslint-import-resolver-oxc: "npm:0.13.0"
+    eslint-import-resolver-oxc: "npm:0.13.1"
     eslint-plugin-custom-rules: "link:packages/eslint-plugin-custom-rules"
     eslint-plugin-i18next: "npm:6.1.1"
     eslint-plugin-import: "npm:2.31.0"
@@ -11309,6 +11310,13 @@ __metadata:
   dependencies:
     minipass: "npm:^7.0.3"
   checksum: 10c0/caddd5f544b2006e88fa6b0124d8d7b28208b83c72d7672d5ade44d794525d23b540f3396108c4eb9280dcb7c01f0bef50682f5b4b2c34291f7c5e211fd1417d
+  languageName: node
+  linkType: hard
+
+"stable-hash@npm:0.0.5":
+  version: 0.0.5
+  resolution: "stable-hash@npm:0.0.5"
+  checksum: 10c0/ca670cb6d172f1c834950e4ec661e2055885df32fee3ebf3647c5df94993b7c2666a5dbc1c9a62ee11fc5c24928579ec5e81bb5ad31971d355d5a341aab493b3
   languageName: node
   linkType: hard
 
