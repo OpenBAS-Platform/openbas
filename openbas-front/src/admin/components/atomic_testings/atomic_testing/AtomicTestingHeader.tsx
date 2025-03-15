@@ -4,10 +4,7 @@ import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import {
-  launchAtomicTesting,
-  relaunchAtomicTesting,
-} from '../../../../actions/atomic_testings/atomic-testing-actions';
+import { launchAtomicTesting, relaunchAtomicTesting, } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
@@ -16,6 +13,7 @@ import { truncate } from '../../../../utils/String';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import AtomicTestingPopover from './AtomicTestingPopover';
 import AtomicTestingUpdate from './AtomicTestingUpdate';
+import Notification from '../../common/notification/Notification';
 
 const useStyles = makeStyles()(() => ({
   title: {
@@ -82,21 +80,31 @@ const AtomicTestingHeader = () => {
     if (injectResultOverviewOutput.inject_ready) {
       const launchOrRelaunchKey = !injectResultOverviewOutput.inject_status?.status_id ? 'Launch now' : 'Relaunch now';
       return (
-        <Button
-          style={{ marginRight: 10 }}
-          startIcon={<PlayArrowOutlined />}
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={handleOpenDialog}
-          disabled={!canLaunch}
-        >
-          {t(launchOrRelaunchKey)}
-        </Button>
+        <>
+          <Notification
+            entityId={injectResultOverviewOutput.inject_id}
+            name={injectResultOverviewOutput.inject_title}
+          />
+          <Button
+            style={{ marginRight: 10 }}
+            startIcon={<PlayArrowOutlined />}
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={handleOpenDialog}
+            disabled={!canLaunch}
+          >
+            {t(launchOrRelaunchKey)}
+          </Button>
+        </>
       );
     } else {
       return (
         <>
+          <Notification
+            entityId={injectResultOverviewOutput.inject_id}
+            name={injectResultOverviewOutput.inject_title}
+          />
           <Button
             style={{ marginRight: 10 }}
             startIcon={<SettingsOutlined />}
@@ -127,9 +135,9 @@ const AtomicTestingHeader = () => {
       >
         <DialogContent>
           <DialogContentText>
-            { injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
+            {injectResultOverviewOutput.inject_ready && !injectResultOverviewOutput.inject_status?.status_id
               ? t('Do you want to launch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })
-              : t('Do you want to relaunch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title }) }
+              : t('Do you want to relaunch this atomic testing: {title}?', { title: injectResultOverviewOutput.inject_title })}
           </DialogContentText>
           {(injectResultOverviewOutput.inject_ready && injectResultOverviewOutput.inject_status?.status_id) && (
             <Alert severity="warning" style={{ marginTop: 20 }}>

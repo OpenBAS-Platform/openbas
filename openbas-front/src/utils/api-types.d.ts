@@ -178,7 +178,6 @@ export interface AssetGroup {
   asset_group_created_at: string;
   asset_group_description?: string;
   asset_group_dynamic_assets?: string[];
-  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
@@ -190,7 +189,6 @@ export interface AssetGroup {
 
 export interface AssetGroupInput {
   asset_group_description?: string;
-  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -200,7 +198,6 @@ export interface AssetGroupOutput {
   /** @uniqueItems true */
   asset_group_assets?: string[];
   asset_group_description?: string;
-  /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_id: string;
   asset_group_name: string;
@@ -1140,7 +1137,6 @@ export interface Filter {
   values?: string[];
 }
 
-/** Filter object to search within filterable attributes */
 export interface FilterGroup {
   filters?: Filter[];
   mode: "and" | "or";
@@ -2224,6 +2220,27 @@ export interface NetworkTraffic {
   /** @format date-time */
   payload_updated_at: string;
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
+}
+
+export interface Notification {
+  listened?: boolean;
+  /** @format date-time */
+  notification_created_at: string;
+  notification_event_types?: string[];
+  notification_filter?: FilterGroup;
+  notification_id: string;
+  notification_name: string;
+  notification_outcomes?: string[];
+  /** @format date-time */
+  notification_updated_at: string;
+  notification_user?: string;
+}
+
+export interface NotificationInput {
+  notification_event_types?: string[];
+  notification_filter?: FilterGroup;
+  notification_name: string;
+  notification_outcomes?: string[];
 }
 
 /** List of Saml2 providers */
@@ -3314,7 +3331,6 @@ export interface ScenarioUpdateTeamsInput {
 }
 
 export interface SearchPaginationInput {
-  /** Filter object to search within filterable attributes */
   filterGroup?: FilterGroup;
   /**
    * Page number to get
