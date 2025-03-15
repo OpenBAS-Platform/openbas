@@ -265,6 +265,12 @@
             <version>4.1.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+<!--            FIXME: remove version-->
+            <version>3.1.5</version>
+        </dependency>
     </dependencies>
 
     <build>

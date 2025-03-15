@@ -1,17 +1,5 @@
 package io.openbas.rest.exercise.service;
 
-import static io.openbas.config.SessionHelper.currentUser;
-import static io.openbas.database.criteria.GenericCriteria.countQuery;
-import static io.openbas.database.specification.TeamSpecification.fromIds;
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.utils.Constants.ARTICLES;
-import static io.openbas.utils.JpaUtils.arrayAggOnId;
-import static io.openbas.utils.StringUtils.duplicateString;
-import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
-import static java.time.Instant.now;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.ofNullable;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
@@ -22,7 +10,6 @@ import io.openbas.database.repository.*;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExerciseSimple;
-import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
@@ -32,12 +19,8 @@ import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.*;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
-import io.openbas.utils.ExerciseMapper;
-import io.openbas.utils.InjectMapper;
-import io.openbas.utils.ResultUtils;
-import io.openbas.utils.TargetType;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -45,11 +28,6 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotBlank;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -63,12 +41,32 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static io.openbas.config.SessionHelper.currentUser;
+import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.ExerciseSpecification.*;
+import static io.openbas.database.specification.TeamSpecification.fromIds;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.utils.Constants.ARTICLES;
+import static io.openbas.utils.JpaUtils.arrayAggOnId;
+import static io.openbas.utils.StringUtils.duplicateString;
+import static io.openbas.utils.pagination.SortUtilsCriteriaBuilder.toSortCriteriaBuilder;
+import static java.time.Instant.now;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+
 @RequiredArgsConstructor
 @Validated
 @Service
 public class ExerciseService {
 
-  @PersistenceContext private EntityManager entityManager;
+  @PersistenceContext
+  private EntityManager entityManager;
 
   private final GrantService grantService;
   private final InjectDuplicateService injectDuplicateService;
@@ -99,7 +97,8 @@ public class ExerciseService {
   @Value("${openbas.mail.imap.username}")
   private String imapUsername;
 
-  @Resource private OpenBASConfig openBASConfig;
+  @Resource
+  private OpenBASConfig openBASConfig;
 
   // endregion
 
@@ -426,7 +425,9 @@ public class ExerciseService {
     return new CriteriaBuilderAndExercises(cb, exercises);
   }
 
-  private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}
+  private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {
+
+  }
 
   // -- SELECT --
   private void select(
@@ -556,7 +557,9 @@ public class ExerciseService {
   private record MappingsByExerciseIds(
       Map<String, List<Object[]>> teamsByExerciseIds,
       Map<String, List<Object[]>> assetsByExerciseIds,
-      Map<String, List<Object[]>> assetGroupsByExerciseIds) {}
+      Map<String, List<Object[]>> assetGroupsByExerciseIds) {
+
+  }
 
   private Map<String, List<RawInjectExpectation>> getExpectationsByExerciseId(
       Set<String> exerciseIds) {
@@ -599,20 +602,29 @@ public class ExerciseService {
         targetsByExerciseIds.getOrDefault(exercise.getId(), emptyList()), targetType);
   }
 
-  // -- SCENARIO EXERCISES --
+  // -- SCENARIO SIMULATIONS --
   public Iterable<ExerciseSimple> scenarioExercises(@NotBlank String scenarioId) {
     List<RawExerciseSimple> exercises = exerciseRepository.rawAllByScenarioIds(List.of(scenarioId));
     return exerciseMapper.getExerciseSimples(exercises);
   }
 
-  // -- GLOBAL RESULTS --
-  public List<ExpectationResultsByType> getGlobalResults(@NotBlank String exerciseId) {
-    return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(exerciseId));
+  public Exercise previousFinishedSimulation(@NotBlank final String scenarioId, @NotNull final Instant instant) {
+    return this.exerciseRepository.findAll(
+            fromScenario(scenarioId).and(finished()).and(closestBefore(instant))
+        ).stream()
+        .findFirst()
+        .orElse(null);
   }
 
-  public ExercisesGlobalScoresOutput getExercisesGlobalScores(ExercisesGlobalScoresInput input) {
+  // -- GLOBAL RESULTS --
+  public List<ExpectationResultsByType> getGlobalResults(@NotBlank String simulationId) {
+    return resultUtils.getResultsByTypes(exerciseRepository.findInjectsByExercise(simulationId));
+  }
+
+  public ExercisesGlobalScoresOutput getExercisesGlobalScores(@NotNull final List<String> simulationIds) {
     Map<String, List<ExpectationResultsByType>> globalScoresByExerciseIds =
-        input.exerciseIds().stream()
+        simulationIds
+            .stream()
             .collect(Collectors.toMap(Function.identity(), this::getGlobalResults));
     return new ExercisesGlobalScoresOutput(globalScoresByExerciseIds);
   }

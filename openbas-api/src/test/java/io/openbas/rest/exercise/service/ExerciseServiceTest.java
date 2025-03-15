@@ -101,8 +101,7 @@ class ExerciseServiceTest {
         .thenReturn(ExpectationResultsByTypeFixture.exercise2GlobalScores);
 
     var results =
-        exerciseService.getExercisesGlobalScores(
-            new ExercisesGlobalScoresInput(List.of(exerciseId1, exerciseId2)));
+        exerciseService.getExercisesGlobalScores(List.of(exerciseId1, exerciseId2));
 
     assertEquals(
         results.globalScoresByExerciseIds(),

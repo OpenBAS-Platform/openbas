@@ -2,6 +2,7 @@ package io.openbas.service;
 
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.criteria.GenericCriteria.countQuery;
+import static io.openbas.database.specification.ScenarioSpecification.bySimulationId;
 import static io.openbas.database.specification.ScenarioSpecification.findGrantedFor;
 import static io.openbas.database.specification.TeamSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -112,6 +113,8 @@ public class ScenarioService {
 
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
+
+  // -- CRUD --
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {
@@ -282,6 +285,12 @@ public class ScenarioService {
   public Scenario scenario(@NotBlank final String scenarioId) {
     return this.scenarioRepository
         .findById(scenarioId)
+        .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
+  }
+
+  public Scenario scenarioFromSimulationId(@NotBlank final String simulationId) {
+    return this.scenarioRepository
+        .findOne(bySimulationId(simulationId))
         .orElseThrow(() -> new ElementNotFoundException("Scenario not found"));
   }
 
