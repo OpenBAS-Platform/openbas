@@ -134,7 +134,8 @@ public class AppSecurityConfig {
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID", openBASConfig.getCookieName())
                     .logoutSuccessUrl(
-                        env.getProperty("openbas.logout-success-url", String.class, "/")));
+                        env.getProperty("openbas.base-url", String.class, "/")
+                            + env.getProperty("openbas.logout-success-url", String.class, "/")));
 
     if (openBASConfig.isAuthOpenidEnable()) {
       http.oauth2Login(
