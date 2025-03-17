@@ -280,9 +280,20 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           fontSize: 9,
         },
       })));
-      fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT' ? upperParentTargetId : parentTargetId).then(
-        (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
-      );
+      fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT' ? upperParentTargetId : parentTargetId)
+        .then((result: { data: InjectExpectationsStore[] }) => {
+          const uniqueResults = Object.values(
+            result.data.reduce((acc, item) => {
+              if (!acc[item.inject_expectation_type] ||
+                item.inject_expectation_id < acc[item.inject_expectation_type].inject_expectation_id) {
+                acc[item.inject_expectation_type] = item;
+              }
+              return acc;
+            }, {} as Record<string, InjectExpectationsStore>)
+          );
+
+          setTargetResults(uniqueResults);
+        });
       setActiveTab(0);
       setTimeout(() => setInitialized(true), 1000);
     }
