@@ -3,6 +3,7 @@ name: Auto close issue and add solved
 on:
   pull_request:
     branches:
+      - issue/2652
       - release/*
       - master
     types:
