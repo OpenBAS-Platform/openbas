@@ -1,4 +1,4 @@
-name: Auto close issue and add solved
+name: Auto close issue and add solved [TEST]
 
 on:
   pull_request:
