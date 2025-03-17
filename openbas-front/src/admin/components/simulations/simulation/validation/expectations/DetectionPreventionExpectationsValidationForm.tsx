@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, TextField as MuiTextField, Typography } from '@mui/material';
+import { Button, Grid, TextField as MuiTextField, Typography } from '@mui/material';
 import { type FunctionComponent } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
@@ -123,6 +123,24 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
         helperText={errors.expectation_score && errors.expectation_score?.message ? errors.expectation_score?.message : `${t('Expected score:')} ${expectation.inject_expectation_expected_score}`}
         inputProps={register('expectation_score')}
       />
+      <Grid container={true} spacing={2}>
+        <Grid item={true} xs={7}>
+          <MuiTextField
+            className={classes.marginTop_2}
+            variant="standard"
+            fullWidth
+            label={t('Alert link')}
+          />
+        </Grid>
+        <Grid item={true} xs={5}>
+          <MuiTextField
+            className={classes.marginTop_2}
+            variant="standard"
+            fullWidth
+            label={t('Prevention time')}
+          />
+        </Grid>
+      </Grid>
       <div className={classes.buttons}>
         <Button
           type="submit"
