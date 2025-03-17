@@ -4102,15 +4102,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.14.1":
-  version: 8.14.1
-  resolution: "acorn@npm:8.14.1"
-  bin:
-    acorn: bin/acorn
-  checksum: 10c0/dbd36c1ed1d2fa3550140000371fcf721578095b18777b85a79df231ca093b08edc6858d75d6e48c73e431c174dcf9214edbd7e6fa5911b93bd8abfa54e47123
-  languageName: node
-  linkType: hard
-
 "agent-base@npm:6":
   version: 6.0.2
   resolution: "agent-base@npm:6.0.2"
@@ -6586,23 +6577,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"foreground-child@npm:^3.1.0, foreground-child@npm:^3.3.0":
+"foreground-child@npm:^3.1.0":
   version: 3.3.0
   resolution: "foreground-child@npm:3.3.0"
   dependencies:
     cross-spawn: "npm:^7.0.0"
     signal-exit: "npm:^4.0.1"
   checksum: 10c0/028f1d41000553fcfa6c4bb5c372963bf3d9bf0b1f25a87d1a6253014343fb69dfb1b42d9625d7cf44c8ba429940f3d0ff718b62105d4d4a4f6ef8ca0a53faa2
-  languageName: node
-  linkType: hard
-
-"foreground-child@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "foreground-child@npm:3.3.1"
-  dependencies:
-    cross-spawn: "npm:^7.0.6"
-    signal-exit: "npm:^4.0.1"
-  checksum: 10c0/8986e4af2430896e65bc2788d6679067294d6aee9545daefc84923a0a4b399ad9c7a3ea7bd8c0b2b80fdf4a92de4c69df3f628233ff3224260e9c1541a9e9ed3
   languageName: node
   linkType: hard
 
@@ -9313,29 +9294,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monocart-coverage-reports@npm:2.12.3":
-  version: 2.12.3
-  resolution: "monocart-coverage-reports@npm:2.12.3"
-  dependencies:
-    acorn: "npm:^8.14.1"
-    acorn-loose: "npm:^8.4.0"
-    acorn-walk: "npm:^8.3.4"
-    commander: "npm:^13.1.0"
-    console-grid: "npm:^2.2.3"
-    eight-colors: "npm:^1.3.1"
-    foreground-child: "npm:^3.3.1"
-    istanbul-lib-coverage: "npm:^3.2.2"
-    istanbul-lib-report: "npm:^3.0.1"
-    istanbul-reports: "npm:^3.1.7"
-    lz-utils: "npm:^2.1.0"
-    monocart-locator: "npm:^1.0.2"
-  bin:
-    mcr: lib/cli.js
-  checksum: 10c0/a5faf70da8fe15ca902a84d80ab7596d3f4710a6e2958cbef9d9c4f48a37473f438c93ac2e021129e25e62ff72358b78c0d89cacdc85fe65d5a8aa4ac20d0ed8
-  languageName: node
-  linkType: hard
-
-"monocart-coverage-reports@npm:^2.12.3":
+"monocart-coverage-reports@npm:2.12.3, monocart-coverage-reports@npm:^2.12.3":
   version: 2.12.3
   resolution: "monocart-coverage-reports@npm:2.12.3"
   dependencies:
