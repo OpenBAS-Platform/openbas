@@ -53,7 +53,8 @@ public class CrowdStrikeExecutorClient {
 
   public ResourcesHosts devices() {
     try {
-      String jsonResponse = this.get(ENDPOINTS_URI + "?id=" + this.config.getHostGroup());
+      String jsonResponse =
+          this.get(ENDPOINTS_URI + "?id=" + this.config.getHostGroup() + "&limit=5000");
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
     } catch (JsonProcessingException e) {
       log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());

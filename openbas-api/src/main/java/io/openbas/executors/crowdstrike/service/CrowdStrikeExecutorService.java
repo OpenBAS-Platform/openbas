@@ -91,7 +91,10 @@ public class CrowdStrikeExecutorService implements Runnable {
   @Override
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
-    List<CrowdStrikeDevice> devices = this.client.devices().getResources().stream().toList();
+    List<CrowdStrikeDevice> devices =
+        this.client.devices().getResources().stream().toList().stream()
+            .filter(device -> device.getHostname() != null)
+            .collect(Collectors.toList());
     List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
     log.info(
         "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");
