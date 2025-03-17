@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+import org.springframework.stereotype.Component;
 
+@Component
 public class V3_72__Add_FKs_jointure_tables_to_tags extends BaseJavaMigration {
 
   @Override
