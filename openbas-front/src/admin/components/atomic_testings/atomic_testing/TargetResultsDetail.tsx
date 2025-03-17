@@ -284,12 +284,12 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         .then((result: { data: InjectExpectationsStore[] }) => {
           const uniqueResults = Object.values(
             result.data.reduce((acc, item) => {
-              if (!acc[item.inject_expectation_type] ||
-                item.inject_expectation_id < acc[item.inject_expectation_type].inject_expectation_id) {
+              if (!acc[item.inject_expectation_type]
+                || item.inject_expectation_id < acc[item.inject_expectation_type].inject_expectation_id) {
                 acc[item.inject_expectation_type] = item;
               }
               return acc;
-            }, {} as Record<string, InjectExpectationsStore>)
+            }, {} as Record<string, InjectExpectationsStore>),
           );
 
           setTargetResults(uniqueResults);
