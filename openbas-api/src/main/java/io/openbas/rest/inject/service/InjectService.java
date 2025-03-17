@@ -6,6 +6,7 @@ import static io.openbas.utils.AgentUtils.isPrimaryAgent;
 import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
+import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -181,19 +182,20 @@ public class InjectService {
     }
   }
 
-  public Map<Asset, AssetGroup> resolveAllAssetsToExecute(@NotNull final Inject inject) {
-    Map<Asset, AssetGroup> assets =
-        inject.getAssets().stream().collect(Collectors.toMap(asset -> asset, asset -> null)); //false
-    inject
-        .getAssetGroups()
-        .forEach(
-            (assetGroup -> {
-              List<Asset> assetsFromGroup =
-                  this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-              // Verify asset validity
-              assetsFromGroup.forEach((asset) -> assets.put(asset, assetGroup)); //true
-            }));
-    return assets;
+  public Map<Asset, List<AssetGroup>> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    Map<Asset, List<AssetGroup>> assetToGroupsMap = new HashMap<>();
+
+    inject.getAssets().forEach(asset -> assetToGroupsMap.put(asset, new ArrayList<>()));
+
+    inject.getAssetGroups().forEach(assetGroup -> {
+      List<Asset> assetsFromGroup = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+
+      assetsFromGroup.forEach(asset ->
+          assetToGroupsMap.computeIfAbsent(asset, k -> new ArrayList<>()).add(assetGroup)
+      );
+    });
+
+    return assetToGroupsMap;
   }
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {

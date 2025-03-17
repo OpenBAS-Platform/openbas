@@ -71,7 +71,7 @@ public class CalderaExecutor extends Injector {
 
     Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
 
-    Map<Asset, AssetGroup> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    Map<Asset, List<AssetGroup>> assets = this.injectService.resolveAllAssetsToExecute(inject);
 
     // Execute inject for all assets
     if (assets.isEmpty()) {
@@ -138,7 +138,7 @@ public class CalderaExecutor extends Injector {
                   .forEach(
                       entry -> {
                         Asset asset = entry.getKey();
-                        boolean isInGroup = entry.getValue();
+                        List<AssetGroup> assetGroups = entry.getValue();
 
                         if (!(asset instanceof Endpoint)) {
                           return;
@@ -256,7 +256,7 @@ public class CalderaExecutor extends Injector {
                             expectations,
                             content,
                             asset,
-                            isInGroup,
+                            assetGroups,
                             executedAgentByEndpoint.get(asset.getId()));
                       });
             },
@@ -387,7 +387,7 @@ public class CalderaExecutor extends Injector {
       final List<Expectation> expectations,
       @NotNull final CalderaInjectContent content,
       @NotNull final Asset asset,
-      final boolean expectationGroup,
+      final List<AssetGroup> assetGroups,
       final List<io.openbas.database.model.Agent> executedAgents) {
 
     if (!content.getExpectations().isEmpty()) {
@@ -403,7 +403,7 @@ public class CalderaExecutor extends Injector {
                                   expectation.getName(),
                                   expectation.getDescription(),
                                   asset,
-                                  expectationGroup,
+                                  assetGroupParent,
                                   expectation.getExpirationTime());
 
                           // We propagate the asset expectation to agents
@@ -427,7 +427,7 @@ public class CalderaExecutor extends Injector {
                                   expectation.getName(),
                                   expectation.getDescription(),
                                   asset,
-                                  expectationGroup,
+                                  assetGroupParent,
                                   expectation.getExpirationTime());
                           // We propagate the asset expectation to agents
                           List<DetectionExpectation> detectionExpectationList =
@@ -450,7 +450,7 @@ public class CalderaExecutor extends Injector {
                                   expectation.getDescription(),
                                   asset,
                                   expectation.getExpirationTime(),
-                                  expectationGroup);
+                                  assetGroupParent);
                           // We propagate the asset expectation to agents
                           List<ManualExpectation> manualExpectationList =
                               ExpectationUtils.getManualExpectationListForCaldera(
