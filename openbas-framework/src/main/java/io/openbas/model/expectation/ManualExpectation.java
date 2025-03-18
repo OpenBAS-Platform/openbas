@@ -48,7 +48,7 @@ public class ManualExpectation implements Expectation {
       final String description,
       @NotNull final Agent agent,
       @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup,
+      final AssetGroup assetGroup,
       final Long expirationTime) {
     ManualExpectation manualExpectation = new ManualExpectation();
     manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
@@ -66,7 +66,7 @@ public class ManualExpectation implements Expectation {
       @NotBlank final String name,
       final String description,
       @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup,
+      final AssetGroup assetGroup,
       final Long expirationTime) {
     ManualExpectation manualExpectation = new ManualExpectation();
     manualExpectation.setScore(Objects.requireNonNullElse(score, 100.0));

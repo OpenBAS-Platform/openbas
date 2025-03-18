@@ -39,7 +39,7 @@ public class DetectionExpectation implements Expectation {
       final String description,
       @NotNull final Agent agent,
       @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup,
+      final AssetGroup assetGroup,
       final Long expirationTime,
       List<InjectExpectationSignature> injectExpectationSignatures) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
@@ -59,7 +59,7 @@ public class DetectionExpectation implements Expectation {
       @NotBlank final String name,
       final String description,
       @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup,
+      final AssetGroup assetGroup,
       final Long expirationTime) {
     DetectionExpectation detectionExpectation = new DetectionExpectation();
     detectionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));

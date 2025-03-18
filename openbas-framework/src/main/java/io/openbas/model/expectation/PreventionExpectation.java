@@ -43,7 +43,7 @@ public class PreventionExpectation implements Expectation {
       final String description,
       @NotNull Agent agent,
       @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup,
+      final AssetGroup assetGroup,
       final Long expirationTime,
       final List<InjectExpectationSignature> injectExpectationSignatures) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
@@ -63,7 +63,7 @@ public class PreventionExpectation implements Expectation {
       @NotBlank final String name,
       final String description,
       @NotNull final Asset asset,
-      @NotNull final AssetGroup assetGroup,
+      final AssetGroup assetGroup,
       final Long expirationTime) {
     PreventionExpectation preventionExpectation = new PreventionExpectation();
     preventionExpectation.setScore(Objects.requireNonNullElse(score, 100.0));
