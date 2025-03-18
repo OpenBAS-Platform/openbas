@@ -606,4 +606,9 @@ public class ExpectationUtils {
       String signatureType, String signatureValue) {
     return builder().type(signatureType).value(signatureValue).build();
   }
+
+  // --
+  public static boolean isAssetGroupExpectation(InjectExpectation e) {
+    return e.getAssetGroup() != null && e.getAsset() == null && e.getAgent() == null;
+  }
 }

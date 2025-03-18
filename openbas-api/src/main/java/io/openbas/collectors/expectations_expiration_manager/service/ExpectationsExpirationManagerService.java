@@ -3,6 +3,7 @@ package io.openbas.collectors.expectations_expiration_manager.service;
 import static io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig.PRODUCT_NAME;
 import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.computeFailedMessage;
 import static io.openbas.collectors.expectations_expiration_manager.utils.ExpectationUtils.isExpired;
+import static io.openbas.utils.ExpectationUtils.isAssetGroupExpectation;
 
 import io.openbas.collectors.expectations_expiration_manager.config.ExpectationsExpirationManagerConfig;
 import io.openbas.database.model.InjectExpectation;
@@ -83,9 +84,7 @@ public class ExpectationsExpirationManagerService {
   private void computeExpectationsForAssetGroups(
       @NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssetGroups =
-        expectations.stream()
-            .filter(e -> isAssetGroupExpectation(e))
-            .toList();
+        expectations.stream().filter(e -> isAssetGroupExpectation(e)).toList();
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
           List<InjectExpectation> expectationAssets =
@@ -103,9 +102,5 @@ public class ExpectationsExpirationManagerService {
                 PRODUCT_NAME);
           }
         }));
-  }
-
-  private static boolean isAssetGroupExpectation(InjectExpectation e) {
-    return e.getAssetGroup() != null && e.getAsset() == null && e.getAgent() == null;
   }
 }

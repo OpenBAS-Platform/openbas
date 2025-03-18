@@ -3,6 +3,7 @@ package io.openbas.service;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.InjectExpectationUtils.*;
+import static io.openbas.utils.ExpectationUtils.isAssetGroupExpectation;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -466,9 +467,7 @@ public class InjectExpectationService {
 
   private void propagateUpdateToAssetGroups(Inject inject, Collector collector) {
     List<InjectExpectation> expectationAssetGroups =
-        inject.getExpectations().stream()
-            .filter(e -> e.getAssetGroup() != null && e.getAsset() == null)
-            .toList();
+        inject.getExpectations().stream().filter(e -> isAssetGroupExpectation(e)).toList();
 
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
