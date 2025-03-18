@@ -746,6 +746,24 @@ export interface CreateUserInput {
   user_tags?: string[];
 }
 
+export interface CustomDashboard {
+  custom_dashboard_content?: string;
+  /** @format date-time */
+  custom_dashboard_created_at: string;
+  custom_dashboard_description?: string;
+  custom_dashboard_id: string;
+  custom_dashboard_name: string;
+  /** @format date-time */
+  custom_dashboard_updated_at: string;
+  listened?: boolean;
+}
+
+export interface CustomDashboardInput {
+  custom_dashboard_content?: string;
+  custom_dashboard_description?: string;
+  custom_dashboard_name: string;
+}
+
 export interface DirectInjectInput {
   inject_content?: object;
   inject_description?: string;
@@ -2767,6 +2785,25 @@ export interface PageAssetGroupOutput {
 
 export interface PageAttackPattern {
   content?: AttackPattern[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageCustomDashboard {
+  content?: CustomDashboard[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
