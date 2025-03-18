@@ -420,13 +420,20 @@ public class InjectExpectationService {
   private void propagateUpdateToAssets(
       InjectExpectation injectExpectation, Inject inject, Collector collector) {
     InjectExpectation finalInjectExpectation = injectExpectation;
+
     List<InjectExpectation> expectationAssets =
         inject.getExpectations().stream()
+            .filter(e -> e.getAsset() != null)
+            .filter(e -> e.getAgent() == null)
+            .filter(e -> e.getAsset().getId().equals(finalInjectExpectation.getAsset().getId()))
             .filter(
                 e ->
-                    e.getAsset() != null
-                        && e.getAgent() == null
-                        && e.getAsset().getId().equals(finalInjectExpectation.getAsset().getId()))
+                    (finalInjectExpectation.getAssetGroup() != null)
+                        ? (e.getAssetGroup() != null
+                            && e.getAssetGroup()
+                                .getId()
+                                .equals(finalInjectExpectation.getAssetGroup().getId()))
+                        : e.getAssetGroup() == null)
             .filter(e -> e.getType().equals(finalInjectExpectation.getType()))
             .toList();
 
@@ -459,7 +466,9 @@ public class InjectExpectationService {
 
   private void propagateUpdateToAssetGroups(Inject inject, Collector collector) {
     List<InjectExpectation> expectationAssetGroups =
-        inject.getExpectations().stream().filter(e -> e.getAssetGroup() != null).toList();
+        inject.getExpectations().stream()
+            .filter(e -> e.getAssetGroup() != null && e.getAsset() == null)
+            .toList();
 
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
