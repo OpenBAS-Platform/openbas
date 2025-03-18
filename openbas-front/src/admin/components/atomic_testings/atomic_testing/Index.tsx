@@ -126,7 +126,7 @@ const Index = () => {
                 className={classes.item}
               />
               {
-                injectResultOverviewOutput.inject_injector_contract.injector_contract_payload && (
+                injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
                   <Tab
                     component={Link}
                     to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
@@ -143,7 +143,7 @@ const Index = () => {
               <Route path="" element={errorWrapper(AtomicTesting)()} />
               <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />
               <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-              {injectResultOverviewOutput.inject_injector_contract.injector_contract_payload && (
+              {injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
                 <Route
                   path="payload_info"
                   element={errorWrapper(AtomicTestingPayloadInfo)()}
