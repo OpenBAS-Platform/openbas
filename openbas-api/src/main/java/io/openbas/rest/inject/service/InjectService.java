@@ -6,7 +6,6 @@ import static io.openbas.utils.AgentUtils.isPrimaryAgent;
 import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.StringUtils.duplicateString;
 import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
-import static java.util.Collections.emptyList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -182,20 +181,38 @@ public class InjectService {
     }
   }
 
-  public Map<Asset, List<AssetGroup>> resolveAllAssetsToExecute(@NotNull final Inject inject) {
-    Map<Asset, List<AssetGroup>> assetToGroupsMap = new HashMap<>();
+  public List<AssetToExecute> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    List<AssetToExecute> assetToExecutes = new ArrayList<>();
 
-    inject.getAssets().forEach(asset -> assetToGroupsMap.put(asset, new ArrayList<>()));
+    inject.getAssets().forEach(asset -> assetToExecutes.add(new AssetToExecute(asset)));
 
-    inject.getAssetGroups().forEach(assetGroup -> {
-      List<Asset> assetsFromGroup = this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
+    inject
+        .getAssetGroups()
+        .forEach(
+            assetGroup -> {
+              List<Asset> assetsFromGroup =
+                  this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
 
-      assetsFromGroup.forEach(asset ->
-          assetToGroupsMap.computeIfAbsent(asset, k -> new ArrayList<>()).add(assetGroup)
-      );
-    });
+              assetsFromGroup.forEach(
+                  asset -> {
+                    AssetToExecute existingAssetToExecute =
+                        assetToExecutes.stream()
+                            .filter(as -> as.asset().getId().equals(asset.getId()))
+                            .findFirst()
+                            .orElse(null);
 
-    return assetToGroupsMap;
+                    if (existingAssetToExecute != null) {
+                      existingAssetToExecute.assetGroups().add(assetGroup);
+                    } else {
+                      AssetToExecute newAssetToExecute =
+                          new AssetToExecute(asset, false, new ArrayList<>());
+                      newAssetToExecute.assetGroups().add(assetGroup);
+                      assetToExecutes.add(newAssetToExecute);
+                    }
+                  });
+            });
+
+    return assetToExecutes;
   }
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
@@ -591,8 +608,8 @@ public class InjectService {
     List<Agent> agents = new ArrayList<>();
     Set<String> agentIds = new HashSet<>();
 
-    resolveAllAssetsToExecute(inject).keySet().stream()
-        .map(asset -> (Endpoint) Hibernate.unproxy(asset))
+    resolveAllAssetsToExecute(inject).stream()
+        .map(assetToExecute -> (Endpoint) Hibernate.unproxy(assetToExecute.asset()))
         .flatMap(
             endpoint -> Optional.ofNullable(endpoint.getAgents()).stream().flatMap(List::stream))
         .filter(agent -> isPrimaryAgent(agent))

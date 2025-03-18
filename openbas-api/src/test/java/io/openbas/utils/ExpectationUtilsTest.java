@@ -35,10 +35,10 @@ class ExpectationUtilsTest {
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationList(endpoint, inject, preventionExpectation);
+        getPreventionExpectationList(endpoint, null, inject, preventionExpectation);
 
     List<DetectionExpectation> detectionExpectations =
-        getDetectionExpectationList(endpoint, inject, detectionExpectation);
+        getDetectionExpectationList(endpoint, null, inject, detectionExpectation);
 
     // -- ASSERT --
     InjectExpectationSignature signature =
@@ -90,10 +90,11 @@ class ExpectationUtilsTest {
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationListForCaldera(endpoint, List.of(agent), preventionExpectation);
+        getPreventionExpectationListForCaldera(
+            endpoint, null, List.of(agent), preventionExpectation);
 
     List<DetectionExpectation> detectionExpectations =
-        getDetectionExpectationListForCaldera(endpoint, List.of(agent), detectionExpectation);
+        getDetectionExpectationListForCaldera(endpoint, null, List.of(agent), detectionExpectation);
 
     // -- ASSERT --
     InjectExpectationSignature signature =

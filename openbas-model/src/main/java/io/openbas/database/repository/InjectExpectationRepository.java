@@ -101,16 +101,18 @@ public interface InjectExpectationRepository
 
   @Query(
       value =
-          "select i from InjectExpectation i where i.inject.id = :injectId and i.agent.id = :agentId")
-  List<InjectExpectation> findAllByInjectAndAgent(
+          "select i from InjectExpectation i where i.inject.id = :injectId and i.assetGroup.id = :assetGroupId and i.agent.id = :agentId")
+  List<InjectExpectation> findAllByInjectAndAssetGroupAndAgent(
       @Param("injectId") @NotBlank final String injectId,
+      @Param("assetGroupId") @NotBlank final String assetGroupId,
       @Param("agentId") @NotBlank final String agentId);
 
   @Query(
       value =
-          "select i from InjectExpectation i where i.inject.id = :injectId and i.asset.id = :assetId and i.agent is null")
-  List<InjectExpectation> findAllByInjectAndAsset(
+          "select i from InjectExpectation i where i.inject.id = :injectId and i.assetGroup.id = :assetGroupId and i.asset.id = :assetId and i.agent is null")
+  List<InjectExpectation> findAllByInjectAndAssetGroupAndAsset(
       @Param("injectId") @NotBlank final String injectId,
+      @Param("assetGroupId") @NotBlank final String assetGroupId,
       @Param("assetId") @NotBlank final String assetId);
 
   @Query(

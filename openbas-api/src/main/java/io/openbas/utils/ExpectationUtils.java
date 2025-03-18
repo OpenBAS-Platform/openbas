@@ -107,7 +107,10 @@ public class ExpectationUtils {
   // -- CALDERA EXPECTATIONS --
 
   public static List<PreventionExpectation> getPreventionExpectationListForCaldera(
-      Asset asset, List<Agent> executedAgents, PreventionExpectation preventionExpectation) {
+      Asset asset,
+      AssetGroup assetGroup,
+      List<Agent> executedAgents,
+      PreventionExpectation preventionExpectation) {
     return executedAgents.stream()
         .map(
             executedAgent ->
@@ -117,6 +120,7 @@ public class ExpectationUtils {
                     preventionExpectation.getDescription(),
                     executedAgent.getParent(),
                     asset,
+                    assetGroup,
                     preventionExpectation.getExpirationTime(),
                     computeSignatures(
                         OBAS_IMPLANT_CALDERA,
@@ -126,7 +130,10 @@ public class ExpectationUtils {
   }
 
   public static List<DetectionExpectation> getDetectionExpectationListForCaldera(
-      Asset asset, List<Agent> executedAgents, DetectionExpectation detectionExpectation) {
+      Asset asset,
+      AssetGroup assetGroup,
+      List<Agent> executedAgents,
+      DetectionExpectation detectionExpectation) {
     return executedAgents.stream()
         .map(
             executedAgent ->
@@ -136,6 +143,7 @@ public class ExpectationUtils {
                     detectionExpectation.getDescription(),
                     executedAgent.getParent(),
                     asset,
+                    assetGroup,
                     detectionExpectation.getExpirationTime(),
                     computeSignatures(
                         OBAS_IMPLANT_CALDERA,
@@ -145,7 +153,10 @@ public class ExpectationUtils {
   }
 
   public static List<ManualExpectation> getManualExpectationListForCaldera(
-      Asset asset, List<Agent> executedAgents, ManualExpectation manualExpectation) {
+      Asset asset,
+      AssetGroup assetGroup,
+      List<Agent> executedAgents,
+      ManualExpectation manualExpectation) {
     return executedAgents.stream()
         .map(
             executedAgent ->
@@ -155,6 +166,7 @@ public class ExpectationUtils {
                     manualExpectation.getDescription(),
                     executedAgent.getParent(),
                     asset,
+                    assetGroup,
                     manualExpectation.getExpirationTime()))
         .toList();
   }
@@ -162,7 +174,10 @@ public class ExpectationUtils {
   // OBAS IMPLANT EXPECTATIONS
 
   public static List<PreventionExpectation> getPreventionExpectationList(
-      Asset asset, Inject inject, PreventionExpectation preventionExpectation) {
+      Asset asset,
+      AssetGroup assetGroup,
+      Inject inject,
+      PreventionExpectation preventionExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -172,13 +187,17 @@ public class ExpectationUtils {
                     preventionExpectation.getDescription(),
                     agent,
                     asset,
+                    assetGroup,
                     preventionExpectation.getExpirationTime(),
                     computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
         .toList();
   }
 
   public static List<DetectionExpectation> getDetectionExpectationList(
-      Asset asset, Inject inject, DetectionExpectation detectionExpectation) {
+      Asset asset,
+      AssetGroup assetGroup,
+      Inject inject,
+      DetectionExpectation detectionExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -188,13 +207,14 @@ public class ExpectationUtils {
                     detectionExpectation.getDescription(),
                     agent,
                     asset,
+                    assetGroup,
                     detectionExpectation.getExpirationTime(),
                     computeSignatures(OBAS_IMPLANT, inject.getId(), agent.getId())))
         .toList();
   }
 
   public static List<ManualExpectation> getManualExpectationList(
-      Asset asset, Inject inject, ManualExpectation manualExpectation) {
+      Asset asset, AssetGroup assetGroup, Inject inject, ManualExpectation manualExpectation) {
     return getActiveAgents(asset, inject).stream()
         .map(
             agent ->
@@ -204,6 +224,7 @@ public class ExpectationUtils {
                     manualExpectation.getDescription(),
                     agent,
                     asset,
+                    assetGroup,
                     manualExpectation.getExpirationTime()))
         .toList();
   }

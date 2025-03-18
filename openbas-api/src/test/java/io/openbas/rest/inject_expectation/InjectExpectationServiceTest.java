@@ -127,12 +127,12 @@ class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
+            .findAllByInjectAndAssetGroupAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
+            .findAllByInjectAndAssetGroupAndAgent(savedInject.getId(), savedAgent.getId())
             .size());
   }
 
@@ -181,7 +181,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
+            .findAllByInjectAndAssetGroupAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
@@ -191,7 +191,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
+            .findAllByInjectAndAssetGroupAndAgent(savedInject.getId(), savedAgent.getId())
             .size());
   }
 
@@ -238,17 +238,17 @@ class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
+            .findAllByInjectAndAssetGroupAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
+            .findAllByInjectAndAssetGroupAndAgent(savedInject.getId(), savedAgent.getId())
             .size());
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
+            .findAllByInjectAndAssetGroupAndAgent(savedInject.getId(), savedAgent1.getId())
             .size());
   }
 
@@ -305,7 +305,7 @@ class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAsset(savedInject.getId(), savedAsset.getId())
+            .findAllByInjectAndAssetGroupAndAsset(savedInject.getId(), savedAsset.getId())
             .size());
     assertEquals(
         2,
@@ -315,12 +315,12 @@ class InjectExpectationServiceTest extends IntegrationTest {
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAgent(savedInject.getId(), savedAgent.getId())
+            .findAllByInjectAndAssetGroupAndAgent(savedInject.getId(), savedAgent.getId())
             .size());
     assertEquals(
         2,
         injectExpectationRepository
-            .findAllByInjectAndAgent(savedInject.getId(), savedAgent1.getId())
+            .findAllByInjectAndAssetGroupAndAgent(savedInject.getId(), savedAgent1.getId())
             .size());
   }
 }

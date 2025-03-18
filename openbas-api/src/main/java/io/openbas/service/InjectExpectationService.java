@@ -688,8 +688,12 @@ public class InjectExpectationService {
         case PLAYER ->
             injectExpectationRepository.findAllByInjectAndTeamAndPlayer(
                 injectId, parentTargetId, targetId);
-        case AGENT -> injectExpectationRepository.findAllByInjectAndAgent(injectId, targetId);
-        case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
+        case AGENT ->
+            injectExpectationRepository.findAllByInjectAndAssetGroupAndAgent(
+                injectId, parentTargetId, targetId);
+        case ASSETS ->
+            injectExpectationRepository.findAllByInjectAndAssetGroupAndAsset(
+                injectId, parentTargetId, targetId);
         case ASSETS_GROUPS ->
             injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
       };
