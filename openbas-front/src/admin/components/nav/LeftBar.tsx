@@ -1,13 +1,4 @@
-import {
-  DashboardOutlined,
-  DescriptionOutlined,
-  DevicesOtherOutlined,
-  DnsOutlined,
-  DomainOutlined,
-  Groups3Outlined,
-  GroupsOutlined,
-  HubOutlined,
-  MovieFilterOutlined,
+import { AnalyticsOutlined, DashboardOutlined, DescriptionOutlined, DevicesOtherOutlined, DnsOutlined, DomainOutlined, Groups3Outlined, GroupsOutlined, HubOutlined, InsertChartOutlined, MovieFilterOutlined,
   OnlinePredictionOutlined,
   PersonOutlined,
   RowingOutlined,
@@ -154,11 +145,23 @@ const LeftBar = () => {
     {
       items: [
         {
+          path: `/admin/workspaces`,
+          icon: () => (<InsertChartOutlined />),
+          label: 'Dashboards',
+          href: 'dashboards',
+          subItems: [
+            {
+              link: '/admin/workspaces/dashboards',
+              label: 'Custom dashboards',
+              icon: () => (<AnalyticsOutlined fontSize="small" />),
+            },
+          ],
+        },
+        {
           path: `/admin/payloads`,
           icon: () => (<SubscriptionsOutlined />),
           label: 'Payloads',
         },
-        // { path: `/admin/mitigations`, icon: () => (<DynamicFormOutlined />), label: 'Mitigations', },
         {
           path: `/admin/integrations`,
           icon: () => (<DnsOutlined />),
