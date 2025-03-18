@@ -70,6 +70,7 @@ public class ExpectationsExpirationManagerService {
               this.injectExpectationService.expectationsForAgents(
                   expectationAsset.getInject(),
                   expectationAsset.getAsset(),
+                  expectationAsset.getAssetGroup(),
                   expectationAsset.getType());
           // Every agent expectation is filled
           if (expectationAgents.stream().noneMatch(e -> e.getResults().isEmpty())) {

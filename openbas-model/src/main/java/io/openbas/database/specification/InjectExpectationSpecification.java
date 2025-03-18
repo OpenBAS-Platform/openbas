@@ -2,6 +2,7 @@ package io.openbas.database.specification;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import java.time.Instant;
@@ -12,6 +13,15 @@ public class InjectExpectationSpecification {
 
   public static Specification<InjectExpectation> type(@NotBlank final EXPECTATION_TYPE type) {
     return (root, query, cb) -> cb.equal(root.get("type"), type);
+  }
+
+  public static Specification<InjectExpectation> assetGroupIsNull() {
+    return (root, query, cb) -> cb.isNull(root.get("assetGroup"));
+  }
+
+  public static Specification<InjectExpectation> fromAssetGroup(
+      @Nullable final String assetGroupId) {
+    return (root, query, cb) -> cb.equal(root.get("assetGroup").get("id"), assetGroupId);
   }
 
   public static Specification<InjectExpectation> from(@NotBlank final Instant date) {

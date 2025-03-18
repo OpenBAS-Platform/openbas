@@ -17,6 +17,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.utils.TargetType;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -147,7 +148,10 @@ public class InjectExpectationService {
             ? this.expectationsForAssets(
                 updated.getInject(), updated.getAssetGroup(), updated.getType())
             : this.expectationsForAgents(
-                updated.getInject(), updated.getAsset(), updated.getType());
+                updated.getInject(),
+                updated.getAsset(),
+                updated.getAssetGroup(),
+                updated.getType());
 
     expectations.forEach(
         expectation -> {
@@ -235,7 +239,10 @@ public class InjectExpectationService {
             ? this.expectationsForAssets(
                 updated.getInject(), updated.getAssetGroup(), updated.getType())
             : this.expectationsForAgents(
-                updated.getInject(), updated.getAsset(), updated.getType());
+                updated.getInject(),
+                updated.getAsset(),
+                updated.getAssetGroup(),
+                updated.getType());
 
     expectations.forEach(
         expectation -> {
@@ -429,6 +436,7 @@ public class InjectExpectationService {
               this.expectationsForAgents(
                   expectationAsset.getInject(),
                   expectationAsset.getAsset(),
+                  expectationAsset.getAssetGroup(),
                   expectationAsset.getType());
           // Every agent expectation (result by collector id) is filled
           if (expectationAgents.stream()
@@ -590,13 +598,26 @@ public class InjectExpectationService {
   public List<InjectExpectation> expectationsForAgents(
       @NotNull final Inject inject,
       @NotNull final Asset asset,
+      @Nullable final AssetGroup assetGroup,
       @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
+
     Endpoint resolvedEndpoint = endpointService.endpoint(asset.getId());
     List<String> agentIds =
         resolvedEndpoint.getAgents().stream().map(Agent::getId).distinct().toList();
-    return this.injectExpectationRepository.findAll(
+
+    Specification<InjectExpectation> spec =
         Specification.where(InjectExpectationSpecification.type(expectationType))
-            .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds)));
+            .and(
+                assetGroup != null
+                    ? InjectExpectationSpecification.fromAssetGroup(assetGroup.getId())
+                    : InjectExpectationSpecification.assetGroupIsNull())
+            .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds));
+
+    return this.injectExpectationRepository.findAll(spec);
+  }
+
+  public static Specification<InjectExpectation> assetGroupIsNull() {
+    return (root, query, cb) -> cb.isNull(root.get("assetGroup"));
   }
 
   public List<InjectExpectation> expectationsForAssets(
