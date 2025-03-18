@@ -83,7 +83,9 @@ public class ExpectationsExpirationManagerService {
   private void computeExpectationsForAssetGroups(
       @NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssetGroups =
-        expectations.stream().filter(e -> e.getAssetGroup() != null).toList();
+        expectations.stream()
+            .filter(e -> e.getAssetGroup() != null && e.getAsset() == null && e.getAgent() == null)
+            .toList();
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
           List<InjectExpectation> expectationAssets =
