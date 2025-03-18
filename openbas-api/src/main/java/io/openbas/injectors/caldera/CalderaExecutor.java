@@ -434,11 +434,12 @@ public class CalderaExecutor extends Injector {
       }
     }
 
-    List<PreventionExpectation> finalPreventionExpectationList = new ArrayList<>();
     assetToExecute
         .assetGroups()
         .forEach(
             assetGroup -> {
+              List<PreventionExpectation> finalPreventionExpectationList = new ArrayList<>();
+
               PreventionExpectation preventionExpectation =
                   preventionExpectationForAsset(
                       expectation.getScore(),
@@ -491,11 +492,12 @@ public class CalderaExecutor extends Injector {
       }
     }
 
-    List<DetectionExpectation> finalDetectionExpectationList = new ArrayList<>();
     assetToExecute
         .assetGroups()
         .forEach(
             assetGroup -> {
+              List<DetectionExpectation> finalDetectionExpectationList = new ArrayList<>();
+
               DetectionExpectation detectionExpectation =
                   detectionExpectationForAsset(
                       expectation.getScore(),
@@ -548,11 +550,12 @@ public class CalderaExecutor extends Injector {
       }
     }
 
-    List<ManualExpectation> finalManualExpectationList = new ArrayList<>();
     assetToExecute
         .assetGroups()
         .forEach(
             assetGroup -> {
+              List<ManualExpectation> finalManualExpectationList = new ArrayList<>();
+
               ManualExpectation manualExpectation =
                   manualExpectationForAsset(
                       expectation.getScore(),
