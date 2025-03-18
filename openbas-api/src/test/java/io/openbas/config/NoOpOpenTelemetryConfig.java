@@ -52,6 +52,6 @@ public class NoOpOpenTelemetryConfig {
       Environment environment,
       SettingRepository settingRepository,
       ThreadPoolTaskScheduler taskScheduler) {
-    return new OpenTelemetryConfig(environment, settingRepository, taskScheduler, null);
+    return new OpenTelemetryConfig(environment, settingRepository, taskScheduler);
   }
 }

@@ -4,7 +4,6 @@ import static io.openbas.database.model.SettingKeys.*;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static java.util.Objects.requireNonNull;
 
-import io.openbas.config.OpenBASConfig;
 import io.openbas.database.model.Setting;
 import io.openbas.database.repository.SettingRepository;
 import io.opentelemetry.api.OpenTelemetry;
@@ -45,7 +44,6 @@ public class OpenTelemetryConfig {
   private final Environment env;
   private final SettingRepository settingRepository;
   private final ThreadPoolTaskScheduler taskScheduler;
-  @jakarta.annotation.Resource private final OpenBASConfig openBASConfig;
 
   @Getter private final Duration collectInterval = Duration.ofMinutes(60);
   @Getter private final Duration exportInterval = Duration.ofMinutes(6 * 60);
@@ -57,9 +55,10 @@ public class OpenTelemetryConfig {
     log.info("Telemetry - Using collect interval: " + collectInterval);
     log.info("Telemetry - Using export interval: " + exportInterval);
 
-    if (!openBASConfig.isFeatureEnabled("telemetry") || !isEndpointReachable(getOTELEndpoint())) {
+    if (!isEndpointReachable(getOTELEndpoint())) {
       return OpenTelemetry.noop();
     }
+
     Resource resource = buildResource();
 
     // Set OTLP Exporter
@@ -90,10 +89,10 @@ public class OpenTelemetryConfig {
 
   // -- PRIVATE --
   private String getOTELEndpoint() {
-    String endpoint = "https://telemetry.filigran.io/v1/metrics";
+    String endpoint = "https://telemetry.obas.filigran.io/v1/metrics";
     if (Arrays.asList(environment.getActiveProfiles()).contains("dev")
         || Arrays.asList(environment.getActiveProfiles()).contains("ci")) {
-      endpoint = "https://telemetry.staging.filigran.io/v1/metrics";
+      endpoint = "https://telemetry.obas.staging.filigran.io/v1/metrics";
     }
     return endpoint;
   }

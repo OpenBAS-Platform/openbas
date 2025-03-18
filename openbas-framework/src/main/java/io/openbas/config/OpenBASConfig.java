@@ -81,10 +81,6 @@ public class OpenBASConfig {
     return hasText(agentUrl) ? url(agentUrl) : url(baseUrl);
   }
 
-  public Boolean isFeatureEnabled(@NotBlank final String feature) {
-    return hasText(enabledDevFeatures) && enabledDevFeatures.contains(feature);
-  }
-
   // -- PRIVATE --
 
   private String url(@NotBlank final String url) {
