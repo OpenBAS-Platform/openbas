@@ -29,9 +29,9 @@ class ExpectationUtilsTest {
     Inject inject = InjectFixture.createTechnicalInject(injectorContract, "Inject", endpoint);
     inject.setId("injectId");
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, null, 60L);
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
@@ -84,9 +84,9 @@ class ExpectationUtilsTest {
     agent.setParent(agentParent);
 
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, null, 60L);
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
