@@ -11,27 +11,49 @@ public class ExpectationFixture {
   static Double SCORE = 100.0;
 
   public static PreventionExpectation createTechnicalPreventionExpectation(
-      Agent agent, Asset asset, Long expirationTime, List<InjectExpectationSignature> signatures) {
+      Agent agent,
+      Asset asset,
+      AssetGroup assetGroup,
+      Long expirationTime,
+      List<InjectExpectationSignature> signatures) {
     return PreventionExpectation.preventionExpectationForAgent(
-        SCORE, "Prevention", "Prevention Expectation", agent, asset, expirationTime, signatures);
+        SCORE,
+        "Prevention",
+        "Prevention Expectation",
+        agent,
+        asset,
+        assetGroup,
+        expirationTime,
+        signatures);
   }
 
   public static DetectionExpectation createTechnicalDetectionExpectation(
-      Agent agent, Asset asset, Long expirationTime, List<InjectExpectationSignature> signatures) {
+      Agent agent,
+      Asset asset,
+      AssetGroup assetGroup,
+      Long expirationTime,
+      List<InjectExpectationSignature> signatures) {
     return DetectionExpectation.detectionExpectationForAgent(
-        SCORE, "Detection", "Detection Expectation", agent, asset, expirationTime, signatures);
+        SCORE,
+        "Detection",
+        "Detection Expectation",
+        agent,
+        asset,
+        assetGroup,
+        expirationTime,
+        signatures);
   }
 
   public static PreventionExpectation createTechnicalPreventionExpectationForAsset(
-      Asset asset, Long expirationTime) {
+      Asset asset, AssetGroup assetGroup, Long expirationTime) {
     return PreventionExpectation.preventionExpectationForAsset(
-        SCORE, "Prevention", "Prevention Expectation", asset, false, expirationTime);
+        SCORE, "Prevention", "Prevention Expectation", asset, assetGroup, expirationTime);
   }
 
   public static DetectionExpectation createTechnicalDetectionExpectationForAsset(
-      Asset asset, Long expirationTime) {
+      Asset asset, AssetGroup assetGroup, Long expirationTime) {
     return DetectionExpectation.detectionExpectationForAsset(
-        SCORE, "Detection", "Detection Expectation", asset, false, expirationTime);
+        SCORE, "Detection", "Detection Expectation", asset, assetGroup, expirationTime);
   }
 
   public static PreventionExpectation createPreventionExpectationForAssetGroup(
