@@ -106,7 +106,7 @@ public class EndpointService {
 
   public Optional<Endpoint> findEndpointByAtLeastOneMacAddress(
       @NotNull final String[] macAddresses) {
-    return this.endpointRepository.findByAtleastOneMacAddress(macAddresses);
+    return this.endpointRepository.findByAtleastOneMacAddress(macAddresses).stream().findFirst();
   }
 
   public List<Endpoint> endpoints() {
