@@ -3,15 +3,16 @@ package io.openbas.rest.custom_dashboard;
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(CustomDashboardApi.CUSTOM_DASHBOARDS_URI)
@@ -28,12 +29,19 @@ public class CustomDashboardApi extends RestBehavior {
   public ResponseEntity<CustomDashboard> createCustomDashboard(
       @RequestBody @Valid @NotNull final CustomDashboardInput input) {
     return ResponseEntity.ok(
-        this.customDashboardService.createCustomDashboard(input.toCustomDashboard(new CustomDashboard())));
+        this.customDashboardService.createCustomDashboard(
+            input.toCustomDashboard(new CustomDashboard())));
   }
 
   @GetMapping
   public ResponseEntity<List<CustomDashboard>> customDashboards() {
     return ResponseEntity.ok(this.customDashboardService.customDashboards());
+  }
+
+  @PostMapping("/search")
+  public ResponseEntity<Page<CustomDashboard>> customDashboards(
+      @NotNull @Valid final SearchPaginationInput searchPaginationInput) {
+    return ResponseEntity.ok(this.customDashboardService.customDashboards(searchPaginationInput));
   }
 
   @GetMapping("/{id}")

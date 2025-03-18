@@ -1,18 +1,5 @@
 package io.openbas.rest.custom_dashboard;
 
-import io.openbas.IntegrationTest;
-import io.openbas.database.model.CustomDashboard;
-import io.openbas.database.repository.CustomDashboardRepository;
-import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
-import io.openbas.utils.mockUser.WithMockAdminUser;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
 import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.NAME;
 import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.createDefaultCustomDashboard;
@@ -22,15 +9,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.openbas.IntegrationTest;
+import io.openbas.database.model.CustomDashboard;
+import io.openbas.database.repository.CustomDashboardRepository;
+import io.openbas.rest.custom_dashboard.form.CustomDashboardInput;
+import io.openbas.utils.mockUser.WithMockAdminUser;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
 @Transactional
 class CustomDashboardApiTest extends IntegrationTest {
 
-  @Autowired
-  private MockMvc mockMvc;
-  @Autowired
-  private CustomDashboardRepository repository;
-  @Autowired
-  private CustomDashboardComposer customDashboardComposer;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private CustomDashboardRepository repository;
+  @Autowired private CustomDashboardComposer customDashboardComposer;
 
   CustomDashboardComposer.Composer createCustomDashboardComposer() {
     return this.customDashboardComposer
@@ -40,7 +36,8 @@ class CustomDashboardApiTest extends IntegrationTest {
 
   @Test
   @WithMockAdminUser
-  void given_valid_dashboard_input_when_creating_dashboard_should_return_created_dashboard() throws Exception {
+  void given_valid_dashboard_input_when_creating_dashboard_should_return_created_dashboard()
+      throws Exception {
     // -- PREPARE --
     CustomDashboardInput input = new CustomDashboardInput();
     String name = "New Dashboard";
@@ -48,9 +45,11 @@ class CustomDashboardApiTest extends IntegrationTest {
     input.setContent("{\"chart\": \"bar\"}");
 
     // -- EXECUTE & ASSERT --
-    mockMvc.perform(post(CUSTOM_DASHBOARDS_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(input)))
+    mockMvc
+        .perform(
+            post(CUSTOM_DASHBOARDS_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(input)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.custom_dashboard_name").value(name));
 
@@ -64,7 +63,8 @@ class CustomDashboardApiTest extends IntegrationTest {
     createCustomDashboardComposer();
 
     // -- EXECUTE & ASSERT --
-    mockMvc.perform(get(CUSTOM_DASHBOARDS_URI))
+    mockMvc
+        .perform(get(CUSTOM_DASHBOARDS_URI))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(1))
         .andExpect(jsonPath("$[0].custom_dashboard_name").value(NAME));
@@ -77,14 +77,16 @@ class CustomDashboardApiTest extends IntegrationTest {
     CustomDashboardComposer.Composer wrapper = createCustomDashboardComposer();
 
     // -- EXECUTE & ASSERT --
-    mockMvc.perform(get(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId()))
+    mockMvc
+        .perform(get(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.custom_dashboard_name").value(NAME));
   }
 
   @Test
   @WithMockAdminUser
-  void given_updated_dashboard_input_when_updating_dashboard_should_return_updated_dashboard() throws Exception {
+  void given_updated_dashboard_input_when_updating_dashboard_should_return_updated_dashboard()
+      throws Exception {
     // -- PREPARE --
     CustomDashboardComposer.Composer wrapper = createCustomDashboardComposer();
     CustomDashboard customDashboard = wrapper.get();
@@ -92,9 +94,11 @@ class CustomDashboardApiTest extends IntegrationTest {
     customDashboard.setDescription(customDashboardDescription);
 
     // -- EXECUTE & ASSERT --
-    mockMvc.perform(put(CUSTOM_DASHBOARDS_URI + "/" + customDashboard.getId())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(customDashboard)))
+    mockMvc
+        .perform(
+            put(CUSTOM_DASHBOARDS_URI + "/" + customDashboard.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(customDashboard)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.custom_dashboard_name").value(NAME))
         .andExpect(jsonPath("$.custom_dashboard_description").value(customDashboardDescription));
@@ -111,10 +115,10 @@ class CustomDashboardApiTest extends IntegrationTest {
     CustomDashboardComposer.Composer wrapper = createCustomDashboardComposer();
 
     // -- EXECUTE & ASSERT --
-    mockMvc.perform(delete(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId()))
+    mockMvc
+        .perform(delete(CUSTOM_DASHBOARDS_URI + "/" + wrapper.get().getId()))
         .andExpect(status().isNoContent());
 
     assertThat(repository.existsById(wrapper.get().getId())).isFalse();
   }
-
 }

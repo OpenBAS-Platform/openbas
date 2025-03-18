@@ -10,8 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomDashboardComposer extends ComposerBase<CustomDashboard> {
 
-  @Autowired
-  private CustomDashboardRepository customDashboardRepository;
+  @Autowired private CustomDashboardRepository customDashboardRepository;
 
   public class Composer extends InnerComposerBase<CustomDashboard> {
 
@@ -43,5 +42,4 @@ public class CustomDashboardComposer extends ComposerBase<CustomDashboard> {
     generatedItems.add(customDashboard);
     return new CustomDashboardComposer.Composer(customDashboard);
   }
-
 }

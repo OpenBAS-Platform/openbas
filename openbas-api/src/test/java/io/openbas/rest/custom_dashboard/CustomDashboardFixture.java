@@ -12,5 +12,4 @@ public class CustomDashboardFixture {
     customDashboard.setContent("{\"chart\": \"bar\"}");
     return customDashboard;
   }
-
 }
