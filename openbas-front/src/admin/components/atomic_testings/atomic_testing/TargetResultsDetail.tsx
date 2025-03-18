@@ -280,7 +280,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           fontSize: 9,
         },
       })));
-      fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT'? previousParentTargetId : parentTargetId).then(
+      fetchTargetResult(inject.inject_id, target.id!, target.targetType!, target.targetType === 'AGENT' ? previousParentTargetId : parentTargetId).then(
         (result: { data: InjectExpectationsStore[] }) => setTargetResults(result.data ?? []),
       );
       setActiveTab(0);
