@@ -1,4 +1,4 @@
-import { DashboardOutlined, DescriptionOutlined, DevicesOtherOutlined, DnsOutlined, DomainOutlined, Groups3Outlined, GroupsOutlined, HubOutlined, MovieFilterOutlined, OnlinePredictionOutlined, PersonOutlined, RowingOutlined, SchoolOutlined, SettingsOutlined, SmartButtonOutlined, SubscriptionsOutlined, TerminalOutlined } from '@mui/icons-material';
+import { AnalyticsOutlined, DashboardOutlined, DescriptionOutlined, DevicesOtherOutlined, DnsOutlined, DomainOutlined, Groups3Outlined, GroupsOutlined, HubOutlined, InsertChartOutlined, MovieFilterOutlined, OnlinePredictionOutlined, PersonOutlined, RowingOutlined, SchoolOutlined, SettingsOutlined, SmartButtonOutlined, SubscriptionsOutlined, TerminalOutlined } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline, PostOutline, SecurityNetwork, SelectGroup, Target } from 'mdi-material-ui';
 
 import { type UserHelper } from '../../../actions/helper';
@@ -120,11 +120,23 @@ const LeftBar = () => {
     {
       items: [
         {
+          path: `/admin/workspaces`,
+          icon: () => (<InsertChartOutlined />),
+          label: 'Dashboards',
+          href: 'dashboards',
+          subItems: [
+            {
+              link: '/admin/workspaces/dashboards',
+              label: 'Custom dashboards',
+              icon: () => (<AnalyticsOutlined fontSize="small" />),
+            },
+          ],
+        },
+        {
           path: `/admin/payloads`,
           icon: () => (<SubscriptionsOutlined />),
           label: 'Payloads',
         },
-        // { path: `/admin/mitigations`, icon: () => (<DynamicFormOutlined />), label: 'Mitigations', },
         {
           path: `/admin/integrations`,
           icon: () => (<DnsOutlined />),
