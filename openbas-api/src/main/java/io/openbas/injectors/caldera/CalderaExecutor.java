@@ -7,6 +7,7 @@ import static io.openbas.model.expectation.DetectionExpectation.*;
 import static io.openbas.model.expectation.ManualExpectation.*;
 import static io.openbas.model.expectation.PreventionExpectation.*;
 import static io.openbas.utils.AgentUtils.isValidAgent;
+import static io.openbas.utils.ExpectationUtils.*;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,7 +32,6 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AgentService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
-import io.openbas.utils.ExpectationUtils;
 import io.openbas.utils.Time;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -404,180 +404,6 @@ public class CalderaExecutor extends Injector {
                       })
               .toList());
     }
-  }
-
-  private static List<PreventionExpectation> getPreventionExpectations(
-      AssetToExecute assetToExecute,
-      List<io.openbas.database.model.Agent> executedAgents,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<PreventionExpectation> preventionExpectationList = new ArrayList<>();
-    List<PreventionExpectation> returnList = new ArrayList<>();
-
-    if (assetToExecute.targetByInject()) {
-      PreventionExpectation preventionExpectation =
-          preventionExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-      // We propagate the asset expectation to agents
-      preventionExpectationList.addAll(
-          ExpectationUtils.getPreventionExpectationListForCaldera(
-              assetToExecute.asset(), null, executedAgents, preventionExpectation));
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!preventionExpectationList.isEmpty()) {
-        returnList.add(preventionExpectation);
-        returnList.addAll(preventionExpectationList);
-      }
-    }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            assetGroup -> {
-              List<PreventionExpectation> finalPreventionExpectationList = new ArrayList<>();
-
-              PreventionExpectation preventionExpectation =
-                  preventionExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the asset expectation to agents
-              finalPreventionExpectationList.addAll(
-                  ExpectationUtils.getPreventionExpectationListForCaldera(
-                      assetToExecute.asset(), assetGroup, executedAgents, preventionExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalPreventionExpectationList.isEmpty()) {
-                returnList.add(preventionExpectation);
-                returnList.addAll(finalPreventionExpectationList);
-              }
-            });
-    return returnList;
-  }
-
-  private static List<DetectionExpectation> getDetectionExpectations(
-      AssetToExecute assetToExecute,
-      List<io.openbas.database.model.Agent> executedAgents,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<DetectionExpectation> detectionExpectationList = new ArrayList<>();
-    List<DetectionExpectation> returnList = new ArrayList<>();
-
-    if (assetToExecute.targetByInject()) {
-      DetectionExpectation preventionExpectation =
-          detectionExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-      // We propagate the asset expectation to agents
-      detectionExpectationList.addAll(
-          ExpectationUtils.getDetectionExpectationListForCaldera(
-              assetToExecute.asset(), null, executedAgents, preventionExpectation));
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!detectionExpectationList.isEmpty()) {
-        returnList.add(preventionExpectation);
-        returnList.addAll(detectionExpectationList);
-      }
-    }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            assetGroup -> {
-              List<DetectionExpectation> finalDetectionExpectationList = new ArrayList<>();
-
-              DetectionExpectation detectionExpectation =
-                  detectionExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the asset expectation to agents
-              finalDetectionExpectationList.addAll(
-                  ExpectationUtils.getDetectionExpectationListForCaldera(
-                      assetToExecute.asset(), assetGroup, executedAgents, detectionExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalDetectionExpectationList.isEmpty()) {
-                returnList.add(detectionExpectation);
-                returnList.addAll(finalDetectionExpectationList);
-              }
-            });
-    return returnList;
-  }
-
-  private static List<ManualExpectation> getManualExpectations(
-      AssetToExecute assetToExecute,
-      List<io.openbas.database.model.Agent> executedAgents,
-      io.openbas.model.inject.form.Expectation expectation) {
-    List<ManualExpectation> manualExpectationList = new ArrayList<>();
-    List<ManualExpectation> returnList = new ArrayList<>();
-
-    if (assetToExecute.targetByInject()) {
-      ManualExpectation manualExpectation =
-          manualExpectationForAsset(
-              expectation.getScore(),
-              expectation.getName(),
-              expectation.getDescription(),
-              assetToExecute.asset(),
-              null,
-              expectation.getExpirationTime());
-      // We propagate the asset expectation to agents
-      manualExpectationList.addAll(
-          ExpectationUtils.getManualExpectationListForCaldera(
-              assetToExecute.asset(), null, executedAgents, manualExpectation));
-      // If any expectation for agent is created then we create also expectation
-      // for asset
-      if (!manualExpectationList.isEmpty()) {
-        returnList.add(manualExpectation);
-        returnList.addAll(manualExpectationList);
-      }
-    }
-
-    assetToExecute
-        .assetGroups()
-        .forEach(
-            assetGroup -> {
-              List<ManualExpectation> finalManualExpectationList = new ArrayList<>();
-
-              ManualExpectation manualExpectation =
-                  manualExpectationForAsset(
-                      expectation.getScore(),
-                      expectation.getName(),
-                      expectation.getDescription(),
-                      assetToExecute.asset(),
-                      assetGroup,
-                      expectation.getExpirationTime());
-
-              // We propagate the asset expectation to agents
-              finalManualExpectationList.addAll(
-                  ExpectationUtils.getManualExpectationListForCaldera(
-                      assetToExecute.asset(), assetGroup, executedAgents, manualExpectation));
-
-              // If any expectation for agent is created then we create also expectation
-              // for asset
-              if (!finalManualExpectationList.isEmpty()) {
-                returnList.add(manualExpectation);
-                returnList.addAll(finalManualExpectationList);
-              }
-            });
-    return returnList;
   }
 
   /**
