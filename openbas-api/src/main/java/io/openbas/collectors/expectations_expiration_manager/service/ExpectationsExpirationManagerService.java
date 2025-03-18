@@ -84,7 +84,7 @@ public class ExpectationsExpirationManagerService {
       @NotNull final List<InjectExpectation> expectations) {
     List<InjectExpectation> expectationAssetGroups =
         expectations.stream()
-            .filter(e -> e.getAssetGroup() != null && e.getAsset() == null && e.getAgent() == null)
+            .filter(e -> isAssetGroupExpectation(e))
             .toList();
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
@@ -103,5 +103,9 @@ public class ExpectationsExpirationManagerService {
                 PRODUCT_NAME);
           }
         }));
+  }
+
+  private static boolean isAssetGroupExpectation(InjectExpectation e) {
+    return e.getAssetGroup() != null && e.getAsset() == null && e.getAgent() == null;
   }
 }
