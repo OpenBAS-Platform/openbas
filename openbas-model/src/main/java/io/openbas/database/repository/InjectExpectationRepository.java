@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -101,19 +102,26 @@ public interface InjectExpectationRepository
 
   @Query(
       value =
-          "select i from InjectExpectation i where i.inject.id = :injectId and i.assetGroup.id = :assetGroupId and i.agent.id = :agentId")
+          "SELECT i FROM InjectExpectation i "
+              + "WHERE i.inject.id = :injectId "
+              + "AND ((:assetGroupId IS NULL AND i.assetGroup IS NULL) OR (:assetGroupId IS NOT NULL AND i.assetGroup.id = :assetGroupId)) "
+              + "AND i.agent.id = :agentId")
   List<InjectExpectation> findAllByInjectAndAssetGroupAndAgent(
-      @Param("injectId") @NotBlank final String injectId,
-      @Param("assetGroupId") @NotBlank final String assetGroupId,
-      @Param("agentId") @NotBlank final String agentId);
+      @Param("injectId") @NotBlank String injectId,
+      @Param("assetGroupId") @Nullable String assetGroupId,
+      @Param("agentId") @NotBlank String agentId);
 
   @Query(
       value =
-          "select i from InjectExpectation i where i.inject.id = :injectId and i.assetGroup.id = :assetGroupId and i.asset.id = :assetId and i.agent is null")
+          "SELECT i FROM InjectExpectation i "
+              + "WHERE i.inject.id = :injectId "
+              + "AND ((:assetGroupId IS NULL AND i.assetGroup IS NULL) OR (:assetGroupId IS NOT NULL AND i.assetGroup.id = :assetGroupId)) "
+              + "AND i.asset.id = :assetId "
+              + "AND i.agent IS NULL")
   List<InjectExpectation> findAllByInjectAndAssetGroupAndAsset(
-      @Param("injectId") @NotBlank final String injectId,
-      @Param("assetGroupId") @NotBlank final String assetGroupId,
-      @Param("assetId") @NotBlank final String assetId);
+      @Param("injectId") @NotBlank String injectId,
+      @Param("assetGroupId") @Nullable String assetGroupId,
+      @Param("assetId") @NotBlank String assetId);
 
   @Query(
       value =
