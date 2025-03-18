@@ -616,10 +616,6 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findAll(spec);
   }
 
-  public static Specification<InjectExpectation> assetGroupIsNull() {
-    return (root, query, cb) -> cb.isNull(root.get("assetGroup"));
-  }
-
   public List<InjectExpectation> expectationsForAssets(
       @NotNull final Inject inject,
       @NotNull final AssetGroup assetGroup,
@@ -634,6 +630,7 @@ public class InjectExpectationService {
             .toList();
     return this.injectExpectationRepository.findAll(
         Specification.where(InjectExpectationSpecification.type(expectationType))
+            .and(InjectExpectationSpecification.fromAssetGroup(assetGroup.getId()))
             .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds)));
   }
 
