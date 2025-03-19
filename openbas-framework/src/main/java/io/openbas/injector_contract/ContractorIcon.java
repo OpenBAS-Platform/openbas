@@ -1,4 +1,4 @@
-package io.openbas.injectorContract;
+package io.openbas.injector_contract;
 
 import java.io.InputStream;
 import lombok.Getter;

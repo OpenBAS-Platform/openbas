@@ -1,4 +1,4 @@
-package io.openbas.injectorContract;
+package io.openbas.injector_contract;
 
 import io.openbas.helper.SupportedLanguage;
 import java.util.Map;
