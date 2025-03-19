@@ -90,4 +90,7 @@ public class PayloadUpsertInput {
 
   @JsonProperty("payload_elevation_required")
   private boolean elevationRequired;
+
+  @JsonProperty("payload_output_parsers")
+  private List<OutputParserInput> outputParsers;
 }

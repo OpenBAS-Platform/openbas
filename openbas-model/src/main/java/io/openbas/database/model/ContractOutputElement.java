@@ -24,7 +24,7 @@ public class ContractOutputElement implements Base {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonSerialize(using = MonoIdDeserializer.class)
-  @JoinColumn(name = "contract_output_element_output_parser")
+  @JoinColumn(name = "contract_output_element_output_parser_id")
   @JsonProperty("contract_output_element_output_parser")
   @Schema(type = "string")
   private OutputParser outputParser;

@@ -3,13 +3,10 @@ package io.openbas.utils.fixtures;
 import static io.openbas.database.model.Payload.PAYLOAD_SOURCE.COMMUNITY;
 import static io.openbas.database.model.Payload.PAYLOAD_STATUS.UNVERIFIED;
 
-import io.openbas.database.model.Document;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
-import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.form.PayloadUpdateInput;
-import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.database.model.*;
+import io.openbas.rest.payload.form.*;
 import java.util.Collections;
+import java.util.List;
 
 public class PayloadInputFixture {
 
@@ -25,6 +22,25 @@ public class PayloadInputFixture {
     input.setTagIds(Collections.emptyList());
     input.setExecutor("bash");
     input.setContent("echo hello");
+    return input;
+  }
+
+  public static PayloadCreateInput createDefaultPayloadCreateInputWithOutputParser() {
+    PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
+
+    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
+    contractOutputElementInput.setGroup(0);
+    contractOutputElementInput.setKey("IPV6");
+    contractOutputElementInput.setType(ContractOutputType.IPv6);
+    contractOutputElementInput.setName("IPV6");
+
+    OutputParserInput outputParserInput = new OutputParserInput();
+    outputParserInput.setMode(ParserMode.STDOUT);
+    outputParserInput.setType(ParserType.REGEX);
+    outputParserInput.setRule("rule");
+    outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
+
+    input.setOutputParsers(List.of(outputParserInput));
     return input;
   }
 
