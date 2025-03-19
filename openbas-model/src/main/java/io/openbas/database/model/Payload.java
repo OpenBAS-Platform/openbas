@@ -206,6 +206,18 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
+  /**
+   * OutputParser
+   * -> mode: stdout/sterr/fichier ->Enum
+   * -> type parsing : regex /xml -> Enum
+   * -> Executor/Rule/Parser: Regex/ xPath -> String
+   * -> List<OutputContractElement>
+   *   -> ParserOutPutContract : group, name, key, contractoutputType
+   *
+   * */
+  @OneToOne
+  private OutputParser outputParser;
+
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {
     return this.collector != null ? this.collector.getType() : null;
