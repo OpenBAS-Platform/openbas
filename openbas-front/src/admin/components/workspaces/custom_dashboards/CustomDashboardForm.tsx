@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@mui/material';
-import { FunctionComponent, ReactNode, useMemo } from 'react';
+import { Box, Button } from '@mui/material';
+import { type FunctionComponent, useMemo } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -14,10 +14,6 @@ interface Props {
   initialValues?: CustomDashboardInput;
   editing?: boolean;
   handleClose: () => void;
-}
-
-function Box(props: { sx: { display: string; justifyContent: string; mt: number }, children: ReactNode }) {
-  return null;
 }
 
 const CustomDashboardForm: FunctionComponent<Props> = ({
@@ -73,7 +69,12 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
         helperText={errors.custom_dashboard_description?.message}
         inputProps={register('custom_dashboard_description')}
       />
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        mt: 2,
+      }}
+      >
         <Button
           variant="contained"
           onClick={handleClose}
