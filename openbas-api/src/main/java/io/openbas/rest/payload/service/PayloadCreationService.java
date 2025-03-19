@@ -2,7 +2,8 @@ package io.openbas.rest.payload.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.PayloadApi.validateArchitecture;
+import static io.openbas.rest.payload.PayloadUtils.copyProperties;
+import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -34,7 +35,7 @@ public class PayloadCreationService {
     switch (payloadType) {
       case PayloadType.COMMAND:
         Command commandPayload = new Command();
-        commandPayload.setUpdateAttributes(input);
+        copyProperties(input, commandPayload);
         commandPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -43,7 +44,7 @@ public class PayloadCreationService {
         return commandPayload;
       case PayloadType.EXECUTABLE:
         Executable executablePayload = new Executable();
-        executablePayload.setUpdateAttributes(input);
+        copyProperties(input, executablePayload);
         executablePayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -54,7 +55,7 @@ public class PayloadCreationService {
         return executablePayload;
       case PayloadType.FILE_DROP:
         FileDrop fileDropPayload = new FileDrop();
-        fileDropPayload.setUpdateAttributes(input);
+        copyProperties(input, fileDropPayload);
         fileDropPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -69,7 +70,7 @@ public class PayloadCreationService {
         return fileDropPayload;
       case PayloadType.DNS_RESOLUTION:
         DnsResolution dnsResolutionPayload = new DnsResolution();
-        dnsResolutionPayload.setUpdateAttributes(input);
+        copyProperties(input, dnsResolutionPayload);
         dnsResolutionPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -78,7 +79,7 @@ public class PayloadCreationService {
         return dnsResolutionPayload;
       case PayloadType.NETWORK_TRAFFIC:
         NetworkTraffic networkTrafficPayload = new NetworkTraffic();
-        networkTrafficPayload.setUpdateAttributes(input);
+        copyProperties(input, networkTrafficPayload);
         networkTrafficPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));

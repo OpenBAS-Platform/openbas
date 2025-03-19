@@ -10,6 +10,7 @@ import static io.openbas.injector_contract.fields.ContractAsset.assetField;
 import static io.openbas.injector_contract.fields.ContractAssetGroup.assetGroupField;
 import static io.openbas.injector_contract.fields.ContractExpectations.expectationsField;
 import static io.openbas.injector_contract.fields.ContractText.textField;
+import static io.openbas.rest.payload.PayloadUtils.copyOutputParsers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,10 @@ import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
-import io.openbas.injector_contract.fields.*;
+import io.openbas.injector_contract.fields.ContractAsset;
+import io.openbas.injector_contract.fields.ContractAssetGroup;
+import io.openbas.injector_contract.fields.ContractChoiceInformation;
+import io.openbas.injector_contract.fields.ContractExpectations;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
 import io.openbas.utils.StringUtils;
 import jakarta.annotation.Resource;
@@ -224,6 +228,7 @@ public class PayloadService {
     duplicate.setCollector(null);
     duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
     duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
+    copyOutputParsers(origin.getOutputParsers(), duplicate);
   }
 
   public void deprecateNonProcessedPayloadsByCollector(
