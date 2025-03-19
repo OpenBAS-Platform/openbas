@@ -1,4 +1,4 @@
-package io.openbas.injectorContract.fields;
+package io.openbas.injector_contract.fields;
 
 import java.util.List;
 import lombok.Getter;
