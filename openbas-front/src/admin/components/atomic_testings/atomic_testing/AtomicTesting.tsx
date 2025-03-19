@@ -59,7 +59,7 @@ const AtomicTesting = () => {
   const theme = useTheme();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
-  const [upperParentTargetId, setUpperParentTargetId] = useState<InjectTargetWithResult>();
+  const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   const { documentMap } = useHelper((helper: DocumentHelper) => ({ documentMap: helper.getDocumentsMap() }));
@@ -77,19 +77,19 @@ const AtomicTesting = () => {
 
   // Handles
 
-  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTargetId?: InjectTargetWithResult) => {
+  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
     setSelectedTarget(target);
     setCurrentParentTarget(currentParent);
-    setUpperParentTargetId(upperParentTargetId);
+    setUpperParentTarget(upperParentTarget);
   };
 
-  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParentTargetId: InjectTargetWithResult | undefined) => {
+  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
     return (
       <>
         <TargetListItem
-          onClick={() => handleTargetClick(target, parent, upperParentTargetId)}
+          onClick={() => handleTargetClick(target, parent, upperParent)}
           target={target}
-          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTargetId?.id === upperParentTargetId?.id}
+          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
         />
         {target?.children && target.children.length > 0 && (
           <List disablePadding style={{ marginLeft: 15 }}>
@@ -334,7 +334,7 @@ const AtomicTesting = () => {
           {selectedTarget && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
               inject={injectResultOverviewOutput}
-              upperParentTargetId={upperParentTargetId?.id}
+              upperParentTargetId={upperParentTarget?.id}
               parentTargetId={currentParentTarget?.id}
               target={selectedTarget}
               lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
