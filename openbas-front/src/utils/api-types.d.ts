@@ -1626,7 +1626,7 @@ export interface InjectResultOverviewOutput {
   /** Id of inject */
   inject_id: string;
   /** Full contract */
-  inject_injector_contract: AtomicInjectorContractOutput;
+  inject_injector_contract?: AtomicInjectorContractOutput;
   /** Kill chain phases */
   inject_kill_chain_phases?: KillChainPhaseSimple[];
   /** Indicates whether the inject is ready for use */

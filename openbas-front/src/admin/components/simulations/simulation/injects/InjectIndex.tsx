@@ -122,7 +122,7 @@ const InjectIndexComponent: FunctionComponent<{
               className={classes.item}
             />
             {
-              injectResultOverviewOutput.inject_injector_contract.injector_contract_payload && (
+              injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
                 <Tab
                   component={Link}
                   to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`)}
@@ -138,7 +138,7 @@ const InjectIndexComponent: FunctionComponent<{
           <Routes>
             <Route path="" element={errorWrapper(AtomicTesting)()} />
             <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-            { injectResultOverviewOutput.inject_injector_contract.injector_contract_payload
+            { injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
               && <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />}
             {/* Not found */}
             <Route path="*" element={<NotFound />} />
