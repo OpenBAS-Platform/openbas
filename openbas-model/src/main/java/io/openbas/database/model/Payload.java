@@ -205,12 +205,11 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "payload_output_parser")
-  @JsonProperty("payload_output_parser")
+  @Type(JsonType.class)
+  @Column(name = "payload_output_parsers")
+  @JsonProperty("payload_output_parsers")
   @JsonSerialize(using = MonoIdDeserializer.class)
-  @Schema(type = "string")
-  private List<OutputParser> outputParser;
+  private List<OutputParser> outputParsers;
 
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {

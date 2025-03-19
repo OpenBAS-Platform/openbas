@@ -1,4 +1,4 @@
-package io.openbas.injector_contract.fields;
+package io.openbas.injectorContract.fields;
 
 import io.openbas.injector_contract.ContractCardinality;
 import java.util.HashMap;
