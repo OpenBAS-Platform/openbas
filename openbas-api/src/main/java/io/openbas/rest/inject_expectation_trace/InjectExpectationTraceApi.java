@@ -45,4 +45,17 @@ public class InjectExpectationTraceApi extends RestBehavior {
     return this.injectExpectationTraceService.getInjectExpectationTracesByExpectationAndCollector(
         injectExpectationId, collectorId);
   }
+
+  @PutMapping("/{injectExpectationTraceId}")
+  public InjectExpectationTrace updateInjectExpectationTrace(String injectExpectationTraceId,
+      @Valid @RequestBody InjectExpectationTraceInput input) {
+    return this.injectExpectationTraceService.updateInjectExpectationTrace(injectExpectationTraceId, input);
+  }
+
+  @DeleteMapping("/{injectExpectationTraceId}")
+  public void deleteInjectExpectationTrace(String injectExpectationTraceId) {
+    this.injectExpectationTraceService.deleteInjectExpectationTrace(injectExpectationTraceId);
+  }
+
+
 }

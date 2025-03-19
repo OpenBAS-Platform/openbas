@@ -14,7 +14,7 @@ import {
   DialogContentText,
   Divider,
   Grid,
-  IconButton,
+  IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText,
   Menu,
   MenuItem,
   Paper,
@@ -31,6 +31,8 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
+import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
+import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
@@ -112,6 +114,12 @@ const useStyles = makeStyles()(theme => ({
     display: 'flex',
     alignItems: 'baseline',
   },
+  paperResults: {
+    position: 'relative',
+    padding: 20,
+    overflow: 'hidden',
+    height: '100%',
+  },
 }));
 
 interface Props {
@@ -151,7 +159,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [initialized, setInitialized] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
-  const [expectationTraces, setExpectationTraces] = useState<InjectExpectationTrace[]>([]);
+  const [selectedResult, setSelectedResult] = useState<InjectExpectationResult | null>(null);
+  const [selectedExpectationForResults, setSelectedExpectationForResults] = useState<InjectExpectationsStore | null>(null);
+  const [cursorStyle, setCursorStyle] = useState<string>('default');
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeResultStep>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
@@ -520,6 +530,18 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         : t('All players (per team) must validate the expectation');
   };
 
+  const handleClickSecurityPlatformResult = (injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult) => {
+    setCursorStyle('pointer');
+    setSelectedResult(expectationResult);
+    setSelectedExpectationForResults(injectExpectation);
+  };
+
+  const handleCloseSecurityPlatformResult = () => {
+    setCursorStyle('default');
+    setSelectedResult(null);
+    setSelectedExpectationForResults(null);
+  };
+
   return (
     <>
       <div className={classes.target}>
@@ -606,10 +628,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               }
               return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
             })
-            .map(injectExpectation => (
-              <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
-                <Grid container={true} spacing={2} style={{ alignItems: 'baseline' }}>
-                  {/* <Grid item={true} xs={4}>
+            .map((injectExpectation) => {
+              const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
+              return (
+                <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
+                  <Paper variant="outlined" classes={{ root: classes.paperResults }}>
+                    <Grid container={true} spacing={2} style={{ alignItems: 'baseline' }}>
+                      {/* <Grid item={true} xs={4}>
                     <Typography variant="h4">
                       {t('Name')}
                     </Typography>
@@ -627,49 +652,139 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     </Typography>
                     {emptyFilled(injectExpectation.inject_expectation_description)}
                   </Grid> */}
-                  <Grid item={true} xs={7}>
-                    <Typography variant="subtitle1">
-                      {injectExpectation.inject_expectation_type}
-                    </Typography>
-                  </Grid>
-                  <Grid item={true} xs={2}>
-                    <Typography variant="h4">
-                      {t('Results')}
-                    </Typography>
-                  </Grid>
-                  <Grid item={true} xs={2}>
-                    <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={injectExpectation.inject_expectation_score} /></Tooltip>
-                  </Grid>
-                  {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
-                    || (injectExpectation.inject_expectation_type === 'MANUAL'
-                      && injectExpectation.inject_expectation_results
-                      && injectExpectation.inject_expectation_results.length === 0))
-                    && (
-                      <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
-                        <IconButton
-                          aria-label="Add"
-                          onClick={() => setSelectedExpectationForCreation({
-                            injectExpectation,
-                            sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
-                          })}
-                        >
-                          <AddModeratorOutlined fontSize="medium" />
-                        </IconButton>
-                      </Grid>
-                    )}
+                      {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 ? (
+                        <Grid item={true} xs={7}>
+                          <Typography variant="h5">
+                            {injectExpectation.inject_expectation_type}
+                            {' '}
+                            {injectExpectation.inject_expectation_type === 'MANUAL' && (t('Expectation'))}
+                          </Typography>
 
-                </Grid>
-                <div className={classes.flexContainer}>
-                  <div>
-                    <Typography variant="h4">
-                      {t('Validation rule:')}
-                    </Typography>
-                  </div>
-                  <div style={{ marginLeft: theme.spacing(1) }}>
-                    {emptyFilled(getLabelOfValidationType(injectExpectation))}
-                  </div>
-                </div>
-                {/* <Grid container={true} spacing={2}>
+                        </Grid>
+                      )
+                        : (
+                            <Grid item={true} xs={6}>
+                              <Typography variant="h5">
+                                {injectExpectation.inject_expectation_type}
+                                {' '}
+                                {injectExpectation.inject_expectation_type === 'MANUAL' && (t('Expectation'))}
+                              </Typography>
+                            </Grid>
+
+                          )}
+                      <Grid item={true} xs={2}>
+                        {
+                          injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
+                            <ItemResult label="Prevented" status="Prevented" />
+                          )
+                        }
+                        {
+                          injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'DETECTION' && (
+                            <ItemResult label="Detected" status="Detected" />
+                          )
+                        }
+                        {
+                          injectExpectation.inject_expectation_status === 'FAILED' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
+                            <ItemResult label="Not Prevented" status="Not Prevented" />
+                          )
+                        }
+                        {
+                          injectExpectation.inject_expectation_status === 'FAILED' && injectExpectation.inject_expectation_type === 'DETECTION' && (
+                            <ItemResult label="Not Detected" status="Not Detected" />
+                          )
+                        }
+                        {
+                          injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_status && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 && (
+                            <ItemResult label={injectExpectation.inject_expectation_status} status={injectExpectation.inject_expectation_status} />
+                          )
+                        }
+                      </Grid>
+                      {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 ? (
+                        <Grid item={true} xs={2}>
+                          <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={injectExpectation.inject_expectation_score} /></Tooltip>
+                        </Grid>
+                      )
+                        : (
+                            <Grid item={true} xs={3}>
+                              <Chip
+                                classes={{ root: classes.score }}
+                                label={`${t('EXPIRES in')} ${duration.hours}
+                                    ${t('h')} ${duration.minutes}
+                                    ${t('m')}`}
+                              />
+                            </Grid>
+
+                          )}
+
+                      {
+                        injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                          return (
+                            <>
+                              <IconButton
+                                color="primary"
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  setAnchorEls({
+                                    ...anchorEls,
+                                    [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget,
+                                  });
+                                }}
+                                aria-haspopup="true"
+                                size="large"
+                                disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
+                              >
+                                <MoreVertOutlined />
+                              </IconButton>
+                              <Menu
+                                anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
+                                open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
+                                onClose={() => setAnchorEls({
+                                  ...anchorEls,
+                                  [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
+                                })}
+                              >
+                                <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
+                                  {t('Update')}
+                                </MenuItem>
+                                <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
+                                  {t('Delete')}
+                                </MenuItem>
+                              </Menu>
+                            </>
+                          );
+                        })
+                      }
+
+                      {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
+                        || (injectExpectation.inject_expectation_type === 'MANUAL'
+                          && injectExpectation.inject_expectation_results
+                          && injectExpectation.inject_expectation_results.length === 0))
+                        && (
+                          <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
+                            <IconButton
+                              aria-label="Add"
+                              onClick={() => setSelectedExpectationForCreation({
+                                injectExpectation,
+                                sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
+                              })}
+                            >
+                              <AddModeratorOutlined fontSize="medium" />
+                            </IconButton>
+                          </Grid>
+                        )}
+
+                    </Grid>
+                    <div className={classes.flexContainer}>
+                      <div>
+                        <Typography variant="h4">
+                          {t('Validation rule:')}
+                        </Typography>
+                      </div>
+                      <div style={{ marginLeft: theme.spacing(1) }}>
+                        {emptyFilled(getLabelOfValidationType(injectExpectation))}
+                      </div>
+                    </div>
+                    {/* <Grid container={true} spacing={2}>
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
                     const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
                     return (
@@ -762,90 +877,116 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       </Grid>
                     )}
                 </Grid> */}
-                {/* <Divider style={{ marginTop: 20 }} /> */}
-                <TableContainer>
-                  <Table sx={{ minWidth: 650 }} size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>{t('Security platforms')}</TableCell>
-                        <TableCell>{t('Status')}</TableCell>
-                        <TableCell>{t('Detection time')}</TableCell>
-                        <TableCell>{t('Alerts')}</TableCell>
-                        <TableCell></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
-                        const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
-                        return (
-                          <TableRow
-                            key={index}
-                          >
-                            <TableCell>
-                              <div className={classes.flexContainer}>
-                                <div>
-                                  {getAvatar(injectExpectation, expectationResult)}
-                                </div>
-                                <div style={{
-                                  marginLeft: theme.spacing(1),
-                                  alignSelf: 'center',
-                                }}
+                    {/* <Divider style={{ marginTop: 20 }} /> */}
+                    {injectExpectation.inject_expectation_type !== 'MANUAL' && (
+                      <TableContainer>
+                        <Table sx={{ minWidth: 650 }} size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>{t('Security platforms')}</TableCell>
+                              <TableCell>{t('Status')}</TableCell>
+                              <TableCell>{t('Detection time')}</TableCell>
+                              <TableCell>{t('Alerts')}</TableCell>
+                              <TableCell></TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                              return (
+                                <TableRow
+                                  key={index}
+                                  hover={true}
+                                  onMouseOver={() => {
+                                    if (injectExpectation.inject_expectation_agent) { setCursorStyle('pointer'); }
+                                  }}
+                                  onClick={() => {
+                                    if (injectExpectation.inject_expectation_agent) { handleClickSecurityPlatformResult(injectExpectation, expectationResult); }
+                                  }}
+                                  sx={{ cursor: { cursorStyle } }}
+                                  selected={expectationResult.sourceId === selectedResult?.sourceId}
                                 >
-                                  <Typography variant="body1">
-                                    {expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
-                                  </Typography>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <ItemResult label={expectationResult.result} status={expectationResult.result} />
-                            </TableCell>
-                            <TableCell>
-                              {emptyFilled(nsdt(expectationResult.date))}
-                            </TableCell>
-                            <TableCell>
-                              {emptyFilled('3')}
-                            </TableCell>
-                            <TableCell>
-                              <IconButton
-                                color="primary"
-                                onClick={(ev) => {
-                                  ev.stopPropagation();
-                                  setAnchorEls({
-                                    ...anchorEls,
-                                    [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget,
-                                  });
-                                }}
-                                aria-haspopup="true"
-                                size="large"
-                                disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
-                              >
-                                <MoreVertOutlined />
-                              </IconButton>
-                              <Menu
-                                anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
-                                open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
-                                onClose={() => setAnchorEls({
-                                  ...anchorEls,
-                                  [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
-                                })}
-                              >
-                                <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
-                                  {t('Update')}
-                                </MenuItem>
-                                <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
-                                  {t('Delete')}
-                                </MenuItem>
-                              </Menu>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </div>
-            ))}
+                                  <TableCell>
+                                    <div className={classes.flexContainer}>
+                                      <div>
+                                        {getAvatar(injectExpectation, expectationResult)}
+                                      </div>
+                                      <div style={{
+                                        marginLeft: theme.spacing(1),
+                                        alignSelf: 'center',
+                                      }}
+                                      >
+                                        <Typography variant="body1">
+                                          {expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
+                                        </Typography>
+                                      </div>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell>
+                                    <ItemResult label={expectationResult.result} status={expectationResult.result} />
+                                  </TableCell>
+                                  <TableCell>
+                                    {emptyFilled(nsdt(expectationResult.date))}
+                                  </TableCell>
+                                  <TableCell>
+                                    {emptyFilled('3')}
+                                  </TableCell>
+                                  <TableCell>
+                                    <IconButton
+                                      color="primary"
+                                      onClick={(ev) => {
+                                        ev.stopPropagation();
+                                        setAnchorEls({
+                                          ...anchorEls,
+                                          [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: ev.currentTarget,
+                                        });
+                                      }}
+                                      aria-haspopup="true"
+                                      size="large"
+                                      disabled={['collector', 'media-pressure', 'challenge'].includes(expectationResult.sourceType ?? 'unknown')}
+                                    >
+                                      <MoreVertOutlined />
+                                    </IconButton>
+                                    <Menu
+                                      anchorEl={anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]}
+                                      open={Boolean(anchorEls[`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`])}
+                                      onClose={() => setAnchorEls({
+                                        ...anchorEls,
+                                        [`${injectExpectation.inject_expectation_id}-${expectationResult.sourceId}`]: null,
+                                      })}
+                                    >
+                                      <MenuItem onClick={() => handleOpenResultEdition(injectExpectation, expectationResult)}>
+                                        {t('Update')}
+                                      </MenuItem>
+                                      <MenuItem onClick={() => handleOpenResultDeletion(injectExpectation, expectationResult)}>
+                                        {t('Delete')}
+                                      </MenuItem>
+                                    </Menu>
+                                  </TableCell>
+                                </TableRow>
+
+                              );
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </Paper>
+
+                  {
+                    selectedResult !== null && selectedResult.sourceId !== undefined && selectedExpectationForResults !== null
+                    && (
+                      <TargetResultsSecurityPlatform
+                        injectExpectation={selectedExpectationForResults}
+                        collectorId={selectedResult.sourceId}
+                        expectationResult={selectedResult}
+                        open={true}
+                        handleClose={() => handleCloseSecurityPlatformResult()}
+                      />
+                    )
+                  }
+                </div>
+              );
+            })}
           <Dialog
             open={selectedExpectationForCreation !== null}
             TransitionComponent={Transition}
@@ -865,6 +1006,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         expectation={selectedExpectationForCreation.injectExpectation}
                         sourceIds={selectedExpectationForCreation.sourceIds}
                         onUpdate={onUpdateValidation}
+                        agentId={selectedExpectationForCreation.injectExpectation.inject_expectation_agent}
                       />
                     )}
                 </>
@@ -895,6 +1037,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         expectation={selectedResultEdition.injectExpectation}
                         result={selectedResultEdition.expectationResult}
                         onUpdate={onUpdateValidation}
+                        agentId={selectedResultEdition.injectExpectation.inject_expectation_agent}
                       />
                     )}
                 </>
