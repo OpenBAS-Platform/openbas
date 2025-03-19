@@ -209,7 +209,7 @@ public class Payload implements Base {
   @OneToMany(mappedBy = "payload", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonProperty("payload_output_parsers")
   @JsonSerialize(using = MultiModelDeserializer.class)
-  private List<OutputParser> outputParsers;
+  private List<OutputParser> outputParsers = new ArrayList<>();
 
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {

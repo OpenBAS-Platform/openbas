@@ -10,9 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.Document;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
@@ -103,6 +101,24 @@ class PayloadApiTest extends IntegrationTest {
               String errorMessage = result.getResolvedException().getMessage();
               assertTrue(errorMessage.contains("Executable architecture must be x86_64 or arm64"));
             });
+  }
+
+  @Test
+  @DisplayName("Create Payload with output parser")
+  @WithMockAdminUser
+  void createPayloadWithOutputParser() throws Exception {
+    PayloadCreateInput input =
+        PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
+
+    mvc.perform(
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_mode").value(ParserMode.STDOUT))
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_type").value(ParserType.REGEX))
+        .andExpect(jsonPath("$.payload_output_parsers[0].output_parser_rule").value("rule"));
   }
 
   @Test
