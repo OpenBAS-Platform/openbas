@@ -4,6 +4,7 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -32,6 +33,7 @@ public class CustomDashboard implements Base {
   @Column(name = "custom_dashboard_name", nullable = false)
   @JsonProperty("custom_dashboard_name")
   @NotBlank
+  @Queryable(filterable = true, searchable = true, sortable = true)
   private String name;
 
   @Column(name = "custom_dashboard_description")

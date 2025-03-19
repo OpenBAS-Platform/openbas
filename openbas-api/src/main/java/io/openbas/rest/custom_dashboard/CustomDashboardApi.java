@@ -40,7 +40,7 @@ public class CustomDashboardApi extends RestBehavior {
 
   @PostMapping("/search")
   public ResponseEntity<Page<CustomDashboard>> customDashboards(
-      @NotNull @Valid final SearchPaginationInput searchPaginationInput) {
+      @RequestBody @NotNull @Valid final SearchPaginationInput searchPaginationInput) {
     return ResponseEntity.ok(this.customDashboardService.customDashboards(searchPaginationInput));
   }
 
