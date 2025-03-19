@@ -89,7 +89,7 @@
     "@types/seamless-immutable": "7.1.19",
     "@typescript-eslint/utils": "8.26.1",
     "@vitejs/plugin-react": "4.3.4",
-    "@vitest/eslint-plugin": "1.1.37",
+    "@vitest/eslint-plugin": "1.1.38",
     "chokidar": "4.0.3",
     "cross-env": "7.0.3",
     "esbuild": "0.25.1",
