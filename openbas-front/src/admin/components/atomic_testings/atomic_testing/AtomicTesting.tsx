@@ -59,7 +59,7 @@ const AtomicTesting = () => {
   const theme = useTheme();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
-  const [previousParentTarget, setPreviousParentTarget] = useState<InjectTargetWithResult>();
+  const [upperParentTargetId, setUpperParentTargetId] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   const { documentMap } = useHelper((helper: DocumentHelper) => ({ documentMap: helper.getDocumentsMap() }));
@@ -80,7 +80,7 @@ const AtomicTesting = () => {
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, previous?: InjectTargetWithResult) => {
     setSelectedTarget(target);
     setCurrentParentTarget(currentParent);
-    setPreviousParentTarget(previous);
+    setUpperParentTargetId(previous);
   };
 
   const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, previous: InjectTargetWithResult | undefined) => {
@@ -89,7 +89,7 @@ const AtomicTesting = () => {
         <TargetListItem
           onClick={() => handleTargetClick(target, parent, previous)}
           target={target}
-          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && previousParentTarget?.id === previous?.id}
+          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTargetId?.id === previous?.id}
         />
         {target?.children && target.children.length > 0 && (
           <List disablePadding style={{ marginLeft: 15 }}>
@@ -334,7 +334,7 @@ const AtomicTesting = () => {
           {selectedTarget && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
               inject={injectResultOverviewOutput}
-              previousParentTargetId={previousParentTarget?.id}
+              upperParentTargetId={upperParentTargetId?.id}
               parentTargetId={currentParentTarget?.id}
               target={selectedTarget}
               lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
