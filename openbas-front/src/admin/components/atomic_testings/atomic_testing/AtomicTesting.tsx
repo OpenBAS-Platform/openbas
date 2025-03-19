@@ -77,19 +77,19 @@ const AtomicTesting = () => {
 
   // Handles
 
-  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, previous?: InjectTargetWithResult) => {
+  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTargetId?: InjectTargetWithResult) => {
     setSelectedTarget(target);
     setCurrentParentTarget(currentParent);
-    setUpperParentTargetId(previous);
+    setUpperParentTargetId(upperParentTargetId);
   };
 
-  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, previous: InjectTargetWithResult | undefined) => {
+  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParentTargetId: InjectTargetWithResult | undefined) => {
     return (
       <>
         <TargetListItem
-          onClick={() => handleTargetClick(target, parent, previous)}
+          onClick={() => handleTargetClick(target, parent, upperParentTargetId)}
           target={target}
-          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTargetId?.id === previous?.id}
+          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTargetId?.id === upperParentTargetId?.id}
         />
         {target?.children && target.children.length > 0 && (
           <List disablePadding style={{ marginLeft: 15 }}>
