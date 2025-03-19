@@ -23,8 +23,8 @@ public class OutputContractElement implements Base {
   @JsonProperty("output_contract_element_group")
   private int group;
 
-  @Column(name = "output_contract_element_label")
-  @JsonProperty("output_contract_element_label")
+  @Column(name = "output_contract_element_name")
+  @JsonProperty("output_contract_element_name")
   private String name;
 
   @Column(name = "output_contract_element_key")
