@@ -1,5 +1,5 @@
 import { Add, DnsOutlined } from '@mui/icons-material';
-import { Fab, List, ListItemButton, ListItemIcon, ListItemText, Step, StepLabel, Stepper } from '@mui/material';
+import { Fab, List, ListItemButton, ListItemIcon, ListItemText, Step, StepButton, Stepper } from '@mui/material';
 import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
@@ -7,7 +7,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
-import { addPayload } from '../../../actions/Payload';
+import { addPayload } from '../../../actions/payloads/payload-actions';
 import Drawer from '../../../components/common/Drawer';
 import inject18n from '../../../components/i18n';
 import PayloadForm from './PayloadForm';
@@ -140,6 +140,8 @@ class CreatePayload extends Component {
   render() {
     const { classes, t } = this.props;
     const { open, activeStep, selectedType } = this.state;
+    const steps = [t('Select the type'), t('Create the payload')];
+
     return (
       <>
         <Fab
@@ -157,12 +159,11 @@ class CreatePayload extends Component {
         >
           <>
             <Stepper activeStep={activeStep} style={{ marginBottom: 20 }}>
-              <Step>
-                <StepLabel>{t('Select the type')}</StepLabel>
-              </Step>
-              <Step>
-                <StepLabel>{t('Create the payload')}</StepLabel>
-              </Step>
+              {steps.map((label, index) => (
+                <Step key={label}>
+                  <StepButton color="inherit" onClick={() => this.setState({ activeStep: index })}>{label}</StepButton>
+                </Step>
+              ))}
             </Stepper>
             {activeStep === 0 && this.renderTypes()}
             {activeStep === 1 && (

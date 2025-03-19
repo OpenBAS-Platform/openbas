@@ -16,6 +16,7 @@ import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectService;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.PayloadMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
@@ -39,6 +40,8 @@ import org.springframework.stereotype.Service;
 public class AtomicTestingService {
 
   @Resource protected ObjectMapper mapper;
+  private final InjectMapper injectMapper;
+  private final ActionMetricCollector actionMetricCollector;
 
   private final AssetGroupRepository assetGroupRepository;
   private final AssetRepository assetRepository;
@@ -50,7 +53,7 @@ public class AtomicTestingService {
   private final TagRepository tagRepository;
   private final DocumentRepository documentRepository;
   private final AssetGroupService assetGroupService;
-  private final InjectMapper injectMapper;
+
   private final InjectSearchService injectSearchService;
   private final InjectService injectService;
 
@@ -139,6 +142,9 @@ public class AtomicTestingService {
             .filter(Objects::nonNull)
             .toList();
     injectToSave.getDocuments().addAll(injectDocuments);
+    if (injectId == null) {
+      actionMetricCollector.addAtomicTestingCreatedCount();
+    }
     Inject inject = injectRepository.save(injectToSave);
     return injectMapper.toInjectResultOverviewOutput(inject);
   }
@@ -205,6 +211,7 @@ public class AtomicTestingService {
   // -- ACTIONS --
 
   public InjectResultOverviewOutput duplicate(String id) {
+    this.actionMetricCollector.addAtomicTestingCreatedCount();
     return injectService.duplicate(id);
   }
 

@@ -181,19 +181,38 @@ public class InjectService {
     }
   }
 
-  public Map<Asset, Boolean> resolveAllAssetsToExecute(@NotNull final Inject inject) {
-    Map<Asset, Boolean> assets =
-        inject.getAssets().stream().collect(Collectors.toMap(asset -> asset, asset -> false));
+  public List<AssetToExecute> resolveAllAssetsToExecute(@NotNull final Inject inject) {
+    List<AssetToExecute> assetToExecutes = new ArrayList<>();
+
+    inject.getAssets().forEach(asset -> assetToExecutes.add(new AssetToExecute(asset)));
+
     inject
         .getAssetGroups()
         .forEach(
-            (assetGroup -> {
+            assetGroup -> {
               List<Asset> assetsFromGroup =
                   this.assetGroupService.assetsFromAssetGroup(assetGroup.getId());
-              // Verify asset validity
-              assetsFromGroup.forEach((asset) -> assets.put(asset, true));
-            }));
-    return assets;
+
+              assetsFromGroup.forEach(
+                  asset -> {
+                    AssetToExecute existingAssetToExecute =
+                        assetToExecutes.stream()
+                            .filter(as -> as.asset().getId().equals(asset.getId()))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (existingAssetToExecute != null) {
+                      existingAssetToExecute.assetGroups().add(assetGroup);
+                    } else {
+                      AssetToExecute newAssetToExecute =
+                          new AssetToExecute(asset, false, new ArrayList<>());
+                      newAssetToExecute.assetGroups().add(assetGroup);
+                      assetToExecutes.add(newAssetToExecute);
+                    }
+                  });
+            });
+
+    return assetToExecutes;
   }
 
   public void cleanInjectsDocExercise(String exerciseId, String documentId) {
@@ -589,8 +608,8 @@ public class InjectService {
     List<Agent> agents = new ArrayList<>();
     Set<String> agentIds = new HashSet<>();
 
-    resolveAllAssetsToExecute(inject).keySet().stream()
-        .map(asset -> (Endpoint) Hibernate.unproxy(asset))
+    resolveAllAssetsToExecute(inject).stream()
+        .map(assetToExecute -> (Endpoint) Hibernate.unproxy(assetToExecute.asset()))
         .flatMap(
             endpoint -> Optional.ofNullable(endpoint.getAgents()).stream().flatMap(List::stream))
         .filter(agent -> isPrimaryAgent(agent))

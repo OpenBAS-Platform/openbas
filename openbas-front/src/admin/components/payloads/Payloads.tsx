@@ -7,7 +7,7 @@ import { fetchCollectors } from '../../../actions/Collector';
 import { type CollectorHelper } from '../../../actions/collectors/collector-helper';
 import { fetchDocuments } from '../../../actions/Document';
 import { type DocumentHelper } from '../../../actions/helper';
-import { searchPayloads } from '../../../actions/Payload';
+import { searchPayloads } from '../../../actions/payloads/payload-actions';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import Drawer from '../../../components/common/Drawer';
 import ExportButton from '../../../components/common/ExportButton';

@@ -759,6 +759,7 @@ export interface EndpointOverviewOutput {
 
 export interface EndpointRegisterInput {
   agent_executed_by_user?: string;
+  agent_installation_mode?: string;
   agent_is_elevated?: boolean;
   agent_is_service?: boolean;
   asset_description?: string;
@@ -901,6 +902,7 @@ export interface ExecutionTracesOutput {
 }
 
 export interface Executor {
+  executor_background_color?: string;
   /** @format date-time */
   executor_created_at: string;
   executor_doc?: string;
@@ -1624,7 +1626,7 @@ export interface InjectResultOverviewOutput {
   /** Id of inject */
   inject_id: string;
   /** Full contract */
-  inject_injector_contract: AtomicInjectorContractOutput;
+  inject_injector_contract?: AtomicInjectorContractOutput;
   /** Kill chain phases */
   inject_kill_chain_phases?: KillChainPhaseSimple[];
   /** Indicates whether the inject is ready for use */
@@ -2368,6 +2370,25 @@ export interface PageExerciseSimple {
   totalPages?: number;
 }
 
+export interface PageFinding {
+  content?: Finding[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageFullTextSearchResult {
   content?: FullTextSearchResult[];
   empty?: boolean;
@@ -2920,6 +2941,8 @@ export interface PlatformSettings {
   postgre_version?: string;
   /** Current version of RabbitMQ */
   rabbitmq_version?: string;
+  /** True if telemetry manager enable */
+  telemetry_manager_enable?: boolean;
   /** True if connection with OpenCTI is enabled */
   xtm_opencti_enable?: boolean;
   /** Url of OpenCTI */

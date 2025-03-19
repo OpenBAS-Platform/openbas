@@ -38,6 +38,7 @@ import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.export.ScenarioFileExport;
 import io.openbas.rest.scenario.form.ScenarioSimple;
 import io.openbas.rest.team.output.TeamOutput;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
@@ -98,6 +99,7 @@ public class ScenarioService {
   private final ArticleRepository articleRepository;
 
   private final ExerciseMapper exerciseMapper;
+  private final ActionMetricCollector actionMetricCollector;
 
   private final GrantService grantService;
   private final VariableService variableService;
@@ -123,6 +125,7 @@ public class ScenarioService {
       }
     }
     this.grantService.computeGrant(scenario);
+    this.actionMetricCollector.addScenarioCreatedCount();
     return this.scenarioRepository.save(scenario);
   }
 
@@ -596,6 +599,7 @@ public class ScenarioService {
       getListOfVariables(scenarioDuplicate, scenarioOrigin);
       getObjectives(scenarioDuplicate, scenarioOrigin);
       getLessonsCategories(scenarioDuplicate, scenarioOrigin);
+      this.actionMetricCollector.addScenarioCreatedCount();
       return scenarioRepository.save(scenario);
     }
     throw new ElementNotFoundException();

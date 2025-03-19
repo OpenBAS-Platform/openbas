@@ -29,7 +29,6 @@ import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.*;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.*;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.ServletOutputStream;
@@ -100,10 +99,6 @@ public class InjectApi extends RestBehavior {
 
   @LogExecutionTime
   @PostMapping(INJECT_URI + "/search/export")
-  @Tracing(
-      name = "Exports injects based on a search specification",
-      layer = "api",
-      operation = "POST")
   public void injectsExportFromSearch(
       @RequestBody @Valid InjectExportFromSearchRequestInput input, HttpServletResponse response)
       throws IOException {
@@ -237,19 +232,19 @@ public class InjectApi extends RestBehavior {
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/callback/{injectId}")
-  public Inject injectExecutionCallback(
+  public void injectExecutionCallback(
       @PathVariable String injectId, @Valid @RequestBody InjectExecutionInput input) {
-    return injectExecutionCallback(null, injectId, input);
+    injectExecutionCallback(null, injectId, input);
   }
 
   @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
-  public Inject injectExecutionCallback(
+  public void injectExecutionCallback(
       @PathVariable
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-    return injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+    injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
   }
 
   @Secured(ROLE_ADMIN)
@@ -258,7 +253,6 @@ public class InjectApi extends RestBehavior {
       summary = "Get the payload ready to be executed",
       description =
           "This endpoint is invoked by implants to retrieve a payload command that's pre-configured and ready for execution.")
-  @Tracing(name = "Get payload ready to be executed", layer = "api", operation = "GET")
   public Payload getExecutablePayloadInject(
       @PathVariable @NotBlank final String injectId, @PathVariable @NotBlank final String agentId)
       throws Exception {
@@ -296,7 +290,6 @@ public class InjectApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
-  @Tracing(name = "Get an iterable of injects for an exercise", layer = "api", operation = "GET")
   public Iterable<Inject> exerciseInjects(@PathVariable @NotBlank final String exerciseId) {
     return injectRepository.findByExerciseId(exerciseId).stream()
         .sorted(Inject.executionComparator)
@@ -307,7 +300,6 @@ public class InjectApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/{exerciseId}/injects/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  @Tracing(name = "Get a page of inject result for an exercise", layer = "api", operation = "POST")
   public Page<InjectResultOutput> searchExerciseInjects(
       @PathVariable final String exerciseId,
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
@@ -318,7 +310,6 @@ public class InjectApi extends RestBehavior {
   @GetMapping(EXERCISE_URI + "/{exerciseId}/injects/results")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   @Transactional(readOnly = true)
-  @Tracing(name = "Get a list of inject results for an exercise", layer = "api", operation = "GET")
   public List<InjectResultOutput> exerciseInjectsResults(@PathVariable final String exerciseId) {
     return injectSearchService.getListOfInjectResults(exerciseId);
   }
@@ -576,7 +567,6 @@ public class InjectApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @PutMapping(INJECT_URI)
   @LogExecutionTime
-  @Tracing(name = "Bulk update of injects", layer = "api", operation = "PUT")
   public List<Inject> bulkUpdateInject(@RequestBody @Valid final InjectBulkUpdateInputs input) {
 
     // Control and format inputs
@@ -593,7 +583,6 @@ public class InjectApi extends RestBehavior {
   @Transactional(rollbackFor = Exception.class)
   @DeleteMapping(INJECT_URI)
   @LogExecutionTime
-  @Tracing(name = "Bulk delete of injects", layer = "api", operation = "DELETE")
   public List<Inject> bulkDelete(@RequestBody @Valid final InjectBulkProcessingInput input) {
 
     // Control and format inputs

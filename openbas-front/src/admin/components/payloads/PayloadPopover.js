@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { deletePayload, duplicatePayload, updatePayload } from '../../../actions/Payload';
+import { deletePayload, duplicatePayload, updatePayload } from '../../../actions/payloads/payload-actions';
 import DialogDelete from '../../../components/common/DialogDelete';
 import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';

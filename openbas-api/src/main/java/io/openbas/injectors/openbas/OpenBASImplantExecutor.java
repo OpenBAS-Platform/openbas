@@ -15,6 +15,7 @@ import io.openbas.model.Expectation;
 import io.openbas.model.expectation.DetectionExpectation;
 import io.openbas.model.expectation.ManualExpectation;
 import io.openbas.model.expectation.PreventionExpectation;
+import io.openbas.rest.inject.service.AssetToExecute;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.InjectExpectationService;
@@ -39,10 +40,10 @@ public class OpenBASImplantExecutor extends Injector {
       throws Exception {
     Inject inject = this.injectService.inject(injection.getInjection().getInject().getId());
 
-    Map<Asset, Boolean> assets = this.injectService.resolveAllAssetsToExecute(inject);
+    List<AssetToExecute> assetToExecutes = this.injectService.resolveAllAssetsToExecute(inject);
 
-    // Check assets target
-    if (assets.isEmpty()) {
+    // Check assetToExecutes target
+    if (assetToExecutes.isEmpty()) {
       execution.addTrace(
           getNewErrorTrace(
               "Found 0 asset to execute the ability on (likely this inject does not have any target or the targeted asset is inactive and has been purged)",
@@ -54,21 +55,10 @@ public class OpenBASImplantExecutor extends Injector {
         contentConvert(injection, OpenBASImplantInjectContent.class);
 
     List<Expectation> expectations = new ArrayList<>();
-    assets.forEach(
-        (asset, isInGroup) -> {
-          Optional<InjectorContract> contract = inject.getInjectorContract();
-          String payloadType = "";
-          if (contract.isPresent()) {
-            Payload payload = contract.get().getPayload();
-            if (payload == null) {
-              log.info(
-                  String.format("No payload for inject %s was found, skipping", inject.getId()));
-              return;
-            }
-            payloadType = payload.getType();
-          }
-          computeExpectationsForAssetAndAgents(
-              expectations, content, asset, isInGroup, inject, payloadType);
+
+    assetToExecutes.forEach(
+        (assetToExecute) -> {
+          computeExpectationsForAssetAndAgents(expectations, content, assetToExecute, inject);
         });
 
     List<AssetGroup> assetGroups = injection.getAssetGroups();
@@ -82,89 +72,24 @@ public class OpenBASImplantExecutor extends Injector {
 
   // -- PRIVATE --
 
-  /** In case of direct asset, we have an individual expectation for the asset */
+  /** In case of direct assetToExecute, we have an individual expectation for the assetToExecute */
   private void computeExpectationsForAssetAndAgents(
       @NotNull final List<Expectation> expectations,
       @NotNull final OpenBASImplantInjectContent content,
-      @NotNull final Asset asset,
-      final boolean expectationGroup,
-      final Inject inject,
-      final String payloadType) {
+      @NotNull final AssetToExecute assetToExecute,
+      final Inject inject) {
     if (!content.getExpectations().isEmpty()) {
       expectations.addAll(
           content.getExpectations().stream()
               .flatMap(
                   expectation ->
                       switch (expectation.getType()) {
-                        case PREVENTION -> {
-                          PreventionExpectation preventionExpectation =
-                              preventionExpectationForAsset(
-                                  expectation.getScore(),
-                                  expectation.getName(),
-                                  expectation.getDescription(),
-                                  asset,
-                                  expectationGroup, // expectationGroup usefully in front-end
-                                  expectation.getExpirationTime());
-
-                          // We propagate the asset expectation to agents
-                          List<PreventionExpectation> preventionExpectationList =
-                              getPreventionExpectationList(
-                                  asset, inject, payloadType, preventionExpectation);
-
-                          // If any expectation for agent is created then we create also expectation
-                          // for asset
-                          if (!preventionExpectationList.isEmpty()) {
-                            yield Stream.concat(
-                                Stream.of(preventionExpectation),
-                                preventionExpectationList.stream());
-                          }
-                          yield Stream.empty();
-                        }
-                        case DETECTION -> {
-                          DetectionExpectation detectionExpectation =
-                              detectionExpectationForAsset(
-                                  expectation.getScore(),
-                                  expectation.getName(),
-                                  expectation.getDescription(),
-                                  asset,
-                                  expectationGroup,
-                                  expectation.getExpirationTime());
-
-                          // We propagate the asset expectation to agents
-                          List<DetectionExpectation> detectionExpectationList =
-                              getDetectionExpectationList(
-                                  asset, inject, payloadType, detectionExpectation);
-
-                          // If any expectation for agent is created then we create also expectation
-                          // for asset
-                          if (!detectionExpectationList.isEmpty()) {
-                            yield Stream.concat(
-                                Stream.of(detectionExpectation), detectionExpectationList.stream());
-                          }
-                          yield Stream.empty();
-                        }
-                        case MANUAL -> {
-                          ManualExpectation manualExpectation =
-                              manualExpectationForAsset(
-                                  expectation.getScore(),
-                                  expectation.getName(),
-                                  expectation.getDescription(),
-                                  asset,
-                                  expectation.getExpirationTime(),
-                                  expectationGroup);
-
-                          // We propagate the asset expectation to agents
-                          List<ManualExpectation> manualExpectationList =
-                              getManualExpectationList(asset, inject, manualExpectation);
-
-                          // If any expectation for agent is created then we create also expectation
-                          // for asset
-                          if (!manualExpectationList.isEmpty()) {
-                            yield Stream.concat(
-                                Stream.of(manualExpectation), manualExpectationList.stream());
-                          }
-                          yield Stream.empty();
-                        }
+                        case PREVENTION ->
+                            getPreventionExpectations(assetToExecute, inject, expectation).stream();
+                        case DETECTION ->
+                            getDetectionExpectations(assetToExecute, inject, expectation).stream();
+                        case MANUAL ->
+                            getManualExpectations(assetToExecute, inject, expectation).stream();
                         default -> Stream.of();
                       })
               .toList());

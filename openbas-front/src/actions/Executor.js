@@ -1,4 +1,4 @@
-import { getReferential, simplePostCall } from '../utils/Action';
+import { getReferential } from '../utils/Action';
 import * as schema from './Schema';
 
 export const fetchExecutors = () => (dispatch) => {
@@ -6,13 +6,4 @@ export const fetchExecutors = () => (dispatch) => {
   return getReferential(schema.arrayOfExecutors, uri)(dispatch);
 };
 
-export const fetchExecutor = executorId => (dispatch) => {
-  const uri = `/api/executors/${executorId}`;
-  return getReferential(schema.executor, uri)(dispatch);
-};
-
-export const searchExecutors = (paginationInput) => {
-  const data = paginationInput;
-  const uri = '/api/executors/search';
-  return simplePostCall(uri, data);
-};
+export default fetchExecutors();

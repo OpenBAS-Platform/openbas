@@ -1,9 +1,13 @@
 package io.openbas.rest.report.model;
 
+import jakarta.persistence.Embeddable;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
+import lombok.Data;
 
+@Data
+@Embeddable
 public class ReportInjectCommentId implements Serializable {
 
   @Serial private static final long serialVersionUID = 1L;

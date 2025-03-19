@@ -27,28 +27,28 @@ public class CalderaInjector {
     Map<String, String> executorCommands = new HashMap<>();
     executorCommands.put(
         Endpoint.PLATFORM_TYPE.Windows.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
-        "$x=\"#{location}\";$location=$x.Replace(\"\\obas-agent-caldera.exe\", \"\");[Environment]::CurrentDirectory = $location;$random=-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_});$filename=\"obas-implant-caldera-$random.exe\";$server=\""
+        "$x=\"#{location}\";$location=$x.Replace(\"\\obas-agent-caldera.exe\", \"\");[Environment]::CurrentDirectory = $location;$filename=\"obas-implant-caldera-#{inject}-agent-#{agent}.exe\";$server=\""
             + calderaInjectorConfig.getPublicUrl()
             + "\";$url=\""
             + openBASConfig.getBaseUrl()
             + "/api/implant/caldera/windows/x86_64\";$wc=New-Object System.Net.WebClient;$data=$wc.DownloadData($url);[io.file]::WriteAllBytes($filename,$data) | Out-Null;Remove-NetFirewallRule -DisplayName \"Allow OpenBAS Inbound\";New-NetFirewallRule -DisplayName \"Allow OpenBAS Inbound\" -Direction Inbound -Program \"$location\\$filename\" -Action Allow | Out-Null;Remove-NetFirewallRule -DisplayName \"Allow OpenBAS Outbound\";New-NetFirewallRule -DisplayName \"Allow OpenBAS Outbound\" -Direction Outbound -Program \"$location\\$filename\" -Action Allow | Out-Null;Start-Process -FilePath \"$location\\$filename\" -ArgumentList \"-server $server -group red\" -WindowStyle hidden;");
     executorCommands.put(
         Endpoint.PLATFORM_TYPE.Linux.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
-        "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-caldera-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 5; echo);server=\""
+        "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-caldera-#{inject}-agent-#{agent};server=\""
             + calderaInjectorConfig.getPublicUrl()
             + "\";curl -s -X GET "
             + openBASConfig.getBaseUrl()
             + "/api/implant/caldera/linux/x86_64 > $location/$filename;chmod +x $location/$filename;$location/$filename -server $server -group red &");
     executorCommands.put(
         Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.x86_64,
-        "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-caldera-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 5; echo);server=\""
+        "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-caldera-#{inject}-agent-#{agent};server=\""
             + calderaInjectorConfig.getPublicUrl()
             + "\";curl -s -X GET "
             + openBASConfig.getBaseUrl()
             + "/api/implant/caldera/macos/x86_64 > $location/$filename;chmod +x $location/$filename;$location/$filename -server $server -group red &");
     executorCommands.put(
         Endpoint.PLATFORM_TYPE.MacOS.name() + "." + Endpoint.PLATFORM_ARCH.arm64,
-        "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-caldera-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 5; echo);server=\""
+        "x=\"#{location}\";location=$(echo \"$x\" | sed \"s#/openbas-caldera-agent##\");filename=obas-implant-caldera-#{inject}-agent-#{agent};server=\""
             + calderaInjectorConfig.getPublicUrl()
             + "\";curl -s -X GET "
             + openBASConfig.getBaseUrl()

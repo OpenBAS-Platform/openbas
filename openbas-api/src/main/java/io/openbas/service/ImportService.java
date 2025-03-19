@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.UnsupportedMediaTypeException;
 
 @Service
 public class ImportService {
@@ -74,7 +75,7 @@ public class ImportService {
         ZipEntry entry = entries.nextElement();
         String entryType = entry.getComment();
         if (entryType == null) {
-          throw new UnsupportedOperationException("Import file is using an incorrect format.");
+          throw new UnsupportedMediaTypeException("Import file is using an incorrect format.");
         }
         InputStream zipInputStream = zipFile.getInputStream(entry);
         switch (entryType) {
@@ -82,7 +83,7 @@ public class ImportService {
           case EXPORT_ENTRY_ATTACHMENT ->
               docReferences.put(entry.getName(), new ImportEntry(entry, zipInputStream));
           default ->
-              throw new UnsupportedOperationException(
+              throw new UnsupportedMediaTypeException(
                   "Import file contains an unsupported type: " + entryType);
         }
       }

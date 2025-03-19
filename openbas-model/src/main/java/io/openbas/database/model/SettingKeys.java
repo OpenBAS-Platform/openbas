@@ -11,7 +11,9 @@ public enum SettingKeys {
       "This platform is dedicated to Filigran team testing. **Sandbox running the latest rolling release.**"),
   PLATFORM_WHITEMARK("platform_whitemark", "false"),
   PLATFORM_NAME("platform_name", "OpenBAS - Breach and Attack Simulation Platform"),
-  PLATFORM_BANNER("platform_banner", "");
+  PLATFORM_BANNER("platform_banner", ""),
+  PLATFORM_INSTANCE("instance_id", ""),
+  PLATFORM_INSTANCE_CREATION("instance_creation_date", "");
 
   private final String key;
   private final String defaultValue;

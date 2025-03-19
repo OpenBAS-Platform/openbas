@@ -10,18 +10,18 @@ interface Props {
 }
 
 const ExecutionTime = ({ startDate, endDate, style = {} }: Props) => {
-  const { t } = useFormatter();
+  const { t, fldt } = useFormatter();
   const executionTimeInfo: {
     label: string;
     value: string | null;
   }[] = [
     {
       label: 'Start date',
-      value: startDate,
+      value: fldt(startDate),
     },
     {
       label: 'End date',
-      value: endDate,
+      value: fldt(endDate),
     },
     {
       label: 'Execution Time',

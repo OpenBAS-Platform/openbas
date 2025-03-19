@@ -59,6 +59,7 @@ const AtomicTesting = () => {
   const theme = useTheme();
   const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
+  const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
 
   const { documentMap } = useHelper((helper: DocumentHelper) => ({ documentMap: helper.getDocumentsMap() }));
@@ -76,24 +77,25 @@ const AtomicTesting = () => {
 
   // Handles
 
-  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult) => {
+  const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
     setSelectedTarget(target);
     setCurrentParentTarget(currentParent);
+    setUpperParentTarget(upperParentTarget);
   };
 
-  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined) => {
+  const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
     return (
       <>
         <TargetListItem
-          onClick={() => handleTargetClick(target, parent)}
+          onClick={() => handleTargetClick(target, parent, upperParent)}
           target={target}
-          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id}
+          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
         />
         {target?.children && target.children.length > 0 && (
           <List disablePadding style={{ marginLeft: 15 }}>
             {target.children.map(child => (
               <Fragment key={child?.id}>
-                {renderTargetItem(child, target)}
+                {renderTargetItem(child, target, parent)}
               </Fragment>
             ))}
             <Divider className={classes.dividerL} />
@@ -186,7 +188,7 @@ const AtomicTesting = () => {
                 {t('Last execution date')}
               </Typography>
               <div style={{ display: 'flex' }}>
-                {fldt(injectResultOverviewOutput.inject_updated_at)}
+                {fldt(injectResultOverviewOutput?.inject_status?.tracking_end_date)}
               </div>
             </Grid>
             <Grid item xs={4} style={{ paddingTop: 10 }}>
@@ -315,7 +317,7 @@ const AtomicTesting = () => {
             <List>
               {sortedTargets.map(target => (
                 <div key={target?.id}>
-                  {renderTargetItem(target, undefined)}
+                  {renderTargetItem(target, undefined, undefined)}
                 </div>
               ))}
             </List>
@@ -332,6 +334,7 @@ const AtomicTesting = () => {
           {selectedTarget && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
               inject={injectResultOverviewOutput}
+              upperParentTargetId={upperParentTarget?.id}
               parentTargetId={currentParentTarget?.id}
               target={selectedTarget}
               lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}

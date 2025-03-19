@@ -13,6 +13,7 @@ import io.openbas.service.GrantService;
 import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
+import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.ExerciseMapper;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.ResultUtils;
@@ -37,6 +38,7 @@ class ExerciseServiceTest {
   @Mock private ExerciseMapper exerciseMapper;
   @Mock private InjectMapper injectMapper;
   @Mock private ResultUtils resultUtils;
+  @Mock private ActionMetricCollector actionMetricCollector;
   @Mock private AssetRepository assetRepository;
   @Mock private AssetGroupRepository assetGroupRepository;
   @Mock private InjectExpectationRepository injectExpectationRepository;
@@ -64,6 +66,7 @@ class ExerciseServiceTest {
             exerciseMapper,
             injectMapper,
             resultUtils,
+            actionMetricCollector,
             assetRepository,
             assetGroupRepository,
             injectExpectationRepository,

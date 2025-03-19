@@ -72,7 +72,7 @@ const AgentTraces = ({ agentStatus }: Props) => {
           >
             <Typography variant="h3">{t('Executor')}</Typography>
             <img
-              src={`/api/images/executors/${agentStatus.agent_executor_type}`}
+              src={`/api/images/executors/icons/${agentStatus.agent_executor_type}`}
               alt={agentStatus.agent_executor_type}
               style={{
                 width: 20,

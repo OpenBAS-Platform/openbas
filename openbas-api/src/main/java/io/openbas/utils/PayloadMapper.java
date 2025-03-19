@@ -14,7 +14,6 @@ import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -27,11 +26,12 @@ public class PayloadMapper {
 
   public StatusPayloadOutput getStatusPayloadOutputFromInject(Optional<Inject> inject) {
 
-    if (inject.isEmpty()) return StatusPayloadOutput.builder().build();
+    if (inject.isEmpty()) return null;
 
     Inject injectObj = inject.get();
     Optional<InjectorContract> injectorContractOpt = injectObj.getInjectorContract();
-    if (injectorContractOpt.isEmpty()) return StatusPayloadOutput.builder().build();
+    if (injectorContractOpt.isEmpty() || injectorContractOpt.get().getPayload() == null)
+      return null;
 
     InjectorContract injectorContract = injectorContractOpt.get();
     StatusPayloadOutput.StatusPayloadOutputBuilder statusPayloadOutputBuilder =
@@ -54,7 +54,7 @@ public class PayloadMapper {
         processPayloadType(statusPayloadOutputBuilder, payload);
         return statusPayloadOutputBuilder.build();
       } else {
-        return fetchPayloadFromExecutor(statusPayloadOutputBuilder, injectorContract);
+        return null;
       }
     }
 
@@ -65,7 +65,7 @@ public class PayloadMapper {
             statusPayload ->
                 populateExecutedPayload(
                     statusPayloadOutputBuilder, statusPayload, injectorContract))
-        .orElse(StatusPayloadOutput.builder().build());
+        .orElse(null);
   }
 
   private void populatePayloadDetails(
@@ -146,30 +146,6 @@ public class PayloadMapper {
         .portDst(payloadNetworkTraffic.getPortDst())
         .ipSrc(payloadNetworkTraffic.getIpSrc())
         .ipDst(payloadNetworkTraffic.getIpDst());
-  }
-
-  private StatusPayloadOutput fetchPayloadFromExecutor(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder, InjectorContract injectorContract) {
-    try {
-      // Inject comes from Caldera ability and tomorrow from other(s) Executor(s)
-      io.openbas.executors.Injector executor =
-          context.getBean(
-              injectorContract.getInjector().getType(), io.openbas.executors.Injector.class);
-      StatusPayload statusPayload = executor.getPayloadOutput(injectorContract.getId());
-      return builder
-          .externalId(statusPayload.getExternalId())
-          .name(statusPayload.getName())
-          .type(statusPayload.getType())
-          .description(statusPayload.getDescription())
-          .platforms(injectorContract.getPlatforms())
-          .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
-          .executableArch(injectorContract.getArch())
-          .payloadCommandBlocks(statusPayload.getPayloadCommandBlocks())
-          .build();
-    } catch (NoSuchBeanDefinitionException e) {
-      log.info("No executor found for this injector: " + injectorContract.getInjector().getType());
-      return StatusPayloadOutput.builder().build();
-    }
   }
 
   private StatusPayloadOutput populateExecutedPayload(

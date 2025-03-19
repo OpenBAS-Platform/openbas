@@ -24,7 +24,6 @@ import io.openbas.rest.user.form.user.UserOutput;
 import io.openbas.rest.user.service.UserCriteriaBuilderService;
 import io.openbas.service.MailingService;
 import io.openbas.service.UserService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -233,7 +232,6 @@ public class UserApi extends RestBehavior {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of users")})
   @PostMapping(USER_URI + "/find")
   @Transactional(readOnly = true)
-  @Tracing(name = "Find users", layer = "api", operation = "POST")
   public List<UserOutput> findUsers(
       @RequestBody @Valid @NotNull @Parameter(description = "List of ids")
           final List<String> userIds) {

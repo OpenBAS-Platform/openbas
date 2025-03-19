@@ -40,6 +40,9 @@ public interface UserRepository
   @Query("select count(distinct u) from User u where u.createdAt > :creationDate")
   long globalCount(Instant creationDate);
 
+  @Query("select count(distinct u) from User u")
+  long globalCount();
+
   // -- ADMIN --
 
   // Custom query to bypass ID generator on User property

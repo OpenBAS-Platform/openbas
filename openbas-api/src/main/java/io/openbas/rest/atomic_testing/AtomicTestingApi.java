@@ -6,7 +6,6 @@ import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AtomicTestingService;
 import io.openbas.service.InjectExpectationService;
-import io.openbas.telemetry.Tracing;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -31,7 +30,6 @@ public class AtomicTestingApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/search")
   @Transactional(readOnly = true)
-  @Tracing(name = "Get a page of atomic testings", layer = "api", operation = "POST")
   public Page<InjectResultOutput> findAllAtomicTestings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return atomicTestingService.searchAtomicTestings(searchPaginationInput);
@@ -40,14 +38,12 @@ public class AtomicTestingApi extends RestBehavior {
   @LogExecutionTime
   @GetMapping("/{injectId}")
   @PreAuthorize("isInjectObserver(#injectId)")
-  @Tracing(name = "Get a atomic testing", layer = "api", operation = "GET")
   public InjectResultOverviewOutput findAtomicTesting(@PathVariable String injectId) {
     return atomicTestingService.findById(injectId);
   }
 
   @LogExecutionTime
   @GetMapping("/{injectId}/payload")
-  @Tracing(name = "Get the payload of an atomic testing", layer = "api", operation = "GET")
   public StatusPayloadOutput findAtomicTestingPayload(@PathVariable String injectId) {
     return atomicTestingService.findPayloadOutputByInjectId(injectId);
   }
@@ -72,21 +68,18 @@ public class AtomicTestingApi extends RestBehavior {
     atomicTestingService.deleteAtomicTesting(injectId);
   }
 
-  @Tracing(name = "Duplicate an atomic testing", layer = "api", operation = "POST")
   @PostMapping("/{atomicTestingId}/duplicate")
   public InjectResultOverviewOutput duplicateAtomicTesting(
       @PathVariable @NotBlank final String atomicTestingId) {
     return atomicTestingService.duplicate(atomicTestingId);
   }
 
-  @Tracing(name = "Launch an atomic testing", layer = "api", operation = "POST")
   @PostMapping("/{atomicTestingId}/launch")
   public InjectResultOverviewOutput launchAtomicTesting(
       @PathVariable @NotBlank final String atomicTestingId) {
     return atomicTestingService.launch(atomicTestingId);
   }
 
-  @Tracing(name = "Relaunch an atomic testing", layer = "api", operation = "POST")
   @PostMapping("/{atomicTestingId}/relaunch")
   public InjectResultOverviewOutput relaunchAtomicTesting(
       @PathVariable @NotBlank final String atomicTestingId) {

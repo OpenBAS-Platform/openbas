@@ -16,7 +16,6 @@ import { type Exercise as ExerciseType, type InjectResultOverviewOutput } from '
 import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
-import isInjectWithPayloadInfo from '../../../../../utils/inject/injectUtils';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
 import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/AtomicTestingPayloadInfo';
@@ -123,7 +122,7 @@ const InjectIndexComponent: FunctionComponent<{
               className={classes.item}
             />
             {
-              isInjectWithPayloadInfo(injectResultOverviewOutput) && (
+              injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
                 <Tab
                   component={Link}
                   to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/payload_info`)}
@@ -139,7 +138,8 @@ const InjectIndexComponent: FunctionComponent<{
           <Routes>
             <Route path="" element={errorWrapper(AtomicTesting)()} />
             <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-            <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />
+            { injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+              && <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />}
             {/* Not found */}
             <Route path="*" element={<NotFound />} />
           </Routes>

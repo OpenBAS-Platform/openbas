@@ -1,6 +1,6 @@
 package io.openbas.executors;
 
-import static io.openbas.service.FileService.EXECUTORS_IMAGES_BASE_PATH;
+import static io.openbas.service.FileService.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.Executor;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExecutorService {
 
+  public static final String EXT_PNG = ".png";
   @Resource protected ObjectMapper mapper;
 
   private FileService fileService;
@@ -31,13 +32,19 @@ public class ExecutorService {
     this.executorRepository = executorRepository;
   }
 
+  public Iterable<Executor> executors() {
+    return this.executorRepository.findAll();
+  }
+
   @Transactional
   public Executor register(
       String id,
       String type,
       String name,
       String documentationUrl,
+      String backgroundColor,
       InputStream iconData,
+      InputStream bannerData,
       String[] platforms)
       throws Exception {
     // Sanity checks
@@ -45,9 +52,14 @@ public class ExecutorService {
       throw new IllegalArgumentException("Executor ID must not be null or empty.");
     }
 
+    // Save imgs
     if (iconData != null) {
-      fileService.uploadStream(EXECUTORS_IMAGES_BASE_PATH, type + ".png", iconData);
+      fileService.uploadStream(EXECUTORS_IMAGES_ICONS_BASE_PATH, type + EXT_PNG, iconData);
     }
+    if (bannerData != null) {
+      fileService.uploadStream(EXECUTORS_IMAGES_BANNERS_BASE_PATH, type + EXT_PNG, bannerData);
+    }
+
     Executor executor = executorRepository.findById(id).orElse(null);
     if (executor == null) {
       Executor executorChecking = executorRepository.findByType(type).orElse(null);
@@ -65,6 +77,7 @@ public class ExecutorService {
     executor.setName(name);
     executor.setType(type);
     executor.setDoc(documentationUrl);
+    executor.setBackgroundColor(backgroundColor);
     executor.setPlatforms(platforms);
 
     executorRepository.save(executor);

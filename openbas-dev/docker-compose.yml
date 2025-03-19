@@ -52,19 +52,23 @@ services:
       - type: bind
         source: caldera.yml
         target: /usr/src/app/conf/local.yml
-  openbas-telemetry-jaeger:
-    container_name: openbas-telemetry-jaeger
-    image: jaegertracing/all-in-one
-    restart: unless-stopped
-    ports:
-      - "16686:16686"
-      - "4317:4317"
 #  openbas-pyroscope:
 #    container_name: openbas-pyroscope
 #    image: grafana/pyroscope:latest
 #    restart: unless-stopped
 #    ports:
 #      - "4040:4040"
+#  openbas-telemetry-otlp:
+#    container_name: openbas-telemetry-otlp
+#    image: otel/opentelemetry-collector-contrib:0.119.0
+#    restart: unless-stopped
+#    volumes:
+#      - "./otlp-config.yaml:/etc/config/otlp-config.yaml"
+#      - "./telemetry.json:/telemetry.json"
+#    command:
+#      - '--config=/etc/config/otlp-config.yaml'
+#    ports:
+#      - "1010:1010"
   openbas-pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin

@@ -244,17 +244,22 @@ const InjectPopover: FunctionComponent<Props> = ({
         open={Boolean(anchorEl)}
         onClose={handlePopoverClose}
       >
-        <MenuItem onClick={handleExportOpen} disabled={isDisabled}>
-          {t('inject_export_json_single')}
-        </MenuItem>
-        <MenuItem onClick={handleOpenDuplicate} disabled={isDisabled}>
-          {t('Duplicate')}
-        </MenuItem>
         <MenuItem
           onClick={handleOpenEditContent}
           disabled={isDisabled}
         >
           {t('Update')}
+        </MenuItem>
+        <MenuItem onClick={handleOpenDuplicate} disabled={isDisabled}>
+          {t('Duplicate')}
+        </MenuItem>
+        {inject.inject_testable && canBeTested && (
+          <MenuItem onClick={handleOpenTest}>
+            {t('Test')}
+          </MenuItem>
+        )}
+        <MenuItem onClick={handleExportOpen} disabled={isDisabled}>
+          {t('inject_export_json_single')}
         </MenuItem>
         {!inject.inject_status && onInjectDone && canDone && (
           <MenuItem
@@ -262,11 +267,6 @@ const InjectPopover: FunctionComponent<Props> = ({
             disabled={isDisabled}
           >
             {t('Mark as done')}
-          </MenuItem>
-        )}
-        {inject.inject_testable && canBeTested && (
-          <MenuItem onClick={handleOpenTest}>
-            {t('Test')}
           </MenuItem>
         )}
         {inject.inject_type !== 'openbas_manual' && canTriggerNow && onUpdateInjectTrigger && (

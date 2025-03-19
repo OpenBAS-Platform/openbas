@@ -31,6 +31,8 @@ public class CrowdStrikeExecutorService implements Runnable {
   private static final String CROWDSTRIKE_EXECUTOR_DOCUMENTATION_LINK =
       "https://docs.openbas.io/latest/deployment/ecosystem/executors/#crowdstrike-falcon-agent";
 
+  private static final String CROWDSTRIKE_EXECUTOR_BACKGROUND_COLOR = "#E12E37";
+
   private final CrowdStrikeExecutorClient client;
 
   private final EndpointService endpointService;
@@ -70,7 +72,9 @@ public class CrowdStrikeExecutorService implements Runnable {
                 CROWDSTRIKE_EXECUTOR_TYPE,
                 CROWDSTRIKE_EXECUTOR_NAME,
                 CROWDSTRIKE_EXECUTOR_DOCUMENTATION_LINK,
+                CROWDSTRIKE_EXECUTOR_BACKGROUND_COLOR,
                 getClass().getResourceAsStream("/img/icon-crowdstrike.png"),
+                getClass().getResourceAsStream("/img/banner-crowdstrike.png"),
                 new String[] {
                   Endpoint.PLATFORM_TYPE.Windows.name(),
                   Endpoint.PLATFORM_TYPE.Linux.name(),
@@ -87,7 +91,10 @@ public class CrowdStrikeExecutorService implements Runnable {
   @Override
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
-    List<CrowdStrikeDevice> devices = this.client.devices().getResources().stream().toList();
+    List<CrowdStrikeDevice> devices =
+        this.client.devices().getResources().stream()
+            .filter(device -> device.getHostname() != null)
+            .toList();
     List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
     log.info(
         "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");

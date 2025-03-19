@@ -88,13 +88,13 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
 
   // Button Popover
   const entries = [];
-  if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({
-    label: 'Duplicate',
-    action: () => handleOpenDuplicate(),
-  });
   if (actions.includes('Update') && atomic.inject_injector_contract !== null) entries.push({
     label: 'Update',
     action: () => handleOpenEdit(),
+  });
+  if (actions.includes('Duplicate') && atomic.inject_injector_contract !== null) entries.push({
+    label: 'Duplicate',
+    action: () => handleOpenDuplicate(),
   });
   if (actions.includes('Export') && atomic.inject_injector_contract !== null) entries.push({
     label: t('inject_export_json_single'),
@@ -108,15 +108,6 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
   return (
     <>
       <ButtonPopover entries={entries} variant={inList ? 'icon' : 'toggle'} />
-      {actions.includes('Duplicate')
-        && (
-          <DialogDuplicate
-            open={duplicate}
-            handleClose={handleCloseDuplicate}
-            handleSubmit={submitDuplicate}
-            text={`${t('Do you want to duplicate this atomic testing:')} ${atomic.inject_title} ?`}
-          />
-        )}
       {actions.includes(('Update'))
         && (
           <AtomicTestingUpdate
@@ -125,13 +116,13 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
             atomic={atomic}
           />
         )}
-      {actions.includes('Delete')
+      {actions.includes('Duplicate')
         && (
-          <DialogDelete
-            open={deletion}
-            handleClose={handleCloseDelete}
-            handleSubmit={submitDelete}
-            text={`${t('Do you want to delete this atomic testing:')} ${atomic.inject_title} ?`}
+          <DialogDuplicate
+            open={duplicate}
+            handleClose={handleCloseDuplicate}
+            handleSubmit={submitDuplicate}
+            text={`${t('Do you want to duplicate this atomic testing:')} ${atomic.inject_title} ?`}
           />
         )}
       {actions.includes('Export')
@@ -142,6 +133,15 @@ const AtomicTestingPopover: FunctionComponent<Props> = ({
             onCancel={handleCloseExport}
             onClose={handleCloseExport}
             onSubmit={doExport}
+          />
+        )}
+      {actions.includes('Delete')
+        && (
+          <DialogDelete
+            open={deletion}
+            handleClose={handleCloseDelete}
+            handleSubmit={submitDelete}
+            text={`${t('Do you want to delete this atomic testing:')} ${atomic.inject_title} ?`}
           />
         )}
     </>
