@@ -126,10 +126,12 @@ public class ExpectationUtils {
               assetToExecute.asset(),
               null,
               expectation.getExpirationTime());
+
       // We propagate the asset expectation to agents
       preventionExpectationList.addAll(
-          ExpectationUtils.getPreventionExpectationListForCaldera(
+          getPreventionExpectationListForCaldera(
               assetToExecute.asset(), null, executedAgents, preventionExpectation));
+
       // If any expectation for agent is created then we create also expectation
       // for asset
       if (!preventionExpectationList.isEmpty()) {
@@ -155,7 +157,7 @@ public class ExpectationUtils {
 
               // We propagate the asset expectation to agents
               finalPreventionExpectationList.addAll(
-                  ExpectationUtils.getPreventionExpectationListForCaldera(
+                  getPreventionExpectationListForCaldera(
                       assetToExecute.asset(), assetGroup, executedAgents, preventionExpectation));
 
               // If any expectation for agent is created then we create also expectation
@@ -184,10 +186,12 @@ public class ExpectationUtils {
               assetToExecute.asset(),
               null,
               expectation.getExpirationTime());
+
       // We propagate the asset expectation to agents
       detectionExpectationList.addAll(
-          ExpectationUtils.getDetectionExpectationListForCaldera(
+          getDetectionExpectationListForCaldera(
               assetToExecute.asset(), null, executedAgents, preventionExpectation));
+
       // If any expectation for agent is created then we create also expectation
       // for asset
       if (!detectionExpectationList.isEmpty()) {
@@ -213,7 +217,7 @@ public class ExpectationUtils {
 
               // We propagate the asset expectation to agents
               finalDetectionExpectationList.addAll(
-                  ExpectationUtils.getDetectionExpectationListForCaldera(
+                  getDetectionExpectationListForCaldera(
                       assetToExecute.asset(), assetGroup, executedAgents, detectionExpectation));
 
               // If any expectation for agent is created then we create also expectation
@@ -242,10 +246,12 @@ public class ExpectationUtils {
               assetToExecute.asset(),
               null,
               expectation.getExpirationTime());
+
       // We propagate the asset expectation to agents
       manualExpectationList.addAll(
-          ExpectationUtils.getManualExpectationListForCaldera(
+          getManualExpectationListForCaldera(
               assetToExecute.asset(), null, executedAgents, manualExpectation));
+
       // If any expectation for agent is created then we create also expectation
       // for asset
       if (!manualExpectationList.isEmpty()) {
@@ -271,7 +277,7 @@ public class ExpectationUtils {
 
               // We propagate the asset expectation to agents
               finalManualExpectationList.addAll(
-                  ExpectationUtils.getManualExpectationListForCaldera(
+                  getManualExpectationListForCaldera(
                       assetToExecute.asset(), assetGroup, executedAgents, manualExpectation));
 
               // If any expectation for agent is created then we create also expectation
@@ -393,7 +399,7 @@ public class ExpectationUtils {
                       expectation.getName(),
                       expectation.getDescription(),
                       assetToExecute.asset(),
-                      assetGroup, // assetGroup usefully in front-end
+                      assetGroup,
                       expectation.getExpirationTime());
 
               // We propagate the assetToExecute expectation to agents
@@ -426,7 +432,7 @@ public class ExpectationUtils {
               expectation.getName(),
               expectation.getDescription(),
               assetToExecute.asset(),
-              null, // assetGroup usefully in front-end
+              null,
               expectation.getExpirationTime());
 
       // We propagate the assetToExecute expectation to agents
@@ -453,7 +459,7 @@ public class ExpectationUtils {
                       expectation.getName(),
                       expectation.getDescription(),
                       assetToExecute.asset(),
-                      assetGroup, // assetGroup usefully in front-end
+                      assetGroup,
                       expectation.getExpirationTime());
 
               // We propagate the assetToExecute expectation to agents
@@ -486,7 +492,7 @@ public class ExpectationUtils {
               expectation.getName(),
               expectation.getDescription(),
               assetToExecute.asset(),
-              null, // assetGroup usefully in front-end
+              null,
               expectation.getExpirationTime());
 
       // We propagate the assetToExecute expectation to agents
@@ -513,7 +519,7 @@ public class ExpectationUtils {
                       expectation.getName(),
                       expectation.getDescription(),
                       assetToExecute.asset(),
-                      assetGroup, // assetGroup usefully in front-end
+                      assetGroup,
                       expectation.getExpirationTime());
 
               // We propagate the assetToExecute expectation to agents
