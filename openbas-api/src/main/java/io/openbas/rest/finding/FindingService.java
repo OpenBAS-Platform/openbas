@@ -66,7 +66,8 @@ public class FindingService {
   }
 
   public void extractFindings(final Inject inject) {
-    OutputParser outputParser = inject.getPayload().get().getOutputParser();
+    OutputParser outputParser =
+        inject.getPayload().get().getOutputParsers().stream().findFirst().get();
     String rawOutput =
         inject.getStatus().get().getTraces().stream()
             .filter(trace -> trace.getStatus().equals(ExecutionTraceStatus.SUCCESS))
