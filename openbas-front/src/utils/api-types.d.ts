@@ -478,7 +478,6 @@ export interface Collector {
   /** @format int32 */
   collector_period?: number;
   collector_security_platform?: SecurityPlatform;
-  collector_traces?: InjectExpectationTrace[];
   collector_type: string;
   /** @format date-time */
   collector_updated_at: string;
@@ -1541,13 +1540,13 @@ export interface InjectExpectationSimple {
 export interface InjectExpectationTrace {
   inject_expectation_trace_alert_link?: string;
   inject_expectation_trace_alert_name?: string;
-  inject_expectation_trace_collector?: string;
   /** @format date-time */
   inject_expectation_trace_created_at: string;
   /** @format date-time */
   inject_expectation_trace_date?: string;
   inject_expectation_trace_expectation?: string;
   inject_expectation_trace_id: string;
+  inject_expectation_trace_source_id?: string;
   /** @format date-time */
   inject_expectation_trace_updated_at: string;
   listened?: boolean;
@@ -1556,10 +1555,10 @@ export interface InjectExpectationTrace {
 export interface InjectExpectationTraceInput {
   inject_expectation_trace_alert_link: string;
   inject_expectation_trace_alert_name: string;
-  inject_expectation_trace_collector: string;
   /** @format date-time */
   inject_expectation_trace_date: string;
   inject_expectation_trace_expectation: string;
+  inject_expectation_trace_source_id: string;
 }
 
 export interface InjectExpectationUpdateInput {
@@ -3493,6 +3492,7 @@ export interface SecurityPlatform {
   listened?: boolean;
   security_platform_logo_dark?: string;
   security_platform_logo_light?: string;
+  security_platform_traces?: InjectExpectationTrace[];
   security_platform_type: "EDR" | "XDR" | "SIEM" | "SOAR" | "NDR" | "ISPM";
 }
 

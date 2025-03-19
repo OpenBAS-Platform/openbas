@@ -10,11 +10,11 @@ import { useFormatter } from '../../../../components/i18n';
 import type { InjectExpectationResult, InjectExpectationTrace } from '../../../../utils/api-types';
 import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 
-const useStyles = makeStyles()(theme => ({ flexContainer: { display: 'flex' } }));
+const useStyles = makeStyles()(() => ({ flexContainer: { display: 'flex' } }));
 
 interface Props {
   injectExpectation: InjectExpectationsStore;
-  collectorId: string;
+  sourceId: string;
   expectationResult: InjectExpectationResult;
   open: boolean;
   handleClose: () => void;
@@ -22,7 +22,7 @@ interface Props {
 
 const TargetResultsSecurityPlatform: FunctionComponent<Props> = ({
   injectExpectation,
-  collectorId,
+  sourceId,
   expectationResult,
   handleClose,
   open,
@@ -33,8 +33,8 @@ const TargetResultsSecurityPlatform: FunctionComponent<Props> = ({
   const [expectationTraces, setExpectationTraces] = useState<InjectExpectationTrace[]>([]);
 
   useEffect(() => {
-    fetchExpectationTraces(injectExpectation.inject_expectation_id, collectorId).then((result: { data: InjectExpectationTrace[] }) => setExpectationTraces(result.data ?? []));
-  }, [injectExpectation.inject_expectation_id, collectorId]);
+    fetchExpectationTraces(injectExpectation.inject_expectation_id, sourceId).then((result: { data: InjectExpectationTrace[] }) => setExpectationTraces(result.data ?? []));
+  }, [injectExpectation.inject_expectation_id, sourceId]);
 
   return (
     <Drawer

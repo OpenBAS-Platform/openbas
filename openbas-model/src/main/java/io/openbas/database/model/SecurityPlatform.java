@@ -11,6 +11,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
@@ -35,7 +37,9 @@ public class SecurityPlatform extends Asset {
     ISPM,
   }
 
-  /** Used by collectors to set collector_id */
+  /**
+   * Used by collectors to set collector_id
+   */
   @Column(name = "asset_external_reference")
   @JsonProperty("asset_external_reference")
   private String externalReference;
@@ -46,6 +50,14 @@ public class SecurityPlatform extends Asset {
   @Enumerated(EnumType.STRING)
   @NotNull
   private SECURITY_PLATFORM_TYPE securityPlatformType;
+
+  @OneToMany(
+      mappedBy = "securityPlatform",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @JsonProperty("security_platform_traces")
+  private List<InjectExpectationTrace> traces;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "security_platform_logo_light")
@@ -61,7 +73,8 @@ public class SecurityPlatform extends Asset {
   @Schema(type = "string")
   private Document logoDark;
 
-  public SecurityPlatform() {}
+  public SecurityPlatform() {
+  }
 
   public SecurityPlatform(
       String id, String type, String name, SECURITY_PLATFORM_TYPE securityPlatformType) {

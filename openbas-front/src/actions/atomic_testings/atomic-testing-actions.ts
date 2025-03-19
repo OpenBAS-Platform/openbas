@@ -64,12 +64,7 @@ export const searchAtomicTestingTeams = (paginationInput: SearchPaginationInput,
 };
 
 // -- EXPECTATIONS --
-export const fetchExpectationTraces = (injectExpectationId: string, collectorId: string) => {
-  const uri = `/api/inject-expectations-traces?injectExpectationId=${injectExpectationId}&collectorId=${collectorId}`;
+export const fetchExpectationTraces = (injectExpectationId: string, sourceId: string) => {
+  const uri = `/api/inject-expectations-traces?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}`;
   return simpleCall(uri);
-};
-
-export const createExpectationTrace = (data: InjectExpectationTraceInput) => {
-  const uri = '/api/inject-expectations-traces';
-  return simplePostCall(uri, data);
 };

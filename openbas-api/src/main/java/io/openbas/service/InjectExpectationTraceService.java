@@ -5,8 +5,10 @@ import io.openbas.database.repository.InjectExpectationTraceRepository;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,33 +25,20 @@ public class InjectExpectationTraceService {
       @NotNull InjectExpectationTrace injectExpectationTrace) {
     Optional<InjectExpectationTrace> existingTrace =
         this.injectExpectationTraceRepository
-            .findByAlertDateAndAlertLinkAndAlertNameAndCollectorAndInjectExpectation(
+            .findByAlertDateAndAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
                 injectExpectationTrace.getAlertDate(),
                 injectExpectationTrace.getAlertLink(),
                 injectExpectationTrace.getAlertName(),
-                injectExpectationTrace.getCollector(),
+                injectExpectationTrace.getSecurityPlatform(),
                 injectExpectationTrace.getInjectExpectation());
     return existingTrace.orElseGet(
         () -> this.injectExpectationTraceRepository.save(injectExpectationTrace));
   }
 
   public List<InjectExpectationTrace> getInjectExpectationTracesByExpectationAndCollector(
-      @NotNull String injectExpectationId, @NotNull String collectorId) {
-    return this.injectExpectationTraceRepository.findByExpectationAndCollector(
-        injectExpectationId, collectorId);
+      @NotNull String injectExpectationId, @NotNull String sourceId) {
+    return this.injectExpectationTraceRepository.findByExpectationAndSecurityPlatform(
+        injectExpectationId, sourceId);
   }
 
-  public InjectExpectationTrace updateInjectExpectationTrace(String injectExpectationTraceId,
-      InjectExpectationTraceInput input) {
-    InjectExpectationTrace injectExpectationTrace = injectExpectationTraceRepository.findById(injectExpectationTraceId)
-        .orElseThrow(() -> new ElementNotFoundException("Trace not found"));
-    injectExpectationTrace.setUpdateAttributes(input);
-    return this.injectExpectationTraceRepository.save(injectExpectationTrace);
-  }
-
-  public void deleteInjectExpectationTrace(String injectExpectationTraceId) {
-    InjectExpectationTrace injectExpectationTrace = injectExpectationTraceRepository.findById(injectExpectationTraceId)
-        .orElseThrow(() -> new ElementNotFoundException("Trace not found"));
-    injectExpectationTraceRepository.delete(injectExpectationTrace);
-  }
 }
