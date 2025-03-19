@@ -1,4 +1,4 @@
-package io.openbas.injectorContract;
+package io.openbas.injector_contract;
 
 import io.openbas.database.model.Variable.VariableType;
 import jakarta.validation.constraints.NotBlank;
