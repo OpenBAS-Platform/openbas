@@ -117,7 +117,7 @@ public class ExpectationUtils {
     List<PreventionExpectation> preventionExpectationList = new ArrayList<>();
     List<PreventionExpectation> returnList = new ArrayList<>();
 
-    if (assetToExecute.targetByInject()) {
+    if (assetToExecute.isDirectlyLinkedToInject()) {
       PreventionExpectation preventionExpectation =
           preventionExpectationForAsset(
               expectation.getScore(),
@@ -175,7 +175,7 @@ public class ExpectationUtils {
     List<DetectionExpectation> detectionExpectationList = new ArrayList<>();
     List<DetectionExpectation> returnList = new ArrayList<>();
 
-    if (assetToExecute.targetByInject()) {
+    if (assetToExecute.isDirectlyLinkedToInject()) {
       DetectionExpectation preventionExpectation =
           detectionExpectationForAsset(
               expectation.getScore(),
@@ -233,7 +233,7 @@ public class ExpectationUtils {
     List<ManualExpectation> manualExpectationList = new ArrayList<>();
     List<ManualExpectation> returnList = new ArrayList<>();
 
-    if (assetToExecute.targetByInject()) {
+    if (assetToExecute.isDirectlyLinkedToInject()) {
       ManualExpectation manualExpectation =
           manualExpectationForAsset(
               expectation.getScore(),
@@ -358,7 +358,7 @@ public class ExpectationUtils {
     List<PreventionExpectation> preventionExpectationList = new ArrayList<>();
     List<PreventionExpectation> returnList = new ArrayList<>();
 
-    if (assetToExecute.targetByInject()) {
+    if (assetToExecute.isDirectlyLinkedToInject()) {
       PreventionExpectation preventionExpectation =
           preventionExpectationForAsset(
               expectation.getScore(),
@@ -419,7 +419,7 @@ public class ExpectationUtils {
     List<DetectionExpectation> detectionExpectationList = new ArrayList<>();
     List<DetectionExpectation> returnList = new ArrayList<>();
 
-    if (assetToExecute.targetByInject()) {
+    if (assetToExecute.isDirectlyLinkedToInject()) {
       DetectionExpectation detectionExpectation =
           detectionExpectationForAsset(
               expectation.getScore(),
@@ -479,7 +479,7 @@ public class ExpectationUtils {
     List<ManualExpectation> manualExpectationList = new ArrayList<>();
     List<ManualExpectation> returnList = new ArrayList<>();
 
-    if (assetToExecute.targetByInject()) {
+    if (assetToExecute.isDirectlyLinkedToInject()) {
       ManualExpectation manualExpectation =
           manualExpectationForAsset(
               expectation.getScore(),
