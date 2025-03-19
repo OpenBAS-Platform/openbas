@@ -29,16 +29,16 @@ class ExpectationUtilsTest {
     Inject inject = InjectFixture.createTechnicalInject(injectorContract, "Inject", endpoint);
     inject.setId("injectId");
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, null, 60L);
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationList(endpoint, inject, preventionExpectation);
+        getPreventionExpectationList(endpoint, null, inject, preventionExpectation);
 
     List<DetectionExpectation> detectionExpectations =
-        getDetectionExpectationList(endpoint, inject, detectionExpectation);
+        getDetectionExpectationList(endpoint, null, inject, detectionExpectation);
 
     // -- ASSERT --
     InjectExpectationSignature signature =
@@ -84,16 +84,17 @@ class ExpectationUtilsTest {
     agent.setParent(agentParent);
 
     PreventionExpectation preventionExpectation =
-        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalPreventionExpectationForAsset(endpoint, null, 60L);
     DetectionExpectation detectionExpectation =
-        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, 60L);
+        ExpectationFixture.createTechnicalDetectionExpectationForAsset(endpoint, null, 60L);
 
     // -- EXECUTE --
     List<PreventionExpectation> preventionExpectations =
-        getPreventionExpectationListForCaldera(endpoint, List.of(agent), preventionExpectation);
+        getPreventionExpectationListForCaldera(
+            endpoint, null, List.of(agent), preventionExpectation);
 
     List<DetectionExpectation> detectionExpectations =
-        getDetectionExpectationListForCaldera(endpoint, List.of(agent), detectionExpectation);
+        getDetectionExpectationListForCaldera(endpoint, null, List.of(agent), detectionExpectation);
 
     // -- ASSERT --
     InjectExpectationSignature signature =

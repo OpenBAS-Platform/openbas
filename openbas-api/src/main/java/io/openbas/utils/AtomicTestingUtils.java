@@ -32,7 +32,9 @@ public class AtomicTestingUtils {
     List<RawInjectExpectation> teamExpectations = new ArrayList<>();
     List<RawInjectExpectation> playerExpectations = new ArrayList<>();
     List<RawInjectExpectation> agentExpectations = new ArrayList<>();
+    List<RawInjectExpectation> agentAssetGroupExpectations = new ArrayList<>();
     List<RawInjectExpectation> assetExpectations = new ArrayList<>();
+    List<RawInjectExpectation> assetAssetGroupExpectations = new ArrayList<>();
     List<RawInjectExpectation> assetGroupExpectations = new ArrayList<>();
 
     // Loop through the expectations to separate them by target
@@ -46,10 +48,18 @@ public class AtomicTestingUtils {
             }
           }
           if (expectation.getAsset_id() != null) {
-            if (expectation.getAgent_id() != null) {
+            if (expectation.getAsset_group_id() != null && expectation.getAgent_id() == null) {
+              assetAssetGroupExpectations.add(
+                  expectation); // Expectation from asset that does not belong to a group
+            } else if (expectation.getAsset_group_id() != null
+                && expectation.getAgent_id() != null) {
+              agentAssetGroupExpectations.add(expectation);
+            } else if (expectation.getAsset_group_id() == null
+                && expectation.getAgent_id() != null) {
               agentExpectations.add(expectation);
             } else {
-              assetExpectations.add(expectation);
+              assetExpectations.add(
+                  expectation); // Expectation from asset that does not belong to a group
             }
           }
           if (expectation.getAsset_group_id() != null
@@ -70,6 +80,14 @@ public class AtomicTestingUtils {
         .filter(expectation -> !assetExpectationMap.containsKey(expectation.getAsset_id()))
         .forEach(expectation -> assetExpectationMap.put(expectation.getAsset_id(), expectation));
 
+    Map<String, RawInjectExpectation> assetAssetGroupExpectationMap = new LinkedHashMap<>();
+    assetAssetGroupExpectations.stream()
+        .filter(
+            expectation -> !assetAssetGroupExpectationMap.containsKey(expectation.getAsset_id()))
+        .forEach(
+            expectation ->
+                assetAssetGroupExpectationMap.put(expectation.getAsset_id(), expectation));
+
     Map<String, RawInjectExpectation> assetGroupExpectationMap = new LinkedHashMap<>();
     assetGroupExpectations.stream()
         .filter(
@@ -80,7 +98,6 @@ public class AtomicTestingUtils {
 
     // Results
     List<InjectTargetWithResult> targets = new ArrayList<>();
-    List<InjectTargetWithResult> assetsToRefine = new ArrayList<>();
 
     // Players
     Map<String, Map<String, List<RawInjectExpectation>>> groupedByTeamAndUser =
@@ -97,6 +114,16 @@ public class AtomicTestingUtils {
                 Collectors.groupingBy(
                     RawInjectExpectation::getAsset_id,
                     Collectors.groupingBy(RawInjectExpectation::getAgent_id)));
+
+    Map<String, Map<String, Map<String, List<RawInjectExpectation>>>>
+        groupedByAssetAndAgentAssetGroup =
+            agentAssetGroupExpectations.stream()
+                .collect(
+                    Collectors.groupingBy(
+                        RawInjectExpectation::getAsset_group_id,
+                        Collectors.groupingBy(
+                            RawInjectExpectation::getAsset_id,
+                            Collectors.groupingBy(RawInjectExpectation::getAgent_id))));
 
     // Check if each team defined in an inject has an expectation. If not, create a result with
     // default expectations
@@ -273,9 +300,7 @@ public class AtomicTestingUtils {
 
     // Calculate asset results from expectations
     if (!assetExpectations.isEmpty()) {
-      // Assets are saved in assetsToRefine because we need check if the asset is linked to the
-      // inject and, at the same time, also linked to the asset group
-      assetsToRefine.addAll(
+      targets.addAll(
           assetExpectations.stream()
               .collect(
                   Collectors.groupingBy(
@@ -312,8 +337,6 @@ public class AtomicTestingUtils {
     }
 
     // -- ASSETS GROUPS - CHILDREN --
-    List<InjectTargetWithResult> assetsToRemove = new ArrayList<>();
-
     // Calculate asset groups results from expectations
     if (!assetGroupExpectations.isEmpty()) {
       targets.addAll(
@@ -328,16 +351,70 @@ public class AtomicTestingUtils {
               .stream()
               .map(
                   entry -> {
-                    List<InjectTargetWithResult> children = new ArrayList<>();
 
-                    // Loop into assetsToRefine to keep just assets linked to asset group
-                    for (InjectTargetWithResult asset : assetsToRefine) {
+                    // Calculate asset results from asset groups from expectations
+                    List<InjectTargetWithResult> assetsAssetGroupsToRefine = new ArrayList<>();
+                    if (!assetAssetGroupExpectations.isEmpty()) {
+                      assetsAssetGroupsToRefine.addAll(
+                          assetAssetGroupExpectations.stream()
+                              .filter(asset -> asset.getAsset_group_id().equals(entry.getKey()))
+                              .collect(
+                                  Collectors.groupingBy(
+                                      RawInjectExpectation::getAsset_id,
+                                      Collectors.collectingAndThen(
+                                          Collectors.toList(),
+                                          AtomicTestingUtils::getExpectationResultByTypesFromRaw)))
+                              .entrySet()
+                              .stream()
+                              .map(
+                                  assetAssGroupExp ->
+                                      new InjectTargetWithResult(
+                                          TargetType.ASSETS,
+                                          assetAssGroupExp.getKey(),
+                                          rawAssetMap
+                                              .get(
+                                                  assetAssetGroupExpectationMap
+                                                      .get(assetAssGroupExp.getKey())
+                                                      .getAsset_id())
+                                              .getAsset_name(),
+                                          assetAssGroupExp.getValue(),
+                                          agentAssetGroupExpectations.isEmpty()
+                                              ? List.of()
+                                              : calculateResultsFromChildren(
+                                                  groupedByAssetAndAgentAssetGroup
+                                                      .get(entry.getKey())
+                                                      .get(assetAssGroupExp.getKey()),
+                                                  rawAgentMap,
+                                                  TargetType.AGENT,
+                                                  RawInjectExpectation::getAgent_id,
+                                                  RawAgent::getAgent_executed_by_user,
+                                                  RawAgent::getExecutor_type),
+                                          Objects.equals(
+                                                  rawAssetMap
+                                                      .get(assetAssGroupExp.getKey())
+                                                      .getAsset_type(),
+                                                  ENDPOINT)
+                                              ? Endpoint.PLATFORM_TYPE.valueOf(
+                                                  rawAssetMap
+                                                      .get(assetAssGroupExp.getKey())
+                                                      .getEndpoint_platform())
+                                              : null,
+                                          null))
+                              .toList());
+                    }
+
+                    List<InjectTargetWithResult> children = new ArrayList<>();
+                    // Loop into assetsAssetGroupsToRefine to keep just assets linked to asset group
+                    for (InjectTargetWithResult asset : assetsAssetGroupsToRefine) {
                       boolean foundExpectationForAsset =
                           rawAssetGroupMap
                               .get(assetGroupExpectationMap.get(entry.getKey()).getAsset_group_id())
                               .getAsset_ids()
                               .stream()
-                              .anyMatch(assetChild -> assetChild.equals(asset.getId()));
+                              .anyMatch(
+                                  assetChild ->
+                                      assetChild.equals(
+                                          asset.getId())); // Verify if asset is part of asset group
 
                       // Verify if any expectation is related to a dynamic assets
                       boolean foundExpectationForDynamicAssets =
@@ -345,10 +422,7 @@ public class AtomicTestingUtils {
                               .anyMatch(assetChild -> assetChild.getId().equals(asset.getId()));
 
                       if (foundExpectationForAsset || foundExpectationForDynamicAssets) {
-                        children.add(asset);
-                        // We add the assetId to the removal list for assets that are directly
-                        // linked to the inject
-                        assetsToRemove.add(asset);
+                        children.add(asset); // children of asset group
                       }
                     }
 
@@ -418,12 +492,6 @@ public class AtomicTestingUtils {
               .toList());
     }
 
-    // Compare the assets directly linked to inject {injectAssetIds} to retain only the results
-    // from these assets
-    assetsToRefine.removeAll(
-        assetsToRemove.stream().filter(asset -> !injectAssets.contains(asset.getId())).toList());
-
-    targets.addAll(assetsToRefine);
     return sortResults(targets);
   }
 

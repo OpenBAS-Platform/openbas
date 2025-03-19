@@ -3,6 +3,7 @@ package io.openbas.service;
 import static io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE.*;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.service.InjectExpectationUtils.*;
+import static io.openbas.utils.ExpectationUtils.isAssetGroupExpectation;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +18,7 @@ import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.utils.TargetType;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -147,7 +149,10 @@ public class InjectExpectationService {
             ? this.expectationsForAssets(
                 updated.getInject(), updated.getAssetGroup(), updated.getType())
             : this.expectationsForAgents(
-                updated.getInject(), updated.getAsset(), updated.getType());
+                updated.getInject(),
+                updated.getAsset(),
+                updated.getAssetGroup(),
+                updated.getType());
 
     expectations.forEach(
         expectation -> {
@@ -235,7 +240,10 @@ public class InjectExpectationService {
             ? this.expectationsForAssets(
                 updated.getInject(), updated.getAssetGroup(), updated.getType())
             : this.expectationsForAgents(
-                updated.getInject(), updated.getAsset(), updated.getType());
+                updated.getInject(),
+                updated.getAsset(),
+                updated.getAssetGroup(),
+                updated.getType());
 
     expectations.forEach(
         expectation -> {
@@ -413,13 +421,20 @@ public class InjectExpectationService {
   private void propagateUpdateToAssets(
       InjectExpectation injectExpectation, Inject inject, Collector collector) {
     InjectExpectation finalInjectExpectation = injectExpectation;
+
     List<InjectExpectation> expectationAssets =
         inject.getExpectations().stream()
+            .filter(e -> e.getAsset() != null)
+            .filter(e -> e.getAgent() == null)
+            .filter(e -> e.getAsset().getId().equals(finalInjectExpectation.getAsset().getId()))
             .filter(
                 e ->
-                    e.getAsset() != null
-                        && e.getAgent() == null
-                        && e.getAsset().getId().equals(finalInjectExpectation.getAsset().getId()))
+                    (finalInjectExpectation.getAssetGroup() != null)
+                        ? (e.getAssetGroup() != null
+                            && e.getAssetGroup()
+                                .getId()
+                                .equals(finalInjectExpectation.getAssetGroup().getId()))
+                        : e.getAssetGroup() == null)
             .filter(e -> e.getType().equals(finalInjectExpectation.getType()))
             .toList();
 
@@ -429,6 +444,7 @@ public class InjectExpectationService {
               this.expectationsForAgents(
                   expectationAsset.getInject(),
                   expectationAsset.getAsset(),
+                  expectationAsset.getAssetGroup(),
                   expectationAsset.getType());
           // Every agent expectation (result by collector id) is filled
           if (expectationAgents.stream()
@@ -451,7 +467,7 @@ public class InjectExpectationService {
 
   private void propagateUpdateToAssetGroups(Inject inject, Collector collector) {
     List<InjectExpectation> expectationAssetGroups =
-        inject.getExpectations().stream().filter(e -> e.getAssetGroup() != null).toList();
+        inject.getExpectations().stream().filter(e -> isAssetGroupExpectation(e)).toList();
 
     expectationAssetGroups.forEach(
         (expectationAssetGroup -> {
@@ -590,13 +606,22 @@ public class InjectExpectationService {
   public List<InjectExpectation> expectationsForAgents(
       @NotNull final Inject inject,
       @NotNull final Asset asset,
+      @Nullable final AssetGroup assetGroup,
       @NotNull final InjectExpectation.EXPECTATION_TYPE expectationType) {
+
     Endpoint resolvedEndpoint = endpointService.endpoint(asset.getId());
     List<String> agentIds =
         resolvedEndpoint.getAgents().stream().map(Agent::getId).distinct().toList();
-    return this.injectExpectationRepository.findAll(
+
+    Specification<InjectExpectation> spec =
         Specification.where(InjectExpectationSpecification.type(expectationType))
-            .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds)));
+            .and(
+                assetGroup != null
+                    ? InjectExpectationSpecification.fromAssetGroup(assetGroup.getId())
+                    : InjectExpectationSpecification.assetGroupIsNull())
+            .and(InjectExpectationSpecification.fromAgents(inject.getId(), agentIds));
+
+    return this.injectExpectationRepository.findAll(spec);
   }
 
   public List<InjectExpectation> expectationsForAssets(
@@ -613,6 +638,7 @@ public class InjectExpectationService {
             .toList();
     return this.injectExpectationRepository.findAll(
         Specification.where(InjectExpectationSpecification.type(expectationType))
+            .and(InjectExpectationSpecification.fromAssetGroup(assetGroup.getId()))
             .and(InjectExpectationSpecification.fromAssets(inject.getId(), assetIds)));
   }
 
@@ -688,8 +714,12 @@ public class InjectExpectationService {
         case PLAYER ->
             injectExpectationRepository.findAllByInjectAndTeamAndPlayer(
                 injectId, parentTargetId, targetId);
-        case AGENT -> injectExpectationRepository.findAllByInjectAndAgent(injectId, targetId);
-        case ASSETS -> injectExpectationRepository.findAllByInjectAndAsset(injectId, targetId);
+        case AGENT ->
+            injectExpectationRepository.findAllByInjectAndAssetGroupAndAgent(
+                injectId, parentTargetId, targetId);
+        case ASSETS ->
+            injectExpectationRepository.findAllByInjectAndAssetGroupAndAsset(
+                injectId, parentTargetId, targetId);
         case ASSETS_GROUPS ->
             injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, targetId);
       };
