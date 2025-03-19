@@ -27,7 +27,7 @@ public class OutputParser implements Base {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonSerialize(using = MonoIdDeserializer.class)
-  @JoinColumn(name = "output_parser_payload")
+  @JoinColumn(name = "output_parser_payload_id")
   @JsonProperty("output_parser_payload")
   @Schema(type = "string")
   private Payload payload;
@@ -44,8 +44,8 @@ public class OutputParser implements Base {
   @JsonProperty("output_parser_rule")
   private String rule;
 
-  @OneToMany(mappedBy = "output_parser", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "outputParser", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonProperty("output_parser_contract_output_elements")
   @JsonSerialize(using = MultiModelDeserializer.class)
-  List<ContractOutputElement> contractOutputElements = new ArrayList<>();
+  private List<ContractOutputElement> contractOutputElements = new ArrayList<>();
 }
