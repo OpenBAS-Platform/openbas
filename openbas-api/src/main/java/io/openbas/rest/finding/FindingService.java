@@ -2,17 +2,13 @@ package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 
-import io.openbas.database.model.ExecutionTraceStatus;
 import io.openbas.database.model.Finding;
 import io.openbas.database.model.Inject;
-import io.openbas.database.model.OutputParser;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -63,28 +59,5 @@ public class FindingService {
       throw new EntityNotFoundException("Finding not found with id: " + id);
     }
     this.findingRepository.deleteById(id);
-  }
-
-  public void extractFindings(final Inject inject) {
-    OutputParser outputParser =
-        inject.getPayload().get().getOutputParsers().stream().findFirst().get();
-    String rawOutput =
-        inject.getStatus().get().getTraces().stream()
-            .filter(trace -> trace.getStatus().equals(ExecutionTraceStatus.SUCCESS))
-            .map(trace -> trace.getMessage())
-            .toString(); // Extract stdout
-
-    // Executor parser
-    switch (outputParser.getMode()) {
-      case "REGEX":
-        Pattern pattern = Pattern.compile(outputParser.getRule());
-        Matcher matcher = pattern.matcher(rawOutput);
-        /** group 1 -> outputContractElement group 1 */
-        break;
-      default:
-        break;
-    }
-
-    // findingRepository.saveAll();
   }
 }
