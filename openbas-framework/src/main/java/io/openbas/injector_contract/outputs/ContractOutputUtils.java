@@ -1,4 +1,4 @@
-package io.openbas.injector_contract.outputs;
+package io.openbas.injectorContract.outputs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
