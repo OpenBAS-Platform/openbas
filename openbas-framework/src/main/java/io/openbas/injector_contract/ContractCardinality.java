@@ -1,4 +1,4 @@
-package io.openbas.injector_contract;
+package io.openbas.injectorContract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
