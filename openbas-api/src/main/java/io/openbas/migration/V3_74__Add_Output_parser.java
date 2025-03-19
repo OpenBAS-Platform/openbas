@@ -13,6 +13,6 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("ALTER TABLE payloads ADD column payload_output_parser varchar(100);");
+    select.execute("ALTER TABLE payloads ADD column payload_output_parser json;");
   }
 }
