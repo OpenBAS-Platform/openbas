@@ -8,11 +8,10 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
 import io.openbas.service.InjectExpectationTraceService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -40,13 +39,10 @@ public class InjectExpectationTraceApi extends RestBehavior {
     return this.injectExpectationTraceService.createInjectExpectationTrace(injectExpectationTrace);
   }
 
-  @GetMapping("")
+  @GetMapping()
   public List<InjectExpectationTrace> getInjectExpectationTracesByExpectationAndCollector(
-      @RequestParam String injectExpectationId,
-      @RequestParam String collectorId) {
-    return this.injectExpectationTraceService.getInjectExpectationTracesByExpectationAndCollector(injectExpectationId,
-        collectorId);
+      @RequestParam String injectExpectationId, @RequestParam String collectorId) {
+    return this.injectExpectationTraceService.getInjectExpectationTracesByExpectationAndCollector(
+        injectExpectationId, collectorId);
   }
-
-
 }

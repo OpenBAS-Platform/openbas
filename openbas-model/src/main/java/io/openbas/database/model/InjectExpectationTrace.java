@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
-
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 

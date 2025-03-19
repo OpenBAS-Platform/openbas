@@ -40,16 +40,33 @@ public class ExpectationApi extends RestBehavior {
     return injectExpectationService.deleteInjectExpectationResult(expectationId, sourceId);
   }
 
+  @Operation(
+      summary = "Get Inject Expectations",
+      description =
+          "Retrieves inject expectations of agents installed on an asset. If an expiration time is provided, it will return all expectations not expired within this timeframe independently of their results. Otherwise, it will return all expectations without any result.")
   @GetMapping(INJECTS_EXPECTATIONS_URI)
-  public List<InjectExpectation> getInjectExpectationsNotFilled() {
+  public List<InjectExpectation> getInjectExpectationsNotFilledOrNotExpired(
+      @RequestParam(required = false, name = "expiration_time") final Integer expirationTime) {
+    if (expirationTime == null) {
+      return Stream.concat(
+              injectExpectationService.manualExpectationsNotFill().stream(),
+              Stream.concat(
+                  injectExpectationService.preventionExpectationsNotFill().stream(),
+                  injectExpectationService.detectionExpectationsNotFill().stream()))
+          .toList();
+    }
     return Stream.concat(
-            injectExpectationService.manualExpectationsNotFill().stream(),
+            injectExpectationService.manualExpectationsNotExpired(expirationTime).stream(),
             Stream.concat(
-                injectExpectationService.preventionExpectationsNotFill().stream(),
-                injectExpectationService.detectionExpectationsNotFill().stream()))
+                injectExpectationService.preventionExpectationsNotExpired(expirationTime).stream(),
+                injectExpectationService.detectionExpectationsNotExpired(expirationTime).stream()))
         .toList();
   }
 
+  @Operation(
+      summary = "Get Inject Expectations for a Specific Source",
+      description =
+          "Retrieves inject expectations that have not seen any result yet of agents installed on an asset for a given source ID.")
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsNotFilledForSource(
       @PathVariable String sourceId) {
@@ -67,10 +84,17 @@ public class ExpectationApi extends RestBehavior {
           "Retrieves inject expectations of agents installed on an asset for a given source ID.")
   @GetMapping(INJECTS_EXPECTATIONS_URI + "/assets/{sourceId}")
   public List<InjectExpectation> getInjectExpectationsAssetsNotFilledForSource(
-      @PathVariable String sourceId) {
+      @PathVariable String sourceId,
+      @RequestParam(required = false, name = "expiration_time") final Integer expirationTime) {
+    if (expirationTime == null) {
+      return Stream.concat(
+              injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
+              injectExpectationService.detectionExpectationsNotFill(sourceId).stream())
+          .toList();
+    }
     return Stream.concat(
-            injectExpectationService.preventionExpectationsNotFill(sourceId).stream(),
-            injectExpectationService.detectionExpectationsNotFill(sourceId).stream())
+            injectExpectationService.preventionExpectationsNotExpired(expirationTime).stream(),
+            injectExpectationService.detectionExpectationsNotExpired(expirationTime).stream())
         .toList();
   }
 
