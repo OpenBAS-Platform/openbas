@@ -8,9 +8,11 @@ import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,14 +65,6 @@ public class Collector implements Base {
   @JoinColumn(name = "collector_security_platform")
   @JsonProperty("collector_security_platform")
   private SecurityPlatform securityPlatform;
-
-  @OneToMany(
-      mappedBy = "collector",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.LAZY)
-  @JsonProperty("collector_traces")
-  private List<InjectExpectationTrace> traces;
 
   @JsonIgnore
   @Override
