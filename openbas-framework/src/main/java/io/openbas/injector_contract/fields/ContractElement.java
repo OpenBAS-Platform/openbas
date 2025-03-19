@@ -1,4 +1,4 @@
-package io.openbas.injector_contract.fields;
+package io.openbas.injectorContract.fields;
 
 import io.openbas.model.LinkedFieldModel;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package io.openbas.injector_contract.fields;
+package io.openbas.injectorContract.fields;
 
 import static io.openbas.injector_contract.ContractCardinality.Multiple;
 
