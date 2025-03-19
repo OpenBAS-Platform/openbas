@@ -44,10 +44,12 @@ public class InjectExpectationTraceApi extends RestBehavior {
   }
 
   @GetMapping()
-  public List<InjectExpectationTrace> getInjectExpectationTracesByExpectationAndSecurityPlatform(
+  public List<InjectExpectationTrace> getInjectExpectationTracesFromCollector(
       @RequestParam String injectExpectationId, @RequestParam String sourceId) {
-    return this.injectExpectationTraceService.getInjectExpectationTracesByExpectationAndCollector(
-        injectExpectationId, sourceId);
+    Collector collector = collectorRepository.findById(sourceId)
+        .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
+    return this.injectExpectationTraceService.getInjectExpectationTracesFromCollector(
+        injectExpectationId, collector.getSecurityPlatform().getId());
   }
 
 
