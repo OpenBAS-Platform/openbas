@@ -54,7 +54,6 @@ import org.hibernate.annotations.UuidGenerator;
 public class Payload implements Base {
 
   private static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_PAYLOAD = 1;
-  protected static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_EXECUTABLE = 2;
 
   public enum PAYLOAD_SOURCE {
     COMMUNITY,
@@ -206,17 +205,12 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
-  /**
-   * OutputParser
-   * -> mode: stdout/sterr/fichier ->Enum
-   * -> type parsing : regex /xml -> Enum
-   * -> Executor/Rule/Parser: Regex/ xPath -> String
-   * -> List<OutputContractElement>
-   *   -> ParserOutPutContract : group, name, key, contractoutputType
-   *
-   * */
-  @OneToOne
-  private OutputParser outputParser;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "payload_output_parser")
+  @JsonProperty("payload_output_parser")
+  @JsonSerialize(using = MonoIdDeserializer.class)
+  @Schema(type = "string")
+  private List<OutputParser> outputParser;
 
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {

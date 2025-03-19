@@ -13,7 +13,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -68,23 +67,23 @@ public class FindingService {
 
   public void extractFindings(final Inject inject) {
     OutputParser outputParser = inject.getPayload().get().getOutputParser();
-    String rawOutput = inject.getStatus().get().getTraces().stream().filter(trace->trace.getStatus().equals(
-        ExecutionTraceStatus.SUCCESS)).map(trace->trace.getMessage()).toString(); // Extract stdout
+    String rawOutput =
+        inject.getStatus().get().getTraces().stream()
+            .filter(trace -> trace.getStatus().equals(ExecutionTraceStatus.SUCCESS))
+            .map(trace -> trace.getMessage())
+            .toString(); // Extract stdout
 
     // Executor parser
-    switch (outputParser.getMode()){
+    switch (outputParser.getMode()) {
       case "REGEX":
         Pattern pattern = Pattern.compile(outputParser.getRule());
         Matcher matcher = pattern.matcher(rawOutput);
-        /**
-         * group 1 -> outputContractElement group 1
-         */
-
+        /** group 1 -> outputContractElement group 1 */
         break;
-        default:
-          break;
+      default:
+        break;
     }
 
-    //findingRepository.saveAll();
+    // findingRepository.saveAll();
   }
 }
