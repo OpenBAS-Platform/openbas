@@ -1,5 +1,5 @@
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
-import { type AtomicTestingInput, type SearchPaginationInput } from '../../utils/api-types';
+import { type AtomicTestingInput, type InjectExpectationTraceInput, type SearchPaginationInput } from '../../utils/api-types';
 
 const ATOMIC_TESTING_URI = '/api/atomic-testings';
 
@@ -67,4 +67,9 @@ export const searchAtomicTestingTeams = (paginationInput: SearchPaginationInput,
 export const fetchExpectationTraces = (injectExpectationId: string, collectorId: string) => {
   const uri = `/api/inject-expectations-traces?injectExpectationId=${injectExpectationId}&collectorId=${collectorId}`;
   return simpleCall(uri);
+};
+
+export const createExpectationTrace = (data: InjectExpectationTraceInput) => {
+  const uri = '/api/inject-expectations-traces';
+  return simplePostCall(uri, data);
 };

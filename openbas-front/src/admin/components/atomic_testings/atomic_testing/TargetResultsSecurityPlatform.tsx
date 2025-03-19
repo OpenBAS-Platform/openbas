@@ -1,57 +1,93 @@
 import { OpenInNew } from '@mui/icons-material';
-import { Grid, Link, Typography } from '@mui/material';
+import { Link, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import { fetchExpectationTraces } from '../../../../actions/atomic_testings/atomic-testing-actions';
+import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import type { InjectExpectationTrace } from '../../../../utils/api-types';
+import type { InjectExpectationResult, InjectExpectationTrace } from '../../../../utils/api-types';
+import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
+
+const useStyles = makeStyles()(theme => ({ flexContainer: { display: 'flex' } }));
 
 interface Props {
-  injectExpectationId: string;
+  injectExpectation: InjectExpectationsStore;
   collectorId: string;
-  expectationResult: string;
+  expectationResult: InjectExpectationResult;
+  open: boolean;
+  handleClose: () => void;
 }
 
 const TargetResultsSecurityPlatform: FunctionComponent<Props> = ({
-  injectExpectationId,
+  injectExpectation,
   collectorId,
   expectationResult,
+  handleClose,
+  open,
 }) => {
+  const { classes } = useStyles();
   const { t, fldt } = useFormatter();
+  const theme = useTheme();
   const [expectationTraces, setExpectationTraces] = useState<InjectExpectationTrace[]>([]);
 
   useEffect(() => {
-    fetchExpectationTraces(injectExpectationId, collectorId).then((result: { data: InjectExpectationTrace[] }) => setExpectationTraces(result.data ?? []));
-  }, [injectExpectationId, collectorId]);
+    fetchExpectationTraces(injectExpectation.inject_expectation_id, collectorId).then((result: { data: InjectExpectationTrace[] }) => setExpectationTraces(result.data ?? []));
+  }, [injectExpectation.inject_expectation_id, collectorId]);
 
   return (
-    <div>
-      {
-        expectationTraces.map((expectationTrace: InjectExpectationTrace, index) => {
-          return (
-            <Grid key={index} container={true} spacing={1}>
-              <Grid item={true} xs={6}>
-                <Link underline="always" href={expectationTrace.inject_expectation_trace_alert_link}>
-                  {expectationTrace.inject_expectation_trace_alert_name}
-                  <OpenInNew fontSize="small" />
-                </Link>
-              </Grid>
-              <Grid item={true} xs={3}>
-                <Typography
-                  variant="h3"
-                  gutterBottom
-                >
-                  {expectationResult}
-                </Typography>
-              </Grid>
-              <Grid item={true} xs={3}>
-                {fldt(expectationTrace.inject_expectation_trace_date)}
-              </Grid>
-            </Grid>
-          );
-        })
-      }
-    </div>
+    <Drawer
+      open={open}
+      handleClose={handleClose}
+      title={t(expectationResult.sourceName)}
+    >
+      <>
+        <Typography variant="body1">
+          {`${injectExpectation.inject_expectation_type} ${t('Alerts')}`}
+        </Typography>
+        <TableContainer sx={{ marginTop: theme.spacing(4) }}>
+          <Table sx={{ minWidth: 650 }} size="small">
+            <TableBody>
+              {
+                expectationTraces.map((expectationTrace: InjectExpectationTrace, index) => {
+                  return (
+                    <TableRow
+                      key={index}
+                    >
+                      <TableCell>
+                        <Link underline="always" href={expectationTrace.inject_expectation_trace_alert_link}>
+                          <div className={classes.flexContainer}>
+                            <div>
+                              {expectationTrace.inject_expectation_trace_alert_name}
+                            </div>
+                            <div>
+                              <OpenInNew fontSize="small" />
+                            </div>
+                          </div>
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Typography
+                          variant="body2"
+                          gutterBottom
+                        >
+                          {expectationResult.result}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {fldt(expectationTrace.inject_expectation_trace_date)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              }
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </>
+
+    </Drawer>
 
   );
 };
