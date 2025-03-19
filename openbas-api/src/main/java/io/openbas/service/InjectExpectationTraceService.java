@@ -35,7 +35,7 @@ public class InjectExpectationTraceService {
         () -> this.injectExpectationTraceRepository.save(injectExpectationTrace));
   }
 
-  public List<InjectExpectationTrace> getInjectExpectationTracesByExpectationAndCollector(
+  public List<InjectExpectationTrace> getInjectExpectationTracesFromCollector(
       @NotNull String injectExpectationId, @NotNull String sourceId) {
     return this.injectExpectationTraceRepository.findByExpectationAndSecurityPlatform(
         injectExpectationId, sourceId);
