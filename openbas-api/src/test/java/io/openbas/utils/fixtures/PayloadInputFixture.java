@@ -77,6 +77,25 @@ public class PayloadInputFixture {
     return input;
   }
 
+  public static PayloadUpdateInput getDefaultCommandPayloadUpdateInputWithOutputParser() {
+    PayloadUpdateInput input = getDefaultCommandPayloadUpdateInput();
+
+    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
+    contractOutputElementInput.setGroup(0);
+    contractOutputElementInput.setKey("IPV6");
+    contractOutputElementInput.setType(ContractOutputType.IPv6);
+    contractOutputElementInput.setName("IPV6");
+
+    OutputParserInput outputParserInput = new OutputParserInput();
+    outputParserInput.setMode(ParserMode.STDOUT);
+    outputParserInput.setType(ParserType.REGEX);
+    outputParserInput.setRule("rule");
+    outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
+
+    input.setOutputParsers(List.of(outputParserInput));
+    return input;
+  }
+
   public static PayloadUpsertInput getDefaultCommandPayloadUpsertInput() {
     PayloadUpsertInput input = new PayloadUpsertInput();
     input.setType("Command");
@@ -95,5 +114,24 @@ public class PayloadInputFixture {
     executableFile.setName("Executable file");
     executableFile.setType("text/x-sh");
     return executableFile;
+  }
+
+  public static PayloadUpsertInput getDefaultCommandPayloadUpsertInputWithOutputParser() {
+    PayloadUpsertInput input = getDefaultCommandPayloadUpsertInput();
+
+    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
+    contractOutputElementInput.setGroup(0);
+    contractOutputElementInput.setKey("IPV4");
+    contractOutputElementInput.setType(ContractOutputType.IPv4);
+    contractOutputElementInput.setName("IPV4");
+
+    OutputParserInput outputParserInput = new OutputParserInput();
+    outputParserInput.setMode(ParserMode.STERR);
+    outputParserInput.setType(ParserType.REGEX);
+    outputParserInput.setRule("regex xPath");
+    outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
+
+    input.setOutputParsers(List.of(outputParserInput));
+    return input;
   }
 }
