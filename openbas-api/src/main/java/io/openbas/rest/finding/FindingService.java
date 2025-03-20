@@ -60,4 +60,26 @@ public class FindingService {
     }
     this.findingRepository.deleteById(id);
   }
+
+  public void extractFindings(final Inject inject) {
+    OutputParser outputParser = inject.getPayload().get().getOutputParser();
+    String rawOutput =
+        inject.getStatus().get().getTraces().stream()
+            .filter(trace -> trace.getStatus().equals(ExecutionTraceStatus.SUCCESS))
+            .map(trace -> trace.getMessage())
+            .toString(); // Extract stdout
+
+    // Executor parser
+    switch (outputParser.getMode()) {
+      case "REGEX":
+        Pattern pattern = Pattern.compile(outputParser.getRule());
+        Matcher matcher = pattern.matcher(rawOutput);
+        /** group 1 -> outputContractElement group 1 */
+        break;
+      default:
+        break;
+    }
+
+    // findingRepository.saveAll();
+  }
 }
