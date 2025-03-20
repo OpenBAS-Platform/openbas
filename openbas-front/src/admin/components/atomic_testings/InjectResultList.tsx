@@ -213,12 +213,12 @@ const InjectResultList: FunctionComponent<Props> = ({
         {
           loading
             ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
-            : injects.map((injectResultOutput, index) => {
+            : injects.map((injectResultOutput) => {
                 return (
                   <ListItem
                     key={injectResultOutput.inject_id}
                     classes={{ root: classes.item }}
-                    divider={injects.length !== index + 1}
+                    divider
                     secondaryAction={showActions ? (
                       <AtomicTestingPopover
                         atomic={injectResultOutput}

@@ -357,8 +357,7 @@ const Endpoints = () => {
                 />
               </ListItemButton>
             </ListItem>
-          )
-          ;
+          );
         })}
       </List>
     </>
