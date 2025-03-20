@@ -34,6 +34,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
@@ -163,6 +165,17 @@ public class EndpointService {
         createNewEndpointAndAgent(input);
       }
     }
+  }
+
+  public void syncAgentsEndpoints(List<AgentRegisterInput> inputs, List<Agent> existingAgents) {
+    Set<String> inputsExternalRefs =
+        inputs.stream().map(AgentRegisterInput::getExternalReference).collect(Collectors.toSet());
+    Set<String> existingAgentsExternalRefs =
+        existingAgents.stream().map(Agent::getExternalReference).collect(Collectors.toSet());
+    List<Agent> agentsToDelete =
+        existingAgents.stream()
+            .filter(a -> !inputsExternalRefs.contains(a.getExternalReference()))
+            .toList();
   }
 
   public Endpoint register(final EndpointRegisterInput input) throws IOException {
