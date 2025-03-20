@@ -2,13 +2,14 @@ package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 
-import io.openbas.database.model.Finding;
-import io.openbas.database.model.Inject;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,8 @@ public class FindingService {
   }
 
   public void extractFindings(final Inject inject) {
-    OutputParser outputParser = inject.getPayload().get().getOutputParser();
+    OutputParser outputParser =
+        inject.getPayload().get().getOutputParsers().stream().findAny().orElse(null);
     String rawOutput =
         inject.getStatus().get().getTraces().stream()
             .filter(trace -> trace.getStatus().equals(ExecutionTraceStatus.SUCCESS))
@@ -70,8 +72,8 @@ public class FindingService {
             .toString(); // Extract stdout
 
     // Executor parser
-    switch (outputParser.getMode()) {
-      case "REGEX":
+    switch (outputParser.getType()) {
+      case ParserType.REGEX:
         Pattern pattern = Pattern.compile(outputParser.getRule());
         Matcher matcher = pattern.matcher(rawOutput);
         /** group 1 -> outputContractElement group 1 */
