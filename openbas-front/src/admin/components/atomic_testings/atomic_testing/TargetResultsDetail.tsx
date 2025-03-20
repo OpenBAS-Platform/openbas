@@ -764,7 +764,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                   key={index}
                                   hover={true}
                                   onClick={() => {
-                                    if (injectExpectation.inject_expectation_agent && expectationResult.sourceType === 'collector') {
+                                    if (injectExpectation.inject_expectation_agent && injectExpectation.inject_expectation_status === 'SUCCESS' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && expectationResult.sourceType === 'collector') {
                                       handleClickSecurityPlatformResult(injectExpectation, expectationResult);
                                     }
                                   }}
