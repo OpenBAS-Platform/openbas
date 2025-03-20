@@ -26,12 +26,11 @@ public interface InjectExpectationTraceRepository
 
   @NotNull
   Optional<InjectExpectationTrace>
-  findByAlertDateAndAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
-      Instant alertDate,
-      String alertLink,
-      String alertName,
-      SecurityPlatform securityPlatform,
-      InjectExpectation injectExpectation);
+      findByAlertLinkAndAlertNameAndCollectorAndInjectExpectation(
+          String alertLink,
+          String alertName,
+          Collector collector,
+          InjectExpectation injectExpectation);
 
   @Query(
       "select t from InjectExpectationTrace t where t.injectExpectation.id = :expectationId and t.securityPlatform.id = :sourceId")

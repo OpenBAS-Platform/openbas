@@ -25,8 +25,7 @@ public class InjectExpectationTraceService {
       @NotNull InjectExpectationTrace injectExpectationTrace) {
     Optional<InjectExpectationTrace> existingTrace =
         this.injectExpectationTraceRepository
-            .findByAlertDateAndAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
-                injectExpectationTrace.getAlertDate(),
+            .findByAlertLinkAndAlertNameAndCollectorAndInjectExpectation(
                 injectExpectationTrace.getAlertLink(),
                 injectExpectationTrace.getAlertName(),
                 injectExpectationTrace.getSecurityPlatform(),
