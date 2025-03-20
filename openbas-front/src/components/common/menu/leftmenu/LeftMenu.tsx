@@ -31,7 +31,6 @@ const LeftMenu: FunctionComponent<{ entries: LeftMenuEntries[] }> = ({ entries =
         '& .MuiDrawer-paper': {
           width: state.navOpen ? 180 : 55,
           minHeight: '100vh',
-          backgroundColor: theme.palette.background.nav,
           overflowX: 'hidden',
         },
       }}
