@@ -10,6 +10,7 @@ import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
 import io.openbas.executors.model.AgentRegisterInput;
+import io.openbas.service.AgentService;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +37,7 @@ public class CrowdStrikeExecutorService implements Runnable {
   private final CrowdStrikeExecutorClient client;
 
   private final EndpointService endpointService;
+  private final AgentService agentService;
 
   private Executor executor = null;
 
@@ -61,9 +63,11 @@ public class CrowdStrikeExecutorService implements Runnable {
       ExecutorService executorService,
       CrowdStrikeExecutorClient client,
       CrowdStrikeExecutorConfig config,
-      EndpointService endpointService) {
+      EndpointService endpointService,
+      AgentService agentService) {
     this.client = client;
     this.endpointService = endpointService;
+    this.agentService = agentService;
     try {
       if (config.isEnable()) {
         this.executor =
@@ -91,17 +95,14 @@ public class CrowdStrikeExecutorService implements Runnable {
   @Override
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
-    List<CrowdStrikeDevice> devices =
-        this.client.devices().getResources().stream()
-            .filter(device -> device.getHostname() != null)
-            .toList();
+    List<CrowdStrikeDevice> devices = this.client.devices();
     List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
     log.info(
         "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");
 
-    for (AgentRegisterInput input : endpointRegisterList) {
-      endpointService.registerAgentEndpoint(input);
-    }
+    List<Agent> existingAgents = agentService.getAgentsByExecutorType("openbas_crowdstrike");
+
+    endpointService.syncAgentsEndpoints(endpointRegisterList, existingAgents);
   }
 
   // -- PRIVATE --
