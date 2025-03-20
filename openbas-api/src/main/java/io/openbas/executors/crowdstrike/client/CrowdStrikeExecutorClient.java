@@ -3,19 +3,17 @@ package io.openbas.executors.crowdstrike.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openbas.database.model.Agent;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
-import io.openbas.executors.crowdstrike.model.Authentication;
-import io.openbas.executors.crowdstrike.model.CrowdStrikeSession;
-import io.openbas.executors.crowdstrike.model.ResourcesHosts;
-import io.openbas.executors.crowdstrike.model.ResourcesSession;
+import io.openbas.executors.crowdstrike.model.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -51,17 +49,55 @@ public class CrowdStrikeExecutorClient {
 
   // -- ENDPOINTS --
 
-  public ResourcesHosts devices() {
+  public List<CrowdStrikeDevice> devices() {
     try {
-      String jsonResponse =
-          this.get(ENDPOINTS_URI + "?id=" + this.config.getHostGroup() + "&limit=5000");
-      return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
-    } catch (JsonProcessingException e) {
-      log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
-      throw new RuntimeException(e);
+      List<CrowdStrikeDevice> hosts = new ArrayList<>();
+      final int[] offset = {0};
+      final int limit = 5000;
+      long lastSeenThreshold =
+          Instant.now().minus(Agent.ACTIVE_THRESHOLD, ChronoUnit.MILLIS).getEpochSecond();
+      String fqlFilter =
+          URLEncoder.encode(
+              "last_seen>" + lastSeenThreshold + " AND hostname!=null", StandardCharsets.UTF_8);
+      List<String> hostGroups = Arrays.asList(this.config.getHostGroup());
+      hostGroups.forEach(
+          hostGroup -> {
+            while (true) {
+              String jsonResponse = null;
+              try {
+                jsonResponse =
+                    this.get(
+                        ENDPOINTS_URI
+                            + "?id="
+                            + this.config.getHostGroup()
+                            + "&limit="
+                            + limit
+                            + "&offset="
+                            + offset[0]
+                            + "&filter="
+                            + fqlFilter);
+              } catch (IOException e) {
+                log.log(
+                    Level.SEVERE,
+                    "I/O error occurred during API request. Error: {}",
+                    e.getMessage());
+                throw new RuntimeException(e);
+              }
+              ResourcesHosts partialResults = null;
+              try {
+                partialResults =
+                    this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+              } catch (JsonProcessingException e) {
+                log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
+                throw new RuntimeException(e);
+              }
+
+              hosts.addAll(partialResults.getResources());
+              if (partialResults.getResources().size() < limit) break;
+              offset[0] += limit;
+            }
+          });
+      return hosts;
     } catch (Exception e) {
       log.log(Level.SEVERE, "Unexpected error occurred. Error: {}", e.getMessage());
       throw new RuntimeException(e);
