@@ -17,7 +17,10 @@ import type { CustomDashboard } from '../../../../utils/api-types';
 import CustomDashboardCreation from './CustomDashboardCreation';
 import CustomDashboardPopover from './CustomDashboardPopover';
 
-const useStyles = makeStyles()(() => ({ itemHead: { textTransform: 'uppercase' } }));
+const useStyles = makeStyles()(() => ({
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+}));
 
 const inlineStyles: Record<string, CSSProperties> = {
   custom_dashboard_name: { width: '10%' },
@@ -107,6 +110,7 @@ const CustomDashboards = () => {
             (
               <ListItem
                 key={customDashboard.custom_dashboard_id}
+                classes={{ root: classes.item }}
                 divider
                 secondaryAction={(
                   <CustomDashboardPopover
@@ -117,28 +121,26 @@ const CustomDashboards = () => {
                 )}
                 disablePadding
               >
-                <ListItem>
-                  <ListItemIcon>
-                    <AnalyticsOutlined color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={(
-                      <div style={bodyItemsStyles.bodyItems}>
-                        {headers.map(header => (
-                          <div
-                            key={header.field}
-                            style={{
-                              ...bodyItemsStyles.bodyItem,
-                              ...inlineStyles[header.field],
-                            }}
-                          >
-                            {header.value?.(customDashboard)}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  />
-                </ListItem>
+                <ListItemIcon>
+                  <AnalyticsOutlined color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={(
+                    <div style={bodyItemsStyles.bodyItems}>
+                      {headers.map(header => (
+                        <div
+                          key={header.field}
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles[header.field],
+                          }}
+                        >
+                          {header.value?.(customDashboard)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                />
               </ListItem>
             )
           );

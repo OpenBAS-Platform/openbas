@@ -54,7 +54,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
         variant="standard"
         fullWidth
         label={t('Name')}
-        style={{ mt: 1 }}
+        sx={{ mt: 1 }}
         error={!!errors.custom_dashboard_name}
         helperText={errors.custom_dashboard_name?.message}
         inputProps={register('custom_dashboard_name')}
@@ -64,7 +64,7 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
         variant="standard"
         fullWidth
         label={t('Description')}
-        style={{ mt: 2 }}
+        sx={{ mt: 2 }}
         error={!!errors.custom_dashboard_description}
         helperText={errors.custom_dashboard_description?.message}
         inputProps={register('custom_dashboard_description')}
