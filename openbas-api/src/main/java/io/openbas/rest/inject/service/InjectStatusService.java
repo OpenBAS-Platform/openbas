@@ -27,10 +27,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Log
 public class InjectStatusService {
 
   private final InjectRepository injectRepository;
@@ -92,11 +94,10 @@ public class InjectStatusService {
 
   private ExecutionTraceAction convertExecutionAction(InjectExecutionAction status) {
     return switch (status) {
-      case InjectExecutionAction.prerequisite_check -> ExecutionTraceAction.PREREQUISITE_CHECK;
-      case InjectExecutionAction.prerequisite_execution ->
-          ExecutionTraceAction.PREREQUISITE_EXECUTION;
-      case InjectExecutionAction.cleanup_execution -> ExecutionTraceAction.CLEANUP_EXECUTION;
-      case InjectExecutionAction.complete -> ExecutionTraceAction.COMPLETE;
+      case prerequisite_check -> ExecutionTraceAction.PREREQUISITE_CHECK;
+      case prerequisite_execution -> ExecutionTraceAction.PREREQUISITE_EXECUTION;
+      case cleanup_execution -> ExecutionTraceAction.CLEANUP_EXECUTION;
+      case complete -> ExecutionTraceAction.COMPLETE;
       default -> ExecutionTraceAction.EXECUTION;
     };
   }
@@ -166,6 +167,20 @@ public class InjectStatusService {
       if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
           && (agentId == null || isAllInjectAgentsExecuted(inject))) {
         updateFinalInjectStatus(injectStatus);
+      }
+
+      if (ExecutionTraceAction.EXECUTION.equals(executionTraces.getAction())) {
+        inject
+            .getPayload()
+            .ifPresent(
+                payload -> {
+                  if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
+                    findingService.extractFindings(payload.getOutputParsers(), executionTraces);
+                  } else {
+                    log.info(
+                        "No output parsers available for payload used in inject:" + inject.getId());
+                  }
+                });
       }
 
       injectRepository.save(inject);

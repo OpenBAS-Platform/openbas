@@ -1,6 +1,7 @@
 package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.rest.finding.FindingUtils.extractRawOutputByMode;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
@@ -62,26 +63,22 @@ public class FindingService {
     this.findingRepository.deleteById(id);
   }
 
-  public void extractFindings(final Inject inject) {
-    OutputParser outputParser =
-        inject.getPayload().get().getOutputParsers().stream().findAny().orElse(null);
-    String rawOutput =
-        inject.getStatus().get().getTraces().stream()
-            .filter(trace -> trace.getStatus().equals(ExecutionTraceStatus.SUCCESS))
-            .map(trace -> trace.getMessage())
-            .toString(); // Extract stdout
+  public void extractFindings(final List<OutputParser> outputParsers, ExecutionTraces trace) {
 
-    // Executor parser
-    switch (outputParser.getType()) {
-      case ParserType.REGEX:
-        Pattern pattern = Pattern.compile(outputParser.getRule());
-        Matcher matcher = pattern.matcher(rawOutput);
-        /** group 1 -> outputContractElement group 1 */
-        break;
-      default:
-        break;
-    }
+    outputParsers.forEach(
+        outputParser -> {
+          String rawOutputByMode =
+              extractRawOutputByMode(trace.getMessage(), outputParser.getMode());
 
-    // findingRepository.saveAll();
+          switch (outputParser.getType()) {
+            case REGEX:
+            default:
+              Pattern pattern = Pattern.compile(outputParser.getRule());
+              Matcher matcher = pattern.matcher(rawOutputByMode);
+              break;
+          }
+
+          // findingRepository.saveAll();
+        });
   }
 }
