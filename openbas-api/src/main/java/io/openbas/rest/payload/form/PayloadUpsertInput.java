@@ -92,5 +92,6 @@ public class PayloadUpsertInput {
   private boolean elevationRequired;
 
   @JsonProperty("payload_output_parsers")
+  @Schema(description = "List of output parsers")
   private List<OutputParserInput> outputParsers;
 }
