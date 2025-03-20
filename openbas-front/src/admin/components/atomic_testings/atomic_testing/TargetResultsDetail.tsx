@@ -1,20 +1,14 @@
-import { Add, AddBoxOutlined, AddModerator, AddModeratorOutlined, ExpandMore, MoreVertOutlined } from '@mui/icons-material';
+import { AddModeratorOutlined, MoreVertOutlined } from '@mui/icons-material';
 import {
-  Accordion, AccordionDetails, AccordionSummary,
   Box,
   Button,
-  Card,
-  CardActionArea,
-  CardContent,
-  CardHeader,
   Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
-  Divider,
   Grid,
-  IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText,
+  IconButton,
   Menu,
   MenuItem,
   Paper,
@@ -31,16 +25,13 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchInjectResultOverviewOutput, fetchTargetResult } from '../../../../actions/atomic_testings/atomic-testing-actions';
 import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
-import SortHeadersComponent from '../../../../components/common/pagination/SortHeadersComponent';
-import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
-import { type InjectExpectation, type InjectExpectationResult, type InjectExpectationTrace, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectExpectation, type InjectExpectationResult, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
-import { splitDuration } from '../../../../utils/Time';
 import { isNotEmptyField } from '../../../../utils/utils';
 import { type InjectExpectationsStore } from '../../common/injects/expectations/Expectation';
 import { isTechnicalExpectation } from '../../common/injects/expectations/ExpectationUtils';
@@ -48,6 +39,7 @@ import InjectIcon from '../../common/injects/InjectIcon';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import ExpirationChip from './ExpirationChip';
 import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
 import nodeTypes from './types/nodes';
 import { type NodeResultStep } from './types/nodes/NodeResultStep';
@@ -161,7 +153,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
   const [selectedResult, setSelectedResult] = useState<InjectExpectationResult | null>(null);
   const [selectedExpectationForResults, setSelectedExpectationForResults] = useState<InjectExpectationsStore | null>(null);
-  const [cursorStyle, setCursorStyle] = useState<string>('default');
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeResultStep>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
@@ -531,13 +522,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   };
 
   const handleClickSecurityPlatformResult = (injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult) => {
-    setCursorStyle('pointer');
     setSelectedResult(expectationResult);
     setSelectedExpectationForResults(injectExpectation);
   };
 
   const handleCloseSecurityPlatformResult = () => {
-    setCursorStyle('default');
     setSelectedResult(null);
     setSelectedExpectationForResults(null);
   };
@@ -629,7 +618,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               return a.inject_expectation_id.localeCompare(b.inject_expectation_id);
             })
             .map((injectExpectation) => {
-              const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
               return (
                 <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
                   <Paper variant="outlined" classes={{ root: classes.paperResults }}>
@@ -643,7 +631,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       </Grid>
                       {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 ? (
 
-                        <Grid item={true} xs={4}>
+                        <Grid item={true} xs={5} sx={{ textAlign: 'end' }}>
                           {
                             injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
                               <ItemResult label="Prevented" status="Prevented" />
@@ -673,22 +661,24 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         </Grid>
                       )
                         : (
-                            <Grid item={true} xs={4}>
-                              <Chip
-                                classes={{ root: classes.score }}
-                                label={`${t('EXPIRES in')} ${duration.hours}
-                                    ${t('h')} ${duration.minutes}
-                                    ${t('m')}`}
-                              />
+                            <Grid item={true} xs={5} sx={{ textAlign: 'end' }}>
+                              {
+                                injectExpectation.inject_expectation_created_at && (
+                                  <ExpirationChip
+                                    expirationTime={injectExpectation.inject_expiration_time}
+                                    startDate={injectExpectation.inject_expectation_created_at}
+                                  />
+                                )
+                              }
                             </Grid>
 
                           )}
 
                       {
-                        injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                        injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
                           return (
                             <>
-                              <Grid item={true} xs={2} style={{ textAlign: 'end' }}>
+                              <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
                                 <IconButton
                                   color="primary"
                                   onClick={(ev) => {
@@ -731,7 +721,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           && injectExpectation.inject_expectation_results
                           && injectExpectation.inject_expectation_results.length === 0))
                         && (
-                          <Grid item={true} xs={2} style={{ textAlign: 'end' }}>
+                          <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
                             <IconButton
                               aria-label="Add"
                               onClick={() => setSelectedExpectationForCreation({
@@ -773,13 +763,12 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                 <TableRow
                                   key={index}
                                   hover={true}
-                                  onMouseOver={() => {
-                                    if (injectExpectation.inject_expectation_agent) { setCursorStyle('pointer'); }
-                                  }}
                                   onClick={() => {
-                                    if (injectExpectation.inject_expectation_agent && expectationResult.sourceType === 'collector') { handleClickSecurityPlatformResult(injectExpectation, expectationResult); }
+                                    if (injectExpectation.inject_expectation_agent && expectationResult.sourceType === 'collector') {
+                                      handleClickSecurityPlatformResult(injectExpectation, expectationResult);
+                                    }
                                   }}
-                                  sx={{ cursor: { cursorStyle } }}
+                                  sx={{ cursor: `${injectExpectation.inject_expectation_agent ? 'pointer' : 'default'}` }}
                                   selected={expectationResult.sourceId === selectedResult?.sourceId}
                                 >
                                   <TableCell>
@@ -883,8 +872,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         expectation={selectedExpectationForCreation.injectExpectation}
                         sourceIds={selectedExpectationForCreation.sourceIds}
                         onUpdate={onUpdateValidation}
-                        agentId={selectedExpectationForCreation.injectExpectation.inject_expectation_agent}
-                        edition={false}
                       />
                     )}
                 </>
@@ -915,8 +902,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         expectation={selectedResultEdition.injectExpectation}
                         result={selectedResultEdition.expectationResult}
                         onUpdate={onUpdateValidation}
-                        agentId={selectedResultEdition.injectExpectation.inject_expectation_agent}
-                        edition={true}
                       />
                     )}
                 </>
