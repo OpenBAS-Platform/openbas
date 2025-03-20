@@ -126,7 +126,7 @@ public class PayloadInputFixture {
     contractOutputElementInput.setName("IPV4");
 
     OutputParserInput outputParserInput = new OutputParserInput();
-    outputParserInput.setMode(ParserMode.STERR);
+    outputParserInput.setMode(ParserMode.STDERR);
     outputParserInput.setType(ParserType.REGEX);
     outputParserInput.setRule("regex xPath");
     outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));

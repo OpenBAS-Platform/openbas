@@ -333,7 +333,7 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(status().isOk())
         .andExpect(
             jsonPath("$.payload_output_parsers[0].output_parser_mode")
-                .value(ParserMode.STERR.name()))
+                .value(ParserMode.STDERR.name()))
         .andExpect(
             jsonPath("$.payload_output_parsers[0].output_parser_type")
                 .value(ParserType.REGEX.name()))

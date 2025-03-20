@@ -2,6 +2,6 @@ package io.openbas.database.model;
 
 public enum ParserMode {
   STDOUT,
-  STERR,
+  STDERR,
   READ_FILE
 }
