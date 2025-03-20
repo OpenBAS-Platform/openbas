@@ -11,7 +11,7 @@ import lombok.Setter;
 public class ContractOutputElementInput {
 
   @JsonProperty("contract_output_element_group")
-  @Schema(description = "Theme of the user")
+  @Schema(description = "Index of the extracted group from the regex match")
   private int group;
 
   @JsonProperty("contract_output_element_name")
