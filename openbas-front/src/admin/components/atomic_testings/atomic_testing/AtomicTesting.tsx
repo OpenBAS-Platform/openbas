@@ -309,6 +309,7 @@ const AtomicTesting = () => {
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
             placeholder={t('Search by target name')}
+            variant="thin"
           />
         </div>
         <div className="clearfix" />
