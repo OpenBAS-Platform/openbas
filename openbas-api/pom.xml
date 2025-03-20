@@ -24,6 +24,7 @@
         <apache-poi.version>5.4.0</apache-poi.version>
         <opentelemetry.version>1.47.0</opentelemetry.version>
         <opentelemetry-semconv.version>1.30.0</opentelemetry-semconv.version>
+        <elasticsearch.version>8.17.3</elasticsearch.version>
     </properties>
 
     <profiles>
@@ -49,6 +50,11 @@
             <groupId>io.openbas</groupId>
             <artifactId>openbas-framework</artifactId>
             <version>1.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+            <version>${elasticsearch.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>

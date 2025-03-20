@@ -2,6 +2,7 @@ package io.openbas.scheduler;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
+import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForever;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 import org.quartz.Trigger;
@@ -43,6 +44,15 @@ public class PlatformTriggers {
         .forJob(this.platformJobs.getScenarioExecution())
         .withIdentity("ScenarioExecutionTrigger")
         .withSchedule(repeatMinutelyForever())
+        .build();
+  }
+
+  @Bean
+  public Trigger elasticSyncExecutionTrigger() {
+    return newTrigger()
+        .forJob(this.platformJobs.getElasticSyncExecution())
+        .withIdentity("elasticSyncExecutionTrigger")
+        .withSchedule(repeatSecondlyForever())
         .build();
   }
 }
