@@ -26,15 +26,19 @@ public interface InjectExpectationTraceRepository
 
   @NotNull
   Optional<InjectExpectationTrace>
-      findByAlertLinkAndAlertNameAndCollectorAndInjectExpectation(
-          String alertLink,
-          String alertName,
-          Collector collector,
-          InjectExpectation injectExpectation);
+  findByAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
+      String alertLink,
+      String alertName,
+      SecurityPlatform securityPlatform,
+      InjectExpectation injectExpectation);
 
   @Query(
       "select t from InjectExpectationTrace t where t.injectExpectation.id = :expectationId and t.securityPlatform.id = :sourceId")
   List<InjectExpectationTrace> findByExpectationAndSecurityPlatform(
       @Param("expectationId") final String expectationId,
+      @Param("sourceId") final String sourceId);
+
+  @Query("select count(distinct t) from InjectExpectationTrace t where t.injectExpectation.id = :expectationId and t.securityPlatform.id = :sourceId")
+  long countAlerts(@Param("expectationId") final String expectationId,
       @Param("sourceId") final String sourceId);
 }

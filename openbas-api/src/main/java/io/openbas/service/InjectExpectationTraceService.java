@@ -25,7 +25,7 @@ public class InjectExpectationTraceService {
       @NotNull InjectExpectationTrace injectExpectationTrace) {
     Optional<InjectExpectationTrace> existingTrace =
         this.injectExpectationTraceRepository
-            .findByAlertLinkAndAlertNameAndCollectorAndInjectExpectation(
+            .findByAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
                 injectExpectationTrace.getAlertLink(),
                 injectExpectationTrace.getAlertName(),
                 injectExpectationTrace.getSecurityPlatform(),
@@ -38,6 +38,10 @@ public class InjectExpectationTraceService {
       @NotNull String injectExpectationId, @NotNull String sourceId) {
     return this.injectExpectationTraceRepository.findByExpectationAndSecurityPlatform(
         injectExpectationId, sourceId);
+  }
+
+  public long getAlertLinksNumber(@NotNull String injectExpectationId, @NotNull String sourceId) {
+    return this.injectExpectationTraceRepository.countAlerts(injectExpectationId, sourceId);
   }
 
 }
