@@ -1,7 +1,9 @@
 package io.openbas.service;
 
 import io.openbas.database.model.InjectExpectationTrace;
+import io.openbas.database.model.SecurityPlatform;
 import io.openbas.database.repository.InjectExpectationTraceRepository;
+import io.openbas.database.repository.SecurityPlatformRepository;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class InjectExpectationTraceService {
 
   private final InjectExpectationTraceRepository injectExpectationTraceRepository;
+  private final SecurityPlatformRepository securityPlatformRepository;
 
   public InjectExpectationTrace createInjectExpectationTrace(
       @NotNull InjectExpectationTrace injectExpectationTrace) {
@@ -33,7 +36,17 @@ public class InjectExpectationTraceService {
         injectExpectationId, sourceId);
   }
 
-  public long getAlertLinksNumber(@NotNull String injectExpectationId, @NotNull String sourceId) {
-    return this.injectExpectationTraceRepository.countAlerts(injectExpectationId, sourceId);
+  public long getAlertLinksNumber(
+      @NotNull String injectExpectationId,
+      @NotNull String sourceId,
+      String expectationResultSourceType) {
+    if (expectationResultSourceType.equalsIgnoreCase("collector")) {
+      SecurityPlatform securityPlatform =
+          securityPlatformRepository.findByExternalReference(sourceId).orElseThrow();
+      return this.injectExpectationTraceRepository.countAlerts(
+          injectExpectationId, securityPlatform.getId());
+    } else {
+      return this.injectExpectationTraceRepository.countAlerts(injectExpectationId, sourceId);
+    }
   }
 }

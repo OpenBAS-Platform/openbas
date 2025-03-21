@@ -69,7 +69,7 @@ export const fetchExpectationTraces = (injectExpectationId: string, sourceId: st
   return simpleCall(uri);
 };
 
-export const getAlertLinksCount = (injectExpectationId: string, sourceId: string | undefined) => {
-  const uri = `/api/inject-expectations-traces/count?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}`;
+export const getAlertLinksCount = (injectExpectationId: string, sourceId: string | undefined, expectationResultSourceType: string | undefined) => {
+  const uri = `/api/inject-expectations-traces/count?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}&expectationResultSourceType=${expectationResultSourceType}`;
   return simpleCall(uri);
 };
