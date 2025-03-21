@@ -57,6 +57,10 @@ public class AssetGroupService {
     return computeDynamicAssets(assetGroup);
   }
 
+  public Optional<AssetGroup> findByExternalReference(String externalReference) {
+    return this.assetGroupRepository.findByExternalReference(externalReference);
+  }
+
   public AssetGroup updateAssetGroup(@NotNull final AssetGroup assetGroup) {
     assetGroup.setUpdatedAt(now());
     AssetGroup assetGroupUpdated = this.assetGroupRepository.save(assetGroup);
@@ -74,6 +78,10 @@ public class AssetGroupService {
 
   public void deleteAssetGroup(@NotBlank final String assetGroupId) {
     this.assetGroupRepository.deleteById(assetGroupId);
+  }
+
+  public AssetGroup createOrUpdateAssetGroupWithoutDynamicAssets(AssetGroup assetGroup) {
+    return this.assetGroupRepository.save(assetGroup);
   }
 
   // -- ASSET --

@@ -37,6 +37,7 @@ public class CrowdStrikeExecutorClient {
 
   private static final Integer AUTH_TIMEOUT = 300;
   private static final String OAUTH_URI = "/oauth2/token";
+  private static final String HOST_GROUPS_URI = "/devices/entities/host-groups/v1";
   private static final String ENDPOINTS_URI = "/devices/combined/host-group-members/v1";
   private static final String SESSION_URI = "/real-time-response/entities/sessions/v1";
   private static final String REAL_TIME_RESPONSE_URI =
@@ -50,63 +51,76 @@ public class CrowdStrikeExecutorClient {
 
   // -- ENDPOINTS --
 
-  public List<CrowdStrikeDevice> devices() {
+  public List<CrowdStrikeDevice> devices(String hostGroup) {
     try {
+      int offset = 0;
       List<CrowdStrikeDevice> hosts = new ArrayList<>();
-
-      final int limit = 100;
-      final String formattedDateTime =
-          DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-              .withZone(ZoneOffset.UTC)
-              .format(Instant.now().minusMillis(EndpointService.DELETE_TTL));
-      String fqlFilter =
-          URLEncoder.encode(
-              "last_seen:>'" + formattedDateTime + "'+hostname:!null", StandardCharsets.UTF_8);
-      List<String> hostGroups = Arrays.asList(this.config.getHostGroup());
-      hostGroups.forEach(
-          hostGroup -> {
-            int offset = 0;
-            while (true) {
-              String jsonResponse = null;
-              try {
-                jsonResponse =
-                    this.get(
-                        ENDPOINTS_URI
-                            + "?id="
-                            + this.config.getHostGroup()
-                            + "&limit="
-                            + limit
-                            + "&offset="
-                            + offset
-                            + "&filter="
-                            + fqlFilter);
-              } catch (IOException e) {
-                log.log(
-                    Level.SEVERE,
-                    "I/O error occurred during API request. Error: {}",
-                    e.getMessage());
-                throw new RuntimeException(e);
-              }
-              ResourcesHosts partialResults;
-              try {
-                partialResults =
-                    this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
-              } catch (JsonProcessingException e) {
-                log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
-                throw new RuntimeException(e);
-              }
-
-              if (partialResults.getResources() == null) {
-                break;
-              }
-              hosts.addAll(partialResults.getResources());
-              if (partialResults.getResources().size() < limit) break;
-              offset += limit;
-            }
-          });
+      ResourcesHosts partialResults = getResourcesHosts(offset, hostGroup);
+      if (partialResults.getResources() == null) {
+        return hosts;
+      } else {
+        hosts.addAll(partialResults.getResources());
+      }
+      while (partialResults.getMeta().getPagination().getTotal() > offset) {
+        offset += partialResults.getMeta().getPagination().getLimit();
+        partialResults = getResourcesHosts(offset, hostGroup);
+        if (partialResults.getResources() == null) {
+          return hosts;
+        } else {
+          hosts.addAll(partialResults.getResources());
+        }
+      }
       return hosts;
     } catch (Exception e) {
       log.log(Level.SEVERE, "Unexpected error occurred. Error: {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private ResourcesHosts getResourcesHosts(int offset, String hostGroup) {
+    final String formattedDateTime =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(ZoneOffset.UTC)
+            .format(Instant.now().minusMillis(EndpointService.DELETE_TTL));
+    String fqlFilter =
+        URLEncoder.encode(
+            "last_seen:>'" + formattedDateTime + "'+hostname:!null", StandardCharsets.UTF_8);
+    String jsonResponse;
+    try {
+      jsonResponse =
+          this.get(
+              ENDPOINTS_URI
+                  + "?id="
+                  + hostGroup
+                  + "&limit=5000"
+                  + "&offset="
+                  + offset
+                  + "&filter="
+                  + fqlFilter);
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
+    try {
+      return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+    } catch (JsonProcessingException e) {
+      log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  public List<CrowdStrikeHostGroup> hostGroups(String hostGroups) {
+    String jsonResponse;
+    try {
+      jsonResponse = this.get(HOST_GROUPS_URI + "?ids=" + hostGroups);
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
+    try {
+      return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+    } catch (JsonProcessingException e) {
+      log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
       throw new RuntimeException(e);
     }
   }

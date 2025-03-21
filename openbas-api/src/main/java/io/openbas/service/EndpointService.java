@@ -9,9 +9,7 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import io.openbas.config.OpenBASConfig;
-import io.openbas.database.model.Agent;
-import io.openbas.database.model.AssetAgentJob;
-import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.repository.ExecutorRepository;
@@ -167,15 +165,25 @@ public class EndpointService {
     }
   }
 
-  public void syncAgentsEndpoints(List<AgentRegisterInput> inputs, List<Agent> existingAgents) {
+  public void syncAgentsEndpoints(
+      List<AgentRegisterInput> inputs, List<Agent> existingAgents, AssetGroup assetGroup) {
+    List<String> existingAssetIds = assetGroup.getAssets().stream().map(Asset::getId).toList();
+    // TODO delete asset/asset group no more in asset group with comparing existingAssetIds and
+    // inputs
+
     Set<String> inputsExternalRefs =
         inputs.stream().map(AgentRegisterInput::getExternalReference).collect(Collectors.toSet());
-    Set<String> existingAgentsExternalRefs =
-        existingAgents.stream().map(Agent::getExternalReference).collect(Collectors.toSet());
-    List<Agent> agentsToDelete =
+    Set<Agent> agentsToUpdate =
         existingAgents.stream()
-            .filter(a -> !inputsExternalRefs.contains(a.getExternalReference()))
-            .toList();
+            .filter(agent -> inputsExternalRefs.contains(agent.getExternalReference()))
+            .collect(Collectors.toSet());
+    // TODO update agent like "updateExistingAgent(existingAgent, input);"
+    // TODO create or update asset/asset group
+
+    inputs.removeIf(input -> inputsExternalRefs.contains(input.getExternalReference()));
+    // TODO "createNewEndpointAndAgent(input);"
+    // TODO create or update asset/asset group
+
   }
 
   public Endpoint register(final EndpointRegisterInput input) throws IOException {
