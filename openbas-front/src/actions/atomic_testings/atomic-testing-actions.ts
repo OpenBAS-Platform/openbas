@@ -62,3 +62,14 @@ export const searchAtomicTestingTeams = (paginationInput: SearchPaginationInput,
   const uri = `${ATOMIC_TESTING_URI}/teams/search?contextualOnly=${contextualOnly}`;
   return simplePostCall(uri, paginationInput);
 };
+
+// -- EXPECTATION TRACES --
+export const fetchExpectationTraces = (injectExpectationId: string, sourceId: string) => {
+  const uri = `/api/inject-expectations-traces?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}`;
+  return simpleCall(uri);
+};
+
+export const getAlertLinksCount = (injectExpectationId: string, sourceId: string | undefined, expectationResultSourceType: string | undefined) => {
+  const uri = `/api/inject-expectations-traces/count?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}&expectationResultSourceType=${expectationResultSourceType}`;
+  return simpleCall(uri);
+};
