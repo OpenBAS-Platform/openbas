@@ -18,7 +18,6 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
                     output_parser_id VARCHAR(255) NOT NULL PRIMARY KEY,
                     output_parser_mode VARCHAR(50) NOT NULL,
                     output_parser_type VARCHAR(50) NOT NULL,
-                    output_parser_rule TEXT NOT NULL,
                     output_parser_payload_id VARCHAR(255) NOT NULL,
                     output_parser_created_at TIMESTAMP DEFAULT now(),
                     output_parser_updated_at TIMESTAMP DEFAULT now(),
@@ -35,7 +34,7 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
 
               CREATE TABLE contract_output_elements (
                    contract_output_element_id VARCHAR(255) NOT NULL,
-                   contract_output_element_group INT NOT NULL,
+                   contract_output_element_rule TEXT NOT NULL,
                    contract_output_element_name VARCHAR(50) NOT NULL,
                    contract_output_element_key VARCHAR(255) NOT NULL,
                    contract_output_element_type VARCHAR(50) NOT NULL,

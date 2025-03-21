@@ -29,9 +29,9 @@ public class ContractOutputElement implements Base {
   @Schema(type = "string")
   private OutputParser outputParser;
 
-  @Column(name = "contract_output_element_group")
-  @JsonProperty("contract_output_element_group")
-  private int group;
+  @Column(name = "contract_output_element_rule")
+  @JsonProperty("contract_output_element_rule")
+  private String rule;
 
   @Column(name = "contract_output_element_name")
   @JsonProperty("contract_output_element_name")
@@ -41,6 +41,7 @@ public class ContractOutputElement implements Base {
   @JsonProperty("contract_output_element_key")
   private String key;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "contract_output_element_type")
   @JsonProperty("contract_output_element_type")
   private ContractOutputType type;
