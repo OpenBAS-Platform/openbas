@@ -8,6 +8,8 @@ import io.openbas.database.repository.FindingRepository;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,22 +65,49 @@ public class FindingService {
     this.findingRepository.deleteById(id);
   }
 
-  public void extractFindings(final List<OutputParser> outputParsers, ExecutionTraces trace) {
+  public void extractFindings(Inject inject, Asset asset, ExecutionTraces trace) {
+    List<Finding> findings = new ArrayList<>();
 
-    outputParsers.forEach(
-        outputParser -> {
-          String rawOutputByMode =
-              extractRawOutputByMode(trace.getMessage(), outputParser.getMode());
+    inject
+        .getPayload()
+        .get()
+        .getOutputParsers()
+        .forEach(
+            outputParser -> {
+              String rawOutputByMode =
+                  extractRawOutputByMode(trace.getMessage(), outputParser.getMode());
 
-          switch (outputParser.getType()) {
-            case REGEX:
-            default:
-              Pattern pattern = Pattern.compile(outputParser.getRule());
-              Matcher matcher = pattern.matcher(rawOutputByMode);
-              break;
-          }
+              switch (outputParser.getType()) {
+                case REGEX:
+                default:
+                  Pattern pattern = Pattern.compile(outputParser.getRule(), Pattern.MULTILINE);
+                  Matcher matcher = pattern.matcher(rawOutputByMode);
 
-          // findingRepository.saveAll();
-        });
+                  /*
+                  Example rule: /(name:)(.*)([0-9]....)
+                  - Fetch groups from regex: (group 1: name)
+                  - Every ContractOutputElement has: group, name, key, type
+                  - Group 1 from regex should map to ContractOutputElement with group 1
+                  */
+
+                  while (matcher.find()) {
+                    outputParser.getContractOutputElements().stream()
+                        .sorted(Comparator.comparingInt(ContractOutputElement::getGroup))
+                        .forEach(
+                            contractOutputElement -> {
+                              Finding finding = new Finding();
+                              finding.setInject(inject); //find by inject and value in order to update asset list
+                              finding.getAssets().add(asset);
+                              finding.setField(contractOutputElement.getKey());
+                              finding.setType(contractOutputElement.getType());
+                              finding.setValue(matcher.group(contractOutputElement.getGroup()));
+                              finding.setLabels(new String[] {contractOutputElement.getName()});
+                              findings.add(finding);
+                            });
+                  }
+                  break;
+              }
+            });
+    findingRepository.saveAll(findings);
   }
 }

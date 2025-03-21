@@ -3,7 +3,6 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -44,6 +43,5 @@ public class OutputParser implements Base {
 
   @OneToMany(mappedBy = "outputParser", cascade = CascadeType.ALL)
   @JsonProperty("output_parser_contract_output_elements")
-  @JsonSerialize(using = MultiModelDeserializer.class)
   private List<ContractOutputElement> contractOutputElements = new ArrayList<>();
 }
