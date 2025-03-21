@@ -11,19 +11,21 @@ import lombok.Setter;
 @Setter
 public class EsBase {
 
-  @Queryable(filterable = true, sortable = true)
-  private String id;
+  @Queryable(label = "id", filterable = true, sortable = true)
+  private String base_id;
 
-  @Queryable(filterable = true, sortable = true)
-  private String type;
+  @Queryable(label = "entity", filterable = true, sortable = true)
+  private String base_entity;
 
-  @Queryable(filterable = true, sortable = true)
-  private Instant created_at;
+  private String base_representative;
 
-  @Queryable(filterable = true, sortable = true)
-  private Instant updated_at;
+  @Queryable(label = "created at", filterable = true, sortable = true)
+  private Instant base_created_at;
+
+  @Queryable(label = "updated at", filterable = true, sortable = true)
+  private Instant base_updated_at;
 
   // To support logical side deletions
   // https://github.com/rieske/postgres-cdc
-  private List<String> dependencies = new ArrayList<>();
+  private List<String> base_dependencies = new ArrayList<>();
 }

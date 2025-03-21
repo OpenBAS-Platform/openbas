@@ -15,6 +15,12 @@ public class V3_71__Indexing_status extends BaseJavaMigration {
     Statement select = connection.createStatement();
     select.execute(
         """
+                   ALTER TABLE exercises ALTER COLUMN exercise_created_at type timestamp with time zone using exercise_created_at::timestamp with time zone;
+                   ALTER TABLE exercises ALTER COLUMN exercise_updated_at type timestamp with time zone using exercise_updated_at::timestamp with time zone;
+
+                   ALTER TABLE scenarios ALTER COLUMN scenario_created_at type timestamp with time zone using scenario_created_at::timestamp with time zone;
+                   ALTER TABLE scenarios ALTER COLUMN scenario_updated_at type timestamp with time zone using scenario_updated_at::timestamp with time zone;
+
                    ALTER TABLE findings ALTER COLUMN finding_created_at type timestamp with time zone using finding_created_at::timestamp with time zone;
                    ALTER TABLE findings ALTER COLUMN finding_updated_at type timestamp with time zone using finding_updated_at::timestamp with time zone;
 
