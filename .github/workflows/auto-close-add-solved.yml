@@ -1,0 +1,97 @@
+name: Auto close issues and add solved label
+
+on:
+  pull_request:
+    branches:
+      - release/*
+
+jobs:
+  check_issues_linked:
+    runs-on: ubuntu-latest
+    outputs:
+      issue_numbers: ${{ steps.get_linked_issues.outputs.issue_numbers }}
+    steps:
+      - name: Get linked issues from PR Development tab
+        id: get_linked_issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const query = `
+              query ($owner: String!, $repo: String!, $prNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $prNumber) {
+                    closingIssuesReferences(first: 10) {
+                      nodes {
+                        number
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+            
+            const variables = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              prNumber: context.payload.pull_request.number
+            };
+            
+            const result = await github.graphql(query, variables);
+            const linkedIssues = result.repository.pullRequest.closingIssuesReferences.nodes.map(issue => issue.number);
+            if (linkedIssues.length > 0) {
+              core.setOutput("issue_numbers", linkedIssues.join(' '));
+            }
+      - name: Check issue references in description
+        env:
+          PR_BODY: "${{ github.event.pull_request.body }}"
+          CLOSING_ISSUES_REFERENCES: "${{ steps.get_linked_issues.outputs.issue_numbers }}"
+        run: |
+          KEYWORDS='close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved'
+          ISSUES_IN_DESCRIPTION=$(echo "${{ github.event.pull_request.body }}" | grep -oiE '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #[0-9]+' | awk '{print $2}' | tr -d '#' | sort -u | tr '\n' ' ')
+         
+          echo "Issues in description: $ISSUES_IN_DESCRIPTION"
+          echo "Closing Issues References: $CLOSING_ISSUES_REFERENCES"
+          
+          for issue in $ISSUES_IN_DESCRIPTION; do
+            if [[ ! " ${CLOSING_ISSUES_REFERENCES} " =~ " ${issue} " ]]; then
+              echo "❌ Issue $issue is mentioned in the description but not in closing issues references."
+              exit 1
+            fi
+          done
+          
+          echo "✅ All referenced issues are properly included in closing issues references."
+
+  auto_close_and_solve:
+    needs: check_issues_linked
+    if: ${{ needs.check_issues_linked.outputs.issue_numbers != '' && github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add "solved" label to issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumbers = "${{ needs.check_issues_linked.outputs.issue_numbers }}".split(' ');
+            for (const issueNumber of issueNumbers) {
+              github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                labels: ["solved"]
+              });
+            }
+      - name: Close the issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumbers = "${{ needs.check_issues_linked.outputs.issue_numbers }}".split(' ');
+            for (const issueNumber of issueNumbers) {
+              github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                state: "closed"
+              });
+            }
