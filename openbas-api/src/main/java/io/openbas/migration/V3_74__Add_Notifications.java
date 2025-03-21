@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Statement;
 
 @Component
-public class V3_73__Add_Notifications extends BaseJavaMigration {
+public class V3_74__Add_Notifications extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

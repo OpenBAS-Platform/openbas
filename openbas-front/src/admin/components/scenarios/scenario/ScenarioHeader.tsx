@@ -17,15 +17,10 @@ import { useAppDispatch } from '../../../../utils/hooks';
 import { truncate } from '../../../../utils/String';
 import ScenarioPopover from './ScenarioPopover';
 import ScenarioRecurringFormDialog from './ScenarioRecurringFormDialog';
+import NotificationComponent from '../../common/notification/NotificationComponent';
 
 const useStyles = makeStyles()(() => ({
-  title: {
-    float: 'left',
-    marginRight: 10,
-  },
   statusScheduled: {
-    float: 'left',
-    margin: '4px 0 0 5px',
     width: 20,
     height: 20,
     borderRadius: '50%',
@@ -33,8 +28,6 @@ const useStyles = makeStyles()(() => ({
     animation: 'pulse-green 1s linear infinite alternate',
   },
   statusNotScheduled: {
-    float: 'left',
-    margin: '4px 0 0 5px',
     width: 20,
     height: 20,
     borderRadius: '50%',
@@ -119,22 +112,28 @@ const ScenarioHeader = ({
 
   return (
     <>
-      <Tooltip title={scenario.scenario_name}>
-        <Typography variant="h1" gutterBottom={true} classes={{ root: classes.title }}>
-          {truncate(scenario.scenario_name, 80)}
-        </Typography>
-      </Tooltip>
-      <div style={{
-        float: 'left',
-        margin: '4px 10px 0 8px',
-        color: theme.palette.text?.disabled,
-        borderLeft: `1px solid ${theme.palette.text?.disabled}`,
-        height: 20,
-      }}
-      />
-      <Tooltip title={t(scenario.scenario_recurrence ? 'Scheduled' : 'Not scheduled')}>
-        <div className={scenario.scenario_recurrence ? classes.statusScheduled : classes.statusNotScheduled} />
-      </Tooltip>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <Tooltip title={scenario.scenario_name}>
+          <Typography variant="h1" gutterBottom={true} sx={{ m: 0 }}>
+            {truncate(scenario.scenario_name, 80)}
+          </Typography>
+        </Tooltip>
+        <div style={{
+          float: 'left',
+          // margin: '4px 10px 0 8px',
+          color: theme.palette.text?.disabled,
+          borderLeft: `1px solid ${theme.palette.text?.disabled}`,
+          height: 20,
+        }}
+        />
+        <Tooltip title={t(scenario.scenario_recurrence ? 'Scheduled' : 'Not scheduled')}>
+          <div className={scenario.scenario_recurrence ? classes.statusScheduled : classes.statusNotScheduled} />
+        </Tooltip>
+        <NotificationComponent
+          entityId={scenario.scenario_id}
+          name={scenario.scenario_name}
+        />
+      </div>
       <div className={classes.actions}>
         {scenario.scenario_recurrence && !ended ? (
           <Button
@@ -196,7 +195,9 @@ const ScenarioHeader = ({
             onClick={async () => {
               setOpenInstantiateSimulationAndStart(false);
               const exercise: Exercise = (await createRunningExerciseFromScenario(scenarioId)).data;
-              MESSAGING$.notifySuccess(t('New simulation successfully created and started. Click {here} to view the simulation.', { here: <Link to={`/admin/simulations/${exercise.exercise_id}`}>{t('here')}</Link> }));
+              MESSAGING$.notifySuccess(t('New simulation successfully created and started. Click {here} to view the simulation.', {
+                here: <Link to={`/admin/simulations/${exercise.exercise_id}`}>{t('here')}</Link>
+              }));
             }}
           >
             {t('Confirm')}

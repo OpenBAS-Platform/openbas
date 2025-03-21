@@ -1,19 +1,19 @@
+import { NotificationsOutlined } from '@mui/icons-material';
+import { ToggleButton, Tooltip } from '@mui/material';
 import { type FunctionComponent, useEffect, useState } from 'react';
-import { type Notification } from '../../../../utils/api-types';
 
 import { createEmailNotification, deleteNotification, findNotificationsByFilter } from '../../../../actions/notifications/notification-action';
-import { useFormatter } from '../../../../components/i18n';
-import { ToggleButton, Tooltip } from '@mui/material';
-import { NotificationsOutlined } from '@mui/icons-material';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import DialogFiligran from '../../../../components/common/DialogFiligran';
+import { useFormatter } from '../../../../components/i18n';
+import { type Notification } from '../../../../utils/api-types';
 
 interface Props {
   entityId: string;
   name: string;
 }
 
-const Notification: FunctionComponent<Props> = ({ entityId, name }) => {
+const NotificationComponent: FunctionComponent<Props> = ({ entityId, name }) => {
   // Standard hooks
   const { t } = useFormatter();
   const [loading, setLoading] = useState(true);
@@ -31,7 +31,7 @@ const Notification: FunctionComponent<Props> = ({ entityId, name }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const submit = () => {
-    createEmailNotification(entityId, name).then((res) => setNotification(res.data));
+    createEmailNotification(entityId, name).then(res => setNotification(res.data));
     handleClose();
   };
 
@@ -63,7 +63,6 @@ const Notification: FunctionComponent<Props> = ({ entityId, name }) => {
             handleOpen();
           }
         }}
-        style={{ marginRight: 10 }}
       >
         <Tooltip
           title={t('Subscribe to update')}
@@ -130,4 +129,4 @@ const Notification: FunctionComponent<Props> = ({ entityId, name }) => {
   );
 };
 
-export default Notification;
+export default NotificationComponent;

@@ -1,18 +1,31 @@
 package io.openbas.service;
 
-import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
-import static java.util.Optional.ofNullable;
-
-import io.openbas.database.model.*;
+import io.openbas.database.model.InjectExpectation;
+import io.openbas.database.model.InjectExpectationResult;
+import io.openbas.database.model.Team;
+import io.openbas.database.model.User;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.model.Expectation;
 import io.openbas.model.expectation.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static io.openbas.expectation.ExpectationPropertiesConfig.DEFAULT_HUMAN_EXPECTATION_EXPIRATION_TIME;
+import static java.util.Optional.ofNullable;
 
 public class InjectExpectationUtils {
+
+  private InjectExpectationUtils() {
+  }
+
+  public static boolean isFulfilled(List<InjectExpectation> injectExpectations) {
+    return injectExpectations.stream().noneMatch(e -> e.getResults().isEmpty());
+  }
 
   public static void computeResult(
       @NotNull final InjectExpectation expectation,
@@ -112,7 +125,7 @@ public class InjectExpectationUtils {
       }
       case MANUAL -> {
         ManualExpectation manualExpectation = (ManualExpectation) expectation;
-        expectationExecution.setName(((ManualExpectation) expectation).getName());
+        expectationExecution.setName(expectation.getName());
         expectationExecution.setManual(
             manualExpectation.getAgent(),
             manualExpectation.getAsset(),

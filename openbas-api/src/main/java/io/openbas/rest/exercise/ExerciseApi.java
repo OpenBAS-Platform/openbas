@@ -481,7 +481,7 @@ public class ExerciseApi extends RestBehavior {
   @PostMapping(EXERCISE_URI + "/global-scores")
   public ExercisesGlobalScoresOutput getExercisesGlobalScores(
       @Valid @RequestBody ExercisesGlobalScoresInput input) {
-    return exerciseService.getExercisesGlobalScores(input);
+    return exerciseService.getExercisesGlobalScores(input.exerciseIds());
   }
 
   @LogExecutionTime

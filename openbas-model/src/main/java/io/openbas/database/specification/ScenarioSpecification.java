@@ -2,14 +2,17 @@ package io.openbas.database.specification;
 
 import io.openbas.database.model.Scenario;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.time.Instant;
 
 public class ScenarioSpecification {
 
-  private ScenarioSpecification() {}
+  private ScenarioSpecification() {
+  }
 
   public static Specification<Scenario> isRecurring() {
     return (root, query, cb) -> cb.isNotNull(root.get("recurrence"));
@@ -50,5 +53,14 @@ public class ScenarioSpecification {
 
   public static Specification<Scenario> byName(@Nullable final String searchText) {
     return UtilsSpecification.byName(searchText, "name");
+  }
+
+  public static Specification<Scenario> bySimulationId(@Nullable final String simulationId) {
+    return (root, query, criteriaBuilder) -> {
+      assert query != null;
+      query.distinct(true);
+      Join<Object, Object> join = root.join("exercises");
+      return criteriaBuilder.equal(join.get("id"), simulationId);
+    };
   }
 }
