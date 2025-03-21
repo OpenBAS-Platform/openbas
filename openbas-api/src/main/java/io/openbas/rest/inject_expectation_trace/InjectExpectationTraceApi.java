@@ -56,7 +56,10 @@ public class InjectExpectationTraceApi extends RestBehavior {
 
   @GetMapping("/count")
   public long getAlertLinksNumber(
-      @RequestParam String injectExpectationId, @RequestParam String sourceId) {
-    return this.injectExpectationTraceService.getAlertLinksNumber(injectExpectationId, sourceId);
+      @RequestParam String injectExpectationId,
+      @RequestParam String sourceId,
+      @RequestParam String expectationResultSourceType) {
+    return this.injectExpectationTraceService.getAlertLinksNumber(
+        injectExpectationId, sourceId, expectationResultSourceType);
   }
 }

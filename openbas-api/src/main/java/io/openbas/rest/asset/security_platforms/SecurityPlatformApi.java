@@ -118,15 +118,6 @@ public class SecurityPlatformApi {
         .orElseThrow(ElementNotFoundException::new);
   }
 
-  @GetMapping(SECURITY_PLATFORM_URI + "/externalReference")
-  @PreAuthorize("isPlanner()")
-  public SecurityPlatform securityPlatformFromExternalReference(
-      @RequestParam @NotBlank final String externalReference) {
-    return this.securityPlatformRepository
-        .findByExternalReference(externalReference)
-        .orElseThrow(ElementNotFoundException::new);
-  }
-
   @PostMapping(SECURITY_PLATFORM_URI + "/search")
   public Page<SecurityPlatform> securityPlatforms(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
