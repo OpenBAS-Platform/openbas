@@ -10,9 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.Document;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
@@ -103,6 +101,33 @@ class PayloadApiTest extends IntegrationTest {
               String errorMessage = result.getResolvedException().getMessage();
               assertTrue(errorMessage.contains("Executable architecture must be x86_64 or arm64"));
             });
+  }
+
+  @Test
+  @DisplayName("Create Payload with output parser")
+  @WithMockAdminUser
+  void createPayloadWithOutputParser() throws Exception {
+    PayloadCreateInput input =
+        PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
+
+    mvc.perform(
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("Command line payload"))
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_mode")
+                .value(ParserMode.STDOUT.name()))
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_type")
+                .value(ParserType.REGEX.name()))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                .value("rule"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
+                .value("IPV6"));
   }
 
   @Test
@@ -216,6 +241,50 @@ class PayloadApiTest extends IntegrationTest {
   }
 
   @Test
+  @DisplayName("Update Payload with output parser")
+  @WithMockAdminUser
+  void updatePayloadWithOutputParser() throws Exception {
+    PayloadCreateInput createInput =
+        PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
+
+    String response =
+        mvc.perform(
+                post(PAYLOAD_URI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(createInput)))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var payloadId = JsonPath.read(response, "$.payload_id");
+
+    PayloadUpdateInput updateInput =
+        PayloadInputFixture.getDefaultCommandPayloadUpdateInputWithOutputParser();
+
+    mvc.perform(
+            put(PAYLOAD_URI + "/" + payloadId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(updateInput)))
+        .andExpect(status().is2xxSuccessful())
+        .andExpect(jsonPath("$.payload_name").value("Updated Command line payload"))
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_mode")
+                .value(ParserMode.STDOUT.name()))
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_type")
+                .value(ParserType.REGEX.name()))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                .value("rule"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
+                .value("IPV6"));
+  }
+
+  @Test
   @DisplayName("Upsert architecture of a Payload")
   @WithMockPlannerUser
   void upsertCommandPayloadToValidateArchitecture() throws Exception {
@@ -246,6 +315,42 @@ class PayloadApiTest extends IntegrationTest {
               String errorMessage = result.getResolvedException().getMessage();
               assertTrue(errorMessage.contains("Payload architecture cannot be null"));
             });
+  }
+
+  @Test
+  @DisplayName("Upsert Payload with output parser")
+  @WithMockPlannerUser
+  void upsertCommandPayloadWitOutputParser() throws Exception {
+    PayloadCreateInput input =
+        PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
+
+    mvc.perform(
+            post(PAYLOAD_URI).contentType(MediaType.APPLICATION_JSON).content(asJsonString(input)))
+        .andExpect(status().is2xxSuccessful());
+
+    PayloadUpsertInput upsertInput =
+        PayloadInputFixture.getDefaultCommandPayloadUpsertInputWithOutputParser();
+    upsertInput.setExternalId("external-id");
+
+    mvc.perform(
+            post(PAYLOAD_URI + "/upsert")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(upsertInput)))
+        .andExpect(status().isOk())
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_mode")
+                .value(ParserMode.STDERR.name()))
+        .andExpect(
+            jsonPath("$.payload_output_parsers[0].output_parser_type")
+                .value(ParserType.REGEX.name()))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                .value("regex xPath"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
+                .value("IPV4"));
   }
 
   // -- CHECK CLEANUP AND EXECUTOR --

@@ -306,6 +306,7 @@ interface BasePayload {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -591,6 +592,25 @@ export interface Condition {
   key: string;
   operator: "eq";
   value?: boolean;
+}
+
+export interface ContractOutputElement {
+  /** @format int32 */
+  contract_output_element_group?: number;
+  contract_output_element_id: string;
+  contract_output_element_key?: string;
+  contract_output_element_name?: string;
+  contract_output_element_output_parser?: string;
+  contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  listened?: boolean;
+}
+
+export interface ContractOutputElementInput {
+  /** @format int32 */
+  contract_output_element_group?: number;
+  contract_output_element_key?: string;
+  contract_output_element_name?: string;
+  contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
 export interface CreateUserInput {
@@ -2294,6 +2314,23 @@ export interface OrganizationUpdateInput {
   organization_tags?: string[];
 }
 
+export interface OutputParser {
+  listened?: boolean;
+  output_parser_contract_output_elements?: ContractOutputElement[];
+  output_parser_id: string;
+  output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
+  output_parser_payload?: Payload;
+  output_parser_rule?: string;
+  output_parser_type?: "REGEX";
+}
+
+export interface OutputParserInput {
+  output_parser_contract_output_elements?: ContractOutputElementInput[];
+  output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
+  output_parser_rule?: string;
+  output_parser_type?: "REGEX";
+}
+
 export interface PageAssetGroupOutput {
   content?: AssetGroupOutput[];
   empty?: boolean;
@@ -2778,6 +2815,7 @@ export interface PayloadCreateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
+  payload_output_parsers?: OutputParserInput[];
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -2812,6 +2850,7 @@ export interface PayloadUpdateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
+  payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
@@ -2833,6 +2872,7 @@ export interface PayloadUpsertInput {
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id: string;
   payload_name: string;
+  payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";

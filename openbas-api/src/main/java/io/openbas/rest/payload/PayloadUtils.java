@@ -1,19 +1,28 @@
 package io.openbas.rest.payload;
 
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.arm64;
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.x86_64;
+import static io.openbas.helper.StreamHelper.iterableToSet;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
-import io.openbas.database.model.PayloadArgument;
-import io.openbas.database.model.PayloadPrerequisite;
-import io.openbas.rest.payload.form.PayloadCreateInput;
+import io.openbas.database.model.*;
+import io.openbas.database.repository.TagRepository;
+import io.openbas.rest.exception.BadRequestException;
+import io.openbas.rest.payload.form.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
+@Component
 public class PayloadUtils {
 
-  private PayloadUtils() {}
+  private final TagRepository tagRepository;
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
@@ -93,5 +102,110 @@ public class PayloadUtils {
     payloadCreateInput.setTagIds(new ArrayList<>());
     payloadCreateInput.setAttackPatternsIds(new ArrayList<>());
     return payloadCreateInput;
+  }
+
+  public static void validateArchitecture(String payloadType, Payload.PAYLOAD_EXECUTION_ARCH arch) {
+    if (arch == null) {
+      throw new BadRequestException("Payload architecture cannot be null.");
+    }
+    if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != x86_64 && arch != arm64)) {
+      throw new BadRequestException("Executable architecture must be x86_64 or arm64.");
+    }
+  }
+
+  // -- COPY PROPERTIES --
+  public Payload copyProperties(Object payloadInput, Payload target) {
+    if (payloadInput == null) {
+      throw new IllegalArgumentException("Input payload cannot be null");
+    }
+
+    if (payloadInput instanceof PayloadCreateInput) {
+      return copyFromPayloadCreateInput((PayloadCreateInput) payloadInput, target);
+    } else if (payloadInput instanceof PayloadUpdateInput) {
+      return copyFromPayloadUpdateInput((PayloadUpdateInput) payloadInput, target);
+    } else if (payloadInput instanceof PayloadUpsertInput) {
+      return copyFromPayloadUpsertInput((PayloadUpsertInput) payloadInput, target);
+    }
+
+    throw new IllegalArgumentException("Unsupported payload input type");
+  }
+
+  private Payload copyFromPayloadCreateInput(PayloadCreateInput input, Payload target) {
+    BeanUtils.copyProperties(input, target);
+    copyOutputParsers(input.getOutputParsers(), target);
+    return target;
+  }
+
+  private Payload copyFromPayloadUpdateInput(PayloadUpdateInput input, Payload target) {
+    BeanUtils.copyProperties(input, target);
+    copyOutputParsers(input.getOutputParsers(), target);
+    return target;
+  }
+
+  private Payload copyFromPayloadUpsertInput(PayloadUpsertInput input, Payload target) {
+    BeanUtils.copyProperties(input, target);
+    copyOutputParsers(input.getOutputParsers(), target);
+    return target;
+  }
+
+  public <T> void copyOutputParsers(List<T> inputParsers, Payload target) {
+    if (inputParsers != null) {
+      List<OutputParser> outputParsers =
+          inputParsers.stream()
+              .map(
+                  inputParser -> {
+                    OutputParser outputParser = new OutputParser();
+                    BeanUtils.copyProperties(inputParser, outputParser);
+                    outputParser.setPayload(target);
+
+                    // Handle contract output elements based on the input type
+                    if (inputParser instanceof OutputParserInput) {
+                      OutputParserInput parserInput = (OutputParserInput) inputParser;
+                      copyContractOutputElements(
+                          parserInput.getContractOutputElements(), outputParser);
+                    } else if (inputParser instanceof OutputParser) {
+                      OutputParser parser = (OutputParser) inputParser;
+                      copyContractOutputElements(parser.getContractOutputElements(), outputParser);
+                    }
+
+                    return outputParser;
+                  })
+              .collect(Collectors.toList());
+
+      target.setOutputParsers(outputParsers);
+    }
+  }
+
+  private void copyContractOutputElements(List<?> inputElements, OutputParser outputParser) {
+    if (inputElements != null) {
+      List<ContractOutputElement> contractOutputElements =
+          inputElements.stream()
+              .map(
+                  inputElement -> {
+                    ContractOutputElement contractOutputElement = new ContractOutputElement();
+                    BeanUtils.copyProperties(inputElement, contractOutputElement);
+                    contractOutputElement.setOutputParser(outputParser);
+                    if (inputElement instanceof ContractOutputElementInput) {
+                      ContractOutputElementInput contractOutputElementInput =
+                          (ContractOutputElementInput) inputElement;
+                      contractOutputElement.setTags(
+                          iterableToSet(
+                              tagRepository.findAllById(contractOutputElementInput.getTagIds())));
+                    } else {
+                      ContractOutputElement contractOutputElementInstance =
+                          (ContractOutputElement) inputElement;
+                      contractOutputElement.setTags(
+                          iterableToSet(
+                              tagRepository.findAllById(
+                                  contractOutputElementInstance.getTags().stream()
+                                      .map(t -> t.getId())
+                                      .toList())));
+                    }
+                    return contractOutputElement;
+                  })
+              .collect(Collectors.toList());
+
+      outputParser.setContractOutputElements(contractOutputElements);
+    }
   }
 }

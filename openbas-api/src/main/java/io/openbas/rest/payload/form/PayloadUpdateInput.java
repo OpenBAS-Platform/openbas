@@ -67,4 +67,8 @@ public class PayloadUpdateInput {
 
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsIds = new ArrayList<>();
+
+  @JsonProperty("payload_output_parsers")
+  @Schema(description = "List of output parsers")
+  private List<OutputParserInput> outputParsers;
 }
