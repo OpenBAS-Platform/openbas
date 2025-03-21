@@ -2106,9 +2106,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/translate@npm:8.5.0":
-  version: 8.5.0
-  resolution: "@google-cloud/translate@npm:8.5.0"
+"@google-cloud/translate@npm:8.5.1":
+  version: 8.5.1
+  resolution: "@google-cloud/translate@npm:8.5.1"
   dependencies:
     "@google-cloud/common": "npm:^5.0.0"
     "@google-cloud/promisify": "npm:^4.0.0"
@@ -2116,7 +2116,7 @@ __metadata:
     extend: "npm:^3.0.2"
     google-gax: "npm:^4.0.3"
     is-html: "npm:^2.0.0"
-  checksum: 10c0/03b4edab2d7e9dce43516ea32a9958be71a42b4d5625ec16f51a7259e9c9bbc0645b95dd3c343c27df6dd6b43c8c9229a13b532d4580161269d13d8cc837d802
+  checksum: 10c0/8675f3230fdb89190cffee6d477ab69e5aef721252ba28c9320f682d2553efc6a749cd642cf8db2443e474439f8639d9b380ff658a7ce073738dee74f45bff29
   languageName: node
   linkType: hard
 
@@ -4336,14 +4336,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.7.9":
-  version: 1.7.9
-  resolution: "axios@npm:1.7.9"
+"axios@npm:1.8.3":
+  version: 1.8.3
+  resolution: "axios@npm:1.8.3"
   dependencies:
     follow-redirects: "npm:^1.15.6"
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/b7a41e24b59fee5f0f26c1fc844b45b17442832eb3a0fb42dd4f1430eb4abc571fe168e67913e8a1d91c993232bd1d1ab03e20e4d1fee8c6147649b576fc1b0b
+  checksum: 10c0/de75da9859adf0a6481d4af2b687db357a054d20f0d69b99d502b71dae3578326b1fdc0951dabaef769827484941cda93d3f89150bf9e04f05f6615fb8316780
   languageName: node
   linkType: hard
 
@@ -7510,20 +7510,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18n-auto-translation@npm:1.10.1":
-  version: 1.10.1
-  resolution: "i18n-auto-translation@npm:1.10.1"
+"i18n-auto-translation@npm:2.1.2":
+  version: 2.1.2
+  resolution: "i18n-auto-translation@npm:2.1.2"
   dependencies:
-    "@google-cloud/translate": "npm:8.5.0"
-    axios: "npm:1.7.9"
+    "@google-cloud/translate": "npm:8.5.1"
+    axios: "npm:1.8.3"
     deep-object-diff: "npm:1.1.9"
     glob: "npm:11.0.1"
     html-entities: "npm:2.5.2"
     just-extend: "npm:6.2.0"
     yargs: "npm:17.7.2"
+    yocto-spinner: "npm:0.2.1"
   bin:
-    i18n-auto-translation: dist/index.js
-  checksum: 10c0/03094f824671eecdbc36180d6df43becf7dea658f2a5de839e7998ee285c672a0b1704c85ce941bd5cbfc45ff6af2251fc048188142d236ee4d54166ff2ff04f
+    i18n-auto-translation: dist/src/index.js
+  checksum: 10c0/0079cf6d75959cea3340a921277bfcf4b32da19966f0b91c49d45364482262421db76eb8126cab8c9cf02cb051fd38154433de7173c697f6ff4d10c8a4c88a04
   languageName: node
   linkType: hard
 
@@ -9723,7 +9724,7 @@ __metadata:
     html-react-parser: "npm:5.2.2"
     html-to-image: "npm:1.11.13"
     http-proxy-middleware: "npm:3.0.3"
-    i18n-auto-translation: "npm:1.10.1"
+    i18n-auto-translation: "npm:2.1.2"
     js-file-download: "npm:0.4.12"
     jsdom: "npm:26.0.0"
     mdi-material-ui: "npm:7.9.3"
@@ -13024,6 +13025,22 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"yocto-spinner@npm:0.2.1":
+  version: 0.2.1
+  resolution: "yocto-spinner@npm:0.2.1"
+  dependencies:
+    yoctocolors: "npm:^2.1.1"
+  checksum: 10c0/c2547108ad052ca9a5f17da705325f97cef95b411d14646c0e70912b566dbf77480eca1ef16e7c530ef0fef5a264790a7ce61e3c6e4f10958e8b000924e83de2
+  languageName: node
+  linkType: hard
+
+"yoctocolors@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "yoctocolors@npm:2.1.1"
+  checksum: 10c0/85903f7fa96f1c70badee94789fade709f9d83dab2ec92753d612d84fcea6d34c772337a9f8914c6bed2f5fc03a428ac5d893e76fab636da5f1236ab725486d0
   languageName: node
   linkType: hard
 
