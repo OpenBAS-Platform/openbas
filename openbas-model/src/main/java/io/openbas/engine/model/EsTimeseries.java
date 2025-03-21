@@ -1,4 +1,4 @@
-package io.openbas.engine;
+package io.openbas.engine.model;
 
 import java.time.Instant;
 import lombok.Getter;
