@@ -10,18 +10,23 @@ public class EsFinding extends EsBase {
 
   public static final String FINDING_TYPE = "finding";
 
-  @Queryable(filterable = true, sortable = true)
-  private String value;
+  /* Every attribute must be uniq, so prefixed with the entity type! */
 
-  @Queryable(filterable = true, sortable = true)
-  private String field;
+  @Queryable(label = "value", filterable = true, sortable = true)
+  private String finding_value;
 
-  @Queryable(filterable = true, sortable = true)
-  private String inject;
+  @Queryable(label = "type", filterable = true, sortable = true)
+  private String finding_type;
 
-  @Queryable(filterable = true, sortable = true)
-  private String simulation;
+  @Queryable(label = "field", filterable = true, sortable = true)
+  private String finding_field;
 
-  @Queryable(filterable = true, sortable = true)
-  private String scenario;
+  @Queryable(label = "inject", filterable = true, sortable = true)
+  private String finding_inject_side; // Must finish by _side
+
+  @Queryable(label = "simulation", filterable = true, sortable = true)
+  private String finding_simulation_side; // Must finish by _side
+
+  @Queryable(label = "scenario", filterable = true, sortable = true)
+  private String finding_scenario_side; // Must finish by _side
 }

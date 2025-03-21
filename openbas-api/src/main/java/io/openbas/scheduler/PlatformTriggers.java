@@ -2,9 +2,10 @@ package io.openbas.scheduler;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.SimpleScheduleBuilder.repeatMinutelyForever;
-import static org.quartz.SimpleScheduleBuilder.repeatSecondlyForever;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -49,10 +50,11 @@ public class PlatformTriggers {
 
   @Bean
   public Trigger elasticSyncExecutionTrigger() {
+    SimpleScheduleBuilder _15_seconds = simpleSchedule().withIntervalInSeconds(15).repeatForever();
     return newTrigger()
         .forJob(this.platformJobs.getElasticSyncExecution())
         .withIdentity("elasticSyncExecutionTrigger")
-        .withSchedule(repeatSecondlyForever())
+        .withSchedule(_15_seconds)
         .build();
   }
 }
