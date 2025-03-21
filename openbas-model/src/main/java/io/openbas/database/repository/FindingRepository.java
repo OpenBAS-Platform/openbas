@@ -6,8 +6,8 @@ import io.openbas.database.model.Finding;
 import java.util.Date;
 import jakarta.validation.constraints.NotBlank;
 
+import io.openbas.database.raw.RawFinding;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 import io.openbas.database.raw.RawFinding;
@@ -38,8 +38,8 @@ public interface FindingRepository
 
   @Query(
       value =
-          "SELECT f.finding_id, f.finding_value, f.finding_type, f.finding_field," +
-              " f.finding_inject_id, i.inject_scenario, f.finding_created_at, f.finding_updated_at "
+          "SELECT f.finding_id, f.finding_value, f.finding_type, f.finding_field,"
+              + " f.finding_inject_id, i.inject_scenario, f.finding_created_at, f.finding_updated_at "
               + "FROM findings f "
               + "LEFT JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "WHERE f.finding_updated_at > :from ORDER BY f.finding_updated_at LIMIT 500;",

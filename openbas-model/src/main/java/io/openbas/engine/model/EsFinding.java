@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class EsFinding extends EsBase {
 
-  public final static String FINDING_TYPE = "finding";
+  public static final String FINDING_TYPE = "finding";
 
   @Queryable(filterable = true, sortable = true)
   private String value;
