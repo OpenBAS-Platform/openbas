@@ -175,7 +175,7 @@ public class InjectStatusService {
             .ifPresent(
                 payload -> {
                   if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
-                    findingService.extractFindings(payload.getOutputParsers(), executionTraces);
+                    findingService.extractFindings(inject, agent.getAsset(), executionTraces);
                   } else {
                     log.info(
                         "No output parsers available for payload used in inject:" + inject.getId());
