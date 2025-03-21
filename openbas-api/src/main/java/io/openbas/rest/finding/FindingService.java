@@ -9,8 +9,8 @@ import io.openbas.rest.inject.service.InjectService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -68,46 +68,48 @@ public class FindingService {
   public void extractFindings(Inject inject, Asset asset, ExecutionTraces trace) {
     List<Finding> findings = new ArrayList<>();
 
-    inject
-        .getPayload()
-        .get()
-        .getOutputParsers()
-        .forEach(
-            outputParser -> {
-              String rawOutputByMode =
-                  extractRawOutputByMode(trace.getMessage(), outputParser.getMode());
+    Optional.ofNullable(inject.getPayload())
+        .map(p -> p.get().getOutputParsers())
+        .ifPresent(
+            outputParsers ->
+                outputParsers.forEach(
+                    outputParser -> {
+                      String rawOutputByMode =
+                          extractRawOutputByMode(trace.getMessage(), outputParser.getMode());
 
-              switch (outputParser.getType()) {
-                case REGEX:
-                default:
-                  Pattern pattern = Pattern.compile(outputParser.getRule(), Pattern.MULTILINE);
-                  Matcher matcher = pattern.matcher(rawOutputByMode);
+                      if (rawOutputByMode == null) {
+                        return;
+                      }
 
-                  /*
-                  Example rule: /(name:)(.*)([0-9]....)
-                  - Fetch groups from regex: (group 1: name)
-                  - Every ContractOutputElement has: group, name, key, type
-                  - Group 1 from regex should map to ContractOutputElement with group 1
-                  */
+                      switch (outputParser.getType()) {
+                        case REGEX:
+                        default:
+                          outputParser
+                              .getContractOutputElements()
+                              .forEach(
+                                  contractOutputElement -> {
+                                    Pattern pattern =
+                                        Pattern.compile(contractOutputElement.getRule());
+                                    Matcher matcher = pattern.matcher(rawOutputByMode);
 
-                  while (matcher.find()) {
-                    outputParser.getContractOutputElements().stream()
-                        .sorted(Comparator.comparingInt(ContractOutputElement::getGroup))
-                        .forEach(
-                            contractOutputElement -> {
-                              Finding finding = new Finding();
-                              finding.setInject(inject); //find by inject and value in order to update asset list
-                              finding.getAssets().add(asset);
-                              finding.setField(contractOutputElement.getKey());
-                              finding.setType(contractOutputElement.getType());
-                              finding.setValue(matcher.group(contractOutputElement.getGroup()));
-                              finding.setLabels(new String[] {contractOutputElement.getName()});
-                              findings.add(finding);
-                            });
-                  }
-                  break;
-              }
-            });
+                                    while (matcher.find()) {
+                                      Finding finding = new Finding();
+                                      finding.setInject(inject); // Find by inject and value
+                                      finding.getAssets().add(asset);
+                                      finding.setField(contractOutputElement.getKey());
+                                      finding.setType(contractOutputElement.getType());
+                                      finding.setValue(matcher.group());
+
+                                      finding.setLabels(
+                                          new String[] {contractOutputElement.getName()});
+
+                                      findings.add(finding);
+                                    }
+                                  });
+                          break;
+                      }
+                    }));
+
     findingRepository.saveAll(findings);
   }
 }
