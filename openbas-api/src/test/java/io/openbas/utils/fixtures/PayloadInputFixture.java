@@ -29,15 +29,14 @@ public class PayloadInputFixture {
     PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
 
     ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
-    contractOutputElementInput.setGroup(0);
     contractOutputElementInput.setKey("IPV6");
     contractOutputElementInput.setType(ContractOutputType.IPv6);
     contractOutputElementInput.setName("IPV6");
+    contractOutputElementInput.setRule("rule");
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDOUT);
     outputParserInput.setType(ParserType.REGEX);
-    outputParserInput.setRule("rule");
     outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
 
     input.setOutputParsers(List.of(outputParserInput));
@@ -81,15 +80,14 @@ public class PayloadInputFixture {
     PayloadUpdateInput input = getDefaultCommandPayloadUpdateInput();
 
     ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
-    contractOutputElementInput.setGroup(0);
     contractOutputElementInput.setKey("IPV6");
     contractOutputElementInput.setType(ContractOutputType.IPv6);
     contractOutputElementInput.setName("IPV6");
+    contractOutputElementInput.setRule("rule");
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDOUT);
     outputParserInput.setType(ParserType.REGEX);
-    outputParserInput.setRule("rule");
     outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
 
     input.setOutputParsers(List.of(outputParserInput));
@@ -120,15 +118,14 @@ public class PayloadInputFixture {
     PayloadUpsertInput input = getDefaultCommandPayloadUpsertInput();
 
     ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
-    contractOutputElementInput.setGroup(0);
     contractOutputElementInput.setKey("IPV4");
     contractOutputElementInput.setType(ContractOutputType.IPv4);
     contractOutputElementInput.setName("IPV4");
+    contractOutputElementInput.setRule("regex xPath");
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDERR);
     outputParserInput.setType(ParserType.REGEX);
-    outputParserInput.setRule("regex xPath");
     outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
 
     input.setOutputParsers(List.of(outputParserInput));
