@@ -6,6 +6,7 @@ import io.openbas.engine.model.EsFinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +25,10 @@ public class FindingHandler implements Handler<EsFinding> {
     }
 
     @Override
-    public List<EsFinding> fetch(Optional<Date> from) {
+    public List<EsFinding> fetch(Instant from) {
         List<EsFinding> data = new ArrayList<>();
-        List<RawFinding> forIndexing = findingRepository.findForIndexing(from.orElse(new Date(0)));
+        Instant queryFrom = from != null ? from : Instant.ofEpochMilli(0);
+        List<RawFinding> forIndexing = findingRepository.findForIndexing(queryFrom);
         if (!forIndexing.isEmpty()) {
             for (RawFinding finding : forIndexing) {
                 EsFinding esFinding = new EsFinding();

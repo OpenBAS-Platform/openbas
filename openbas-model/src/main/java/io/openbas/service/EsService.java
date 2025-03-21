@@ -12,6 +12,7 @@ import io.openbas.engine.handler.Handler;
 import io.openbas.engine.model.EsBase;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -48,8 +49,8 @@ public class EsService {
             Optional<IndexingStatus> indexingStatus = indexingStatusRepository.findByType(model.getName());
             Handler<? extends EsBase> handler = model.getHandler();
             String index = model.getIndex();
-            Optional<Date> fetchDate = indexingStatus.map(value -> Date.from(value.getLastIndexing()));
-            List<? extends EsBase> results = handler.fetch(fetchDate);
+            Instant fetchInstant = indexingStatus.map(IndexingStatus::getLastIndexing).orElse(null);
+            List<? extends EsBase> results = handler.fetch(fetchInstant);
             if (!results.isEmpty()) {
                 // Create bulk for the data
                 BulkRequest.Builder br = new BulkRequest.Builder();
