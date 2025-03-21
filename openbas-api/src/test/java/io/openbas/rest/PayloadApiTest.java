@@ -120,7 +120,10 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(
             jsonPath("$.payload_output_parsers[0].output_parser_type")
                 .value(ParserType.REGEX.name()))
-        .andExpect(jsonPath("$.payload_output_parsers[0].output_parser_rule").value("rule"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                .value("rule"))
         .andExpect(
             jsonPath(
                     "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
@@ -271,7 +274,10 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(
             jsonPath("$.payload_output_parsers[0].output_parser_type")
                 .value(ParserType.REGEX.name()))
-        .andExpect(jsonPath("$.payload_output_parsers[0].output_parser_rule").value("rule"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                .value("rule"))
         .andExpect(
             jsonPath(
                     "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
@@ -337,7 +343,10 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(
             jsonPath("$.payload_output_parsers[0].output_parser_type")
                 .value(ParserType.REGEX.name()))
-        .andExpect(jsonPath("$.payload_output_parsers[0].output_parser_rule").value("regex xPath"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_rule")
+                .value("regex xPath"))
         .andExpect(
             jsonPath(
                     "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")

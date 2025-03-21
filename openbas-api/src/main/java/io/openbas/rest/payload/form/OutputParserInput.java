@@ -20,10 +20,6 @@ public class OutputParserInput {
   @Schema(description = "Parser Type: REGEX")
   private ParserType type;
 
-  @JsonProperty("output_parser_rule")
-  @Schema(description = "Parser Rule")
-  private String rule;
-
   @JsonProperty("output_parser_contract_output_elements")
   @Schema(description = "List of Contract output elements")
   private List<ContractOutputElementInput> contractOutputElements;
