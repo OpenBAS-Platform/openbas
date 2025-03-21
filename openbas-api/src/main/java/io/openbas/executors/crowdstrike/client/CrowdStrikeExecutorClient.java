@@ -3,16 +3,17 @@ package io.openbas.executors.crowdstrike.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openbas.database.model.Agent;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.*;
+import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
@@ -52,16 +53,19 @@ public class CrowdStrikeExecutorClient {
   public List<CrowdStrikeDevice> devices() {
     try {
       List<CrowdStrikeDevice> hosts = new ArrayList<>();
-      final int[] offset = {0};
-      final int limit = 5000;
-      long lastSeenThreshold =
-          Instant.now().minus(Agent.ACTIVE_THRESHOLD, ChronoUnit.MILLIS).getEpochSecond();
+
+      final int limit = 100;
+      final String formattedDateTime =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+              .withZone(ZoneOffset.UTC)
+              .format(Instant.now().minusMillis(EndpointService.DELETE_TTL));
       String fqlFilter =
           URLEncoder.encode(
-              "last_seen>" + lastSeenThreshold + " AND hostname!=null", StandardCharsets.UTF_8);
+              "last_seen:>'" + formattedDateTime + "'+hostname:!null", StandardCharsets.UTF_8);
       List<String> hostGroups = Arrays.asList(this.config.getHostGroup());
       hostGroups.forEach(
           hostGroup -> {
+            int offset = 0;
             while (true) {
               String jsonResponse = null;
               try {
@@ -73,7 +77,7 @@ public class CrowdStrikeExecutorClient {
                             + "&limit="
                             + limit
                             + "&offset="
-                            + offset[0]
+                            + offset
                             + "&filter="
                             + fqlFilter);
               } catch (IOException e) {
@@ -83,7 +87,7 @@ public class CrowdStrikeExecutorClient {
                     e.getMessage());
                 throw new RuntimeException(e);
               }
-              ResourcesHosts partialResults = null;
+              ResourcesHosts partialResults;
               try {
                 partialResults =
                     this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
@@ -92,9 +96,12 @@ public class CrowdStrikeExecutorClient {
                 throw new RuntimeException(e);
               }
 
+              if (partialResults.getResources() == null) {
+                break;
+              }
               hosts.addAll(partialResults.getResources());
               if (partialResults.getResources().size() < limit) break;
-              offset[0] += limit;
+              offset += limit;
             }
           });
       return hosts;
