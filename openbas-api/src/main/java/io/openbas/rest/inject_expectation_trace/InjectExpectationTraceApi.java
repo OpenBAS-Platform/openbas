@@ -10,9 +10,7 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
 import io.openbas.service.InjectExpectationTraceService;
 import jakarta.validation.Valid;
-
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +35,10 @@ public class InjectExpectationTraceApi extends RestBehavior {
         injectExpectationRepository
             .findById(input.getInjectExpectationId())
             .orElseThrow(() -> new ElementNotFoundException("Inject expectation not found")));
-    Collector collector = collectorRepository.findById(input.getSourceId())
-        .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
+    Collector collector =
+        collectorRepository
+            .findById(input.getSourceId())
+            .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
     injectExpectationTrace.setSecurityPlatform(collector.getSecurityPlatform());
     return this.injectExpectationTraceService.createInjectExpectationTrace(injectExpectationTrace);
   }
@@ -46,15 +46,17 @@ public class InjectExpectationTraceApi extends RestBehavior {
   @GetMapping()
   public List<InjectExpectationTrace> getInjectExpectationTracesFromCollector(
       @RequestParam String injectExpectationId, @RequestParam String sourceId) {
-    Collector collector = collectorRepository.findById(sourceId)
-        .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
+    Collector collector =
+        collectorRepository
+            .findById(sourceId)
+            .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
     return this.injectExpectationTraceService.getInjectExpectationTracesFromCollector(
         injectExpectationId, collector.getSecurityPlatform().getId());
   }
 
   @GetMapping("/count")
-  public long getAlertLinksNumber(@RequestParam String injectExpectationId, @RequestParam String sourceId) {
+  public long getAlertLinksNumber(
+      @RequestParam String injectExpectationId, @RequestParam String sourceId) {
     return this.injectExpectationTraceService.getAlertLinksNumber(injectExpectationId, sourceId);
   }
-
 }
