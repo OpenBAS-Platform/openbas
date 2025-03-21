@@ -22,9 +22,18 @@ public interface ScenarioRepository
 
   @Query(
       value =
+          "SELECT s.scenario_id, s.scenario_name, s.scenario_updated_at, s.scenario_created_at "
+              + "FROM scenarios s "
+              + "WHERE s.scenario_updated_at > :from ORDER BY s.scenario_updated_at LIMIT 500;",
+      nativeQuery = true)
+  List<RawScenario> findForIndexing(@Param("from") Instant from);
+
+  @Query(
+      value =
           "SELECT ex.exercise_id, "
               + "ex.exercise_status, "
               + "ex.exercise_start_date, "
+              + "ex.exercise_created_at, "
               + "ex.exercise_updated_at, "
               + "ex.exercise_end_date, "
               + "ex.exercise_name, "

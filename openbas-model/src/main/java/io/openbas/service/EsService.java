@@ -2,30 +2,29 @@ package io.openbas.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.aggregations.Buckets;
-import co.elastic.clients.elasticsearch._types.aggregations.DateHistogramBucket;
-import co.elastic.clients.elasticsearch._types.aggregations.ExtendedBounds;
-import co.elastic.clients.elasticsearch._types.aggregations.FieldDateMath;
+import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.repository.IndexingStatusRepository;
 import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
-import io.openbas.engine.EsTimeseries;
 import io.openbas.engine.api.DateHistogramConfig;
+import io.openbas.engine.api.StructuralHistogramConfig;
 import io.openbas.engine.handler.Handler;
 import io.openbas.engine.model.EsBase;
+import io.openbas.engine.model.EsStructuralSeries;
+import io.openbas.engine.model.EsTimeseries;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +69,9 @@ public class EsService {
                 BulkRequest.Builder br = new BulkRequest.Builder();
                 for (EsBase result : results) {
                   br.operations(
-                      op -> op.index(idx -> idx.index(index).id(result.getId()).document(result)));
+                      op ->
+                          op.index(
+                              idx -> idx.index(index).id(result.getBase_id()).document(result)));
                 }
                 // Execute the bulk
                 try {
@@ -89,12 +90,12 @@ public class EsService {
                     // Update the status for the next round
                     if (indexingStatus.isPresent()) {
                       IndexingStatus status = indexingStatus.get();
-                      status.setLastIndexing(results.getLast().getUpdated_at());
+                      status.setLastIndexing(results.getLast().getBase_updated_at());
                       indexingStatusRepository.save(status);
                     } else {
                       IndexingStatus status = new IndexingStatus();
                       status.setType(model.getName());
-                      status.setLastIndexing(results.getLast().getUpdated_at());
+                      status.setLastIndexing(results.getLast().getBase_updated_at());
                       indexingStatusRepository.save(status);
                     }
                   }
@@ -112,14 +113,12 @@ public class EsService {
           TermsQuery.of(
                   t -> t.field("id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
               ._toQuery();
-      ;
       Query dependenciesId =
           TermsQuery.of(
                   t ->
                       t.field("dependencies.keyword")
                           .terms(TermsQueryField.of(tq -> tq.value(values))))
               ._toQuery();
-      ;
       Query query =
           BoolQuery.of(b -> b.should(directId, dependenciesId).minimumShouldMatch("1"))._toQuery();
       elasticClient.deleteByQuery(
@@ -174,7 +173,63 @@ public class EsService {
     return boolQuery.build()._toQuery();
   }
 
-  // Timeseries { date, value }
+  public Map<String, String> resolveIdsRepresentative(List<String> ids) {
+    List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
+    Query query =
+        TermsQuery.of(t -> t.field("id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
+            ._toQuery();
+    try {
+      SearchResponse<EsBase> response =
+          elasticClient.search(b -> b.index("openbas_*").query(query), EsBase.class);
+      List<Hit<EsBase>> hits = response.hits().hits();
+      return hits.stream()
+          .map(Hit::source)
+          .collect(Collectors.toMap(EsBase::getBase_id, EsBase::getBase_representative));
+    } catch (Exception e) {
+      System.out.println("ElasticSyncExecutionJob exception: " + e);
+    }
+    return Map.of();
+  }
+
+  public List<EsStructuralSeries> termHistogram(StructuralHistogramConfig config) {
+    Query query = queryFromFilterGroup(config.getFilter());
+    String aggregationKey = "term_histogram";
+    try {
+      TermsAggregation termsAggregation =
+          new TermsAggregation.Builder().field(config.getField() + ".keyword").size(100).build();
+      SearchResponse<Void> response =
+          elasticClient.search(
+              b ->
+                  b.index("openbas_*")
+                      .size(0)
+                      .query(query)
+                      .aggregations(
+                          aggregationKey,
+                          new Aggregation.Builder().terms(termsAggregation).build()),
+              Void.class);
+      Buckets<StringTermsBucket> buckets =
+          response.aggregations().get(aggregationKey).sterms().buckets();
+      boolean isSideAggregation = config.getField().endsWith("_side");
+      Map<String, String> resolutions = new HashMap<>();
+      if (isSideAggregation) {
+        List<String> ids = buckets.array().stream().map(s -> s.key().stringValue()).toList();
+        resolutions.putAll(resolveIdsRepresentative(ids));
+      }
+      return buckets.array().stream()
+          .map(
+              b -> {
+                String key = b.key().stringValue();
+                String label = isSideAggregation ? resolutions.get(key) : key;
+                String seriesKey = label != null ? label : "deleted";
+                return new EsStructuralSeries(seriesKey, b.docCount());
+              })
+          .toList();
+    } catch (Exception e) {
+      System.out.println("ElasticSyncExecutionJob exception: " + e);
+    }
+    return List.of();
+  }
+
   public List<EsTimeseries> dateHistogram(DateHistogramConfig config) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
     Query dateRangeQuery =
