@@ -52,5 +52,9 @@ public class InjectExpectationTraceApi extends RestBehavior {
         injectExpectationId, collector.getSecurityPlatform().getId());
   }
 
+  @GetMapping("/count")
+  public long getAlertLinksNumber(@RequestParam String injectExpectationId, @RequestParam String sourceId) {
+    return this.injectExpectationTraceService.getAlertLinksNumber(injectExpectationId, sourceId);
+  }
 
 }

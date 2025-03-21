@@ -40,6 +40,7 @@ import DetectionPreventionExpectationsValidationForm from '../../simulations/sim
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 import ExpirationChip from './ExpirationChip';
+import TargetResultAlertNumber from './TargetResultAlertNumber';
 import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
 import nodeTypes from './types/nodes';
 import { type NodeResultStep } from './types/nodes/NodeResultStep';
@@ -791,10 +792,26 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                     <ItemResult label={expectationResult.result} status={expectationResult.result} />
                                   </TableCell>
                                   <TableCell>
-                                    {emptyFilled(nsdt(expectationResult.date))}
+                                    {
+                                      (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected' || expectationResult.result === 'SUCCESS') ? nsdt(expectationResult.date) : '-'
+                                    }
                                   </TableCell>
                                   <TableCell>
-                                    {emptyFilled('3')}
+                                    {
+                                      expectationResult.sourceId && injectExpectation.inject_expectation_agent && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && (
+                                        <TargetResultAlertNumber expectationResult={expectationResult} injectExpectationId={injectExpectation.inject_expectation_id} />
+                                      )
+                                    }
+                                    {
+                                      !injectExpectation.inject_expectation_agent && (
+                                        '-'
+                                      )
+                                    }
+                                    {
+                                      injectExpectation.inject_expectation_agent && (expectationResult.result === 'Not Detected' || expectationResult.result === 'Not Prevented') && (
+                                        '-'
+                                      )
+                                    }
                                   </TableCell>
                                   <TableCell>
                                     <IconButton

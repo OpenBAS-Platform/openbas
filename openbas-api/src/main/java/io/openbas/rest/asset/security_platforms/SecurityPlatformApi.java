@@ -13,7 +13,9 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -115,6 +117,15 @@ public class SecurityPlatformApi {
       @PathVariable @NotBlank final String securityPlatformId) {
     return this.securityPlatformRepository
         .findById(securityPlatformId)
+        .orElseThrow(ElementNotFoundException::new);
+  }
+
+  @GetMapping(SECURITY_PLATFORM_URI + "/externalReference")
+  @PreAuthorize("isPlanner()")
+  public SecurityPlatform securityPlatformFromExternalReference(
+      @RequestParam @NotBlank final String externalReference) {
+    return this.securityPlatformRepository
+        .findByExternalReference(externalReference)
         .orElseThrow(ElementNotFoundException::new);
   }
 
