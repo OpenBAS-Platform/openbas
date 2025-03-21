@@ -53,6 +53,10 @@ public class AssetGroup implements Base {
   @Queryable(filterable = true, sortable = true)
   private String description;
 
+  @Column(name = "asset_group_external_reference")
+  @JsonProperty("asset_group_external_reference")
+  private String externalReference;
+
   // -- ASSET --
 
   @Type(JsonType.class)

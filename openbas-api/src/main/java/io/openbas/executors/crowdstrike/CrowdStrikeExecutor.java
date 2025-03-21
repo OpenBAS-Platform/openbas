@@ -5,6 +5,7 @@ import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService;
 import io.openbas.service.AgentService;
+import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
@@ -22,6 +23,7 @@ public class CrowdStrikeExecutor {
   private final EndpointService endpointService;
   private final ExecutorService executorService;
   private final AgentService agentService;
+  private final AssetGroupService assetGroupService;
 
   @PostConstruct
   public void init() {
@@ -31,9 +33,11 @@ public class CrowdStrikeExecutor {
             this.client,
             this.config,
             this.endpointService,
-            this.agentService);
+            this.agentService,
+            this.assetGroupService);
     if (this.config.isEnable()) {
-      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60000));
+      // TODO update ?
+      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
     }
   }
 }

@@ -1,13 +1,11 @@
 package io.openbas.executors.crowdstrike.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.List;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResourcesHosts {
+public class CrowdstrikeMeta {
 
-  private List<CrowdStrikeDevice> resources;
-  private CrowdstrikeMeta meta;
+  private CrowdstrikePagination pagination;
 }
