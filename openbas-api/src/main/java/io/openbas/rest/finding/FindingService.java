@@ -1,14 +1,18 @@
 package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.rest.finding.FindingUtils.extractRawOutputByMode;
 
-import io.openbas.database.model.Finding;
-import io.openbas.database.model.Inject;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -59,5 +63,53 @@ public class FindingService {
       throw new EntityNotFoundException("Finding not found with id: " + id);
     }
     this.findingRepository.deleteById(id);
+  }
+
+  public void extractFindings(Inject inject, Asset asset, ExecutionTraces trace) {
+    List<Finding> findings = new ArrayList<>();
+
+    Optional.ofNullable(inject.getPayload())
+        .map(p -> p.get().getOutputParsers())
+        .ifPresent(
+            outputParsers ->
+                outputParsers.forEach(
+                    outputParser -> {
+                      String rawOutputByMode =
+                          extractRawOutputByMode(trace.getMessage(), outputParser.getMode());
+
+                      if (rawOutputByMode == null) {
+                        return;
+                      }
+
+                      switch (outputParser.getType()) {
+                        case REGEX:
+                        default:
+                          outputParser
+                              .getContractOutputElements()
+                              .forEach(
+                                  contractOutputElement -> {
+                                    Pattern pattern =
+                                        Pattern.compile(contractOutputElement.getRule()); // hashmap <regex, pattern compile>
+                                    Matcher matcher = pattern.matcher(rawOutputByMode);
+
+                                    while (matcher.find()) {
+                                      Finding finding = new Finding();
+                                      finding.setInject(inject); // Find by inject and value
+                                      finding.getAssets().add(asset);
+                                      finding.setField(contractOutputElement.getKey());
+                                      finding.setType(contractOutputElement.getType());
+                                      finding.setValue(matcher.group());
+
+                                      finding.setLabels(
+                                          new String[] {contractOutputElement.getName()});
+
+                                      findings.add(finding);
+                                    }
+                                  });
+                          break;
+                      }
+                    }));
+
+    findingRepository.saveAll(findings);
   }
 }
