@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 public class ContractOutputElementInput {
 
-  @JsonProperty("contract_output_element_group")
-  @Schema(description = "Index of the extracted group from the regex match")
-  private int group;
+  @JsonProperty("contract_output_element_rule")
+  @Schema(description = "Parser Rule")
+  private String rule;
 
   @JsonProperty("contract_output_element_name")
   @Schema(description = "Name")
