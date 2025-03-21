@@ -9,6 +9,7 @@ import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,6 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
     this.crowdStrikeExecutorClient.executeAction(
         agent.getExternalReference(),
         scriptName,
-        Base64.getEncoder().encodeToString(command.getBytes()));
+        Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_16LE)));
   }
 }
