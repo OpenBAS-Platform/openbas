@@ -6,7 +6,7 @@ import io.openbas.database.model.ParserMode;
 
 public class FindingUtils {
 
-  public static String extractRawOutputByMode(final String rawOutput, final ParserMode mode) {
+  public static String extractRawOutputByMode(String rawOutput, ParserMode mode) {
     if (rawOutput == null || rawOutput.isEmpty()) {
       return "";
     }
