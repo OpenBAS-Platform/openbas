@@ -6,6 +6,7 @@ import io.openbas.database.model.Finding;
 import java.util.Date;
 import jakarta.validation.constraints.NotBlank;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -43,5 +44,5 @@ public interface FindingRepository
               + "LEFT JOIN injects i ON i.inject_id = f.finding_inject_id "
               + "WHERE f.finding_updated_at > :from ORDER BY f.finding_updated_at LIMIT 500;",
       nativeQuery = true)
-  List<RawFinding> findForIndexing(@Param("from") Date from);
+  List<RawFinding> findForIndexing(@Param("from") Instant from);
 }
