@@ -206,7 +206,7 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
-  @OneToMany(mappedBy = "payload", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "payload", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JsonProperty("payload_output_parsers")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<OutputParser> outputParsers = new ArrayList<>();
