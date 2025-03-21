@@ -32,17 +32,15 @@ public class OutputParser implements Base {
   @Schema(type = "string")
   private Payload payload;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "output_parser_mode")
   @JsonProperty("output_parser_mode")
   private ParserMode mode;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "output_parser_type")
   @JsonProperty("output_parser_type")
   private ParserType type;
-
-  @Column(name = "output_parser_rule")
-  @JsonProperty("output_parser_rule")
-  private String rule;
 
   @OneToMany(mappedBy = "outputParser", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JsonProperty("output_parser_contract_output_elements")
