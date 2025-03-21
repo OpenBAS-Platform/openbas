@@ -42,7 +42,7 @@ public class OutputParser implements Base {
   @JsonProperty("output_parser_type")
   private ParserType type;
 
-  @OneToMany(mappedBy = "outputParser", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "outputParser", cascade = CascadeType.ALL)
   @JsonProperty("output_parser_contract_output_elements")
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<ContractOutputElement> contractOutputElements = new ArrayList<>();
