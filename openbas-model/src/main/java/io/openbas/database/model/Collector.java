@@ -8,11 +8,8 @@ import io.openbas.database.audit.ModelBaseListener;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
-
 import lombok.Getter;
 import lombok.Setter;
 

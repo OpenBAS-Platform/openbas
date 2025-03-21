@@ -2,18 +2,11 @@ package io.openbas.service;
 
 import io.openbas.database.model.InjectExpectationTrace;
 import io.openbas.database.repository.InjectExpectationTraceRepository;
-import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import io.openbas.rest.exception.ElementNotFoundException;
-
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +36,4 @@ public class InjectExpectationTraceService {
   public long getAlertLinksNumber(@NotNull String injectExpectationId, @NotNull String sourceId) {
     return this.injectExpectationTraceRepository.countAlerts(injectExpectationId, sourceId);
   }
-
 }

@@ -8,10 +8,9 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -37,9 +36,7 @@ public class SecurityPlatform extends Asset {
     ISPM,
   }
 
-  /**
-   * Used by collectors to set collector_id
-   */
+  /** Used by collectors to set collector_id */
   @Column(name = "asset_external_reference")
   @JsonProperty("asset_external_reference")
   private String externalReference;
@@ -73,8 +70,7 @@ public class SecurityPlatform extends Asset {
   @Schema(type = "string")
   private Document logoDark;
 
-  public SecurityPlatform() {
-  }
+  public SecurityPlatform() {}
 
   public SecurityPlatform(
       String id, String type, String name, SECURITY_PLATFORM_TYPE securityPlatformType) {
