@@ -89,7 +89,7 @@ public class FindingService {
                               .forEach(
                                   contractOutputElement -> {
                                     Pattern pattern =
-                                        Pattern.compile(contractOutputElement.getRule());
+                                        Pattern.compile(contractOutputElement.getRule()); // hashmap <regex, pattern compile>
                                     Matcher matcher = pattern.matcher(rawOutputByMode);
 
                                     while (matcher.find()) {
