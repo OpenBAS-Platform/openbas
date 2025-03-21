@@ -6,7 +6,6 @@ import io.openbas.database.raw.RawFinding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.engine.model.EsFinding;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,25 +22,26 @@ public class FindingHandler implements Handler<EsFinding> {
 
   @Override
   public List<EsFinding> fetch(Instant from) {
-    List<EsFinding> data = new ArrayList<>();
     Instant queryFrom = from != null ? from : Instant.ofEpochMilli(0);
     List<RawFinding> forIndexing = findingRepository.findForIndexing(queryFrom);
-    if (!forIndexing.isEmpty()) {
-      for (RawFinding finding : forIndexing) {
-        EsFinding esFinding = new EsFinding();
-        esFinding.setId(finding.getFinding_id());
-        esFinding.setType(FINDING_TYPE);
-        esFinding.setCreated_at(finding.getFinding_created_at());
-        esFinding.setUpdated_at(finding.getFinding_updated_at());
-        esFinding.setField(finding.getFinding_field());
-        esFinding.setValue(finding.getFinding_value());
-        esFinding.setInject(finding.getFinding_inject_id());
-        esFinding.setScenario(finding.getInject_scenario());
-        esFinding.setDependencies(
-            List.of(finding.getFinding_inject_id(), finding.getInject_scenario()));
-        data.add(esFinding);
-      }
-    }
-    return data;
+    return forIndexing.stream()
+        .map(
+            finding -> {
+              EsFinding esFinding = new EsFinding();
+              esFinding.setBase_id(finding.getFinding_id());
+              esFinding.setBase_entity(FINDING_TYPE);
+              esFinding.setBase_representative(finding.getFinding_value());
+              esFinding.setFinding_type(finding.getFinding_type());
+              esFinding.setBase_created_at(finding.getFinding_created_at());
+              esFinding.setBase_updated_at(finding.getFinding_updated_at());
+              esFinding.setFinding_field(finding.getFinding_field());
+              esFinding.setFinding_value(finding.getFinding_value());
+              esFinding.setFinding_inject_side(finding.getFinding_inject_id());
+              esFinding.setFinding_scenario_side(finding.getInject_scenario());
+              esFinding.setBase_dependencies(
+                  List.of(finding.getFinding_inject_id(), finding.getInject_scenario()));
+              return esFinding;
+            })
+        .toList();
   }
 }

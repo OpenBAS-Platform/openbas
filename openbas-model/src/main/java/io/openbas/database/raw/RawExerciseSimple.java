@@ -11,6 +11,8 @@ public interface RawExerciseSimple {
 
   Instant getExercise_start_date();
 
+  Instant getExercise_created_at();
+
   Instant getExercise_updated_at();
 
   Instant getExercise_end_date();
