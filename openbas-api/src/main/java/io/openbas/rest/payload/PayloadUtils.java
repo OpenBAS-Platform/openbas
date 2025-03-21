@@ -2,24 +2,27 @@ package io.openbas.rest.payload;
 
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.arm64;
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.x86_64;
+import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.database.model.*;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.BadRequestException;
-import io.openbas.rest.payload.form.OutputParserInput;
-import io.openbas.rest.payload.form.PayloadCreateInput;
-import io.openbas.rest.payload.form.PayloadUpdateInput;
-import io.openbas.rest.payload.form.PayloadUpsertInput;
+import io.openbas.rest.payload.form.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
+@Component
 public class PayloadUtils {
 
-  private PayloadUtils() {}
+  private final TagRepository tagRepository;
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
@@ -111,7 +114,7 @@ public class PayloadUtils {
   }
 
   // -- COPY PROPERTIES --
-  public static Payload copyProperties(Object payloadInput, Payload target) {
+  public Payload copyProperties(Object payloadInput, Payload target) {
     if (payloadInput == null) {
       throw new IllegalArgumentException("Input payload cannot be null");
     }
@@ -127,25 +130,25 @@ public class PayloadUtils {
     throw new IllegalArgumentException("Unsupported payload input type");
   }
 
-  private static Payload copyFromPayloadCreateInput(PayloadCreateInput input, Payload target) {
+  private Payload copyFromPayloadCreateInput(PayloadCreateInput input, Payload target) {
     BeanUtils.copyProperties(input, target);
     copyOutputParsers(input.getOutputParsers(), target);
     return target;
   }
 
-  private static Payload copyFromPayloadUpdateInput(PayloadUpdateInput input, Payload target) {
+  private Payload copyFromPayloadUpdateInput(PayloadUpdateInput input, Payload target) {
     BeanUtils.copyProperties(input, target);
     copyOutputParsers(input.getOutputParsers(), target);
     return target;
   }
 
-  private static Payload copyFromPayloadUpsertInput(PayloadUpsertInput input, Payload target) {
+  private Payload copyFromPayloadUpsertInput(PayloadUpsertInput input, Payload target) {
     BeanUtils.copyProperties(input, target);
     copyOutputParsers(input.getOutputParsers(), target);
     return target;
   }
 
-  public static <T> void copyOutputParsers(List<T> inputParsers, Payload target) {
+  public <T> void copyOutputParsers(List<T> inputParsers, Payload target) {
     if (inputParsers != null) {
       List<OutputParser> outputParsers =
           inputParsers.stream()
@@ -173,7 +176,7 @@ public class PayloadUtils {
     }
   }
 
-  private static void copyContractOutputElements(List<?> inputElements, OutputParser outputParser) {
+  private void copyContractOutputElements(List<?> inputElements, OutputParser outputParser) {
     if (inputElements != null) {
       List<ContractOutputElement> contractOutputElements =
           inputElements.stream()
@@ -182,6 +185,22 @@ public class PayloadUtils {
                     ContractOutputElement contractOutputElement = new ContractOutputElement();
                     BeanUtils.copyProperties(inputElement, contractOutputElement);
                     contractOutputElement.setOutputParser(outputParser);
+                    if (inputElement instanceof ContractOutputElementInput) {
+                      ContractOutputElementInput contractOutputElementInput =
+                          (ContractOutputElementInput) inputElement;
+                      contractOutputElement.setTags(
+                          iterableToSet(
+                              tagRepository.findAllById(contractOutputElementInput.getTagIds())));
+                    } else {
+                      ContractOutputElement contractOutputElementInstance =
+                          (ContractOutputElement) inputElement;
+                      contractOutputElement.setTags(
+                          iterableToSet(
+                              tagRepository.findAllById(
+                                  contractOutputElementInstance.getTags().stream()
+                                      .map(t -> t.getId())
+                                      .toList())));
+                    }
                     return contractOutputElement;
                   })
               .collect(Collectors.toList());

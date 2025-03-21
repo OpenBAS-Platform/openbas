@@ -53,6 +53,35 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
                         PRIMARY KEY (contract_output_element_output_parser_id, contract_output_element_key)
 );
               """);
+
+      statement.execute(
+          """
+          CREATE TABLE contract_output_elements_tags (
+            contract_output_elements_tag_id varchar(255) not null constraint payload_id_fk references contract_output_elements,
+            tag_id varchar(255) not null constraint tag_id_fk references tags,
+            constraint payloads_tags_pkey primary key (contract_output_elements_tag_id, tag_id)
+          );
+          CREATE INDEX idx_contract_output_elements_tags_contract_output_elements on contract_output_elements_tags (contract_output_element_id);
+          CREATE INDEX idx_contract_output_elements_tags_tag on contract_output_elements_tags (tag_id);
+
+          """);
+
+      statement.execute(
+          """
+          CREATE TABLE findings_tags (
+              finding_id varchar(255) not null
+                  constraint finding_id_fk
+                      references findings
+                      on delete cascade,
+              _tags varchar(255) not null
+                  constraint asset_id_fk
+                      references tags
+                      on delete cascade,
+              primary key (finding_id, tag_id)
+          );
+          CREATE INDEX idx_fingings_tags_finding on findings_assets (finding_id);
+          CREATE INDEX idx_fingings_tags_tag on findings_assets (tag_id);
+      """);
     }
   }
 }

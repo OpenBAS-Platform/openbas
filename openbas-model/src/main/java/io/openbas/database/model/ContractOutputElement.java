@@ -3,9 +3,13 @@ package io.openbas.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -45,4 +49,14 @@ public class ContractOutputElement implements Base {
   @Column(name = "contract_output_element_type")
   @JsonProperty("contract_output_element_type")
   private ContractOutputType type;
+
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "contract_output_elements_tags",
+      joinColumns = @JoinColumn(name = "contract_output_element_id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
+  @JsonProperty("contract_output_element_tags")
+  private Set<Tag> tags = new HashSet<>();
 }
