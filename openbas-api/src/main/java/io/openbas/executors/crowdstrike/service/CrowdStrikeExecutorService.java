@@ -3,14 +3,17 @@ package io.openbas.executors.crowdstrike.service;
 import static io.openbas.utils.Time.toInstant;
 
 import io.openbas.database.model.Agent;
+import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Executor;
 import io.openbas.executors.ExecutorService;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
+import io.openbas.executors.crowdstrike.model.CrowdStrikeHostGroup;
 import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.service.AgentService;
+import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,9 +38,10 @@ public class CrowdStrikeExecutorService implements Runnable {
   private static final String CROWDSTRIKE_EXECUTOR_BACKGROUND_COLOR = "#E12E37";
 
   private final CrowdStrikeExecutorClient client;
-
+  private final CrowdStrikeExecutorConfig config;
   private final EndpointService endpointService;
   private final AgentService agentService;
+  private final AssetGroupService assetGroupService;
 
   private Executor executor = null;
 
@@ -64,10 +68,13 @@ public class CrowdStrikeExecutorService implements Runnable {
       CrowdStrikeExecutorClient client,
       CrowdStrikeExecutorConfig config,
       EndpointService endpointService,
-      AgentService agentService) {
+      AgentService agentService,
+      AssetGroupService assetGroupService) {
     this.client = client;
+    this.config = config;
     this.endpointService = endpointService;
     this.agentService = agentService;
+    this.assetGroupService = assetGroupService;
     try {
       if (config.isEnable()) {
         this.executor =
@@ -95,14 +102,37 @@ public class CrowdStrikeExecutorService implements Runnable {
   @Override
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
-    List<CrowdStrikeDevice> devices = this.client.devices();
-    List<AgentRegisterInput> endpointRegisterList = toAgentEndpoint(devices);
-    log.info(
-        "CrowdStrike executor provisioning based on " + endpointRegisterList.size() + " assets");
-
-    List<Agent> existingAgents = agentService.getAgentsByExecutorType("openbas_crowdstrike");
-
-    endpointService.syncAgentsEndpoints(endpointRegisterList, existingAgents);
+    List<Agent> agentsFromDb = agentService.getAgentsByExecutorType(CROWDSTRIKE_EXECUTOR_TYPE);
+    List<String> hostGroups = List.of(this.config.getHostGroup().split(","));
+    List<CrowdStrikeHostGroup> crowdStrikeHostGroups =
+        this.client.hostGroups(this.config.getHostGroup());
+    for (String hostGroup : hostGroups) {
+      List<CrowdStrikeDevice> devices = this.client.devices(hostGroup);
+      Optional<AssetGroup> existingAssetGroup =
+          assetGroupService.findByExternalReference(hostGroup);
+      CrowdStrikeHostGroup crowdStrikeHostGroup =
+          crowdStrikeHostGroups.stream()
+              .filter(cshg -> cshg.getId().equals(hostGroup))
+              .findFirst()
+              .get();
+      AssetGroup assetGroup;
+      if (existingAssetGroup.isPresent()) {
+        assetGroup = existingAssetGroup.get();
+      } else {
+        assetGroup = new AssetGroup();
+        assetGroup.setExternalReference(hostGroup);
+      }
+      assetGroup.setName(crowdStrikeHostGroup.getName());
+      assetGroup.setDescription(crowdStrikeHostGroup.getDescription());
+      AssetGroup assetGroupSaved =
+          assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
+      log.info(
+          "CrowdStrike executor provisioning based on "
+              + devices.size()
+              + " assets for the host group "
+              + assetGroupSaved.getName());
+      endpointService.syncAgentsEndpoints(toAgentEndpoint(devices), agentsFromDb, assetGroupSaved);
+    }
   }
 
   // -- PRIVATE --

@@ -4,6 +4,7 @@ import io.openbas.database.model.AssetGroup;
 import io.openbas.database.raw.RawAssetGroup;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,8 @@ public interface AssetGroupRepository
   @Override
   @Query("select count(distinct ag) from AssetGroup ag where ag.createdAt > :creationDate")
   long globalCount(@Param("creationDate") Instant creationDate);
+
+  Optional<AssetGroup> findByExternalReference(String externalReference);
 
   /**
    * Returns the raw asset group having the ids passed in parameter
