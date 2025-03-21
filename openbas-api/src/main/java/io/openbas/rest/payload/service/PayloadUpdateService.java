@@ -2,7 +2,6 @@ package io.openbas.rest.payload.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.PayloadUtils.copyProperties;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 import io.openbas.database.model.*;
@@ -11,6 +10,7 @@ import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
@@ -29,6 +29,7 @@ public class PayloadUpdateService {
   private final PayloadService payloadService;
   private final PayloadRepository payloadRepository;
   private final DocumentRepository documentRepository;
+  private final PayloadUtils payloadUtils;
 
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(String payloadId, PayloadUpdateInput input) {
@@ -44,13 +45,13 @@ public class PayloadUpdateService {
     switch (payloadType) {
       case PayloadType.COMMAND:
         Command payloadCommand = (Command) Hibernate.unproxy(payload);
-        copyProperties(input, payloadCommand);
+        payloadUtils.copyProperties(input, payloadCommand);
         payloadCommand = payloadRepository.save(payloadCommand);
         this.payloadService.updateInjectorContractsForPayload(payloadCommand);
         return payloadCommand;
       case PayloadType.EXECUTABLE:
         Executable payloadExecutable = (Executable) Hibernate.unproxy(payload);
-        copyProperties(input, payloadExecutable);
+        payloadUtils.copyProperties(input, payloadExecutable);
         payloadExecutable.setExecutableFile(
             documentRepository.findById(input.getExecutableFile()).orElseThrow());
         payloadExecutable = payloadRepository.save(payloadExecutable);
@@ -58,7 +59,7 @@ public class PayloadUpdateService {
         return payloadExecutable;
       case PayloadType.FILE_DROP:
         FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(payload);
-        copyProperties(input, payloadFileDrop);
+        payloadUtils.copyProperties(input, payloadFileDrop);
         payloadFileDrop.setFileDropFile(
             documentRepository.findById(input.getFileDropFile()).orElseThrow());
         payloadFileDrop = payloadRepository.save(payloadFileDrop);
@@ -66,13 +67,13 @@ public class PayloadUpdateService {
         return payloadFileDrop;
       case PayloadType.DNS_RESOLUTION:
         DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(payload);
-        copyProperties(input, payloadDnsResolution);
+        payloadUtils.copyProperties(input, payloadDnsResolution);
         payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
         this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
         return payloadDnsResolution;
       case PayloadType.NETWORK_TRAFFIC:
         NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(payload);
-        copyProperties(input, payloadNetworkTraffic);
+        payloadUtils.copyProperties(input, payloadNetworkTraffic);
         payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
         this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
         return payloadNetworkTraffic;

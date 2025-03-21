@@ -3,6 +3,8 @@ package io.openbas.rest.payload.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,4 +29,8 @@ public class ContractOutputElementInput {
       description =
           "Contract Output element type, can be: text, number, port, IPV6, IPV4, portscan, credentials")
   private ContractOutputType type;
+
+  @JsonProperty("contract_output_element_tags")
+  @Schema(description = "List of tags")
+  private List<String> tagIds = new ArrayList<>();
 }

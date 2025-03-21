@@ -2,11 +2,11 @@ package io.openbas.rest.payload.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.PayloadUtils.copyProperties;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
@@ -27,6 +27,7 @@ public class PayloadUpsertService {
   private final PayloadRepository payloadRepository;
   private final DocumentRepository documentRepository;
   private final CollectorRepository collectorRepository;
+  private final PayloadUtils payloadUtils;
 
   @Transactional(rollbackOn = Exception.class)
   public Payload upsertPayload(PayloadUpsertInput input) {
@@ -49,13 +50,13 @@ public class PayloadUpsertService {
       switch (payloadType) {
         case PayloadType.COMMAND:
           Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
-          copyProperties(input, payloadCommand);
+          payloadUtils.copyProperties(input, payloadCommand);
           payloadCommand = payloadRepository.save(payloadCommand);
           this.payloadService.updateInjectorContractsForPayload(payloadCommand);
           return payloadCommand;
         case PayloadType.EXECUTABLE:
           Executable payloadExecutable = (Executable) Hibernate.unproxy(existingPayload);
-          copyProperties(input, payloadExecutable);
+          payloadUtils.copyProperties(input, payloadExecutable);
           payloadExecutable.setExecutableFile(
               documentRepository.findById(input.getExecutableFile()).orElseThrow());
           payloadExecutable = payloadRepository.save(payloadExecutable);
@@ -63,7 +64,7 @@ public class PayloadUpsertService {
           return payloadExecutable;
         case PayloadType.FILE_DROP:
           FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(existingPayload);
-          copyProperties(input, payloadFileDrop);
+          payloadUtils.copyProperties(input, payloadFileDrop);
           payloadFileDrop.setFileDropFile(
               documentRepository.findById(input.getFileDropFile()).orElseThrow());
           payloadFileDrop = payloadRepository.save(payloadFileDrop);
@@ -71,14 +72,14 @@ public class PayloadUpsertService {
           return payloadFileDrop;
         case PayloadType.DNS_RESOLUTION:
           DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(existingPayload);
-          copyProperties(input, payloadDnsResolution);
+          payloadUtils.copyProperties(input, payloadDnsResolution);
           payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
           this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
           return payloadDnsResolution;
         case PayloadType.NETWORK_TRAFFIC:
           NetworkTraffic payloadNetworkTraffic =
               (NetworkTraffic) Hibernate.unproxy(existingPayload);
-          copyProperties(input, payloadNetworkTraffic);
+          payloadUtils.copyProperties(input, payloadNetworkTraffic);
           payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
           this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
           return payloadNetworkTraffic;
@@ -92,7 +93,7 @@ public class PayloadUpsertService {
       switch (payloadType) {
         case PayloadType.COMMAND:
           Command commandPayload = new Command();
-          copyProperties(input, commandPayload);
+          payloadUtils.copyProperties(input, commandPayload);
           if (input.getCollector() != null) {
             commandPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -107,7 +108,7 @@ public class PayloadUpsertService {
           return commandPayload;
         case PayloadType.EXECUTABLE:
           Executable executablePayload = new Executable();
-          copyProperties(input, executablePayload);
+          payloadUtils.copyProperties(input, executablePayload);
           if (input.getCollector() != null) {
             executablePayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -124,7 +125,7 @@ public class PayloadUpsertService {
           return executablePayload;
         case PayloadType.FILE_DROP:
           FileDrop fileDropPayload = new FileDrop();
-          copyProperties(input, fileDropPayload);
+          payloadUtils.copyProperties(input, fileDropPayload);
           if (input.getCollector() != null) {
             fileDropPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -141,7 +142,7 @@ public class PayloadUpsertService {
           return fileDropPayload;
         case PayloadType.DNS_RESOLUTION:
           DnsResolution dnsResolutionPayload = new DnsResolution();
-          copyProperties(input, dnsResolutionPayload);
+          payloadUtils.copyProperties(input, dnsResolutionPayload);
           if (input.getCollector() != null) {
             dnsResolutionPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());
@@ -156,7 +157,7 @@ public class PayloadUpsertService {
           return dnsResolutionPayload;
         case PayloadType.NETWORK_TRAFFIC:
           NetworkTraffic networkTrafficPayload = new NetworkTraffic();
-          copyProperties(input, networkTrafficPayload);
+          payloadUtils.copyProperties(input, networkTrafficPayload);
           if (input.getCollector() != null) {
             networkTrafficPayload.setCollector(
                 collectorRepository.findById(input.getCollector()).orElseThrow());

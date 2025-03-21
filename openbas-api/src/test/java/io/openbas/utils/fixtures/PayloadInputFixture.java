@@ -33,6 +33,7 @@ public class PayloadInputFixture {
     contractOutputElementInput.setType(ContractOutputType.IPv6);
     contractOutputElementInput.setName("IPV6");
     contractOutputElementInput.setRule("rule");
+    contractOutputElementInput.setTagIds(List.of("tagId"));
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDOUT);
@@ -84,6 +85,7 @@ public class PayloadInputFixture {
     contractOutputElementInput.setType(ContractOutputType.IPv6);
     contractOutputElementInput.setName("IPV6");
     contractOutputElementInput.setRule("rule");
+    contractOutputElementInput.setTagIds(List.of("tagId"));
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDOUT);
@@ -122,6 +124,7 @@ public class PayloadInputFixture {
     contractOutputElementInput.setType(ContractOutputType.IPv4);
     contractOutputElementInput.setName("IPV4");
     contractOutputElementInput.setRule("regex xPath");
+    contractOutputElementInput.setTagIds(List.of("tagId"));
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDERR);
