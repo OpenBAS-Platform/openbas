@@ -10,6 +10,7 @@ import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import io.openbas.config.EngineConfig;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.repository.IndexingStatusRepository;
@@ -24,6 +25,7 @@ import io.openbas.engine.model.EsTimeseries;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,9 +33,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class EsService {
 
+  private static final Logger LOGGER = Logger.getLogger(EsService.class.getName());
+
   private EsEngine esEngine;
   private ElasticsearchClient elasticClient;
   private IndexingStatusRepository indexingStatusRepository;
+  private EngineConfig engineConfig;
+
+  @Autowired
+  public void setEngineConfig(EngineConfig engineConfig) {
+    this.engineConfig = engineConfig;
+  }
 
   @Autowired
   public void setEsEngine(EsEngine esEngine) {
@@ -52,7 +62,7 @@ public class EsService {
 
   public void bulkParallelProcessing() {
     List<EsModel<?>> models = this.esEngine.getModels();
-    System.out.println("Executing bulk parallel processing for " + models.size() + " models");
+    LOGGER.info("Executing bulk parallel processing for " + models.size() + " models");
     models.stream()
         .parallel()
         .forEach(
@@ -60,7 +70,7 @@ public class EsService {
               Optional<IndexingStatus> indexingStatus =
                   indexingStatusRepository.findByType(model.getName());
               Handler<? extends EsBase> handler = model.getHandler();
-              String index = model.getIndex();
+              String index = model.getIndex(engineConfig);
               Instant fetchInstant =
                   indexingStatus.map(IndexingStatus::getLastIndexing).orElse(null);
               List<? extends EsBase> results = handler.fetch(fetchInstant);
@@ -75,15 +85,14 @@ public class EsService {
                 }
                 // Execute the bulk
                 try {
-                  System.out.println(
-                      "Executing " + results.size() + " in bulk request for " + model.getName());
+                  LOGGER.info("Indexing (" + results.size() + ") in progress for " + model.getName());
                   BulkRequest bulkRequest = br.build();
                   BulkResponse result = elasticClient.bulk(bulkRequest);
                   // Log errors, if any
                   if (result.errors()) {
                     for (BulkResponseItem item : result.items()) {
                       if (item.error() != null) {
-                        System.out.println(item.error().reason());
+                        LOGGER.severe(item.error().reason());
                       }
                     }
                   } else {
@@ -100,8 +109,10 @@ public class EsService {
                     }
                   }
                 } catch (IOException e) {
-                  System.out.println("ElasticSyncExecutionJob exception: " + e);
+                  LOGGER.severe("bulkParallelProcessing exception: " + e);
                 }
+              } else {
+                LOGGER.info("Indexing <up to date> for " + model.getName());
               }
             });
   }
@@ -122,9 +133,12 @@ public class EsService {
       Query query =
           BoolQuery.of(b -> b.should(directId, dependenciesId).minimumShouldMatch("1"))._toQuery();
       elasticClient.deleteByQuery(
-          new DeleteByQueryRequest.Builder().index("openbas_*").query(query).build());
+          new DeleteByQueryRequest.Builder()
+              .index(engineConfig.getIndexPrefix() + "*")
+              .query(query)
+              .build());
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      LOGGER.severe("bulkDelete exception: " + e);
     }
   }
 
@@ -180,13 +194,14 @@ public class EsService {
             ._toQuery();
     try {
       SearchResponse<EsBase> response =
-          elasticClient.search(b -> b.index("openbas_*").query(query), EsBase.class);
+          elasticClient.search(
+              b -> b.index(engineConfig.getIndexPrefix() + "*").query(query), EsBase.class);
       List<Hit<EsBase>> hits = response.hits().hits();
       return hits.stream()
           .map(Hit::source)
           .collect(Collectors.toMap(EsBase::getBase_id, EsBase::getBase_representative));
     } catch (Exception e) {
-      System.out.println("ElasticSyncExecutionJob exception: " + e);
+      LOGGER.severe("resolveIdsRepresentative exception: " + e);
     }
     return Map.of();
   }
@@ -200,7 +215,7 @@ public class EsService {
       SearchResponse<Void> response =
           elasticClient.search(
               b ->
-                  b.index("openbas_*")
+                  b.index(engineConfig.getIndexPrefix() + "*")
                       .size(0)
                       .query(query)
                       .aggregations(
@@ -225,7 +240,7 @@ public class EsService {
               })
           .toList();
     } catch (Exception e) {
-      System.out.println("ElasticSyncExecutionJob exception: " + e);
+      LOGGER.severe("termHistogram exception: " + e);
     }
     return List.of();
   }
@@ -251,7 +266,7 @@ public class EsService {
       SearchResponse<Void> response =
           elasticClient.search(
               b ->
-                  b.index("openbas_*")
+                  b.index(engineConfig.getIndexPrefix() + "*")
                       .size(0)
                       .query(query)
                       .aggregations(
@@ -272,7 +287,7 @@ public class EsService {
           .map(b -> new EsTimeseries(Instant.ofEpochMilli(b.key()), b.docCount()))
           .toList();
     } catch (IOException e) {
-      System.out.println("ElasticSyncExecutionJob exception: " + e);
+      LOGGER.severe("dateHistogram exception: " + e);
     }
     return List.of();
   }
