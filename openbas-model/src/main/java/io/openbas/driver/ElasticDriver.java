@@ -13,6 +13,7 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.openbas.config.EngineConfig;
@@ -89,6 +90,7 @@ public class ElasticDriver {
     JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
     jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
     jsonpMapper.objectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    jsonpMapper.objectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);
     return new ElasticsearchClient(transport);
   }
