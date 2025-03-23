@@ -1,5 +1,6 @@
 package io.openbas.engine;
 
+import io.openbas.config.EngineConfig;
 import io.openbas.engine.handler.Handler;
 import io.openbas.engine.model.EsBase;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class EsModel<T extends EsBase> {
     this.handler = handler;
   }
 
-  public String getIndex() {
-    return "openbas_" + this.name;
+  public String getIndex(EngineConfig engineConfig) {
+    return engineConfig.getIndexPrefix() + "_" + this.name;
   }
 }

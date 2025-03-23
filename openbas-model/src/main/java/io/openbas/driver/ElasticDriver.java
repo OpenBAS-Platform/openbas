@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -46,6 +47,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ElasticDriver {
 
+  private static final Logger LOGGER = Logger.getLogger(ElasticDriver.class.getName());
+  public static final String ES_MODEL_VERSION = "1.0";
   public static final String ES_ILM_POLICY = "-ilm-policy";
   public static final String ES_CORE_SETTINGS = "-core-settings";
 
@@ -148,6 +151,7 @@ public class ElasticDriver {
     client.cluster().putComponentTemplate(coreSettings.build());
   }
 
+  @SuppressWarnings("SameParameterValue")
   private void createIndex(
       ElasticsearchClient client, String name, String version, Map<String, Property> mappings)
       throws IOException {
@@ -248,7 +252,7 @@ public class ElasticDriver {
 
   @Bean
   public ElasticsearchClient elasticClient() throws Exception {
-    System.out.println("Creating ElasticClient");
+    LOGGER.info("Creating ElasticClient");
     ElasticsearchClient elasticClient = getElasticClient();
     // TODO enable telemetry ?
     // https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/opentelemetry.html
@@ -268,8 +272,8 @@ public class ElasticDriver {
             esModel -> {
               Map<String, Property> mappings = mappingGeneratorForClass(esModel);
               try {
-                System.out.println("Creating Index " + esModel.getName());
-                createIndex(elasticClient, esModel.getName(), "1.0", mappings);
+                LOGGER.info("Creating Index " + esModel.getName());
+                createIndex(elasticClient, esModel.getName(), ES_MODEL_VERSION, mappings);
               } catch (IOException e) {
                 throw new RuntimeException(e);
               }
