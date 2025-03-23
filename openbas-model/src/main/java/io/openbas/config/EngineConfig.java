@@ -22,6 +22,8 @@ public class EngineConfig {
 
   private int maxResultWindow = 100000;
 
+  private int defaultPagination = 500;
+
   private long maxPrimaryShardDocs = 75000000;
 
   private String maxPrimaryShardsSize = "50Gb";
