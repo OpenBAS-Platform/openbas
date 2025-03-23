@@ -15,6 +15,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.openbas.config.EngineConfig;
 import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
 import java.io.IOException;
@@ -36,20 +37,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ElasticDriver {
 
-  public static final String DATA_VERSION = "1.0";
-  public static final String ELASTIC_URI = "http://localhost:9200";
-  public static final String INDEX_PREFIX = "openbas";
-  public static final String CORE_SETTINGS_NAME = INDEX_PREFIX + "-core-settings";
-  public static final String ES_INDEX_PREFIX_ILM_POLICY = INDEX_PREFIX + "-ilm-policy";
-  public static final String ES_INDEX_SUFFIX = "-000001";
-  public static final String ES_INDEX_MAX_FIELDS_SIZE = "4096";
-  public static final String ES_INDEX_NUMBER_OF_REPLICA = "1";
-  public static final String ES_INDEX_NUMBER_OF_SHARDS = "1";
-  public static final int ES_INDEX_MAX_RESULT_WINDOWS = 100000;
-  public static final long ES_INDEX_MAX_PRIMARY_SHARDS_DOCS = 75000000;
-  public static final String ES_INDEX_MAX_PRIMARY_SHARDS_SIZE = "10Gb";
+  public static final String ES_ILM_POLICY = "-ilm-policy";
+  public static final String ES_CORE_SETTINGS = "-core-settings";
 
   private EsEngine esEngine;
+  private final EngineConfig config;
 
   @Autowired
   public void setEsEngine(EsEngine esEngine) {
@@ -57,7 +49,7 @@ public class ElasticDriver {
   }
 
   public ElasticsearchClient getElasticClient() {
-    RestClient restClient = RestClient.builder(HttpHost.create(ELASTIC_URI)).build();
+    RestClient restClient = RestClient.builder(HttpHost.create(config.getUrl())).build();
     JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
     jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
     jsonpMapper.objectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -68,7 +60,7 @@ public class ElasticDriver {
   private void createRolloverPolicy(ElasticsearchClient client) throws IOException {
     PutLifecycleRequest lifecycleRequest =
         new PutLifecycleRequest.Builder()
-            .name(ES_INDEX_PREFIX_ILM_POLICY)
+            .name(config.getIndexPrefix() + ES_ILM_POLICY)
             .policy(
                 new IlmPolicy.Builder()
                     .phases(
@@ -80,9 +72,9 @@ public class ElasticDriver {
                                             .rollover(
                                                 new RolloverAction.Builder()
                                                     .maxPrimaryShardDocs(
-                                                        ES_INDEX_MAX_PRIMARY_SHARDS_DOCS)
+                                                            config.getMaxPrimaryShardDocs())
                                                     .maxPrimaryShardSize(
-                                                        ES_INDEX_MAX_PRIMARY_SHARDS_SIZE)
+                                                        config.getMaxPrimaryShardsSize())
                                                     .build())
                                             .setPriority(
                                                 new SetPriorityAction.Builder()
@@ -98,15 +90,15 @@ public class ElasticDriver {
 
   private void createCoreSettings(ElasticsearchClient client) throws IOException {
     PutComponentTemplateRequest.Builder coreSettings = new PutComponentTemplateRequest.Builder();
-    coreSettings.name(CORE_SETTINGS_NAME);
+    coreSettings.name(config.getIndexPrefix() + ES_CORE_SETTINGS);
     coreSettings.create(false);
     coreSettings.template(
         new IndexState.Builder()
             .settings(
                 new IndexSettings.Builder()
-                    .maxResultWindow(ES_INDEX_MAX_RESULT_WINDOWS)
-                    .numberOfReplicas(ES_INDEX_NUMBER_OF_REPLICA)
-                    .numberOfShards(ES_INDEX_NUMBER_OF_SHARDS)
+                    .maxResultWindow(config.getMaxResultWindow())
+                    .numberOfReplicas(config.getNumberOfReplicas())
+                    .numberOfShards(config.getNumberOfShards())
                     .analysis(
                         new IndexSettingsAnalysis.Builder()
                             .normalizer(
@@ -127,12 +119,14 @@ public class ElasticDriver {
       ElasticsearchClient client, String name, String version, Map<String, Property> mappings)
       throws IOException {
     // Create template
-    String indexName = INDEX_PREFIX + "_" + name;
+    String indexName = config.getIndexPrefix() + "_" + name;
+    String coreSettings = config.getIndexPrefix() + ES_CORE_SETTINGS;
+    String ilmPolicy = config.getIndexPrefix() + ES_ILM_POLICY;
     PutIndexTemplateRequest.Builder mapping = new PutIndexTemplateRequest.Builder();
     mapping.name(indexName);
     mapping.meta("version", JsonData.of(version));
     mapping.indexPatterns(indexName + "*");
-    mapping.composedOf(CORE_SETTINGS_NAME);
+    mapping.composedOf(coreSettings);
     TypeMapping indexMapping =
         new TypeMapping.Builder()
             .dynamic(DynamicMapping.Strict)
@@ -146,14 +140,14 @@ public class ElasticDriver {
                 new IndexSettings.Builder()
                     .lifecycle(
                         new IndexSettingsLifecycle.Builder()
-                            .name(ES_INDEX_PREFIX_ILM_POLICY)
+                            .name(ilmPolicy)
                             .rolloverAlias(indexName)
                             .build())
                     .mapping(
                         new MappingLimitSettings.Builder()
                             .totalFields(
                                 new MappingLimitSettingsTotalFields.Builder()
-                                    .limit(ES_INDEX_MAX_FIELDS_SIZE)
+                                    .limit(config.getMaxFieldsSize())
                                     .build())
                             .build())
                     .build())
@@ -172,7 +166,7 @@ public class ElasticDriver {
           .indices()
           .create(
               new CreateIndexRequest.Builder()
-                  .index(indexName + ES_INDEX_SUFFIX)
+                  .index(indexName + config.getIndexSuffix())
                   .aliases(indexName, new Alias.Builder().build())
                   .build());
     }
@@ -242,7 +236,7 @@ public class ElasticDriver {
               Map<String, Property> mappings = mappingGeneratorForClass(esModel);
               try {
                 System.out.println("Creating Index " + esModel.getName());
-                createIndex(elasticClient, esModel.getName(), DATA_VERSION, mappings);
+                createIndex(elasticClient, esModel.getName(), "1.0", mappings);
               } catch (IOException e) {
                 throw new RuntimeException(e);
               }
