@@ -2,6 +2,7 @@ package io.openbas.database.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -33,7 +34,7 @@ public class Filters {
   public static class FilterGroup {
 
     @NotNull private FilterMode mode; // Between filters
-    private List<Filter> filters;
+    private List<Filter> filters = new ArrayList<>();
 
     // -- UTILS --
 
