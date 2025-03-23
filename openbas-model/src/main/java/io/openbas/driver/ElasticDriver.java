@@ -21,14 +21,23 @@ import io.openbas.engine.EsModel;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.net.ssl.SSLContext;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -49,7 +58,31 @@ public class ElasticDriver {
   }
 
   public ElasticsearchClient getElasticClient() {
-    RestClient restClient = RestClient.builder(HttpHost.create(config.getUrl())).build();
+    RestClientBuilder restClientBuilder = RestClient.builder(HttpHost.create(config.getUrl()));
+    HttpAsyncClientBuilder clientBuilder = HttpAsyncClientBuilder.create();
+    if (config.getUsername() != null) {
+      BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
+      credsProv.setCredentials(
+          AuthScope.ANY,
+          new UsernamePasswordCredentials(config.getUsername(), config.getPassword()));
+      clientBuilder.setDefaultCredentialsProvider(credsProv);
+    }
+    if (!config.isRejectUnauthorized()) {
+      // Create an SSLContext that trusts all certificates
+      try {
+        SSLContext sslContext =
+            SSLContextBuilder.create()
+                .loadTrustMaterial(null, (X509Certificate[] chain, String authType) -> true)
+                .build();
+        clientBuilder
+            .setSSLContext(sslContext)
+            .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
+    restClientBuilder.setHttpClientConfigCallback(hc -> clientBuilder);
+    RestClient restClient = restClientBuilder.build();
     JacksonJsonpMapper jsonpMapper = new JacksonJsonpMapper();
     jsonpMapper.objectMapper().registerModule(new JavaTimeModule());
     jsonpMapper.objectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -72,7 +105,7 @@ public class ElasticDriver {
                                             .rollover(
                                                 new RolloverAction.Builder()
                                                     .maxPrimaryShardDocs(
-                                                            config.getMaxPrimaryShardDocs())
+                                                        config.getMaxPrimaryShardDocs())
                                                     .maxPrimaryShardSize(
                                                         config.getMaxPrimaryShardsSize())
                                                     .build())
