@@ -14,7 +14,6 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import io.openbas.config.EngineConfig;
-import io.openbas.config.S3Config;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.repository.IndexingStatusRepository;
@@ -39,14 +38,12 @@ import org.springframework.stereotype.Service;
 public class EsService {
 
   private static final Logger LOGGER = Logger.getLogger(EsService.class.getName());
-  private final List<String> BASE_FIELDS =
-      List.of("base_id", "base_entity", "base_representative", "finding_value");
+  private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
   private EsEngine esEngine;
   private ElasticsearchClient elasticClient;
   private IndexingStatusRepository indexingStatusRepository;
   private EngineConfig engineConfig;
-  private S3Config s3Config;
 
   @Autowired
   public void setEngineConfig(EngineConfig engineConfig) {
