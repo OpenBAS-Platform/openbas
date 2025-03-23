@@ -5,6 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import io.openbas.database.model.Filters;
 import io.openbas.engine.api.DateHistogramConfig;
 import io.openbas.engine.api.StructuralHistogramConfig;
+import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.model.EsStructuralSeries;
 import io.openbas.engine.model.EsTimeseries;
 import io.openbas.rest.helper.RestBehavior;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardApi extends RestBehavior {
 
   public static final String DASHBOARD_URI = "/api/dashboards";
+  public static final String QUERY_URI = "/api/query";
 
   private EsService esService;
 
@@ -62,5 +64,10 @@ public class DashboardApi extends RestBehavior {
     StructuralHistogramConfig structuralConfig = new StructuralHistogramConfig(filterGroup);
     structuralConfig.setField("finding_type"); // finding_scenario_side
     return esService.termHistogram(structuralConfig);
+  }
+
+  @GetMapping(DASHBOARD_URI + "/search/{search}")
+  public List<EsSearch> search(@PathVariable String search) {
+    return esService.search(search, null);
   }
 }

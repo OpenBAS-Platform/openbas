@@ -1,7 +1,10 @@
 package io.openbas.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
@@ -11,6 +14,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import io.openbas.config.EngineConfig;
+import io.openbas.config.S3Config;
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.IndexingStatus;
 import io.openbas.database.repository.IndexingStatusRepository;
@@ -20,6 +24,7 @@ import io.openbas.engine.api.DateHistogramConfig;
 import io.openbas.engine.api.StructuralHistogramConfig;
 import io.openbas.engine.handler.Handler;
 import io.openbas.engine.model.EsBase;
+import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.model.EsStructuralSeries;
 import io.openbas.engine.model.EsTimeseries;
 import java.io.IOException;
@@ -34,11 +39,14 @@ import org.springframework.stereotype.Service;
 public class EsService {
 
   private static final Logger LOGGER = Logger.getLogger(EsService.class.getName());
+  private final List<String> BASE_FIELDS =
+      List.of("base_id", "base_entity", "base_representative", "finding_value");
 
   private EsEngine esEngine;
   private ElasticsearchClient elasticClient;
   private IndexingStatusRepository indexingStatusRepository;
   private EngineConfig engineConfig;
+  private S3Config s3Config;
 
   @Autowired
   public void setEngineConfig(EngineConfig engineConfig) {
@@ -85,7 +93,8 @@ public class EsService {
                 }
                 // Execute the bulk
                 try {
-                  LOGGER.info("Indexing (" + results.size() + ") in progress for " + model.getName());
+                  LOGGER.info(
+                      "Indexing (" + results.size() + ") in progress for " + model.getName());
                   BulkRequest bulkRequest = br.build();
                   BulkResponse result = elasticClient.bulk(bulkRequest);
                   // Log errors, if any
@@ -172,19 +181,41 @@ public class EsService {
     return boolQuery.build()._toQuery();
   }
 
-  public Query queryFromFilterGroup(Filters.FilterGroup filter) {
-    Filters.FilterMode filterMode = filter.getMode();
-    BoolQuery.Builder boolQuery = new BoolQuery.Builder();
-    List<Query> filterQueries = new ArrayList<>();
-    List<Filters.Filter> filters = filter.getFilters();
-    filters.forEach(f -> filterQueries.add(queryFromFilter(f)));
-    if (filterMode == Filters.FilterMode.and) {
-      boolQuery.must(filterQueries);
-    } else {
-      boolQuery.should(filterQueries);
-      boolQuery.minimumShouldMatch("1");
+  public Query queryFromFilterGroup(String search, Filters.FilterGroup groupFilter) {
+    Query filteringQuery = null;
+    // Handle filter generation
+    if (groupFilter != null) {
+      Filters.FilterMode filterMode = groupFilter.getMode();
+      BoolQuery.Builder filterQuery = new BoolQuery.Builder();
+      List<Query> filterQueries = new ArrayList<>();
+      List<Filters.Filter> filters = groupFilter.getFilters();
+      filters.forEach(f -> filterQueries.add(queryFromFilter(f)));
+      if (filterMode == Filters.FilterMode.and) {
+        filterQuery.must(filterQueries);
+      } else {
+        filterQuery.should(filterQueries);
+        filterQuery.minimumShouldMatch("1");
+      }
+      filteringQuery = filterQuery.build()._toQuery();
+      if (search == null) {
+        return filteringQuery;
+      }
     }
-    return boolQuery.build()._toQuery();
+    // Handle search generation
+    if (search != null) {
+      // Add search parameter if needed
+      BoolQuery.Builder mainQuery = new BoolQuery.Builder();
+      QueryStringQuery.Builder queryStringQuery = new QueryStringQuery.Builder();
+      queryStringQuery.query(search).analyzeWildcard(true).fields(BASE_FIELDS);
+      Query searchQuery = queryStringQuery.build()._toQuery();
+      if (filteringQuery != null) {
+        mainQuery.must(List.of(filteringQuery, searchQuery));
+        return mainQuery.build()._toQuery();
+      }
+      return searchQuery;
+    }
+    // No parameter
+    throw new IllegalArgumentException("One of search or filter must not be null");
   }
 
   public Map<String, String> resolveIdsRepresentative(List<String> ids) {
@@ -207,7 +238,7 @@ public class EsService {
   }
 
   public List<EsStructuralSeries> termHistogram(StructuralHistogramConfig config) {
-    Query query = queryFromFilterGroup(config.getFilter());
+    Query query = queryFromFilterGroup(null, config.getFilter());
     String aggregationKey = "term_histogram";
     try {
       TermsAggregation termsAggregation =
@@ -255,7 +286,7 @@ public class EsService {
                         .lt(config.getEnd().toString()))
             ._toRangeQuery()
             ._toQuery();
-    Query filterQuery = queryFromFilterGroup(config.getFilter());
+    Query filterQuery = queryFromFilterGroup(null, config.getFilter());
     Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
     bounds.min(FieldDateMath.of(m -> m.value((double) config.getStart().toEpochMilli())));
@@ -288,6 +319,36 @@ public class EsService {
           .toList();
     } catch (IOException e) {
       LOGGER.severe("dateHistogram exception: " + e);
+    }
+    return List.of();
+  }
+
+  public List<EsSearch> search(String search, Filters.FilterGroup filter) {
+    Query query = queryFromFilterGroup(search, filter);
+    try {
+      SearchResponse<EsSearch> response =
+          elasticClient.search(
+              b ->
+                  b.index(engineConfig.getIndexPrefix() + "*")
+                      .size(engineConfig.getDefaultPagination())
+                      .query(query)
+                      .sort(
+                          SortOptions.of(
+                              s ->
+                                  s.field(
+                                      FieldSort.of(f -> f.field("_score").order(SortOrder.Desc))))),
+              EsSearch.class);
+      return response.hits().hits().stream()
+          .filter(hit -> hit.source() != null)
+          .map(
+              hit -> {
+                EsSearch source = hit.source();
+                source.setScore(hit.score());
+                return source;
+              })
+          .toList();
+    } catch (IOException e) {
+      LOGGER.severe("query exception: " + e);
     }
     return List.of();
   }
