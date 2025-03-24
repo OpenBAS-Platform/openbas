@@ -54,7 +54,7 @@ jobs:
               pull_number: context.payload.pull_request.number
             });
           KEYWORDS='close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved'
-          ISSUES_IN_DESCRIPTION=$(echo "${{ prDetails.data.body }}" | grep -oiE '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #[0-9]+' | awk '{print $2}' | tr -d '#' | sort -u | tr '\n' ' ')
+          ISSUES_IN_DESCRIPTION=$(echo prDetails.data.body | grep -oiE '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #[0-9]+' | awk '{print $2}' | tr -d '#' | sort -u | tr '\n' ' ')
          
           echo "Issues in description: $ISSUES_IN_DESCRIPTION"
           echo "Closing Issues References: $CLOSING_ISSUES_REFERENCES"
