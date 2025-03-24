@@ -10,7 +10,7 @@ import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
 import { documentOptions, platformOptions } from '../../../utils/Option';
-import PayloadForm from './PayloadForm.tsx';
+import PayloadForm from './PayloadForm';
 
 const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
   const [openDuplicate, setOpenDuplicate] = useState(false);
