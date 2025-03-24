@@ -33,6 +33,10 @@ public class ContractOutputElement implements Base {
   @Schema(type = "string")
   private OutputParser outputParser;
 
+  @Column(name = "contract_output_element_is_finding")
+  @JsonProperty("contract_output_element_is_finding")
+  private boolean isFinding;
+
   @Column(name = "contract_output_element_rule")
   @JsonProperty("contract_output_element_rule")
   private String rule;

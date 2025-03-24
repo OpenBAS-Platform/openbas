@@ -33,6 +33,7 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
           """
           CREATE TABLE contract_output_elements (
             contract_output_element_id VARCHAR(255) NOT NULL PRIMARY KEY,
+            contract_output_element_is_finding bool default true,
             contract_output_element_rule TEXT NOT NULL,
             contract_output_element_name VARCHAR(50) NOT NULL,
             contract_output_element_key VARCHAR(255) NOT NULL,

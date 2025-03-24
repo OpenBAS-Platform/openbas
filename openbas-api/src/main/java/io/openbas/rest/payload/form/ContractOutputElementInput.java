@@ -12,6 +12,12 @@ import lombok.Setter;
 @Setter
 public class ContractOutputElementInput {
 
+  @JsonProperty("contract_output_element_is_finding")
+  @Schema(
+      description =
+          "Indicates whether this contract output element can be used to generate a finding")
+  private boolean isFinding;
+
   @JsonProperty("contract_output_element_rule")
   @Schema(description = "Parser Rule")
   private String rule;
