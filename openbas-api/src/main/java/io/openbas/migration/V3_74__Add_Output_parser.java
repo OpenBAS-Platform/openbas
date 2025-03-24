@@ -50,6 +50,21 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
 
       statement.execute(
           """
+          CREATE TABLE regex_groups (
+            regex_group_id VARCHAR(255) NOT NULL PRIMARY KEY,
+            regex_group_field VARCHAR(50) NOT NULL,
+            regex_group_index int NOT NULL,
+            regex_groups_contract_output_element_id VARCHAR(255) NOT NULL
+                CONSTRAINT regex_groups_contract_output_element_id_fk
+                REFERENCES contract_output_elements
+                ON DELETE CASCADE,
+            contract_output_element_created_at TIMESTAMP DEFAULT now(),
+            contract_output_element_updated_at TIMESTAMP DEFAULT now(),
+            );
+          """);
+
+      statement.execute(
+          """
           CREATE TABLE contract_output_elements_tags (
             contract_output_element_id varchar(255) not null constraint contract_output_element_id_fk references contract_output_elements on delete cascade,
             tag_id varchar(255) not null constraint tag_id_fk references tags on delete cascade,
