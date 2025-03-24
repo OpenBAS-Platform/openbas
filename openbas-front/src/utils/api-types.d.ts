@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -595,21 +596,30 @@ export interface Condition {
 }
 
 export interface ContractOutputElement {
-  /** @format int32 */
-  contract_output_element_group?: number;
   contract_output_element_id: string;
+  contract_output_element_is_finding?: boolean;
   contract_output_element_key?: string;
   contract_output_element_name?: string;
   contract_output_element_output_parser?: string;
+  contract_output_element_rule?: string;
+  contract_output_element_tags?: string[];
   contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   listened?: boolean;
 }
 
+/** List of Contract output elements */
 export interface ContractOutputElementInput {
-  /** @format int32 */
-  contract_output_element_group?: number;
+  /** Indicates whether this contract output element can be used to generate a finding */
+  contract_output_element_is_finding?: boolean;
+  /** Key */
   contract_output_element_key?: string;
+  /** Name */
   contract_output_element_name?: string;
+  /** Parser Rule */
+  contract_output_element_rule?: string;
+  /** List of tags */
+  contract_output_element_tags?: string[];
+  /** Contract Output element type, can be: text, number, port, IPV6, IPV4, portscan, credentials */
   contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
@@ -1174,6 +1184,7 @@ export interface Finding {
   finding_id: string;
   finding_inject_id?: string;
   finding_labels?: string[];
+  finding_tags?: string[];
   finding_teams?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   /** @format date-time */
@@ -2320,14 +2331,16 @@ export interface OutputParser {
   output_parser_id: string;
   output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
   output_parser_payload?: Payload;
-  output_parser_rule?: string;
   output_parser_type?: "REGEX";
 }
 
+/** List of output parsers */
 export interface OutputParserInput {
+  /** List of Contract output elements */
   output_parser_contract_output_elements?: ContractOutputElementInput[];
+  /** Paser Mode: STDOUT, STDERR, READ_FILE */
   output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
-  output_parser_rule?: string;
+  /** Parser Type: REGEX */
   output_parser_type?: "REGEX";
 }
 
@@ -2815,6 +2828,7 @@ export interface PayloadCreateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
+  /** List of output parsers */
   payload_output_parsers?: OutputParserInput[];
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
@@ -2850,6 +2864,7 @@ export interface PayloadUpdateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
+  /** List of output parsers */
   payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
@@ -2872,6 +2887,7 @@ export interface PayloadUpsertInput {
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id: string;
   payload_name: string;
+  /** List of output parsers */
   payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
