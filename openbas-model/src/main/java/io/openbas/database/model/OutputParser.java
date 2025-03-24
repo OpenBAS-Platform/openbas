@@ -7,10 +7,11 @@ import io.openbas.helper.MultiModelDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -45,5 +46,5 @@ public class OutputParser implements Base {
   @OneToMany(mappedBy = "outputParser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JsonProperty("output_parser_contract_output_elements")
   @JsonSerialize(using = MultiModelDeserializer.class)
-  private List<ContractOutputElement> contractOutputElements = new ArrayList<>();
+  private Set<ContractOutputElement> contractOutputElements = new HashSet<>();
 }
