@@ -1,9 +1,11 @@
 package io.openbas.engine;
 
-import io.openbas.engine.handler.FindingHandler;
-import io.openbas.engine.handler.ScenarioHandler;
-import io.openbas.engine.model.EsFinding;
-import io.openbas.engine.model.EsScenario;
+import io.openbas.engine.model.finding.EsFinding;
+import io.openbas.engine.model.finding.FindingHandler;
+import io.openbas.engine.model.inject.EsInject;
+import io.openbas.engine.model.inject.InjectHandler;
+import io.openbas.engine.model.scenario.EsScenario;
+import io.openbas.engine.model.scenario.ScenarioHandler;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ public class EsEngine {
     List<EsModel<?>> models = new ArrayList<>();
     models.add(new EsModel<>(EsFinding.class, context.getBean(FindingHandler.class)));
     models.add(new EsModel<>(EsScenario.class, context.getBean(ScenarioHandler.class)));
+    models.add(new EsModel<>(EsInject.class, context.getBean(InjectHandler.class)));
     return models;
   }
 }

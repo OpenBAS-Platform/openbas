@@ -1,8 +1,8 @@
-package io.openbas.engine.handler;
+package io.openbas.engine.model.finding;
 
 import io.openbas.database.raw.RawFinding;
 import io.openbas.database.repository.FindingRepository;
-import io.openbas.engine.model.EsFinding;
+import io.openbas.engine.Handler;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

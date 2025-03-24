@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 import lombok.RequiredArgsConstructor;
@@ -228,7 +229,7 @@ public class ElasticDriver {
     Field[] fields = ArrayUtils.addAll(directFields, parentFields);
     for (Field field : fields) {
       Class<?> fieldType = field.getType();
-      if (List.class.isAssignableFrom(field.getType())) {
+      if (List.class.isAssignableFrom(field.getType()) || Set.class.isAssignableFrom(fieldType)) {
         ParameterizedType fieldGenericType = (ParameterizedType) field.getGenericType();
         fieldType = (Class<?>) fieldGenericType.getActualTypeArguments()[0];
       }
