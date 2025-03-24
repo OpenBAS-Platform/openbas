@@ -5,10 +5,13 @@ on:
     branches:
       - release/*
       - master
+    types:
+      - closed
 
 jobs:
   check_issues_linked:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     outputs:
       issue_numbers: ${{ steps.get_linked_issues.outputs.issue_numbers }}
     steps:
@@ -47,23 +50,18 @@ jobs:
                 pull_number: context.payload.pull_request.number
               });
               const prBody = pr.data.body || "";
-              console.log("PR Description:", prBody);
-
               const issueRegex = /(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #(\d+)/gi;
               let issuesInDescription = []
-            
               while ((match = issueRegex.exec(prBody)) !== null) {
                 issuesInDescription.push(match[2]);
               }
-
               issuesInDescription = [...new Set(issuesInDescription)];
-              console.log("Issues in description:", issuesInDescription);
             
               core.setOutput("issue_numbers", issuesInDescription.join(' '));
             }
   auto_close_and_solve:
     needs: check_issues_linked
-    if: ${{ needs.check_issues_linked.outputs.issue_numbers != ''}}
+    if: ${{ needs.check_issues_linked.outputs.issue_numbers != '' && github.event.pull_request.merged == true}}
     runs-on: ubuntu-latest
     steps:
       - name: Add "solved" label to issues
