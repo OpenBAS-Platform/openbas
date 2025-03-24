@@ -26,6 +26,6 @@ public class EsBase {
   private Instant base_updated_at;
 
   // To support logical side deletions
-  // https://github.com/rieske/postgres-cdc
+  // https://github.com/rieske/postgres-cdc could be an alternative.
   private List<String> base_dependencies = new ArrayList<>();
 }

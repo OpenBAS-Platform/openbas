@@ -12,7 +12,7 @@ public class DateHistogramConfig {
   private Instant start;
   private Instant end;
   private Filters.FilterGroup filter;
-  private String field = "created_at";
+  private String field = "base_created_at";
   private HistogramInterval interval = HistogramInterval.day;
 
   public DateHistogramConfig() {

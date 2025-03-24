@@ -128,12 +128,12 @@ public class EsService {
       List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
       Query directId =
           TermsQuery.of(
-                  t -> t.field("id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
+                  t -> t.field("base_id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
               ._toQuery();
       Query dependenciesId =
           TermsQuery.of(
                   t ->
-                      t.field("dependencies.keyword")
+                      t.field("base_dependencies.keyword")
                           .terms(TermsQueryField.of(tq -> tq.value(values))))
               ._toQuery();
       Query query =
@@ -218,7 +218,7 @@ public class EsService {
   public Map<String, String> resolveIdsRepresentative(List<String> ids) {
     List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
     Query query =
-        TermsQuery.of(t -> t.field("id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
+        TermsQuery.of(t -> t.field("base_id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
             ._toQuery();
     try {
       SearchResponse<EsBase> response =
