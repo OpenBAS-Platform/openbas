@@ -15,7 +15,7 @@ jobs:
     outputs:
       issue_numbers: ${{ steps.get_linked_issues.outputs.issue_numbers }}
     steps:
-      - name: Get linked issues from PR Development tab
+      - name: Get linked issues from PR Development tab and matches with issues in PR description
         id: get_linked_issues
         uses: actions/github-script@v7
         with:
