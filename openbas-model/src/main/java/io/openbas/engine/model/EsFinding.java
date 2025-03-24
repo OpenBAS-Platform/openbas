@@ -1,15 +1,14 @@
 package io.openbas.engine.model;
 
+import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Indexable(index = "finding", label = "Finding")
 public class EsFinding extends EsBase {
-
-  public static final String FINDING_TYPE = "finding";
-
   /* Every attribute must be uniq, so prefixed with the entity type! */
 
   @Queryable(label = "value", filterable = true, sortable = true)
