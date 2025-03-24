@@ -18,8 +18,16 @@ public class PropertySchemaDTO {
   private String jsonName;
 
   @NotNull
+  @JsonProperty("schema_property_label")
+  private String label;
+
+  @NotNull
   @JsonProperty("schema_property_type")
   private String type;
+
+  @NotNull
+  @JsonProperty("schema_property_entity")
+  private String entity;
 
   @JsonProperty("schema_property_type_array")
   private boolean isArray;
@@ -32,9 +40,14 @@ public class PropertySchemaDTO {
 
   public PropertySchemaDTO(@NotNull final PropertySchema propertySchema) {
     this.setJsonName(propertySchema.getJsonName());
-    this.setArray(
-        propertySchema.getType().isArray()
-            || Collection.class.isAssignableFrom(propertySchema.getType()));
+    this.setEntity(propertySchema.getEntity());
+    if (propertySchema.getLabel() != null) {
+      this.setLabel(propertySchema.getLabel());
+    } else {
+      this.setLabel(propertySchema.getJsonName());
+    }
+    Class<?> clazzType = propertySchema.getType();
+    this.setArray(clazzType.isArray() || Collection.class.isAssignableFrom(clazzType));
     this.setValues(propertySchema.getAvailableValues());
     this.setDynamicValues(propertySchema.isDynamicValues());
     this.setType(propertySchema.getType().getSimpleName().toLowerCase());

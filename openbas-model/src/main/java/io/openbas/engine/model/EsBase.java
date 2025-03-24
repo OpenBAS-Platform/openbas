@@ -1,5 +1,6 @@
 package io.openbas.engine.model;
 
+import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class EsBase {
   private String base_id;
 
   @Queryable(label = "entity", filterable = true, sortable = true)
-  private String base_entity;
+  private final String base_entity;
 
   private String base_representative;
 
@@ -28,4 +29,8 @@ public class EsBase {
   // To support logical side deletions
   // https://github.com/rieske/postgres-cdc could be an alternative.
   private List<String> base_dependencies = new ArrayList<>();
+
+  public EsBase() {
+    base_entity = this.getClass().getAnnotation(Indexable.class).index();
+  }
 }
