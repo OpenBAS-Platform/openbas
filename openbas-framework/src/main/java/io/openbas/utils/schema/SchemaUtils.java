@@ -3,6 +3,7 @@ package io.openbas.utils.schema;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import io.openbas.utils.SubclassScanner;
 import jakarta.persistence.Column;
@@ -62,8 +63,8 @@ public class SchemaUtils {
     List<PropertySchema> properties = new ArrayList<>();
 
     while (clazz != null) {
-      properties.addAll(computeProperties(clazz.getDeclaredFields()));
-      properties.addAll(computeMethods(clazz.getDeclaredMethods()));
+      properties.addAll(computeProperties(clazz, clazz.getDeclaredFields()));
+      properties.addAll(computeMethods(clazz, clazz.getDeclaredMethods()));
       clazz = clazz.getSuperclass();
     }
 
@@ -72,13 +73,14 @@ public class SchemaUtils {
 
   // -- PROPERTIES --
 
-  private static List<PropertySchema> computeProperties(@NotNull Field[] fields) {
+  private static List<PropertySchema> computeProperties(
+      @NotNull Class<?> clazz, @NotNull Field[] fields) {
     return Arrays.stream(fields)
-        .map(SchemaUtils::buildPropertySchemaFromField)
+        .map(f -> buildPropertySchemaFromField(clazz, f))
         .collect(Collectors.toList());
   }
 
-  private static PropertySchema buildPropertySchemaFromField(Field field) {
+  private static PropertySchema buildPropertySchemaFromField(Class<?> clazz, Field field) {
     PropertySchema.PropertySchemaBuilder builder =
         PropertySchema.builder()
             .name(field.getName())
@@ -94,7 +96,7 @@ public class SchemaUtils {
     }
 
     for (Annotation annotation : field.getDeclaredAnnotations()) {
-      processAnnotations(builder, annotation, field);
+      processAnnotations(clazz, builder, annotation, field);
     }
 
     return builder.build();
@@ -102,13 +104,13 @@ public class SchemaUtils {
 
   // -- METHODS --
 
-  private static List<PropertySchema> computeMethods(@NotNull Method[] methods) {
+  private static List<PropertySchema> computeMethods(Class<?> clazz, @NotNull Method[] methods) {
     return Arrays.stream(methods)
-        .map(SchemaUtils::buildPropertySchemaFromMethod)
+        .map(m -> buildPropertySchemaFromMethod(clazz, m))
         .collect(Collectors.toList());
   }
 
-  private static PropertySchema buildPropertySchemaFromMethod(Method method) {
+  private static PropertySchema buildPropertySchemaFromMethod(Class<?> clazz, Method method) {
     PropertySchema.PropertySchemaBuilder builder =
         PropertySchema.builder()
             .name(method.getName())
@@ -137,7 +139,7 @@ public class SchemaUtils {
     }
 
     for (Annotation annotation : method.getDeclaredAnnotations()) {
-      processAnnotations(builder, annotation, method);
+      processAnnotations(clazz, builder, annotation, method);
     }
 
     return builder.build();
@@ -150,6 +152,7 @@ public class SchemaUtils {
   }
 
   private static void processAnnotations(
+      @NotNull final Class<?> clazz,
       @NotNull final PropertySchema.PropertySchemaBuilder builder,
       @NotNull final Annotation annotation,
       @NotNull final Object member) {
@@ -166,11 +169,17 @@ public class SchemaUtils {
               ? ((Field) member).getAnnotation(Queryable.class)
               : ((Method) member).getAnnotation(Queryable.class);
       if (queryable != null) {
+        String entity =
+            clazz.isAnnotationPresent(Indexable.class)
+                ? clazz.getAnnotation(Indexable.class).index()
+                : clazz.getSimpleName().toLowerCase();
         builder
             .searchable(queryable.searchable())
             .filterable(queryable.filterable())
             .dynamicValues(queryable.dynamicValues())
             .sortable(queryable.sortable())
+            .label(queryable.label())
+            .entity(entity)
             .path(queryable.path())
             .paths(queryable.paths());
         if (member instanceof Method) {

@@ -1,5 +1,6 @@
 package io.openbas.engine;
 
+import io.openbas.annotation.Indexable;
 import io.openbas.config.EngineConfig;
 import io.openbas.engine.handler.Handler;
 import io.openbas.engine.model.EsBase;
@@ -10,11 +11,13 @@ import lombok.Setter;
 @Setter
 public class EsModel<T extends EsBase> {
   private String name;
+  private String label;
   private Class<T> model;
   private Handler<T> handler;
 
-  public EsModel(String name, Class<T> model, Handler<T> handler) {
-    this.name = name;
+  public EsModel(Class<T> model, Handler<T> handler) {
+    this.name = model.getAnnotation(Indexable.class).index();
+    this.label = model.getAnnotation(Indexable.class).label();
     this.model = model;
     this.handler = handler;
   }
