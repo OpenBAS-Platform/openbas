@@ -14,7 +14,6 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -57,28 +56,38 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
     switch (platform) {
       case Windows -> {
         scriptName = this.crowdStrikeExecutorConfig.getWindowsScriptName();
-        implantLocation = "$location=C:\\Windows\\Temp\\.openbas\\implant-" + UUID.randomUUID() + "md $location -ea 0;filename=";
+        implantLocation =
+            "$location=\"C:\\Windows\\Temp\\.openbas\\implant-"
+                + UUID.randomUUID()
+                + "\";md $location -ea 0;[Environment]::CurrentDirectory";
       }
       case Linux, MacOS -> {
         scriptName = this.crowdStrikeExecutorConfig.getUnixScriptName();
-        implantLocation = "location=/tmp/.openbas/implant-" + UUID.randomUUID() + ";mkdir -p $location;filename=";
+        implantLocation =
+            "location=/tmp/.openbas/implant-" + UUID.randomUUID() + ";mkdir -p $location;filename=";
       }
       default -> throw new RuntimeException("Unsupported platform: " + platform);
-    };
+    }
+    ;
 
     String executorCommandKey = platform.name() + "." + arch.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
 
     command = replaceArgs(platform, command, inject.getId(), agent.getId());
-    command = command.replaceFirst("\\$?x=.+location=.+;filename=", Matcher.quoteReplacement(implantLocation));
+    command =
+        platform == Endpoint.PLATFORM_TYPE.Windows
+            ? command.replaceFirst(
+                "\\$?x=.+location=.+;\\[Environment]::CurrentDirectory",
+                Matcher.quoteReplacement(implantLocation))
+            : command.replaceFirst(
+                "\\$?x=.+location=.+;filename=", Matcher.quoteReplacement(implantLocation));
 
-    String commandEncoded = platform == Endpoint.PLATFORM_TYPE.Windows ?
-            Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_16LE)) :
-            Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_8));
+    String commandEncoded =
+        platform == Endpoint.PLATFORM_TYPE.Windows
+            ? Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_16LE))
+            : Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_8));
 
     this.crowdStrikeExecutorClient.executeAction(
-        agent.getExternalReference(),
-        scriptName,
-        commandEncoded);
+        agent.getExternalReference(), scriptName, commandEncoded);
   }
 }
