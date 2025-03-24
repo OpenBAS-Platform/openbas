@@ -30,9 +30,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -109,6 +107,10 @@ public class EndpointService {
     return this.endpointRepository.findByAtleastOneMacAddress(macAddresses).stream().findFirst();
   }
 
+  public List<Endpoint> findEndpointsByMacAddresses(final String[] macAddresses) {
+    return this.endpointRepository.findByAtleastOneMacAddress(macAddresses);
+  }
+
   public List<Endpoint> endpoints() {
     return fromIterable(this.endpointRepository.findAll());
   }
@@ -120,6 +122,10 @@ public class EndpointService {
   public Endpoint updateEndpoint(@NotNull final Endpoint endpoint) {
     endpoint.setUpdatedAt(now());
     return this.endpointRepository.save(endpoint);
+  }
+
+  public Iterable<Endpoint> saveAllEndpoints(List<Endpoint> endpoints) {
+    return this.endpointRepository.saveAll(endpoints);
   }
 
   public void deleteEndpoint(@NotBlank final String endpointId) {
@@ -149,7 +155,7 @@ public class EndpointService {
 
   // -- INSTALLATION AGENT --
   public void registerAgentEndpoint(AgentRegisterInput input) {
-    // Check if agent exists (only 1 agent can be found for Crowdstrike and Tanium)
+    // Check if agent exists (only 1 agent can be found for Tanium)
     List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
     if (!existingAgents.isEmpty()) {
       updateExistingAgent(existingAgents.getFirst(), input);
@@ -167,22 +173,40 @@ public class EndpointService {
 
   public void syncAgentsEndpoints(
       List<AgentRegisterInput> inputs, List<Agent> existingAgents, AssetGroup assetGroup) {
-    List<String> existingAssetIds = assetGroup.getAssets().stream().map(Asset::getId).toList();
-    // TODO delete asset/asset group no more in asset group with comparing existingAssetIds and
-    // inputs
-
+    List<Agent> agentsToSave = new ArrayList<>();
+    List<Endpoint> endpointsToSave = new ArrayList<>();
+    AgentRegisterInput inputToSave;
+    // Update agents/endpoints with external reference
     Set<String> inputsExternalRefs =
         inputs.stream().map(AgentRegisterInput::getExternalReference).collect(Collectors.toSet());
     Set<Agent> agentsToUpdate =
         existingAgents.stream()
             .filter(agent -> inputsExternalRefs.contains(agent.getExternalReference()))
             .collect(Collectors.toSet());
-    // TODO update agent like "updateExistingAgent(existingAgent, input);"
+    for(Agent agentToUpdate : agentsToUpdate) {
+      inputToSave = inputs.stream().filter(input -> input.getExternalReference().equals(agentToUpdate.getExternalReference())).findFirst().get();
+      Endpoint endpoint = (Endpoint) Hibernate.unproxy(agentToUpdate.getAsset());
+      setUpdatedEndpointAttributes(endpoint, inputToSave);
+      agentToUpdate.setAsset(endpoint);
+      agentToUpdate.setLastSeen(inputToSave.getLastSeen());
+    }
     // TODO create or update asset/asset group
-
     inputs.removeIf(input -> inputsExternalRefs.contains(input.getExternalReference()));
+    // Update agents/endpoints with mac address
+    String[] inputsMacAddresses = inputs.stream().map(AgentRegisterInput::getMacAddresses).toList().stream().flatMap(Arrays::stream).toArray(String[]::new);
+    List<Endpoint> endpointsToUpdate = findEndpointsByMacAddresses(inputsMacAddresses);
+    for(Endpoint endpointToUpdate : endpointsToUpdate) {
+      inputToSave = inputs.stream().filter(input -> Arrays.asList(input.getMacAddresses()).retainAll(Arrays.asList(endpointToUpdate.getMacAddresses()))).findFirst().get();
+    }
+    // TODO update endpoint + create agent if mac address
+
     // TODO "createNewEndpointAndAgent(input);"
     // TODO create or update asset/asset group
+
+    saveAllEndpoints(endpointsToSave);
+    agentService.saveAllAgents(agentsToSave);
+    List<String> existingAssetIds = assetGroup.getAssets().stream().map(Asset::getId).toList();
+    // TODO delete asset/asset group no more in asset group with comparing existingAssetIds and endpoints from agents to update/create
 
   }
 
