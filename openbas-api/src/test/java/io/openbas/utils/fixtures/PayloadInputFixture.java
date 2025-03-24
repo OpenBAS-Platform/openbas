@@ -7,6 +7,8 @@ import io.openbas.database.model.*;
 import io.openbas.rest.payload.form.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 public class PayloadInputFixture {
 
@@ -28,6 +30,10 @@ public class PayloadInputFixture {
   public static PayloadCreateInput createDefaultPayloadCreateInputWithOutputParser() {
     PayloadCreateInput input = createDefaultPayloadCreateInputForCommandLine();
 
+    RegexGroupInput regexGroupInput = new RegexGroupInput();
+    regexGroupInput.setField("ipv6");
+    regexGroupInput.setIndex(0);
+
     ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
     contractOutputElementInput.setKey("IPV6");
     contractOutputElementInput.setType(ContractOutputType.IPv6);
@@ -35,13 +41,14 @@ public class PayloadInputFixture {
     contractOutputElementInput.setRule("rule");
     contractOutputElementInput.setTagIds(List.of("id"));
     contractOutputElementInput.setFinding(true);
+    contractOutputElementInput.setRegexGroups(Set.of(regexGroupInput));
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDOUT);
     outputParserInput.setType(ParserType.REGEX);
-    outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
+    outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
-    input.setOutputParsers(List.of(outputParserInput));
+    input.setOutputParsers(Set.of(outputParserInput));
     return input;
   }
 
@@ -92,9 +99,9 @@ public class PayloadInputFixture {
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDOUT);
     outputParserInput.setType(ParserType.REGEX);
-    outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
+    outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
-    input.setOutputParsers(List.of(outputParserInput));
+    input.setOutputParsers(Set.of(outputParserInput));
     return input;
   }
 
@@ -121,20 +128,31 @@ public class PayloadInputFixture {
   public static PayloadUpsertInput getDefaultCommandPayloadUpsertInputWithOutputParser() {
     PayloadUpsertInput input = getDefaultCommandPayloadUpsertInput();
 
-    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
-    contractOutputElementInput.setKey("IPV4");
-    contractOutputElementInput.setType(ContractOutputType.IPv4);
-    contractOutputElementInput.setName("IPV4");
-    contractOutputElementInput.setRule("regex xPath");
-    contractOutputElementInput.setTagIds(List.of("id"));
-    contractOutputElementInput.setFinding(true);
+    ContractOutputElementInput contractOutputElementInput = getContractOutputElementInput();
 
     OutputParserInput outputParserInput = new OutputParserInput();
     outputParserInput.setMode(ParserMode.STDERR);
     outputParserInput.setType(ParserType.REGEX);
-    outputParserInput.setContractOutputElements(List.of(contractOutputElementInput));
+    outputParserInput.setContractOutputElements(Set.of(contractOutputElementInput));
 
-    input.setOutputParsers(List.of(outputParserInput));
+    input.setOutputParsers(Set.of(outputParserInput));
     return input;
+  }
+
+  @NotNull
+  private static ContractOutputElementInput getContractOutputElementInput() {
+    RegexGroupInput regexGroupUserNameInput = new RegexGroupInput();
+    regexGroupUserNameInput.setField("username");
+    regexGroupUserNameInput.setIndex(1);
+
+    ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
+    contractOutputElementInput.setKey("credentials_user");
+    contractOutputElementInput.setType(ContractOutputType.Credentials);
+    contractOutputElementInput.setName("Credentials");
+    contractOutputElementInput.setRule("regex xPath");
+    contractOutputElementInput.setTagIds(List.of("id"));
+    contractOutputElementInput.setFinding(true);
+    contractOutputElementInput.setRegexGroups(Set.of(regexGroupUserNameInput));
+    return contractOutputElementInput;
   }
 }

@@ -352,7 +352,15 @@ class PayloadApiTest extends IntegrationTest {
         .andExpect(
             jsonPath(
                     "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_key")
-                .value("IPV4"));
+                .value("credentials_user"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_regex_groups[0].regex_group_field")
+                .value("username"))
+        .andExpect(
+            jsonPath(
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_regex_groups[0].regex_group_index")
+                .value("1"));
   }
 
   // -- CHECK CLEANUP AND EXECUTOR --

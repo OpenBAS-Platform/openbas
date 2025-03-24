@@ -193,17 +193,38 @@ public class PayloadUtils {
                       contractOutputElement.setTags(
                           iterableToSet(
                               tagRepository.findAllById(contractOutputElementInput.getTagIds())));
+                      copyRegexGroups(
+                          contractOutputElementInput.getRegexGroups(), contractOutputElement);
                     } else {
                       ContractOutputElement contractOutputElementInstance =
                           (ContractOutputElement) inputElement;
                       contractOutputElement.setTags(
                           iterableToSet(new HashSet<>(contractOutputElementInstance.getTags())));
+                      copyRegexGroups(
+                          contractOutputElement.getRegexGroups(), contractOutputElement);
                     }
                     return contractOutputElement;
                   })
               .collect(Collectors.toSet());
 
       outputParser.setContractOutputElements(contractOutputElements);
+    }
+  }
+
+  private void copyRegexGroups(Set<?> inputElements, ContractOutputElement contractOutputElement) {
+    if (inputElements != null) {
+      Set<RegexGroup> regexGroups =
+          inputElements.stream()
+              .map(
+                  inputElement -> {
+                    RegexGroup regexGroup = new RegexGroup();
+                    BeanUtils.copyProperties(inputElement, regexGroup);
+                    regexGroup.setContractOutputElement(contractOutputElement);
+                    return regexGroup;
+                  })
+              .collect(Collectors.toSet());
+
+      contractOutputElement.setRegexGroups(regexGroups);
     }
   }
 }

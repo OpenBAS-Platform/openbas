@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Getter;
@@ -94,5 +95,5 @@ public class PayloadUpsertInput {
 
   @JsonProperty("payload_output_parsers")
   @Schema(description = "Set of output parsers")
-  private Set<OutputParserInput> outputParsers;
+  private Set<OutputParserInput> outputParsers = new HashSet<>();
 }

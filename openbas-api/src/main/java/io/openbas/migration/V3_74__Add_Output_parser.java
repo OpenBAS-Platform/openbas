@@ -53,11 +53,11 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
                       regex_group_id VARCHAR(255) NOT NULL PRIMARY KEY,
                       regex_group_field VARCHAR(50) NOT NULL,
                       regex_group_index INT NOT NULL,
-                      regex_groups_contract_output_element_id VARCHAR(255) NOT NULL,
-                      regex_groups_created_at TIMESTAMP DEFAULT now(),
-                      regex_groups_updated_at TIMESTAMP DEFAULT now(),
-                      CONSTRAINT regex_groups_contract_output_element_id_fk
-                          FOREIGN KEY (regex_groups_contract_output_element_id)
+                      regex_group_contract_output_element_id VARCHAR(255) NOT NULL,
+                      regex_group_created_at TIMESTAMP DEFAULT now(),
+                      regex_group_updated_at TIMESTAMP DEFAULT now(),
+                      CONSTRAINT regex_group_contract_output_element_id_fk
+                          FOREIGN KEY (regex_group_contract_output_element_id)
                           REFERENCES contract_output_elements(contract_output_element_id)
                           ON DELETE CASCADE
                   );

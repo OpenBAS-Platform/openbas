@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
@@ -41,6 +42,10 @@ public class ContractOutputElement implements Base {
   @JsonProperty("contract_output_element_rule")
   private String rule;
 
+  @Column(name = "contract_output_element_name")
+  @JsonProperty("contract_output_element_name")
+  private String name;
+
   @OneToMany(mappedBy = "contractOutputElement", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JsonProperty("contract_output_element_regex_groups")
   private Set<RegexGroup> regexGroups = new HashSet<>();
@@ -63,4 +68,9 @@ public class ContractOutputElement implements Base {
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("contract_output_element_tags")
   private Set<Tag> tags = new HashSet<>();
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

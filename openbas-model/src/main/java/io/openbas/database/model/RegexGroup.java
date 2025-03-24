@@ -6,6 +6,7 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Objects;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -36,4 +37,9 @@ public class RegexGroup implements Base {
   @Column(name = "regex_group_index")
   @JsonProperty("regex_group_index")
   private int index;
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

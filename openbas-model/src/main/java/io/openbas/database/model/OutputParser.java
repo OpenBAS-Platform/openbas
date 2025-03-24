@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
@@ -44,4 +45,9 @@ public class OutputParser implements Base {
   @OneToMany(mappedBy = "outputParser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JsonProperty("output_parser_contract_output_elements")
   private Set<ContractOutputElement> contractOutputElements = new HashSet<>();
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }
