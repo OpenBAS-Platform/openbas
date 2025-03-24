@@ -50,6 +50,7 @@ jobs:
               console.log("PR Description:", prBody);
 
               const issueRegex = /(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved) #(\d+)/gi;
+              const issuesInDescription = []
             
               while ((match = issueRegex.exec(prBody)) !== null) {
                 issuesInDescription.push(match[2]);
