@@ -87,20 +87,34 @@ public class FindingService {
                                   contractOutputElement -> {
                                     String regex = contractOutputElement.getRule();
                                     Pattern pattern =
-                                        patternCache.computeIfAbsent(
-                                            regex,
-                                            Pattern::compile); // Cache & reuse compiled pattern
-
+                                        patternCache.computeIfAbsent(regex, Pattern::compile);
                                     Matcher matcher = pattern.matcher(rawOutputByMode);
+
                                     while (matcher.find()) {
-                                      Finding finding = new Finding();
-                                      finding.setInject(inject);
+                                      String value = matcher.group(0);
+
+                                      Optional<Finding> optionalFinding =
+                                          findingRepository.findByInjectIdAndValue(
+                                              inject.getId(), value);
+
+                                      Finding finding =
+                                          optionalFinding.orElseGet(
+                                              () -> {
+                                                Finding newFinding = new Finding();
+                                                newFinding.setInject(inject);
+                                                newFinding.setField(contractOutputElement.getKey());
+                                                newFinding.setType(contractOutputElement.getType());
+                                                newFinding.setValue(value);
+                                                newFinding.setTags(
+                                                    new HashSet<>(contractOutputElement.getTags()));
+                                                return newFinding;
+                                              });
+
                                       finding.getAssets().add(asset);
-                                      finding.setField(contractOutputElement.getKey());
-                                      finding.setType(contractOutputElement.getType());
-                                      finding.setValue(matcher.group());
-                                      // finding.setLabels(contractOutputElement.getTags());
-                                      findings.add(finding);
+
+                                      if (!optionalFinding.isPresent()) {
+                                        findings.add(finding);
+                                      }
                                     }
                                   });
                           break;
