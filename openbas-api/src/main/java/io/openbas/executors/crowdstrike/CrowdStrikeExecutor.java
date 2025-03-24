@@ -36,8 +36,7 @@ public class CrowdStrikeExecutor {
             this.agentService,
             this.assetGroupService);
     if (this.config.isEnable()) {
-      // TODO update ?
-      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(60));
+      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(300));
     }
   }
 }

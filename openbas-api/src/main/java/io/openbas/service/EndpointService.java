@@ -213,8 +213,9 @@ public class EndpointService {
             .toArray(String[]::new);
     if (inputsMacAddresses.length > 0) {
       List<Endpoint> endpointsToUpdate = findEndpointsByMacAddresses(inputsMacAddresses);
+      Optional<AgentRegisterInput> optionalInputToSave;
       for (Endpoint endpointToUpdate : endpointsToUpdate) {
-        final AgentRegisterInput inputToSave =
+        optionalInputToSave =
             inputs.stream()
                 .filter(
                     input ->
@@ -222,16 +223,18 @@ public class EndpointService {
                             .anyMatch(
                                 macAddress ->
                                     Arrays.asList(input.getMacAddresses()).contains(macAddress)))
-                .findFirst()
-                .get();
-        setUpdatedEndpointAttributes(endpointToUpdate, inputToSave);
-        agentToSave = new Agent();
-        setNewAgentAttributes(inputToSave, agentToSave);
-        setUpdatedAgentAttributes(agentToSave, inputToSave, endpointToUpdate);
-        endpointsToSave.add(endpointToUpdate);
-        agentsToSave.add(agentToSave);
-        inputs.removeIf(
-            input -> Arrays.equals(input.getMacAddresses(), inputToSave.getMacAddresses()));
+                .findFirst();
+        if (optionalInputToSave.isPresent()) {
+          final AgentRegisterInput inputToSave = optionalInputToSave.get();
+          setUpdatedEndpointAttributes(endpointToUpdate, inputToSave);
+          agentToSave = new Agent();
+          setNewAgentAttributes(inputToSave, agentToSave);
+          setUpdatedAgentAttributes(agentToSave, inputToSave, endpointToUpdate);
+          endpointsToSave.add(endpointToUpdate);
+          agentsToSave.add(agentToSave);
+          inputs.removeIf(
+              input -> Arrays.equals(input.getMacAddresses(), inputToSave.getMacAddresses()));
+        }
       }
     }
     // Create new agents/endpoints
@@ -295,13 +298,13 @@ public class EndpointService {
     // If agent is not temporary and not the same version as the platform => Create an upgrade task
     // for the agent
     Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
-    if (agent.getParent() == null && !agent.getVersion().equals(version)) {
+    /*if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(
           generateUpgradeCommand(endpoint.getPlatform().name(), input.getInstallationMode()));
       assetAgentJob.setAgent(agent);
       assetAgentJobRepository.save(assetAgentJob);
-    }
+    }*/
     return endpoint;
   }
 
