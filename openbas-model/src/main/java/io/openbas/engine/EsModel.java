@@ -2,7 +2,6 @@ package io.openbas.engine;
 
 import io.openbas.annotation.Indexable;
 import io.openbas.config.EngineConfig;
-import io.openbas.engine.handler.Handler;
 import io.openbas.engine.model.EsBase;
 import lombok.Getter;
 import lombok.Setter;

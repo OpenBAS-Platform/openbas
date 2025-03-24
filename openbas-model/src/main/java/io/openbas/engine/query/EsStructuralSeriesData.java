@@ -1,4 +1,4 @@
-package io.openbas.engine.model;
+package io.openbas.engine.query;
 
 import lombok.Getter;
 import lombok.Setter;
