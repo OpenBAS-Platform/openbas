@@ -1,5 +1,7 @@
 package io.openbas.engine.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,10 +9,15 @@ import lombok.Setter;
 @Setter
 public class EsStructuralSeries {
   private String label;
-  private long value;
+  private String color;
+  private List<EsStructuralSeriesData> data = new ArrayList<>();
 
-  public EsStructuralSeries(String label, long value) {
+  public EsStructuralSeries(String label) {
     this.label = label;
-    this.value = value;
+  }
+
+  public EsStructuralSeries(String label, List<EsStructuralSeriesData> data) {
+    this.label = label;
+    this.data = data;
   }
 }
