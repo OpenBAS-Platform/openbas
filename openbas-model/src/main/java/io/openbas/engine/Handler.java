@@ -1,4 +1,4 @@
-package io.openbas.engine.handler;
+package io.openbas.engine;
 
 import io.openbas.engine.model.EsBase;
 import java.time.Instant;

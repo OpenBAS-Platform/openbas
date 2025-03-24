@@ -6,6 +6,8 @@ import io.openbas.database.model.Filters;
 import io.openbas.engine.api.DateHistogramConfig;
 import io.openbas.engine.api.StructuralHistogramConfig;
 import io.openbas.engine.model.*;
+import io.openbas.engine.query.EsStructuralSeries;
+import io.openbas.engine.query.EsTimeseries;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EsService;
 import java.util.List;

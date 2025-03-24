@@ -1,7 +1,8 @@
-package io.openbas.engine.model;
+package io.openbas.engine.model.finding;
 
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.engine.model.EsBase;
 import lombok.Getter;
 import lombok.Setter;
 
