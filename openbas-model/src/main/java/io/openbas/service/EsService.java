@@ -22,10 +22,7 @@ import io.openbas.engine.EsModel;
 import io.openbas.engine.api.DateHistogramConfig;
 import io.openbas.engine.api.StructuralHistogramConfig;
 import io.openbas.engine.handler.Handler;
-import io.openbas.engine.model.EsBase;
-import io.openbas.engine.model.EsSearch;
-import io.openbas.engine.model.EsStructuralSeries;
-import io.openbas.engine.model.EsTimeseries;
+import io.openbas.engine.model.*;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -65,6 +62,97 @@ public class EsService {
     this.indexingStatusRepository = indexingStatusRepository;
   }
 
+  // region utils
+  private Query queryFromFilter(Filters.Filter filter) {
+    Filters.FilterOperator operator = filter.getOperator();
+    BoolQuery.Builder boolQuery = new BoolQuery.Builder();
+    Filters.FilterMode filterMode = filter.getMode();
+    String field = filter.getKey();
+    switch (operator) {
+      case eq:
+        List<Query> queryList =
+            filter.getValues().stream()
+                .map(v -> TermQuery.of(t -> t.field(field).value(v))._toQuery())
+                .toList();
+        if (filterMode == Filters.FilterMode.and) {
+          boolQuery.must(queryList);
+        } else {
+          boolQuery.should(queryList).minimumShouldMatch("1");
+        }
+        break;
+      case not_eq:
+        List<Query> queryNotList =
+            filter.getValues().stream()
+                .map(v -> TermQuery.of(t -> t.field(field).value(v))._toQuery())
+                .toList();
+        boolQuery.mustNot(queryNotList);
+        break;
+      default:
+        throw new UnsupportedOperationException("Filter operator " + operator + " not supported");
+    }
+    return boolQuery.build()._toQuery();
+  }
+
+  private Query queryFromFilterGroup(String search, Filters.FilterGroup groupFilter) {
+    Query filteringQuery = null;
+    // Handle filter generation
+    if (groupFilter != null) {
+      Filters.FilterMode filterMode = groupFilter.getMode();
+      BoolQuery.Builder filterQuery = new BoolQuery.Builder();
+      List<Query> filterQueries = new ArrayList<>();
+      List<Filters.Filter> filters = groupFilter.getFilters();
+      filters.forEach(f -> filterQueries.add(queryFromFilter(f)));
+      if (filterMode == Filters.FilterMode.and) {
+        filterQuery.must(filterQueries);
+      } else {
+        filterQuery.should(filterQueries);
+        filterQuery.minimumShouldMatch("1");
+      }
+      filteringQuery = filterQuery.build()._toQuery();
+      if (search == null) {
+        return filteringQuery;
+      }
+    }
+    // Handle search generation
+    if (search != null) {
+      // Add search parameter if needed
+      BoolQuery.Builder mainQuery = new BoolQuery.Builder();
+      QueryStringQuery.Builder queryStringQuery = new QueryStringQuery.Builder();
+      queryStringQuery.query(search).analyzeWildcard(true).fields(BASE_FIELDS);
+      Query searchQuery = queryStringQuery.build()._toQuery();
+      if (filteringQuery != null) {
+        mainQuery.must(List.of(filteringQuery, searchQuery));
+        return mainQuery.build()._toQuery();
+      }
+      return searchQuery;
+    }
+    // No parameter
+    throw new IllegalArgumentException("One of search or filter must not be null");
+  }
+
+  private Map<String, String> resolveIdsRepresentative(List<String> ids) {
+    List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
+    Query query =
+        TermsQuery.of(
+                t -> t.field("base_id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
+            ._toQuery();
+    try {
+      SearchResponse<EsBase> response =
+          elasticClient.search(
+              b -> b.index(engineConfig.getIndexPrefix() + "*").query(query), EsBase.class);
+      List<Hit<EsBase>> hits = response.hits().hits();
+      return hits.stream()
+          .map(Hit::source)
+          .collect(Collectors.toMap(EsBase::getBase_id, EsBase::getBase_representative));
+    } catch (Exception e) {
+      LOGGER.severe("resolveIdsRepresentative exception: " + e);
+    }
+    return Map.of();
+  }
+
+  // endregion
+
+  // region indexing
   public void bulkParallelProcessing() {
     List<EsModel<?>> models = this.esEngine.getModels();
     LOGGER.info("Executing bulk parallel processing for " + models.size() + " models");
@@ -148,93 +236,10 @@ public class EsService {
     }
   }
 
-  public Query queryFromFilter(Filters.Filter filter) {
-    Filters.FilterOperator operator = filter.getOperator();
-    BoolQuery.Builder boolQuery = new BoolQuery.Builder();
-    Filters.FilterMode filterMode = filter.getMode();
-    String field = filter.getKey();
-    switch (operator) {
-      case eq:
-        List<Query> queryList =
-            filter.getValues().stream()
-                .map(v -> TermQuery.of(t -> t.field(field).value(v))._toQuery())
-                .toList();
-        if (filterMode == Filters.FilterMode.and) {
-          boolQuery.must(queryList);
-        } else {
-          boolQuery.should(queryList).minimumShouldMatch("1");
-        }
-        break;
-      case not_eq:
-        List<Query> queryNotList =
-            filter.getValues().stream()
-                .map(v -> TermQuery.of(t -> t.field(field).value(v))._toQuery())
-                .toList();
-        boolQuery.mustNot(queryNotList);
-        break;
-      default:
-        throw new UnsupportedOperationException("Filter operator " + operator + " not supported");
-    }
-    return boolQuery.build()._toQuery();
-  }
+  // endregion
 
-  public Query queryFromFilterGroup(String search, Filters.FilterGroup groupFilter) {
-    Query filteringQuery = null;
-    // Handle filter generation
-    if (groupFilter != null) {
-      Filters.FilterMode filterMode = groupFilter.getMode();
-      BoolQuery.Builder filterQuery = new BoolQuery.Builder();
-      List<Query> filterQueries = new ArrayList<>();
-      List<Filters.Filter> filters = groupFilter.getFilters();
-      filters.forEach(f -> filterQueries.add(queryFromFilter(f)));
-      if (filterMode == Filters.FilterMode.and) {
-        filterQuery.must(filterQueries);
-      } else {
-        filterQuery.should(filterQueries);
-        filterQuery.minimumShouldMatch("1");
-      }
-      filteringQuery = filterQuery.build()._toQuery();
-      if (search == null) {
-        return filteringQuery;
-      }
-    }
-    // Handle search generation
-    if (search != null) {
-      // Add search parameter if needed
-      BoolQuery.Builder mainQuery = new BoolQuery.Builder();
-      QueryStringQuery.Builder queryStringQuery = new QueryStringQuery.Builder();
-      queryStringQuery.query(search).analyzeWildcard(true).fields(BASE_FIELDS);
-      Query searchQuery = queryStringQuery.build()._toQuery();
-      if (filteringQuery != null) {
-        mainQuery.must(List.of(filteringQuery, searchQuery));
-        return mainQuery.build()._toQuery();
-      }
-      return searchQuery;
-    }
-    // No parameter
-    throw new IllegalArgumentException("One of search or filter must not be null");
-  }
-
-  public Map<String, String> resolveIdsRepresentative(List<String> ids) {
-    List<FieldValue> values = ids.stream().map(FieldValue::of).toList();
-    Query query =
-        TermsQuery.of(t -> t.field("base_id.keyword").terms(TermsQueryField.of(tq -> tq.value(values))))
-            ._toQuery();
-    try {
-      SearchResponse<EsBase> response =
-          elasticClient.search(
-              b -> b.index(engineConfig.getIndexPrefix() + "*").query(query), EsBase.class);
-      List<Hit<EsBase>> hits = response.hits().hits();
-      return hits.stream()
-          .map(Hit::source)
-          .collect(Collectors.toMap(EsBase::getBase_id, EsBase::getBase_representative));
-    } catch (Exception e) {
-      LOGGER.severe("resolveIdsRepresentative exception: " + e);
-    }
-    return Map.of();
-  }
-
-  public List<EsStructuralSeries> termHistogram(StructuralHistogramConfig config) {
+  // region query
+  public EsStructuralSeries termHistogram(StructuralHistogramConfig config) {
     Query query = queryFromFilterGroup(null, config.getFilter());
     String aggregationKey = "term_histogram";
     try {
@@ -258,22 +263,28 @@ public class EsService {
         List<String> ids = buckets.array().stream().map(s -> s.key().stringValue()).toList();
         resolutions.putAll(resolveIdsRepresentative(ids));
       }
-      return buckets.array().stream()
-          .map(
-              b -> {
-                String key = b.key().stringValue();
-                String label = isSideAggregation ? resolutions.get(key) : key;
-                String seriesKey = label != null ? label : "deleted";
-                return new EsStructuralSeries(seriesKey, b.docCount());
-              })
-          .toList();
+      List<EsStructuralSeriesData> data =
+          buckets.array().stream()
+              .map(
+                  b -> {
+                    String key = b.key().stringValue();
+                    String label = isSideAggregation ? resolutions.get(key) : key;
+                    String seriesKey = label != null ? label : "deleted";
+                    return new EsStructuralSeriesData(seriesKey, b.docCount());
+                  })
+              .toList();
+      return new EsStructuralSeries(config.getName(), data);
     } catch (Exception e) {
       LOGGER.severe("termHistogram exception: " + e);
     }
-    return List.of();
+    return new EsStructuralSeries(config.getName());
   }
 
-  public List<EsTimeseries> dateHistogram(DateHistogramConfig config) {
+  public List<EsStructuralSeries> multiTermHistogram(List<StructuralHistogramConfig> configs) {
+    return configs.stream().parallel().map(this::termHistogram).toList();
+  }
+
+  public EsTimeseries dateHistogram(DateHistogramConfig config) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
     Query dateRangeQuery =
         DateRangeQuery.of(
@@ -311,13 +322,19 @@ public class EsService {
               Void.class);
       Buckets<DateHistogramBucket> buckets =
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
-      return buckets.array().stream()
-          .map(b -> new EsTimeseries(Instant.ofEpochMilli(b.key()), b.docCount()))
-          .toList();
+      List<EsTimeseriesData> data =
+          buckets.array().stream()
+              .map(b -> new EsTimeseriesData(Instant.ofEpochMilli(b.key()), b.docCount()))
+              .toList();
+      return new EsTimeseries(config.getName(), data);
     } catch (IOException e) {
       LOGGER.severe("dateHistogram exception: " + e);
     }
-    return List.of();
+    return new EsTimeseries(config.getName());
+  }
+
+  public List<EsTimeseries> multiDateHistogram(List<DateHistogramConfig> configs) {
+    return configs.stream().parallel().map(this::dateHistogram).toList();
   }
 
   public List<EsSearch> search(String search, Filters.FilterGroup filter) {
@@ -349,4 +366,5 @@ public class EsService {
     }
     return List.of();
   }
+  // endregion
 }

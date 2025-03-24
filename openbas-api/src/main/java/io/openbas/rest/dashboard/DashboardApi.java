@@ -5,9 +5,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import io.openbas.database.model.Filters;
 import io.openbas.engine.api.DateHistogramConfig;
 import io.openbas.engine.api.StructuralHistogramConfig;
-import io.openbas.engine.model.EsSearch;
-import io.openbas.engine.model.EsStructuralSeries;
-import io.openbas.engine.model.EsTimeseries;
+import io.openbas.engine.model.*;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EsService;
 import java.util.List;
@@ -45,8 +43,8 @@ public class DashboardApi extends RestBehavior {
     filter.setValues(List.of("finding"));
     filterGroup.setFilters(List.of(filter));
     // Try to fetch a date histogram
-    DateHistogramConfig config = new DateHistogramConfig(filterGroup);
-    return esService.dateHistogram(config);
+    DateHistogramConfig config = new DateHistogramConfig("series01", filterGroup);
+    return esService.multiDateHistogram(List.of(config));
   }
 
   @GetMapping(DASHBOARD_URI + "/structural/{widget}")
@@ -61,9 +59,10 @@ public class DashboardApi extends RestBehavior {
     filter.setValues(List.of("finding"));
     filterGroup.setFilters(List.of(filter));
     // Try to fetch a structural histogram
-    StructuralHistogramConfig structuralConfig = new StructuralHistogramConfig(filterGroup);
+    StructuralHistogramConfig structuralConfig =
+        new StructuralHistogramConfig("series01", filterGroup);
     structuralConfig.setField("finding_type"); // finding_scenario_side
-    return esService.termHistogram(structuralConfig);
+    return esService.multiTermHistogram(List.of(structuralConfig));
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

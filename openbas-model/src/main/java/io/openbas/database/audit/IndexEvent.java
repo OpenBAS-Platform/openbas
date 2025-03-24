@@ -5,14 +5,14 @@ import lombok.Getter;
 
 @Getter
 public class IndexEvent {
-    @JsonProperty("event_id")
-    private String id;
+  @JsonProperty("event_id")
+  private String id;
 
-    @JsonProperty("event_type")
-    private String type;
+  @JsonProperty("event_type")
+  private String type;
 
-    public IndexEvent(String type, String id) {
-        this.type = type;
-        this.id = id;
-    }
+  public IndexEvent(String type, String id) {
+    this.type = type;
+    this.id = id;
+  }
 }

@@ -7,15 +7,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StructuralHistogramConfig {
-  private Filters.FilterGroup filter;
+  private String name;
   private String field = "base_id";
+  private Filters.FilterGroup filter;
 
-  public StructuralHistogramConfig() {
-    // Default constructor
+  public StructuralHistogramConfig(String name) {
+    this.name = name;
   }
 
-  public StructuralHistogramConfig(Filters.FilterGroup filter) {
-    this();
+  public StructuralHistogramConfig(String name, Filters.FilterGroup filter) {
+    this(name);
     this.filter = filter;
   }
 }
