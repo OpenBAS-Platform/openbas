@@ -11,7 +11,9 @@ import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -148,9 +150,9 @@ public class PayloadUtils {
     return target;
   }
 
-  public <T> void copyOutputParsers(List<T> inputParsers, Payload target) {
+  public <T> void copyOutputParsers(Set<T> inputParsers, Payload target) {
     if (inputParsers != null) {
-      List<OutputParser> outputParsers =
+      Set<OutputParser> outputParsers =
           inputParsers.stream()
               .map(
                   inputParser -> {
@@ -170,15 +172,15 @@ public class PayloadUtils {
 
                     return outputParser;
                   })
-              .collect(Collectors.toList());
+              .collect(Collectors.toSet());
 
       target.setOutputParsers(outputParsers);
     }
   }
 
-  private void copyContractOutputElements(List<?> inputElements, OutputParser outputParser) {
+  private void copyContractOutputElements(Set<?> inputElements, OutputParser outputParser) {
     if (inputElements != null) {
-      List<ContractOutputElement> contractOutputElements =
+      Set<ContractOutputElement> contractOutputElements =
           inputElements.stream()
               .map(
                   inputElement -> {
@@ -195,15 +197,11 @@ public class PayloadUtils {
                       ContractOutputElement contractOutputElementInstance =
                           (ContractOutputElement) inputElement;
                       contractOutputElement.setTags(
-                          iterableToSet(
-                              tagRepository.findAllById(
-                                  contractOutputElementInstance.getTags().stream()
-                                      .map(t -> t.getId())
-                                      .toList())));
+                          iterableToSet(new HashSet<>(contractOutputElementInstance.getTags())));
                     }
                     return contractOutputElement;
                   })
-              .collect(Collectors.toList());
+              .collect(Collectors.toSet());
 
       outputParser.setContractOutputElements(contractOutputElements);
     }

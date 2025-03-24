@@ -15,7 +15,6 @@ import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
-import io.openbas.helper.MultiModelDeserializer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -208,7 +207,6 @@ public class Payload implements Base {
 
   @OneToMany(mappedBy = "payload", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JsonProperty("payload_output_parsers")
-  @JsonSerialize(using = MultiModelDeserializer.class)
   private Set<OutputParser> outputParsers = new HashSet<>();
 
   @JsonProperty("payload_collector_type")

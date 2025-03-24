@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -92,6 +93,6 @@ public class PayloadUpsertInput {
   private boolean elevationRequired;
 
   @JsonProperty("payload_output_parsers")
-  @Schema(description = "List of output parsers")
-  private List<OutputParserInput> outputParsers;
+  @Schema(description = "Set of output parsers")
+  private Set<OutputParserInput> outputParsers;
 }

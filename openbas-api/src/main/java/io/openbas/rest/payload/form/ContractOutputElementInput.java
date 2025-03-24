@@ -2,9 +2,12 @@ package io.openbas.rest.payload.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
+import io.openbas.database.model.RegexGroup;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,4 +42,8 @@ public class ContractOutputElementInput {
   @JsonProperty("contract_output_element_tags")
   @Schema(description = "List of tags")
   private List<String> tagIds = new ArrayList<>();
+
+  @JsonProperty("contract_output_element_regex_groups")
+  @Schema(description = "Set of regex groups")
+  private Set<RegexGroup> regexGroups = new HashSet<>();
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ParserMode;
 import io.openbas.database.model.ParserType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,5 +22,5 @@ public class OutputParserInput {
 
   @JsonProperty("output_parser_contract_output_elements")
   @Schema(description = "List of Contract output elements")
-  private List<ContractOutputElementInput> contractOutputElements;
+  private Set<ContractOutputElementInput> contractOutputElements;
 }

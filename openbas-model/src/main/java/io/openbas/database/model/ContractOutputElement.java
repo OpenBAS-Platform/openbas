@@ -8,9 +8,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
@@ -45,7 +43,7 @@ public class ContractOutputElement implements Base {
 
   @OneToMany(mappedBy = "contractOutputElement", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JsonProperty("contract_output_element_regex_groups")
-  private List<RegexGroup> regexGroups = new ArrayList<>();
+  private Set<RegexGroup> regexGroups = new HashSet<>();
 
   @Column(name = "contract_output_element_key")
   @JsonProperty("contract_output_element_key")
