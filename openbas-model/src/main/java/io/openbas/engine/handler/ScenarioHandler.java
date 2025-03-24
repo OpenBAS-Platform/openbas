@@ -1,7 +1,5 @@
 package io.openbas.engine.handler;
 
-import static io.openbas.engine.model.EsScenario.SCENARIO_TYPE;
-
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.engine.model.EsScenario;
@@ -29,7 +27,6 @@ public class ScenarioHandler implements Handler<EsScenario> {
             scenario -> {
               EsScenario esScenario = new EsScenario();
               esScenario.setBase_id(scenario.getScenario_id());
-              esScenario.setBase_entity(SCENARIO_TYPE);
               esScenario.setBase_created_at(scenario.getScenario_created_at());
               esScenario.setBase_updated_at(scenario.getScenario_updated_at());
               esScenario.setBase_representative(scenario.getScenario_name());

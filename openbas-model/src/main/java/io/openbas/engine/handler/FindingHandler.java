@@ -1,7 +1,5 @@
 package io.openbas.engine.handler;
 
-import static io.openbas.engine.model.EsFinding.FINDING_TYPE;
-
 import io.openbas.database.raw.RawFinding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.engine.model.EsFinding;
@@ -29,7 +27,6 @@ public class FindingHandler implements Handler<EsFinding> {
             finding -> {
               EsFinding esFinding = new EsFinding();
               esFinding.setBase_id(finding.getFinding_id());
-              esFinding.setBase_entity(FINDING_TYPE);
               esFinding.setBase_representative(finding.getFinding_value());
               esFinding.setFinding_type(finding.getFinding_type());
               esFinding.setBase_created_at(finding.getFinding_created_at());
