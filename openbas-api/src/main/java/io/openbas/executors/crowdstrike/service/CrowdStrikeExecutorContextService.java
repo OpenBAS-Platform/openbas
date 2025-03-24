@@ -12,6 +12,9 @@ import jakarta.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.regex.Matcher;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -49,21 +52,33 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
-    String scriptName =
-        switch (platform) {
-          case Windows -> this.crowdStrikeExecutorConfig.getWindowsScriptName();
-          case Linux, MacOS -> this.crowdStrikeExecutorConfig.getUnixScriptName();
-          default -> throw new RuntimeException("Unsupported platform: " + platform);
-        };
+    String scriptName;
+    String implantLocation;
+    switch (platform) {
+      case Windows -> {
+        scriptName = this.crowdStrikeExecutorConfig.getWindowsScriptName();
+        implantLocation = "$location=C:\\Windows\\Temp\\.openbas\\implant-" + UUID.randomUUID() + "md $location -ea 0;filename=";
+      }
+      case Linux, MacOS -> {
+        scriptName = this.crowdStrikeExecutorConfig.getUnixScriptName();
+        implantLocation = "location=/tmp/.openbas/implant-" + UUID.randomUUID() + ";mkdir -p $location;filename=";
+      }
+      default -> throw new RuntimeException("Unsupported platform: " + platform);
+    };
 
     String executorCommandKey = platform.name() + "." + arch.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
 
     command = replaceArgs(platform, command, inject.getId(), agent.getId());
+    command = command.replaceFirst("\\$?x=.+location=.+;filename=", Matcher.quoteReplacement(implantLocation));
+
+    String commandEncoded = platform == Endpoint.PLATFORM_TYPE.Windows ?
+            Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_16LE)) :
+            Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_8));
 
     this.crowdStrikeExecutorClient.executeAction(
         agent.getExternalReference(),
         scriptName,
-        Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_16LE)));
+        commandEncoded);
   }
 }
