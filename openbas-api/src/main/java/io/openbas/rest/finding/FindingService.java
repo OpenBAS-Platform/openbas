@@ -8,9 +8,7 @@ import io.openbas.database.repository.FindingRepository;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +65,7 @@ public class FindingService {
 
   public void extractFindings(Inject inject, Asset asset, ExecutionTraces trace) {
     List<Finding> findings = new ArrayList<>();
+    Map<String, Pattern> patternCache = new HashMap<>(); // Cache for compiled patterns
 
     Optional.ofNullable(inject.getPayload())
         .map(p -> p.get().getOutputParsers())
@@ -76,11 +75,9 @@ public class FindingService {
                     outputParser -> {
                       String rawOutputByMode =
                           extractRawOutputByMode(trace.getMessage(), outputParser.getMode());
-
                       if (rawOutputByMode == null) {
                         return;
                       }
-
                       switch (outputParser.getType()) {
                         case REGEX:
                         default:
@@ -88,28 +85,27 @@ public class FindingService {
                               .getContractOutputElements()
                               .forEach(
                                   contractOutputElement -> {
+                                    String regex = contractOutputElement.getRule();
                                     Pattern pattern =
-                                        Pattern.compile(contractOutputElement.getRule()); // hashmap <regex, pattern compile>
-                                    Matcher matcher = pattern.matcher(rawOutputByMode);
+                                        patternCache.computeIfAbsent(
+                                            regex,
+                                            Pattern::compile); // Cache & reuse compiled pattern
 
+                                    Matcher matcher = pattern.matcher(rawOutputByMode);
                                     while (matcher.find()) {
                                       Finding finding = new Finding();
-                                      finding.setInject(inject); // Find by inject and value
+                                      finding.setInject(inject);
                                       finding.getAssets().add(asset);
                                       finding.setField(contractOutputElement.getKey());
                                       finding.setType(contractOutputElement.getType());
                                       finding.setValue(matcher.group());
-
-                                      finding.setLabels(
-                                          new String[] {contractOutputElement.getName()});
-
+                                      // finding.setLabels(contractOutputElement.getTags());
                                       findings.add(finding);
                                     }
                                   });
                           break;
                       }
                     }));
-
     findingRepository.saveAll(findings);
   }
 }
