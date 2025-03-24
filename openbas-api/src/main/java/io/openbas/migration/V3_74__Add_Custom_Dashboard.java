@@ -1,9 +1,10 @@
 package io.openbas.migration;
 
-import java.sql.Statement;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
+
+import java.sql.Statement;
 
 @Component
 public class V3_74__Add_Custom_Dashboard extends BaseJavaMigration {
@@ -11,6 +12,7 @@ public class V3_74__Add_Custom_Dashboard extends BaseJavaMigration {
   @Override
   public void migrate(Context context) throws Exception {
     try (Statement statement = context.getConnection().createStatement()) {
+      // Custom dashboards table
       statement.execute(
           """
               CREATE TABLE custom_dashboards (
@@ -21,6 +23,20 @@ public class V3_74__Add_Custom_Dashboard extends BaseJavaMigration {
                   custom_dashboard_created_at TIMESTAMP DEFAULT now(),
                   custom_dashboard_updated_at TIMESTAMP DEFAULT now()
               );
+              """);
+      // Widgets table
+      statement.execute(
+          """
+                  CREATE TABLE widgets (
+                      widget_id varchar(255) NOT NULL CONSTRAINT widgets_pkey PRIMARY KEY,
+                      widget_type VARCHAR(255) NOT NULL,
+                      widget_data_selections JSONB NOT NULL DEFAULT '[]',
+                      widget_parameters JSONB,
+                      widget_layout JSONB,
+                      widget_custom_dashboard varchar(255) constraint custom_dashboards_pkey references custom_dashboards on delete cascade,
+                      widget_created_at TIMESTAMP DEFAULT now(),
+                      widget_updated_at TIMESTAMP DEFAULT now()
+                  );
               """);
     }
   }
