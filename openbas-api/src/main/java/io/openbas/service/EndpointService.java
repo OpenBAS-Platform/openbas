@@ -73,6 +73,8 @@ public class EndpointService {
   private final AssetAgentJobRepository assetAgentJobRepository;
   private final TagRepository tagRepository;
   private final AgentService agentService;
+  private final AssetGroupService assetGroupService;
+  private final AssetService assetService;
 
   // -- CRUD --
   public Endpoint createEndpoint(@NotNull final Endpoint endpoint) {
@@ -124,10 +126,6 @@ public class EndpointService {
     return this.endpointRepository.save(endpoint);
   }
 
-  public Iterable<Endpoint> saveAllEndpoints(List<Endpoint> endpoints) {
-    return this.endpointRepository.saveAll(endpoints);
-  }
-
   public void deleteEndpoint(@NotBlank final String endpointId) {
     this.endpointRepository.deleteById(endpointId);
   }
@@ -174,40 +172,81 @@ public class EndpointService {
   public void syncAgentsEndpoints(
       List<AgentRegisterInput> inputs, List<Agent> existingAgents, AssetGroup assetGroup) {
     List<Agent> agentsToSave = new ArrayList<>();
-    List<Endpoint> endpointsToSave = new ArrayList<>();
+    List<Asset> endpointsToSave = new ArrayList<>();
     AgentRegisterInput inputToSave;
+    Endpoint endpointToSave;
+    Agent agentToSave;
     // Update agents/endpoints with external reference
     Set<String> inputsExternalRefs =
         inputs.stream().map(AgentRegisterInput::getExternalReference).collect(Collectors.toSet());
-    Set<Agent> agentsToUpdate =
-        existingAgents.stream()
-            .filter(agent -> inputsExternalRefs.contains(agent.getExternalReference()))
-            .collect(Collectors.toSet());
-    for(Agent agentToUpdate : agentsToUpdate) {
-      inputToSave = inputs.stream().filter(input -> input.getExternalReference().equals(agentToUpdate.getExternalReference())).findFirst().get();
-      Endpoint endpoint = (Endpoint) Hibernate.unproxy(agentToUpdate.getAsset());
-      setUpdatedEndpointAttributes(endpoint, inputToSave);
-      agentToUpdate.setAsset(endpoint);
-      agentToUpdate.setLastSeen(inputToSave.getLastSeen());
+    if (!inputsExternalRefs.isEmpty()) {
+      Set<Agent> agentsToUpdate =
+          existingAgents.stream()
+              .filter(agent -> inputsExternalRefs.contains(agent.getExternalReference()))
+              .collect(Collectors.toSet());
+      for (Agent agentToUpdate : agentsToUpdate) {
+        inputToSave =
+            inputs.stream()
+                .filter(
+                    input ->
+                        input.getExternalReference().equals(agentToUpdate.getExternalReference()))
+                .findFirst()
+                .get();
+        endpointToSave = (Endpoint) Hibernate.unproxy(agentToUpdate.getAsset());
+        setUpdatedEndpointAttributes(endpointToSave, inputToSave);
+        agentToUpdate.setAsset(endpointToSave);
+        agentToUpdate.setLastSeen(inputToSave.getLastSeen());
+        endpointsToSave.add(endpointToSave);
+        agentsToSave.add(agentToUpdate);
+      }
+      inputs.removeIf(input -> inputsExternalRefs.contains(input.getExternalReference()));
     }
-    // TODO create or update asset/asset group
-    inputs.removeIf(input -> inputsExternalRefs.contains(input.getExternalReference()));
     // Update agents/endpoints with mac address
-    String[] inputsMacAddresses = inputs.stream().map(AgentRegisterInput::getMacAddresses).toList().stream().flatMap(Arrays::stream).toArray(String[]::new);
-    List<Endpoint> endpointsToUpdate = findEndpointsByMacAddresses(inputsMacAddresses);
-    for(Endpoint endpointToUpdate : endpointsToUpdate) {
-      inputToSave = inputs.stream().filter(input -> Arrays.asList(input.getMacAddresses()).retainAll(Arrays.asList(endpointToUpdate.getMacAddresses()))).findFirst().get();
+    String[] inputsMacAddresses =
+        inputs.stream().map(AgentRegisterInput::getMacAddresses).toList().stream()
+            .flatMap(Arrays::stream)
+            .toArray(String[]::new);
+    if (inputsMacAddresses.length > 0) {
+      List<Endpoint> endpointsToUpdate = findEndpointsByMacAddresses(inputsMacAddresses);
+      for (Endpoint endpointToUpdate : endpointsToUpdate) {
+        inputToSave =
+            inputs.stream()
+                .filter(
+                    input ->
+                        Arrays.asList(input.getMacAddresses())
+                            .retainAll(Arrays.asList(endpointToUpdate.getMacAddresses())))
+                .findFirst()
+                .get();
+        setUpdatedEndpointAttributes(endpointToUpdate, inputToSave);
+        agentToSave = new Agent();
+        setNewAgentAttributes(inputToSave, agentToSave);
+        setUpdatedAgentAttributes(agentToSave, inputToSave, endpointToUpdate);
+        endpointsToSave.add(endpointToUpdate);
+        agentsToSave.add(agentToSave);
+      }
+      inputs.removeIf(input -> Arrays.equals(inputsMacAddresses, input.getMacAddresses()));
     }
-    // TODO update endpoint + create agent if mac address
-
-    // TODO "createNewEndpointAndAgent(input);"
-    // TODO create or update asset/asset group
-
-    saveAllEndpoints(endpointsToSave);
+    // Create new agents/endpoints
+    if (!inputs.isEmpty()) {
+      for (AgentRegisterInput inputToUpdate : inputs) {
+        endpointToSave = new Endpoint();
+        endpointToSave.setId(UUID.randomUUID().toString());
+        endpointToSave.setUpdateAttributes(inputToUpdate);
+        endpointToSave.setIps(inputToUpdate.getIps());
+        endpointToSave.setSeenIp(inputToUpdate.getSeenIp());
+        endpointToSave.setMacAddresses(inputToUpdate.getMacAddresses());
+        endpointsToSave.add(endpointToSave);
+        agentToSave = new Agent();
+        setNewAgentAttributes(inputToUpdate, agentToSave);
+        setUpdatedAgentAttributes(agentToSave, inputToUpdate, endpointToSave);
+        agentsToSave.add(agentToSave);
+      }
+    }
+    // Save all in database
+    List<Asset> endpoints = fromIterable(assetService.saveAllAssets(endpointsToSave));
     agentService.saveAllAgents(agentsToSave);
-    List<String> existingAssetIds = assetGroup.getAssets().stream().map(Asset::getId).toList();
-    // TODO delete asset/asset group no more in asset group with comparing existingAssetIds and endpoints from agents to update/create
-
+    assetGroup.setAssets(endpoints);
+    assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
   }
 
   public Endpoint register(final EndpointRegisterInput input) throws IOException {
