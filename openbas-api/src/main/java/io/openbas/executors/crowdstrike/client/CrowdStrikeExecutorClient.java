@@ -109,10 +109,10 @@ public class CrowdStrikeExecutorClient {
     }
   }
 
-  public List<CrowdStrikeHostGroup> hostGroups(String hostGroups) {
+  public ResourcesGroups hostGroup(String hostGroup) {
     String jsonResponse;
     try {
-      jsonResponse = this.get(HOST_GROUPS_URI + "?ids=" + hostGroups);
+      jsonResponse = this.get(HOST_GROUPS_URI + "?ids=" + hostGroup);
     } catch (IOException e) {
       log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
       throw new RuntimeException(e);
