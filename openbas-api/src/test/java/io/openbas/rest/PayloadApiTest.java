@@ -13,6 +13,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.collector.form.CollectorCreateInput;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
@@ -39,6 +40,7 @@ class PayloadApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
   @Autowired private DocumentRepository documentRepository;
   @Autowired private PayloadRepository payloadRepository;
+  @Autowired private TagRepository tagRepository;
 
   @Resource private ObjectMapper objectMapper;
 
