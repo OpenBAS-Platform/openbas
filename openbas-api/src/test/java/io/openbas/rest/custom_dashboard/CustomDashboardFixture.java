@@ -9,7 +9,6 @@ public class CustomDashboardFixture {
   public static CustomDashboard createDefaultCustomDashboard() {
     CustomDashboard customDashboard = new CustomDashboard();
     customDashboard.setName(NAME);
-    customDashboard.setContent("{\"chart\": \"bar\"}");
     return customDashboard;
   }
 }
