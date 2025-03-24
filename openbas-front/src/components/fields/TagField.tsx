@@ -2,7 +2,7 @@ import { AddOutlined, LabelOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
 import * as R from 'ramda';
 import { type CSSProperties, type FunctionComponent, useState } from 'react';
-import { type GlobalError } from 'react-hook-form/dist/types/errors';
+import { type GlobalError } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import { type TagHelper, type UserHelper } from '../../actions/helper';
