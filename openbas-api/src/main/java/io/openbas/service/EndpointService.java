@@ -73,7 +73,6 @@ public class EndpointService {
   private final AssetAgentJobRepository assetAgentJobRepository;
   private final TagRepository tagRepository;
   private final AgentService agentService;
-  private final AssetGroupService assetGroupService;
   private final AssetService assetService;
 
   // -- CRUD --
@@ -175,11 +174,10 @@ public class EndpointService {
     }
   }
 
-  public void syncAgentsEndpoints(
-      List<AgentRegisterInput> inputs, List<Agent> existingAgents, AssetGroup assetGroup) {
+  public List<Asset> syncAgentsEndpoints(
+      List<AgentRegisterInput> inputs, List<Agent> existingAgents) {
     List<Agent> agentsToSave = new ArrayList<>();
     List<Asset> endpointsToSave = new ArrayList<>();
-    AgentRegisterInput inputToSave;
     Endpoint endpointToSave;
     Agent agentToSave;
     // Update agents/endpoints with external reference
@@ -191,7 +189,7 @@ public class EndpointService {
               .filter(agent -> inputsExternalRefs.contains(agent.getExternalReference()))
               .collect(Collectors.toSet());
       for (Agent agentToUpdate : agentsToUpdate) {
-        inputToSave =
+        final AgentRegisterInput inputToSave =
             inputs.stream()
                 .filter(
                     input ->
@@ -204,8 +202,9 @@ public class EndpointService {
         agentToUpdate.setLastSeen(inputToSave.getLastSeen());
         endpointsToSave.add(endpointToSave);
         agentsToSave.add(agentToUpdate);
+        inputs.removeIf(
+            input -> input.getExternalReference().equals(inputToSave.getExternalReference()));
       }
-      inputs.removeIf(input -> inputsExternalRefs.contains(input.getExternalReference()));
     }
     // Update agents/endpoints with mac address
     String[] inputsMacAddresses =
@@ -215,12 +214,14 @@ public class EndpointService {
     if (inputsMacAddresses.length > 0) {
       List<Endpoint> endpointsToUpdate = findEndpointsByMacAddresses(inputsMacAddresses);
       for (Endpoint endpointToUpdate : endpointsToUpdate) {
-        inputToSave =
+        final AgentRegisterInput inputToSave =
             inputs.stream()
                 .filter(
                     input ->
-                        Arrays.asList(input.getMacAddresses())
-                            .retainAll(Arrays.asList(endpointToUpdate.getMacAddresses())))
+                        Arrays.stream(endpointToUpdate.getMacAddresses())
+                            .anyMatch(
+                                macAddress ->
+                                    Arrays.asList(input.getMacAddresses()).contains(macAddress)))
                 .findFirst()
                 .get();
         setUpdatedEndpointAttributes(endpointToUpdate, inputToSave);
@@ -229,14 +230,14 @@ public class EndpointService {
         setUpdatedAgentAttributes(agentToSave, inputToSave, endpointToUpdate);
         endpointsToSave.add(endpointToUpdate);
         agentsToSave.add(agentToSave);
+        inputs.removeIf(
+            input -> Arrays.equals(input.getMacAddresses(), inputToSave.getMacAddresses()));
       }
-      inputs.removeIf(input -> Arrays.equals(inputsMacAddresses, input.getMacAddresses()));
     }
     // Create new agents/endpoints
     if (!inputs.isEmpty()) {
       for (AgentRegisterInput inputToUpdate : inputs) {
         endpointToSave = new Endpoint();
-        endpointToSave.setId(UUID.randomUUID().toString());
         endpointToSave.setUpdateAttributes(inputToUpdate);
         endpointToSave.setIps(inputToUpdate.getIps());
         endpointToSave.setSeenIp(inputToUpdate.getSeenIp());
@@ -251,8 +252,7 @@ public class EndpointService {
     // Save all in database
     List<Asset> endpoints = fromIterable(assetService.saveAllAssets(endpointsToSave));
     agentService.saveAllAgents(agentsToSave);
-    assetGroup.setAssets(endpoints);
-    assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
+    return endpoints;
   }
 
   public Endpoint register(final EndpointRegisterInput input) throws IOException {

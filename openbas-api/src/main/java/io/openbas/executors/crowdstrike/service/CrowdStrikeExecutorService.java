@@ -2,10 +2,7 @@ package io.openbas.executors.crowdstrike.service;
 
 import static io.openbas.utils.Time.toInstant;
 
-import io.openbas.database.model.Agent;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Executor;
+import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorService;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
@@ -104,17 +101,12 @@ public class CrowdStrikeExecutorService implements Runnable {
     log.info("Running CrowdStrike executor endpoints gathering...");
     List<Agent> agentsFromDb = agentService.getAgentsByExecutorType(CROWDSTRIKE_EXECUTOR_TYPE);
     List<String> hostGroups = List.of(this.config.getHostGroup().split(","));
-    List<CrowdStrikeHostGroup> crowdStrikeHostGroups =
-        this.client.hostGroups(this.config.getHostGroup());
     for (String hostGroup : hostGroups) {
       List<CrowdStrikeDevice> devices = this.client.devices(hostGroup);
       Optional<AssetGroup> existingAssetGroup =
           assetGroupService.findByExternalReference(hostGroup);
       CrowdStrikeHostGroup crowdStrikeHostGroup =
-          crowdStrikeHostGroups.stream()
-              .filter(cshg -> cshg.getId().equals(hostGroup))
-              .findFirst()
-              .get();
+          this.client.hostGroup(hostGroup).getResources().getFirst();
       AssetGroup assetGroup;
       if (existingAssetGroup.isPresent()) {
         assetGroup = existingAssetGroup.get();
@@ -124,14 +116,15 @@ public class CrowdStrikeExecutorService implements Runnable {
       }
       assetGroup.setName(crowdStrikeHostGroup.getName());
       assetGroup.setDescription(crowdStrikeHostGroup.getDescription());
-      AssetGroup assetGroupSaved =
-          assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
       log.info(
           "CrowdStrike executor provisioning based on "
               + devices.size()
               + " assets for the host group "
-              + assetGroupSaved.getName());
-      endpointService.syncAgentsEndpoints(toAgentEndpoint(devices), agentsFromDb, assetGroupSaved);
+              + assetGroup.getName());
+      List<Asset> assets =
+          endpointService.syncAgentsEndpoints(toAgentEndpoint(devices), agentsFromDb);
+      assetGroup.setAssets(assets);
+      assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
     }
   }
 
