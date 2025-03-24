@@ -21,6 +21,9 @@ public class V3_71__Indexing_status extends BaseJavaMigration {
                    ALTER TABLE scenarios ALTER COLUMN scenario_created_at type timestamp with time zone using scenario_created_at::timestamp with time zone;
                    ALTER TABLE scenarios ALTER COLUMN scenario_updated_at type timestamp with time zone using scenario_updated_at::timestamp with time zone;
 
+                   ALTER TABLE injects ALTER COLUMN inject_created_at type timestamp with time zone using inject_created_at::timestamp with time zone;
+                   ALTER TABLE injects ALTER COLUMN inject_updated_at type timestamp with time zone using inject_updated_at::timestamp with time zone;
+
                    ALTER TABLE findings ALTER COLUMN finding_created_at type timestamp with time zone using finding_created_at::timestamp with time zone;
                    ALTER TABLE findings ALTER COLUMN finding_updated_at type timestamp with time zone using finding_updated_at::timestamp with time zone;
 
