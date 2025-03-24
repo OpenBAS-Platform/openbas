@@ -44,7 +44,7 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
                 ON DELETE CASCADE,
             contract_output_element_created_at TIMESTAMP DEFAULT now(),
             contract_output_element_updated_at TIMESTAMP DEFAULT now(),
-            UNIQUE (contract_output_element_key, contract_output_element_output_parser_id)
+            UNIQUE (contract_output_element_key, contract_output_element_output_parser_id),
             );
           """);
 
