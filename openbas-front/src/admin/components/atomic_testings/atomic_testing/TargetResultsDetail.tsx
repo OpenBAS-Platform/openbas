@@ -798,7 +798,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                   </TableCell>
                                   <TableCell>
                                     {
-                                      expectationResult.sourceId && injectExpectation.inject_expectation_agent && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && (
+                                      expectationResult.sourceId && injectExpectation.inject_expectation_agent && expectationResult.sourceType === 'collector' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && (
                                         <TargetResultAlertNumber expectationResult={expectationResult} injectExpectationId={injectExpectation.inject_expectation_id} />
                                       )
                                     }
@@ -809,6 +809,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                     }
                                     {
                                       injectExpectation.inject_expectation_agent && (expectationResult.result === 'Not Detected' || expectationResult.result === 'Not Prevented') && (
+                                        '-'
+                                      )
+                                    }
+                                    {
+                                      injectExpectation.inject_expectation_agent && expectationResult.sourceType !== 'collector' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && (
                                         '-'
                                       )
                                     }

@@ -5,7 +5,7 @@ const countdown = (timePeriod: number, interval: number, minusTime: number) => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setRemainingTimePeriod(remainingTimePeriod - minusTime);
+      setRemainingTimePeriod(current => Math.max(current - minusTime, 0));
     }, interval);
     return () => {
       clearInterval(intervalId);

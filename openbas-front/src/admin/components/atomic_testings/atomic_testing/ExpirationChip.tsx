@@ -20,38 +20,45 @@ interface Props {
   startDate: string;
 }
 
-const ExpirationChip: FunctionComponent<Props> = ({ expirationTime, startDate }) => {
+const ExpirationChipExpired = () => {
   const { classes } = useStyles();
   const { t } = useFormatter();
 
-  let expiration: number;
-  const remainingSeconds = moment.utc().seconds() - moment.utc(startDate).seconds();
-  if (remainingSeconds <= 0) {
-    expiration = 0;
-  } else {
-    expiration = countdown(expirationTime - remainingSeconds, 60, 60);
-  }
-  const splitExpirationTime = splitDuration(expiration);
-
   return (
-    <>
-      {
-        expiration === 0 ? (
-          <Chip
-            classes={{ root: classes.score }}
-            label={t('Expired')}
-          />
-        ) : (
-          <Chip
-            classes={{ root: classes.score }}
-            label={`${t('EXPIRES in')} ${splitExpirationTime.hours}
+    <Chip
+      classes={{ root: classes.score }}
+      label={t('Expired')}
+    />
+  );
+};
+
+const ExpirationChipCountdown: FunctionComponent<{
+  expirationTime: number;
+  remainingSeconds: number;
+}> = ({ expirationTime, remainingSeconds }) => {
+  const { classes } = useStyles();
+  const { t } = useFormatter();
+
+  const remainingTimePeriod = countdown(expirationTime - remainingSeconds, 60000, 60);
+  const splitExpirationTime = splitDuration(remainingTimePeriod);
+  return (
+    <Chip
+      classes={{ root: classes.score }}
+      label={`${t('EXPIRES in')} ${splitExpirationTime.hours}
                                     ${t('h')} ${splitExpirationTime.minutes}
                                     ${t('m')}`}
-          />
-        )
-      }
-    </>
+    />
   );
+};
+
+const ExpirationChip: FunctionComponent<Props> = ({ expirationTime, startDate }) => {
+  const remainingSeconds = moment.utc().unix() - moment.utc(startDate).unix();
+
+  if (remainingSeconds <= 0) {
+    return <ExpirationChipExpired />;
+  }
+
+  return <ExpirationChipCountdown expirationTime={expirationTime} remainingSeconds={remainingSeconds} />;
 };
 
 export default ExpirationChip;
