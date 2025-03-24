@@ -673,7 +673,6 @@ export interface CreateUserInput {
 }
 
 export interface CustomDashboard {
-  custom_dashboard_content?: string;
   /** @format date-time */
   custom_dashboard_created_at: string;
   custom_dashboard_description?: string;
@@ -681,11 +680,11 @@ export interface CustomDashboard {
   custom_dashboard_name: string;
   /** @format date-time */
   custom_dashboard_updated_at: string;
+  custom_dashboard_widgets?: string[];
   listened?: boolean;
 }
 
 export interface CustomDashboardInput {
-  custom_dashboard_content?: string;
   custom_dashboard_description?: string;
   custom_dashboard_name: string;
 }

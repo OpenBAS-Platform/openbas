@@ -1,20 +1,25 @@
 package io.openbas.database.model;
 
-import static java.time.Instant.now;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.hypersistence.utils.hibernate.type.json.JsonType;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.helper.MultiModelDeserializer;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+
+import java.time.Instant;
+import java.util.List;
+
+import static jakarta.persistence.FetchType.LAZY;
+import static java.time.Instant.now;
 
 @Data
 @Entity
@@ -40,10 +45,11 @@ public class CustomDashboard implements Base {
   @JsonProperty("custom_dashboard_description")
   private String description;
 
-  @Type(JsonType.class)
-  @Column(name = "custom_dashboard_content", columnDefinition = "JSONB")
-  @JsonProperty("custom_dashboard_content")
-  private String content;
+  @OneToMany(mappedBy = "customDashboard", fetch = LAZY)
+  @JsonProperty("custom_dashboard_widgets")
+  @JsonSerialize(using = MultiModelDeserializer.class)
+  @ArraySchema(schema = @Schema(type = "string"))
+  private List<Widget> widgets;
 
   // -- AUDIT --
 

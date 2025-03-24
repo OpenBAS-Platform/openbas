@@ -1,6 +1,7 @@
 import { AnalyticsOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, useCallback, useMemo, useState } from 'react';
+import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchCustomDashboards } from '../../../../actions/custom_dashboards/customdashboard-action';
@@ -13,7 +14,8 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import type { Header } from '../../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../../components/i18n';
-import type { CustomDashboard } from '../../../../utils/api-types';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader';
+import type { CustomDashboard, SearchPaginationInput } from '../../../../utils/api-types';
 import CustomDashboardCreation from './CustomDashboardCreation';
 import CustomDashboardPopover from './CustomDashboardPopover';
 
@@ -23,8 +25,8 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  custom_dashboard_name: { width: '10%' },
-  custom_dashboard_description: { width: '10%' },
+  custom_dashboard_name: { width: '30%' },
+  custom_dashboard_description: { width: '70%' },
 };
 
 const CustomDashboards = () => {
@@ -34,9 +36,15 @@ const CustomDashboards = () => {
   const bodyItemsStyles = useBodyItemsStyles();
 
   // Pagination
+  const [loading, setLoading] = useState<boolean>(true);
   const [customDashboards, setCustomDashboards] = useState<CustomDashboard[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('custom_dashboards', buildSearchPagination({ sorts: initSorting('custom_dashboard_name') }));
   const availableFilterNames = ['custom_dashboard_name'];
+
+  const search = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchCustomDashboards(input).finally(() => setLoading(false));
+  };
 
   // Headers
   const headers: Header[] = useMemo(() => [
@@ -80,7 +88,7 @@ const CustomDashboards = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchCustomDashboards}
+        fetch={search}
         searchPaginationInput={searchPaginationInput}
         setContent={setCustomDashboards}
         entityPrefix="custom_dashboard"
@@ -105,46 +113,55 @@ const CustomDashboards = () => {
             )}
           />
         </ListItem>
-        {customDashboards.map((customDashboard: CustomDashboard) => {
-          return (
-            (
-              <ListItem
-                key={customDashboard.custom_dashboard_id}
-                classes={{ root: classes.item }}
-                divider
-                secondaryAction={(
-                  <CustomDashboardPopover
-                    customDashboard={customDashboard}
-                    onUpdate={handleUpdate}
-                    onDelete={handleDelete}
-                  />
-                )}
-                disablePadding
-              >
-                <ListItemIcon>
-                  <AnalyticsOutlined color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div style={bodyItemsStyles.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          style={{
-                            ...bodyItemsStyles.bodyItem,
-                            ...inlineStyles[header.field],
-                          }}
-                        >
-                          {header.value?.(customDashboard)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                />
-              </ListItem>
-            )
-          );
-        })}
+        {
+          loading
+            ? <PaginatedListLoader Icon={AnalyticsOutlined} headers={headers} headerStyles={inlineStyles} />
+            : customDashboards.map((customDashboard: CustomDashboard) => {
+                return (
+                  (
+                    <ListItem
+                      key={customDashboard.custom_dashboard_id}
+                      divider
+                      secondaryAction={(
+                        <CustomDashboardPopover
+                          customDashboard={customDashboard}
+                          onUpdate={handleUpdate}
+                          onDelete={handleDelete}
+                        />
+                      )}
+                      disablePadding
+                    >
+                      <ListItemButton
+                        component={Link}
+                        to={`/admin/workspaces/custom_dashboards/${customDashboard.custom_dashboard_id}`}
+                        classes={{ root: classes.item }}
+                      >
+                        <ListItemIcon>
+                          <AnalyticsOutlined color="primary" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={(
+                            <div style={bodyItemsStyles.bodyItems}>
+                              {headers.map(header => (
+                                <div
+                                  key={header.field}
+                                  style={{
+                                    ...bodyItemsStyles.bodyItem,
+                                    ...inlineStyles[header.field],
+                                  }}
+                                >
+                                  {header.value?.(customDashboard)}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  )
+                );
+              })
+        }
       </List>
       <CustomDashboardCreation
         onCreate={(result: CustomDashboard) => setCustomDashboards([result, ...customDashboards])}

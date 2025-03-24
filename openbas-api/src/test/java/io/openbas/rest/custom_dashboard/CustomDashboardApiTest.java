@@ -42,7 +42,6 @@ class CustomDashboardApiTest extends IntegrationTest {
     CustomDashboardInput input = new CustomDashboardInput();
     String name = "New Dashboard";
     input.setName(name);
-    input.setContent("{\"chart\": \"bar\"}");
 
     // -- EXECUTE & ASSERT --
     mockMvc
