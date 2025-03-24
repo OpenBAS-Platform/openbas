@@ -10,7 +10,7 @@ import Drawer from '../../../components/common/Drawer';
 import Transition from '../../../components/common/Transition';
 import { useFormatter } from '../../../components/i18n';
 import { documentOptions, platformOptions } from '../../../utils/Option';
-import PayloadForm from './PayloadForm';
+import PayloadForm from './PayloadForm.tsx';
 
 const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate, disableUpdate, disableDelete }) => {
   const [openDuplicate, setOpenDuplicate] = useState(false);
@@ -87,6 +87,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
     R.pick([
       'payload_name',
       'payload_description',
+      'payload_type',
       'command_executor',
       'command_content',
       'dns_resolution_hostname',
@@ -145,13 +146,7 @@ const PayloadPopover = ({ payload, documentsMap, onUpdate, onDelete, onDuplicate
         handleClose={handleCloseEdit}
         title={t('Update the payload')}
       >
-        <PayloadForm
-          initialValues={initialValues}
-          editing={true}
-          onSubmit={onSubmitEdit}
-          handleClose={handleCloseEdit}
-          type={payload.payload_type}
-        />
+        <PayloadForm onSubmit={onSubmitEdit} handleClose={handleCloseEdit} editing initialValues={initialValues} />
       </Drawer>
     </>
   );

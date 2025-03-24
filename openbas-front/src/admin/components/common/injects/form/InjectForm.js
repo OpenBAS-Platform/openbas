@@ -85,14 +85,13 @@ class InjectForm extends Component {
         <Controller
           control={control}
           name="inject_tags"
-          render={({ field: { onChange, value } }) => (
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TagField
-              name="inject_tags"
               label={t('Tags')}
               fieldValue={value ?? []}
               fieldOnChange={onChange}
               style={{ marginTop: 20 }}
-              errors={{}}
+              error={error}
             />
           )}
         />
