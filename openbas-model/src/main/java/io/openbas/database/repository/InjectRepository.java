@@ -2,6 +2,7 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.Inject;
 import io.openbas.database.raw.RawInject;
+import io.openbas.database.raw.RawInjectIndexing;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -29,6 +30,21 @@ public interface InjectRepository
 
   @NotNull
   Optional<Inject> findWithStatusById(@NotNull String id);
+
+  @Query(
+      value =
+          "SELECT f.inject_id, f.inject_title, f.inject_scenario, f.inject_exercise, f.inject_created_at, f.inject_updated_at, f.inject_injector_contract, "
+              + "array_agg(icap.attack_pattern_id) FILTER ( WHERE icap.attack_pattern_id IS NOT NULL ) as inject_attack_patterns, "
+              + "array_agg(ap.phase_id) FILTER ( WHERE ap.phase_id IS NOT NULL ) as inject_kill_chain_phases, "
+              + "coalesce(array_agg(ins.status_name) FILTER ( WHERE ins.status_name IS NOT NULL ), '{}') as inject_status_name "
+              + "FROM openbas.public.injects f "
+              + "LEFT JOIN openbas.public.injects_statuses ins ON ins.status_inject = f.inject_id "
+              + "LEFT JOIN openbas.public.injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "
+              + "LEFT JOIN openbas.public.injectors_contracts_attack_patterns icap ON icap.injector_contract_id = ic.injector_contract_id "
+              + "LEFT JOIN openbas.public.attack_patterns_kill_chain_phases ap ON ap.attack_pattern_id = icap.attack_pattern_id "
+              + "WHERE f.inject_updated_at > :from GROUP BY f.inject_id, f.inject_updated_at ORDER BY f.inject_updated_at LIMIT 500 ",
+      nativeQuery = true)
+  List<RawInjectIndexing> findForIndexing(@Param("from") Instant from);
 
   @Query(
       value =

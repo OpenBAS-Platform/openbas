@@ -1,8 +1,8 @@
-package io.openbas.engine.handler;
+package io.openbas.engine.model.scenario;
 
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.engine.model.EsScenario;
+import io.openbas.engine.Handler;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
