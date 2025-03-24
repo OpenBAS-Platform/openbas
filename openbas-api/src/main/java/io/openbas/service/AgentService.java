@@ -45,6 +45,10 @@ public class AgentService {
     return this.agentRepository.save(agent);
   }
 
+  public Iterable<Agent> saveAllAgents(List<Agent> agents) {
+    return agentRepository.saveAll(agents);
+  }
+
   public void deleteAgent(@NotBlank final String agentId) {
     this.agentRepository.deleteByAgentId(agentId);
   }
