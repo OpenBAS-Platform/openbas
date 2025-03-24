@@ -34,9 +34,9 @@ public class RegexGroup implements Base {
   @JsonProperty("regex_group_field")
   private String field;
 
-  @Column(name = "regex_group_index")
-  @JsonProperty("regex_group_index")
-  private int index;
+  @Column(name = "regex_group_index_values")
+  @JsonProperty("regex_group_index_values")
+  private String indexValues;
 
   @Override
   public int hashCode() {

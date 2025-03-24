@@ -359,8 +359,8 @@ class PayloadApiTest extends IntegrationTest {
                 .value("username"))
         .andExpect(
             jsonPath(
-                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_regex_groups[0].regex_group_index")
-                .value("1"));
+                    "$.payload_output_parsers[0].output_parser_contract_output_elements[0].contract_output_element_regex_groups[0].regex_group_index_values")
+                .value("$1"));
   }
 
   // -- CHECK CLEANUP AND EXECUTOR --

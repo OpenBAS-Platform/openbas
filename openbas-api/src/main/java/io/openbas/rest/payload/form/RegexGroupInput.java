@@ -13,7 +13,7 @@ public class RegexGroupInput {
   @Schema(description = "Field")
   private String field;
 
-  @JsonProperty("regex_group_index")
-  @Schema(description = "Index of the group from the regex match")
-  private int index;
+  @JsonProperty("regex_group_index_values")
+  @Schema(description = "Index of the group from the regex match: $index0$index1")
+  private String indexValues;
 }
