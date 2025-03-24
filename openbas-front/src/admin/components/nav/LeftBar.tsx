@@ -126,7 +126,7 @@ const LeftBar = () => {
           href: 'dashboards',
           subItems: [
             {
-              link: '/admin/workspaces/dashboards',
+              link: '/admin/workspaces/custom_dashboards',
               label: 'Custom dashboards',
               icon: () => (<AnalyticsOutlined fontSize="small" />),
             },
