@@ -31,22 +31,21 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
 
       statement.execute(
           """
-
-              CREATE TABLE contract_output_elements (
-      contract_output_element_id VARCHAR(255) NOT NULL PRIMARY KEY,
-      contract_output_element_rule TEXT NOT NULL,
-      contract_output_element_name VARCHAR(50) NOT NULL,
-      contract_output_element_key VARCHAR(255) NOT NULL,
-      contract_output_element_type VARCHAR(50) NOT NULL,
-      contract_output_element_output_parser_id VARCHAR(255) NOT NULL
-          CONSTRAINT contract_output_element_output_parser_id_fk
-          REFERENCES output_parsers
-          ON DELETE CASCADE,
-      contract_output_element_created_at TIMESTAMP DEFAULT now(),
-      contract_output_element_updated_at TIMESTAMP DEFAULT now(),
-      UNIQUE (contract_output_element_key, contract_output_element_output_parser_id) -- Enforce uniqueness
-                );
-              """);
+          CREATE TABLE contract_output_elements (
+            contract_output_element_id VARCHAR(255) NOT NULL PRIMARY KEY,
+            contract_output_element_rule TEXT NOT NULL,
+            contract_output_element_name VARCHAR(50) NOT NULL,
+            contract_output_element_key VARCHAR(255) NOT NULL,
+            contract_output_element_type VARCHAR(50) NOT NULL,
+            contract_output_element_output_parser_id VARCHAR(255) NOT NULL
+                CONSTRAINT contract_output_element_output_parser_id_fk
+                REFERENCES output_parsers
+                ON DELETE CASCADE,
+            contract_output_element_created_at TIMESTAMP DEFAULT now(),
+            contract_output_element_updated_at TIMESTAMP DEFAULT now(),
+            UNIQUE (contract_output_element_key, contract_output_element_output_parser_id) 
+            );
+          """);
 
       statement.execute(
           """
