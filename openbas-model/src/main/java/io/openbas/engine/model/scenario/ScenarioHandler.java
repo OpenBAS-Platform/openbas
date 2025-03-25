@@ -1,5 +1,7 @@
 package io.openbas.engine.model.scenario;
 
+import static io.openbas.engine.EsUtils.buildRestrictions;
+
 import io.openbas.database.raw.RawScenario;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.engine.Handler;
@@ -26,10 +28,13 @@ public class ScenarioHandler implements Handler<EsScenario> {
         .map(
             scenario -> {
               EsScenario esScenario = new EsScenario();
+              // Base
               esScenario.setBase_id(scenario.getScenario_id());
               esScenario.setBase_created_at(scenario.getScenario_created_at());
               esScenario.setBase_updated_at(scenario.getScenario_updated_at());
               esScenario.setBase_representative(scenario.getScenario_name());
+              esScenario.setBase_restrictions(buildRestrictions(scenario.getScenario_id()));
+              // Specific
               return esScenario;
             })
         .toList();
