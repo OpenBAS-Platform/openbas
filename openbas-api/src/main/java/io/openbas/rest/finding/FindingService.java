@@ -5,6 +5,7 @@ import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContra
 import static io.openbas.rest.finding.FindingUtils.extractRawOutputByMode;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 
+import com.cronutils.utils.VisibleForTesting;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -149,8 +150,6 @@ public class FindingService {
 
   private void extractFindings(Inject inject, Asset asset, String trace) {
     List<Finding> findings = new ArrayList<>();
-    Map<String, Pattern> patternCache = new HashMap<>(); // Cache for compiled patterns
-
     Optional.ofNullable(inject.getPayload())
         .map(p -> p.get().getOutputParsers())
         .ifPresent(
@@ -165,76 +164,94 @@ public class FindingService {
                       switch (outputParser.getType()) {
                         case REGEX:
                         default:
-                          outputParser
-                              .getContractOutputElements()
-                              .forEach(
-                                  contractOutputElement -> {
-                                    String regex = contractOutputElement.getRule();
-                                    Pattern pattern =
-                                        patternCache.computeIfAbsent(regex, Pattern::compile);
-                                    Matcher matcher = pattern.matcher(rawOutputByMode);
-
-                                    while (matcher.find()) {
-                                      StringBuilder value = new StringBuilder();
-
-                                      for (ContractOutputField field :
-                                          contractOutputElement.getType().fields) {
-                                        String[] indexes =
-                                            contractOutputElement.getRegexGroups().stream()
-                                                .filter(
-                                                    regexGroup ->
-                                                        field
-                                                            .getKey()
-                                                            .equals(regexGroup.getField()))
-                                                .map(RegexGroup::getIndexValues)
-                                                .map(values -> values.split("\\$"))
-                                                .flatMap(Arrays::stream)
-                                                .filter(s -> !s.isEmpty())
-                                                .toArray(String[]::new);
-
-                                        for (String index : indexes) {
-                                          try {
-                                            int groupIndex = Integer.parseInt(index);
-                                            value.append(matcher.group(groupIndex)).append(" ");
-                                          } catch (NumberFormatException
-                                              | IllegalStateException e) {
-                                            System.err.println(
-                                                "Invalid regex group index: " + index);
-                                          }
-                                        }
-                                      }
-
-                                      String finalValue = value.toString().trim();
-
-                                      Optional<Finding> optionalFinding =
-                                          findingRepository.findByInjectIdAndValue(
-                                              inject.getId(), finalValue);
-
-                                      Finding finding =
-                                          optionalFinding.orElseGet(
-                                              () -> {
-                                                Finding newFinding = new Finding();
-                                                newFinding.setInject(inject);
-                                                newFinding.setField(contractOutputElement.getKey());
-                                                newFinding.setType(contractOutputElement.getType());
-                                                newFinding.setValue(finalValue);
-                                                newFinding.setTags(
-                                                    new HashSet<>(contractOutputElement.getTags()));
-                                                return newFinding;
-                                              });
-
-                                      finding.getAssets().add(asset);
-
-                                      if (!optionalFinding.isPresent()) {
-                                        findings.add(finding);
-                                      }
-                                    }
-                                  });
+                          findings.addAll(
+                              computeFindingUsingRegexRules(
+                                  inject,
+                                  asset,
+                                  rawOutputByMode,
+                                  outputParser.getContractOutputElements()));
                           break;
                       }
                     }));
 
     findingRepository.saveAll(findings);
+  }
+
+  private List<Finding> computeFindingUsingRegexRules(
+      Inject inject,
+      Asset asset,
+      String rawOutputByMode,
+      Set<io.openbas.database.model.ContractOutputElement> contractOutputElements) {
+    List<Finding> findings = new ArrayList<>();
+    Map<String, Pattern> patternCache = new HashMap<>();
+
+    contractOutputElements.stream()
+        .filter(io.openbas.database.model.ContractOutputElement::isFinding)
+        .forEach(
+            contractOutputElement -> {
+              String regex = contractOutputElement.getRule();
+              Pattern pattern = patternCache.computeIfAbsent(regex, Pattern::compile);
+              Matcher matcher = pattern.matcher(rawOutputByMode);
+
+              while (matcher.find()) {
+                String finalValue = buildValue(contractOutputElement, matcher);
+                Finding finding = buildFinding(inject, asset, contractOutputElement, finalValue);
+                findings.add(finding);
+              }
+            });
+
+    return findings;
+  }
+
+  private Finding buildFinding(
+      Inject inject,
+      Asset asset,
+      io.openbas.database.model.ContractOutputElement contractOutputElement,
+      String finalValue) {
+    Optional<Finding> optionalFinding =
+        findingRepository.findByInjectIdAndValue(inject.getId(), finalValue);
+
+    Finding finding =
+        optionalFinding.orElseGet(
+            () -> {
+              Finding newFinding = new Finding();
+              newFinding.setInject(inject);
+              newFinding.setField(contractOutputElement.getKey());
+              newFinding.setType(contractOutputElement.getType());
+              newFinding.setValue(finalValue);
+              newFinding.setTags(new HashSet<>(contractOutputElement.getTags()));
+              return newFinding;
+            });
+
+    finding.getAssets().add(asset);
+    return finding;
+  }
+
+  @VisibleForTesting
+  private String buildValue(
+      io.openbas.database.model.ContractOutputElement contractOutputElement, Matcher matcher) {
+    StringBuilder value = new StringBuilder();
+
+    for (ContractOutputField field : contractOutputElement.getType().fields) {
+      String[] indexes =
+          contractOutputElement.getRegexGroups().stream()
+              .filter(regexGroup -> field.getKey().equals(regexGroup.getField()))
+              .map(RegexGroup::getIndexValues)
+              .map(values -> values.split("\\$"))
+              .flatMap(Arrays::stream)
+              .filter(s -> !s.isEmpty())
+              .toArray(String[]::new);
+
+      for (String index : indexes) {
+        try {
+          int groupIndex = Integer.parseInt(index);
+          value.append(matcher.group(groupIndex)).append(" ");
+        } catch (NumberFormatException | IllegalStateException e) {
+          System.err.println("Invalid regex group index: " + index);
+        }
+      }
+    }
+    return value.toString();
   }
 
   public Finding linkFindings(
