@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class PayloadCreateInput {
 
   @NotBlank(message = MANDATORY_MESSAGE)

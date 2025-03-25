@@ -3,15 +3,14 @@ package io.openbas.rest.payload.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class ContractOutputElementInput {
 
   @JsonProperty("contract_output_element_is_finding")
