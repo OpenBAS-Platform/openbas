@@ -1,5 +1,7 @@
 package io.openbas.engine.model.inject;
 
+import static io.openbas.engine.EsUtils.buildRestrictions;
+
 import io.openbas.database.raw.RawInjectIndexing;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.engine.Handler;
@@ -28,10 +30,14 @@ public class InjectHandler implements Handler<EsInject> {
         .map(
             inject -> {
               EsInject esInject = new EsInject();
+              // Base
               esInject.setBase_id(inject.getInject_id());
               esInject.setBase_representative(inject.getInject_title());
               esInject.setBase_created_at(inject.getInject_created_at());
               esInject.setBase_updated_at(inject.getInject_updated_at());
+              esInject.setBase_restrictions(
+                  buildRestrictions(inject.getInject_scenario(), inject.getInject_Exercise()));
+              // Specific
               esInject.setInject_title(inject.getInject_title());
               esInject.setInject_status(inject.getInject_status_name());
               esInject.setInject_scenario_side(inject.getInject_scenario());

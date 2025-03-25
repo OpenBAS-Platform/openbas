@@ -3,6 +3,7 @@ package io.openbas.database.repository;
 import io.openbas.database.model.User;
 import io.openbas.database.raw.RawPlayer;
 import io.openbas.database.raw.RawUser;
+import io.openbas.database.raw.RawUserAuth;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -71,6 +72,19 @@ public interface UserRepository
               + "      group by us.user_id;",
       nativeQuery = true)
   List<RawUser> rawAll();
+
+  @Query(
+      value =
+          "select us.user_id, us.user_admin, "
+              + "array_remove(array_agg(grt.grant_exercise), null) as user_grant_exercises, "
+              + "array_remove(array_agg(grt.grant_scenario), null) as user_grant_scenarios "
+              + "from users us "
+              + "left join users_groups usr_grp on us.user_id = usr_grp.user_id "
+              + "left join grants grt on grt.grant_group = usr_grp.group_id "
+              + "where us.user_id = :userId "
+              + "group by us.user_id;",
+      nativeQuery = true)
+  RawUserAuth getUserWithAuth(@Param("userId") String userId);
 
   @Query(
       value =
