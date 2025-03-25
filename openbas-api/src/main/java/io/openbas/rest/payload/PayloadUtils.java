@@ -2,21 +2,21 @@ package io.openbas.rest.payload;
 
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.arm64;
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.x86_64;
-import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.*;
-import io.openbas.rest.payload.service.PayloadService;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -27,11 +27,6 @@ import org.springframework.stereotype.Component;
 public class PayloadUtils {
 
   private final TagRepository tagRepository;
-  private final AttackPatternRepository attackPatternRepository;
-  private final PayloadService payloadService;
-  private final PayloadRepository payloadRepository;
-  private final DocumentRepository documentRepository;
-  private final CollectorRepository collectorRepository;
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
@@ -119,252 +114,6 @@ public class PayloadUtils {
     }
     if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != x86_64 && arch != arm64)) {
       throw new BadRequestException("Executable architecture must be x86_64 or arm64.");
-    }
-  }
-
-  // -- CREATION --
-  public Payload createPayload(PayloadCreateInput input) {
-    PayloadType payloadType = PayloadType.fromString(input.getType());
-    validateArchitecture(payloadType.key, input.getExecutionArch());
-
-    switch (payloadType) {
-      case COMMAND:
-        Command commandPayload = new Command();
-        copyProperties(input, commandPayload);
-        commandPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        commandPayload = payloadRepository.save(commandPayload);
-        this.payloadService.updateInjectorContractsForPayload(commandPayload);
-        return commandPayload;
-      case EXECUTABLE:
-        Executable executablePayload = new Executable();
-        copyProperties(input, executablePayload);
-        executablePayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        executablePayload.setExecutableFile(
-            documentRepository.findById(input.getExecutableFile()).orElseThrow());
-        executablePayload = payloadRepository.save(executablePayload);
-        this.payloadService.updateInjectorContractsForPayload(executablePayload);
-        return executablePayload;
-      case FILE_DROP:
-        FileDrop fileDropPayload = new FileDrop();
-        copyProperties(input, fileDropPayload);
-        fileDropPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        Optional<Document> document = documentRepository.findById(input.getFileDropFile());
-        if (document.isPresent()) {
-          fileDropPayload.setFileDropFile(document.get());
-        } else {
-          log.info("Document not found: " + input.getFileDropFile());
-        }
-        fileDropPayload = payloadRepository.save(fileDropPayload);
-        this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
-        return fileDropPayload;
-      case DNS_RESOLUTION:
-        DnsResolution dnsResolutionPayload = new DnsResolution();
-        copyProperties(input, dnsResolutionPayload);
-        dnsResolutionPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
-        this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
-        return dnsResolutionPayload;
-      case NETWORK_TRAFFIC:
-        NetworkTraffic networkTrafficPayload = new NetworkTraffic();
-        copyProperties(input, networkTrafficPayload);
-        networkTrafficPayload.setAttackPatterns(
-            fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
-        networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        networkTrafficPayload = payloadRepository.save(networkTrafficPayload);
-        this.payloadService.updateInjectorContractsForPayload(networkTrafficPayload);
-        return networkTrafficPayload;
-      default:
-        throw new UnsupportedOperationException(
-            "Payload type " + input.getType() + " is not supported");
-    }
-  }
-
-  public Payload createPayloadFromUpsert(PayloadUpsertInput input) {
-    PayloadType payloadType = PayloadType.fromString(input.getType());
-    validateArchitecture(payloadType.key, input.getExecutionArch());
-
-    switch (payloadType) {
-      case COMMAND:
-        Command commandPayload = new Command();
-        copyProperties(input, commandPayload);
-        if (input.getCollector() != null) {
-          commandPayload.setCollector(
-              collectorRepository.findById(input.getCollector()).orElseThrow());
-        }
-        commandPayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllByExternalIdInIgnoreCase(
-                    input.getAttackPatternsExternalIds())));
-        commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        commandPayload = payloadRepository.save(commandPayload);
-        this.payloadService.updateInjectorContractsForPayload(commandPayload);
-        return commandPayload;
-      case EXECUTABLE:
-        Executable executablePayload = new Executable();
-        copyProperties(input, executablePayload);
-        if (input.getCollector() != null) {
-          executablePayload.setCollector(
-              collectorRepository.findById(input.getCollector()).orElseThrow());
-        }
-        executablePayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllByExternalIdInIgnoreCase(
-                    input.getAttackPatternsExternalIds())));
-        executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        executablePayload.setExecutableFile(
-            documentRepository.findById(input.getExecutableFile()).orElseThrow());
-        executablePayload = payloadRepository.save(executablePayload);
-        this.payloadService.updateInjectorContractsForPayload(executablePayload);
-        return executablePayload;
-      case FILE_DROP:
-        FileDrop fileDropPayload = new FileDrop();
-        copyProperties(input, fileDropPayload);
-        if (input.getCollector() != null) {
-          fileDropPayload.setCollector(
-              collectorRepository.findById(input.getCollector()).orElseThrow());
-        }
-        fileDropPayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllByExternalIdInIgnoreCase(
-                    input.getAttackPatternsExternalIds())));
-        fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        fileDropPayload.setFileDropFile(
-            documentRepository.findById(input.getFileDropFile()).orElseThrow());
-        fileDropPayload = payloadRepository.save(fileDropPayload);
-        this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
-        return fileDropPayload;
-      case DNS_RESOLUTION:
-        DnsResolution dnsResolutionPayload = new DnsResolution();
-        copyProperties(input, dnsResolutionPayload);
-        if (input.getCollector() != null) {
-          dnsResolutionPayload.setCollector(
-              collectorRepository.findById(input.getCollector()).orElseThrow());
-        }
-        dnsResolutionPayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllByExternalIdInIgnoreCase(
-                    input.getAttackPatternsExternalIds())));
-        dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
-        this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
-        return dnsResolutionPayload;
-      case NETWORK_TRAFFIC:
-        NetworkTraffic networkTrafficPayload = new NetworkTraffic();
-        copyProperties(input, networkTrafficPayload);
-        if (input.getCollector() != null) {
-          networkTrafficPayload.setCollector(
-              collectorRepository.findById(input.getCollector()).orElseThrow());
-        }
-        networkTrafficPayload.setAttackPatterns(
-            fromIterable(
-                attackPatternRepository.findAllByExternalIdInIgnoreCase(
-                    input.getAttackPatternsExternalIds())));
-        networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
-        networkTrafficPayload = payloadRepository.save(networkTrafficPayload);
-        this.payloadService.updateInjectorContractsForPayload(networkTrafficPayload);
-        return networkTrafficPayload;
-      default:
-        throw new UnsupportedOperationException(
-            "Payload type " + input.getType() + " is not supported");
-    }
-  }
-
-  // -- UPDATE --
-  public Payload updatePayload(PayloadUpdateInput input, Payload existingPayload) {
-    PayloadType payloadType = PayloadType.fromString(existingPayload.getType());
-    validateArchitecture(payloadType.key, input.getExecutionArch());
-
-    switch (payloadType) {
-      case COMMAND:
-        Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadCommand);
-        payloadCommand = payloadRepository.save(payloadCommand);
-        this.payloadService.updateInjectorContractsForPayload(payloadCommand);
-        return payloadCommand;
-      case EXECUTABLE:
-        Executable payloadExecutable = (Executable) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadExecutable);
-        payloadExecutable.setExecutableFile(
-            documentRepository.findById(input.getExecutableFile()).orElseThrow());
-        payloadExecutable = payloadRepository.save(payloadExecutable);
-        this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
-        return payloadExecutable;
-      case FILE_DROP:
-        FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadFileDrop);
-        payloadFileDrop.setFileDropFile(
-            documentRepository.findById(input.getFileDropFile()).orElseThrow());
-        payloadFileDrop = payloadRepository.save(payloadFileDrop);
-        this.payloadService.updateInjectorContractsForPayload(payloadFileDrop);
-        return payloadFileDrop;
-      case DNS_RESOLUTION:
-        DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadDnsResolution);
-        payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
-        this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
-        return payloadDnsResolution;
-      case NETWORK_TRAFFIC:
-        NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadNetworkTraffic);
-        payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
-        this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
-        return payloadNetworkTraffic;
-      default:
-        throw new UnsupportedOperationException(
-            "Payload type " + existingPayload.getType() + " is not supported");
-    }
-  }
-
-  public Payload updatePayloadFromUpsert(PayloadUpsertInput input, Payload existingPayload) {
-    PayloadType payloadType = PayloadType.fromString(existingPayload.getType());
-    validateArchitecture(payloadType.key, input.getExecutionArch());
-
-    switch (payloadType) {
-      case COMMAND:
-        Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadCommand);
-        payloadCommand = payloadRepository.save(payloadCommand);
-        this.payloadService.updateInjectorContractsForPayload(payloadCommand);
-        return payloadCommand;
-      case EXECUTABLE:
-        Executable payloadExecutable = (Executable) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadExecutable);
-        payloadExecutable.setExecutableFile(
-            documentRepository.findById(input.getExecutableFile()).orElseThrow());
-        payloadExecutable = payloadRepository.save(payloadExecutable);
-        this.payloadService.updateInjectorContractsForPayload(payloadExecutable);
-        return payloadExecutable;
-      case FILE_DROP:
-        FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadFileDrop);
-        payloadFileDrop.setFileDropFile(
-            documentRepository.findById(input.getFileDropFile()).orElseThrow());
-        payloadFileDrop = payloadRepository.save(payloadFileDrop);
-        this.payloadService.updateInjectorContractsForPayload(payloadFileDrop);
-        return payloadFileDrop;
-      case DNS_RESOLUTION:
-        DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadDnsResolution);
-        payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
-        this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
-        return payloadDnsResolution;
-      case NETWORK_TRAFFIC:
-        NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(existingPayload);
-        copyProperties(input, payloadNetworkTraffic);
-        payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
-        this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
-        return payloadNetworkTraffic;
-      default:
-        throw new UnsupportedOperationException(
-            "Payload type " + existingPayload.getType() + " is not supported");
     }
   }
 
