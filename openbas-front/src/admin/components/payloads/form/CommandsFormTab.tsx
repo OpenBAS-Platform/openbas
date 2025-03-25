@@ -21,6 +21,8 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
   useEffect(() => {
     if (!(type == 'Command' || type == 'Executable')) {
       setValue('payload_execution_arch', 'ALL_ARCHITECTURES'); // Automatically set arch to 'all' if type is 'a'
+    } else if (type === 'Executable') {
+      setValue('payload_execution_arch', '');
     }
   }, [type, setValue]);
 
@@ -61,10 +63,12 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
       value: 'arm64',
       label: t('arm64'),
     },
-    {
-      value: 'ALL_ARCHITECTURES',
-      label: t('ALL_ARCHITECTURES'),
-    },
+    ...(type !== 'Executable'
+      ? [{
+          value: 'ALL_ARCHITECTURES',
+          label: t('ALL_ARCHITECTURES'),
+        }]
+      : []),
   ];
 
   const executorsItems = [
@@ -121,7 +125,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
               setFieldValue={(_name, document) => {
                 onChange(document);
               }}
-              initialValue={{ id: value.id }}
+              initialValue={{ id: value?.id }}
               InputLabelProps={{ required: true }}
               error={!!error}
             />
