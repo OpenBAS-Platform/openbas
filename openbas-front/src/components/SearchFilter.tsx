@@ -1,6 +1,6 @@
 import { Search } from '@mui/icons-material';
 import { InputAdornment, TextField } from '@mui/material';
-import { type ChangeEvent, type FunctionComponent, type KeyboardEvent, useCallback } from 'react';
+import { type ChangeEvent, type FunctionComponent, useCallback } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { debounce } from '../utils/utils';
@@ -8,51 +8,25 @@ import { useFormatter } from './i18n';
 
 const useStyles = makeStyles()(theme => ({
   searchRoot: {
-    borderRadius: 4,
-    padding: '0 10px 0 10px',
-    backgroundColor: theme.palette.background.paper,
-  },
-  searchRootTopBar: {
-    borderRadius: 4,
-    padding: '1px 10px 0 10px',
-    marginRight: 5,
-    backgroundColor: theme.palette.background.paper,
-    minWidth: 550,
-    width: '50%',
-  },
-  searchRootFullTopBar: {
-    borderRadius: 4,
-    padding: '1px 10px 0 10px',
-    marginRight: 5,
-    backgroundColor: theme.palette.background.paper,
-    minWidth: 1300,
-    width: '50%',
-  },
-  searchRootInDrawer: {
-    borderRadius: 5,
-    padding: '0 10px 0 10px',
-    height: 30,
-  },
-  searchRootThin: {
-    borderRadius: 5,
-    padding: '0 10px 0 10px',
-    height: 30,
-    backgroundColor: theme.palette.background.paper,
-  },
-  searchRootNoAnimation: {
-    borderRadius: 5,
-    padding: '0 10px 0 10px',
-    backgroundColor: theme.palette.background.default,
+    'borderRadius': 5,
+    'padding': '0 10px',
+    'backgroundColor': theme.palette.background.paper,
+    '&.inDrawer': { height: 30 },
+    '&.topBar': {
+      marginRight: 5,
+      minWidth: 550,
+      width: '50%',
+    },
+    '&.thin': { height: 30 },
   },
   searchInput: {
     'transition': theme.transitions.create('width'),
     'width': 200,
     '&:focus': { width: 350 },
-  },
-  searchInputSmall: {
-    'transition': theme.transitions.create('width'),
-    'width': 150,
-    '&:focus': { width: 250 },
+    '&.small, &.thin': {
+      'width': 150,
+      '&:focus': { width: 250 },
+    },
   },
 }));
 
@@ -75,32 +49,27 @@ const SearchInput: FunctionComponent<Props> = ({
   placeholder,
   debounceMs,
 }) => {
+  // Standard hooks
   const { classes } = useStyles();
-
   const { t } = useFormatter();
 
-  let classRoot = classes.searchRoot;
-  if (variant === 'inDrawer') {
-    classRoot = classes.searchRootInDrawer;
-  } else if (variant === 'noAnimation') {
-    classRoot = classes.searchRootNoAnimation;
-  } else if (variant === 'topBar') {
-    classRoot = classes.searchRootTopBar;
-  } else if (variant === 'fullTopBar') {
-    // FIXME: why ?
-    classRoot = classes.searchRootFullTopBar;
-  } else if (variant === 'thin') {
-    classRoot = classes.searchRootThin;
-  }
+  const classRoot = `${classes.searchRoot} ${variant ?? ''}`.trim();
+  const inputClass = `${classes.searchInput} ${variant ?? ''}`.trim();
 
   const debouncedChangeHandler = useCallback(
-    debounce(onChange!, debounceMs),
-    [],
+    debounce((value?: string) => onChange?.(value), debounceMs),
+    [onChange, debounceMs],
   );
 
   const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
     if (typeof onChange === 'function') {
       debouncedChangeHandler(target.value);
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      onSubmit?.(event.currentTarget.value);
     }
   };
 
@@ -111,13 +80,9 @@ const SearchInput: FunctionComponent<Props> = ({
       defaultValue={keyword}
       variant="outlined"
       size="small"
-      placeholder={placeholder || `${t('Search these results')}...`}
+      placeholder={placeholder ?? `${t('Search these results')}...`}
       onChange={handleChange}
-      onKeyPress={(event: KeyboardEvent<HTMLInputElement>) => {
-        if (typeof onSubmit === 'function' && event.key === 'Enter') {
-          onSubmit((event.target as HTMLInputElement).value);
-        }
-      }}
+      onKeyDown={handleKeyDown}
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
@@ -126,13 +91,7 @@ const SearchInput: FunctionComponent<Props> = ({
         ),
         classes: {
           root: classRoot,
-          input:
-          // eslint-disable-next-line no-nested-ternary
-            variant === 'small' || variant === 'thin'
-              ? classes.searchInputSmall
-              : variant !== 'noAnimation'
-                ? classes.searchInput
-                : '',
+          input: inputClass,
         },
       }}
       autoComplete="off"
