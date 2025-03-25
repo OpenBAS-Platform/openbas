@@ -1,5 +1,7 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
@@ -8,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -70,6 +73,16 @@ public class ContractOutputElement implements Base {
   @JsonProperty("contract_output_element_tags")
   private Set<Tag> tags = new HashSet<>();
 
+  @Column(name = "contract_output_element_created_at")
+  @JsonProperty("contract_output_element_created_at")
+  @NotNull
+  private Instant createdAt = now();
+
+  @Column(name = "contract_output_element_updated_at")
+  @JsonProperty("contract_output_element_updated_at")
+  @NotNull
+  private Instant updatedAt = now();
+
   @Override
   public int hashCode() {
     return Objects.hash(id);
@@ -82,6 +95,9 @@ public class ContractOutputElement implements Base {
 
   @Override
   public void setId(String id) {
-    this.id = UUID.fromString(id);
+    this.id = null;
+    if (id != null && !id.isEmpty()) {
+      this.id = UUID.fromString(id);
+    }
   }
 }

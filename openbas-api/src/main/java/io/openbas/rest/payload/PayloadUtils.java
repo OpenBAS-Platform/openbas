@@ -3,6 +3,7 @@ package io.openbas.rest.payload;
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.arm64;
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.x86_64;
 import static io.openbas.helper.StreamHelper.iterableToSet;
+import static java.time.Instant.now;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -160,7 +161,10 @@ public class PayloadUtils {
                   inputParser -> {
                     OutputParser outputParser = new OutputParser();
                     BeanUtils.copyProperties(inputParser, outputParser);
+                    outputParser.setId(null);
                     outputParser.setPayload(target);
+                    outputParser.setCreatedAt(now());
+                    outputParser.setUpdatedAt(now());
 
                     // Handle contract output elements based on the input type
                     if (inputParser instanceof OutputParserInput) {
@@ -188,7 +192,11 @@ public class PayloadUtils {
                   inputElement -> {
                     ContractOutputElement contractOutputElement = new ContractOutputElement();
                     BeanUtils.copyProperties(inputElement, contractOutputElement);
+                    contractOutputElement.setId(null);
                     contractOutputElement.setOutputParser(outputParser);
+                    contractOutputElement.setCreatedAt(now());
+                    contractOutputElement.setUpdatedAt(now());
+
                     if (inputElement instanceof ContractOutputElementInput) {
                       ContractOutputElementInput contractOutputElementInput =
                           (ContractOutputElementInput) inputElement;
@@ -221,7 +229,11 @@ public class PayloadUtils {
                   inputElement -> {
                     RegexGroup regexGroup = new RegexGroup();
                     BeanUtils.copyProperties(inputElement, regexGroup);
+                    regexGroup.setId(null);
                     regexGroup.setContractOutputElement(contractOutputElement);
+                    regexGroup.setCreatedAt(now());
+                    regexGroup.setUpdatedAt(now());
+
                     return regexGroup;
                   })
               .collect(Collectors.toSet());

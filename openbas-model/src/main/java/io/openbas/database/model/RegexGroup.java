@@ -1,11 +1,14 @@
 package io.openbas.database.model;
 
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Data;
@@ -39,6 +42,16 @@ public class RegexGroup implements Base {
   @JsonProperty("regex_group_index_values")
   private String indexValues;
 
+  @Column(name = "regex_group_created_at")
+  @JsonProperty("regex_group_created_at")
+  @NotNull
+  private Instant createdAt = now();
+
+  @Column(name = "regex_group_updated_at")
+  @JsonProperty("regex_group_updated_at")
+  @NotNull
+  private Instant updatedAt = now();
+
   @Override
   public int hashCode() {
     return Objects.hash(id);
@@ -51,6 +64,9 @@ public class RegexGroup implements Base {
 
   @Override
   public void setId(String id) {
-    this.id = UUID.fromString(id);
+    this.id = null;
+    if (id != null && !id.isEmpty()) {
+      this.id = UUID.fromString(id);
+    }
   }
 }
