@@ -83,7 +83,11 @@ const PaginationComponentV2 = <T extends object>({
               operator: availableOperators(property)[0],
             } as OptionPropertySchema
           ))
-          .sort((a, b) => a.label.localeCompare(b.label));
+          .sort((a, b) => {
+            const labelA = Array.isArray(a.label) ? a.label[0] : a.label;
+            const labelB = Array.isArray(b.label) ? b.label[0] : b.label;
+            return labelA.localeCompare(labelB);
+          });
         setOptions(newOptions);
         setProperties(propertySchemas);
       });
