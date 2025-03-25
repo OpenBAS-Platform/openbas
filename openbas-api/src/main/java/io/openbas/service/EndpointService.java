@@ -292,13 +292,13 @@ public class EndpointService {
     // If agent is not temporary and not the same version as the platform => Create an upgrade task
     // for the agent
     Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
-    /*if (agent.getParent() == null && !agent.getVersion().equals(version)) {
+    if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(
           generateUpgradeCommand(endpoint.getPlatform().name(), input.getInstallationMode()));
       assetAgentJob.setAgent(agent);
       assetAgentJobRepository.save(assetAgentJob);
-    }*/
+    }
     return endpoint;
   }
 
