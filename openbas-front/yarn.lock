@@ -9412,7 +9412,7 @@ __metadata:
     react-final-form: "npm:6.5.9"
     react-final-form-arrays: "npm:3.1.4"
     react-hook-form: "npm:7.54.2"
-    react-intl: "npm:7.1.8"
+    react-intl: "npm:7.1.9"
     react-markdown: "npm:9.1.0"
     react-redux: "npm:9.2.0"
     react-router: "npm:7.4.0"
@@ -10050,9 +10050,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-intl@npm:7.1.8":
-  version: 7.1.8
-  resolution: "react-intl@npm:7.1.8"
+"react-intl@npm:7.1.9":
+  version: 7.1.9
+  resolution: "react-intl@npm:7.1.9"
   dependencies:
     "@formatjs/ecma402-abstract": "npm:2.3.4"
     "@formatjs/icu-messageformat-parser": "npm:2.11.2"
@@ -10068,7 +10068,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/0541d88be2ee9f63245ef28d4cccafc5cdbcd1fbfb9a96cf36d4429db8ee5ddb0b3b19865f525bf08e8bd6202ad51679f96a0057f90598f1e58bcaa0c97c85d9
+  checksum: 10c0/6af67a0933f5ddecc4d2dce28ef297e3be81aca2a317b6431486746847c0819c5ede03fbca7abf9d2b3975c17fd2495668b8c0d53229f4733e767c5818abd641
   languageName: node
   linkType: hard
 
