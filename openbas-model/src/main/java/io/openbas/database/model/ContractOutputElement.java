@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -21,11 +22,11 @@ public class ContractOutputElement implements Base {
 
   @Id
   @Column(name = "contract_output_element_id")
-  @GeneratedValue(generator = "UUID")
+  @GeneratedValue
   @UuidGenerator
   @JsonProperty("contract_output_element_id")
   @NotBlank
-  private String id;
+  private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -72,5 +73,15 @@ public class ContractOutputElement implements Base {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  @Override
+  public String getId() {
+    return this.id != null ? this.id.toString() : "";
+  }
+
+  @Override
+  public void setId(String id) {
+    this.id = UUID.fromString(id);
   }
 }

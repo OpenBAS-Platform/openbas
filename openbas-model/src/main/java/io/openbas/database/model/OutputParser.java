@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -19,11 +20,11 @@ public class OutputParser implements Base {
 
   @Id
   @Column(name = "output_parser_id")
-  @GeneratedValue(generator = "UUID")
+  @GeneratedValue
   @UuidGenerator
   @JsonProperty("output_parser_id")
   @NotBlank
-  private String id;
+  private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -49,5 +50,15 @@ public class OutputParser implements Base {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  @Override
+  public String getId() {
+    return this.id != null ? this.id.toString() : "";
+  }
+
+  @Override
+  public void setId(String id) {
+    this.id = UUID.fromString(id);
   }
 }
