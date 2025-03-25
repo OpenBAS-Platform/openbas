@@ -182,12 +182,12 @@ const SimulationList: FunctionComponent<Props> = ({
       {
         loading
           ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} />
-          : exercises.map((exercise: ExerciseSimple, index) => (
+          : exercises.map((exercise: ExerciseSimple) => (
               <ListItem
                 key={exercise.exercise_id}
                 secondaryAction={secondaryAction && secondaryAction(exercise)}
                 disablePadding
-                divider={exercises.length !== index + 1}
+                divider
               >
                 <ListItemButton
                   classes={{ root: classes.item }}
