@@ -1,6 +1,5 @@
 /* eslint-disable */
 /* tslint:disable */
-// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -307,6 +306,7 @@ interface BasePayload {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
@@ -596,14 +596,20 @@ export interface Condition {
 }
 
 export interface ContractOutputElement {
+  /** @format date-time */
+  contract_output_element_created_at: string;
   contract_output_element_id: string;
   contract_output_element_is_finding?: boolean;
   contract_output_element_key?: string;
   contract_output_element_name?: string;
   contract_output_element_output_parser?: string;
+  /** @uniqueItems true */
+  contract_output_element_regex_groups?: RegexGroup[];
   contract_output_element_rule?: string;
   contract_output_element_tags?: string[];
   contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  /** @format date-time */
+  contract_output_element_updated_at: string;
   listened?: boolean;
 }
 
@@ -615,6 +621,11 @@ export interface ContractOutputElementInput {
   contract_output_element_key?: string;
   /** Name */
   contract_output_element_name?: string;
+  /**
+   * Set of regex groups
+   * @uniqueItems true
+   */
+  contract_output_element_regex_groups?: RegexGroupInput[];
   /** Parser Rule */
   contract_output_element_rule?: string;
   /** List of tags */
@@ -2327,16 +2338,24 @@ export interface OrganizationUpdateInput {
 
 export interface OutputParser {
   listened?: boolean;
+  /** @uniqueItems true */
   output_parser_contract_output_elements?: ContractOutputElement[];
+  /** @format date-time */
+  output_parser_created_at: string;
   output_parser_id: string;
   output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
   output_parser_payload?: Payload;
   output_parser_type?: "REGEX";
+  /** @format date-time */
+  output_parser_updated_at: string;
 }
 
-/** List of output parsers */
+/** Set of output parsers */
 export interface OutputParserInput {
-  /** List of Contract output elements */
+  /**
+   * List of Contract output elements
+   * @uniqueItems true
+   */
   output_parser_contract_output_elements?: ContractOutputElementInput[];
   /** Paser Mode: STDOUT, STDERR, READ_FILE */
   output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
@@ -2828,7 +2847,10 @@ export interface PayloadCreateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
-  /** List of output parsers */
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
   payload_output_parsers?: OutputParserInput[];
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
@@ -2864,7 +2886,10 @@ export interface PayloadUpdateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
-  /** List of output parsers */
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
   payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
@@ -2887,7 +2912,10 @@ export interface PayloadUpsertInput {
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id: string;
   payload_name: string;
-  /** List of output parsers */
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
   payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
@@ -3166,6 +3194,26 @@ export interface RawUser {
   user_phone?: string;
   user_tags?: string[];
   user_teams?: string[];
+}
+
+export interface RegexGroup {
+  listened?: boolean;
+  regex_group_contract_output_element?: string;
+  /** @format date-time */
+  regex_group_created_at: string;
+  regex_group_field?: string;
+  regex_group_id: string;
+  regex_group_index_values?: string;
+  /** @format date-time */
+  regex_group_updated_at: string;
+}
+
+/** Set of regex groups */
+export interface RegexGroupInput {
+  /** Field */
+  regex_group_field?: string;
+  /** Index of the group from the regex match: $index0$index1 */
+  regex_group_index_values?: string;
 }
 
 export interface RenewTokenInput {
