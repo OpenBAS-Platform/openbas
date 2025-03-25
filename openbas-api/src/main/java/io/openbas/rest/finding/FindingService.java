@@ -91,11 +91,40 @@ public class FindingService {
                                     Matcher matcher = pattern.matcher(rawOutputByMode);
 
                                     while (matcher.find()) {
-                                      String value = matcher.group(0);
+                                      StringBuilder value = new StringBuilder();
+
+                                      for (ContractOutputField field :
+                                          contractOutputElement.getType().fields) {
+                                        String[] indexes =
+                                            contractOutputElement.getRegexGroups().stream()
+                                                .filter(
+                                                    regexGroup ->
+                                                        field
+                                                            .getKey()
+                                                            .equals(regexGroup.getField()))
+                                                .map(RegexGroup::getIndexValues)
+                                                .map(values -> values.split("\\$"))
+                                                .flatMap(Arrays::stream)
+                                                .filter(s -> !s.isEmpty())
+                                                .toArray(String[]::new);
+
+                                        for (String index : indexes) {
+                                          try {
+                                            int groupIndex = Integer.parseInt(index);
+                                            value.append(matcher.group(groupIndex)).append(" ");
+                                          } catch (NumberFormatException
+                                              | IllegalStateException e) {
+                                            System.err.println(
+                                                "Invalid regex group index: " + index);
+                                          }
+                                        }
+                                      }
+
+                                      String finalValue = value.toString().trim();
 
                                       Optional<Finding> optionalFinding =
                                           findingRepository.findByInjectIdAndValue(
-                                              inject.getId(), value);
+                                              inject.getId(), finalValue);
 
                                       Finding finding =
                                           optionalFinding.orElseGet(
@@ -104,7 +133,7 @@ public class FindingService {
                                                 newFinding.setInject(inject);
                                                 newFinding.setField(contractOutputElement.getKey());
                                                 newFinding.setType(contractOutputElement.getType());
-                                                newFinding.setValue(value);
+                                                newFinding.setValue(finalValue);
                                                 newFinding.setTags(
                                                     new HashSet<>(contractOutputElement.getTags()));
                                                 return newFinding;
@@ -120,6 +149,7 @@ public class FindingService {
                           break;
                       }
                     }));
+
     findingRepository.saveAll(findings);
   }
 }
