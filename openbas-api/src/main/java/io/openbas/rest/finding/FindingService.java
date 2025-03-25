@@ -85,21 +85,8 @@ public class FindingService {
   }
 
   // -- EXTRACTION FINDINGS --
-  public void extractFindingsFromRawOutput(InjectExecutionInput input, Inject inject, Agent agent) {
-    if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
-      inject
-          .getPayload()
-          .ifPresent(
-              payload -> {
-                if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
-                  extractFindings(inject, agent.getAsset(), input.getMessage());
-                } else {
-                  log.info(
-                      "No output parsers available for payload used in inject:" + inject.getId());
-                }
-              });
-    }
-  }
+
+  // -- STRUCTURED OUTPUT --
 
   public void extractFindingsFromStructuredOutput(InjectExecutionInput input, Inject inject) {
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
@@ -145,6 +132,54 @@ public class FindingService {
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
+    }
+  }
+
+  private Finding linkFindings(
+      ContractOutputElement contractOutput, JsonNode jsonNode, Finding finding) {
+    // Create links with assets
+    if (contractOutput.getType().toFindingAssets != null) {
+      List<String> assetsIds = contractOutput.getType().toFindingAssets.apply(jsonNode);
+      List<Optional<Asset>> assets =
+          assetsIds.stream().map(this.assetRepository::findById).toList();
+      if (!assets.isEmpty()) {
+        finding.setAssets(assets.stream().filter(Optional::isPresent).map(Optional::get).toList());
+      }
+    }
+    // Create links with teams
+    if (contractOutput.getType().toFindingTeams != null) {
+      List<String> teamsIds = contractOutput.getType().toFindingTeams.apply(jsonNode);
+      List<Optional<Team>> teams = teamsIds.stream().map(this.teamRepository::findById).toList();
+      if (!teams.isEmpty()) {
+        finding.setTeams(teams.stream().filter(Optional::isPresent).map(Optional::get).toList());
+      }
+    }
+    // Create links with users
+    if (contractOutput.getType().toFindingUsers != null) {
+      List<String> usersIds = contractOutput.getType().toFindingUsers.apply(jsonNode);
+      List<Optional<User>> users = usersIds.stream().map(this.userRepository::findById).toList();
+      if (!users.isEmpty()) {
+        finding.setUsers(users.stream().filter(Optional::isPresent).map(Optional::get).toList());
+      }
+    }
+    return finding;
+  }
+
+  // -- RAW OUTPUT --
+
+  public void extractFindingsFromRawOutput(InjectExecutionInput input, Inject inject, Agent agent) {
+    if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
+      inject
+          .getPayload()
+          .ifPresent(
+              payload -> {
+                if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
+                  extractFindings(inject, agent.getAsset(), input.getMessage());
+                } else {
+                  log.info(
+                      "No output parsers available for payload used in inject:" + inject.getId());
+                }
+              });
     }
   }
 
@@ -252,35 +287,5 @@ public class FindingService {
       }
     }
     return value.toString();
-  }
-
-  public Finding linkFindings(
-      ContractOutputElement contractOutput, JsonNode jsonNode, Finding finding) {
-    // Create links with assets
-    if (contractOutput.getType().toFindingAssets != null) {
-      List<String> assetsIds = contractOutput.getType().toFindingAssets.apply(jsonNode);
-      List<Optional<Asset>> assets =
-          assetsIds.stream().map(this.assetRepository::findById).toList();
-      if (!assets.isEmpty()) {
-        finding.setAssets(assets.stream().filter(Optional::isPresent).map(Optional::get).toList());
-      }
-    }
-    // Create links with teams
-    if (contractOutput.getType().toFindingTeams != null) {
-      List<String> teamsIds = contractOutput.getType().toFindingTeams.apply(jsonNode);
-      List<Optional<Team>> teams = teamsIds.stream().map(this.teamRepository::findById).toList();
-      if (!teams.isEmpty()) {
-        finding.setTeams(teams.stream().filter(Optional::isPresent).map(Optional::get).toList());
-      }
-    }
-    // Create links with users
-    if (contractOutput.getType().toFindingUsers != null) {
-      List<String> usersIds = contractOutput.getType().toFindingUsers.apply(jsonNode);
-      List<Optional<User>> users = usersIds.stream().map(this.userRepository::findById).toList();
-      if (!users.isEmpty()) {
-        finding.setUsers(users.stream().filter(Optional::isPresent).map(Optional::get).toList());
-      }
-    }
-    return finding;
   }
 }
