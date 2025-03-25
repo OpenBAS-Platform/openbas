@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -23,7 +24,7 @@ public class RegexGroup implements Base {
   @UuidGenerator
   @JsonProperty("regex_group_id")
   @NotBlank
-  private String id;
+  private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "regex_group_contract_output_element_id")
@@ -53,5 +54,15 @@ public class RegexGroup implements Base {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  @Override
+  public String getId() {
+    return this.id != null ? this.id.toString() : "";
+  }
+
+  @Override
+  public void setId(String id) {
+    this.id = UUID.fromString(id);
   }
 }
