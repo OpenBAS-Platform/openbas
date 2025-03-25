@@ -182,13 +182,12 @@ const ScenarioForm: FunctionComponent<Props> = ({
             <Controller
               control={control}
               name="scenario_tags"
-              render={({ field: { onChange, value } }) => (
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
                 <TagField
-                  name="scenarios_tags"
                   label={t('Tags')}
                   fieldValue={value ?? []}
                   fieldOnChange={onChange}
-                  errors={errors}
+                  error={error}
                   style={{ marginTop: 20 }}
                 />
               )}

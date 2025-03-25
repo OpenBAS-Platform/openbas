@@ -140,13 +140,12 @@ const SecurityPlatformForm: FunctionComponent<Props> = ({
       <Controller
         control={control}
         name="asset_tags"
-        render={({ field: { onChange, value } }) => (
+        render={({ field: { onChange, value }, fieldState: { error } }) => (
           <TagField
-            name="asset_tags"
             label={t('Tags')}
             fieldValue={value ?? []}
             fieldOnChange={onChange}
-            errors={errors}
+            error={error}
             style={{ marginTop: 20 }}
           />
         )}
