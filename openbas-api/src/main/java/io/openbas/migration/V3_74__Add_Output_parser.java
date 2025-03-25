@@ -14,7 +14,7 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
       statement.execute(
           """
               CREATE TABLE output_parsers (
-                      output_parser_id VARCHAR(255) NOT NULL PRIMARY KEY,
+                      output_parser_id UUID NOT NULL PRIMARY KEY,
                       output_parser_mode VARCHAR(50) NOT NULL,
                       output_parser_type VARCHAR(50) NOT NULL,
                       output_parser_payload_id VARCHAR(255) NOT NULL,
@@ -30,13 +30,13 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
       statement.execute(
           """
                   CREATE TABLE contract_output_elements (
-                      contract_output_element_id VARCHAR(255) NOT NULL PRIMARY KEY,
+                      contract_output_element_id UUID NOT NULL PRIMARY KEY,
                       contract_output_element_is_finding BOOLEAN DEFAULT true,
                       contract_output_element_rule TEXT NOT NULL,
                       contract_output_element_name VARCHAR(50) NOT NULL,
                       contract_output_element_key VARCHAR(255) NOT NULL,
                       contract_output_element_type VARCHAR(50) NOT NULL,
-                      contract_output_element_output_parser_id VARCHAR(255) NOT NULL,
+                      contract_output_element_output_parser_id UUID NOT NULL,
                       contract_output_element_created_at TIMESTAMP DEFAULT now(),
                       contract_output_element_updated_at TIMESTAMP DEFAULT now(),
                       CONSTRAINT contract_output_element_output_parser_id_fk
@@ -50,10 +50,10 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
       statement.execute(
           """
                   CREATE TABLE regex_groups (
-                      regex_group_id VARCHAR(255) NOT NULL PRIMARY KEY,
+                      regex_group_id UUID NOT NULL PRIMARY KEY,
                       regex_group_field VARCHAR(50) NOT NULL,
                       regex_group_index_values VARCHAR(50) NOT NULL,
-                      regex_group_contract_output_element_id VARCHAR(255) NOT NULL,
+                      regex_group_contract_output_element_id UUID NOT NULL,
                       regex_group_created_at TIMESTAMP DEFAULT now(),
                       regex_group_updated_at TIMESTAMP DEFAULT now(),
                       CONSTRAINT regex_group_contract_output_element_id_fk
@@ -66,7 +66,7 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
       statement.execute(
           """
                   CREATE TABLE contract_output_elements_tags (
-                     contract_output_element_id VARCHAR(255) NOT NULL,
+                     contract_output_element_id UUID NOT NULL,
                      tag_id VARCHAR(255) NOT NULL,
                      PRIMARY KEY (contract_output_element_id, tag_id),
                      CONSTRAINT contract_output_element_id_fk
