@@ -1,8 +1,11 @@
 package io.openbas.rest.dashboard;
 
+import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_USER;
 
 import io.openbas.database.model.Filters;
+import io.openbas.database.raw.RawUserAuth;
+import io.openbas.database.repository.UserRepository;
 import io.openbas.engine.api.DateHistogramConfig;
 import io.openbas.engine.api.StructuralHistogramConfig;
 import io.openbas.engine.model.*;
@@ -27,10 +30,16 @@ public class DashboardApi extends RestBehavior {
   public static final String QUERY_URI = "/api/query";
 
   private EsService esService;
+  private UserRepository userRepository;
 
   @Autowired
   public void setEsService(EsService esService) {
     this.esService = esService;
+  }
+
+  @Autowired
+  public void setUserRepository(UserRepository userRepository) {
+    this.userRepository = userRepository;
   }
 
   @GetMapping(DASHBOARD_URI + "/temporal/{widget}")
@@ -46,7 +55,8 @@ public class DashboardApi extends RestBehavior {
     filterGroup.setFilters(List.of(filter));
     // Try to fetch a date histogram
     DateHistogramConfig config = new DateHistogramConfig("series01", filterGroup);
-    return esService.multiDateHistogram(List.of(config));
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    return esService.multiDateHistogram(userWithAuth, List.of(config));
   }
 
   @GetMapping(DASHBOARD_URI + "/structural/{widget}")
@@ -63,12 +73,14 @@ public class DashboardApi extends RestBehavior {
     // Try to fetch a structural histogram
     StructuralHistogramConfig structuralConfig =
         new StructuralHistogramConfig("series01", filterGroup);
-    structuralConfig.setField("finding_type"); // finding_scenario_side
-    return esService.multiTermHistogram(List.of(structuralConfig));
+    structuralConfig.setField("finding_scenario_side"); // finding_scenario_side
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    return esService.multiTermHistogram(userWithAuth, List.of(structuralConfig));
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")
   public List<EsSearch> search(@PathVariable String search) {
-    return esService.search(search, null);
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    return esService.search(userWithAuth, search, null);
   }
 }
