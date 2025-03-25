@@ -5,7 +5,7 @@ import io.openbas.database.model.ExecutionTraceAction;
 import io.openbas.database.model.ExecutionTraceStatus;
 import io.openbas.rest.inject.form.InjectExecutionAction;
 
-public class StatusUtils {
+public class InjectExecutionUtils {
 
   public static ExecutionTraceStatus convertExecutionStatus(ExecutionStatus status) {
     return switch (status) {
@@ -18,8 +18,8 @@ public class StatusUtils {
     };
   }
 
-  public static ExecutionTraceAction convertExecutionAction(InjectExecutionAction status) {
-    return switch (status) {
+  public static ExecutionTraceAction convertExecutionAction(InjectExecutionAction action) {
+    return switch (action) {
       case prerequisite_check -> ExecutionTraceAction.PREREQUISITE_CHECK;
       case prerequisite_execution -> ExecutionTraceAction.PREREQUISITE_EXECUTION;
       case cleanup_execution -> ExecutionTraceAction.CLEANUP_EXECUTION;
