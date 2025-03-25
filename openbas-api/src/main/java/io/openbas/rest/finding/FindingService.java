@@ -3,7 +3,7 @@ package io.openbas.rest.finding;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
 import static io.openbas.rest.finding.FindingUtils.extractRawOutputByMode;
-import static io.openbas.utils.StatusUtils.convertExecutionAction;
+import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

@@ -1,7 +1,7 @@
 package io.openbas.rest.inject.service;
 
-import static io.openbas.utils.StatusUtils.convertExecutionAction;
-import static io.openbas.utils.StatusUtils.convertExecutionStatus;
+import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
+import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
