@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class OutputParser implements Base {
   @GeneratedValue
   @UuidGenerator
   @JsonProperty("output_parser_id")
-  @NotBlank
+  @NotNull
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
