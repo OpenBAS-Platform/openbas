@@ -79,7 +79,7 @@ const PayloadForm = ({
     }).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_execution_arch: z.enum(['x86_64', 'arm64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_cleanup_command: z.string().optional(),
-    payload_cleanup_executor: z.string().optional(), // TODO should be required if the cleanup command is set
+    payload_cleanup_executor: z.string().optional(),
     payload_arguments: z.array(payloadArgumentZodObject).optional(),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional(),
   };

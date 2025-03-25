@@ -21,7 +21,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
   useEffect(() => {
     if (!(type == 'Command' || type == 'Executable')) {
       setValue('payload_execution_arch', 'ALL_ARCHITECTURES'); // Automatically set arch to 'all' if type is 'a'
-    } else if (type === 'Executable') {
+    } else if (!disabledPayloadType && type === 'Executable') {
       setValue('payload_execution_arch', '');
     }
   }, [type, setValue]);
