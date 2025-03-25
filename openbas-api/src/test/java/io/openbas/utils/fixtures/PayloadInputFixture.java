@@ -32,7 +32,7 @@ public class PayloadInputFixture {
 
     RegexGroupInput regexGroupInput = new RegexGroupInput();
     regexGroupInput.setField("ipv6");
-    regexGroupInput.setIndex(0);
+    regexGroupInput.setIndexValues("$0");
 
     ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
     contractOutputElementInput.setKey("IPV6");
@@ -143,7 +143,7 @@ public class PayloadInputFixture {
   private static ContractOutputElementInput getContractOutputElementInput() {
     RegexGroupInput regexGroupUserNameInput = new RegexGroupInput();
     regexGroupUserNameInput.setField("username");
-    regexGroupUserNameInput.setIndex(1);
+    regexGroupUserNameInput.setIndexValues("$1");
 
     ContractOutputElementInput contractOutputElementInput = new ContractOutputElementInput();
     contractOutputElementInput.setKey("credentials_user");
