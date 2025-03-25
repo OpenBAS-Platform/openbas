@@ -150,4 +150,9 @@ class FindingServiceTest extends IntegrationTest {
     // -- EXECUTE & ASSERT --
     assertThrows(EntityNotFoundException.class, () -> findingService.deleteFinding("id"));
   }
+
+
+
+
+
 }

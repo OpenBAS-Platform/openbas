@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.injects.atomic_testing;
 
 import static io.openbas.expectation.ExpectationType.*;
 import static io.openbas.utils.fixtures.ExpectationResultByTypeFixture.createDefaultExpectationResultsByType;
@@ -12,6 +12,8 @@ import io.openbas.service.AssetGroupService;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import java.util.List;
 import java.util.Set;
+
+import io.openbas.utils.ResultUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
