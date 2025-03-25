@@ -36,7 +36,8 @@ public class CrowdStrikeExecutor {
             this.agentService,
             this.assetGroupService);
     if (this.config.isEnable()) {
-      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(300));
+      // Get and create/update the Crowdstrike asset groups, assets and agents each hour
+      this.taskScheduler.scheduleAtFixedRate(service, Duration.ofSeconds(3600));
     }
   }
 }
