@@ -126,6 +126,7 @@ public class PayloadUtils {
   public Payload createPayload(PayloadCreateInput input) {
     PayloadType payloadType = PayloadType.fromString(input.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
+
     switch (payloadType) {
       case COMMAND:
         Command commandPayload = new Command();
@@ -280,6 +281,7 @@ public class PayloadUtils {
   public Payload updatePayload(PayloadUpdateInput input, Payload existingPayload) {
     PayloadType payloadType = PayloadType.fromString(existingPayload.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
+
     switch (payloadType) {
       case COMMAND:
         Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
