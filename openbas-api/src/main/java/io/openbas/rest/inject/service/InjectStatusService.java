@@ -169,20 +169,6 @@ public class InjectStatusService {
         updateFinalInjectStatus(injectStatus);
       }
 
-      if (ExecutionTraceAction.EXECUTION.equals(executionTraces.getAction())) {
-        inject
-            .getPayload()
-            .ifPresent(
-                payload -> {
-                  if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
-                    findingService.extractFindings(inject, agent.getAsset(), executionTraces);
-                  } else {
-                    log.info(
-                        "No output parsers available for payload used in inject:" + inject.getId());
-                  }
-                });
-      }
-
       injectRepository.save(inject);
     }
   }
@@ -194,6 +180,22 @@ public class InjectStatusService {
     updateInjectStatus(agentId, inject, input);
 
     // -- FINDINGS --
+
+    //
+    if (ExecutionTraceAction.EXECUTION.equals(input.getAction())) {
+      inject
+          .getPayload()
+          .ifPresent(
+              payload -> {
+                if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
+                  findingService.extractFindings(inject, agent.getAsset(), executionTraces);
+                } else {
+                  log.info(
+                      "No output parsers available for payload used in inject:" + inject.getId());
+                }
+              });
+    }
+
     // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
     if (input.getOutputStructured() != null) {
       try {
