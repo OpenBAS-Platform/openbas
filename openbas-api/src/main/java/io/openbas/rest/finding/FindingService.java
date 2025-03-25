@@ -1,5 +1,10 @@
 package io.openbas.rest.finding;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
+import static io.openbas.rest.finding.FindingUtils.extractRawOutputByMode;
+import static io.openbas.utils.StatusUtils.convertExecutionAction;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,25 +15,20 @@ import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.injector_contract.outputs.ContractOutputElement;
+import io.openbas.injector_contract.outputs.ContractOutputUtils;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.service.InjectService;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static io.openbas.helper.StreamHelper.fromIterable;
-import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
-import static io.openbas.rest.finding.FindingUtils.extractRawOutputByMode;
-import static io.openbas.utils.StatusUtils.convertExecutionAction;
 
 @Log
 @Service
@@ -42,8 +42,7 @@ public class FindingService {
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
 
-  @Resource
-  private ObjectMapper mapper;
+  @Resource private ObjectMapper mapper;
 
   // -- CRUD --
 
@@ -122,7 +121,7 @@ public class FindingService {
                         if (!contractOutput.getType().validate.apply(jsonNode)) {
                           throw new IllegalArgumentException("Finding not correctly formatted");
                         }
-                        Finding finding = createFinding(contractOutput);
+                        Finding finding = ContractOutputUtils.createFinding(contractOutput);
                         finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
                         Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
                         findings.add(linkedFinding);
@@ -133,7 +132,7 @@ public class FindingService {
                     if (!contractOutput.getType().validate.apply(jsonNode)) {
                       throw new IllegalArgumentException("Finding not correctly formatted");
                     }
-                    Finding finding = this.createFinding(contractOutput);
+                    Finding finding = ContractOutputUtils.createFinding(contractOutput);
                     finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
                     Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
                     findings.add(linkedFinding);
@@ -198,7 +197,7 @@ public class FindingService {
                                             int groupIndex = Integer.parseInt(index);
                                             value.append(matcher.group(groupIndex)).append(" ");
                                           } catch (NumberFormatException
-                                                   | IllegalStateException e) {
+                                              | IllegalStateException e) {
                                             System.err.println(
                                                 "Invalid regex group index: " + index);
                                           }

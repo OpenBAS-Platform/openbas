@@ -1,5 +1,8 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.utils.StatusUtils.convertExecutionAction;
+import static io.openbas.utils.StatusUtils.convertExecutionStatus;
+
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
 import io.openbas.database.repository.InjectRepository;
@@ -12,16 +15,12 @@ import io.openbas.utils.InjectUtils;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-
-import static io.openbas.utils.StatusUtils.convertExecutionAction;
-import static io.openbas.utils.StatusUtils.convertExecutionStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
@@ -136,7 +135,8 @@ public class InjectStatusService {
     }
   }
 
-  public void handleInjectExecutionCallback(String injectId, String agentId, InjectExecutionInput input) {
+  public void handleInjectExecutionCallback(
+      String injectId, String agentId, InjectExecutionInput input) {
     Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
 
     Agent agent =
@@ -167,7 +167,8 @@ public class InjectStatusService {
         case SUCCESS, WARNING -> successCount++;
         case PARTIAL -> partialCount++;
         case ERROR, COMMAND_NOT_FOUND, AGENT_INACTIVE -> errorCount++;
-        case MAYBE_PREVENTED, MAYBE_PARTIAL_PREVENTED, COMMAND_CANNOT_BE_EXECUTED -> maybePreventedCount++;
+        case MAYBE_PREVENTED, MAYBE_PARTIAL_PREVENTED, COMMAND_CANNOT_BE_EXECUTED ->
+            maybePreventedCount++;
       }
     }
 
