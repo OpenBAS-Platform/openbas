@@ -1,4 +1,4 @@
-import { AddModeratorOutlined, MoreVertOutlined } from '@mui/icons-material';
+import { AddModeratorOutlined, MoreVertOutlined, PersonAddOutlined } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -723,15 +723,28 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           && injectExpectation.inject_expectation_results.length === 0))
                         && (
                           <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
-                            <IconButton
-                              aria-label="Add"
-                              onClick={() => setSelectedExpectationForCreation({
-                                injectExpectation,
-                                sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
-                              })}
-                            >
-                              <AddModeratorOutlined fontSize="medium" />
-                            </IconButton>
+                            <Tooltip title={t('Add a result')}>
+                              <IconButton
+                                aria-label="Add"
+                                onClick={() => setSelectedExpectationForCreation({
+                                  injectExpectation,
+                                  sourceIds: computeExistingSourceIds(injectExpectation.inject_expectation_results ?? []),
+                                })}
+                              >
+                                {
+                                  ['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type) && (
+                                    <AddModeratorOutlined fontSize="medium" />
+                                  )
+                                }
+                                {
+                                  injectExpectation.inject_expectation_type === 'MANUAL' && (
+                                    <PersonAddOutlined fontSize="medium" />
+                                  )
+                                }
+
+                              </IconButton>
+                            </Tooltip>
+
                           </Grid>
                         )}
 
@@ -748,7 +761,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     </div>
                     {injectExpectation.inject_expectation_type !== 'MANUAL' && (
                       <TableContainer>
-                        <Table sx={{ minWidth: 650 }} size="small">
+                        <Table
+                          sx={{
+                            minWidth: 650,
+                            fontSize: '12 px',
+                          }}
+                          size="small"
+                        >
                           <TableHead>
                             <TableRow>
                               <TableCell>{t('Security platforms')}</TableCell>

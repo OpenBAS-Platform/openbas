@@ -56,13 +56,13 @@ const TargetResultsSecurityPlatform: FunctionComponent<Props> = ({
                       key={index}
                     >
                       <TableCell>
-                        <Link underline="always" href={expectationTrace.inject_expectation_trace_alert_link}>
+                        <Link underline="always" href={expectationTrace.inject_expectation_trace_alert_link} target="_blank">
                           <div className={classes.flexContainer}>
                             <div>
                               {expectationTrace.inject_expectation_trace_alert_name}
                             </div>
                             <div>
-                              <OpenInNew fontSize="small" />
+                              <OpenInNew fontSize="inherit" />
                             </div>
                           </div>
                         </Link>
