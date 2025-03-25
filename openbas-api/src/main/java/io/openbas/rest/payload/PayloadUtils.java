@@ -123,7 +123,6 @@ public class PayloadUtils {
   }
 
   // -- CREATION --
-  @NotNull
   public Payload createPayload(PayloadCreateInput input) {
     PayloadType payloadType = PayloadType.fromString(input.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
@@ -187,7 +186,6 @@ public class PayloadUtils {
     }
   }
 
-  @NotNull
   public Payload createPayloadFromUpsert(PayloadUpsertInput input) {
     PayloadType payloadType = PayloadType.fromString(input.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
@@ -279,8 +277,6 @@ public class PayloadUtils {
   }
 
   // -- UPDATE --
-
-  @NotNull
   public Payload updatePayload(PayloadUpdateInput input, Payload existingPayload) {
     PayloadType payloadType = PayloadType.fromString(existingPayload.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
@@ -325,7 +321,6 @@ public class PayloadUtils {
     }
   }
 
-  @NotNull
   public Payload updatePayloadFromUpsert(PayloadUpsertInput input, Payload existingPayload) {
     PayloadType payloadType = PayloadType.fromString(existingPayload.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
