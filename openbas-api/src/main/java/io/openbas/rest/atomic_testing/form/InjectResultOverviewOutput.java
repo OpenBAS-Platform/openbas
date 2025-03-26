@@ -2,6 +2,7 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.database.model.Tag;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -65,9 +67,9 @@ public class InjectResultOverviewOutput {
   @JsonProperty("inject_kill_chain_phases")
   private List<KillChainPhaseSimple> killChainPhases;
 
-  @Schema(description = "Attack pattern")
-  @JsonProperty("inject_attack_patterns")
-  private List<AttackPatternSimple> attackPatterns;
+  @Schema(description = "Tags")
+  @JsonProperty("inject_tags")
+  private Set<Tag> tags;
 
   @Schema(description = "Indicates whether the inject is ready for use")
   @JsonProperty("inject_ready")
