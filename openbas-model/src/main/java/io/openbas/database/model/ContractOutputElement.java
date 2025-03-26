@@ -2,9 +2,9 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdSetDeserializer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,10 +32,8 @@ public class ContractOutputElement implements Base {
   private String id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JsonSerialize(using = MonoIdDeserializer.class)
   @JoinColumn(name = "contract_output_element_output_parser_id")
-  @JsonProperty("contract_output_element_output_parser")
-  @Schema(type = "string")
+  @JsonIgnore
   private OutputParser outputParser;
 
   @Column(name = "contract_output_element_is_finding")

@@ -2,10 +2,8 @@ package io.openbas.database.model;
 
 import static java.time.Instant.now;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openbas.helper.MonoIdDeserializer;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -30,10 +28,8 @@ public class OutputParser implements Base {
   private String id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JsonSerialize(using = MonoIdDeserializer.class)
   @JoinColumn(name = "output_parser_payload_id")
-  @JsonProperty("output_parser_payload")
-  @Schema(type = "string")
+  @JsonIgnore
   private Payload payload;
 
   @Enumerated(EnumType.STRING)
