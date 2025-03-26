@@ -31,5 +31,4 @@ public class WidgetParameters {
 
   @JsonProperty("widget_parameters_display_legend")
   private boolean displayLegend;
-
 }

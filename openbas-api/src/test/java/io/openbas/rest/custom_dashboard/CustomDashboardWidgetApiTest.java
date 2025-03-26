@@ -1,5 +1,16 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
+import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
+import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.createDefaultCustomDashboard;
+import static io.openbas.rest.custom_dashboard.WidgetFixture.NAME;
+import static io.openbas.rest.custom_dashboard.WidgetFixture.createDefaultWidget;
+import static io.openbas.utils.JsonUtils.asJsonString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.model.Widget;
@@ -14,33 +25,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
-import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
-import static io.openbas.rest.custom_dashboard.CustomDashboardFixture.createDefaultCustomDashboard;
-import static io.openbas.rest.custom_dashboard.WidgetFixture.NAME;
-import static io.openbas.rest.custom_dashboard.WidgetFixture.createDefaultWidget;
-import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @Transactional
 class CustomDashboardWidgetApiTest extends IntegrationTest {
 
-  @Autowired
-  private MockMvc mockMvc;
-  @Autowired
-  private WidgetRepository repository;
-  @Autowired
-  private WidgetComposer widgetComposer;
-  @Autowired
-  private CustomDashboardComposer customDashboardComposer;
+  @Autowired private MockMvc mockMvc;
+  @Autowired private WidgetRepository repository;
+  @Autowired private WidgetComposer widgetComposer;
+  @Autowired private CustomDashboardComposer customDashboardComposer;
 
   WidgetComposer.Composer createWidgetComposer() {
     return this.widgetComposer
         .forWidget(createDefaultWidget())
-        .withCustomDashboard(customDashboardComposer.forCustomDashboard(createDefaultCustomDashboard()))
+        .withCustomDashboard(
+            customDashboardComposer.forCustomDashboard(createDefaultCustomDashboard()))
         .persist();
   }
 
@@ -93,7 +90,12 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     // -- EXECUTE & ASSERT --
     mockMvc
         .perform(
-            get(CUSTOM_DASHBOARDS_URI + "/" + customDashboard.getId() + "/widgets/" + composer.get().getId()))
+            get(
+                CUSTOM_DASHBOARDS_URI
+                    + "/"
+                    + customDashboard.getId()
+                    + "/widgets/"
+                    + composer.get().getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.widget_parameters.widget_parameters_title").value(NAME));
   }
@@ -114,7 +116,11 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     // -- EXECUTE & ASSERT --
     mockMvc
         .perform(
-            put(CUSTOM_DASHBOARDS_URI + "/" + customDashboard.getId() + "/widgets/" + widget.getId())
+            put(CUSTOM_DASHBOARDS_URI
+                    + "/"
+                    + customDashboard.getId()
+                    + "/widgets/"
+                    + widget.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(widget)))
         .andExpect(status().isOk())
@@ -132,7 +138,13 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
 
     // -- EXECUTE & ASSERT --
     mockMvc
-        .perform(delete(CUSTOM_DASHBOARDS_URI + "/" + customDashboard.getId() + "/widgets/" + widget.getId()))
+        .perform(
+            delete(
+                CUSTOM_DASHBOARDS_URI
+                    + "/"
+                    + customDashboard.getId()
+                    + "/widgets/"
+                    + widget.getId()))
         .andExpect(status().isNoContent());
 
     assertThat(repository.existsById(widget.getId())).isFalse();

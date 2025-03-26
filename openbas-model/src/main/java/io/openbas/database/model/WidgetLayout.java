@@ -17,5 +17,4 @@ public class WidgetLayout {
 
   @JsonProperty("widget_layout_y")
   protected int y;
-
 }

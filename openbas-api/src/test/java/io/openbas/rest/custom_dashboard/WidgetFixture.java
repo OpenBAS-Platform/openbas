@@ -1,9 +1,9 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
+
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetParameters;
-
-import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
 
 public class WidgetFixture {
 

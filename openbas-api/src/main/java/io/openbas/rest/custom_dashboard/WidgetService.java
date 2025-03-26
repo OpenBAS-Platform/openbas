@@ -1,18 +1,17 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.helper.StreamHelper.fromIterable;
+
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.model.Widget;
 import io.openbas.database.repository.WidgetRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static io.openbas.helper.StreamHelper.fromIterable;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +24,7 @@ public class WidgetService {
 
   @Transactional
   public Widget createWidget(
-      @NotBlank final String customDashboardId,
-      @NotNull final Widget widget) {
+      @NotBlank final String customDashboardId, @NotNull final Widget widget) {
     CustomDashboard customDashboard = customDashboardService.customDashboard(customDashboardId);
     widget.setCustomDashboard(customDashboard);
     return this.widgetRepository.save(widget);
@@ -38,13 +36,10 @@ public class WidgetService {
   }
 
   @Transactional(readOnly = true)
-  public Widget widget(
-      @NotBlank final String customDashboardId,
-      @NotBlank final String widgetId) {
+  public Widget widget(@NotBlank final String customDashboardId, @NotBlank final String widgetId) {
     return this.widgetRepository
         .findByCustomDashboardIdAndId(customDashboardId, widgetId)
-        .orElseThrow(
-            () -> new EntityNotFoundException("Widget with id: " + widgetId));
+        .orElseThrow(() -> new EntityNotFoundException("Widget with id: " + widgetId));
   }
 
   @Transactional
@@ -54,8 +49,7 @@ public class WidgetService {
 
   @Transactional
   public void deleteWidget(
-      @NotBlank final String customDashboardId,
-      @NotBlank final String widgetId) {
+      @NotBlank final String customDashboardId, @NotBlank final String widgetId) {
     if (!this.widgetRepository.existsWidgetByCustomDashboardIdAndId(customDashboardId, widgetId)) {
       throw new EntityNotFoundException("Widget not found with id: " + widgetId);
     }

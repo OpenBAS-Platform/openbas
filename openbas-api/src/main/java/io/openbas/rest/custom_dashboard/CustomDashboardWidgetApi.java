@@ -1,19 +1,18 @@
 package io.openbas.rest.custom_dashboard;
 
+import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
+
 import io.openbas.database.model.Widget;
 import io.openbas.rest.custom_dashboard.form.WidgetInput;
 import io.openbas.rest.helper.RestBehavior;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
 
 @RestController
 @RequestMapping(CustomDashboardWidgetApi.CUSTOM_DASHBOARDS_WIDGET_URI)
@@ -40,8 +39,7 @@ public class CustomDashboardWidgetApi extends RestBehavior {
 
   @GetMapping("/{widgetId}")
   public ResponseEntity<Widget> widget(
-      @PathVariable @NotBlank final String id,
-      @PathVariable @NotBlank final String widgetId) {
+      @PathVariable @NotBlank final String id, @PathVariable @NotBlank final String widgetId) {
     return ResponseEntity.ok(this.widgetService.widget(id, widgetId));
   }
 
@@ -57,8 +55,7 @@ public class CustomDashboardWidgetApi extends RestBehavior {
 
   @DeleteMapping("/{widgetId}")
   public ResponseEntity<Void> deleteWidget(
-      @PathVariable @NotBlank final String id,
-      @PathVariable @NotBlank final String widgetId) {
+      @PathVariable @NotBlank final String id, @PathVariable @NotBlank final String widgetId) {
     this.widgetService.deleteWidget(id, widgetId);
     return ResponseEntity.noContent().build();
   }

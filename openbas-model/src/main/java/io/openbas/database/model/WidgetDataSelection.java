@@ -11,5 +11,4 @@ public class WidgetDataSelection {
 
   @JsonProperty("widget_data_selection_filter")
   private Filters.FilterGroup filter;
-
 }
