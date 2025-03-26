@@ -769,12 +769,12 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           size="small"
                         >
                           <TableHead>
-                            <TableRow>
+                            <TableRow sx={{ textTransform: 'uppercase' }}>
                               <TableCell>{t('Security platforms')}</TableCell>
                               <TableCell>{t('Status')}</TableCell>
                               <TableCell>{t('Detection time')}</TableCell>
                               <TableCell>{t('Alerts')}</TableCell>
-                              <TableCell></TableCell>
+
                             </TableRow>
                           </TableHead>
                           <TableBody>

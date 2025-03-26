@@ -1,5 +1,5 @@
 import { OpenInNew } from '@mui/icons-material';
-import { Link, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
+import { Link, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -47,35 +47,41 @@ const TargetResultsSecurityPlatform: FunctionComponent<Props> = ({
           {`${injectExpectation.inject_expectation_type} ${t('Alerts')}`}
         </Typography>
         <TableContainer sx={{ marginTop: theme.spacing(4) }}>
-          <Table sx={{ minWidth: 650 }} size="small">
+          <Table
+            sx={{ minWidth: 650 }}
+            size="small"
+          >
+            <TableHead>
+              <TableRow sx={{ textTransform: 'uppercase' }}>
+                <TableCell>{t('Name')}</TableCell>
+                <TableCell>{t('Prevention date')}</TableCell>
+              </TableRow>
+            </TableHead>
             <TableBody>
               {
                 expectationTraces.map((expectationTrace: InjectExpectationTrace, index) => {
                   return (
                     <TableRow
                       key={index}
+                      sx={{ height: '50px' }}
                     >
-                      <TableCell>
+                      <TableCell sx={{ fontSize: '14px' }}>
                         <Link underline="always" href={expectationTrace.inject_expectation_trace_alert_link} target="_blank">
                           <div className={classes.flexContainer}>
                             <div>
                               {expectationTrace.inject_expectation_trace_alert_name}
                             </div>
-                            <div>
+                            <div style={{
+                              paddingTop: '2px',
+                              marginLeft: '2px',
+                            }}
+                            >
                               <OpenInNew fontSize="inherit" />
                             </div>
                           </div>
                         </Link>
                       </TableCell>
-                      <TableCell>
-                        <Typography
-                          variant="body2"
-                          gutterBottom
-                        >
-                          {expectationResult.result}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
+                      <TableCell sx={{ fontSize: '14px' }}>
                         {fldt(expectationTrace.inject_expectation_trace_date)}
                       </TableCell>
                     </TableRow>
