@@ -1,12 +1,14 @@
 package io.openbas.rest.finding;
 
+import static io.openbas.utils.fixtures.AssetFixture.getDefaultAsset;
+import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
+import static io.openbas.utils.fixtures.OutputParserFixture.getDefaultContractOutputElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
-import io.openbas.database.model.ContractOutputElement;
-import io.openbas.database.model.ContractOutputType;
-import io.openbas.database.model.RegexGroup;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
@@ -172,5 +174,26 @@ class FindingUtilsTest {
     }
 
     assertEquals(expected, result.toString().trim());
+  }
+
+  @Test
+  @DisplayName("Should have two assets for a finding")
+  void given_a_finding_already_existent_with_one_asset_should_have_two_assets() {
+    Inject inject = getDefaultInject();
+    Asset asset1 = getDefaultAsset("asset1");
+    Asset asset2 = getDefaultAsset("asset2");
+    String value = "value-already-existent";
+    ContractOutputElement contractOutputElement = getDefaultContractOutputElement();
+
+    Finding finding1 = new Finding();
+    finding1.setValue(value);
+    finding1.getAssets().add(asset1);
+
+    when(findingRepository.findByInjectIdAndValue(inject.getId(), value))
+        .thenReturn(Optional.of(finding1));
+
+    Finding updatedFinding =
+        findingUtils.buildFinding(inject, asset2, contractOutputElement, value);
+    assertEquals(2, updatedFinding.getAssets().size());
   }
 }
