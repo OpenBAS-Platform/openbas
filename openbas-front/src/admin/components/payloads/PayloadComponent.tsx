@@ -145,16 +145,21 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         {selectedPayload?.payload_type === 'Command' && selectedPayload.command_executor && (
           <>{selectedPayload.command_executor}</>
         )}
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: 20 }}
-        >
-          {t('Attack command')}
-        </Typography>
-        <pre>
-          <ItemCopy content={getAttackCommand(selectedPayload)} />
-        </pre>
+        {selectedPayload?.payload_type === 'Command' && (
+          <>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Attack command')}
+            </Typography>
+            <pre>
+              <ItemCopy content={getAttackCommand(selectedPayload)} />
+            </pre>
+          </>
+        )}
+
         <Typography
           variant="h3"
           gutterBottom
