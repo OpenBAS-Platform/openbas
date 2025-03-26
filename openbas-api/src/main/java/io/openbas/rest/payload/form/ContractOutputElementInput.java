@@ -18,6 +18,7 @@ public class ContractOutputElementInput {
   @Schema(
       description =
           "Indicates whether this contract output element can be used to generate a finding")
+  @NotNull
   private boolean isFinding;
 
   @JsonProperty("contract_output_element_rule")
