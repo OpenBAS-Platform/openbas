@@ -97,7 +97,7 @@ class FindingUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get host:port(service) from raw output command")
+  @DisplayName("Should get host:port(service) from raw output of netstat command")
   void getValueFromPortScan() {
     String rawOutputByMode =
         "TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       1234\\n\" +\n"
@@ -113,11 +113,12 @@ class FindingUtilsTest {
 
     RegexGroup regexGroup3 = new RegexGroup();
     regexGroup3.setField("service");
-    regexGroup3.setIndexValues("$5");
+    regexGroup3.setIndexValues("$4");
 
     ContractOutputElement contractOutputElement = new ContractOutputElement();
     contractOutputElement.setType(ContractOutputType.PortsScan);
-    contractOutputElement.setRule("(\\S+)\\s+(\\S+):(\\d+)\\s+(\\S+)\\s+(\\d+)");
+    contractOutputElement.setRule(
+        "^\\s*(TCP|UDP)\\s+([\\d\\.:]+):(\\d+)\\s+\\S+\\s+\\S+\\s+(\\d+)");
     contractOutputElement.setRegexGroups(Set.of(regexGroup1, regexGroup2, regexGroup3));
 
     String regex = contractOutputElement.getRule();

@@ -141,7 +141,7 @@ public class FindingUtils {
         String service =
             fieldValuesMap.getOrDefault("service", List.of("")).isEmpty()
                 ? ""
-                : "(" + fieldValuesMap.get("service").get(0) + ")";
+                : " (" + fieldValuesMap.get("service").get(0) + ")";
         return host + ":" + port + service;
 
       default:
