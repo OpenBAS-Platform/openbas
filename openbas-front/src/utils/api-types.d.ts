@@ -616,7 +616,7 @@ export interface ContractOutputElement {
 /** List of Contract output elements */
 export interface ContractOutputElementInput {
   /** Indicates whether this contract output element can be used to generate a finding */
-  contract_output_element_is_finding?: boolean;
+  contract_output_element_is_finding: boolean;
   /** Key */
   contract_output_element_key: string;
   /** Name */
