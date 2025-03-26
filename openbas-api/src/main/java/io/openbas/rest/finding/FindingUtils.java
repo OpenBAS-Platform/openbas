@@ -62,7 +62,7 @@ public class FindingUtils {
         return rootNode.get("stderr").asText();
       }
     } catch (Exception e) {
-      return "ERROR: Invalid JSON format";
+      log.log(Level.WARNING, e.getMessage(), e);
     }
 
     return "";
