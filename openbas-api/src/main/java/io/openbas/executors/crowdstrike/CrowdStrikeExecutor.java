@@ -39,7 +39,7 @@ public class CrowdStrikeExecutor {
       // Get and create/update the Crowdstrike asset groups, assets and agents each hour (by
       // default)
       this.taskScheduler.scheduleAtFixedRate(
-          service, Duration.ofSeconds(this.config.getApiRegisterDelay()));
+          service, Duration.ofSeconds(this.config.getApiRegisterInterval()));
     }
   }
 }
