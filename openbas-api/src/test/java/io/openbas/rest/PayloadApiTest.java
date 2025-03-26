@@ -108,7 +108,8 @@ class PayloadApiTest extends IntegrationTest {
   @Test
   @DisplayName("Create Payload with output parser")
   @WithMockAdminUser
-  void createPayloadWithOutputParser() throws Exception {
+  void given_payload_create_input_with_output_parsers_should_return_payload_with_output_parsers()
+      throws Exception {
     PayloadCreateInput input =
         PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
 
@@ -245,7 +246,9 @@ class PayloadApiTest extends IntegrationTest {
   @Test
   @DisplayName("Update Payload with output parser")
   @WithMockAdminUser
-  void updatePayloadWithOutputParser() throws Exception {
+  void
+      given_payload_update_input_with_output_parsers_should_return_updated_payloadd_with_output_parsers()
+          throws Exception {
     PayloadCreateInput createInput =
         PayloadInputFixture.createDefaultPayloadCreateInputForCommandLine();
 
@@ -322,7 +325,9 @@ class PayloadApiTest extends IntegrationTest {
   @Test
   @DisplayName("Upsert Payload with output parser")
   @WithMockPlannerUser
-  void upsertCommandPayloadWitOutputParser() throws Exception {
+  void
+      given_payload_upsert_input_with_output_parsers_should_return_updated_payload_with_output_parsers()
+          throws Exception {
     PayloadCreateInput input =
         PayloadInputFixture.createDefaultPayloadCreateInputWithOutputParser();
 

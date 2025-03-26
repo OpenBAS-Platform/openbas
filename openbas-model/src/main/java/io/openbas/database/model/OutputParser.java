@@ -39,11 +39,13 @@ public class OutputParser implements Base {
   @Enumerated(EnumType.STRING)
   @Column(name = "output_parser_mode")
   @JsonProperty("output_parser_mode")
+  @NotNull
   private ParserMode mode;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "output_parser_type")
   @JsonProperty("output_parser_type")
+  @NotNull
   private ParserType type;
 
   @OneToMany(mappedBy = "outputParser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)

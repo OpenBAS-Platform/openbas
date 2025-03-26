@@ -18,8 +18,8 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
                       output_parser_mode VARCHAR(50) NOT NULL,
                       output_parser_type VARCHAR(50) NOT NULL,
                       output_parser_payload_id VARCHAR(255) NOT NULL,
-                      output_parser_created_at TIMESTAMP DEFAULT now(),
-                      output_parser_updated_at TIMESTAMP DEFAULT now(),
+                      output_parser_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+                      output_parser_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                       CONSTRAINT output_parser_payload_id_fk
                           FOREIGN KEY (output_parser_payload_id)
                           REFERENCES payloads(payload_id)
@@ -37,8 +37,8 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
                       contract_output_element_key VARCHAR(255) NOT NULL,
                       contract_output_element_type VARCHAR(50) NOT NULL,
                       contract_output_element_output_parser_id UUID NOT NULL,
-                      contract_output_element_created_at TIMESTAMP DEFAULT now(),
-                      contract_output_element_updated_at TIMESTAMP DEFAULT now(),
+                      contract_output_element_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+                      contract_output_element_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                       CONSTRAINT contract_output_element_output_parser_id_fk
                           FOREIGN KEY (contract_output_element_output_parser_id)
                           REFERENCES output_parsers(output_parser_id)
@@ -54,8 +54,8 @@ public class V3_74__Add_Output_parser extends BaseJavaMigration {
                       regex_group_field VARCHAR(50) NOT NULL,
                       regex_group_index_values VARCHAR(50) NOT NULL,
                       regex_group_contract_output_element_id UUID NOT NULL,
-                      regex_group_created_at TIMESTAMP DEFAULT now(),
-                      regex_group_updated_at TIMESTAMP DEFAULT now(),
+                      regex_group_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+                      regex_group_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
                       CONSTRAINT regex_group_contract_output_element_id_fk
                           FOREIGN KEY (regex_group_contract_output_element_id)
                           REFERENCES contract_output_elements(contract_output_element_id)

@@ -9,6 +9,7 @@ import io.openbas.helper.MultiIdSetDeserializer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.HashSet;
@@ -40,14 +41,17 @@ public class ContractOutputElement implements Base {
 
   @Column(name = "contract_output_element_is_finding")
   @JsonProperty("contract_output_element_is_finding")
+  @NotNull
   private boolean isFinding;
 
   @Column(name = "contract_output_element_rule")
   @JsonProperty("contract_output_element_rule")
+  @NotBlank
   private String rule;
 
   @Column(name = "contract_output_element_name")
   @JsonProperty("contract_output_element_name")
+  @NotBlank
   private String name;
 
   @OneToMany(mappedBy = "contractOutputElement", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -56,11 +60,13 @@ public class ContractOutputElement implements Base {
 
   @Column(name = "contract_output_element_key")
   @JsonProperty("contract_output_element_key")
+  @NotBlank
   private String key;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "contract_output_element_type")
   @JsonProperty("contract_output_element_type")
+  @NotNull
   private ContractOutputType type;
 
   @ArraySchema(schema = @Schema(type = "string"))

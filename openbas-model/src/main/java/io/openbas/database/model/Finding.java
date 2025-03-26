@@ -58,6 +58,7 @@ public class Finding implements Base {
   @NotBlank
   protected String value;
 
+  @Deprecated
   @Type(StringArrayType.class)
   @Column(name = "finding_labels", columnDefinition = "text[]")
   @JsonProperty("finding_labels")

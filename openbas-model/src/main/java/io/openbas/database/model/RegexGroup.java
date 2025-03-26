@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
@@ -36,10 +37,12 @@ public class RegexGroup implements Base {
 
   @Column(name = "regex_group_field")
   @JsonProperty("regex_group_field")
+  @NotBlank
   private String field;
 
   @Column(name = "regex_group_index_values")
   @JsonProperty("regex_group_index_values")
+  @NotBlank
   private String indexValues;
 
   @Column(name = "regex_group_created_at")
