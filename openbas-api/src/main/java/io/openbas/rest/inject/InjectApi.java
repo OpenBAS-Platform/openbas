@@ -38,6 +38,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +91,8 @@ public class InjectApi extends RestBehavior {
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
   private final AuthorisationService authorisationService;
+
+  private final  ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
   // -- INJECTS --
 
@@ -237,14 +241,16 @@ public class InjectApi extends RestBehavior {
     injectExecutionCallback(null, injectId, input);
   }
 
-  @Secured(ROLE_ADMIN)
   @PostMapping(INJECT_URI + "/execution/{agentId}/callback/{injectId}")
   public void injectExecutionCallback(
       @PathVariable
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-    injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+
+    executorService.submit(() -> {
+      injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+    });
   }
 
   @Secured(ROLE_ADMIN)
