@@ -11,7 +11,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -25,8 +24,8 @@ public class RegexGroup implements Base {
   @GeneratedValue(generator = "UUID")
   @UuidGenerator
   @JsonProperty("regex_group_id")
-  @NotNull
-  private UUID id;
+  @NotBlank
+  private String id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonSerialize(using = MonoIdDeserializer.class)
@@ -58,18 +57,5 @@ public class RegexGroup implements Base {
   @Override
   public int hashCode() {
     return Objects.hash(id);
-  }
-
-  @Override
-  public String getId() {
-    return this.id != null ? this.id.toString() : "";
-  }
-
-  @Override
-  public void setId(String id) {
-    this.id = null;
-    if (id != null && !id.isEmpty()) {
-      this.id = UUID.fromString(id);
-    }
   }
 }
