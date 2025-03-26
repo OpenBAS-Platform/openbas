@@ -9424,7 +9424,7 @@ __metadata:
     remark-parse: "npm:11.0.0"
     rxjs: "npm:7.8.2"
     seamless-immutable: "npm:7.1.4"
-    swagger-typescript-api: "npm:13.0.25"
+    swagger-typescript-api: "npm:13.0.28"
     tss-react: "npm:4.9.15"
     typescript: "npm:5.8.2"
     typescript-eslint: "npm:8.28.0"
@@ -11395,9 +11395,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swagger-typescript-api@npm:13.0.25":
-  version: 13.0.25
-  resolution: "swagger-typescript-api@npm:13.0.25"
+"swagger-typescript-api@npm:13.0.28":
+  version: 13.0.28
+  resolution: "swagger-typescript-api@npm:13.0.28"
   dependencies:
     "@types/swagger-schema-official": "npm:^2.0.25"
     citty: "npm:^0.1.6"
@@ -11414,7 +11414,7 @@ __metadata:
   bin:
     sta: ./dist/cli.js
     swagger-typescript-api: ./dist/cli.js
-  checksum: 10c0/5b3fb22ff0aa80c51e8d44d4dc191160a2230d11964d344845b17589c0eadf6c121d386aca61f23a4ce583ee54409b8d7e47445343af08c76c65f00607da37c7
+  checksum: 10c0/513c6c2ae25f61187a0e160941b4eee6203f1d5803a588dbed26ccf57a365018f4eeb06ba14b4497714ab8a2672837129be1bd7c5cd5fbdd77ccd42750e8a1df
   languageName: node
   linkType: hard
 
