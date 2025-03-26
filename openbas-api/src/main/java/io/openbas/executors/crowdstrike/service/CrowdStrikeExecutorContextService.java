@@ -5,6 +5,7 @@ import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorServic
 
 import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorContextService;
+import io.openbas.executors.ExecutorHelper;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.rest.exception.AgentException;
@@ -22,6 +23,9 @@ import org.springframework.stereotype.Service;
 @Service(CROWDSTRIKE_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class CrowdStrikeExecutorContextService extends ExecutorContextService {
+
+  private static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
+  private static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
 
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
@@ -57,18 +61,23 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       case Windows -> {
         scriptName = this.crowdStrikeExecutorConfig.getWindowsScriptName();
         implantLocation =
-            "$location=\"C:\\Windows\\Temp\\.openbas\\implant-"
+            "$location="
+                + IMPLANT_LOCATION_WINDOWS
+                + ExecutorHelper.IMPLANT_BASE_NAME
                 + UUID.randomUUID()
                 + "\";md $location -ea 0;[Environment]::CurrentDirectory";
       }
       case Linux, MacOS -> {
         scriptName = this.crowdStrikeExecutorConfig.getUnixScriptName();
         implantLocation =
-            "location=/tmp/.openbas/implant-" + UUID.randomUUID() + ";mkdir -p $location;filename=";
+            "location="
+                + IMPLANT_LOCATION_UNIX
+                + ExecutorHelper.IMPLANT_BASE_NAME
+                + UUID.randomUUID()
+                + ";mkdir -p $location;filename=";
       }
       default -> throw new RuntimeException("Unsupported platform: " + platform);
     }
-    ;
 
     String executorCommandKey = platform.name() + "." + arch.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
