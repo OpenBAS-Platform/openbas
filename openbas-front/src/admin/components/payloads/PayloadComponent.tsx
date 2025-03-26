@@ -135,26 +135,34 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         {emptyFilled(selectedPayload?.payload_external_id)}
       </Grid>
       <Grid item xs={12} style={{ paddingTop: 10 }}>
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: 20 }}
-        >
-          {t('Command executor')}
-        </Typography>
+        {selectedPayload?.payload_type === 'Command' && (
+          <Typography
+            variant="h3"
+            gutterBottom
+            style={{ marginTop: 20 }}
+          >
+            {t('Command executor')}
+          </Typography>
+        )}
+
         {selectedPayload?.payload_type === 'Command' && selectedPayload.command_executor && (
           <>{selectedPayload.command_executor}</>
         )}
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: 20 }}
-        >
-          {t('Attack command')}
-        </Typography>
-        <pre>
-          <ItemCopy content={getAttackCommand(selectedPayload)} />
-        </pre>
+        {selectedPayload?.payload_type === 'Command' && (
+          <>
+            <Typography
+              variant="h3"
+              gutterBottom
+              style={{ marginTop: 20 }}
+            >
+              {t('Attack command')}
+            </Typography>
+            <pre>
+              <ItemCopy content={getAttackCommand(selectedPayload)} />
+            </pre>
+          </>
+        )}
+
         <Typography
           variant="h3"
           gutterBottom
