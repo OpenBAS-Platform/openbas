@@ -21,10 +21,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class FindingUtilsTest {
 
-  public static final String SIMPLE_RAW_OUTPUT =
+  public static final String SIMPLE_RAW_OUTPUT_TASKLIST =
       "\r\nImage Name                 PID  Session Name        Session#    Mem Usage\r\n"
           + "=========================  ========  ================  ===========  ============\r\n"
           + "System Idle Process           0  Services               0          8 K\r\n";
+
+  public static final String SIMPLE_RAW_OUTPUT_NETSTAT =
+      "\n"
+          + "Active Connections\n"
+          + "\n"
+          + "  Proto  Local Address          Foreign Address        State\n"
+          + "  TCP    192.168.1.10:135            0.0.0.0:0              LISTENING\n"
+          + "  TCP    176.125.125.10:445            0.0.0.0:0              LISTENING\n"
+          + "  TCP    192.168.12.12:902            0.0.0.0:0              LISTENING\n";
 
   @Mock private FindingRepository findingRepository;
 
@@ -44,7 +53,7 @@ class FindingUtilsTest {
   @DisplayName("Should return an empty string for a raw output empty")
   void given_a_raw_output_empty_should_return_empty() {
     RegexGroup regexGroup = new RegexGroup();
-    regexGroup.setField("Any text");
+    regexGroup.setField("Empty output");
     regexGroup.setIndexValues("$2");
     testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
   }
@@ -53,30 +62,37 @@ class FindingUtilsTest {
   @DisplayName("Should return an empty string for an index bigger than matcher count")
   void given_a_group_bigger_than_matcher_count_should_return_empty() {
     RegexGroup regexGroup = new RegexGroup();
-    regexGroup.setField("Any text");
+    regexGroup.setField("Wrong Index");
     regexGroup.setIndexValues("$2");
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
+        SIMPLE_RAW_OUTPUT_TASKLIST, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
   }
 
   @Test
   @DisplayName("Should return empty for a non-numeric index")
   void given_an_index_no_numerical_should_return_empty() {
     RegexGroup regexGroup = new RegexGroup();
-    regexGroup.setField("Any text");
+    regexGroup.setField("Non-numeric Index");
     regexGroup.setIndexValues("$t");
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
+        SIMPLE_RAW_OUTPUT_TASKLIST, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
   }
 
   @Test
   @DisplayName("Should return numbers from raw output of command")
   void given_raw_output_netstat_should_return_number() {
     RegexGroup regexGroup = new RegexGroup();
-    regexGroup.setField("Any text");
+    regexGroup.setField("Any number");
     regexGroup.setIndexValues("$1");
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Number, "^(\\S+)()", "");
+        SIMPLE_RAW_OUTPUT_NETSTAT,
+        Set.of(regexGroup),
+        ContractOutputType.Number,
+        "(\\d+)",
+        "192\n168\n1\n10\n135\n0\n"
+            + "0\n0\n0\n0\n176\n125\n125\n"
+            + "10\n445\n0\n0\n0\n0\n0\n192\n"
+            + "168\n12\n12\n902\n0\n0\n0\n0\n0");
   }
 
   @Test
@@ -105,15 +121,17 @@ class FindingUtilsTest {
   @Test
   @DisplayName("Should get username:password from raw output command")
   void given_raw_output_tasklist_should_return_credentials() {
-    String rawOutput = "user1 pass123\nadmin root\n";
+    // username:RID:LM_Hash:NTLM_Hash:::
+    String rawOutput =
+        "SMB                      192.168.11.23   415    CASSANOVAS          [+] workgroup\\\\savacano:savacano (Pwn3d!)\\n";
 
     RegexGroup regexGroup1 = new RegexGroup();
     regexGroup1.setField("username");
-    regexGroup1.setIndexValues("$1");
+    regexGroup1.setIndexValues("$2");
 
     RegexGroup regexGroup2 = new RegexGroup();
-    regexGroup1.setField("password");
-    regexGroup1.setIndexValues("$2");
+    regexGroup2.setField("password");
+    regexGroup2.setIndexValues("$3");
 
     Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2);
 
@@ -121,18 +139,13 @@ class FindingUtilsTest {
         rawOutput,
         regexGroups,
         ContractOutputType.Credentials,
-        "^(\\S+)\\s+(\\S+)",
-        "user1:pass123\nadmin:root");
+        "(\\S+)\\\\(\\S+):(\\S+)",
+        "savacano:savacano");
   }
 
   @Test
   @DisplayName("Should get host:port(service) from raw output of netstat command")
   void given_raw_output_netstat_should_return_portscans() {
-    String rawOutput =
-        """
-            TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       1234
-            UDP    0.0.0.0:53             *:*                    LISTENING       5678
-        """;
     RegexGroup regexGroup1 = new RegexGroup();
     regexGroup1.setField("host");
     regexGroup1.setIndexValues("$2");
@@ -148,41 +161,69 @@ class FindingUtilsTest {
     Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2, regexGroup3);
 
     testRegexExtraction(
-        rawOutput,
+        SIMPLE_RAW_OUTPUT_NETSTAT,
         regexGroups,
         ContractOutputType.PortsScan,
-        "^\\s*(TCP|UDP)\\s+([\\d\\.:]+):(\\d+)\\s+\\S+\\s+\\S+\\s+(\\d+)",
-        "0.0.0.0:80 (1234)\n0.0.0.0:53 (5678)");
+        "^\\s*(TCP|UDP)\\s+([\\d\\.]+|\\*)?:?(\\d+)\\s+\\S+\\s+(\\S+)",
+        "192.168.1.10:135 (LISTENING)\n176.125.125.10:445 (LISTENING)\n192.168.12.12:902 (LISTENING)");
   }
 
   @Test
-  @DisplayName("Should return ports from raw output of command")
+  @DisplayName("Should return ports from raw output of netstat -an command")
   void given_raw_output_netstat_should_return_ports() {
     RegexGroup regexGroup = new RegexGroup();
-    regexGroup.setField("Any text");
-    regexGroup.setIndexValues("$t");
+    regexGroup.setField("port");
+    regexGroup.setIndexValues("$1");
+
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Port, "^(\\S+)", "");
+        SIMPLE_RAW_OUTPUT_NETSTAT,
+        Set.of(regexGroup),
+        ContractOutputType.Port,
+        "(?:TCP|UDP)\\s+[\\d\\.]+:(\\d+)",
+        "135\n445\n902");
   }
 
   @Test
-  @DisplayName("Should return ipv4s from raw output of command")
+  @DisplayName("Should return IPv4s from raw output of netstat -an command")
   void given_raw_output_netstat_should_return_ipv4() {
     RegexGroup regexGroup = new RegexGroup();
-    regexGroup.setField("Any text");
-    regexGroup.setIndexValues("$t");
+    regexGroup.setField("ipv4");
+    regexGroup.setIndexValues("$0");
+
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.IPv4, "^(\\S+)", "");
+        SIMPLE_RAW_OUTPUT_NETSTAT,
+        Set.of(regexGroup),
+        ContractOutputType.IPv4,
+        "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b",
+        "192.168.1.10\n0.0.0.0\n176.125.125.10\n0.0.0.0\n192.168.12.12\n0.0.0.0");
   }
 
   @Test
-  @DisplayName("Should return ipv6s  from raw output of command")
+  @DisplayName("Should return IPv6s from raw output of netstat -an command")
   void given_raw_output_netstat_should_return_ipv6() {
+    String rawOutput =
+        "\n"
+            + "Active Connections\n"
+            + "\n"
+            + " Proto Local Address Foreign Address State\n"
+            + " TCP 0.0.0.0:135 0.0.0.0:0 LISTENING\n"
+            + " UDP [fe80::1b03:a1ff:ccdb:b464%66]:1900 *:*\n"
+            + " UDP [fe80::1b04:a1ff:ccdb:b464%66]:2177 *:*\n"
+            + " UDP [fe80::1b03:a1ff:ccdb:b464%66]:58907 *:*\n"
+            + " UDP [fe80::6168:894c:9ee9:d02a%27]:1900 *:*\n";
+
     RegexGroup regexGroup = new RegexGroup();
-    regexGroup.setField("Any text");
-    regexGroup.setIndexValues("$t");
+    regexGroup.setField("ipv6");
+    regexGroup.setIndexValues("$1");
+
+    String ipv6Regex = "\\[([a-fA-F0-9:]+(?:%[a-zA-Z0-9]+)?)\\]:\\d+";
+
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.IPv6, "^(\\S+)", "");
+        rawOutput,
+        Set.of(regexGroup),
+        ContractOutputType.IPv6,
+        ipv6Regex,
+        "fe80::1b03:a1ff:ccdb:b464%66\nfe80::1b04:a1ff:ccdb:b464%66\nfe80::1b03:a1ff:ccdb:b464%66\nfe80::6168:894c:9ee9:d02a%27");
   }
 
   private void testRegexExtraction(
