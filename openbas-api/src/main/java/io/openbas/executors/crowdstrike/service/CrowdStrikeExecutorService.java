@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -99,9 +100,9 @@ public class CrowdStrikeExecutorService implements Runnable {
   @Override
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
-    List<Agent> agentsFromDb = agentService.getAgentsByExecutorType(CROWDSTRIKE_EXECUTOR_TYPE);
-    List<String> hostGroups = List.of(this.config.getHostGroup().split(","));
+    List<String> hostGroups = Stream.of(this.config.getHostGroup().split(",")).distinct().toList();
     for (String hostGroup : hostGroups) {
+      List<Agent> agentsFromDb = agentService.getAgentsByExecutorType(CROWDSTRIKE_EXECUTOR_TYPE);
       List<CrowdStrikeDevice> devices = this.client.devices(hostGroup);
       Optional<AssetGroup> existingAssetGroup =
           assetGroupService.findByExternalReference(hostGroup);

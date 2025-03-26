@@ -17,6 +17,8 @@ public class CrowdStrikeExecutorConfig {
 
   @Getter @NotBlank private String apiUrl;
 
+  @Getter @NotBlank private Integer apiRegisterDelay = 3600;
+
   @Getter @NotBlank private String clientId;
 
   @Getter @NotBlank private String clientSecret;
