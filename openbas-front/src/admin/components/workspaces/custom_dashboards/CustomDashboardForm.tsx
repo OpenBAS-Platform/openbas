@@ -33,7 +33,6 @@ const CustomDashboardForm: FunctionComponent<Props> = ({
       zodImplement<CustomDashboardInput>().with({
         custom_dashboard_name: z.string().min(1, { message: t('Should not be empty') }),
         custom_dashboard_description: z.string().optional(),
-        custom_dashboard_content: z.string().optional(),
       }),
     [],
   );

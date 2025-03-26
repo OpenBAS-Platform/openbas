@@ -4551,3 +4551,47 @@ export interface ViolationErrorBag {
   /** The type of error */
   type?: string;
 }
+
+export interface Widget {
+  listened?: boolean;
+  /** @format date-time */
+  widget_created_at: string;
+  widget_custom_dashboard?: string;
+  widget_data_selections: WidgetDataSelection[];
+  widget_id: string;
+  widget_layout?: WidgetLayout;
+  widget_parameters: WidgetParameters;
+  widget_type: "vertical-barchart";
+  /** @format date-time */
+  widget_updated_at: string;
+}
+
+export interface WidgetDataSelection {
+  /** Filter object to search within filterable attributes */
+  widget_data_selection_filter?: FilterGroup;
+  widget_data_selection_label?: string;
+}
+
+export interface WidgetInput {
+  widget_data_selections: WidgetDataSelection[];
+  widget_parameters: WidgetParameters;
+  widget_type: "vertical-barchart";
+}
+
+export interface WidgetLayout {
+  /** @format int32 */
+  widget_layout_h?: number;
+  /** @format int32 */
+  widget_layout_w?: number;
+  /** @format int32 */
+  widget_layout_x?: number;
+  /** @format int32 */
+  widget_layout_y?: number;
+}
+
+export interface WidgetParameters {
+  widget_parameters_display_legend?: boolean;
+  widget_parameters_mode?: "structure" | "temporal";
+  widget_parameters_stacked?: boolean;
+  widget_parameters_title?: string;
+}
