@@ -39,6 +39,15 @@ class FindingUtilsTest {
   }
 
   @Test
+  @DisplayName("Should return an empty string for a raw output empty")
+  void given_a_raw_output_empty_should_return_empty() {
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Any text");
+    regexGroup.setIndexValues("$2");
+    testRegexExtraction("", Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
+  }
+
+  @Test
   @DisplayName("Should return an empty string for an index bigger than matcher count")
   void given_a_group_bigger_than_matcher_count_should_return_empty() {
     RegexGroup regexGroup = new RegexGroup();
@@ -96,7 +105,7 @@ class FindingUtilsTest {
 
     Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2);
 
-    testRegexExtraction(
+    this.testRegexExtraction(
         rawOutput,
         regexGroups,
         ContractOutputType.Credentials,
@@ -132,6 +141,16 @@ class FindingUtilsTest {
         ContractOutputType.PortsScan,
         "^\\s*(TCP|UDP)\\s+([\\d\\.:]+):(\\d+)\\s+\\S+\\s+\\S+\\s+(\\d+)",
         "0.0.0.0:80 (1234)\n0.0.0.0:53 (5678)");
+  }
+
+  @Test
+  @DisplayName("Should return ipv4s  from raw output of command")
+  void given_raw_output_netstat_should_return_ipv4() {
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Any text");
+    regexGroup.setIndexValues("$t");
+    testRegexExtraction(
+        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
   }
 
   private void testRegexExtraction(
