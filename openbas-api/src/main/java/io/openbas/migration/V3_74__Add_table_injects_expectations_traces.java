@@ -21,9 +21,9 @@ public class V3_74__Add_table_injects_expectations_traces extends BaseJavaMigrat
                         inject_expectation_trace_source_id VARCHAR(255) NOT NULL CONSTRAINT inject_expectation_trace_source_id_fk REFERENCES assets (asset_id) ON DELETE CASCADE,
                         inject_expectation_trace_alert_name text,
                         inject_expectation_trace_alert_link text,
-                        inject_expectation_trace_date timestamp,
-                        inject_expectation_trace_created_at timestamp not null default now(),
-                        inject_expectation_trace_updated_at timestamp not null default now()
+                        inject_expectation_trace_date timestamp(0) with time zone,
+                        inject_expectation_trace_created_at timestamp(0) with time zone not null default now(),
+                        inject_expectation_trace_updated_at timestamp(0) with time zone not null default now()
                     );
                     CREATE INDEX idx_inject_expectation_trace_expectation ON injects_expectations_traces(inject_expectation_trace_expectation);
                     CREATE INDEX idx_inject_expectation_trace_source_id ON injects_expectations_traces(inject_expectation_trace_source_id);

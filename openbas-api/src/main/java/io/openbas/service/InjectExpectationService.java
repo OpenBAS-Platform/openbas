@@ -46,7 +46,6 @@ public class InjectExpectationService {
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
   private final CollectorRepository collectorRepository;
-  private final AgentService agentService;
 
   @Resource protected ObjectMapper mapper;
 
@@ -547,7 +546,9 @@ public class InjectExpectationService {
   }
 
   private boolean isSuccess(List<InjectExpectation> expectations, boolean isGroup) {
-    if (expectations.isEmpty()) return false;
+    if (expectations.isEmpty()) {
+      return false;
+    }
     return isGroup
         ? expectations.stream().anyMatch(e -> e.getExpectedScore().equals(e.getScore()))
         : expectations.stream().allMatch(e -> e.getExpectedScore().equals(e.getScore()));
@@ -649,14 +650,11 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findAll(
         Specification.where(
             InjectExpectationSpecification.type(PREVENTION)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
                 .and(
-                    InjectExpectationSpecification.agentNotNull()
-                        .and(
-                            InjectExpectationSpecification.assetNotNull()
-                                .and(
-                                    InjectExpectationSpecification.from(
-                                        Instant.now()
-                                            .minus(expirationTime, ChronoUnit.MINUTES)))))));
+                    InjectExpectationSpecification.from(
+                        Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
   }
 
   public List<InjectExpectation> preventionExpectationsNotFill(@NotBlank final String source) {
@@ -683,14 +681,11 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findAll(
         Specification.where(
             InjectExpectationSpecification.type(DETECTION)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
                 .and(
-                    InjectExpectationSpecification.agentNotNull()
-                        .and(
-                            InjectExpectationSpecification.assetNotNull()
-                                .and(
-                                    InjectExpectationSpecification.from(
-                                        Instant.now()
-                                            .minus(expirationTime, ChronoUnit.MINUTES)))))));
+                    InjectExpectationSpecification.from(
+                        Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
   }
 
   public List<InjectExpectation> detectionExpectationsNotFill(@NotBlank final String source) {
@@ -717,14 +712,11 @@ public class InjectExpectationService {
     return this.injectExpectationRepository.findAll(
         Specification.where(
             InjectExpectationSpecification.type(MANUAL)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
                 .and(
-                    InjectExpectationSpecification.agentNotNull()
-                        .and(
-                            InjectExpectationSpecification.assetNotNull()
-                                .and(
-                                    InjectExpectationSpecification.from(
-                                        Instant.now()
-                                            .minus(expirationTime, ChronoUnit.MINUTES)))))));
+                    InjectExpectationSpecification.from(
+                        Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
   }
 
   public List<InjectExpectation> manualExpectationsNotFill(@NotBlank final String source) {

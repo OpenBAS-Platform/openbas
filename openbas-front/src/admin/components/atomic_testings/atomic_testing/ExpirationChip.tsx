@@ -7,11 +7,11 @@ import { useFormatter } from '../../../../components/i18n';
 import countdown from '../../../../utils/hooks/countDown';
 import { splitDuration } from '../../../../utils/Time';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   score: {
     fontSize: '0.75rem',
     height: '20px',
-    padding: '0 4px',
+    padding: theme.spacing(1),
   },
 }));
 

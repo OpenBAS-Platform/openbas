@@ -54,15 +54,15 @@ const TargetResultsSecurityPlatform: FunctionComponent<Props> = ({
             <TableHead>
               <TableRow sx={{ textTransform: 'uppercase' }}>
                 <TableCell>{t('Name')}</TableCell>
-                <TableCell>{t('Prevention date')}</TableCell>
+                <TableCell>{`${injectExpectation.inject_expectation_type} ${t('Date')}`}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {
-                expectationTraces.map((expectationTrace: InjectExpectationTrace, index) => {
+                expectationTraces.map((expectationTrace: InjectExpectationTrace) => {
                   return (
                     <TableRow
-                      key={index}
+                      key={expectationTrace.inject_expectation_trace_id}
                       sx={{ height: '50px' }}
                     >
                       <TableCell sx={{ fontSize: '14px' }}>

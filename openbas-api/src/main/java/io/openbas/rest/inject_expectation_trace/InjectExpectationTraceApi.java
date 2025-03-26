@@ -4,7 +4,6 @@ import io.openbas.database.model.Collector;
 import io.openbas.database.model.InjectExpectationTrace;
 import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
@@ -24,7 +23,6 @@ public class InjectExpectationTraceApi extends RestBehavior {
   private final InjectExpectationTraceService injectExpectationTraceService;
   private final InjectExpectationRepository injectExpectationRepository;
   private final CollectorRepository collectorRepository;
-  private final SecurityPlatformRepository securityPlatformRepository;
 
   @PostMapping()
   public InjectExpectationTrace createInjectExpectationTraceForCollector(

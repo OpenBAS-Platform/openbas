@@ -113,6 +113,7 @@ const useStyles = makeStyles()(theme => ({
     overflow: 'hidden',
     height: '100%',
   },
+  tableFontSize: { fontSize: '12px' },
 }));
 
 interface Props {
@@ -762,10 +763,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     {injectExpectation.inject_expectation_type !== 'MANUAL' && (
                       <TableContainer>
                         <Table
-                          sx={{
-                            minWidth: 650,
-                            fontSize: '12 px',
-                          }}
                           size="small"
                         >
                           <TableHead>
@@ -791,7 +788,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                   sx={{ cursor: `${injectExpectation.inject_expectation_agent ? 'pointer' : 'default'}` }}
                                   selected={expectationResult.sourceId === selectedResult?.sourceId}
                                 >
-                                  <TableCell>
+                                  <TableCell className={classes.tableFontSize}>
                                     <div className={classes.flexContainer}>
                                       <div>
                                         {getAvatar(injectExpectation, expectationResult)}
@@ -801,16 +798,14 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                         alignSelf: 'center',
                                       }}
                                       >
-                                        <Typography variant="body1">
-                                          {expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
-                                        </Typography>
+                                        {expectationResult.sourceName ? t(expectationResult.sourceName) : t('Unknown')}
                                       </div>
                                     </div>
                                   </TableCell>
                                   <TableCell>
                                     <ItemResult label={expectationResult.result} status={expectationResult.result} />
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell className={classes.tableFontSize}>
                                     {
                                       (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected' || expectationResult.result === 'SUCCESS') ? nsdt(expectationResult.date) : '-'
                                     }
@@ -877,20 +872,20 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         </Table>
                       </TableContainer>
                     )}
+                    {
+                      selectedResult !== null && selectedResult.sourceId !== undefined && selectedExpectationForResults !== null
+                      && (
+                        <TargetResultsSecurityPlatform
+                          injectExpectation={selectedExpectationForResults}
+                          sourceId={selectedResult.sourceId}
+                          expectationResult={selectedResult}
+                          open={true}
+                          handleClose={() => handleCloseSecurityPlatformResult()}
+                        />
+                      )
+                    }
                   </Paper>
 
-                  {
-                    selectedResult !== null && selectedResult.sourceId !== undefined && selectedExpectationForResults !== null
-                    && (
-                      <TargetResultsSecurityPlatform
-                        injectExpectation={selectedExpectationForResults}
-                        sourceId={selectedResult.sourceId}
-                        expectationResult={selectedResult}
-                        open={true}
-                        handleClose={() => handleCloseSecurityPlatformResult()}
-                      />
-                    )
-                  }
                 </div>
               );
             })}

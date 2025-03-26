@@ -18,9 +18,6 @@ public interface InjectExpectationTraceRepository
         JpaSpecificationExecutor<InjectExpectationTrace> {
 
   @NotNull
-  Optional<InjectExpectationTrace> findById(@NotNull String id);
-
-  @NotNull
   Optional<InjectExpectationTrace>
       findByAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
           String alertLink,

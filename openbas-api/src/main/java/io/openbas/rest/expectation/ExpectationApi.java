@@ -48,18 +48,19 @@ public class ExpectationApi extends RestBehavior {
   public List<InjectExpectation> getInjectExpectationsNotFilledOrNotExpired(
       @RequestParam(required = false, name = "expiration_time") final Integer expirationTime) {
     if (expirationTime == null) {
-      return Stream.concat(
-              injectExpectationService.manualExpectationsNotFill().stream(),
-              Stream.concat(
-                  injectExpectationService.preventionExpectationsNotFill().stream(),
-                  injectExpectationService.detectionExpectationsNotFill().stream()))
+      return Stream.of(
+              injectExpectationService.manualExpectationsNotFill(),
+              injectExpectationService.preventionExpectationsNotFill(),
+              injectExpectationService.detectionExpectationsNotFill())
+          .flatMap(List::stream)
           .toList();
     }
-    return Stream.concat(
-            injectExpectationService.manualExpectationsNotExpired(expirationTime).stream(),
-            Stream.concat(
-                injectExpectationService.preventionExpectationsNotExpired(expirationTime).stream(),
-                injectExpectationService.detectionExpectationsNotExpired(expirationTime).stream()))
+
+    return Stream.of(
+            injectExpectationService.manualExpectationsNotExpired(expirationTime),
+            injectExpectationService.preventionExpectationsNotExpired(expirationTime),
+            injectExpectationService.detectionExpectationsNotExpired(expirationTime))
+        .flatMap(List::stream)
         .toList();
   }
 
