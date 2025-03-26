@@ -556,6 +556,8 @@ export interface Command {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -602,7 +604,6 @@ export interface ContractOutputElement {
   contract_output_element_is_finding: boolean;
   contract_output_element_key: string;
   contract_output_element_name: string;
-  contract_output_element_output_parser?: string;
   /** @uniqueItems true */
   contract_output_element_regex_groups?: RegexGroup[];
   contract_output_element_rule: string;
@@ -677,6 +678,8 @@ export interface DnsResolution {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -863,6 +866,8 @@ export interface Executable {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -1151,6 +1156,8 @@ export interface FileDrop {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -2258,6 +2265,8 @@ export interface NetworkTraffic {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -2345,7 +2354,6 @@ export interface OutputParser {
   output_parser_created_at: string;
   output_parser_id: string;
   output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
-  output_parser_payload?: Payload;
   output_parser_type: "REGEX";
   /** @format date-time */
   output_parser_updated_at: string;
@@ -3199,7 +3207,6 @@ export interface RawUser {
 
 export interface RegexGroup {
   listened?: boolean;
-  regex_group_contract_output_element?: string;
   /** @format date-time */
   regex_group_created_at: string;
   regex_group_field: string;
