@@ -111,7 +111,7 @@
     "swagger-typescript-api": "13.0.25",
     "typescript": "5.8.2",
     "typescript-eslint": "8.28.0",
-    "vite": "6.2.2",
+    "vite": "6.2.3",
     "vitest": "3.0.9"
   },
   "resolutions": {
