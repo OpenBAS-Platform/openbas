@@ -19,6 +19,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class FindingUtilsTest {
 
+  public static final String SIMPLE_RAW_OUTPUT =
+      "\r\nImage Name                 PID Session Name        Session#    Mem Usage\r\n"
+          + "=========================  ========  ================  ===========  ============\r\n"
+          + "System Idle Process           0 Services               0          8 K\r\n";
+
   @Mock private FindingRepository findingRepository;
 
   private FindingUtils findingUtils;
@@ -29,8 +34,61 @@ class FindingUtilsTest {
   }
 
   @Test
+  @DisplayName("Should return an empty string for an index bigger than matcher count")
+  void given_a_group_bigger_than_matcher_count_should_return_empty() {
+    String rawOutputByMode = SIMPLE_RAW_OUTPUT;
+
+    RegexGroup regexGroup1 = new RegexGroup();
+    regexGroup1.setField("Any text");
+    regexGroup1.setIndexValues("$2");
+
+    ContractOutputElement contractOutputElement = new ContractOutputElement();
+    contractOutputElement.setType(ContractOutputType.Text);
+    contractOutputElement.setRule("^(\\S+)");
+    contractOutputElement.setRegexGroups(Set.of(regexGroup1));
+
+    String regex = contractOutputElement.getRule();
+    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
+    Pattern pattern = Pattern.compile(regex, flags);
+    Matcher matcher = pattern.matcher(rawOutputByMode);
+
+    StringBuilder result = new StringBuilder();
+    while (matcher.find()) {
+      result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
+    }
+    assertEquals("", result.toString().trim());
+  }
+
+  @Test
+  @DisplayName("Should return empty for an index no numerique")
+  void given_an_index_no_numercal_should_return_nothing() {
+    String rawOutputByMode = SIMPLE_RAW_OUTPUT;
+
+    RegexGroup regexGroup1 = new RegexGroup();
+    regexGroup1.setField("Any text");
+    regexGroup1.setIndexValues("$t");
+
+    ContractOutputElement contractOutputElement = new ContractOutputElement();
+    contractOutputElement.setType(ContractOutputType.Text);
+    contractOutputElement.setRule("^(\\S+)");
+    contractOutputElement.setRegexGroups(Set.of(regexGroup1));
+
+    String regex = contractOutputElement.getRule();
+    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
+    Pattern pattern = Pattern.compile(regex, flags);
+
+    Matcher matcher = pattern.matcher(rawOutputByMode);
+
+    StringBuilder result = new StringBuilder();
+    while (matcher.find()) {
+      result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
+    }
+    assertEquals("", result.toString().trim());
+  }
+
+  @Test
   @DisplayName("Should get image names from raw output of tasklist command")
-  void getValueFromText() {
+  void given_raw_output_tasklist_should_return_names() {
     String rawOutputByMode =
         "\r\nImage Name                 PID Session Name        Session#    Mem Usage\r\n"
             + "=========================  ========  ================  ===========  ============\r\n"
@@ -65,7 +123,7 @@ class FindingUtilsTest {
 
   @Test
   @DisplayName("Should get username:password from raw output command")
-  void getValueFromCredentials() {
+  void given_raw_output_tasklist_should_return_credentials() {
     String rawOutputByMode = "";
 
     RegexGroup regexGroup1 = new RegexGroup();
@@ -98,7 +156,7 @@ class FindingUtilsTest {
 
   @Test
   @DisplayName("Should get host:port(service) from raw output of netstat command")
-  void getValueFromPortScan() {
+  void given_raw_output_netstat_should_return_portscans() {
     String rawOutputByMode =
         "TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       1234\\n\" +\n"
             + "                               \"UDP    0.0.0.0:53             *:*                     LISTENING       5678";
