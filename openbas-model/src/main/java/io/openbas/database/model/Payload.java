@@ -206,6 +206,11 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
+  @JsonProperty("payload_attack_patterns_details")
+  public List<AttackPattern> getAttackPatternsDetails(){
+    return this.attackPatterns;
+  }
+
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {
     return this.collector != null ? this.collector.getType() : null;
