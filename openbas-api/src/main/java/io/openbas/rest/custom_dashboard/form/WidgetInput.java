@@ -1,17 +1,16 @@
 package io.openbas.rest.custom_dashboard.form;
 
+import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetDataSelection;
 import io.openbas.database.model.WidgetParameters;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-
-import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
-import static java.util.Objects.requireNonNull;
 
 @Getter
 @Setter
