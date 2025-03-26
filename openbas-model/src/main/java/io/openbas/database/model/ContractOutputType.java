@@ -112,7 +112,12 @@ public enum ContractOutputType {
       },
       null,
       null,
-      null);
+      null) {
+    @Override
+    public String toString() {
+      return "";
+    }
+  };
 
   public final String label;
   public final ContractOutputTechnicalType technicalType;

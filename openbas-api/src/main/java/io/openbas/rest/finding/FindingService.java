@@ -2,10 +2,8 @@ package io.openbas.rest.finding;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injector_contract.outputs.ContractOutputUtils.getContractOutputs;
-import static io.openbas.rest.finding.FindingUtils.extractRawOutputByMode;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 
-import com.cronutils.utils.VisibleForTesting;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,8 +21,6 @@ import jakarta.annotation.Resource;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class FindingService {
 
-  private final FindingRepository findingRepository;
+  private final FindingUtils findingUtils;
   private final InjectService injectService;
+
+  private final FindingRepository findingRepository;
   private final AssetRepository assetRepository;
   private final TeamRepository teamRepository;
   private final UserRepository userRepository;
@@ -192,7 +190,7 @@ public class FindingService {
                 outputParsers.forEach(
                     outputParser -> {
                       String rawOutputByMode =
-                          extractRawOutputByMode(trace, outputParser.getMode());
+                          findingUtils.extractRawOutputByMode(trace, outputParser.getMode());
                       if (rawOutputByMode == null) {
                         return;
                       }
@@ -200,7 +198,7 @@ public class FindingService {
                         case REGEX:
                         default:
                           findings.addAll(
-                              computeFindingUsingRegexRules(
+                              findingUtils.computeFindingUsingRegexRules(
                                   inject,
                                   asset,
                                   rawOutputByMode,
@@ -210,82 +208,5 @@ public class FindingService {
                     }));
 
     findingRepository.saveAll(findings);
-  }
-
-  private List<Finding> computeFindingUsingRegexRules(
-      Inject inject,
-      Asset asset,
-      String rawOutputByMode,
-      Set<io.openbas.database.model.ContractOutputElement> contractOutputElements) {
-    List<Finding> findings = new ArrayList<>();
-    Map<String, Pattern> patternCache = new HashMap<>();
-
-    contractOutputElements.stream()
-        .filter(io.openbas.database.model.ContractOutputElement::isFinding)
-        .forEach(
-            contractOutputElement -> {
-              String regex = contractOutputElement.getRule();
-              Pattern pattern = patternCache.computeIfAbsent(regex, Pattern::compile);
-              Matcher matcher = pattern.matcher(rawOutputByMode);
-
-              while (matcher.find()) {
-                String finalValue = buildValue(contractOutputElement, matcher);
-                Finding finding = buildFinding(inject, asset, contractOutputElement, finalValue);
-                findings.add(finding);
-              }
-            });
-
-    return findings;
-  }
-
-  private Finding buildFinding(
-      Inject inject,
-      Asset asset,
-      io.openbas.database.model.ContractOutputElement contractOutputElement,
-      String finalValue) {
-    Optional<Finding> optionalFinding =
-        findingRepository.findByInjectIdAndValue(inject.getId(), finalValue);
-
-    Finding finding =
-        optionalFinding.orElseGet(
-            () -> {
-              Finding newFinding = new Finding();
-              newFinding.setInject(inject);
-              newFinding.setField(contractOutputElement.getKey());
-              newFinding.setType(contractOutputElement.getType());
-              newFinding.setValue(finalValue);
-              newFinding.setTags(new HashSet<>(contractOutputElement.getTags()));
-              return newFinding;
-            });
-
-    finding.getAssets().add(asset);
-    return finding;
-  }
-
-  @VisibleForTesting
-  private String buildValue(
-      io.openbas.database.model.ContractOutputElement contractOutputElement, Matcher matcher) {
-    StringBuilder value = new StringBuilder();
-
-    for (ContractOutputField field : contractOutputElement.getType().fields) {
-      String[] indexes =
-          contractOutputElement.getRegexGroups().stream()
-              .filter(regexGroup -> field.getKey().equals(regexGroup.getField()))
-              .map(RegexGroup::getIndexValues)
-              .map(values -> values.split("\\$"))
-              .flatMap(Arrays::stream)
-              .filter(s -> !s.isEmpty())
-              .toArray(String[]::new);
-
-      for (String index : indexes) {
-        try {
-          int groupIndex = Integer.parseInt(index);
-          value.append(matcher.group(groupIndex)).append(" ");
-        } catch (NumberFormatException | IllegalStateException e) {
-          System.err.println("Invalid regex group index: " + index);
-        }
-      }
-    }
-    return value.toString();
   }
 }
