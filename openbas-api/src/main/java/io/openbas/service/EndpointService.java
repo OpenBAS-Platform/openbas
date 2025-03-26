@@ -182,14 +182,13 @@ public class EndpointService {
           existingAgents.stream()
               .filter(agent -> inputsExternalRefs.contains(agent.getExternalReference()))
               .collect(Collectors.toSet());
+      Map<String, AgentRegisterInput> inputsByExternalReference =
+          inputs.stream()
+              .collect(
+                  Collectors.toMap(AgentRegisterInput::getExternalReference, agent2 -> agent2));
       for (Agent agentToUpdate : agentsToUpdate) {
         final AgentRegisterInput inputToSave =
-            inputs.stream()
-                .filter(
-                    input ->
-                        input.getExternalReference().equals(agentToUpdate.getExternalReference()))
-                .findFirst()
-                .get();
+            inputsByExternalReference.get(agentToUpdate.getExternalReference());
         endpointToSave = (Endpoint) Hibernate.unproxy(agentToUpdate.getAsset());
         setUpdatedEndpointAttributes(endpointToSave, inputToSave);
         agentToUpdate.setAsset(endpointToSave);

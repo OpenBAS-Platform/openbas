@@ -1,6 +1,5 @@
 package io.openbas.executors.crowdstrike.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
@@ -61,7 +60,11 @@ public class CrowdStrikeExecutorClient {
       } else {
         hosts.addAll(partialResults.getResources());
       }
-      while (partialResults.getMeta().getPagination().getTotal() > offset) {
+      int numberOfExecution =
+          Math.ceilDiv(
+              partialResults.getMeta().getPagination().getTotal(),
+              partialResults.getMeta().getPagination().getLimit());
+      for (int callNumber = 1; callNumber < numberOfExecution; callNumber += 1) {
         offset += partialResults.getMeta().getPagination().getLimit();
         partialResults = getResourcesHosts(offset, hostGroup);
         if (partialResults.getResources() == null) {
@@ -97,14 +100,12 @@ public class CrowdStrikeExecutorClient {
                   + offset
                   + "&filter="
                   + fqlFilter);
-    } catch (IOException e) {
-      log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
-      throw new RuntimeException(e);
-    }
-    try {
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
-    } catch (JsonProcessingException e) {
-      log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
+    } catch (Exception e) {
+      log.log(
+          Level.SEVERE,
+          "Error occurred during Crowdstrike getResourcesHosts API request. Error: {}",
+          e.getMessage());
       throw new RuntimeException(e);
     }
   }
@@ -113,14 +114,12 @@ public class CrowdStrikeExecutorClient {
     String jsonResponse;
     try {
       jsonResponse = this.get(HOST_GROUPS_URI + "?ids=" + hostGroup);
-    } catch (IOException e) {
-      log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
-      throw new RuntimeException(e);
-    }
-    try {
       return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
-    } catch (JsonProcessingException e) {
-      log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
+    } catch (Exception e) {
+      log.log(
+          Level.SEVERE,
+          "Error occurred during Crowdstrike hostGroup API request. Error: {}",
+          e.getMessage());
       throw new RuntimeException(e);
     }
   }
