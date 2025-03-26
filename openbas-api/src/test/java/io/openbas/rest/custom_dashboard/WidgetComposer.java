@@ -4,16 +4,14 @@ import io.openbas.database.model.Widget;
 import io.openbas.database.repository.WidgetRepository;
 import io.openbas.utils.fixtures.composers.ComposerBase;
 import io.openbas.utils.fixtures.composers.InnerComposerBase;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class WidgetComposer extends ComposerBase<Widget> {
 
-  @Autowired
-  private WidgetRepository widgetRepository;
+  @Autowired private WidgetRepository widgetRepository;
 
   public class Composer extends InnerComposerBase<Widget> {
 
