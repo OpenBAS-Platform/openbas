@@ -70,6 +70,16 @@ class FindingUtilsTest {
   }
 
   @Test
+  @DisplayName("Should return numbers from raw output of command")
+  void given_raw_output_netstat_should_return_number() {
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Any text");
+    regexGroup.setIndexValues("$1");
+    testRegexExtraction(
+        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Number, "^(\\S+)()", "");
+  }
+
+  @Test
   @DisplayName("Should get image names from raw output of tasklist command")
   void given_raw_output_tasklist_should_return_names() {
     String rawOutput =
@@ -146,13 +156,33 @@ class FindingUtilsTest {
   }
 
   @Test
-  @DisplayName("Should return ipv4s  from raw output of command")
+  @DisplayName("Should return ports from raw output of command")
+  void given_raw_output_netstat_should_return_ports() {
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Any text");
+    regexGroup.setIndexValues("$t");
+    testRegexExtraction(
+        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Port, "^(\\S+)", "");
+  }
+
+  @Test
+  @DisplayName("Should return ipv4s from raw output of command")
   void given_raw_output_netstat_should_return_ipv4() {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Any text");
     regexGroup.setIndexValues("$t");
     testRegexExtraction(
-        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
+        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.IPv4, "^(\\S+)", "");
+  }
+
+  @Test
+  @DisplayName("Should return ipv6s  from raw output of command")
+  void given_raw_output_netstat_should_return_ipv6() {
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Any text");
+    regexGroup.setIndexValues("$t");
+    testRegexExtraction(
+        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.IPv6, "^(\\S+)", "");
   }
 
   private void testRegexExtraction(
