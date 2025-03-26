@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.FindingRepository;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Component;
@@ -69,38 +69,54 @@ public class FindingUtils {
   }
 
   public String buildValue(ContractOutputElement contractOutputElement, Matcher matcher) {
+    Map<String, List<String>> fieldValuesMap = new LinkedHashMap<>();
+
+    // If there are no specific fields, extract all matched groups
     if (contractOutputElement.getType().fields == null) {
-      return matcher.group();
+      List<String> extractedValues = extractValues(contractOutputElement.getRegexGroups(), matcher);
+      fieldValuesMap.put(null, extractedValues);
+    } else {
+      // Extract values for each defined field
+      for (ContractOutputField field : contractOutputElement.getType().fields) {
+        List<String> extractedValues =
+            extractValues(
+                contractOutputElement.getRegexGroups().stream()
+                    .filter(regexGroup -> field.getKey().equals(regexGroup.getField()))
+                    .collect(Collectors.toSet()),
+                matcher);
+        fieldValuesMap.put(field.getKey(), extractedValues);
+      }
     }
 
-    Map<String, List<String>> fieldValuesMap = new HashMap<>();
+    return formatFinalValue(contractOutputElement.getType(), fieldValuesMap);
+  }
 
-    // Extract values based on mapped regex groups
-    for (ContractOutputField field : contractOutputElement.getType().fields) {
-      List<String> extractedValues = new ArrayList<>();
+  private List<String> extractValues(Set<RegexGroup> regexGroups, Matcher matcher) {
+    List<String> extractedValues = new ArrayList<>();
 
+    for (RegexGroup regexGroup : regexGroups) {
       String[] indexes =
-          contractOutputElement.getRegexGroups().stream()
-              .filter(regexGroup -> field.getKey().equals(regexGroup.getField()))
-              .map(RegexGroup::getIndexValues)
-              .map(values -> values.split("\\$"))
-              .flatMap(Stream::of)
-              .filter(s -> !s.isEmpty())
+          Arrays.stream(regexGroup.getIndexValues().split("\\$", -1))
+              .filter(index -> !index.isEmpty())
               .toArray(String[]::new);
 
       for (String index : indexes) {
         try {
           int groupIndex = Integer.parseInt(index);
-          extractedValues.add(matcher.group(groupIndex).trim());
+          if (groupIndex > matcher.groupCount()) {
+            log.log(Level.WARNING, "Skipping invalid group index: " + groupIndex);
+            continue;
+          }
+          String extracted = matcher.group(groupIndex);
+          if (extracted != null) {
+            extractedValues.add(extracted.trim());
+          }
         } catch (NumberFormatException | IllegalStateException e) {
-          System.err.println("Invalid regex group index: " + index);
+          log.log(Level.SEVERE, "Invalid regex group index: " + index, e);
         }
       }
-
-      fieldValuesMap.put(field.getKey(), extractedValues);
     }
-
-    return formatFinalValue(contractOutputElement.getType(), fieldValuesMap);
+    return extractedValues;
   }
 
   public Finding buildFinding(
