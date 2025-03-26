@@ -150,7 +150,6 @@ public class FindingUtils {
         String username = String.join(" ", fieldValuesMap.getOrDefault("username", List.of("")));
         String password = String.join(" ", fieldValuesMap.getOrDefault("password", List.of("")));
         return username + ":" + password;
-
       case PortsScan:
         String host = fieldValuesMap.getOrDefault("host", List.of("")).get(0);
         String port = fieldValuesMap.getOrDefault("port", List.of("")).get(0);
@@ -159,7 +158,6 @@ public class FindingUtils {
                 ? ""
                 : " (" + fieldValuesMap.get("service").get(0) + ")";
         return host + ":" + port + service;
-
       default:
         return fieldValuesMap.values().stream()
             .map(list -> String.join(" ", list))

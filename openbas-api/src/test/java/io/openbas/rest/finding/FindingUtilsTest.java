@@ -20,76 +20,48 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class FindingUtilsTest {
 
   public static final String SIMPLE_RAW_OUTPUT =
-      "\r\nImage Name                 PID Session Name        Session#    Mem Usage\r\n"
+      "\r\nImage Name                 PID  Session Name        Session#    Mem Usage\r\n"
           + "=========================  ========  ================  ===========  ============\r\n"
-          + "System Idle Process           0 Services               0          8 K\r\n";
+          + "System Idle Process           0  Services               0          8 K\r\n";
 
   @Mock private FindingRepository findingRepository;
 
   private FindingUtils findingUtils;
 
   @BeforeEach
-  void before() {
+  void setup() {
     findingUtils = new FindingUtils(findingRepository);
+  }
+
+  private Matcher getMatcher(String regex, String input) {
+    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
+    return Pattern.compile(regex, flags).matcher(input);
   }
 
   @Test
   @DisplayName("Should return an empty string for an index bigger than matcher count")
   void given_a_group_bigger_than_matcher_count_should_return_empty() {
-    String rawOutputByMode = SIMPLE_RAW_OUTPUT;
-
-    RegexGroup regexGroup1 = new RegexGroup();
-    regexGroup1.setField("Any text");
-    regexGroup1.setIndexValues("$2");
-
-    ContractOutputElement contractOutputElement = new ContractOutputElement();
-    contractOutputElement.setType(ContractOutputType.Text);
-    contractOutputElement.setRule("^(\\S+)");
-    contractOutputElement.setRegexGroups(Set.of(regexGroup1));
-
-    String regex = contractOutputElement.getRule();
-    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
-    Pattern pattern = Pattern.compile(regex, flags);
-    Matcher matcher = pattern.matcher(rawOutputByMode);
-
-    StringBuilder result = new StringBuilder();
-    while (matcher.find()) {
-      result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
-    }
-    assertEquals("", result.toString().trim());
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Any text");
+    regexGroup.setIndexValues("$2");
+    testRegexExtraction(
+        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
   }
 
   @Test
-  @DisplayName("Should return empty for an index no numerique")
-  void given_an_index_no_numercal_should_return_nothing() {
-    String rawOutputByMode = SIMPLE_RAW_OUTPUT;
-
-    RegexGroup regexGroup1 = new RegexGroup();
-    regexGroup1.setField("Any text");
-    regexGroup1.setIndexValues("$t");
-
-    ContractOutputElement contractOutputElement = new ContractOutputElement();
-    contractOutputElement.setType(ContractOutputType.Text);
-    contractOutputElement.setRule("^(\\S+)");
-    contractOutputElement.setRegexGroups(Set.of(regexGroup1));
-
-    String regex = contractOutputElement.getRule();
-    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
-    Pattern pattern = Pattern.compile(regex, flags);
-
-    Matcher matcher = pattern.matcher(rawOutputByMode);
-
-    StringBuilder result = new StringBuilder();
-    while (matcher.find()) {
-      result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
-    }
-    assertEquals("", result.toString().trim());
+  @DisplayName("Should return empty for a non-numeric index")
+  void given_an_index_no_numerical_should_return_empty() {
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Any text");
+    regexGroup.setIndexValues("$t");
+    testRegexExtraction(
+        SIMPLE_RAW_OUTPUT, Set.of(regexGroup), ContractOutputType.Text, "^(\\S+)", "");
   }
 
   @Test
   @DisplayName("Should get image names from raw output of tasklist command")
   void given_raw_output_tasklist_should_return_names() {
-    String rawOutputByMode =
+    String rawOutput =
         "\r\nImage Name                 PID Session Name        Session#    Mem Usage\r\n"
             + "=========================  ========  ================  ===========  ============\r\n"
             + "System Idle Process           0 Services               0          8 K\r\n"
@@ -97,34 +69,22 @@ class FindingUtilsTest {
             + "Secure System                284 Services               0    112,156 K\r\n"
             + "Registry                     328 Services               0     58,904 K\r\n";
 
-    RegexGroup regexGroup1 = new RegexGroup();
-    regexGroup1.setField("Image name");
-    regexGroup1.setIndexValues("$0");
+    RegexGroup regexGroup = new RegexGroup();
+    regexGroup.setField("Image name");
+    regexGroup.setIndexValues("$0");
 
-    ContractOutputElement contractOutputElement = new ContractOutputElement();
-    contractOutputElement.setType(ContractOutputType.Text);
-    contractOutputElement.setRule("^(\\S+)");
-    contractOutputElement.setRegexGroups(Set.of(regexGroup1));
-
-    String regex = contractOutputElement.getRule();
-    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
-    Pattern pattern = Pattern.compile(regex, flags);
-
-    Matcher matcher = pattern.matcher(rawOutputByMode);
-
-    StringBuilder result = new StringBuilder();
-    while (matcher.find()) {
-      result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
-    }
-    assertEquals(
-        "Image\n=========================\nSystem\nSystem\nSecure\nRegistry",
-        result.toString().trim());
+    testRegexExtraction(
+        rawOutput,
+        Set.of(regexGroup),
+        ContractOutputType.Text,
+        "^(\\S+)",
+        "Image\n=========================\nSystem\nSystem\nSecure\nRegistry");
   }
 
   @Test
   @DisplayName("Should get username:password from raw output command")
   void given_raw_output_tasklist_should_return_credentials() {
-    String rawOutputByMode = "";
+    String rawOutput = "user1 pass123\nadmin root\n";
 
     RegexGroup regexGroup1 = new RegexGroup();
     regexGroup1.setField("username");
@@ -134,33 +94,24 @@ class FindingUtilsTest {
     regexGroup1.setField("password");
     regexGroup1.setIndexValues("$2");
 
-    ContractOutputElement contractOutputElement = new ContractOutputElement();
-    contractOutputElement.setType(ContractOutputType.Text);
-    contractOutputElement.setRule("^(\\S+)");
-    contractOutputElement.setRegexGroups(Set.of(regexGroup1, regexGroup2));
+    Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2);
 
-    String regex = contractOutputElement.getRule();
-    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
-    Pattern pattern = Pattern.compile(regex, flags);
-
-    Matcher matcher = pattern.matcher(rawOutputByMode);
-
-    StringBuilder result = new StringBuilder();
-    while (matcher.find()) {
-      result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
-    }
-    assertEquals(
-        "Image\n=========================\nSystem\nSystem\nSecure\nRegistry",
-        result.toString().trim());
+    testRegexExtraction(
+        rawOutput,
+        regexGroups,
+        ContractOutputType.Credentials,
+        "^(\\S+)\\s+(\\S+)",
+        "user1:pass123\nadmin:root");
   }
 
   @Test
   @DisplayName("Should get host:port(service) from raw output of netstat command")
   void given_raw_output_netstat_should_return_portscans() {
-    String rawOutputByMode =
-        "TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       1234\\n\" +\n"
-            + "                               \"UDP    0.0.0.0:53             *:*                     LISTENING       5678";
-
+    String rawOutput =
+        """
+            TCP    0.0.0.0:80             0.0.0.0:0              LISTENING       1234
+            UDP    0.0.0.0:53             *:*                    LISTENING       5678
+        """;
     RegexGroup regexGroup1 = new RegexGroup();
     regexGroup1.setField("host");
     regexGroup1.setIndexValues("$2");
@@ -173,22 +124,34 @@ class FindingUtilsTest {
     regexGroup3.setField("service");
     regexGroup3.setIndexValues("$4");
 
+    Set<RegexGroup> regexGroups = Set.of(regexGroup1, regexGroup2, regexGroup3);
+
+    testRegexExtraction(
+        rawOutput,
+        regexGroups,
+        ContractOutputType.PortsScan,
+        "^\\s*(TCP|UDP)\\s+([\\d\\.:]+):(\\d+)\\s+\\S+\\s+\\S+\\s+(\\d+)",
+        "0.0.0.0:80 (1234)\n0.0.0.0:53 (5678)");
+  }
+
+  private void testRegexExtraction(
+      String input,
+      Set<RegexGroup> regexGroups,
+      ContractOutputType type,
+      String regex,
+      String expected) {
     ContractOutputElement contractOutputElement = new ContractOutputElement();
-    contractOutputElement.setType(ContractOutputType.PortsScan);
-    contractOutputElement.setRule(
-        "^\\s*(TCP|UDP)\\s+([\\d\\.:]+):(\\d+)\\s+\\S+\\s+\\S+\\s+(\\d+)");
-    contractOutputElement.setRegexGroups(Set.of(regexGroup1, regexGroup2, regexGroup3));
+    contractOutputElement.setType(type);
+    contractOutputElement.setRule(regex);
+    contractOutputElement.setRegexGroups(regexGroups);
 
-    String regex = contractOutputElement.getRule();
-    int flags = (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
-    Pattern pattern = Pattern.compile(regex, flags);
-
-    Matcher matcher = pattern.matcher(rawOutputByMode);
-
+    Matcher matcher = getMatcher(regex, input);
     StringBuilder result = new StringBuilder();
+
     while (matcher.find()) {
       result.append(findingUtils.buildValue(contractOutputElement, matcher)).append("\n");
     }
-    assertEquals("0.0.0.0:80 (1234)", result.toString().trim());
+
+    assertEquals(expected, result.toString().trim());
   }
 }
