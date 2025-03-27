@@ -317,7 +317,7 @@ const InjectDetailsForm = ({
         content={injectorContractLabel}
         disabled={disabled}
       />
-      <InjectForm control={control} disabled={disabled} isAtomic={isAtomic} register={register} />
+      <InjectForm control={control} disabled={disabled} isAtomic={isAtomic} register={register} theme={theme} />
       {injectorContractContent && (
         <div style={{ width: '100%' }}>
           {openDetails && (

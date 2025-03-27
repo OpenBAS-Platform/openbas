@@ -56,6 +56,7 @@ class InjectForm extends Component {
   render() {
     const {
       t,
+      theme,
       control,
       register,
       classes,
@@ -68,7 +69,7 @@ class InjectForm extends Component {
           variant="h5"
           style={{
             fontWeight: 500,
-            marginTop: 20,
+            marginTop: theme.spacing(2),
           }}
         >
           {t('Title')}
@@ -84,7 +85,7 @@ class InjectForm extends Component {
           variant="h5"
           style={{
             fontWeight: 500,
-            marginTop: 20,
+            marginTop: theme.spacing(2),
           }}
         >
           {t('Description')}
@@ -95,7 +96,7 @@ class InjectForm extends Component {
           fullWidth={true}
           multiline={true}
           rows={2}
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
           disabled={disabled}
           control={control}
         />
@@ -103,7 +104,7 @@ class InjectForm extends Component {
           variant="h5"
           style={{
             fontWeight: 500,
-            marginTop: 20,
+            marginTop: theme.spacing(2),
           }}
         >
           {t('Tags')}
@@ -115,7 +116,7 @@ class InjectForm extends Component {
             <TagField
               fieldValue={value ?? []}
               fieldOnChange={onChange}
-              style={{ marginTop: 20 }}
+              style={{ marginTop: theme.spacing(2) }}
               error={error}
             />
           )}
@@ -166,6 +167,7 @@ InjectForm.propTypes = {
   isAtomic: PropTypes.bool,
   classes: PropTypes.object,
   t: PropTypes.func,
+  theme: PropTypes.func,
 };
 
 export default R.compose(inject18n, Component => withStyles(Component, styles))(InjectForm);
