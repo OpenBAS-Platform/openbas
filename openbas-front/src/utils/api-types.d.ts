@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -272,7 +273,6 @@ export interface AttackPatternCreateInput {
   attack_pattern_stix_id?: string;
 }
 
-/** Attack pattern */
 export interface AttackPatternSimple {
   attack_pattern_external_id: string;
   attack_pattern_id: string;
@@ -1664,8 +1664,6 @@ export interface InjectResultOutput {
 }
 
 export interface InjectResultOverviewOutput {
-  /** Attack pattern */
-  inject_attack_patterns?: AttackPatternSimple[];
   inject_content?: object;
   /** Description of inject */
   inject_description?: string;
@@ -1683,6 +1681,11 @@ export interface InjectResultOverviewOutput {
   inject_ready?: boolean;
   /** status */
   inject_status?: InjectStatusOutput;
+  /**
+   * Tags
+   * @uniqueItems true
+   */
+  inject_tags?: string[];
   /** Results of expectations for each target */
   inject_targets: InjectTargetWithResult[];
   /** Title of inject */
