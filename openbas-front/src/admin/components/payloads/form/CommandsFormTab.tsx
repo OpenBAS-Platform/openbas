@@ -24,7 +24,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
     } else if (!disabledPayloadType && type === 'Executable') {
       setValue('payload_execution_arch', '');
     }
-  }, [type, setValue]);
+  }, [type]);
 
   const { fields: argumentsFields, append: argumentsAppend, remove: argumentsRemove } = useFieldArray({
     control,

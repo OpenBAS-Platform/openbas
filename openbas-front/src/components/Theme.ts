@@ -21,6 +21,7 @@ declare module '@mui/material/styles' {
     nav: string;
     accent: string;
     shadow: string;
+    code: string;
   }
   interface PaletteColor {
     background: string;
