@@ -561,6 +561,7 @@ class InjectDefinition extends Component {
             <Typography
               variant="h5"
               style={{
+                marginTop: 20,
                 fontWeight: 500,
                 float: 'left',
               }}

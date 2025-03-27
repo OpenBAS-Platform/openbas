@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
@@ -63,31 +64,55 @@ class InjectForm extends Component {
     } = this.props;
     return (
       <div>
+        <Typography
+          variant="h5"
+          style={{
+            fontWeight: 500,
+            marginTop: 20,
+          }}
+        >
+          {t('Title')}
+        </Typography>
         <TextField
           variant="standard"
           inputProps={register('inject_title')}
           fullWidth={true}
-          label={t('Title')}
           disabled={disabled}
           control={control}
         />
+        <Typography
+          variant="h5"
+          style={{
+            fontWeight: 500,
+            marginTop: 20,
+          }}
+        >
+          {t('Description')}
+        </Typography>
         <TextField
           variant="standard"
           inputProps={register('inject_description')}
           fullWidth={true}
           multiline={true}
           rows={2}
-          label={t('Description')}
           style={{ marginTop: 20 }}
           disabled={disabled}
           control={control}
         />
+        <Typography
+          variant="h5"
+          style={{
+            fontWeight: 500,
+            marginTop: 20,
+          }}
+        >
+          {t('Tags')}
+        </Typography>
         <Controller
           control={control}
           name="inject_tags"
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TagField
-              label={t('Tags')}
               fieldValue={value ?? []}
               fieldOnChange={onChange}
               style={{ marginTop: 20 }}
