@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogTitle,
   Fab,
-  Grid,
+  GridLegacy,
   List,
   ListItemButton,
   ListItemIcon,
@@ -150,16 +150,16 @@ const TeamAddPlayers: FunctionComponent<Props> = ({ addedUsersIds, teamId }) => 
       >
         <DialogTitle>{t('Add players in this team')}</DialogTitle>
         <DialogContent>
-          <Grid container spacing={3} style={{ marginTop: -15 }}>
-            <Grid item xs={8}>
-              <Grid container spacing={3}>
-                <Grid item xs={6}>
+          <GridLegacy container spacing={3} style={{ marginTop: -15 }}>
+            <GridLegacy item xs={8}>
+              <GridLegacy container spacing={3}>
+                <GridLegacy item xs={6}>
                   <SearchFilter
                     onChange={(value?: string) => setKeyword(value || '')}
                     fullWidth
                   />
-                </Grid>
-                <Grid item xs={6}>
+                </GridLegacy>
+                <GridLegacy item xs={6}>
                   <TagsFilter
                     onAddTag={(value: Option) => {
                       if (value) {
@@ -170,8 +170,8 @@ const TeamAddPlayers: FunctionComponent<Props> = ({ addedUsersIds, teamId }) => 
                     currentTags={tags}
                     fullWidth
                   />
-                </Grid>
-              </Grid>
+                </GridLegacy>
+              </GridLegacy>
               <List>
                 {filteredUsers.map((user: UserStoreExtended) => {
                   const disabled = usersIds.includes(user.user_id)
@@ -202,8 +202,8 @@ const TeamAddPlayers: FunctionComponent<Props> = ({ addedUsersIds, teamId }) => 
                   onCreate={user => setUsersIds([...usersIds, user.user_id])}
                 />
               </List>
-            </Grid>
-            <Grid item xs={4}>
+            </GridLegacy>
+            <GridLegacy item xs={4}>
               <Box className={classes.box}>
                 {usersIds.map((userId) => {
                   const user = usersMap[userId];
@@ -229,8 +229,8 @@ const TeamAddPlayers: FunctionComponent<Props> = ({ addedUsersIds, teamId }) => 
                   );
                 })}
               </Box>
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => {

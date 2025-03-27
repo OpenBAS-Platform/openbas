@@ -1,5 +1,5 @@
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, MoreHorizOutlined, ShareOutlined } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Dialog, DialogContent, DialogTitle, Grid, Slide, Typography } from '@mui/material';
+import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Dialog, DialogContent, DialogTitle, GridLegacy, Slide, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { forwardRef, useState } from 'react';
@@ -108,9 +108,9 @@ const ChannelNewspaper = ({ channelReader }) => {
           <Empty message={t('No media pressure entry in this channel yet.')} />
         </div>
       )}
-      <Grid container={true} spacing={3} style={{ marginTop: 10 }}>
+      <GridLegacy container={true} spacing={3} style={{ marginTop: 10 }}>
         {firstArticle && (
-          <Grid item={true} xs={headArticles.length > 0 ? 8 : 12}>
+          <GridLegacy item={true} xs={headArticles.length > 0 ? 8 : 12}>
             <Card
               variant="outlined"
               classes={{ root: classes.card }}
@@ -128,9 +128,9 @@ const ChannelNewspaper = ({ channelReader }) => {
                 title={firstArticle.article_author || t('Unknown')}
                 subheader={fldt(firstArticle.article_virtual_publication)}
               />
-              <Grid container={true} spacing={3}>
+              <GridLegacy container={true} spacing={3}>
                 {firstArticleImages.map(doc => (
-                  <Grid
+                  <GridLegacy
                     key={doc.document_id}
                     item={true}
                     xs={firstArticleColumns}
@@ -140,9 +140,9 @@ const ChannelNewspaper = ({ channelReader }) => {
                       height="200"
                       src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                     />
-                  </Grid>
+                  </GridLegacy>
                 ))}
-              </Grid>
+              </GridLegacy>
               <CardContent style={{ marginBottom: 30 }}>
                 <Typography
                   gutterBottom
@@ -196,10 +196,10 @@ const ChannelNewspaper = ({ channelReader }) => {
                 </div>
               </CardContent>
             </Card>
-          </Grid>
+          </GridLegacy>
         )}
         {headArticles.length > 0 && (
-          <Grid item={true} xs={4}>
+          <GridLegacy item={true} xs={4}>
             {headArticles.map((article, index) => {
               const images = article.article_documents
                 .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
@@ -230,17 +230,17 @@ const ChannelNewspaper = ({ channelReader }) => {
                     title={article.article_author || t('Unknown')}
                     subheader={fldt(article.article_virtual_publication)}
                   />
-                  <Grid container={true} spacing={3}>
+                  <GridLegacy container={true} spacing={3}>
                     {images.map(doc => (
-                      <Grid key={doc.document_id} item={true} xs={columns}>
+                      <GridLegacy key={doc.document_id} item={true} xs={columns}>
                         <CardMedia
                           component="img"
                           height="100"
                           src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                         />
-                      </Grid>
+                      </GridLegacy>
                     ))}
-                  </Grid>
+                  </GridLegacy>
                   <CardContent style={{ marginBottom: 30 }}>
                     <Typography
                       gutterBottom
@@ -292,10 +292,10 @@ const ChannelNewspaper = ({ channelReader }) => {
                 </Card>
               );
             })}
-          </Grid>
+          </GridLegacy>
         )}
-      </Grid>
-      <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+      </GridLegacy>
+      <GridLegacy container={true} spacing={3} style={{ marginTop: 0 }}>
         {otherArticles.map((article) => {
           const images = article.article_documents
             .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
@@ -310,7 +310,7 @@ const ChannelNewspaper = ({ channelReader }) => {
             columns = 3;
           }
           return (
-            <Grid key={article.article_id} item={true} xs={4}>
+            <GridLegacy key={article.article_id} item={true} xs={4}>
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
@@ -328,17 +328,17 @@ const ChannelNewspaper = ({ channelReader }) => {
                   title={article.article_author || t('Unknown')}
                   subheader={fldt(article.article_virtual_publication)}
                 />
-                <Grid container={true} spacing={3}>
+                <GridLegacy container={true} spacing={3}>
                   {images.map(doc => (
-                    <Grid key={doc.document_id} item={true} xs={columns}>
+                    <GridLegacy key={doc.document_id} item={true} xs={columns}>
                       <CardMedia
                         component="img"
                         height="150"
                         src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                       />
-                    </Grid>
+                    </GridLegacy>
                   ))}
-                </Grid>
+                </GridLegacy>
                 <CardContent style={{ marginBottom: 30 }}>
                   <Typography
                     gutterBottom
@@ -388,10 +388,10 @@ const ChannelNewspaper = ({ channelReader }) => {
                   </div>
                 </CardContent>
               </Card>
-            </Grid>
+            </GridLegacy>
           );
         })}
-      </Grid>
+      </GridLegacy>
       <Dialog
         TransitionComponent={Transition}
         open={currentArticle !== null}

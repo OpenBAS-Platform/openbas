@@ -21,7 +21,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  Grid,
+  GridLegacy,
   IconButton,
   List,
   ListItem,
@@ -323,12 +323,12 @@ const ChallengesPlayer = () => {
                 <Typography variant="h1" style={{ margin: '40px 0 30px 0' }}>
                   {category !== 'null' ? category : t('No category')}
                 </Typography>
-                <Grid container={true} spacing={3}>
+                <GridLegacy container={true} spacing={3}>
                   {sortedChallenges[category].map((challengeEntry) => {
                     const challenge = challengeEntry.challenge_detail;
                     const expectation = challengeEntry.challenge_expectation;
                     return (
-                      <Grid key={challenge.challenge_id} item={true} xs={4}>
+                      <GridLegacy key={challenge.challenge_id} item={true} xs={4}>
                         <Card
                           variant="outlined"
                           classes={{ root: classes.card }}
@@ -412,10 +412,10 @@ const ChallengesPlayer = () => {
                             </CardContent>
                           </CardActionArea>
                         </Card>
-                      </Grid>
+                      </GridLegacy>
                     );
                   })}
-                </Grid>
+                </GridLegacy>
               </div>
             );
           })}

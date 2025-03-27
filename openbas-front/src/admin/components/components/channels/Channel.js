@@ -1,4 +1,4 @@
-import { Grid, Paper, Skeleton, Typography } from '@mui/material';
+import { GridLegacy, Paper, Skeleton, Typography } from '@mui/material';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router';
@@ -75,8 +75,8 @@ const Channel = () => {
   )(channel);
   return (
     <div className={classes.root}>
-      <Grid container={true} spacing={3}>
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+      <GridLegacy container={true} spacing={3}>
+        <GridLegacy item={true} xs={6} style={{ paddingTop: 10 }}>
           <Typography variant="h4">{t('Parameters')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ChannelParametersForm
@@ -89,8 +89,8 @@ const Channel = () => {
             {t('Logos')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
+            <GridLegacy container={true} spacing={3}>
+              <GridLegacy item={true} xs={6}>
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
                   {t('Dark theme')}
                 </Typography>
@@ -117,8 +117,8 @@ const Channel = () => {
                     handleAddLogo={documentId => submitLogo(documentId, 'dark')}
                   />
                 )}
-              </Grid>
-              <Grid item={true} xs={6}>
+              </GridLegacy>
+              <GridLegacy item={true} xs={6}>
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
                   {t('Light theme')}
                 </Typography>
@@ -145,11 +145,11 @@ const Channel = () => {
                     handleAddLogo={documentId => submitLogo(documentId, 'light')}
                   />
                 )}
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
           </Paper>
-        </Grid>
-        <Grid item={true} xs={6} style={{ paddingTop: 10 }}>
+        </GridLegacy>
+        <GridLegacy item={true} xs={6} style={{ paddingTop: 10 }}>
           <Typography variant="h4">{t('Overview')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {channel.channel_type === 'newspaper' && (
@@ -162,8 +162,8 @@ const Channel = () => {
               <ChannelOverviewTvChannel channel={enrichedChannel} />
             )}
           </Paper>
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { InfoOutlined } from '@mui/icons-material';
-import { Button, Grid, Tooltip, Typography } from '@mui/material';
+import { Button, GridLegacy, Tooltip, Typography } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import { Component } from 'react';
 import { Form } from 'react-final-form';
@@ -48,8 +48,8 @@ class GroupForm extends Component {
               label={t('Description')}
               style={{ marginTop: 20 }}
             />
-            <Grid container spacing={3} style={{ marginTop: 0 }}>
-              <Grid item xs={12} style={{ display: 'flex' }}>
+            <GridLegacy container spacing={3} style={{ marginTop: 0 }}>
+              <GridLegacy item xs={12} style={{ display: 'flex' }}>
                 <OldSwitchField
                   name="group_default_user_assign"
                   label={t('Auto assign')}
@@ -65,15 +65,15 @@ class GroupForm extends Component {
                     style={{ marginTop: 8 }}
                   />
                 </Tooltip>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
+              </GridLegacy>
+              <GridLegacy item xs={12}>
+                <GridLegacy container spacing={3}>
+                  <GridLegacy item xs={12}>
                     <Typography variant="h2" style={{ marginBottom: 0 }}>
                       {t('Scenario')}
                     </Typography>
-                  </Grid>
-                  <Grid item xs={6} style={{ display: 'flex' }}>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
                     <OldSwitchField
                       name="group_default_scenario_observer"
                       label={t('Auto observer')}
@@ -89,8 +89,8 @@ class GroupForm extends Component {
                         style={{ marginTop: 8 }}
                       />
                     </Tooltip>
-                  </Grid>
-                  <Grid item xs={6} style={{ display: 'flex' }}>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
                     <OldSwitchField
                       name="group_default_scenario_planner"
                       label={t('Auto planner')}
@@ -106,17 +106,17 @@ class GroupForm extends Component {
                         style={{ marginTop: 8 }}
                       />
                     </Tooltip>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
+                  </GridLegacy>
+                </GridLegacy>
+              </GridLegacy>
+              <GridLegacy item xs={12}>
+                <GridLegacy container spacing={3}>
+                  <GridLegacy item xs={12}>
                     <Typography variant="h2" style={{ marginBottom: 0 }}>
                       {t('Simulation')}
                     </Typography>
-                  </Grid>
-                  <Grid item xs={6} style={{ display: 'flex' }}>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
                     <OldSwitchField
                       name="group_default_exercise_observer"
                       label={t('Auto observer')}
@@ -132,8 +132,8 @@ class GroupForm extends Component {
                         style={{ marginTop: 8 }}
                       />
                     </Tooltip>
-                  </Grid>
-                  <Grid item xs={6} style={{ display: 'flex' }}>
+                  </GridLegacy>
+                  <GridLegacy item xs={6} style={{ display: 'flex' }}>
                     <OldSwitchField
                       name="group_default_exercise_planner"
                       label={t('Auto planner')}
@@ -149,10 +149,10 @@ class GroupForm extends Component {
                         style={{ marginTop: 8 }}
                       />
                     </Tooltip>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
+                  </GridLegacy>
+                </GridLegacy>
+              </GridLegacy>
+            </GridLegacy>
             <div style={{
               float: 'right',
               marginTop: 20,

@@ -1,5 +1,5 @@
 import { ComputerOutlined, HubOutlined, MovieFilterOutlined, PersonOutlined } from '@mui/icons-material';
-import { Grid, Paper, Typography } from '@mui/material';
+import { GridLegacy, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
@@ -153,8 +153,8 @@ const Dashboard = () => {
   );
 
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={3}>
+    <GridLegacy container spacing={3}>
+      <GridLegacy item xs={3}>
         <PaperMetric
           title={t('Scenarios')}
           subTitle={t('(last 180 days)')}
@@ -162,8 +162,8 @@ const Dashboard = () => {
           number={statistics?.scenarios_count?.global_count}
           progression={statistics?.scenarios_count?.progression_count}
         />
-      </Grid>
-      <Grid item xs={3}>
+      </GridLegacy>
+      <GridLegacy item xs={3}>
         <PaperMetric
           title={t('Simulations')}
           subTitle={t('(last 180 days)')}
@@ -171,8 +171,8 @@ const Dashboard = () => {
           number={statistics?.exercises_count?.global_count}
           progression={statistics?.exercises_count?.progression_count}
         />
-      </Grid>
-      <Grid item xs={3}>
+      </GridLegacy>
+      <GridLegacy item xs={3}>
         <PaperMetric
           title={t('Players')}
           subTitle={t('(last 180 days)')}
@@ -180,8 +180,8 @@ const Dashboard = () => {
           number={statistics?.users_count?.global_count}
           progression={statistics?.users_count?.progression_count}
         />
-      </Grid>
-      <Grid item xs={3}>
+      </GridLegacy>
+      <GridLegacy item xs={3}>
         <PaperMetric
           title={t('Assets')}
           subTitle={t('(last 180 days)')}
@@ -189,16 +189,16 @@ const Dashboard = () => {
           number={statistics?.assets_count?.global_count}
           progression={statistics?.assets_count?.progression_count}
         />
-      </Grid>
-      <Grid item xs={6}>
+      </GridLegacy>
+      <GridLegacy item xs={6}>
         <Typography variant="h4">{t('Performance Overview')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperWithChart }}>
           {loading
             ? <Loader variant="inElement" />
             : <ResponsePie expectationResultsByTypes={statistics?.expectation_results} />}
         </Paper>
-      </Grid>
-      <Grid item={true} xs={6}>
+      </GridLegacy>
+      <GridLegacy item={true} xs={6}>
         <Typography variant="h4">{t('Simulations')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {loading ? (<Loader variant="inElement" />)
@@ -225,8 +225,8 @@ const Dashboard = () => {
                 />
               )}
         </Paper>
-      </Grid>
-      <Grid item={true} xs={3}>
+      </GridLegacy>
+      <GridLegacy item={true} xs={3}>
         <Typography variant="h4">{t('Top simulation categories')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {loading
@@ -249,8 +249,8 @@ const Dashboard = () => {
                 />
               )}
         </Paper>
-      </Grid>
-      <Grid item={true} xs={3}>
+      </GridLegacy>
+      <GridLegacy item={true} xs={3}>
         <Typography variant="h4">{t('Top attack patterns')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperChart }}>
           {loading
@@ -276,8 +276,8 @@ const Dashboard = () => {
                 />
               )}
         </Paper>
-      </Grid>
-      <Grid item={true} xs={6}>
+      </GridLegacy>
+      <GridLegacy item={true} xs={6}>
         <Typography variant="h4">{t('Last simulations')}</Typography>
         <Paper variant="outlined" classes={{ root: classes.paperList }}>
           {exercises.length === 0 && <Empty message={t('No simulation in this platform yet')} />}
@@ -288,8 +288,8 @@ const Dashboard = () => {
             loading={loadingExercises}
           />
         </Paper>
-      </Grid>
-      <Grid item xs={12}>
+      </GridLegacy>
+      <GridLegacy item xs={12}>
         <Typography variant="h4">{t('MITRE ATT&CK Coverage')}</Typography>
         <Paper
           variant="outlined"
@@ -308,8 +308,8 @@ const Dashboard = () => {
                 )
           }
         </Paper>
-      </Grid>
-    </Grid>
+      </GridLegacy>
+    </GridLegacy>
   );
 };
 

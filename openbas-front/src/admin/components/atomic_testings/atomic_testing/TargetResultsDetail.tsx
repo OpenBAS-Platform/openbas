@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogContentText,
   Divider,
-  Grid,
+  GridLegacy,
   IconButton,
   Menu,
   MenuItem,
@@ -592,34 +592,34 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
             })
             .map(injectExpectation => (
               <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
-                <Grid container={true} spacing={2}>
-                  <Grid item={true} xs={4}>
+                <GridLegacy container={true} spacing={2}>
+                  <GridLegacy item={true} xs={4}>
                     <Typography variant="h4">
                       {t('Name')}
                     </Typography>
                     {emptyFilled(injectExpectation.inject_expectation_name)}
-                  </Grid>
-                  <Grid item={true} xs={4}>
+                  </GridLegacy>
+                  <GridLegacy item={true} xs={4}>
                     <Typography variant="h4">
                       {t('Validation type')}
                     </Typography>
                     {emptyFilled(getLabelOfValidationType(injectExpectation))}
-                  </Grid>
-                  <Grid item={true} xs={4}>
+                  </GridLegacy>
+                  <GridLegacy item={true} xs={4}>
                     <Typography variant="h4">
                       {t('Description')}
                     </Typography>
                     {emptyFilled(injectExpectation.inject_expectation_description)}
-                  </Grid>
-                </Grid>
+                  </GridLegacy>
+                </GridLegacy>
                 <Typography variant="h4" style={{ marginTop: 20 }}>
                   {t('Results')}
                 </Typography>
-                <Grid container={true} spacing={2}>
+                <GridLegacy container={true} spacing={2}>
                   {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
                     const duration = splitDuration(injectExpectation.inject_expiration_time || 0);
                     return (
-                      <Grid key={index} item xs={4}>
+                      <GridLegacy key={index} item xs={4}>
                         <Card key={injectExpectation.inject_expectation_id}>
                           <CardHeader
                             classes={{ content: classes.cardHeaderContent }}
@@ -685,7 +685,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                             <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={expectationResult.score} /></Tooltip>
                           </CardContent>
                         </Card>
-                      </Grid>
+                      </GridLegacy>
                     );
                   })}
                   {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
@@ -693,7 +693,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                       && injectExpectation.inject_expectation_results
                       && injectExpectation.inject_expectation_results.length === 0))
                     && (
-                      <Grid item xs={4}>
+                      <GridLegacy item xs={4}>
                         <Card classes={{ root: classes.resultCardDummy }}>
                           <CardActionArea
                             classes={{ root: classes.area }}
@@ -705,9 +705,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                             <AddBoxOutlined />
                           </CardActionArea>
                         </Card>
-                      </Grid>
+                      </GridLegacy>
                     )}
-                </Grid>
+                </GridLegacy>
                 <Divider style={{ marginTop: 20 }} />
               </div>
             ))}

@@ -1,5 +1,5 @@
 import { AutoModeOutlined, SubscriptionsOutlined } from '@mui/icons-material';
-import { Card, CardActionArea, CardContent, Chip, Grid, Tooltip, Typography } from '@mui/material';
+import { Card, CardActionArea, CardContent, Chip, GridLegacy, Tooltip, Typography } from '@mui/material';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -100,10 +100,10 @@ const Injectors = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <Grid container={true} spacing={3}>
+      <GridLegacy container={true} spacing={3}>
         {sortedInjectors.map((injector: Injector) => {
           return (
-            <Grid key={injector.injector_id} item={true} xs={3}>
+            <GridLegacy key={injector.injector_id} item={true} xs={3}>
               <Card classes={{ root: classes.card }} variant="outlined">
                 <CardActionArea
                   classes={{ root: classes.area }}
@@ -182,10 +182,10 @@ const Injectors = () => {
                   </CardContent>
                 </CardActionArea>
               </Card>
-            </Grid>
+            </GridLegacy>
           );
         })}
-      </Grid>
+      </GridLegacy>
     </>
   );
 };

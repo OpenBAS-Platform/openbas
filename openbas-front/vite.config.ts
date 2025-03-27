@@ -32,7 +32,10 @@ export default ({ mode }: { mode: string }) => {
       minify: false,
     },
 
-    resolve: { extensions: ['.js', '.tsx', '.ts', '.jsx', '.json'] },
+    resolve: {
+      extensions: ['.js', '.tsx', '.ts', '.jsx', '.json'],
+      conditions: ['mui-modern', 'module', 'browser', 'development|production'],
+    },
 
     optimizeDeps: {
       entries: [
