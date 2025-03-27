@@ -1,11 +1,10 @@
-package io.openbas.utils.schema;
+package io.openbas.schema;
 
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
-import io.openbas.utils.SubclassScanner;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.Email;

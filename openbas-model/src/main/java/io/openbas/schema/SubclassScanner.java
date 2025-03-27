@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.schema;
 
 import java.util.Set;
 import java.util.stream.Collectors;
