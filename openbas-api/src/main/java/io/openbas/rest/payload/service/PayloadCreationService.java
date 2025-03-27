@@ -30,7 +30,6 @@ public class PayloadCreationService {
   private final AttackPatternRepository attackPatternRepository;
   private final PayloadRepository payloadRepository;
   private final DocumentRepository documentRepository;
-  private final PayloadUtils payloadUtils;
 
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(PayloadCreateInput input) {
