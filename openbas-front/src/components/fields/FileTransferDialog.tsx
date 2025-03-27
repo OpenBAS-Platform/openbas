@@ -1,5 +1,5 @@
 import { DescriptionOutlined } from '@mui/icons-material';
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, GridLegacy, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -166,24 +166,24 @@ const FileTransferDialog: FunctionComponent<Props> = ({
     >
       <DialogTitle>{t(label)}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={3}>
-          <Grid item xs={multiple ? 8 : 12}>
-            <Grid container spacing={3}>
-              <Grid item xs={6}>
+        <GridLegacy container spacing={3}>
+          <GridLegacy item xs={multiple ? 8 : 12}>
+            <GridLegacy container spacing={3}>
+              <GridLegacy item xs={6}>
                 <SearchFilter
                   onChange={handleSearchDocuments}
                   fullWidth
                 />
-              </Grid>
-              <Grid item xs={6}>
+              </GridLegacy>
+              <GridLegacy item xs={6}>
                 <TagsFilter
                   onAddTag={handleAddTag}
                   onClearTag={handleClearTag}
                   currentTags={tags}
                   fullWidth
                 />
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
             <List>
               {filteredDocuments.map((document: RawDocument) => {
                 return (
@@ -214,9 +214,9 @@ const FileTransferDialog: FunctionComponent<Props> = ({
                 />
               )}
             </List>
-          </Grid>
+          </GridLegacy>
           {multiple && (
-            <Grid item xs={4}>
+            <GridLegacy item xs={4}>
               <Box className={classes.box}>
                 {selectedDocuments.map(document => (
                   <Chip
@@ -229,9 +229,9 @@ const FileTransferDialog: FunctionComponent<Props> = ({
                   />
                 ))}
               </Box>
-            </Grid>
+            </GridLegacy>
           )}
-        </Grid>
+        </GridLegacy>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>{t('Cancel')}</Button>

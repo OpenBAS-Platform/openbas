@@ -1,4 +1,4 @@
-import { Chip, Divider, Grid, List, Paper, Tooltip, Typography } from '@mui/material';
+import { Chip, Divider, GridLegacy, List, Paper, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Fragment, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -110,18 +110,18 @@ const AtomicTesting = () => {
   }
 
   return (
-    <Grid
+    <GridLegacy
       container
       spacing={3}
       classes={{ container: classes.gridContainer }}
     >
-      <Grid item xs={6} style={{ paddingTop: 10 }}>
+      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
         <Typography variant="h4" gutterBottom>
           {t('Information')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          <Grid container spacing={3}>
-            <Grid item xs={8} style={{ paddingTop: 10 }}>
+          <GridLegacy container spacing={3}>
+            <GridLegacy item xs={8} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -133,8 +133,8 @@ const AtomicTesting = () => {
                 source={injectResultOverviewOutput.inject_description}
                 limit={300}
               />
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -147,8 +147,8 @@ const AtomicTesting = () => {
                 status={injectResultOverviewOutput.inject_status?.status_name}
                 label={t(injectResultOverviewOutput.inject_status?.status_name ?? 'Unknown')}
               />
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -178,8 +178,8 @@ const AtomicTesting = () => {
                   </div>
                 </Tooltip>
               </div>
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -190,8 +190,8 @@ const AtomicTesting = () => {
               <div style={{ display: 'flex' }}>
                 {fldt(injectResultOverviewOutput?.inject_status?.tracking_end_date)}
               </div>
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography variant="h3" gutterBottom style={{ marginTop: 20 }}>
                 {t('Documents')}
               </Typography>
@@ -210,8 +210,8 @@ const AtomicTesting = () => {
                       </Typography>
                     )
               }
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -238,8 +238,8 @@ const AtomicTesting = () => {
                   </div>
                 ))}
               </div>
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -257,8 +257,8 @@ const AtomicTesting = () => {
                   label={killChainPhase.phase_name}
                 />
               ))}
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -277,11 +277,11 @@ const AtomicTesting = () => {
                   />
                 </Tooltip>
               ))}
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
         </Paper>
-      </Grid>
-      <Grid item xs={6} style={{ paddingTop: 10 }}>
+      </GridLegacy>
+      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
         <Typography variant="h4" gutterBottom>
           {t('Results')}
         </Typography>
@@ -295,8 +295,8 @@ const AtomicTesting = () => {
         >
           <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
         </Paper>
-      </Grid>
-      <Grid item xs={6} style={{ marginTop: 30 }}>
+      </GridLegacy>
+      <GridLegacy item xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4" gutterBottom style={{ float: 'left' }}>
           {t('Targets')}
         </Typography>
@@ -326,8 +326,8 @@ const AtomicTesting = () => {
             <Empty message={t('No target configured.')} />
           )}
         </Paper>
-      </Grid>
-      <Grid item xs={6} style={{ marginTop: 29 }}>
+      </GridLegacy>
+      <GridLegacy item xs={6} style={{ marginTop: 29 }}>
         <Typography variant="h4" gutterBottom>
           {t('Results by target')}
         </Typography>
@@ -346,8 +346,8 @@ const AtomicTesting = () => {
             <Empty message={t('No target data available.')} />
           )}
         </Paper>
-      </Grid>
-    </Grid>
+      </GridLegacy>
+    </GridLegacy>
   )
   ;
 };

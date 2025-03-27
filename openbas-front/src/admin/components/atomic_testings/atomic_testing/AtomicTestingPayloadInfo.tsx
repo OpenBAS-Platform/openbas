@@ -1,4 +1,4 @@
-import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { Chip, GridLegacy, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
@@ -46,8 +46,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
   }, [injectId]);
 
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} style={{ marginBottom: 30 }}>
+    <GridLegacy container spacing={3}>
+      <GridLegacy item xs={12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Payload')}</Typography>
         {payloadOutput ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
@@ -65,8 +65,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
             >
               {emptyFilled(payloadOutput.payload_description)}
             </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
+            <GridLegacy container spacing={3}>
+              <GridLegacy item xs={12} sm={6}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -79,8 +79,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
                 ) : payloadOutput.payload_platforms?.map(
                   platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
                 )}
-              </Grid>
-              <Grid item xs={12} sm={6}>
+              </GridLegacy>
+              <GridLegacy item xs={12} sm={6}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -98,8 +98,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
                     />
                   </Tooltip>
                 ))}
-              </Grid>
-              <Grid item xs={12} sm={6}>
+              </GridLegacy>
+              <GridLegacy item xs={12} sm={6}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -111,8 +111,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
                   variant="reduced-view"
                   tags={payloadOutput.payload_tags}
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
+              </GridLegacy>
+              <GridLegacy item xs={12} sm={6}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -121,8 +121,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
                   {t('External ID')}
                 </Typography>
                 {emptyFilled(payloadOutput.payload_external_id)}
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
 
           </Paper>
         ) : (
@@ -130,8 +130,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
             <Typography variant="body1">{t('No data available')}</Typography>
           </Paper>
         )}
-      </Grid>
-      <Grid item xs={12} style={{ marginBottom: 30 }}>
+      </GridLegacy>
+      <GridLegacy item xs={12} style={{ marginBottom: 30 }}>
         <Typography variant="h4">{t('Commands')}</Typography>
         {payloadOutput ? (
           <Paper variant="outlined" classes={{ root: classes.paper }}>
@@ -448,8 +448,8 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
             <Typography variant="body1">{t('No data available')}</Typography>
           </Paper>
         )}
-      </Grid>
-    </Grid>
+      </GridLegacy>
+    </GridLegacy>
   );
 };
 

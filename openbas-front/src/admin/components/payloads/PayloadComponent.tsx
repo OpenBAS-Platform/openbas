@@ -1,4 +1,4 @@
-import { Chip, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { Chip, GridLegacy, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -51,8 +51,8 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
   };
 
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} style={{ paddingTop: 10 }}>
+    <GridLegacy container spacing={3}>
+      <GridLegacy item xs={12} style={{ paddingTop: 10 }}>
         <Typography
           variant="h2"
           gutterBottom
@@ -68,9 +68,9 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         >
           {emptyFilled(selectedPayload?.payload_description)}
         </Typography>
-      </Grid>
+      </GridLegacy>
 
-      <Grid item xs={6} style={{ paddingTop: 10 }}>
+      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
         <Typography
           variant="h3"
           gutterBottom
@@ -106,8 +106,8 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
           variant="reduced-view"
           tags={selectedPayload?.payload_tags}
         />
-      </Grid>
-      <Grid item xs={6} style={{ paddingTop: 10 }}>
+      </GridLegacy>
+      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
         <Typography
           variant="h3"
           gutterBottom
@@ -133,8 +133,8 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
           {t('External ID')}
         </Typography>
         {emptyFilled(selectedPayload?.payload_external_id)}
-      </Grid>
-      <Grid item xs={12} style={{ paddingTop: 10 }}>
+      </GridLegacy>
+      <GridLegacy item xs={12} style={{ paddingTop: 10 }}>
         <Typography
           variant="h3"
           gutterBottom
@@ -284,8 +284,8 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
           ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
 
-      </Grid>
-    </Grid>
+      </GridLegacy>
+    </GridLegacy>
   );
 };
 

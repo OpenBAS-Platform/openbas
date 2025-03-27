@@ -1,5 +1,5 @@
 import { BarChartOutlined, KeyboardArrowRight, ReorderOutlined } from '@mui/icons-material';
-import { Chip, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import { Chip, GridLegacy, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Paper, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router';
@@ -236,48 +236,48 @@ const Mails = () => {
       </ToggleButtonGroup>
       {viewMode === 'distribution' && (
         <>
-          <Grid container spacing={3} classes={{ container: classes.gridContainer }}>
-            <Grid item xs={6} style={{ paddingTop: 10 }}>
+          <GridLegacy container spacing={3} classes={{ container: classes.gridContainer }}>
+            <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
               <Typography variant="h4">
                 {t('Sent mails over time')}
               </Typography>
               <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                 <MailDistributionOverTimeChart exerciseId={exerciseId} />
               </Paper>
-            </Grid>
-            <Grid item xs={6} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
               <Typography variant="h4">
                 {t('Sent mails over time')}
               </Typography>
               <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                 <MailDistributionOverTimeLine exerciseId={exerciseId} />
               </Paper>
-            </Grid>
-            <Grid item xs={4} style={{ marginTop: 25 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ marginTop: 25 }}>
               <Typography variant="h4">
                 {t('Distribution of mails by team')}
               </Typography>
               <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                 <MailDistributionByTeam exerciseId={exerciseId} />
               </Paper>
-            </Grid>
-            <Grid item xs={4} style={{ marginTop: 25 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ marginTop: 25 }}>
               <Typography variant="h4">
                 {t('Distribution of mails by player')}
               </Typography>
               <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                 <MailDistributionByPlayer exerciseId={exerciseId} />
               </Paper>
-            </Grid>
-            <Grid item xs={4} style={{ marginTop: 25 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ marginTop: 25 }}>
               <Typography variant="h4">
                 {t('Distribution of mails by inject')}
               </Typography>
               <Paper variant="outlined" classes={{ root: classes.paperChart }}>
                 <MailDistributionByInject exerciseId={exerciseId} />
               </Paper>
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
         </>
       )}
       {viewMode === 'list' && (

@@ -1,5 +1,5 @@
 import { DownloadingOutlined } from '@mui/icons-material';
-import { Card, CardActionArea, CardContent, Grid2, Typography } from '@mui/material';
+import { Card, CardActionArea, CardContent, Grid, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { makeStyles } from 'tss-react/mui';
 
@@ -31,7 +31,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ selectedExecutor, s
   };
 
   return (
-    <Grid2 container spacing={1}>
+    <Grid container spacing={1}>
       {selectedExecutor?.executor_platforms
         && selectedExecutor?.executor_platforms.map(platform => (
           <Card
@@ -66,7 +66,7 @@ const PlatformSelector: React.FC<PlatformSelectorProps> = ({ selectedExecutor, s
             </CardActionArea>
           </Card>
         ))}
-    </Grid2>
+    </Grid>
   );
 };
 
