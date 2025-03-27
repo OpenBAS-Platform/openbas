@@ -113,7 +113,7 @@ public class PayloadUtils {
   }
 
   // -- COPY PROPERTIES --
-  public Payload copyProperties(Object payloadInput, Payload target) {
+  public Payload copyProperties(Object payloadInput, Payload target, boolean copyId) {
     if (payloadInput == null) {
       throw new IllegalArgumentException("Input payload cannot be null");
     }
@@ -122,13 +122,13 @@ public class PayloadUtils {
 
     if (payloadInput instanceof PayloadCreateInput) {
       outputParserUtils.copyOutputParsers(
-          ((PayloadCreateInput) payloadInput).getOutputParsers(), target);
+          ((PayloadCreateInput) payloadInput).getOutputParsers(), target, copyId);
     } else if (payloadInput instanceof PayloadUpdateInput) {
       outputParserUtils.copyOutputParsers(
-          ((PayloadUpdateInput) payloadInput).getOutputParsers(), target);
+          ((PayloadUpdateInput) payloadInput).getOutputParsers(), target, copyId);
     } else if (payloadInput instanceof PayloadUpsertInput) {
       outputParserUtils.copyOutputParsers(
-          ((PayloadUpsertInput) payloadInput).getOutputParsers(), target);
+          ((PayloadUpsertInput) payloadInput).getOutputParsers(), target, copyId);
     } else {
       throw new IllegalArgumentException("Unsupported payload input type");
     }

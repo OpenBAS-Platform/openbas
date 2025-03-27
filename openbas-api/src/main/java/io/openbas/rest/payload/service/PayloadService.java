@@ -182,39 +182,44 @@ public class PayloadService {
   }
 
   public Payload generateDuplicatedPayload(Payload originalPayload) {
-    return switch (originalPayload.getTypeEnum()) {
-      case PayloadType.COMMAND -> {
-        Command originCommand = (Command) Hibernate.unproxy(originalPayload);
-        Command duplicateCommand = new Command();
-        duplicateCommonProperties(originCommand, duplicateCommand);
-        yield duplicateCommand;
-      }
-      case PayloadType.EXECUTABLE -> {
-        Executable originExecutable = (Executable) Hibernate.unproxy(originalPayload);
-        Executable duplicateExecutable = new Executable();
-        duplicateCommonProperties(originExecutable, duplicateExecutable);
-        duplicateExecutable.setExecutableFile(originExecutable.getExecutableFile());
-        yield duplicateExecutable;
-      }
-      case PayloadType.FILE_DROP -> {
-        FileDrop originFileDrop = (FileDrop) Hibernate.unproxy(originalPayload);
-        FileDrop duplicateFileDrop = new FileDrop();
-        duplicateCommonProperties(originFileDrop, duplicateFileDrop);
-        yield duplicateFileDrop;
-      }
-      case PayloadType.DNS_RESOLUTION -> {
-        DnsResolution originDnsResolution = (DnsResolution) Hibernate.unproxy(originalPayload);
-        DnsResolution duplicateDnsResolution = new DnsResolution();
-        duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
-        yield duplicateDnsResolution;
-      }
-      case PayloadType.NETWORK_TRAFFIC -> {
-        NetworkTraffic originNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(originalPayload);
-        NetworkTraffic duplicateNetworkTraffic = new NetworkTraffic();
-        duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
-        yield duplicateNetworkTraffic;
-      }
-    };
+    Payload duplicated =
+        switch (originalPayload.getTypeEnum()) {
+          case PayloadType.COMMAND -> {
+            Command originCommand = (Command) Hibernate.unproxy(originalPayload);
+            Command duplicateCommand = new Command();
+            duplicateCommonProperties(originCommand, duplicateCommand);
+            yield duplicateCommand;
+          }
+          case PayloadType.EXECUTABLE -> {
+            Executable originExecutable = (Executable) Hibernate.unproxy(originalPayload);
+            Executable duplicateExecutable = new Executable();
+            duplicateCommonProperties(originExecutable, duplicateExecutable);
+            duplicateExecutable.setExecutableFile(originExecutable.getExecutableFile());
+            yield duplicateExecutable;
+          }
+          case PayloadType.FILE_DROP -> {
+            FileDrop originFileDrop = (FileDrop) Hibernate.unproxy(originalPayload);
+            FileDrop duplicateFileDrop = new FileDrop();
+            duplicateCommonProperties(originFileDrop, duplicateFileDrop);
+            yield duplicateFileDrop;
+          }
+          case PayloadType.DNS_RESOLUTION -> {
+            DnsResolution originDnsResolution = (DnsResolution) Hibernate.unproxy(originalPayload);
+            DnsResolution duplicateDnsResolution = new DnsResolution();
+            duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
+            yield duplicateDnsResolution;
+          }
+          case PayloadType.NETWORK_TRAFFIC -> {
+            NetworkTraffic originNetworkTraffic =
+                (NetworkTraffic) Hibernate.unproxy(originalPayload);
+            NetworkTraffic duplicateNetworkTraffic = new NetworkTraffic();
+            duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
+            yield duplicateNetworkTraffic;
+          }
+          default ->
+              throw new IllegalStateException("Unexpected value: " + originalPayload.getTypeEnum());
+        };
+    return duplicated;
   }
 
   private <T extends Payload> void duplicateCommonProperties(
@@ -229,7 +234,7 @@ public class PayloadService {
     duplicate.setCollector(null);
     duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
     duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
-    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate);
+    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate, false);
   }
 
   public void deprecateNonProcessedPayloadsByCollector(
