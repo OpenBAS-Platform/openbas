@@ -92,8 +92,6 @@ public class InjectApi extends RestBehavior {
   private final ScenarioRepository scenarioRepository;
   private final AuthorisationService authorisationService;
 
-  private final  ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-
   // -- INJECTS --
 
   @GetMapping(INJECT_URI + "/{injectId}")
@@ -247,7 +245,12 @@ public class InjectApi extends RestBehavior {
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
-    injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+    InjectExecutionCallback injectExecutionCallback = InjectExecutionCallback.builder()
+            .injectExecutionInput(input)
+            .agentId(agentId)
+            .injectId(injectId)
+            .build();
+    injectStatusService.batchInjectExecutionCallback(injectExecutionCallback);
   }
 
   @GetMapping(INJECT_URI + "/execution/testThreads")

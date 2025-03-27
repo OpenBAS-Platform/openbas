@@ -14,6 +14,7 @@ import io.openbas.injector_contract.outputs.ContractOutputElement;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
 import io.openbas.rest.inject.form.InjectExecutionAction;
+import io.openbas.rest.inject.form.InjectExecutionCallback;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
@@ -22,15 +23,20 @@ import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Log
 public class InjectStatusService {
 
   private final InjectRepository injectRepository;
@@ -44,6 +50,13 @@ public class InjectStatusService {
   private final FindingService findingService;
 
   @Resource private ObjectMapper mapper;
+
+  ScheduledFuture<?> scheduledTask = null;
+  List<InjectExecutionCallback> callbacksWaiting = new ArrayList<>();
+
+  private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(20);
+    @Autowired
+    private FindingRepository findingRepository;
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
@@ -151,7 +164,7 @@ public class InjectStatusService {
     }
   }
 
-  private void updateInjectStatus(String agentId, Inject inject, InjectExecutionInput input) {
+  private Inject updateInjectStatus(String agentId, Inject inject, InjectExecutionInput input) {
     Agent agent =
         agentId == null
             ? null
@@ -162,66 +175,107 @@ public class InjectStatusService {
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTraces, agentId);
     injectStatus.addTrace(executionTraces);
 
-    synchronized (inject.getId()) {
       if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
           && (agentId == null || isAllInjectAgentsExecuted(inject))) {
         updateFinalInjectStatus(injectStatus);
       }
 
-      injectRepository.save(inject);
-    }
+      return inject;
   }
 
-  public void handleInjectExecutionCallback(
-      String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+  private void handleInjectExecutionCallback(List<InjectExecutionCallback> callbacksWaiting) {
+    Map<String, Inject> injectMap = injectRepository.findAllById(callbacksWaiting.stream()
+            .map(InjectExecutionCallback::getInjectId).toList())
+            .stream().collect(Collectors.toMap(Inject::getId, x -> x));
 
-    updateInjectStatus(agentId, inject, input);
+    List<Inject> injectToUpdate = new ArrayList<>();
+    for(InjectExecutionCallback injectExecutionCallback : callbacksWaiting) {
+      injectToUpdate.add(updateInjectStatus(injectExecutionCallback.getAgentId(), injectMap.get(injectExecutionCallback.getInjectId()), injectExecutionCallback.getInjectExecutionInput()));
+    }
 
-    // -- FINDINGS --
-    // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
-    if (input.getOutputStructured() != null) {
-      try {
-        List<Finding> findings = new ArrayList<>();
-        // Get the contract
-        InjectorContract injectorContract = inject.getInjectorContract().orElseThrow();
-        List<ContractOutputElement> contractOutputs =
-            getContractOutputs(injectorContract.getConvertedContent(), mapper);
-        ObjectNode values = mapper.readValue(input.getOutputStructured(), ObjectNode.class);
-        if (!contractOutputs.isEmpty()) {
-          contractOutputs.forEach(
-              contractOutput -> {
-                if (contractOutput.isFindingCompatible()) {
-                  if (contractOutput.isMultiple()) {
-                    JsonNode jsonNodes = values.get(contractOutput.getField());
-                    if (jsonNodes != null && jsonNodes.isArray()) {
-                      for (JsonNode jsonNode : jsonNodes) {
-                        if (!contractOutput.getType().validate.apply(jsonNode)) {
-                          throw new IllegalArgumentException("Finding not correctly formatted");
+    injectRepository.saveAll(injectToUpdate);
+
+    List<Finding> findingsToUpdate = new ArrayList<>();
+
+    for(InjectExecutionCallback injectExecutionCallback : callbacksWaiting) {
+      // -- FINDINGS --
+      // NOTE: do it in every call to callback ? (reflexion on implant mechanism)
+      if (injectExecutionCallback.getInjectExecutionInput().getOutputStructured() != null) {
+        try {
+          List<Finding> findings = new ArrayList<>();
+          // Get the contract
+          InjectorContract injectorContract = injectMap.get(injectExecutionCallback.getInjectId()).getInjectorContract().orElseThrow();
+          List<ContractOutputElement> contractOutputs =
+                  getContractOutputs(injectorContract.getConvertedContent(), mapper);
+          ObjectNode values = mapper.readValue(injectExecutionCallback.getInjectExecutionInput().getOutputStructured(), ObjectNode.class);
+          if (!contractOutputs.isEmpty()) {
+            contractOutputs.forEach(
+                    contractOutput -> {
+                      if (contractOutput.isFindingCompatible()) {
+                        if (contractOutput.isMultiple()) {
+                          JsonNode jsonNodes = values.get(contractOutput.getField());
+                          if (jsonNodes != null && jsonNodes.isArray()) {
+                            for (JsonNode jsonNode : jsonNodes) {
+                              if (!contractOutput.getType().validate.apply(jsonNode)) {
+                                throw new IllegalArgumentException("Finding not correctly formatted");
+                              }
+                              Finding finding = createFinding(contractOutput);
+                              finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
+                              Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
+                              findings.add(linkedFinding);
+                            }
+                          }
+                        } else {
+                          JsonNode jsonNode = values.get(contractOutput.getField());
+                          if (!contractOutput.getType().validate.apply(jsonNode)) {
+                            throw new IllegalArgumentException("Finding not correctly formatted");
+                          }
+                          Finding finding = createFinding(contractOutput);
+                          finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
+                          Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
+                          findings.add(linkedFinding);
                         }
-                        Finding finding = createFinding(contractOutput);
-                        finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
-                        Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
-                        findings.add(linkedFinding);
                       }
-                    }
-                  } else {
-                    JsonNode jsonNode = values.get(contractOutput.getField());
-                    if (!contractOutput.getType().validate.apply(jsonNode)) {
-                      throw new IllegalArgumentException("Finding not correctly formatted");
-                    }
-                    Finding finding = createFinding(contractOutput);
-                    finding.setValue(contractOutput.getType().toFindingValue.apply(jsonNode));
-                    Finding linkedFinding = linkFindings(contractOutput, jsonNode, finding);
-                    findings.add(linkedFinding);
-                  }
-                }
-              });
+                    });
+          }
+          findingsToUpdate.addAll(this.findingService.createFindings(findings, injectMap.get(injectExecutionCallback.getInjectId())));
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
         }
-        this.findingService.createFindings(findings, injectId);
-      } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
       }
+    }
+
+    findingRepository.saveAll(findingsToUpdate);
+  }
+
+  public void batchInjectExecutionCallback(InjectExecutionCallback input) {
+    callbacksWaiting.add(input);
+    if(callbacksWaiting.size() > 1000) {
+      executorService.execute(() -> {
+        scheduledTask.cancel(false);
+        List<InjectExecutionCallback> callbacks = new ArrayList<>(callbacksWaiting);
+        callbacksWaiting.clear();
+        scheduledTask = null;
+        try {
+          handleInjectExecutionCallback(callbacks);
+        } catch (RuntimeException e) {
+          log.severe(e.getMessage());
+        }
+      });
+    } else {
+      if(scheduledTask == null) {
+        scheduledTask = executorService.schedule(() -> {
+          List<InjectExecutionCallback> callbacks = new ArrayList<>(callbacksWaiting);
+          callbacksWaiting.clear();
+          scheduledTask = null;
+          try {
+            handleInjectExecutionCallback(callbacks);
+          } catch (RuntimeException e) {
+            log.severe(e.getMessage());
+          }
+        }, 10, TimeUnit.SECONDS);
+      }
+      callbacksWaiting.add(input);
     }
   }
 
