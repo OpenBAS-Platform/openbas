@@ -144,7 +144,7 @@ class FindingUtilsTest {
   }
 
   @Test
-  @DisplayName("Should get host:port(service) from raw output of netstat command")
+  @DisplayName("Should get host:port (service) from raw output of netstat command")
   void given_raw_output_netstat_should_return_portscans() {
     RegexGroup regexGroup1 = new RegexGroup();
     regexGroup1.setField("host");
