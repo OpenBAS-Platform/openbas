@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DateHistogramConfig {
+public class DateHistogramConfig extends HistogramConfig {
   private String name;
   private String start;
   private String end;
@@ -16,7 +16,12 @@ public class DateHistogramConfig {
   private Filters.FilterGroup filter;
   private HistogramInterval interval = HistogramInterval.day;
 
+  public DateHistogramConfig() {
+    super("temporal");
+  }
+
   public DateHistogramConfig(String name) {
+    this();
     this.name = name;
     this.end = Instant.now().toString();
     this.start = Instant.parse(this.end).minus(30, ChronoUnit.DAYS).toString();

@@ -23,10 +23,8 @@ import io.openbas.engine.EsModel;
 import io.openbas.engine.Handler;
 import io.openbas.engine.api.*;
 import io.openbas.engine.model.*;
-import io.openbas.engine.query.EsStructuralSeries;
-import io.openbas.engine.query.EsStructuralSeriesData;
-import io.openbas.engine.query.EsTimeseries;
-import io.openbas.engine.query.EsTimeseriesData;
+import io.openbas.engine.query.EsSeries;
+import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
 import io.openbas.schema.SchemaUtils;
 import java.io.IOException;
@@ -343,12 +341,12 @@ public class EsService {
     return 0;
   }
 
-  public EsStructuralSeries termHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
-    StructuralHistogramConfig config = runtime.getConfig();
-    Query query = buildQuery(user, null, config.getFilter(), runtime.getParameters());
+  public EsSeries termHistogram(
+      RawUserAuth user, StructuralHistogramConfig config, Map<String, String> parameters) {
+    Query query = buildQuery(user, null, config.getFilter(), parameters);
     String aggregationKey = "term_histogram";
     try {
-      String field = runtime.getParameters().getOrDefault(config.getField(), config.getField());
+      String field = parameters.getOrDefault(config.getField(), config.getField());
       TermsAggregation termsAggregation =
           new TermsAggregation.Builder().field(field + ".keyword").size(100).build();
       SearchResponse<Void> response =
@@ -369,40 +367,43 @@ public class EsService {
         List<String> ids = buckets.array().stream().map(s -> s.key().stringValue()).toList();
         resolutions.putAll(resolveIdsRepresentative(user, ids));
       }
-      List<EsStructuralSeriesData> data =
+      List<EsSeriesData> data =
           buckets.array().stream()
               .map(
                   b -> {
                     String key = b.key().stringValue();
                     String label = isSideAggregation ? resolutions.get(key) : key;
                     String seriesKey = label != null ? label : "deleted";
-                    return new EsStructuralSeriesData(seriesKey, b.docCount());
+                    return new EsSeriesData(seriesKey, b.docCount());
                   })
               .toList();
-      return new EsStructuralSeries(config.getName(), data);
+      return new EsSeries(config.getName(), data);
     } catch (Exception e) {
       LOGGER.severe("termHistogram exception: " + e);
     }
-    return new EsStructuralSeries(config.getName());
+    return new EsSeries(config.getName());
   }
 
-  public List<EsStructuralSeries> multiTermHistogram(
-      RawUserAuth user, List<StructuralHistogramRuntime> runtimes) {
-    return runtimes.stream().parallel().map(r -> termHistogram(user, r)).toList();
+  public List<EsSeries> multiTermHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
+    Map<String, String> parameters = runtime.getParameters();
+    return runtime.getConfigs().stream()
+        .parallel()
+        .map(c -> termHistogram(user, c, parameters))
+        .toList();
   }
 
-  public EsTimeseries dateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
-    DateHistogramConfig config = runtime.getConfig();
+  public EsSeries dateHistogram(
+      RawUserAuth user, DateHistogramConfig config, Map<String, String> parameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    String start = runtime.getParameters().getOrDefault(config.getStart(), config.getStart());
+    String start = parameters.getOrDefault(config.getStart(), config.getStart());
     Instant startInstant = Instant.parse(start);
-    String end = runtime.getParameters().getOrDefault(config.getEnd(), config.getEnd());
+    String end = parameters.getOrDefault(config.getEnd(), config.getEnd());
     Instant endInstant = Instant.parse(end);
     Query dateRangeQuery =
         DateRangeQuery.of(d -> d.field(config.getField()).gt(start).lt(end))
             ._toRangeQuery()
             ._toQuery();
-    Query filterQuery = buildQuery(user, null, config.getFilter(), runtime.getParameters());
+    Query filterQuery = buildQuery(user, null, config.getFilter(), parameters);
     Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
     bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
@@ -430,20 +431,23 @@ public class EsService {
               Void.class);
       Buckets<DateHistogramBucket> buckets =
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
-      List<EsTimeseriesData> data =
+      List<EsSeriesData> data =
           buckets.array().stream()
-              .map(b -> new EsTimeseriesData(Instant.ofEpochMilli(b.key()), b.docCount()))
+              .map(b -> new EsSeriesData(Instant.ofEpochMilli(b.key()).toString(), b.docCount()))
               .toList();
-      return new EsTimeseries(config.getName(), data);
+      return new EsSeries(config.getName(), data);
     } catch (IOException e) {
       LOGGER.severe("dateHistogram exception: " + e);
     }
-    return new EsTimeseries(config.getName());
+    return new EsSeries(config.getName());
   }
 
-  public List<EsTimeseries> multiDateHistogram(
-      RawUserAuth user, List<DateHistogramRuntime> runtimes) {
-    return runtimes.stream().parallel().map(r -> dateHistogram(user, r)).toList();
+  public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
+    Map<String, String> parameters = runtime.getParameters();
+    return runtime.getConfigs().stream()
+        .parallel()
+        .map(c -> dateHistogram(user, c, parameters))
+        .toList();
   }
 
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {
