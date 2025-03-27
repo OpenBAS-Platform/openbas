@@ -247,10 +247,11 @@ public class InjectApi extends RestBehavior {
           String agentId, // must allow null because http injector used also this method to work.
       @PathVariable String injectId,
       @Valid @RequestBody InjectExecutionInput input) {
+    executorService.execute(() -> injectStatusService.handleInjectExecutionCallback(injectId, agentId, input));
+  }
 
-    executorService.submit(() -> {
-      injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
-    });
+  @GetMapping(INJECT_URI + "/execution/testThreads")
+  public void testThreads() {
   }
 
   @Secured(ROLE_ADMIN)
