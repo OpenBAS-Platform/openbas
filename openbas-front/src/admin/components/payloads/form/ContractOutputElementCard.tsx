@@ -85,14 +85,14 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
       label: 'IPv4',
       fields: [{
         value: 'ipv4',
-        label: t('IPv4'),
+        label: 'IPv4',
       }],
     }, {
       value: 'ipv6',
       label: 'IPv6',
       fields: [{
         value: 'ipv6',
-        label: t('IPv6'),
+        label: 'IPv6',
       }],
     }, {
       value: 'credentials',
