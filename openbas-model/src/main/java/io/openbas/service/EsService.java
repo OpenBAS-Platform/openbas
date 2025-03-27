@@ -100,6 +100,10 @@ public class EsService {
   }
 
   private Query buildQueryRestrictions(RawUserAuth user) {
+    // If user is admin, no need to check the ACL
+    if (user.getUser_admin()) {
+      return null;
+    }
     Set<String> scenarioIds = user.getUser_grant_scenarios();
     Set<String> exerciseIds = user.getUser_grant_exercises();
     List<String> restrictions = Stream.concat(exerciseIds.stream(), scenarioIds.stream()).toList();
@@ -141,7 +145,11 @@ public class EsService {
 
   private Query buildQuery(RawUserAuth user, String search, Filters.FilterGroup groupFilter) {
     BoolQuery.Builder mainQuery = new BoolQuery.Builder();
+    List<Query> mainMust = new ArrayList<>();
     Query restrictionQuery = buildQueryRestrictions(user);
+    if (restrictionQuery != null) {
+      mainMust.add(restrictionQuery);
+    }
     BoolQuery.Builder dataQueryBuilder = new BoolQuery.Builder();
     List<Query> shouldList = new ArrayList<>();
     if (search != null) {
@@ -157,7 +165,8 @@ public class EsService {
     }
     Query dataQuery =
         dataQueryBuilder.should(shouldList).minimumShouldMatch("1").build()._toQuery();
-    return mainQuery.must(restrictionQuery, dataQuery).build()._toQuery();
+    mainMust.add(dataQuery);
+    return mainQuery.must(mainMust).build()._toQuery();
   }
 
   private Map<String, String> resolveIdsRepresentative(RawUserAuth user, List<String> ids) {
