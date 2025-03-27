@@ -1,12 +1,10 @@
 package io.openbas.schema;
 
-import static io.openbas.utils.schema.SchemaUtils.isValidClassName;
+import static io.openbas.schema.SchemaUtils.isValidClassName;
 
 import io.openbas.engine.EsEngine;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.schema.model.PropertySchemaDTO;
-import io.openbas.utils.schema.PropertySchema;
-import io.openbas.utils.schema.SchemaUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
