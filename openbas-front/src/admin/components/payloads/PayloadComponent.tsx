@@ -56,7 +56,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h2"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {selectedPayload?.payload_name}
         </Typography>
@@ -64,7 +64,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="body2"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {emptyFilled(selectedPayload?.payload_description)}
         </Typography>
@@ -74,7 +74,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Platforms')}
         </Typography>
@@ -88,7 +88,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
             <Typography
               variant="h3"
               gutterBottom
-              style={{ marginTop: 20 }}
+              style={{ marginTop: theme.spacing(2) }}
             >
               {t('Architecture')}
             </Typography>
@@ -98,7 +98,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Tags')}
         </Typography>
@@ -111,7 +111,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Attack patterns')}
         </Typography>
@@ -128,7 +128,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('External ID')}
         </Typography>
@@ -150,7 +150,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
             <Typography
               variant="h3"
               gutterBottom
-              style={{ marginTop: 20 }}
+              style={{ marginTop: theme.spacing(2) }}
             >
               {t('Attack command')}
             </Typography>
@@ -163,7 +163,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Arguments')}
         </Typography>
@@ -214,7 +214,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Prerequisites')}
         </Typography>
@@ -274,7 +274,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Cleanup executor')}
         </Typography>
@@ -282,7 +282,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Cleanup command')}
         </Typography>
