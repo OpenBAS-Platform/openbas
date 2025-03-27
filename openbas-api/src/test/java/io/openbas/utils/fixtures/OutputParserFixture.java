@@ -19,7 +19,7 @@ public class OutputParserFixture {
   public static RegexGroup getDefaultRegexGroup() {
     RegexGroup regexGroup = new RegexGroup();
     regexGroup.setField("Any text");
-    regexGroup.setIndexValues("$t");
+    regexGroup.setIndexValues("$1");
     return regexGroup;
   }
 
