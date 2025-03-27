@@ -147,15 +147,7 @@ public class InjectStatusService {
     updateInjectStatus(agent, inject, input);
 
     // -- FINDINGS --
-    computeFindings(input, inject, agent);
-  }
-
-  private void computeFindings(InjectExecutionInput input, Inject inject, Agent agent) {
-    // Used for inject with payload
-    findingService.extractFindingsFromRawOutput(input, inject, agent);
-
-    // Used for injectors
-    findingService.extractFindingsFromStructuredOutput(input, inject);
+    findingService.computeFindings(input, inject, agent);
   }
 
   public ExecutionStatus computeStatus(List<ExecutionTraces> traces) {
