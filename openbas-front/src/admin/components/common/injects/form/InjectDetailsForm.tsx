@@ -341,6 +341,7 @@ const InjectDetailsForm = ({
               usersNumber={0}
               teamsUsers={[]}
               isAtomic={isAtomic}
+              theme={theme}
               {...props}
             />
           )}
