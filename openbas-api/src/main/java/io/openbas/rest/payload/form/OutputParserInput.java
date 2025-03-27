@@ -12,6 +12,9 @@ import lombok.Data;
 @Data
 public class OutputParserInput {
 
+  @JsonProperty("output_parser_id")
+  private String id;
+
   @JsonProperty("output_parser_mode")
   @Schema(description = "Paser Mode: STDOUT, STDERR, READ_FILE")
   @NotNull

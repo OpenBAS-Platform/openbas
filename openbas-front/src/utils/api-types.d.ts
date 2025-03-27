@@ -616,6 +616,7 @@ export interface ContractOutputElement {
 
 /** List of Contract output elements */
 export interface ContractOutputElementInput {
+  contract_output_element_id?: string;
   /** Indicates whether this contract output element can be used to generate a finding */
   contract_output_element_is_finding: boolean;
   /** Key */
@@ -2394,6 +2395,7 @@ export interface OutputParserInput {
    * @uniqueItems true
    */
   output_parser_contract_output_elements: ContractOutputElementInput[];
+  output_parser_id?: string;
   /** Paser Mode: STDOUT, STDERR, READ_FILE */
   output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
   /** Parser Type: REGEX */
@@ -3248,6 +3250,7 @@ export interface RegexGroup {
 export interface RegexGroupInput {
   /** Field */
   regex_group_field: string;
+  regex_group_id?: string;
   /** Index of the group from the regex match: $index0$index1 */
   regex_group_index_values: string;
 }
