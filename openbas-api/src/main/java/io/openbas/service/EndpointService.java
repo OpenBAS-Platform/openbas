@@ -218,15 +218,19 @@ public class EndpointService {
                                     Arrays.asList(input.getMacAddresses()).contains(macAddress)))
                 .findFirst();
         if (optionalInputToSave.isPresent()) {
-          final AgentRegisterInput inputToSave = optionalInputToSave.get();
-          setUpdatedEndpointAttributes(endpointToUpdate, inputToSave);
-          agentToSave = new Agent();
-          setNewAgentAttributes(inputToSave, agentToSave);
-          setUpdatedAgentAttributes(agentToSave, inputToSave, endpointToUpdate);
-          endpointsToSave.add(endpointToUpdate);
-          agentsToSave.add(agentToSave);
-          inputs.removeIf(
-              input -> Arrays.equals(input.getMacAddresses(), inputToSave.getMacAddresses()));
+          // If no existing agent Crowdstrike in this endpoint, add to it
+          if (existingAgents.stream()
+              .noneMatch(agent -> agent.getAsset().getId().equals(endpointToUpdate.getId()))) {
+            final AgentRegisterInput inputToSave = optionalInputToSave.get();
+            setUpdatedEndpointAttributes(endpointToUpdate, inputToSave);
+            agentToSave = new Agent();
+            setNewAgentAttributes(inputToSave, agentToSave);
+            setUpdatedAgentAttributes(agentToSave, inputToSave, endpointToUpdate);
+            endpointsToSave.add(endpointToUpdate);
+            agentsToSave.add(agentToSave);
+            inputs.removeIf(
+                input -> Arrays.equals(input.getMacAddresses(), inputToSave.getMacAddresses()));
+          }
         }
       }
     }
