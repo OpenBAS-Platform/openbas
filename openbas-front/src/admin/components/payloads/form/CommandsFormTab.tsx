@@ -24,7 +24,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
     } else if (!disabledPayloadType && type === 'Executable') {
       setValue('payload_execution_arch', '');
     }
-  }, [type, setValue]);
+  }, [type]);
 
   const { fields: argumentsFields, append: argumentsAppend, remove: argumentsRemove } = useFieldArray({
     control,
@@ -110,7 +110,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
         <>
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Attack command')}</Typography>
           <SelectFieldController name="command_executor" label={t('Executor')} items={executorsItems} isLabelAligned required />
-          <TextFieldController multiline rows={3} name="command_content" label={t('Command content')} required />
+          <TextFieldController multiline rows={3} name="command_content" isCommand required />
         </>
       )}
 
@@ -209,8 +209,8 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
               key={`payload_prerequisites_${prerequisitesIndex}`}
             >
               <SelectFieldController name={`payload_prerequisites.${prerequisitesIndex}.executor` as const} label={t('Executor')} items={executorsItems} required />
-              <TextFieldController name={`payload_prerequisites.${prerequisitesIndex}.get_command` as const} label={t('Get command')} required />
-              <TextFieldController name={`payload_prerequisites.${prerequisitesIndex}.check_command` as const} label={t('Check command')} />
+              <TextFieldController name={`payload_prerequisites.${prerequisitesIndex}.get_command` as const} isCommand label={t('Get command')} required />
+              <TextFieldController name={`payload_prerequisites.${prerequisitesIndex}.check_command` as const} isCommand label={t('Check command')} />
               <IconButton
                 onClick={() => prerequisitesRemove(prerequisitesIndex)}
                 size="small"
@@ -241,7 +241,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
           {/* CLEANUP */}
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Cleanup command')}</Typography>
           <SelectFieldController name="payload_cleanup_executor" label={t('Executor')} items={executorsItems} isLabelAligned />
-          <TextFieldController multiline rows={3} name="payload_cleanup_command" label={t('Cleanup command')} />
+          <TextFieldController multiline rows={3} name="payload_cleanup_command" isCommand />
         </>
       )}
     </>

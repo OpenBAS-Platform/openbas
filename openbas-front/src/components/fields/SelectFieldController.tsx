@@ -38,9 +38,11 @@ const SelectFieldController = ({ name, label, items, isLabelAligned, style, requ
         control={control}
         render={({ field, fieldState: { error } }) => (
           <FormControl size="medium" error={!!error}>
-            {!isLabelAligned && <InputLabel>{`${label}${required ? ' *' : ''}`}</InputLabel>}
+            {!isLabelAligned && <InputLabel id="demo-simple-select-label">{`${label}${required ? ' *' : ''}`}</InputLabel>}
             <Select
               {...field}
+              labelId="demo-simple-select-standard-label"
+              id="demo-simple-select-standard"
               label={label}
               sx={{ minWidth: 140 }}
               style={style}

@@ -92,7 +92,11 @@ const TagField: FunctionComponent<Props> = ({
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{
+      position: 'relative',
+      ...style,
+    }}
+    >
       <MuiAutocomplete
         value={values()}
         size="small"
@@ -120,7 +124,6 @@ const TagField: FunctionComponent<Props> = ({
             label={label}
             variant="standard"
             fullWidth
-            style={style}
             error={!!error}
             slotProps={{
               input: {
