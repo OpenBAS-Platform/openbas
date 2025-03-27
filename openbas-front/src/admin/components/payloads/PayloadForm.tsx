@@ -67,7 +67,7 @@ const PayloadForm = ({
     contract_output_element_key: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_type: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_tags: z.string().array().optional(),
-    contract_output_element_rule: z.string().min(1, { message: t('Should not be empty') }), // TODO
+    contract_output_element_rule: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_regex_groups: z.array(regexGroupObject),
   });
   const outputParserObject = z.object({
