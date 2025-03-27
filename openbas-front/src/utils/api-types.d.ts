@@ -1635,7 +1635,7 @@ export interface InjectResultOverviewOutput {
    * Tags
    * @uniqueItems true
    */
-  inject_tags?: Tag[];
+  inject_tags?: string[];
   /** Results of expectations for each target */
   inject_targets: InjectTargetWithResult[];
   /** Title of inject */

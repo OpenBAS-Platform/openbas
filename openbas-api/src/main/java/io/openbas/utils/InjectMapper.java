@@ -40,7 +40,7 @@ public class InjectMapper {
         .status(toInjectStatusOutput(inject.getStatus()))
         .expectations(toInjectExpectationSimples(inject.getExpectations()))
         .killChainPhases(toKillChainPhasesSimples(inject.getKillChainPhases()))
-        .tags(inject.getTags())
+        .tags(inject.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .isReady(inject.isReady())
         .updatedAt(inject.getUpdatedAt())
         .expectationResultByTypes(
