@@ -1,4 +1,4 @@
-import { Grid, List, Paper, Typography } from '@mui/material';
+import { GridLegacy, List, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -27,17 +27,17 @@ const Endpoint = () => {
   const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
   return (
     <div>
-      <Grid
+      <GridLegacy
         container
         spacing={3}
       >
-        <Grid item xs={12} style={{ paddingTop: 15 }}>
+        <GridLegacy item xs={12} style={{ paddingTop: 15 }}>
           <Typography variant="h4">
             {t('Endpoint Information')}
           </Typography>
           <Paper classes={{ root: classes.paper }} variant="outlined">
-            <Grid container spacing={3}>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+            <GridLegacy container spacing={3}>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -55,8 +55,8 @@ const Endpoint = () => {
                     limit={300}
                   />
                 </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+              </GridLegacy>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -71,8 +71,8 @@ const Endpoint = () => {
                 >
                   {endpoint.endpoint_hostname}
                 </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+              </GridLegacy>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -87,8 +87,8 @@ const Endpoint = () => {
                 >
                   {endpoint.endpoint_seen_ip}
                 </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+              </GridLegacy>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -105,8 +105,8 @@ const Endpoint = () => {
                   {' '}
                   {endpoint.endpoint_platform}
                 </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+              </GridLegacy>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -121,8 +121,8 @@ const Endpoint = () => {
                 >
                   {endpoint.endpoint_arch}
                 </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+              </GridLegacy>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -143,8 +143,8 @@ const Endpoint = () => {
                     </div>
                   ))}
                 </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+              </GridLegacy>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -165,8 +165,8 @@ const Endpoint = () => {
                     </div>
                   ))}
                 </div>
-              </Grid>
-              <Grid item xs={3} style={{ paddingTop: 20 }}>
+              </GridLegacy>
+              <GridLegacy item xs={3} style={{ paddingTop: 20 }}>
                 <Typography
                   variant="h3"
                   gutterBottom
@@ -181,11 +181,11 @@ const Endpoint = () => {
                 >
                   <ItemTags variant="list" tags={endpoint.asset_tags} />
                 </div>
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
           </Paper>
-        </Grid>
-        <Grid item xs={12}>
+        </GridLegacy>
+        <GridLegacy item xs={12}>
           <Typography variant="h4" style={{ float: 'left' }}>
             {t('Agents')}
           </Typography>
@@ -199,8 +199,8 @@ const Endpoint = () => {
               <Empty message={t('No agents installed.')} />
             )}
           </Paper>
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
     </div>
   );
 };

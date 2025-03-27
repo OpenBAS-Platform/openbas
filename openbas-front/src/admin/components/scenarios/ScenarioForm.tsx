@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Autocomplete, Box, Button, Chip, Grid, MenuItem, Tab, Tabs, TextField as MuiTextField } from '@mui/material';
+import { Autocomplete, Box, Button, Chip, GridLegacy, MenuItem, Tab, Tabs, TextField as MuiTextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
@@ -91,8 +91,8 @@ const ScenarioForm: FunctionComponent<Props> = ({
               setValue={setValue}
               askAi={true}
             />
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
+            <GridLegacy container spacing={2}>
+              <GridLegacy item xs={6}>
                 <SelectField
                   variant="standard"
                   fullWidth={true}
@@ -109,8 +109,8 @@ const ScenarioForm: FunctionComponent<Props> = ({
                     </MenuItem>
                   ))}
                 </SelectField>
-              </Grid>
-              <Grid item xs={6}>
+              </GridLegacy>
+              <GridLegacy item xs={6}>
                 <SelectField
                   variant="standard"
                   fullWidth={true}
@@ -140,8 +140,8 @@ const ScenarioForm: FunctionComponent<Props> = ({
                     {t('Strategic Reaction')}
                   </MenuItem>
                 </SelectField>
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
             <SelectField
               variant="standard"
               fullWidth={true}
