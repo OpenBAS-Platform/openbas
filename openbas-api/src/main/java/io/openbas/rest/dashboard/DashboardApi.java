@@ -6,10 +6,7 @@ import static io.openbas.database.model.User.ROLE_USER;
 import io.openbas.database.model.Filters;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.UserRepository;
-import io.openbas.engine.api.DateHistogramConfig;
-import io.openbas.engine.api.DateHistogramRuntime;
-import io.openbas.engine.api.StructuralHistogramConfig;
-import io.openbas.engine.api.StructuralHistogramRuntime;
+import io.openbas.engine.api.*;
 import io.openbas.engine.model.*;
 import io.openbas.engine.query.EsStructuralSeries;
 import io.openbas.engine.query.EsTimeseries;
@@ -45,6 +42,20 @@ public class DashboardApi extends RestBehavior {
   @Autowired
   public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
+  }
+
+  @GetMapping(DASHBOARD_URI + "/count/{widget}")
+  public long count(@PathVariable String widget) {
+    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    Filters.Filter filter = new Filters.Filter();
+    filter.setKey("base_entity");
+    filter.setOperator(Filters.FilterOperator.eq);
+    filter.setValues(List.of("finding"));
+    filterGroup.setFilters(List.of(filter));
+    CountConfig config = new CountConfig("Series01", filterGroup);
+    CountRuntime runtime = new CountRuntime(config);
+    RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
+    return esService.count(userWithAuth, runtime);
   }
 
   @GetMapping(DASHBOARD_URI + "/temporal/{widget}")

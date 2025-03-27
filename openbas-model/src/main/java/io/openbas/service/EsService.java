@@ -21,10 +21,7 @@ import io.openbas.database.repository.IndexingStatusRepository;
 import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.Handler;
-import io.openbas.engine.api.DateHistogramConfig;
-import io.openbas.engine.api.DateHistogramRuntime;
-import io.openbas.engine.api.StructuralHistogramConfig;
-import io.openbas.engine.api.StructuralHistogramRuntime;
+import io.openbas.engine.api.*;
 import io.openbas.engine.model.*;
 import io.openbas.engine.query.EsStructuralSeries;
 import io.openbas.engine.query.EsStructuralSeriesData;
@@ -333,6 +330,19 @@ public class EsService {
   // endregion
 
   // region query
+  public long count(RawUserAuth user, CountRuntime runtime) {
+    try {
+      CountConfig config = runtime.getConfig();
+      Query query = buildQuery(user, null, config.getFilter(), runtime.getParameters());
+      return elasticClient
+          .count(c -> c.index(engineConfig.getIndexPrefix() + "*").query(query))
+          .count();
+    } catch (IOException e) {
+      LOGGER.severe("count exception: " + e);
+    }
+    return 0;
+  }
+
   public EsStructuralSeries termHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
     StructuralHistogramConfig config = runtime.getConfig();
     Query query = buildQuery(user, null, config.getFilter(), runtime.getParameters());
