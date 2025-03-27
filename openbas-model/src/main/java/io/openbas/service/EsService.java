@@ -22,12 +22,16 @@ import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.Handler;
 import io.openbas.engine.api.DateHistogramConfig;
+import io.openbas.engine.api.DateHistogramRuntime;
 import io.openbas.engine.api.StructuralHistogramConfig;
+import io.openbas.engine.api.StructuralHistogramRuntime;
 import io.openbas.engine.model.*;
 import io.openbas.engine.query.EsStructuralSeries;
 import io.openbas.engine.query.EsStructuralSeriesData;
 import io.openbas.engine.query.EsTimeseries;
 import io.openbas.engine.query.EsTimeseriesData;
+import io.openbas.schema.PropertySchema;
+import io.openbas.schema.SchemaUtils;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -68,17 +72,59 @@ public class EsService {
     this.indexingStatusRepository = indexingStatusRepository;
   }
 
+  // TODO ADD IN CONSTRUCTOR OR CACHE
+  private Map<String, PropertySchema> getIndexingSchema() {
+    Set<PropertySchema> properties =
+        esEngine.getModels().stream()
+            .flatMap(
+                model -> {
+                  try {
+                    return SchemaUtils.schemaWithSubtypes(model.getModel()).stream();
+                  } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .filter(PropertySchema::isFilterable)
+            .collect(Collectors.toSet());
+    return properties.stream().collect(Collectors.toMap(PropertySchema::getName, prop -> prop));
+  }
+
+  private FieldValue toVal(String field, String value, Map<String, String> parameters) {
+    FieldValue.Builder builder = new FieldValue.Builder();
+    String target = parameters.getOrDefault(value, value);
+    PropertySchema propertyField = getIndexingSchema().get(field);
+    if (propertyField == null) {
+      throw new RuntimeException("Unknown field: " + field);
+    }
+    if (propertyField.getType().isAssignableFrom(String.class)) {
+      builder.stringValue(target);
+    } else if (propertyField.getType().isAssignableFrom(Number.class)) {
+      builder.longValue(Long.parseLong(target));
+    } else if (propertyField.getType().isAssignableFrom(Boolean.class)) {
+      builder.booleanValue(Boolean.parseBoolean(target));
+    } else {
+      throw new RuntimeException("Unsupported field type: " + propertyField.getType());
+    }
+    return builder.build();
+  }
+
   // region utils
-  private Query queryFromBaseFilter(Filters.Filter filter) {
+  private Query queryFromBaseFilter(Filters.Filter filter, Map<String, String> parameters) {
     Filters.FilterOperator operator = filter.getOperator();
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
+    // TODO MUST BE PART OF QUERYABLE IN THE SCHEMA
+    String elasticField =
+        field.endsWith("_id") || field.endsWith("_side") ? (field + ".keyword") : field;
     switch (operator) {
       case eq:
         List<Query> queryList =
             filter.getValues().stream()
-                .map(v -> TermQuery.of(t -> t.field(field).value(v))._toQuery())
+                .map(
+                    v ->
+                        TermQuery.of(t -> t.field(elasticField).value(toVal(field, v, parameters)))
+                            ._toQuery())
                 .toList();
         if (filterMode == Filters.FilterMode.and) {
           boolQuery.must(queryList);
@@ -89,7 +135,10 @@ public class EsService {
       case not_eq:
         List<Query> queryNotList =
             filter.getValues().stream()
-                .map(v -> TermQuery.of(t -> t.field(field).value(v))._toQuery())
+                .map(
+                    v ->
+                        TermQuery.of(t -> t.field(elasticField).value(toVal(field, v, parameters)))
+                            ._toQuery())
                 .toList();
         boolQuery.mustNot(queryNotList);
         break;
@@ -128,12 +177,12 @@ public class EsService {
     return queryStringQuery.build()._toQuery();
   }
 
-  private Query queryFromFilter(Filters.FilterGroup groupFilter) {
+  private Query queryFromFilter(Filters.FilterGroup groupFilter, Map<String, String> parameters) {
     Filters.FilterMode filterMode = groupFilter.getMode();
     BoolQuery.Builder filterQuery = new BoolQuery.Builder();
     List<Query> filterQueries = new ArrayList<>();
     List<Filters.Filter> filters = groupFilter.getFilters();
-    filters.forEach(f -> filterQueries.add(queryFromBaseFilter(f)));
+    filters.forEach(f -> filterQueries.add(queryFromBaseFilter(f, parameters)));
     if (filterMode == Filters.FilterMode.and) {
       filterQuery.must(filterQueries);
     } else {
@@ -143,7 +192,11 @@ public class EsService {
     return filterQuery.build()._toQuery();
   }
 
-  private Query buildQuery(RawUserAuth user, String search, Filters.FilterGroup groupFilter) {
+  private Query buildQuery(
+      RawUserAuth user,
+      String search,
+      Filters.FilterGroup groupFilter,
+      Map<String, String> parameters) {
     BoolQuery.Builder mainQuery = new BoolQuery.Builder();
     List<Query> mainMust = new ArrayList<>();
     Query restrictionQuery = buildQueryRestrictions(user);
@@ -157,7 +210,7 @@ public class EsService {
       shouldList.add(searchQuery);
     }
     if (groupFilter.getFilters() != null) {
-      Query filterQuery = queryFromFilter(groupFilter);
+      Query filterQuery = queryFromFilter(groupFilter, parameters);
       shouldList.add(filterQuery);
     }
     if (shouldList.isEmpty()) {
@@ -172,11 +225,11 @@ public class EsService {
   private Map<String, String> resolveIdsRepresentative(RawUserAuth user, List<String> ids) {
     Filters.FilterGroup filterGroup = new Filters.FilterGroup();
     Filters.Filter filter = new Filters.Filter();
-    filter.setKey("base_id.keyword");
+    filter.setKey("base_id");
     filter.setOperator(Filters.FilterOperator.eq);
     filter.setValues(ids);
     filterGroup.setFilters(List.of(filter));
-    Query query = buildQuery(user, null, filterGroup);
+    Query query = buildQuery(user, null, filterGroup, new HashMap<>());
     try {
       SearchResponse<EsBase> response =
           elasticClient.search(
@@ -280,12 +333,14 @@ public class EsService {
   // endregion
 
   // region query
-  public EsStructuralSeries termHistogram(RawUserAuth user, StructuralHistogramConfig config) {
-    Query query = buildQuery(user, null, config.getFilter());
+  public EsStructuralSeries termHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
+    StructuralHistogramConfig config = runtime.getConfig();
+    Query query = buildQuery(user, null, config.getFilter(), runtime.getParameters());
     String aggregationKey = "term_histogram";
     try {
+      String field = runtime.getParameters().getOrDefault(config.getField(), config.getField());
       TermsAggregation termsAggregation =
-          new TermsAggregation.Builder().field(config.getField() + ".keyword").size(100).build();
+          new TermsAggregation.Builder().field(field + ".keyword").size(100).build();
       SearchResponse<Void> response =
           elasticClient.search(
               b ->
@@ -298,7 +353,7 @@ public class EsService {
               Void.class);
       Buckets<StringTermsBucket> buckets =
           response.aggregations().get(aggregationKey).sterms().buckets();
-      boolean isSideAggregation = config.getField().endsWith("_side");
+      boolean isSideAggregation = field.endsWith("_side");
       Map<String, String> resolutions = new HashMap<>();
       if (isSideAggregation) {
         List<String> ids = buckets.array().stream().map(s -> s.key().stringValue()).toList();
@@ -322,25 +377,26 @@ public class EsService {
   }
 
   public List<EsStructuralSeries> multiTermHistogram(
-      RawUserAuth user, List<StructuralHistogramConfig> configs) {
-    return configs.stream().parallel().map(c -> termHistogram(user, c)).toList();
+      RawUserAuth user, List<StructuralHistogramRuntime> runtimes) {
+    return runtimes.stream().parallel().map(r -> termHistogram(user, r)).toList();
   }
 
-  public EsTimeseries dateHistogram(RawUserAuth user, DateHistogramConfig config) {
+  public EsTimeseries dateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
+    DateHistogramConfig config = runtime.getConfig();
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
+    String start = runtime.getParameters().getOrDefault(config.getStart(), config.getStart());
+    Instant startInstant = Instant.parse(start);
+    String end = runtime.getParameters().getOrDefault(config.getEnd(), config.getEnd());
+    Instant endInstant = Instant.parse(end);
     Query dateRangeQuery =
-        DateRangeQuery.of(
-                d ->
-                    d.field(config.getField())
-                        .gt(config.getStart().toString())
-                        .lt(config.getEnd().toString()))
+        DateRangeQuery.of(d -> d.field(config.getField()).gt(start).lt(end))
             ._toRangeQuery()
             ._toQuery();
-    Query filterQuery = buildQuery(user, null, config.getFilter());
+    Query filterQuery = buildQuery(user, null, config.getFilter(), runtime.getParameters());
     Query query = queryBuilder.must(dateRangeQuery, filterQuery).build()._toQuery();
     ExtendedBounds.Builder<FieldDateMath> bounds = new ExtendedBounds.Builder<>();
-    bounds.min(FieldDateMath.of(m -> m.value((double) config.getStart().toEpochMilli())));
-    bounds.max(FieldDateMath.of(m -> m.value((double) config.getEnd().toEpochMilli())));
+    bounds.min(FieldDateMath.of(m -> m.value((double) startInstant.toEpochMilli())));
+    bounds.max(FieldDateMath.of(m -> m.value((double) endInstant.toEpochMilli())));
     ExtendedBounds<FieldDateMath> extendedBounds = bounds.build();
     try {
       String aggregationKey = "date_histogram";
@@ -376,12 +432,12 @@ public class EsService {
   }
 
   public List<EsTimeseries> multiDateHistogram(
-      RawUserAuth user, List<DateHistogramConfig> configs) {
-    return configs.stream().parallel().map(c -> dateHistogram(user, c)).toList();
+      RawUserAuth user, List<DateHistogramRuntime> runtimes) {
+    return runtimes.stream().parallel().map(r -> dateHistogram(user, r)).toList();
   }
 
   public List<EsSearch> search(RawUserAuth user, String search, Filters.FilterGroup filter) {
-    Query query = buildQuery(user, search, filter);
+    Query query = buildQuery(user, search, filter, new HashMap<>());
     try {
       SearchResponse<EsSearch> response =
           elasticClient.search(

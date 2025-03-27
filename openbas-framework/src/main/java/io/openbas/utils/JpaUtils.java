@@ -3,7 +3,7 @@ package io.openbas.utils;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.model.Base;
-import io.openbas.utils.schema.PropertySchema;
+import io.openbas.schema.PropertySchema;
 import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

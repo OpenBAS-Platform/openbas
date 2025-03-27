@@ -10,16 +10,16 @@ import lombok.Setter;
 @Setter
 public class DateHistogramConfig {
   private String name;
-  private Instant start;
-  private Instant end;
-  private Filters.FilterGroup filter;
+  private String start;
+  private String end;
   private String field = "base_created_at";
+  private Filters.FilterGroup filter;
   private HistogramInterval interval = HistogramInterval.day;
 
   public DateHistogramConfig(String name) {
     this.name = name;
-    this.end = Instant.now();
-    this.start = this.end.minus(30, ChronoUnit.DAYS);
+    this.end = Instant.now().toString();
+    this.start = Instant.parse(this.end).minus(30, ChronoUnit.DAYS).toString();
   }
 
   public DateHistogramConfig(String name, Filters.FilterGroup filter) {
@@ -27,7 +27,7 @@ public class DateHistogramConfig {
     this.filter = filter;
   }
 
-  public DateHistogramConfig(String name, Instant start, Instant end) {
+  public DateHistogramConfig(String name, String start, String end) {
     this(name);
     this.start = start;
     this.end = end;

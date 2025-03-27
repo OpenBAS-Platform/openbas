@@ -1,7 +1,7 @@
 package io.openbas.schema.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.utils.schema.PropertySchema;
+import io.openbas.schema.PropertySchema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collection;
