@@ -37,8 +37,8 @@ const DialogApplyTagRule: FunctionComponent<DialogDeleteProps> = ({
           {t('ASSET RULE DETECTED')}
         </DialogTitle>
         <DialogContentText>
-          {t('We detected that your change will trigger an {assetrule}. Would you like to apply the defined asset groups on your current existing injects ?',
-            { assetrule: <Link to="/admin/settings/asset_rules" target="_blank" rel="noreferrer">{t('asset rule')}</Link> }) }
+          {t('We detected that your change will trigger an {assetrule}. Would you like to apply the defined asset groups on your current existing injects?',
+            { assetrule: <Link to="/admin/settings/asset_rules" target="_blank" rel="noreferrer">{t('asset rule')}</Link> })}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
