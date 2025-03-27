@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch._types.analysis.CustomNormalizer;
 import co.elastic.clients.elasticsearch._types.analysis.Normalizer;
 import co.elastic.clients.elasticsearch._types.mapping.*;
 import co.elastic.clients.elasticsearch.cluster.PutComponentTemplateRequest;
+import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.elasticsearch.ilm.*;
 import co.elastic.clients.elasticsearch.indices.*;
 import co.elastic.clients.elasticsearch.indices.put_index_template.IndexTemplateMapping;
@@ -257,6 +258,14 @@ public class ElasticDriver {
   public ElasticsearchClient elasticClient() throws Exception {
     LOGGER.info("Creating ElasticClient");
     ElasticsearchClient elasticClient = getElasticClient();
+    // Try to client configuration
+    try {
+      InfoResponse info = elasticClient.info();
+      LOGGER.info("ElasticClient ready for " + info.name() + " - " + info.version());
+    } catch (Exception e) {
+      LOGGER.severe("Error activating engine: " + e);
+      return elasticClient;
+    }
     // TODO enable telemetry ?
     // https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/opentelemetry.html
     // Initialize elastic if needed.
