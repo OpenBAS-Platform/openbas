@@ -2,13 +2,14 @@ package io.openbas.rest.payload.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.rest.payload.PayloadApi.validateArchitecture;
+import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AttackPatternRepository;
 import io.openbas.database.repository.DocumentRepository;
 import io.openbas.database.repository.PayloadRepository;
 import io.openbas.database.repository.TagRepository;
+import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadCreateInput;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
@@ -21,29 +22,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class PayloadCreationService {
 
+  private final PayloadUtils payloadUtils;
+
+  private final PayloadService payloadService;
+
   private final TagRepository tagRepository;
   private final AttackPatternRepository attackPatternRepository;
-  private final PayloadService payloadService;
   private final PayloadRepository payloadRepository;
   private final DocumentRepository documentRepository;
 
   @Transactional(rollbackOn = Exception.class)
   public Payload createPayload(PayloadCreateInput input) {
+    return create(input);
+  }
+
+  private Payload create(PayloadCreateInput input) {
     PayloadType payloadType = PayloadType.fromString(input.getType());
     validateArchitecture(payloadType.key, input.getExecutionArch());
+
     switch (payloadType) {
-      case PayloadType.COMMAND:
+      case COMMAND:
         Command commandPayload = new Command();
-        commandPayload.setUpdateAttributes(input);
+        payloadUtils.copyProperties(input, commandPayload);
         commandPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         commandPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         commandPayload = payloadRepository.save(commandPayload);
         this.payloadService.updateInjectorContractsForPayload(commandPayload);
         return commandPayload;
-      case PayloadType.EXECUTABLE:
+      case EXECUTABLE:
         Executable executablePayload = new Executable();
-        executablePayload.setUpdateAttributes(input);
+        payloadUtils.copyProperties(input, executablePayload);
         executablePayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         executablePayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -52,9 +61,9 @@ public class PayloadCreationService {
         executablePayload = payloadRepository.save(executablePayload);
         this.payloadService.updateInjectorContractsForPayload(executablePayload);
         return executablePayload;
-      case PayloadType.FILE_DROP:
+      case FILE_DROP:
         FileDrop fileDropPayload = new FileDrop();
-        fileDropPayload.setUpdateAttributes(input);
+        payloadUtils.copyProperties(input, fileDropPayload);
         fileDropPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         fileDropPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
@@ -67,18 +76,18 @@ public class PayloadCreationService {
         fileDropPayload = payloadRepository.save(fileDropPayload);
         this.payloadService.updateInjectorContractsForPayload(fileDropPayload);
         return fileDropPayload;
-      case PayloadType.DNS_RESOLUTION:
+      case DNS_RESOLUTION:
         DnsResolution dnsResolutionPayload = new DnsResolution();
-        dnsResolutionPayload.setUpdateAttributes(input);
+        payloadUtils.copyProperties(input, dnsResolutionPayload);
         dnsResolutionPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         dnsResolutionPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
         dnsResolutionPayload = payloadRepository.save(dnsResolutionPayload);
         this.payloadService.updateInjectorContractsForPayload(dnsResolutionPayload);
         return dnsResolutionPayload;
-      case PayloadType.NETWORK_TRAFFIC:
+      case NETWORK_TRAFFIC:
         NetworkTraffic networkTrafficPayload = new NetworkTraffic();
-        networkTrafficPayload.setUpdateAttributes(input);
+        payloadUtils.copyProperties(input, networkTrafficPayload);
         networkTrafficPayload.setAttackPatterns(
             fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
         networkTrafficPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));

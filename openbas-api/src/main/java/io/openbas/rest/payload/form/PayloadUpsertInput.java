@@ -11,12 +11,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Set;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class PayloadUpsertInput {
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_type")
@@ -90,4 +90,8 @@ public class PayloadUpsertInput {
 
   @JsonProperty("payload_elevation_required")
   private boolean elevationRequired;
+
+  @JsonProperty("payload_output_parsers")
+  @Schema(description = "Set of output parsers")
+  private Set<OutputParserInput> outputParsers = new HashSet<>();
 }

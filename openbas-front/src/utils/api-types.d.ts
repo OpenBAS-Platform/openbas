@@ -306,6 +306,8 @@ interface BasePayload {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -554,6 +556,8 @@ export interface Command {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -591,6 +595,44 @@ export interface Condition {
   key: string;
   operator: "eq";
   value?: boolean;
+}
+
+export interface ContractOutputElement {
+  /** @format date-time */
+  contract_output_element_created_at: string;
+  contract_output_element_id: string;
+  contract_output_element_is_finding: boolean;
+  contract_output_element_key: string;
+  contract_output_element_name: string;
+  /** @uniqueItems true */
+  contract_output_element_regex_groups?: RegexGroup[];
+  contract_output_element_rule: string;
+  contract_output_element_tags?: string[];
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  /** @format date-time */
+  contract_output_element_updated_at: string;
+  listened?: boolean;
+}
+
+/** List of Contract output elements */
+export interface ContractOutputElementInput {
+  /** Indicates whether this contract output element can be used to generate a finding */
+  contract_output_element_is_finding: boolean;
+  /** Key */
+  contract_output_element_key: string;
+  /** Name */
+  contract_output_element_name: string;
+  /**
+   * Set of regex groups
+   * @uniqueItems true
+   */
+  contract_output_element_regex_groups: RegexGroupInput[];
+  /** Parser Rule */
+  contract_output_element_rule: string;
+  /** List of tags */
+  contract_output_element_tags?: string[];
+  /** Contract Output element type, can be: text, number, port, IPV6, IPV4, portscan, credentials */
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
 export interface CreateUserInput {
@@ -636,6 +678,8 @@ export interface DnsResolution {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -822,6 +866,8 @@ export interface Executable {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -1110,6 +1156,8 @@ export interface FileDrop {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -1153,7 +1201,9 @@ export interface Finding {
   finding_field: string;
   finding_id: string;
   finding_inject_id?: string;
+  /** @deprecated */
   finding_labels?: string[];
+  finding_tags?: string[];
   finding_teams?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   /** @format date-time */
@@ -2215,6 +2265,8 @@ export interface NetworkTraffic {
   payload_external_id?: string;
   payload_id: string;
   payload_name: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -2292,6 +2344,32 @@ export interface OrganizationUpdateInput {
   organization_description?: string;
   organization_name: string;
   organization_tags?: string[];
+}
+
+export interface OutputParser {
+  listened?: boolean;
+  /** @uniqueItems true */
+  output_parser_contract_output_elements?: ContractOutputElement[];
+  /** @format date-time */
+  output_parser_created_at: string;
+  output_parser_id: string;
+  output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
+  output_parser_type: "REGEX";
+  /** @format date-time */
+  output_parser_updated_at: string;
+}
+
+/** Set of output parsers */
+export interface OutputParserInput {
+  /**
+   * List of Contract output elements
+   * @uniqueItems true
+   */
+  output_parser_contract_output_elements: ContractOutputElementInput[];
+  /** Paser Mode: STDOUT, STDERR, READ_FILE */
+  output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
+  /** Parser Type: REGEX */
+  output_parser_type: "REGEX";
 }
 
 export interface PageAssetGroupOutput {
@@ -2778,6 +2856,11 @@ export interface PayloadCreateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
+  payload_output_parsers?: OutputParserInput[];
   payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -2812,6 +2895,11 @@ export interface PayloadUpdateInput {
   payload_description?: string;
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
+  payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_tags?: string[];
@@ -2833,6 +2921,11 @@ export interface PayloadUpsertInput {
   payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_external_id: string;
   payload_name: string;
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
+  payload_output_parsers?: OutputParserInput[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
@@ -3110,6 +3203,25 @@ export interface RawUser {
   user_phone?: string;
   user_tags?: string[];
   user_teams?: string[];
+}
+
+export interface RegexGroup {
+  listened?: boolean;
+  /** @format date-time */
+  regex_group_created_at: string;
+  regex_group_field: string;
+  regex_group_id: string;
+  regex_group_index_values: string;
+  /** @format date-time */
+  regex_group_updated_at: string;
+}
+
+/** Set of regex groups */
+export interface RegexGroupInput {
+  /** Field */
+  regex_group_field: string;
+  /** Index of the group from the regex match: $index0$index1 */
+  regex_group_index_values: string;
 }
 
 export interface RenewTokenInput {
