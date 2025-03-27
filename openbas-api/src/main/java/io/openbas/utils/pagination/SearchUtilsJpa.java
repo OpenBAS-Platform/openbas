@@ -1,12 +1,12 @@
 package io.openbas.utils.pagination;
 
+import static io.openbas.schema.SchemaUtils.getSearchableProperties;
 import static io.openbas.utils.JpaUtils.toPath;
-import static io.openbas.utils.schema.SchemaUtils.getSearchableProperties;
 import static org.springframework.util.StringUtils.hasText;
 
+import io.openbas.schema.PropertySchema;
+import io.openbas.schema.SchemaUtils;
 import io.openbas.utils.OperationUtilsJpa;
-import io.openbas.utils.schema.PropertySchema;
-import io.openbas.utils.schema.SchemaUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;

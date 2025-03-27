@@ -7,13 +7,19 @@ import io.openbas.database.model.Filters;
 import io.openbas.database.raw.RawUserAuth;
 import io.openbas.database.repository.UserRepository;
 import io.openbas.engine.api.DateHistogramConfig;
+import io.openbas.engine.api.DateHistogramRuntime;
 import io.openbas.engine.api.StructuralHistogramConfig;
+import io.openbas.engine.api.StructuralHistogramRuntime;
 import io.openbas.engine.model.*;
 import io.openbas.engine.query.EsStructuralSeries;
 import io.openbas.engine.query.EsTimeseries;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.EsService;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -27,7 +33,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardApi extends RestBehavior {
 
   public static final String DASHBOARD_URI = "/api/dashboards";
-  public static final String QUERY_URI = "/api/query";
 
   private EsService esService;
   private UserRepository userRepository;
@@ -53,10 +58,18 @@ public class DashboardApi extends RestBehavior {
     filter.setOperator(Filters.FilterOperator.eq);
     filter.setValues(List.of("finding"));
     filterGroup.setFilters(List.of(filter));
+    Map<String, String> parameters = new HashMap<>();
+    Instant end = Instant.now();
+    Instant start = end.minus(15, ChronoUnit.DAYS);
+    parameters.put("$start", start.toString());
+    parameters.put("$end", end.toString());
     // Try to fetch a date histogram
     DateHistogramConfig config = new DateHistogramConfig("series01", filterGroup);
+    config.setStart("$start");
+    config.setEnd("$end");
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    return esService.multiDateHistogram(userWithAuth, List.of(config));
+    DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
+    return esService.multiDateHistogram(userWithAuth, List.of(runtime));
   }
 
   @GetMapping(DASHBOARD_URI + "/structural/{widget}")
@@ -68,14 +81,18 @@ public class DashboardApi extends RestBehavior {
     Filters.Filter filter = new Filters.Filter();
     filter.setKey("base_entity");
     filter.setOperator(Filters.FilterOperator.eq);
-    filter.setValues(List.of("finding"));
+    filter.setValues(List.of("$type"));
     filterGroup.setFilters(List.of(filter));
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put("$type", "finding");
     // Try to fetch a structural histogram
     StructuralHistogramConfig structuralConfig =
         new StructuralHistogramConfig("series01", filterGroup);
     structuralConfig.setField("finding_scenario_side"); // finding_scenario_side
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
-    return esService.multiTermHistogram(userWithAuth, List.of(structuralConfig));
+    StructuralHistogramRuntime runtime =
+        new StructuralHistogramRuntime(structuralConfig, parameters);
+    return esService.multiTermHistogram(userWithAuth, List.of(runtime));
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")

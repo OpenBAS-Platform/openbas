@@ -2,18 +2,18 @@ package io.openbas.utils;
 
 import static io.openbas.database.model.Filters.FilterMode.and;
 import static io.openbas.database.model.Filters.FilterMode.or;
+import static io.openbas.schema.SchemaUtils.getFilterableProperties;
+import static io.openbas.schema.SchemaUtils.retrieveProperty;
 import static io.openbas.utils.JpaUtils.toPath;
 import static io.openbas.utils.OperationUtilsJpa.*;
-import static io.openbas.utils.schema.SchemaUtils.getFilterableProperties;
-import static io.openbas.utils.schema.SchemaUtils.retrieveProperty;
 
 import io.openbas.database.model.Base;
 import io.openbas.database.model.Filters.Filter;
 import io.openbas.database.model.Filters.FilterGroup;
 import io.openbas.database.model.Filters.FilterMode;
 import io.openbas.database.model.Filters.FilterOperator;
-import io.openbas.utils.schema.PropertySchema;
-import io.openbas.utils.schema.SchemaUtils;
+import io.openbas.schema.PropertySchema;
+import io.openbas.schema.SchemaUtils;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
