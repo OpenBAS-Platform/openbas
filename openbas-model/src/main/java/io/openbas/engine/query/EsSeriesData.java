@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EsStructuralSeriesData {
+public class EsSeriesData {
   private String label;
   private long value;
 
-  public EsStructuralSeriesData(String label, long value) {
+  public EsSeriesData(String label, long value) {
     this.label = label;
     this.value = value;
   }

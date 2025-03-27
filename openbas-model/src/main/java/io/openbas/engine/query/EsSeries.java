@@ -7,16 +7,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EsTimeseries {
+public class EsSeries {
   private String label;
   private String color;
-  private List<EsTimeseriesData> data = new ArrayList<>();
+  private List<EsSeriesData> data = new ArrayList<>();
 
-  public EsTimeseries(String label) {
+  public EsSeries(String label) {
     this.label = label;
   }
 
-  public EsTimeseries(String label, List<EsTimeseriesData> data) {
+  public EsSeries(String label, List<EsSeriesData> data) {
     this.label = label;
     this.data = data;
   }
