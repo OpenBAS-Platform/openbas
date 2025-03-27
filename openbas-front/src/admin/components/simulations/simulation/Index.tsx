@@ -141,7 +141,6 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(Simulation)()} />
-              <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
               <Route path="definition" element={errorWrapper(SimulationDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
