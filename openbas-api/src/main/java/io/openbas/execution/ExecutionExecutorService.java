@@ -32,7 +32,8 @@ public class ExecutionExecutorService {
         inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
     AtomicBoolean atLeastOneExecution = new AtomicBoolean(false);
     AtomicBoolean atOneTraceAdded = new AtomicBoolean(false);
-
+    // TODO manage inactive status
+    // TODO get all and pass all for Crowdstrike execution
     agents.forEach(
         agent -> {
           try {
@@ -59,7 +60,7 @@ public class ExecutionExecutorService {
   }
 
   private void launchExecutorContextForAgent(Inject inject, Agent agent) throws AgentException {
-    Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    Endpoint assetEndpoint = (Endpoint) agent.getAsset(); // TODO unproxy or not ?
     Executor executor = agent.getExecutor();
     if (executor == null) {
       throw new AgentException(
