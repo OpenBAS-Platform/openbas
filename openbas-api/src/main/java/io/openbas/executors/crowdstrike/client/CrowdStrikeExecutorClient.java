@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.*;
 import io.openbas.service.EndpointService;
+import io.openbas.executors.crowdstrike.model.Authentication;
+import io.openbas.executors.crowdstrike.model.ResourcesHosts;
+import io.openbas.executors.crowdstrike.model.ResourcesSession;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
@@ -38,9 +41,9 @@ public class CrowdStrikeExecutorClient {
   private static final String OAUTH_URI = "/oauth2/token";
   private static final String HOST_GROUPS_URI = "/devices/entities/host-groups/v1";
   private static final String ENDPOINTS_URI = "/devices/combined/host-group-members/v1";
-  private static final String SESSION_URI = "/real-time-response/entities/sessions/v1";
+  private static final String SESSION_URI = "/real-time-response/combined/batch-init-session/v1";
   private static final String REAL_TIME_RESPONSE_URI =
-      "/real-time-response/entities/active-responder-command/v1";
+      "/real-time-response/combined/batch-active-responder-command/v1";
 
   private final CrowdStrikeExecutorConfig config;
   private final ObjectMapper objectMapper = new ObjectMapper();
@@ -147,19 +150,18 @@ public class CrowdStrikeExecutorClient {
     try {
       // Open remote session
       Map<String, Object> bodySession = new HashMap<>();
-      bodySession.put("device_id", deviceId);
+      bodySession.put("host_ids", List.of(deviceId));
       bodySession.put("queue_offline", false);
       String jsonSessionResponse = this.post(SESSION_URI, bodySession);
-      ResourcesSession sessions =
+      ResourcesSession session =
           this.objectMapper.readValue(jsonSessionResponse, new TypeReference<>() {});
-      CrowdStrikeSession session = sessions.getResources().getFirst();
       if (session == null) {
         log.log(Level.SEVERE, "Cannot get the session on the selected device");
         throw new RuntimeException("Cannot get the session on the selected device");
       }
       // Execute the command
       Map<String, Object> bodyCommand = new HashMap<>();
-      bodyCommand.put("session_id", session.getSession_id());
+      bodyCommand.put("batch_id", session.getBatch_id());
       bodyCommand.put("base_command", "runscript");
       bodyCommand.put(
           "command_string",
@@ -168,7 +170,9 @@ public class CrowdStrikeExecutorClient {
               + "\"  -CommandLine=```'{\"command\":\""
               + command
               + "\"}'```");
-      this.post(REAL_TIME_RESPONSE_URI, bodyCommand);
+      // TODO pagination in properties
+      //HttpAsyncClientBuilder.create();
+      this.post(REAL_TIME_RESPONSE_URI, bodyCommand); // TODO async ? @Async or HttpAsyncClient (Julien lib)
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
