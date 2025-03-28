@@ -1,5 +1,11 @@
 package io.openbas.config;
 
+import static io.openbas.database.model.User.ROLE_ADMIN;
+import static io.openbas.database.model.User.ROLE_USER;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.util.StringUtils.hasLength;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +18,14 @@ import io.openbas.security.SsoRefererAuthenticationSuccessHandler;
 import io.openbas.security.TokenAuthenticationFilter;
 import io.openbas.service.UserService;
 import jakarta.annotation.Resource;
-import org.jboss.logging.MDC;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,8 +37,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -49,23 +60,7 @@ import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilt
 import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
-
-import static io.openbas.database.model.User.ROLE_ADMIN;
-import static io.openbas.database.model.User.ROLE_USER;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.springframework.util.StringUtils.hasLength;
 
 @Configuration
 @EnableWebSecurity
@@ -78,8 +73,7 @@ public class AppSecurityConfig {
   private OpenBASConfig openBASConfig;
   private Environment env;
 
-  @Resource
-  protected ObjectMapper mapper;
+  @Resource protected ObjectMapper mapper;
 
   @Autowired
   public void setEnv(Environment env) {
@@ -108,7 +102,7 @@ public class AppSecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         .requestCache(Customizer.withDefaults())
-        /**/.requestCache((cache) -> cache.requestCache(new HttpSessionRequestCache()))
+        /**/ .requestCache((cache) -> cache.requestCache(new HttpSessionRequestCache()))
         .csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .securityContext((securityContext) -> securityContext.requireExplicitSave(false))
@@ -142,20 +136,6 @@ public class AppSecurityConfig {
                     .logoutSuccessUrl(
                         env.getProperty("openbas.base-url", String.class, "/")
                             + env.getProperty("openbas.logout-success-url", String.class, "/")));
-
-    http.addFilterAfter((servletRequest, servletResponse, filterChain) -> {
-      {
-        MDC.put("user-name", "toto");
-        MDC.put("source", "Frontend");
-
-        ofNullable(SecurityContextHolder.getContext())
-            .map(SecurityContext::getAuthentication)
-            .ifPresent(authentication -> {
-              MDC.put("user-name", "toto");
-            });
-      }
-      filterChain.doFilter(servletRequest, servletResponse);
-    }, SecurityContextHolderFilter.class);
 
     if (openBASConfig.isAuthOpenidEnable()) {
       http.oauth2Login(
@@ -197,8 +177,7 @@ public class AppSecurityConfig {
   }
 
   private List<String> extractRolesFromToken(OAuth2AccessToken accessToken, String registrationId) {
-    ObjectReader listReader = mapper.readerFor(new TypeReference<List<String>>() {
-    });
+    ObjectReader listReader = mapper.readerFor(new TypeReference<List<String>>() {});
     if (accessToken != null) {
       String rolesPathConfig = "openbas.provider." + registrationId + ".roles_path";
       //noinspection unchecked
