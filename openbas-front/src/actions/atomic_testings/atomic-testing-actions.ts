@@ -2,6 +2,7 @@ import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../
 import { type AtomicTestingInput, type SearchPaginationInput } from '../../utils/api-types';
 
 const ATOMIC_TESTING_URI = '/api/atomic-testings';
+const EXPECTATION_TRACE_URI = '/api/inject-expectations-traces';
 
 export const searchAtomicTestings = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
@@ -61,4 +62,15 @@ export const createAtomicTesting = (data: AtomicTestingInput) => {
 export const searchAtomicTestingTeams = (paginationInput: SearchPaginationInput, contextualOnly: boolean = false) => {
   const uri = `${ATOMIC_TESTING_URI}/teams/search?contextualOnly=${contextualOnly}`;
   return simplePostCall(uri, paginationInput);
+};
+
+// -- EXPECTATION TRACES --
+export const fetchExpectationTraces = (injectExpectationId: string, sourceId: string) => {
+  const uri = `${EXPECTATION_TRACE_URI}?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}`;
+  return simpleCall(uri);
+};
+
+export const getAlertLinksCount = (injectExpectationId: string, sourceId: string | undefined, expectationResultSourceType: string | undefined) => {
+  const uri = `${EXPECTATION_TRACE_URI}/count?injectExpectationId=${injectExpectationId}&sourceId=${sourceId}&expectationResultSourceType=${expectationResultSourceType}`;
+  return simpleCall(uri);
 };
