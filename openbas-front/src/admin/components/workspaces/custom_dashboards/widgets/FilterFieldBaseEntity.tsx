@@ -27,7 +27,7 @@ const FilterFieldBaseEntity: FunctionComponent<Props> = ({
   useEffect(() => {
     const newOptions = [{
       id: 'base_entity',
-      label: 'base_entity',
+      label: 'Entity',
       operator: 'eq',
     } as OptionPropertySchema];
     const newPropertySchemas = [{
