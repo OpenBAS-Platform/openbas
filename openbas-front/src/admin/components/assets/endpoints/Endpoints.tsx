@@ -1,4 +1,4 @@
-import { DevicesOtherOutlined } from '@mui/icons-material';
+import { DevicesOtherOutlined, HelpOutlineOutlined } from '@mui/icons-material';
 import { Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useState } from 'react';
@@ -20,9 +20,10 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { type EndpointOutput, type ExecutorOutput } from '../../../../utils/api-types';
+import { type EndpointOutput, type ExecutorOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useAuth from '../../../../utils/hooks/useAuth';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -98,6 +99,13 @@ const Endpoints = () => {
     ],
     exportData: endpoints,
     exportFileName: `${t('Endpoints')}.csv`,
+  };
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const searchEndpointsToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchEndpoints(input).finally(() => setLoading(false));
   };
 
   const getActiveMsgTooltip = (endpoint: EndpointOutput) => {
@@ -285,7 +293,7 @@ const Endpoints = () => {
         .
       </Alert>
       <PaginationComponentV2
-        fetch={searchEndpoints}
+        fetch={searchEndpointsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setEndpoints}
         entityPrefix="asset"
@@ -298,7 +306,6 @@ const Endpoints = () => {
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
-          divider={false}
           style={{ paddingTop: 0 }}
           secondaryAction={<>&nbsp;</>}
         >
@@ -313,56 +320,59 @@ const Endpoints = () => {
             )}
           />
         </ListItem>
-        {endpoints.map((endpoint: EndpointOutput) => {
-          return (
-            <ListItem
-              key={endpoint.asset_id}
-              classes={{ root: classes.item }}
-              divider
-              secondaryAction={
-                (userAdmin
-                  && (
-                    <EndpointPopover
-                      inline
-                      endpoint={{
-                        ...endpoint,
-                        type: 'static',
-                      }}
-                      onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
-                    />
-                  ))
-              }
-              disablePadding
-            >
-              <ListItemButton
-                classes={{ root: classes.item }}
-                component={Link}
-                to={`/admin/assets/endpoints/${endpoint.asset_id}`}
-              >
-                <ListItemIcon>
-                  <DevicesOtherOutlined color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div style={bodyItemsStyles.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          style={{
-                            ...bodyItemsStyles.bodyItem,
-                            ...inlineStyles[header.field],
-                          }}
-                        >
-                          {header.value(endpoint)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+        {
+          loading
+            ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+            : endpoints.map((endpoint: EndpointOutput) => {
+                return (
+                  <ListItem
+                    key={endpoint.asset_id}
+                    classes={{ root: classes.item }}
+                    divider
+                    secondaryAction={
+                      (userAdmin
+                        && (
+                          <EndpointPopover
+                            inline
+                            endpoint={{
+                              ...endpoint,
+                              type: 'static',
+                            }}
+                            onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
+                          />
+                        ))
+                    }
+                    disablePadding
+                  >
+                    <ListItemButton
+                      component={Link}
+                      to={`/admin/assets/endpoints/${endpoint.asset_id}`}
+                    >
+                      <ListItemIcon>
+                        <DevicesOtherOutlined color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={(
+                          <div style={bodyItemsStyles.bodyItems}>
+                            {headers.map(header => (
+                              <div
+                                key={header.field}
+                                style={{
+                                  ...bodyItemsStyles.bodyItem,
+                                  ...inlineStyles[header.field],
+                                }}
+                              >
+                                {header.value(endpoint)}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })
+        }
       </List>
     </>
   );
