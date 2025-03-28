@@ -9,8 +9,10 @@ import { searchInjectLinkedToFindingsAsOption } from '../../../../actions/inject
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioAsOption, searchScenarioCategoryAsOption } from '../../../../actions/scenarios/scenario-actions';
+import { engineSchemas } from '../../../../actions/schema/schema-action';
 import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamsAsOption } from '../../../../actions/teams/team-actions';
+import { type PropertySchemaDTO } from '../../../../utils/api-types';
 import { type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
 
@@ -104,6 +106,17 @@ const useSearchOptions = () => {
           setOptions(response.data.map(d => ({
             id: d.id,
             label: t(d.label),
+          })));
+        });
+        break;
+      case 'base_entity':
+        engineSchemas().then((response: { data: PropertySchemaDTO[] }) => {
+          const ids = Array.from(new Set(
+            response.data.map(d => d.schema_property_entity),
+          ));
+          setOptions(ids.map(id => ({
+            id,
+            label: t(id),
           })));
         });
         break;

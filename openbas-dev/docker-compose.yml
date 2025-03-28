@@ -69,7 +69,7 @@ services:
 #      - '--config=/etc/config/otlp-config.yaml'
 #    ports:
 #      - "1010:1010"
-  openbas-pgadmin:
+  openbas-dev-pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
     restart: always
@@ -78,3 +78,40 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_USER}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+  openbas-dev-elasticsearch:
+    container_name: openbas-dev-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+      - essnapshots:/usr/share/elasticsearch/snapshots
+    environment:
+      - discovery.type=single-node
+      - xpack.ml.enabled=false
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms2G -Xmx2G"
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 9200:9200
+      - 9300:9300
+  openbas-dev-kibana:
+    container_name: openbas-dev-kibana
+    image: docker.elastic.co/kibana/kibana:8.17.3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://openbas-dev-elasticsearch:9200
+    restart: unless-stopped
+    ports:
+      - 5601:5601
+    depends_on:
+      - openbas-dev-elasticsearch
+volumes:
+  esdata:
+    driver: local
+  essnapshots:
+    driver: local
