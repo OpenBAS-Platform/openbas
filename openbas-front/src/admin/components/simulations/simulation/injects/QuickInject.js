@@ -457,7 +457,7 @@ class QuickInject extends Component {
   }
 
   renderFields(renderedFields, values, attachedDocs) {
-    const { exercise, classes, t } = this.props;
+    const { exercise, classes, t, theme } = this.props;
     return (
       <div>
         {renderedFields.map((field, position) => {
@@ -471,7 +471,7 @@ class QuickInject extends Component {
                       label={t(field.label)}
                       fullWidth={true}
                       style={{
-                        marginTop: 20,
+                        marginTop: theme.spacing(2.5),
                         height: 250,
                       }}
                       disabled={isExerciseReadOnly(exercise)}
@@ -486,7 +486,7 @@ class QuickInject extends Component {
                       multiline={true}
                       rows={10}
                       label={t(field.label)}
-                      style={{ marginTop: 20 }}
+                      style={{ marginTop: theme.spacing(2.5) }}
                       disabled={isExerciseReadOnly(exercise)}
                     />
                   );
@@ -499,7 +499,7 @@ class QuickInject extends Component {
                   fullWidth={true}
                   type="number"
                   label={t(field.label)}
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: theme.spacing(2.5) }}
                   disabled={isExerciseReadOnly(exercise)}
                 />
               );
@@ -509,7 +509,7 @@ class QuickInject extends Component {
                   key={field.key}
                   name={field.key}
                   label={t(field.label)}
-                  style={{ marginTop: position > 0 ? 10 : 20 }}
+                  style={{ marginTop: position > 0 ? theme.spacing(1.25) : theme.spacing(2.5) }}
                   disabled={isExerciseReadOnly(exercise)}
                 />
               );
@@ -519,7 +519,7 @@ class QuickInject extends Component {
                   <FieldArray name={field.key}>
                     {({ fields }) => (
                       <div>
-                        <div style={{ marginTop: 20 }}>
+                        <div style={{ marginTop: theme.spacing(2.5) }}>
                           <InputLabel
                             variant="standard"
                             shrink={true}
@@ -544,7 +544,7 @@ class QuickInject extends Component {
                             )}
                           </InputLabel>
                         </div>
-                        <List style={{ marginTop: -20 }}>
+                        <List style={{ marginTop: -theme.spacing(2.5) }}>
                           {fields.map((name, index) => {
                             return (
                               <ListItem
@@ -557,7 +557,7 @@ class QuickInject extends Component {
                                   name={`${name}.type`}
                                   fullWidth={true}
                                   label={t('Type')}
-                                  style={{ marginRight: 20 }}
+                                  style={{ marginRight: theme.spacing(2.5) }}
                                   disabled={isExerciseReadOnly(exercise)}
                                 >
                                   <MenuItem key="text" value="text">
@@ -579,7 +579,7 @@ class QuickInject extends Component {
                                   name={`${name}.key`}
                                   fullWidth={true}
                                   label={t('Key')}
-                                  style={{ marginRight: 20 }}
+                                  style={{ marginRight: theme.spacing(2.5) }}
                                   disabled={isExerciseReadOnly(exercise)}
                                 />
                                 {values
@@ -592,7 +592,7 @@ class QuickInject extends Component {
                                         name={`${name}.value`}
                                         fullWidth={true}
                                         label={t('Value')}
-                                        style={{ marginRight: 20 }}
+                                        style={{ marginRight: theme.spacing(2.5) }}
                                         disabled={isExerciseReadOnly(exercise)}
                                       >
                                         {attachedDocs.map(doc => (
@@ -612,7 +612,7 @@ class QuickInject extends Component {
                                         name={`${name}.value`}
                                         fullWidth={true}
                                         label={t('Value')}
-                                        style={{ marginRight: 20 }}
+                                        style={{ marginRight: theme.spacing(2.5) }}
                                         disabled={isExerciseReadOnly(exercise)}
                                       />
                                     )}
@@ -647,7 +647,7 @@ class QuickInject extends Component {
                       renderValue={v => v.map(a => field.choices[a]).join(', ')}
                       name={field.key}
                       fullWidth={true}
-                      style={{ marginTop: 20 }}
+                      style={{ marginTop: theme.spacing(2.5) }}
                       disabled={isExerciseReadOnly(exercise)}
                     >
                       {Object.entries(field.choices)
@@ -671,7 +671,7 @@ class QuickInject extends Component {
                         : field.choices[v])}
                       name={field.key}
                       fullWidth={true}
-                      style={{ marginTop: 20 }}
+                      style={{ marginTop: theme.spacing(2.5) }}
                       disabled={isExerciseReadOnly(exercise)}
                     >
                       {Object.entries(field.choices)
@@ -700,7 +700,7 @@ class QuickInject extends Component {
                       renderValue={v => v.map(a => choices[a]).join(', ')}
                       name={field.key}
                       fullWidth={true}
-                      style={{ marginTop: 20 }}
+                      style={{ marginTop: theme.spacing(2.5) }}
                       disabled={isExerciseReadOnly(exercise)}
                     >
                       {Object.entries(choices)
@@ -720,7 +720,7 @@ class QuickInject extends Component {
                       renderValue={v => (field.expectation ? t(choices[v] || 'Unknown') : choices[v])}
                       name={field.key}
                       fullWidth={true}
-                      style={{ marginTop: 20 }}
+                      style={{ marginTop: theme.spacing(2.5) }}
                     >
                       {Object.entries(choices)
                         .sort((a, b) => a[1].localeCompare(b[1]))
@@ -741,7 +741,7 @@ class QuickInject extends Component {
                   name={field.key}
                   fullWidth={true}
                   label={t(field.label)}
-                  style={{ marginTop: 20 }}
+                  style={{ marginTop: theme.spacing(2.5) }}
                   disabled={isExerciseReadOnly(exercise)}
                 />
               );
@@ -787,6 +787,7 @@ class QuickInject extends Component {
   render() {
     const {
       t,
+      theme,
       classes,
       handleClose,
       exerciseId,
@@ -1144,7 +1145,7 @@ class QuickInject extends Component {
                     </List>
                   </div>
                 )}
-                <div style={{ marginTop: hasTeams ? 30 : 0 }}>
+                <div style={{ marginTop: hasTeams ? theme.spacing(2.5) : 0 }}>
                   <div style={{ float: 'left' }}>
                     <Typography variant="h2">{t('Inject data')}</Typography>
                   </div>
@@ -1217,7 +1218,7 @@ class QuickInject extends Component {
                           <div style={{ marginTop: -15 }}>
                             {this.renderFields(
                               expectationsNotManual.filter((f) => {
-                              // Filter display if linked fields
+                                // Filter display if linked fields
                                 for (
                                   let index = 0;
                                   index < f.linkedFields.length;
@@ -1433,6 +1434,7 @@ class QuickInject extends Component {
 QuickInject.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
+  theme: PropTypes.func,
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
   fetchInjectTeams: PropTypes.func,
