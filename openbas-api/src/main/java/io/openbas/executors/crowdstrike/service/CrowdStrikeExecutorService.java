@@ -8,6 +8,8 @@ import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeHostGroup;
+import io.openbas.executors.crowdstrike.model.CrowdstrikeError;
+import io.openbas.executors.crowdstrike.model.ResourcesGroups;
 import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.service.AgentService;
 import io.openbas.service.AssetGroupService;
@@ -101,31 +103,49 @@ public class CrowdStrikeExecutorService implements Runnable {
   public void run() {
     log.info("Running CrowdStrike executor endpoints gathering...");
     List<String> hostGroups = Stream.of(this.config.getHostGroup().split(",")).distinct().toList();
+    ResourcesGroups crowdStrikeResourceGroup;
+    CrowdStrikeHostGroup crowdStrikeHostGroup;
     for (String hostGroup : hostGroups) {
-      List<Agent> agentsFromDb = agentService.getAgentsByExecutorType(CROWDSTRIKE_EXECUTOR_TYPE);
-      List<CrowdStrikeDevice> devices = this.client.devices(hostGroup);
-      Optional<AssetGroup> existingAssetGroup =
-          assetGroupService.findByExternalReference(hostGroup);
-      CrowdStrikeHostGroup crowdStrikeHostGroup =
-          this.client.hostGroup(hostGroup).getResources().getFirst();
-      AssetGroup assetGroup;
-      if (existingAssetGroup.isPresent()) {
-        assetGroup = existingAssetGroup.get();
-      } else {
-        assetGroup = new AssetGroup();
-        assetGroup.setExternalReference(hostGroup);
+      crowdStrikeResourceGroup = this.client.hostGroup(hostGroup);
+      if (crowdStrikeResourceGroup.getErrors() != null
+          && !crowdStrikeResourceGroup.getErrors().isEmpty()) {
+        CrowdstrikeError e = crowdStrikeResourceGroup.getErrors().getFirst();
+        log.log(
+            Level.SEVERE,
+            "Error occurred while getting Crowdstrike hostGroup API request for id "
+                + hostGroup
+                + ". Code: "
+                + e.getCode()
+                + ", message: "
+                + e.getMessage());
+        continue;
       }
-      assetGroup.setName(crowdStrikeHostGroup.getName());
-      assetGroup.setDescription(crowdStrikeHostGroup.getDescription());
-      log.info(
-          "CrowdStrike executor provisioning based on "
-              + devices.size()
-              + " assets for the host group "
-              + assetGroup.getName());
-      List<Asset> assets =
-          endpointService.syncAgentsEndpoints(toAgentEndpoint(devices), agentsFromDb);
-      assetGroup.setAssets(assets);
-      assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
+      List<CrowdStrikeDevice> devices = this.client.devices(hostGroup);
+      if (!devices.isEmpty()) {
+        Optional<AssetGroup> existingAssetGroup =
+            assetGroupService.findByExternalReference(hostGroup);
+        AssetGroup assetGroup;
+        if (existingAssetGroup.isPresent()) {
+          assetGroup = existingAssetGroup.get();
+        } else {
+          assetGroup = new AssetGroup();
+          assetGroup.setExternalReference(hostGroup);
+        }
+        crowdStrikeHostGroup = crowdStrikeResourceGroup.getResources().getFirst();
+        assetGroup.setName(crowdStrikeHostGroup.getName());
+        assetGroup.setDescription(crowdStrikeHostGroup.getDescription());
+        log.info(
+            "CrowdStrike executor provisioning based on "
+                + devices.size()
+                + " assets for the host group "
+                + assetGroup.getName());
+        List<Asset> assets =
+            endpointService.syncAgentsEndpoints(
+                toAgentEndpoint(devices),
+                agentService.getAgentsByExecutorType(CROWDSTRIKE_EXECUTOR_TYPE));
+        assetGroup.setAssets(assets);
+        assetGroupService.createOrUpdateAssetGroupWithoutDynamicAssets(assetGroup);
+      }
     }
   }
 

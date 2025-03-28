@@ -55,7 +55,18 @@ public class CrowdStrikeExecutorClient {
       int offset = 0;
       List<CrowdStrikeDevice> hosts = new ArrayList<>();
       ResourcesHosts partialResults = getResourcesHosts(offset, hostGroup);
-      if (partialResults.getResources() == null) {
+      if (partialResults.getErrors() != null && !partialResults.getErrors().isEmpty()) {
+        CrowdstrikeError e = partialResults.getErrors().getFirst();
+        log.log(
+            Level.SEVERE,
+            "Error occurred while getting Crowdstrike devices API request for hostGroup id "
+                + hostGroup
+                + ". Code: "
+                + e.getCode()
+                + ", message: "
+                + e.getMessage());
+        return hosts;
+      } else if (partialResults.getResources() == null) {
         return hosts;
       } else {
         hosts.addAll(partialResults.getResources());

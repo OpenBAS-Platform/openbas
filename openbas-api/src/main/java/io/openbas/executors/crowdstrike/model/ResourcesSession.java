@@ -9,4 +9,5 @@ import lombok.Data;
 public class ResourcesSession {
 
   private List<CrowdStrikeSession> resources;
+  private List<CrowdstrikeError> errors;
 }
