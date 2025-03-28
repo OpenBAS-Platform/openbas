@@ -64,7 +64,7 @@ const ReportPopover: FunctionComponent<Props> = ({
         open={openDelete}
         handleClose={() => setOpenDelete(false)}
         handleSubmit={submitDelete}
-        text={t('Do you want to delete this report ?')}
+        text={t('Do you want to delete this report?')}
       />
     </>
   );
