@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("isAdmin()")
 public class InjectExpectationTraceApi extends RestBehavior {
 
+  public static final String INJECT_EXPECTATION_TRACES_URI = "/api/inject-expectations-traces";
+
   private final InjectExpectationTraceService injectExpectationTraceService;
   private final InjectExpectationRepository injectExpectationRepository;
   private final CollectorRepository collectorRepository;
