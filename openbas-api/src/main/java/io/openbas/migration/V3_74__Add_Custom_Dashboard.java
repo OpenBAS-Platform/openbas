@@ -29,8 +29,7 @@ public class V3_74__Add_Custom_Dashboard extends BaseJavaMigration {
                   CREATE TABLE widgets (
                       widget_id varchar(255) NOT NULL CONSTRAINT widgets_pkey PRIMARY KEY,
                       widget_type VARCHAR(255) NOT NULL,
-                      widget_data_selections JSONB NOT NULL DEFAULT '[]',
-                      widget_parameters JSONB,
+                      widget_config JSONB,
                       widget_layout JSONB,
                       widget_custom_dashboard varchar(255) constraint custom_dashboards_pkey references custom_dashboards on delete cascade,
                       widget_created_at TIMESTAMP DEFAULT now(),

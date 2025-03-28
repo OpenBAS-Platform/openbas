@@ -22,6 +22,8 @@ import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
 import io.openbas.engine.Handler;
 import io.openbas.engine.api.*;
+import io.openbas.engine.api.DateHistogramWidget.DateHistogramSeries;
+import io.openbas.engine.api.StructuralHistogramWidget.StructuralHistogramSeries;
 import io.openbas.engine.model.*;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
@@ -204,7 +206,7 @@ public class EsService {
       Query searchQuery = queryFromSearch(search);
       shouldList.add(searchQuery);
     }
-    if (groupFilter.getFilters() != null) {
+    if (groupFilter != null && groupFilter.getFilters() != null) {
       Query filterQuery = queryFromFilter(groupFilter, parameters);
       shouldList.add(filterQuery);
     }
@@ -342,11 +344,14 @@ public class EsService {
   }
 
   public EsSeries termHistogram(
-      RawUserAuth user, StructuralHistogramConfig config, Map<String, String> parameters) {
+      RawUserAuth user,
+      StructuralHistogramWidget widgetConfig,
+      StructuralHistogramSeries config,
+      Map<String, String> parameters) {
     Query query = buildQuery(user, null, config.getFilter(), parameters);
     String aggregationKey = "term_histogram";
     try {
-      String field = parameters.getOrDefault(config.getField(), config.getField());
+      String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
       TermsAggregation termsAggregation =
           new TermsAggregation.Builder().field(field + ".keyword").size(100).build();
       SearchResponse<Void> response =
@@ -386,21 +391,24 @@ public class EsService {
 
   public List<EsSeries> multiTermHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
-    return runtime.getConfigs().stream()
+    return runtime.getWidget().getSeries().stream()
         .parallel()
-        .map(c -> termHistogram(user, c, parameters))
+        .map(c -> termHistogram(user, runtime.getWidget(), c, parameters))
         .toList();
   }
 
   public EsSeries dateHistogram(
-      RawUserAuth user, DateHistogramConfig config, Map<String, String> parameters) {
+      RawUserAuth user,
+      DateHistogramWidget widgetConfig,
+      DateHistogramSeries config,
+      Map<String, String> parameters) {
     BoolQuery.Builder queryBuilder = new BoolQuery.Builder();
-    String start = parameters.getOrDefault(config.getStart(), config.getStart());
+    String start = parameters.getOrDefault(widgetConfig.getStart(), widgetConfig.getStart());
     Instant startInstant = Instant.parse(start);
-    String end = parameters.getOrDefault(config.getEnd(), config.getEnd());
+    String end = parameters.getOrDefault(widgetConfig.getEnd(), widgetConfig.getEnd());
     Instant endInstant = Instant.parse(end);
     Query dateRangeQuery =
-        DateRangeQuery.of(d -> d.field(config.getField()).gt(start).lt(end))
+        DateRangeQuery.of(d -> d.field(widgetConfig.getField()).gt(start).lt(end))
             ._toRangeQuery()
             ._toQuery();
     Query filterQuery = buildQuery(user, null, config.getFilter(), parameters);
@@ -422,10 +430,10 @@ public class EsService {
                           a ->
                               a.dateHistogram(
                                   h ->
-                                      h.field(config.getField())
+                                      h.field(widgetConfig.getField())
                                           .minDocCount(0)
-                                          .format(config.getInterval().format)
-                                          .calendarInterval(config.getInterval().type)
+                                          .format(widgetConfig.getInterval().format)
+                                          .calendarInterval(widgetConfig.getInterval().type)
                                           .extendedBounds(extendedBounds)
                                           .keyed(false))),
               Void.class);
@@ -444,9 +452,9 @@ public class EsService {
 
   public List<EsSeries> multiDateHistogram(RawUserAuth user, DateHistogramRuntime runtime) {
     Map<String, String> parameters = runtime.getParameters();
-    return runtime.getConfigs().stream()
+    return runtime.getWidget().getSeries().stream()
         .parallel()
-        .map(c -> dateHistogram(user, c, parameters))
+        .map(c -> dateHistogram(user, runtime.getWidget(), c, parameters))
         .toList();
   }
 

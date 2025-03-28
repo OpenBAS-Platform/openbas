@@ -1,4 +1,4 @@
-import filterableProperties from '../../../../actions/schema/schema-action';
+import { filterableProperties } from '../../../../actions/schema/schema-action';
 import { type PropertySchemaDTO } from '../../../../utils/api-types';
 import { convertJsonClassToJavaClass } from './FilterUtils';
 

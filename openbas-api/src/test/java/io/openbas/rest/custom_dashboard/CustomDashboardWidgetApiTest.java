@@ -15,8 +15,8 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.CustomDashboard;
 import io.openbas.database.model.Widget;
 import io.openbas.database.model.WidgetLayout;
-import io.openbas.database.model.WidgetParameters;
 import io.openbas.database.repository.WidgetRepository;
+import io.openbas.engine.api.DateHistogramWidget;
 import io.openbas.rest.custom_dashboard.form.WidgetInput;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import org.junit.jupiter.api.Test;
@@ -51,9 +51,9 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     WidgetInput input = new WidgetInput();
     input.setType(VERTICAL_BAR_CHART);
     String name = "My new widget";
-    WidgetParameters widgetParameters = new WidgetParameters();
-    widgetParameters.setTitle(name);
-    input.setParameters(widgetParameters);
+    DateHistogramWidget widgetConfig = new DateHistogramWidget();
+    widgetConfig.setTitle(name);
+    input.setHistogramWidget(widgetConfig);
 
     // -- EXECUTE & ASSERT --
     mockMvc

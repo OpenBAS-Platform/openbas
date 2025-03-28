@@ -5,12 +5,12 @@ import { type Widget } from '../../../../../utils/api-types';
 export const widgetVisualizationTypes: [{
   name: string;
   category: Widget['widget_type'];
-  dataSelectionsLimit: number;
+  seriesLimit: number;
 }] = [
   {
     name: 'Vertical Bar',
     category: 'vertical-barchart',
-    dataSelectionsLimit: 5,
+    seriesLimit: 5,
   },
 ];
 
@@ -23,6 +23,6 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
   }
 };
 
-export const getCurrentDataSelectionsLimit = (type: Widget['widget_type']) => {
-  return widgetVisualizationTypes.find(widget => widget.category === type)?.dataSelectionsLimit ?? 0;
+export const getCurrentSeriesLimit = (type: Widget['widget_type']) => {
+  return widgetVisualizationTypes.find(widget => widget.category === type)?.seriesLimit ?? 0;
 };

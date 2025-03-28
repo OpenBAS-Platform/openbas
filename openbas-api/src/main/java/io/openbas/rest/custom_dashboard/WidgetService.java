@@ -42,6 +42,13 @@ public class WidgetService {
         .orElseThrow(() -> new EntityNotFoundException("Widget with id: " + widgetId));
   }
 
+  @Transactional(readOnly = true)
+  public Widget widget(@NotBlank final String widgetId) {
+    return this.widgetRepository
+        .findById(widgetId)
+        .orElseThrow(() -> new EntityNotFoundException("Widget with id: " + widgetId));
+  }
+
   @Transactional
   public Widget updateWidget(@NotNull final Widget widget) {
     return this.widgetRepository.save(widget);

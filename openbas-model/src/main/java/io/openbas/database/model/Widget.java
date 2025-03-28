@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.openbas.database.audit.ModelBaseListener;
+import io.openbas.engine.api.HistogramWidget;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.List;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -51,16 +51,10 @@ public class Widget implements Base {
   protected WidgetType type;
 
   @Type(JsonType.class)
-  @Column(name = "widget_data_selections", columnDefinition = "JSONB")
-  @JsonProperty("widget_data_selections")
+  @Column(name = "widget_config", columnDefinition = "JSONB")
+  @JsonProperty("widget_config")
   @NotNull
-  private List<WidgetDataSelection> dataSelections;
-
-  @Type(JsonType.class)
-  @Column(name = "widget_parameters", columnDefinition = "JSONB")
-  @JsonProperty("widget_parameters")
-  @NotNull
-  private WidgetParameters parameters;
+  private HistogramWidget histogramWidget;
 
   @Type(JsonType.class)
   @Column(name = "widget_layout", columnDefinition = "JSONB")

@@ -1,7 +1,6 @@
 package io.openbas.engine.api;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,15 +9,15 @@ import lombok.Setter;
 @Setter
 public class DateHistogramRuntime {
   private Map<String, String> parameters;
-  private List<DateHistogramConfig> configs;
+  private DateHistogramWidget widget;
 
-  public DateHistogramRuntime(List<DateHistogramConfig> configs) {
-    this.configs = configs;
+  public DateHistogramRuntime(DateHistogramWidget widget) {
+    this.widget = widget;
     this.parameters = new HashMap<>();
   }
 
-  public DateHistogramRuntime(List<DateHistogramConfig> configs, Map<String, String> parameters) {
-    this.configs = configs;
+  public DateHistogramRuntime(DateHistogramWidget widget, Map<String, String> parameters) {
+    this.widget = widget;
     this.parameters = parameters;
   }
 }
