@@ -10,6 +10,8 @@
  * ---------------------------------------------------------------
  */
 
+type UtilRequiredKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
 export interface Agent {
   agent_active?: boolean;
   agent_asset: string;
@@ -689,6 +691,19 @@ export interface CustomDashboardInput {
   custom_dashboard_name: string;
 }
 
+export interface DateHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type DateHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
+  end: string;
+  interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  series: DateHistogramSeries[];
+  start: string;
+};
+
 export interface DirectInjectInput {
   inject_content?: object;
   inject_description?: string;
@@ -866,6 +881,28 @@ export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
   asset_tags?: string[];
+}
+
+export interface EsSearch {
+  base_created_at?: string;
+  base_entity?: string;
+  base_id: string;
+  base_representative?: string;
+  /** @format double */
+  base_score?: number;
+  base_updated_at?: string;
+}
+
+export interface EsSeries {
+  color?: string;
+  data?: EsSeriesData[];
+  label?: string;
+}
+
+export interface EsSeriesData {
+  label?: string;
+  /** @format int64 */
+  value?: number;
 }
 
 export interface Evaluation {
@@ -1330,6 +1367,14 @@ export interface GroupGrantInput {
 
 export interface GroupUpdateUsersInput {
   group_users?: string[];
+}
+
+export interface HistogramWidget {
+  display_legend?: boolean;
+  field: string;
+  mode: "structural" | "temporal";
+  stacked?: boolean;
+  title?: string;
 }
 
 export interface ImportMapper {
@@ -3195,7 +3240,9 @@ export interface PolicyInput {
 }
 
 export interface PropertySchemaDTO {
+  schema_property_entity: string;
   schema_property_has_dynamic_value?: boolean;
+  schema_property_label: string;
   schema_property_name: string;
   schema_property_type: string;
   schema_property_type_array?: boolean;
@@ -3736,6 +3783,16 @@ export interface StatusPayloadOutput {
   payload_type?: string;
 }
 
+export interface StructuralHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type StructuralHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
+  series: StructuralHistogramSeries[];
+};
+
 export interface Tag {
   listened?: boolean;
   /** Color of the tag */
@@ -4189,27 +4246,19 @@ export interface ViolationErrorBag {
 
 export interface Widget {
   listened?: boolean;
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
   /** @format date-time */
   widget_created_at: string;
   widget_custom_dashboard?: string;
-  widget_data_selections: WidgetDataSelection[];
   widget_id: string;
   widget_layout?: WidgetLayout;
-  widget_parameters: WidgetParameters;
   widget_type: "vertical-barchart";
   /** @format date-time */
   widget_updated_at: string;
 }
 
-export interface WidgetDataSelection {
-  /** Filter object to search within filterable attributes */
-  widget_data_selection_filter?: FilterGroup;
-  widget_data_selection_label?: string;
-}
-
 export interface WidgetInput {
-  widget_data_selections: WidgetDataSelection[];
-  widget_parameters: WidgetParameters;
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
   widget_type: "vertical-barchart";
 }
 
@@ -4222,11 +4271,4 @@ export interface WidgetLayout {
   widget_layout_x?: number;
   /** @format int32 */
   widget_layout_y?: number;
-}
-
-export interface WidgetParameters {
-  widget_parameters_display_legend?: boolean;
-  widget_parameters_mode?: "structure" | "temporal";
-  widget_parameters_stacked?: boolean;
-  widget_parameters_title?: string;
 }

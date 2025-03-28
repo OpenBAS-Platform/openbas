@@ -4,64 +4,64 @@ import { type FunctionComponent } from 'react';
 
 import { emptyFilterGroup } from '../../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../../components/i18n';
-import { type Widget, type WidgetDataSelection } from '../../../../../utils/api-types';
-import WidgetCreationDataSelection from './WidgetCreationDataSelection';
-import { getCurrentDataSelectionsLimit } from './WidgetUtils';
+import { type DateHistogramSeries, type StructuralHistogramSeries, type Widget } from '../../../../../utils/api-types';
+import WidgetCreationSeries from './WidgetCreationSeries';
+import { getCurrentSeriesLimit } from './WidgetUtils';
 
-const WidgetCreationDataSelections: FunctionComponent<{
+const WidgetCreationSeriesList: FunctionComponent<{
   widgetType: Widget['widget_type'];
-  value: Widget['widget_data_selections'];
-  onChange: (dataSelection: WidgetDataSelection[]) => void;
+  value: DateHistogramSeries[] | StructuralHistogramSeries[];
+  onChange: (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => void;
   onSubmit: () => void;
-}> = ({ widgetType, value, onChange, onSubmit }) => {
+}> = ({ widgetType, value = [], onChange, onSubmit }) => {
   // Standard hooks
   const { t } = useFormatter();
 
-  const onChangeDataSelection = (index: number, dataSelection: WidgetDataSelection) => {
+  const onChangeSeries = (index: number, series: DateHistogramSeries | StructuralHistogramSeries) => {
     const newDatas = value.map((data, n) => {
       if (n === index) {
-        return dataSelection;
+        return series;
       }
       return data;
     });
     onChange(newDatas);
   };
 
-  const handleRemoveDataSelection = (index: number) => {
-    const newDataSelection = Array.from(value);
-    newDataSelection.splice(index, 1);
-    onChange(newDataSelection);
+  const handleRemoveSeries = (index: number) => {
+    const newSeries = Array.from(value);
+    newSeries.splice(index, 1);
+    onChange(newSeries);
   };
-  const handleAddDataSelection = () => {
+  const handleAddSeries = () => {
     onChange([
       ...value,
       {
-        widget_data_selection_label: '',
-        widget_data_selection_filter: emptyFilterGroup,
+        name: '',
+        filter: emptyFilterGroup,
       },
     ]);
   };
 
   return (
     <div style={{ marginTop: 20 }}>
-      {value.map((dataSelection, index) => {
+      {value.map((series, index) => {
         return (
-          <WidgetCreationDataSelection
+          <WidgetCreationSeries
             key={index}
             index={index}
-            dataSelection={dataSelection}
-            onChange={dataSelection => onChangeDataSelection(index, dataSelection)}
-            onRemove={handleRemoveDataSelection}
+            series={series}
+            onChange={series => onChangeSeries(index, series)}
+            onRemove={handleRemoveSeries}
           />
         );
       })}
       <div style={{ display: 'flex' }}>
         <Button
           variant="contained"
-          disabled={getCurrentDataSelectionsLimit(widgetType) === value.length}
+          disabled={getCurrentSeriesLimit(widgetType) === value.length}
           color="secondary"
           size="small"
-          onClick={handleAddDataSelection}
+          onClick={handleAddSeries}
           style={{
             width: '100%',
             height: 20,
@@ -92,4 +92,4 @@ const WidgetCreationDataSelections: FunctionComponent<{
   );
 };
 
-export default WidgetCreationDataSelections;
+export default WidgetCreationSeriesList;
