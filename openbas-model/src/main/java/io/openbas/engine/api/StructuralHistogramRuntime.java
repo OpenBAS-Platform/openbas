@@ -1,7 +1,5 @@
 package io.openbas.engine.api;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,16 +8,11 @@ import lombok.Setter;
 @Setter
 public class StructuralHistogramRuntime {
   private Map<String, String> parameters;
-  private List<StructuralHistogramConfig> configs;
-
-  public StructuralHistogramRuntime(List<StructuralHistogramConfig> configs) {
-    this.configs = configs;
-    this.parameters = new HashMap<>();
-  }
+  private StructuralHistogramWidget widget;
 
   public StructuralHistogramRuntime(
-      List<StructuralHistogramConfig> configs, Map<String, String> parameters) {
-    this.configs = configs;
+      StructuralHistogramWidget widget, Map<String, String> parameters) {
+    this.widget = widget;
     this.parameters = parameters;
   }
 }

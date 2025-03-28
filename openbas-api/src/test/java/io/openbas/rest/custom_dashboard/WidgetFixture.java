@@ -3,7 +3,7 @@ package io.openbas.rest.custom_dashboard;
 import static io.openbas.database.model.Widget.WidgetType.VERTICAL_BAR_CHART;
 
 import io.openbas.database.model.Widget;
-import io.openbas.database.model.WidgetParameters;
+import io.openbas.engine.api.DateHistogramWidget;
 
 public class WidgetFixture {
 
@@ -12,9 +12,9 @@ public class WidgetFixture {
   public static Widget createDefaultWidget() {
     Widget widget = new Widget();
     widget.setType(VERTICAL_BAR_CHART);
-    WidgetParameters widgetParameters = new WidgetParameters();
-    widgetParameters.setTitle(NAME);
-    widget.setParameters(widgetParameters);
+    DateHistogramWidget widgetConfig = new DateHistogramWidget();
+    widgetConfig.setTitle(NAME);
+    widget.setHistogramWidget(widgetConfig);
     return widget;
   }
 }
