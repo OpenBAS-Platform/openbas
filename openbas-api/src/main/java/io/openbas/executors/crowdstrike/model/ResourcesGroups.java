@@ -6,9 +6,8 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResourcesHosts {
+public class ResourcesGroups {
 
-  private List<CrowdStrikeDevice> resources;
-  private CrowdstrikeMeta meta;
+  private List<CrowdStrikeHostGroup> resources;
   private List<CrowdstrikeError> errors;
 }
