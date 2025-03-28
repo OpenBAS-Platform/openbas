@@ -9,6 +9,7 @@ import io.openbas.database.model.PayloadArgument;
 import io.openbas.database.model.PayloadPrerequisite;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ public class PayloadUpdateInput {
   private String content;
 
   @JsonProperty("payload_execution_arch")
+  @NotNull
   private Payload.PAYLOAD_EXECUTION_ARCH executionArch =
       Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
 

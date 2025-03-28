@@ -319,6 +319,36 @@ interface BasePayload {
   typeEnum?: "COMMAND" | "EXECUTABLE" | "FILE_DROP" | "DNS_RESOLUTION" | "NETWORK_TRAFFIC";
 }
 
+interface BasePayloadCreateInput {
+  command_content?: string | null;
+  command_executor?: string | null;
+  dns_resolution_hostname?: string;
+  executable_file?: string;
+  file_drop_file?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string | null;
+  payload_cleanup_executor?: string | null;
+  payload_description?: string;
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_name: string;
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
+  payload_output_parsers?: OutputParserInput[];
+  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  payload_tags?: string[];
+  payload_type: string;
+}
+
+type BasePayloadCreateInputPayloadTypeMapping<Key, Type> = {
+  payload_type: Key;
+} & Type;
+
 type BasePayloadPayloadTypeMapping<Key, Type> = {
   payload_type: Key;
 } & Type;
@@ -2846,31 +2876,14 @@ export interface PayloadCommandBlock {
   payload_cleanup_command?: string[];
 }
 
-export interface PayloadCreateInput {
-  command_content?: string | null;
-  command_executor?: string | null;
-  dns_resolution_hostname?: string;
-  executable_file?: string;
-  file_drop_file?: string;
-  payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: string[];
-  payload_cleanup_command?: string | null;
-  payload_cleanup_executor?: string | null;
-  payload_description?: string;
-  payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  payload_name: string;
-  /**
-   * Set of output parsers
-   * @uniqueItems true
-   */
-  payload_output_parsers?: OutputParserInput[];
-  payload_platforms: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
-  payload_prerequisites?: PayloadPrerequisite[];
-  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
-  payload_tags?: string[];
-  payload_type: string;
-}
+export type PayloadCreateInput = BasePayloadCreateInput &
+  (
+    | BasePayloadCreateInputPayloadTypeMapping<"Command", Command>
+    | BasePayloadCreateInputPayloadTypeMapping<"Executable", Executable>
+    | BasePayloadCreateInputPayloadTypeMapping<"File", FileDrop>
+    | BasePayloadCreateInputPayloadTypeMapping<"Dns", DnsResolution>
+    | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
+  );
 
 export interface PayloadPrerequisite {
   check_command?: string;
@@ -2896,7 +2909,7 @@ export interface PayloadUpdateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
-  payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
   /**
    * Set of output parsers
