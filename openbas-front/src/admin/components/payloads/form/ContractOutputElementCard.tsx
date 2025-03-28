@@ -106,7 +106,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
       />
       {regexGroups.length > 0 && (
         <Typography className={classes.outputValueTitle} variant="h3">
-          {`${t('Output value')} *`}
+          {`${t('Output value')}`}
         </Typography>
       )}
       {regexGroups.sort((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)).map((field, indexField) => (
