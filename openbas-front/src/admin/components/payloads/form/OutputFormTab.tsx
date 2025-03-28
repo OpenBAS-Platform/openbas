@@ -36,7 +36,7 @@ const OutputFormTab = () => {
           target="_blank"
           rel="noreferrer"
         >
-          {t('Learn more about parser')}
+          {t('Learn more about parser.')}
         </a>
       </Typography>
       <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Parsing rules')}</Typography>
@@ -78,9 +78,9 @@ const OutputFormTab = () => {
         </Button>
       </div>
 
-      {contractOutputElements.map((_contractOutputElementField, contractOutputElementIndex) => (
+      {contractOutputElements.map((contractOutputElementField, contractOutputElementIndex) => (
         <ContractOutputElementCard
-          key={`contract_output_element_${contractOutputElementIndex}`}
+          key={contractOutputElementField.id}
           prefixName={outputParserName}
           index={contractOutputElementIndex}
           remove={outputElementRemove}

@@ -690,7 +690,7 @@
   "Launch import": "Lancer l'importation",
   "Launch now": "Lancer maintenant",
   "Launch simulation now": "Lancer la simulation maintenant",
-  "Learn more about parser": "En savoir plus sur les analyseurs",
+  "Learn more about parser": "En savoir plus sur les analyseurs.",
   "Learn more information about how to setup simulation agents": "En savoir plus sur la configuration des agents de simulation",
   "Lessons learned": "Expérience",
   "Lessons learned details": "Détails des leçons apprises",
@@ -855,7 +855,6 @@
   "Obfuscator": "Obfuscateur",
   "Obfuscators": "Obfuscateurs",
   "Objective achievement evaluation": "Evaluation de l'atteinte de l'objectif",
-  "Objective achievement evalution": "Evaluation de l'atteinte de l'objectif",
   "Objectives": "Objectifs",
   "of which": "dont",
   "on": "le",
@@ -1439,5 +1438,6 @@
   "Your communication check is": "Votre test de communication est",
   "Your file should be a XLS": "Votre fichier doit être un XLS",
   "Your overall evaluation about this question.": "Votre évaluation globale de cette question.",
-  "YYYY": "AAAA"
+  "YYYY": "AAAA",
+  "Objective achievement evalution": "Evaluation de l'atteinte de l'objectif"
 }

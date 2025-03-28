@@ -4,7 +4,6 @@ import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
 import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
 import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
-import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 import static java.util.Optional.ofNullable;
 
 import io.openbas.database.model.*;
@@ -82,6 +81,7 @@ public class PayloadMapper {
         .collectorType(payload.getCollectorType())
         .description(payload.getDescription())
         .platforms(payload.getPlatforms())
+        .payloadOutputParser(payload.getOutputParsers())
         .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
         .executableArch(injectorContract.getArch());
   }
@@ -100,9 +100,6 @@ public class PayloadMapper {
         break;
       case DNS_RESOLUTION_TYPE:
         handleDnsResolutionType(builder, (DnsResolution) Hibernate.unproxy(payload));
-        break;
-      case NETWORK_TRAFFIC_TYPE:
-        handleNetworkTrafficType(builder, (NetworkTraffic) Hibernate.unproxy(payload));
         break;
       default:
         break;
@@ -137,17 +134,6 @@ public class PayloadMapper {
     builder.hostname(payloadDnsResolution.getHostname());
   }
 
-  private void handleNetworkTrafficType(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder,
-      NetworkTraffic payloadNetworkTraffic) {
-    builder
-        .protocol(payloadNetworkTraffic.getProtocol())
-        .portSrc(payloadNetworkTraffic.getPortSrc())
-        .portDst(payloadNetworkTraffic.getPortDst())
-        .ipSrc(payloadNetworkTraffic.getIpSrc())
-        .ipDst(payloadNetworkTraffic.getIpDst());
-  }
-
   private StatusPayloadOutput populateExecutedPayload(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder,
       StatusPayload statusPayload,
@@ -161,11 +147,6 @@ public class PayloadMapper {
         .executableFile(statusPayload.getExecutableFile())
         .fileDropFile(statusPayload.getFileDropFile())
         .hostname(statusPayload.getHostname())
-        .ipSrc(statusPayload.getIpSrc())
-        .ipDst(statusPayload.getIpDst())
-        .portSrc(statusPayload.getPortSrc())
-        .portDst(statusPayload.getPortDst())
-        .protocol(statusPayload.getProtocol())
         .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
         .executableArch(injectorContract.getArch())
         .name(statusPayload.getName())
