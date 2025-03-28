@@ -115,7 +115,7 @@ public class FindingUtils {
             continue;
           }
           String extracted = matcher.group(groupIndex);
-          if (extracted.isEmpty() || extracted == null) {
+          if (extracted == null || extracted.isEmpty()) {
             log.log(Level.WARNING, "Skipping invalid extracted value");
             continue;
           }
