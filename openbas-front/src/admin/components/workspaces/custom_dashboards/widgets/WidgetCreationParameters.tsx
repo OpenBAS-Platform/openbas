@@ -1,20 +1,27 @@
 import { Autocomplete, FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { type FunctionComponent, useEffect, useState } from 'react';
-import { type Control, Controller, useWatch } from 'react-hook-form';
+import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-hook-form';
 
 import { engineSchemas } from '../../../../../actions/schema/schema-action';
 import { useFormatter } from '../../../../../components/i18n';
 import { type PropertySchemaDTO, type WidgetInput } from '../../../../../utils/api-types';
 import { type Option } from '../../../../../utils/Option';
 
-const WidgetCreationParameters: FunctionComponent<{ control: Control<WidgetInput> }> = ({ control }) => {
+const WidgetCreationParameters: FunctionComponent<{
+  control: Control<WidgetInput>;
+  setValue: UseFormSetValue<WidgetInput>;
+}> = ({ control, setValue }) => {
   // Standard hooks
   const { t } = useFormatter();
 
   const mode = useWatch({
     control,
     name: 'widget_config.mode',
+  });
+  const interval = useWatch({
+    control,
+    name: 'widget_config.interval',
   });
 
   const [options, setOptions] = useState<Option[]>([]);
@@ -34,6 +41,13 @@ const WidgetCreationParameters: FunctionComponent<{ control: Control<WidgetInput
       setOptions(newOptions);
     });
   }, [mode]);
+  useEffect(() => {
+    if (mode === 'temporal' && !interval) {
+      setValue('widget_config.interval', 'day');
+    } else if (mode === 'structural') {
+      setValue('widget_config.interval', null);
+    }
+  }, [mode, interval, control]);
 
   return (
     <>
@@ -101,16 +115,19 @@ const WidgetCreationParameters: FunctionComponent<{ control: Control<WidgetInput
           <Controller
             control={control}
             name="widget_config.interval"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 select
                 variant="standard"
                 fullWidth
-                label={t('Mode')}
+                label={t('Interval')}
                 sx={{ mt: 2 }}
                 value={field.value ?? ''}
                 onChange={e => field.onChange(e.target.value)}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                required={true}
               >
                 <MenuItem value="day">{t('Day')}</MenuItem>
                 <MenuItem value="week">{t('Week')}</MenuItem>

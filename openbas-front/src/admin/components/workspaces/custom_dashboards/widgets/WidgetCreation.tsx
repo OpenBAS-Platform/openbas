@@ -92,7 +92,7 @@ const WidgetCreation: FunctionComponent<{
       field: z.string().min(1, { message: t('Should not be empty') }),
       start: z.string().min(1, { message: t('Should not be empty') }),
       end: z.string().min(1, { message: t('Should not be empty') }),
-      interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']).optional(),
+      interval: z.enum(['year', 'month', 'week', 'day', 'hour', 'quarter']),
       stacked: z.boolean().optional(),
       display_legend: z.boolean().optional(),
       series: z.array(z.object({
@@ -118,6 +118,7 @@ const WidgetCreation: FunctionComponent<{
     handleSubmit,
     watch,
     reset,
+    setValue,
   } = useForm<WidgetInput>({
     mode: 'onTouched',
     resolver: zodResolver(
@@ -194,7 +195,7 @@ const WidgetCreation: FunctionComponent<{
               <Controller
                 control={control}
                 name="widget_config"
-                render={() => <WidgetCreationParameters control={control} />}
+                render={() => <WidgetCreationParameters control={control} setValue={setValue} />}
               />
             )}
           </>
