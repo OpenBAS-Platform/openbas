@@ -139,6 +139,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   const [targetResults, setTargetResults] = useState<InjectExpectationsStore[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<NodeResultStep>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
   const initialSteps = [{
     label: t('Attack started'),
     type: '',
@@ -157,9 +158,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   };
   useAutoLayout(layoutOptions, targetResults);
   const { fitView } = useReactFlow();
-  useEffect(() => {
-    fitView();
-  }, [nodes, fitView]);
 
   const handleOpenResultEdition = (injectExpectation: InjectExpectationsStore, expectationResult: InjectExpectationResult) => {
     setAnchorEls({
@@ -540,7 +538,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           colorMode={theme.palette.mode}
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
+          onNodesChange={(changes) => {
+            fitView();
+            onNodesChange(changes);
+          }}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
           nodesDraggable={false}
