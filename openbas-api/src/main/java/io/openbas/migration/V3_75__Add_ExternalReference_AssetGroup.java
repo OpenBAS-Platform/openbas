@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_74__Add_ExternalReference_AssetGroup extends BaseJavaMigration {
+public class V3_75__Add_ExternalReference_AssetGroup extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
