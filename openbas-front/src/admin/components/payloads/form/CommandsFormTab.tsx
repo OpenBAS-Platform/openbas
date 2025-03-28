@@ -160,13 +160,13 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
         <>
           {/* ARGUMENTS */}
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Arguments')}</Typography>
-          {argumentsFields.map((_argsField, argIndex) => (
+          {argumentsFields.map((argsField, argIndex) => (
             <div
               style={{
                 display: 'flex',
                 gap: theme.spacing(1),
               }}
-              key={`payload_arguments_${argIndex}`}
+              key={argsField.id}
             >
               <SelectFieldController name={`payload_arguments.${argIndex}.type` as const} label={t('Type')} items={argumentTypeItems} required />
               <TextFieldController name={`payload_arguments.${argIndex}.key` as const} label={t('Key')} required />
@@ -200,13 +200,13 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
 
           {/* PREREQUISITE */}
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Prerequisites')}</Typography>
-          {prerequisitesFields.map((_prerequisitesField, prerequisitesIndex) => (
+          {prerequisitesFields.map((prerequisitesField, prerequisitesIndex) => (
             <div
               style={{
                 display: 'flex',
                 gap: theme.spacing(1),
               }}
-              key={`payload_prerequisites_${prerequisitesIndex}`}
+              key={prerequisitesField.id}
             >
               <SelectFieldController name={`payload_prerequisites.${prerequisitesIndex}.executor` as const} label={t('Executor')} items={executorsItems} required />
               <TextFieldController name={`payload_prerequisites.${prerequisitesIndex}.get_command` as const} label={t('Get command')} required />

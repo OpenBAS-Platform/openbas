@@ -57,11 +57,13 @@ const PayloadForm = ({
   };
 
   const regexGroupObject = z.object({
+    regex_group_id: z.string().optional(),
     regex_group_field: z.string().min(1, { message: t('Should not be empty') }),
     regex_group_index_values: z.string().min(1, { message: t('Should not be empty') }),
   });
 
   const contractOutputElementObject = z.object({
+    contract_output_element_id: z.string().optional(),
     contract_output_element_is_finding: z.boolean().optional(),
     contract_output_element_name: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_key: z.string().min(1, { message: t('Should not be empty') }),
@@ -71,6 +73,7 @@ const PayloadForm = ({
     contract_output_element_regex_groups: z.array(regexGroupObject),
   });
   const outputParserObject = z.object({
+    output_parser_id: z.string().optional(),
     output_parser_mode: z.string().min(1, { message: t('Should not be empty') }),
     output_parser_type: z.string().min(1, { message: t('Should not be empty') }),
     output_parser_contract_output_elements: z.array(contractOutputElementObject).optional(),
