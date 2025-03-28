@@ -83,7 +83,7 @@ class InjectExpectationServiceTest {
 
     // Act
     List<InjectExpectation> result =
-        testInjectExpectationService.detectionExpectationsNotExpired(
+        testInjectExpectationService.manualExpectationsNotExpired(
             EXPIRATION_TIME_SIX_HOURS.intValue() * 2);
 
     // Assert
