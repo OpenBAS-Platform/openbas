@@ -1,5 +1,6 @@
 import { Add } from '@mui/icons-material';
 import { Drawer, Fab } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -28,6 +29,7 @@ interface Props { exercise: Exercise }
 const CreateQuickInject: FunctionComponent<Props> = ({ exercise }) => {
   const dispatch = useAppDispatch();
   const { classes } = useStyles();
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const { injectorContract }: { injectorContract: InjectorContract }
     = useHelper((helper: InjectorContractHelper) => ({ injectorContract: helper.getInjectorContract(EMAIL_CONTRACT) }));
@@ -62,6 +64,7 @@ const CreateQuickInject: FunctionComponent<Props> = ({ exercise }) => {
               exercise={exercise}
               injectorContract={injectorContract}
               handleClose={() => setOpen(false)}
+              theme={theme}
             />
           </Drawer>
         )}
