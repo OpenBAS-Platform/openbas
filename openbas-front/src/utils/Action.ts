@@ -245,9 +245,11 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
     });
 };
 
+const OPENBAS_FRONTEND  = "[OPENBAS-FRONTEND]";
+
 export const sendErrorToBackend = async (error: Error, stack: ErrorInfo) => {
   const errorDetails = {
-    message: error.message,
+    message: OPENBAS_FRONTEND + error.message,
     stack: stack.componentStack,
     timestamp: new Date().toISOString(),
     level: 'ERROR',
