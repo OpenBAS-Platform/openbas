@@ -1,5 +1,7 @@
 package io.openbas.rest.log;
 
+import static io.openbas.utils.LogUtils.*;
+
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.log.form.LogDetailsInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,21 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class LogApi extends RestBehavior {
 
   private static final Logger logger = LoggerFactory.getLogger(LogApi.class);
-
-  public enum LogLevel {
-    INFO,
-    WARN,
-    DEBUG,
-    ERROR;
-
-    public static LogLevel fromString(String level) {
-      try {
-        return LogLevel.valueOf(level.toUpperCase());
-      } catch (IllegalArgumentException e) {
-        return ERROR; // Default to ERROR if the level is invalid
-      }
-    }
-  }
 
   @PostMapping("/api/logs")
   @Operation(
@@ -58,38 +45,21 @@ public class LogApi extends RestBehavior {
           @Valid
           @RequestBody
           LogDetailsInput logDetailsInput) {
-    LogLevel level = LogLevel.fromString(logDetailsInput.getLevel());
+    LogLevel level = LogLevel.valueOf(logDetailsInput.getLevel());
 
-    // Log the message based on the provided level
     switch (level) {
       case WARN:
-        logger.warn(
-            "Message warn received: "
-                + logDetailsInput.getMessage()
-                + " stacktrace: "
-                + logDetailsInput.getStack());
+        logger.warn(buildLogMessage(logDetailsInput, level));
         break;
       case INFO:
-        logger.info(
-            "Message info received: "
-                + logDetailsInput.getMessage()
-                + " stacktrace: "
-                + logDetailsInput.getStack());
+        logger.info(buildLogMessage(logDetailsInput, level));
         break;
       case DEBUG:
-        logger.debug(
-            "Message debug received: "
-                + logDetailsInput.getMessage()
-                + " stacktrace: "
-                + logDetailsInput.getStack());
+        logger.debug(buildLogMessage(logDetailsInput, level));
         break;
       case ERROR:
       default:
-        logger.error(
-            "Message error received: "
-                + logDetailsInput.getMessage()
-                + " stacktrace: "
-                + logDetailsInput.getStack());
+        logger.error(buildLogMessage(logDetailsInput, level));
         break;
     }
 
