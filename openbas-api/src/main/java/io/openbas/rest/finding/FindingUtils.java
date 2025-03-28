@@ -39,12 +39,18 @@ public class FindingUtils {
 
               while (matcher.find()) {
                 String finalValue = buildValue(contractOutputElement, matcher);
-                Finding finding = buildFinding(inject, asset, contractOutputElement, finalValue);
-                findings.add(finding);
+                if (isValid(finalValue)) {
+                  Finding finding = buildFinding(inject, asset, contractOutputElement, finalValue);
+                  findings.add(finding);
+                }
               }
             });
 
     return findings;
+  }
+
+  private static boolean isValid(String finalValue) {
+    return finalValue != null && !finalValue.isEmpty();
   }
 
   public String extractRawOutputByMode(String rawOutput, ParserMode mode) {
@@ -74,6 +80,7 @@ public class FindingUtils {
     // If there are no specific fields, extract all matched groups
     if (contractOutputElement.getType().fields == null) {
       List<String> extractedValues = extractValues(contractOutputElement.getRegexGroups(), matcher);
+
       fieldValuesMap.put(null, extractedValues);
     } else {
       // Extract values for each defined field
@@ -108,6 +115,10 @@ public class FindingUtils {
             continue;
           }
           String extracted = matcher.group(groupIndex);
+          if (extracted.isEmpty() || extracted == null) {
+            log.log(Level.WARNING, "Skipping invalid extracted value");
+            continue;
+          }
           if (extracted != null) {
             extractedValues.add(extracted.trim());
           }
