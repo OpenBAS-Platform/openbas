@@ -647,7 +647,7 @@ class InjectDefinition extends Component {
               variant="h5"
               style={{
                 fontWeight: 500,
-                marginTop: hasTeams ? 20 : 0,
+                marginTop: hasTeams ? theme.spacing(2.5) : 0,
               }}
             >
               {t('Targeted assets')}
@@ -675,7 +675,7 @@ class InjectDefinition extends Component {
               variant="h5"
               style={{
                 fontWeight: 500,
-                marginTop: hasTeams || hasAssets ? 20 : 0,
+                marginTop: hasTeams || hasAssets ? theme.spacing(2.5) : 0,
               }}
             >
               {t('Targeted asset groups')}
@@ -697,7 +697,7 @@ class InjectDefinition extends Component {
               variant="h5"
               style={{
                 fontWeight: 500,
-                marginTop: hasTeams || hasAssets || hasAssetGroups ? 20 : 0,
+                marginTop: hasTeams || hasAssets || hasAssetGroups ? theme.spacing(2.5) : 0,
               }}
             >
               {t('Media pressure to publish')}
@@ -768,7 +768,7 @@ class InjectDefinition extends Component {
               variant="h5"
               style={{
                 fontWeight: 500,
-                marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? 20 : 0,
+                marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles ? theme.spacing(2.5) : 0,
               }}
             >
               {t('Challenges to publish')}
@@ -834,7 +834,7 @@ class InjectDefinition extends Component {
         {dynamicFields.length > 0
           && (
             <>
-              <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? 24 : 0 }}>
+              <div style={{ marginTop: hasTeams || hasAssets || hasAssetGroups || hasArticles || hasChallenges ? theme.spacing(2.5) : 0 }}>
                 <div style={{ float: 'left' }}>
                   <Typography variant="h5" style={{ fontWeight: 500 }}>{t('Inject data')}</Typography>
                 </div>
@@ -887,7 +887,7 @@ class InjectDefinition extends Component {
             <Typography
               variant="h5"
               style={{
-                marginTop: 20,
+                marginTop: theme.spacing(2.5),
                 fontWeight: 500,
               }}
             >
@@ -931,7 +931,7 @@ class InjectDefinition extends Component {
               variant="h5"
               style={{
                 fontWeight: 500,
-                marginTop: 20,
+                marginTop: theme.spacing(2.5),
               }}
             >
               {t('Inject documents')}
