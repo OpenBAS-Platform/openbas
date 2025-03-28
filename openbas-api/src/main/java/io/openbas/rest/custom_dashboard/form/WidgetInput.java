@@ -5,10 +5,8 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Widget;
-import io.openbas.database.model.WidgetDataSelection;
-import io.openbas.database.model.WidgetParameters;
+import io.openbas.engine.api.HistogramWidget;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,13 +18,9 @@ public class WidgetInput {
   @NotNull(message = MANDATORY_MESSAGE)
   private Widget.WidgetType type;
 
-  @JsonProperty("widget_data_selections")
+  @JsonProperty("widget_config")
   @NotNull(message = MANDATORY_MESSAGE)
-  private List<WidgetDataSelection> dataSelections;
-
-  @JsonProperty("widget_parameters")
-  @NotNull(message = MANDATORY_MESSAGE)
-  private WidgetParameters parameters;
+  private HistogramWidget histogramWidget;
 
   // -- METHOD --
 
@@ -34,8 +28,7 @@ public class WidgetInput {
     requireNonNull(widget, "Widget must not be null.");
 
     widget.setType(this.getType());
-    widget.setDataSelections(this.getDataSelections());
-    widget.setParameters(this.getParameters());
+    widget.setHistogramWidget(this.getHistogramWidget());
     return widget;
   }
 }
