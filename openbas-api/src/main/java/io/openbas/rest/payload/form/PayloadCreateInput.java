@@ -3,12 +3,11 @@ package io.openbas.rest.payload.form;
 import static io.openbas.config.AppConfig.MANDATORY_MESSAGE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.database.model.*;
 import io.openbas.database.model.Endpoint.PLATFORM_TYPE;
-import io.openbas.database.model.Payload;
 import io.openbas.database.model.Payload.PAYLOAD_SOURCE;
 import io.openbas.database.model.Payload.PAYLOAD_STATUS;
-import io.openbas.database.model.PayloadArgument;
-import io.openbas.database.model.PayloadPrerequisite;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -19,6 +18,22 @@ import java.util.List;
 import java.util.Set;
 import lombok.Data;
 
+@Schema(
+    discriminatorProperty = "payload_type",
+    oneOf = {
+      Command.class,
+      Executable.class,
+      FileDrop.class,
+      DnsResolution.class,
+      NetworkTraffic.class
+    },
+    discriminatorMapping = {
+      @DiscriminatorMapping(value = "Command", schema = Command.class),
+      @DiscriminatorMapping(value = "Executable", schema = Executable.class),
+      @DiscriminatorMapping(value = "File", schema = FileDrop.class),
+      @DiscriminatorMapping(value = "Dns", schema = DnsResolution.class),
+      @DiscriminatorMapping(value = "Network", schema = NetworkTraffic.class)
+    })
 @Data
 public class PayloadCreateInput {
 
@@ -43,6 +58,7 @@ public class PayloadCreateInput {
   private PLATFORM_TYPE[] platforms;
 
   @JsonProperty("payload_execution_arch")
+  @NotNull
   private Payload.PAYLOAD_EXECUTION_ARCH executionArch =
       Payload.PAYLOAD_EXECUTION_ARCH.ALL_ARCHITECTURES;
 

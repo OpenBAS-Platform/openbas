@@ -6,6 +6,7 @@ import { z, type ZodBoolean } from 'zod';
 
 import { useFormatter } from '../../../../../components/i18n';
 import { type Report, type ReportInformationInput, type ReportInput } from '../../../../../utils/api-types';
+import { zodImplement } from '../../../../../utils/Zod';
 import ReportInformationType from './ReportInformationType';
 
 interface ExerciseReportFormInput {
@@ -77,10 +78,8 @@ const ExerciseReportForm: FunctionComponent<Props> = ({
   };
 
   const initialModulesValues: Record<string, boolean> = {};
-  const modulesFormInput: Record<string, ZodBoolean> = {};
   exerciseReportModulesConfig.forEach((moduleConfig) => {
     initialModulesValues[moduleConfig.name] = findReportInfo(moduleConfig.type);
-    modulesFormInput[moduleConfig.name] = z.boolean();
   });
 
   const {
@@ -89,10 +88,16 @@ const ExerciseReportForm: FunctionComponent<Props> = ({
     formState: { errors, isSubmitting },
   } = useForm<ExerciseReportFormInput>({
     mode: 'onTouched',
-    resolver: zodResolver(z.object({
-      report_name: z.string().min(1, { message: t('Should not be empty') }),
-      ...modulesFormInput,
-    })),
+    resolver: zodResolver(
+      zodImplement<ExerciseReportFormInput>().with({
+        report_name: z.string().min(1, { message: t('Should not be empty') }),
+        report_exercise_details: z.boolean(),
+        report_global_observation: z.boolean(),
+        report_inject_result: z.boolean(),
+        report_main_information: z.boolean(),
+        report_player_surveys: z.boolean(),
+        report_score_details: z.boolean(),
+      })),
     defaultValues: {
       report_name: initialValues?.report_name || '',
       ...initialModulesValues,

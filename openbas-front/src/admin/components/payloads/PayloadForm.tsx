@@ -7,13 +7,17 @@ import { z, type ZodTypeAny } from 'zod';
 
 import { useFormatter } from '../../../components/i18n';
 import type { PayloadCreateInput } from '../../../utils/api-types';
-import type { Option } from '../../../utils/Option';
 import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
 
+interface Option {
+  id: string;
+  label: string;
+}
+
 type PayloadCreateInputForm = Omit<PayloadCreateInput, 'payload_source' | 'payload_status' | 'payload_platforms' | 'executable_file'> & {
   payload_platforms: Option[];
-  executable_file: Option | undefined;
+  executable_file?: Option;
 };
 
 interface Props {
@@ -57,7 +61,7 @@ const PayloadForm = ({
   const payloadPrerequisiteZodObject = z.object({
     executor: z.string().min(1, { message: t('Should not be empty') }),
     get_command: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().nullish(),
+    description: z.string().optional(),
     check_command: z.string().optional(),
   });
 
@@ -65,7 +69,7 @@ const PayloadForm = ({
     default_value: z.string().nonempty(t('Should not be empty')),
     key: z.string().min(1, { message: t('Should not be empty') }),
     type: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().nullish(),
+    description: z.string().optional(),
   });
 
   const baseSchema = {
@@ -78,10 +82,16 @@ const PayloadForm = ({
       label: z.string(),
     }).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_execution_arch: z.enum(['x86_64', 'arm64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }).describe('Commands-tab'),
-    payload_cleanup_command: z.string().optional(),
-    payload_cleanup_executor: z.string().optional(),
+    payload_cleanup_command: z.string().optional().nullish(),
+    payload_cleanup_executor: z.string().optional().nullish(),
     payload_arguments: z.array(payloadArgumentZodObject).optional(),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional(),
+    // these will be override depending on the payload type
+    command_content: z.string().optional().nullish(),
+    command_executor: z.string().optional().nullish(),
+    dns_resolution_hostname: z.string().optional(),
+    executable_file: z.string().optional(),
+    file_drop_file: z.string().optional(),
   };
 
   const commandSchema = z.object({
@@ -106,7 +116,7 @@ const PayloadForm = ({
   const dnsResolutionSchema = z.object({
     ...baseSchema,
     payload_type: z.literal('DnsResolution').describe('Commands-tab'),
-    dns_resolution_hostname: z.string().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
+    // dns_resolution_hostname: z.string().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
   });
 
   const schema = z.discriminatedUnion('payload_type', [commandSchema, executableSchema, fileDropSchema, dnsResolutionSchema])
