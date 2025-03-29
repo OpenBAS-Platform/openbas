@@ -9445,7 +9445,7 @@ __metadata:
     rxjs: "npm:7.8.2"
     seamless-immutable: "npm:7.1.4"
     swagger-typescript-api: "npm:13.0.28"
-    tss-react: "npm:4.9.15"
+    tss-react: "npm:4.9.16"
     typescript: "npm:5.8.2"
     typescript-eslint: "npm:8.28.0"
     usehooks-ts: "npm:3.1.1"
@@ -11652,9 +11652,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tss-react@npm:4.9.15":
-  version: 4.9.15
-  resolution: "tss-react@npm:4.9.15"
+"tss-react@npm:4.9.16":
+  version: 4.9.16
+  resolution: "tss-react@npm:4.9.16"
   dependencies:
     "@emotion/cache": "npm:*"
     "@emotion/serialize": "npm:*"
@@ -11662,7 +11662,7 @@ __metadata:
   peerDependencies:
     "@emotion/react": ^11.4.1
     "@emotion/server": ^11.4.0
-    "@mui/material": ^5.0.0 || ^6.0.0
+    "@mui/material": ^5.0.0 || ^6.0.0 || ^7.0.0
     "@types/react": ^16.8.0 || ^17.0.2 || ^18.0.0 || ^19.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   peerDependenciesMeta:
@@ -11670,7 +11670,7 @@ __metadata:
       optional: true
     "@mui/material":
       optional: true
-  checksum: 10c0/f11069b19ec276f34a26f5f4a987c53f7898a16dcb344b3102c977070ce1a378ae14fa8a84330b2554564206d15c781cd7d181df89fc1c5039ce84047f6c9f33
+  checksum: 10c0/f8a9644483fa9a65c8828f5b1f36da3c4af18cedef7a163172e1be115c5405fdcefe9713b66f99e7583fd610165b5db76419e87f39ced6edf255211ee6567f61
   languageName: node
   linkType: hard
 
