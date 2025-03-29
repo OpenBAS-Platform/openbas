@@ -6,7 +6,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_74__Add_Custom_Dashboard extends BaseJavaMigration {
+public class V3_75__Add_Custom_Dashboard extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
