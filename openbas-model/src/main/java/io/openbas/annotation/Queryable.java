@@ -16,6 +16,8 @@ public @interface Queryable {
 
   boolean sortable() default false;
 
+  String label() default "";
+
   String path() default "";
 
   String[] paths() default {};
