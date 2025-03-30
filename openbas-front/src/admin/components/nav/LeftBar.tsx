@@ -145,17 +145,9 @@ const LeftBar = () => {
     {
       items: [
         {
-          path: `/admin/workspaces`,
+          path: `/admin/workspaces/custom_dashboards`,
           icon: () => (<InsertChartOutlined />),
           label: 'Dashboards',
-          href: 'dashboards',
-          subItems: [
-            {
-              link: '/admin/workspaces/custom_dashboards',
-              label: 'Custom dashboards',
-              icon: () => (<AnalyticsOutlined fontSize="small" />),
-            },
-          ],
         },
         {
           path: `/admin/payloads`,
