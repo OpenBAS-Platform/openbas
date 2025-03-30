@@ -675,6 +675,7 @@ export interface CreateUserInput {
 }
 
 export interface CustomDashboard {
+  custom_dashboard_content?: CustomDashboardContent;
   /** @format date-time */
   custom_dashboard_created_at: string;
   custom_dashboard_description?: string;
@@ -682,8 +683,19 @@ export interface CustomDashboard {
   custom_dashboard_name: string;
   /** @format date-time */
   custom_dashboard_updated_at: string;
-  custom_dashboard_widgets?: string[];
+  custom_dashboard_widgets?: Widget[];
   listened?: boolean;
+}
+
+export interface CustomDashboardContent {
+  /** @format int32 */
+  widget_layout_h?: number;
+  /** @format int32 */
+  widget_layout_w?: number;
+  /** @format int32 */
+  widget_layout_x?: number;
+  /** @format int32 */
+  widget_layout_y?: number;
 }
 
 export interface CustomDashboardInput {
@@ -699,7 +711,7 @@ export interface DateHistogramSeries {
 
 export type DateHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
   end: string;
-  interval: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
   series: DateHistogramSeries[];
   start: string;
 };
@@ -4251,7 +4263,7 @@ export interface Widget {
   widget_created_at: string;
   widget_custom_dashboard?: string;
   widget_id: string;
-  widget_layout?: WidgetLayout;
+  widget_layout: WidgetLayout;
   widget_type: "vertical-barchart";
   /** @format date-time */
   widget_updated_at: string;
@@ -4259,16 +4271,17 @@ export interface Widget {
 
 export interface WidgetInput {
   widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_layout: WidgetLayout;
   widget_type: "vertical-barchart";
 }
 
 export interface WidgetLayout {
   /** @format int32 */
-  widget_layout_h?: number;
+  widget_layout_h: number;
   /** @format int32 */
-  widget_layout_w?: number;
+  widget_layout_w: number;
   /** @format int32 */
-  widget_layout_x?: number;
+  widget_layout_x: number;
   /** @format int32 */
-  widget_layout_y?: number;
+  widget_layout_y: number;
 }
