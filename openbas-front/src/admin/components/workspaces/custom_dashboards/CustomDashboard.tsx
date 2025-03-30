@@ -10,7 +10,6 @@ import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import { type CustomDashboard } from '../../../../utils/api-types';
 import WidgetCreation from './widgets/WidgetCreation';
-import WidgetStructuralViz from './widgets/WidgetStructuralViz';
 import WidgetTemporalViz from './widgets/WidgetTemporalViz';
 
 const CustomDashboardComponent = () => {
@@ -103,10 +102,10 @@ const CustomDashboardComponent = () => {
               variant="outlined"
             >
               <ErrorBoundary>
-                {widget.widget_id === idToResize ? <div /> : (
+                {widget.widget_id === idToResize ? (<div />) : (
                   <>
                     {widget.widget_config.mode === 'structural' && (
-                      <WidgetStructuralViz widget={widget} />
+                      <WidgetTemporalViz widget={widget} />
                     )}
                     {widget.widget_config.mode === 'temporal' && (
                       <WidgetTemporalViz widget={widget} />
