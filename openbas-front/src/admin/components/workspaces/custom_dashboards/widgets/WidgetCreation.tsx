@@ -8,11 +8,13 @@ import { createCustomDashboardWidget } from '../../../../../actions/custom_dashb
 import ButtonCreate from '../../../../../components/common/ButtonCreate';
 import Dialog from '../../../../../components/common/Dialog';
 import { useFormatter } from '../../../../../components/i18n';
-import { type WidgetInput } from '../../../../../utils/api-types';
+import { type Widget, type WidgetInput } from '../../../../../utils/api-types';
 import { zodImplement } from '../../../../../utils/Zod';
-import WidgetCreationParameters from './WidgetCreationParameters';
+import WidgetCreationParameters, { type WidgetInputForm } from './WidgetCreationParameters';
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
+
+const COL_WIDTH = 30;
 
 const steps = ['Visualization', 'Filters', 'Parameters'];
 
@@ -58,9 +60,11 @@ const ActionsComponent: FunctionComponent<{
 
 const WidgetCreation: FunctionComponent<{
   customDashboardId: string;
+  widgets: Widget[];
   initialValues?: WidgetInput;
 }> = ({
   customDashboardId,
+  widgets,
   initialValues = {
     widget_type: 'vertical-barchart',
     widget_config: {
@@ -83,6 +87,22 @@ const WidgetCreation: FunctionComponent<{
   const nextStep = () => setActiveStep(prevActiveStep => prevActiveStep + 1);
   const goToStep = (step: number) => step <= activeStep && setActiveStep(step);
   const isLastStep = () => activeStep === steps.length - 1;
+
+  // Layout
+  const getMaxY = () => {
+    return widgets.reduce(
+      (max, n) => ((n.widget_layout?.widget_layout_y ?? 0) > max ? (n.widget_layout?.widget_layout_y ?? 0) : max),
+      0,
+    );
+  };
+
+  const getMaxX = () => {
+    const y = getMaxY();
+    const maxX = widgets
+      .filter(n => (n.widget_layout?.widget_layout_y ?? 0) === y)
+      .reduce((max, n) => ((n.widget_layout?.widget_layout_x ?? 0) > max ? (n.widget_layout?.widget_layout_x ?? 0) : max), 0);
+    return maxX + 4;
+  };
 
   // Form
   const widgetConfigSchema = z.discriminatedUnion('mode', [
@@ -119,10 +139,10 @@ const WidgetCreation: FunctionComponent<{
     watch,
     reset,
     setValue,
-  } = useForm<WidgetInput>({
+  } = useForm<WidgetInputForm>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<WidgetInput>().with({
+      zodImplement<WidgetInputForm>().with({
         widget_type: z.enum(['vertical-barchart']),
         widget_config: widgetConfigSchema,
       }),
@@ -137,8 +157,24 @@ const WidgetCreation: FunctionComponent<{
     setActiveStep(0);
   };
 
-  const onSubmit = async (input: WidgetInput) => {
-    await createCustomDashboardWidget(customDashboardId, input);
+  const onSubmit = async (input: WidgetInputForm) => {
+    let maxX = getMaxX();
+    let maxY = getMaxY();
+    if (maxX >= COL_WIDTH - 4) {
+      maxX = 0;
+      maxY += 2;
+    }
+    const layout = {
+      widget_layout_x: maxX,
+      widget_layout_y: maxY,
+      widget_layout_w: 4,
+      widget_layout_h: 2,
+    };
+    const finalInput = {
+      ...input,
+      widget_layout: layout,
+    };
+    await createCustomDashboardWidget(customDashboardId, finalInput);
     toggleDialog();
     reset(initialValues);
     setActiveStep(0);

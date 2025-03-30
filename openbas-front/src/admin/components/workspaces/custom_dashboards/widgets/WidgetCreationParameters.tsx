@@ -8,9 +8,11 @@ import { useFormatter } from '../../../../../components/i18n';
 import { type PropertySchemaDTO, type WidgetInput } from '../../../../../utils/api-types';
 import { type Option } from '../../../../../utils/Option';
 
+export type WidgetInputForm = Omit<WidgetInput, 'widget_id' | 'widget_layout'>;
+
 const WidgetCreationParameters: FunctionComponent<{
-  control: Control<WidgetInput>;
-  setValue: UseFormSetValue<WidgetInput>;
+  control: Control<WidgetInputForm>;
+  setValue: UseFormSetValue<WidgetInputForm>;
 }> = ({ control, setValue }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -44,8 +46,6 @@ const WidgetCreationParameters: FunctionComponent<{
   useEffect(() => {
     if (mode === 'temporal' && !interval) {
       setValue('widget_config.interval', 'day');
-    } else if (mode === 'structural') {
-      setValue('widget_config.interval', null);
     }
   }, [mode, interval, control]);
 
@@ -151,7 +151,6 @@ const WidgetCreationParameters: FunctionComponent<{
                     fullWidth: true,
                     error: !!fieldState.error,
                     helperText: fieldState.error?.message,
-                    required: true,
                   },
                 }}
               />
@@ -171,7 +170,6 @@ const WidgetCreationParameters: FunctionComponent<{
                     fullWidth: true,
                     error: !!fieldState.error,
                     helperText: fieldState.error?.message,
-                    required: true,
                   },
                 }}
               />
