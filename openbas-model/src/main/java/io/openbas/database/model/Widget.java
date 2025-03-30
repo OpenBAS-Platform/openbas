@@ -59,6 +59,7 @@ public class Widget implements Base {
   @Type(JsonType.class)
   @Column(name = "widget_layout", columnDefinition = "JSONB")
   @JsonProperty("widget_layout")
+  @NotNull
   private WidgetLayout layout;
 
   // -- RELATIONS --
