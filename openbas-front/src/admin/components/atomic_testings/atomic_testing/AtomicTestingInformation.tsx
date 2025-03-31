@@ -85,13 +85,18 @@ const AtomicTestingInformation: FunctionComponent<Props> = ({ injectResultOvervi
             label={t(injectResultOverviewOutput.inject_status?.status_name ?? 'Unknown')}
           />
         </div>
-        <div style={{ gridArea: 'type' }}>
+        <div style={{
+          gridArea: 'type',
+          minWidth: 0,
+        }}
+        >
           <Typography variant="h3" gutterBottom>
             {t('Type')}
           </Typography>
           <div style={{
             display: 'flex',
             gap: theme.spacing(1),
+            marginRight: theme.spacing(1),
           }}
           >
             <InjectIcon
