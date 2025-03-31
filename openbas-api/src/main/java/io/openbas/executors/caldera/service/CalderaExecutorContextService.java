@@ -73,7 +73,7 @@ public class CalderaExecutorContextService extends ExecutorContextService {
       throws AgentException {
 
     if (!this.calderaExecutorConfig.isEnable()) {
-      throw new AgentException("Fatal error: Caldera executor is not enabled", agent);
+      throw new AgentException("Caldera executor is not enabled", agent);
     }
 
     inject
@@ -94,6 +94,9 @@ public class CalderaExecutorContextService extends ExecutorContextService {
               }
             });
   }
+
+  public void launchBatchExecutorSubprocess(
+      Inject inject, List<Agent> agents, InjectStatus injectStatus) {}
 
   public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Agent agent) {
     if (this.injectorExecutorAbilities.containsKey(injector.getId())) {
