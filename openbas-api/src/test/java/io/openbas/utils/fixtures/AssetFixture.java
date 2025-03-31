@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class AssetFixture {
 
-  public static Asset getDefaultAsset(@NotNull final String name) {
+  public static Asset createDefaultAsset(@NotNull final String name) {
     Asset asset = new Asset();
     asset.setCreatedAt(Instant.now());
     asset.setUpdatedAt(Instant.now());

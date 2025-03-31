@@ -1,6 +1,6 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.utils.fixtures.AssetFixture.getDefaultAsset;
+import static io.openbas.utils.fixtures.AssetFixture.createDefaultAsset;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
 import static io.openbas.utils.fixtures.OutputParserFixture.getDefaultContractOutputElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -251,8 +251,8 @@ class FindingUtilsTest {
   @DisplayName("Should have two assets for a finding")
   void given_a_finding_already_existent_with_one_asset_should_have_two_assets() {
     Inject inject = getDefaultInject();
-    Asset asset1 = getDefaultAsset("asset1");
-    Asset asset2 = getDefaultAsset("asset2");
+    Asset asset1 = createDefaultAsset("asset1");
+    Asset asset2 = createDefaultAsset("asset2");
     String value = "value-already-existent";
     ContractOutputElement contractOutputElement = getDefaultContractOutputElement();
 
