@@ -123,6 +123,7 @@ const DetectionPreventionExpectationsValidationForm: FunctionComponent<FormProps
         helperText={errors.expectation_score && errors.expectation_score?.message ? errors.expectation_score?.message : `${t('Expected score:')} ${expectation.inject_expectation_expected_score}`}
         inputProps={register('expectation_score')}
       />
+
       <div className={classes.buttons}>
         <Button
           type="submit"

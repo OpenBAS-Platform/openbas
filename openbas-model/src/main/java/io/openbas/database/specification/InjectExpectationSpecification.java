@@ -28,6 +28,14 @@ public class InjectExpectationSpecification {
     return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), date);
   }
 
+  public static Specification<InjectExpectation> agentNotNull() {
+    return (root, query, cb) -> cb.isNotNull(root.get("agent"));
+  }
+
+  public static Specification<InjectExpectation> assetNotNull() {
+    return (root, query, cb) -> cb.isNotNull(root.get("asset"));
+  }
+
   public static Specification<InjectExpectation> fromAgents(
       @NotBlank final String injectId, @NotEmpty final List<String> agentIds) {
     return (root, query, cb) ->

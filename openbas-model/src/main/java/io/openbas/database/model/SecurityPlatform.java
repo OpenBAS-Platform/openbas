@@ -8,6 +8,7 @@ import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -46,6 +47,14 @@ public class SecurityPlatform extends Asset {
   @Enumerated(EnumType.STRING)
   @NotNull
   private SECURITY_PLATFORM_TYPE securityPlatformType;
+
+  @OneToMany(
+      mappedBy = "securityPlatform",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
+  @JsonProperty("security_platform_traces")
+  private List<InjectExpectationTrace> traces;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "security_platform_logo_light")
