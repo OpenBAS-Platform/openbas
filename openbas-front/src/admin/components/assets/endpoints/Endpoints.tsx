@@ -277,9 +277,8 @@ const Endpoints = () => {
           {t('agent installation page')}
         </a>
         &nbsp;
-        {' '}
         {t('and in our')}
-&nbsp;
+        &nbsp;
         <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">
           {t('documentation')}
         </a>
