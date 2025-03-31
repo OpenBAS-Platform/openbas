@@ -39,7 +39,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
 
   const defaultFields = {
     credentials: ['username', 'password'],
-    portscan: ['asset_id', 'host', 'port', 'service'],
+    portscan: ['host', 'port', 'service'],
   };
 
   const selectedContractOutputElementType = watch(`${prefixName}.${index}.contract_output_element_type`) as keyof typeof defaultFields | undefined;
@@ -115,7 +115,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
             }}
             variant="h3"
           >
-            {field.regex_group_field}
+            {t(field.regex_group_field.charAt(0).toUpperCase() + field.regex_group_field.slice(1))}
           </Typography>
           <TextFieldController placeholder={`$${indexField + 1}`} isCommand style={{ gridColumn: 'span 5' }} name={`${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`} required />
         </>
