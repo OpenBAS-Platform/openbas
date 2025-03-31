@@ -74,9 +74,9 @@ const PayloadForm = ({
   });
   const outputParserObject = z.object({
     output_parser_id: z.string().optional(),
-    output_parser_mode: z.string().min(1, { message: t('Should not be empty') }),
-    output_parser_type: z.string().min(1, { message: t('Should not be empty') }),
-    output_parser_contract_output_elements: z.array(contractOutputElementObject).optional(),
+    output_parser_mode: z.enum(['STDOUT'], { message: t('Should not be empty') }),
+    output_parser_type: z.enum(['REGEX'], { message: t('Should not be empty') }),
+    output_parser_contract_output_elements: z.array(contractOutputElementObject),
   });
 
   const payloadPrerequisiteZodObject = z.object({

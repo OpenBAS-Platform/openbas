@@ -20,15 +20,16 @@ interface Props {
 const useStyles = makeStyles()(theme => ({
   outputParserElement: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr auto auto',
-    gap: theme.spacing(1),
+    gridTemplateColumns: '1fr 1fr 1fr auto',
+    columnGap: theme.spacing(1),
+    rowGap: theme.spacing(2),
     padding: theme.spacing(2),
     alignItems: 'start',
   },
   outputValueTitle: {
     marginBottom: 0,
     marginTop: theme.spacing(2),
-    gridColumn: 'span 6',
+    gridColumn: 'span 2',
   },
 }));
 
@@ -87,10 +88,10 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
   }, [selectedContractOutputElementType]);
 
   return (
-    <Card key={`contract-output-element-${index}`} className={classes.outputParserElement} variant="outlined">
-      <TextFieldController style={{ gridColumn: 'span 2' }} name={`${prefixName}.${index}.contract_output_element_name` as const} label={t('Name')} required />
-      <TextFieldController style={{ gridColumn: 'span 2' }} name={`${prefixName}.${index}.contract_output_element_key` as const} label={t('Key')} required />
-      <SelectFieldController style={{ width: '100%' }} name={`${prefixName}.${index}.contract_output_element_type` as const} label={t('Type')} items={outputParserTypeList} required />
+    <Card className={classes.outputParserElement} variant="outlined">
+      <TextFieldController name={`${prefixName}.${index}.contract_output_element_name` as const} label={t('Name')} required />
+      <TextFieldController name={`${prefixName}.${index}.contract_output_element_key` as const} label={t('Key')} required />
+      <SelectFieldController name={`${prefixName}.${index}.contract_output_element_type` as const} label={t('Type')} items={outputParserTypeList} required />
       <IconButton
         onClick={() => remove(index)}
         size="small"
@@ -98,17 +99,34 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
       >
         <DeleteOutlined />
       </IconButton>
-      <TagFieldController style={{ gridColumn: 'span 6' }} name={`${prefixName}.${index}.contract_output_element_tags` as const} label={t('Tags')} />
-      <CheckboxFieldController style={{ gridColumn: 'span 6' }} name={`${prefixName}.${index}.contract_output_element_is_finding` as const} label={t('Show in findings')} />
-      <TextFieldController isCommand style={{ gridColumn: 'span 6' }} name={`${prefixName}.${index}.contract_output_element_rule` as const} label={t('Regex group rules')} required />
+      <TagFieldController style={{ gridColumn: 'span 4' }} name={`${prefixName}.${index}.contract_output_element_tags` as const} label={t('Tags')} />
+      <CheckboxFieldController style={{ gridColumn: 'span 4' }} name={`${prefixName}.${index}.contract_output_element_is_finding` as const} label={t('Show in findings')} />
+      <Typography
+        sx={{
+          margin: 0,
+          gridColumn: 'span 4',
+        }}
+        variant="h3"
+      >
+        {`${t('Regex group rules')} * :`}
+      </Typography>
+      <TextFieldController variant="outlined" style={{ gridColumn: 'span 4' }} name={`${prefixName}.${index}.contract_output_element_rule` as const} required />
       {regexGroups.length > 0 && (
         <Typography className={classes.outputValueTitle} variant="h3">
           {`${t('Output value')} *`}
         </Typography>
       )}
       {regexGroups.sort((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)).map((field, indexField) => (
-        <>
+        <div
+          style={{
+            gridColumn: 'span 4',
+            display: 'grid',
+            gridTemplateColumns: '1fr 5fr',
+          }}
+          key={field.regex_group_field}
+        >
           <Typography
+            key={field.regex_group_field}
             sx={{
               margin: 0,
               alignSelf: 'center',
@@ -117,8 +135,8 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
           >
             {t(field.regex_group_field.charAt(0).toUpperCase() + field.regex_group_field.slice(1))}
           </Typography>
-          <TextFieldController placeholder={`$${indexField + 1}`} isCommand style={{ gridColumn: 'span 5' }} name={`${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`} required />
-        </>
+          <TextFieldController placeholder={`$${indexField + 1}`} variant="outlined" name={`${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`} required />
+        </div>
       ))}
     </Card>
   );

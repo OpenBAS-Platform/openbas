@@ -80,6 +80,7 @@ const OutputFormTab = () => {
 
       {contractOutputElements.map((_, contractOutputElementIndex) => (
         <ContractOutputElementCard
+          key={`contract-output-element-${contractOutputElementIndex}`}
           prefixName={outputParserName}
           index={contractOutputElementIndex}
           remove={outputElementRemove}
