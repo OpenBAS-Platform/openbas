@@ -1,3 +1,4 @@
+import { HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type CSSProperties, useState } from 'react';
@@ -14,6 +15,7 @@ import { buildSearchPagination } from '../../../../components/common/queryable/Q
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { useHelper } from '../../../../store';
 import { type SearchPaginationInput, type SecurityPlatform } from '../../../../utils/api-types';
 import { isNotEmptyField } from '../../../../utils/utils';
@@ -101,6 +103,12 @@ const SecurityPlatforms = () => {
     exportFileName: `${t('Security Platforms')}.csv`,
   };
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const searchSecurityPlatformsToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchSecurityPlatforms(input).finally(() => setLoading(false));
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -111,7 +119,7 @@ const SecurityPlatforms = () => {
         }]}
       />
       <PaginationComponent
-        fetch={searchSecurityPlatforms}
+        fetch={searchSecurityPlatformsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setSecurityPlatforms}
         exportProps={exportProps}
@@ -145,73 +153,75 @@ const SecurityPlatforms = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {securityPlatforms.map((securityPlatform: SecurityPlatform) => {
-          return (
-            <ListItem
-              key={securityPlatform.asset_id}
-              classes={{ root: classes.item }}
-              divider={true}
-            >
-              <ListItemIcon>
-                <img
-                  src={`/api/images/security_platforms/id/${securityPlatform.asset_id}/${theme.palette.mode}?${Date.now()}`}
-                  alt={securityPlatform.asset_name}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    borderRadius: 4,
-                  }}
-                />
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <div style={bodyItemsStyles.bodyItems}>
-                    <div style={{
-                      ...bodyItemsStyles.bodyItem,
-                      ...inlineStyles.asset_name,
-                    }}
-                    >
-                      {securityPlatform.asset_name}
-                    </div>
-                    <div style={{
-                      ...bodyItemsStyles.bodyItem,
-                      ...inlineStyles.security_platform_type,
-                    }}
-                    >
-                      {securityPlatform.security_platform_type}
-                    </div>
-                    <div style={{
-                      ...bodyItemsStyles.bodyItem,
-                      ...inlineStyles.asset_description,
-                    }}
-                    >
-                      {securityPlatform.asset_description}
-                    </div>
-                    <div style={{
-                      ...bodyItemsStyles.bodyItem,
-                      ...inlineStyles.asset_tags,
-                    }}
-                    >
-                      <ItemTags variant="list" tags={securityPlatform.asset_tags} />
-                    </div>
-                  </div>
-                )}
-              />
-              <ListItemSecondaryAction>
-                <SecurityPlatformPopover
-                  securityPlatform={{
-                    ...securityPlatform,
-                    type: 'static',
-                  }}
-                  onUpdate={result => setSecurityPlatforms(securityPlatforms.map(e => (e.asset_id !== result.asset_id ? e : result)))}
-                  onDelete={result => setSecurityPlatforms(securityPlatforms.filter(e => (e.asset_id !== result)))}
-                  openEditOnInit={securityPlatform.asset_id === searchId}
-                  disabled={isNotEmptyField(securityPlatform.asset_external_reference)}
-                />
-              </ListItemSecondaryAction>
-            </ListItem>
-          );
-        })}
+        {loading
+          ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+          : securityPlatforms.map((securityPlatform: SecurityPlatform) => {
+              return (
+                <ListItem
+                  key={securityPlatform.asset_id}
+                  classes={{ root: classes.item }}
+                  divider={true}
+                >
+                  <ListItemIcon>
+                    <img
+                      src={`/api/images/security_platforms/id/${securityPlatform.asset_id}/${theme.palette.mode}?${Date.now()}`}
+                      alt={securityPlatform.asset_name}
+                      style={{
+                        width: 25,
+                        height: 25,
+                        borderRadius: 4,
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div style={bodyItemsStyles.bodyItems}>
+                        <div style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles.asset_name,
+                        }}
+                        >
+                          {securityPlatform.asset_name}
+                        </div>
+                        <div style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles.security_platform_type,
+                        }}
+                        >
+                          {securityPlatform.security_platform_type}
+                        </div>
+                        <div style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles.asset_description,
+                        }}
+                        >
+                          {securityPlatform.asset_description}
+                        </div>
+                        <div style={{
+                          ...bodyItemsStyles.bodyItem,
+                          ...inlineStyles.asset_tags,
+                        }}
+                        >
+                          <ItemTags variant="list" tags={securityPlatform.asset_tags} />
+                        </div>
+                      </div>
+                    )}
+                  />
+                  <ListItemSecondaryAction>
+                    <SecurityPlatformPopover
+                      securityPlatform={{
+                        ...securityPlatform,
+                        type: 'static',
+                      }}
+                      onUpdate={result => setSecurityPlatforms(securityPlatforms.map(e => (e.asset_id !== result.asset_id ? e : result)))}
+                      onDelete={result => setSecurityPlatforms(securityPlatforms.filter(e => (e.asset_id !== result)))}
+                      openEditOnInit={securityPlatform.asset_id === searchId}
+                      disabled={isNotEmptyField(securityPlatform.asset_external_reference)}
+                    />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            })}
       </List>
       {userAdmin && <SecurityPlatformCreation onCreate={result => setSecurityPlatforms([result, ...securityPlatforms])} />}
     </>

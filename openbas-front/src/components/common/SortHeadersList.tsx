@@ -19,7 +19,7 @@ export interface Header {
   label: string;
   isSortable: boolean;
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  value?: (...values: any[]) => ReactElement | string;
+  value?: (...values: any[]) => ReactElement | string | undefined;
 }
 
 interface Props {
