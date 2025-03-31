@@ -38,26 +38,6 @@ class CreatePayload extends Component {
   }
 
   onSubmit(data) {
-    function cleanupObjects(array, idKey, nestedKey, cleanupFn) {
-      if (!Array.isArray(array)) return [];
-      return array.map(({ [idKey]: _, [nestedKey]: nestedArray, ...cleaned }) => ({
-        ...cleaned,
-        [nestedKey]: cleanupFn ? cleanupFn(nestedArray) : nestedArray,
-      }));
-    }
-
-    function handleCleanupRegexGroupValue(regexGroups) {
-      return cleanupObjects(regexGroups, 'regex_group_id');
-    }
-
-    function handleCleanupContractOutputsValue(contractOutputs) {
-      return cleanupObjects(contractOutputs, 'contract_output_element_id', 'contract_output_element_regex_groups', handleCleanupRegexGroupValue);
-    }
-
-    function handleCleanupOutputParsersValue(outputParsers) {
-      return cleanupObjects(outputParsers, 'output_parser_id', 'output_parser_contract_output_elements', handleCleanupContractOutputsValue);
-    }
-
     function handleCleanupCommandValue(payload_cleanup_command) {
       return payload_cleanup_command === '' ? null : payload_cleanup_command;
     }
@@ -78,7 +58,6 @@ class CreatePayload extends Component {
       R.assoc('executable_file', data.executable_file?.id),
       R.assoc('payload_cleanup_executor', handleCleanupExecutorValue(data.payload_cleanup_executor, data.payload_cleanup_command)),
       R.assoc('payload_cleanup_command', handleCleanupCommandValue(data.payload_cleanup_command)),
-      R.assoc('payload_output_parsers', handleCleanupOutputParsersValue(data.payload_output_parsers)),
     )(data);
     return this.props
       .addPayload(inputValues)
