@@ -146,11 +146,11 @@ public class CrowdStrikeExecutorClient {
     }
   }
 
-  public void executeAction(String deviceId, String scriptName, String command) {
+  public void executeAction(List<String> devicesId, String scriptName, String command) {
     try {
       // Open remote session
       Map<String, Object> bodySession = new HashMap<>();
-      bodySession.put("host_ids", List.of(deviceId));
+      bodySession.put("host_ids", devicesId);
       bodySession.put("queue_offline", false);
       String jsonSessionResponse = this.post(SESSION_URI, bodySession);
       ResourcesSession session =
@@ -170,9 +170,10 @@ public class CrowdStrikeExecutorClient {
               + "\"  -CommandLine=```'{\"command\":\""
               + command
               + "\"}'```");
-      // TODO pagination in properties
-      //HttpAsyncClientBuilder.create();
-      this.post(REAL_TIME_RESPONSE_URI, bodyCommand); // TODO async ? @Async or HttpAsyncClient (Julien lib)
+      // HttpAsyncClientBuilder.create();
+      this.post(
+          REAL_TIME_RESPONSE_URI,
+          bodyCommand); // TODO async ? @Async or HttpAsyncClient (Julien lib)
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

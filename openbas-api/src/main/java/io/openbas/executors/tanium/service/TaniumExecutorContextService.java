@@ -10,7 +10,7 @@ import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
 import java.util.Base64;
-import java.util.Objects;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -30,13 +30,11 @@ public class TaniumExecutorContextService extends ExecutorContextService {
       throws AgentException {
 
     if (!this.taniumExecutorConfig.isEnable()) {
-      throw new AgentException("Fatal error: Tanium executor is not enabled", agent);
+      throw new AgentException("Tanium executor is not enabled", agent);
     }
 
-    Endpoint.PLATFORM_TYPE platform =
-        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getPlatform() : null;
-    Endpoint.PLATFORM_ARCH arch =
-        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getArch() : null;
+    Endpoint.PLATFORM_TYPE platform = assetEndpoint.getPlatform();
+    Endpoint.PLATFORM_ARCH arch = assetEndpoint.getArch();
     if (platform == null || arch == null) {
       throw new RuntimeException("Unsupported platform: " + platform + " (arch:" + arch + ")");
     }
@@ -64,4 +62,7 @@ public class TaniumExecutorContextService extends ExecutorContextService {
         packageId,
         Base64.getEncoder().encodeToString(command.getBytes()));
   }
+
+  public void launchBatchExecutorSubprocess(
+      Inject inject, List<Agent> agents, InjectStatus injectStatus) {}
 }

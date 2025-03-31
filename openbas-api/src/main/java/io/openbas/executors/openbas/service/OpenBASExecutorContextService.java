@@ -7,7 +7,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.executors.ExecutorContextService;
 import jakarta.validation.constraints.NotNull;
-import java.util.Objects;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -45,10 +45,8 @@ public class OpenBASExecutorContextService extends ExecutorContextService {
       @NotNull final Inject inject,
       @NotNull final Endpoint assetEndpoint,
       @NotNull final Agent agent) {
-    Endpoint.PLATFORM_TYPE platform =
-        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getPlatform() : null;
-    Endpoint.PLATFORM_ARCH arch =
-        Objects.equals(assetEndpoint.getType(), "Endpoint") ? assetEndpoint.getArch() : null;
+    Endpoint.PLATFORM_TYPE platform = assetEndpoint.getPlatform();
+    Endpoint.PLATFORM_ARCH arch = assetEndpoint.getArch();
     if (platform == null) {
       throw new RuntimeException("Unsupported null platform");
     }
@@ -58,4 +56,7 @@ public class OpenBASExecutorContextService extends ExecutorContextService {
     assetAgentJob.setInject(inject);
     assetAgentJobRepository.save(assetAgentJob);
   }
+
+  public void launchBatchExecutorSubprocess(
+      Inject inject, List<Agent> agents, InjectStatus injectStatus) {}
 }
