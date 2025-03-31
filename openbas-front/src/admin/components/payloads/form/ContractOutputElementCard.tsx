@@ -87,7 +87,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
   }, [selectedContractOutputElementType]);
 
   return (
-    <Card className={classes.outputParserElement} variant="outlined">
+    <Card key={`contract-output-element-${index}`} className={classes.outputParserElement} variant="outlined">
       <TextFieldController style={{ gridColumn: 'span 2' }} name={`${prefixName}.${index}.contract_output_element_name` as const} label={t('Name')} required />
       <TextFieldController style={{ gridColumn: 'span 2' }} name={`${prefixName}.${index}.contract_output_element_key` as const} label={t('Key')} required />
       <SelectFieldController style={{ width: '100%' }} name={`${prefixName}.${index}.contract_output_element_type` as const} label={t('Type')} items={outputParserTypeList} required />

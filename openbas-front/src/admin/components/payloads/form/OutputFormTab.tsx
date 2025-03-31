@@ -78,9 +78,8 @@ const OutputFormTab = () => {
         </Button>
       </div>
 
-      {contractOutputElements.map((contractOutputElementField, contractOutputElementIndex) => (
+      {contractOutputElements.map((_, contractOutputElementIndex) => (
         <ContractOutputElementCard
-          key={contractOutputElementField.id}
           prefixName={outputParserName}
           index={contractOutputElementIndex}
           remove={outputElementRemove}
