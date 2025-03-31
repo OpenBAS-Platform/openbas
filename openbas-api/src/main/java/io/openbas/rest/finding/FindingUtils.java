@@ -33,15 +33,13 @@ public class FindingUtils {
         .forEach(
             contractOutputElement -> {
               String regex = contractOutputElement.getRule();
-              int multilineFlag =
-                  (regex.contains("^") || regex.contains("$")) ? Pattern.MULTILINE : 0;
               Pattern pattern =
                   patternCache.computeIfAbsent(
                       regex,
                       r ->
                           Pattern.compile(
                               r,
-                              multilineFlag
+                              Pattern.MULTILINE
                                   | Pattern.CASE_INSENSITIVE
                                   | Pattern.UNICODE_CHARACTER_CLASS));
               Matcher matcher = pattern.matcher(rawOutputByMode);
