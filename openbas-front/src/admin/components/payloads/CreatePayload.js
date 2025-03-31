@@ -88,7 +88,6 @@ class CreatePayload extends Component {
           open={open}
           handleClose={this.handleClose.bind(this)}
           title={t('Create a new payload')}
-          containerStyle={{ height: '100%' }}
         >
           <PayloadForm
             editing={false}

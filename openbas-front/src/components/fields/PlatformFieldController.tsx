@@ -57,7 +57,7 @@ const PlatformFieldController: FunctionComponent<Props> = ({
       rules={{ required: `${label} is required` }}
       render={({ field, fieldState: { error } }) => (
         <Autocomplete
-          size="small"
+          size="medium"
           multiple
           options={platformsOptions}
           openOnFocus
