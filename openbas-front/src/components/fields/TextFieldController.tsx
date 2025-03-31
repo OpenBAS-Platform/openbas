@@ -1,4 +1,4 @@
-import { TextField, type TextFieldVariants } from '@mui/material';
+import { InputAdornment, TextField, type TextFieldVariants } from '@mui/material';
 import { type CSSProperties } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
@@ -13,16 +13,12 @@ interface Props {
   variant?: TextFieldVariants;
   placeholder?: string;
   size?: 'medium' | 'small';
+  adornmentLabel?: string;
 }
-const useStyles = makeStyles()(theme => ({
-  root: {
-    '& .MuiOutlinedInput-root': { background: theme.palette.background.code },
-  },
-}));
 
-const TextFieldController = ({ name, label, multiline, rows, required, style = {}, size, variant, placeholder = '' }: Props) => {
+const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': { background: theme.palette.background.code } } }));
 
-const TextFieldController = ({ name, label, multiline, rows, required, style = {}, isCommand = false, placeholder = '' }: Props) => {
+const TextFieldController = ({ name, label, multiline, rows, required, style = {}, size, variant, placeholder = '', adornmentLabel }: Props) => {
   const { control } = useFormContext();
   const { classes } = useStyles();
 
@@ -46,6 +42,7 @@ const TextFieldController = ({ name, label, multiline, rows, required, style = {
           style={style}
           variant={variant || 'standard'}
           size={size || 'medium'}
+          slotProps={adornmentLabel ? { input: { endAdornment: <InputAdornment position="end">{adornmentLabel}</InputAdornment> } } : {}}
         />
       )}
     />

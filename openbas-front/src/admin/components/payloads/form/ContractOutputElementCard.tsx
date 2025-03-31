@@ -9,7 +9,7 @@ import SelectFieldController from '../../../../components/fields/SelectFieldCont
 import TagFieldController from '../../../../components/fields/TagFieldController';
 import TextFieldController from '../../../../components/fields/TextFieldController';
 import { useFormatter } from '../../../../components/i18n';
-import { type RegexGroup } from '../../../../utils/api-types';
+import { type ContractOutputElement, type RegexGroup } from '../../../../utils/api-types';
 
 interface Props {
   prefixName: string;
@@ -46,30 +46,16 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
   const selectedContractOutputElementType = watch(`${prefixName}.${index}.contract_output_element_type`) as keyof typeof defaultFields | undefined;
   const regexGroups: RegexGroup[] = watch(`${prefixName}.${index}.contract_output_element_regex_groups`);
 
-  const outputParserTypeList = [
-    {
-      value: 'text',
-      label: t('Text'),
-    }, {
-      value: 'number',
-      label: t('Number'),
-    }, {
-      value: 'port',
-      label: t('Port'),
-    }, {
-      value: 'portscan',
-      label: t('Port scan'),
-    }, {
-      value: 'ipv4',
-      label: 'IPv4',
-    }, {
-      value: 'ipv6',
-      label: 'IPv6',
-    }, {
-      value: 'credentials',
-      label: t('Credentials'),
-    },
+  type ContractOutputElementType = ContractOutputElement['contract_output_element_type'];
+
+  const contractOutputElementTypes: ContractOutputElementType[] = [
+    'text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials',
   ];
+
+  const outputParserTypeList = contractOutputElementTypes.map(type => ({
+    value: type,
+    label: t(type.charAt(0).toUpperCase() + type.slice(1)),
+  }));
 
   useEffect(() => {
     if (!selectedContractOutputElementType) return;
@@ -110,7 +96,13 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
       >
         {`${t('Regex group rules')} * :`}
       </Typography>
-      <TextFieldController variant="outlined" style={{ gridColumn: 'span 4' }} name={`${prefixName}.${index}.contract_output_element_rule` as const} required />
+      <TextFieldController
+        variant="outlined"
+        style={{ gridColumn: 'span 4' }}
+        name={`${prefixName}.${index}.contract_output_element_rule` as const}
+        required
+        adornmentLabel={'\\gm'}
+      />
       {regexGroups.length > 0 && (
         <Typography className={classes.outputValueTitle} variant="h3">
           {`${t('Output value')} *`}
@@ -135,7 +127,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
           >
             {t(field.regex_group_field.charAt(0).toUpperCase() + field.regex_group_field.slice(1))}
           </Typography>
-          <TextFieldController placeholder={`$${indexField + 1}`} variant="outlined" name={`${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`} required />
+          <TextFieldController size="small" placeholder={`$${indexField + 1}`} variant="outlined" name={`${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`} required />
         </div>
       ))}
     </Card>

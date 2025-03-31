@@ -110,7 +110,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
         <>
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Attack command')}</Typography>
           <SelectFieldController name="command_executor" label={t('Executor')} items={executorsItems} required />
-          <TextFieldController multiline rows={3} name="command_content" label={t('Command content')} required />
+          <TextFieldController variant="outlined" multiline rows={3} name="command_content" required />
         </>
       )}
 
@@ -241,7 +241,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
           {/* CLEANUP */}
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Cleanup command')}</Typography>
           <SelectFieldController name="payload_cleanup_executor" label={t('Executor')} items={executorsItems} />
-          <TextFieldController multiline rows={3} name="payload_cleanup_command" label={t('Cleanup command')} />
+          <TextFieldController variant="outlined" multiline rows={3} name="payload_cleanup_command" />
         </>
       )}
     </>

@@ -57,23 +57,23 @@ const PayloadForm = ({
   };
 
   const regexGroupObject = z.object({
-    regex_group_id: z.string().optional(),
+    ...editing && { regex_group_id: z.string() },
     regex_group_field: z.string().min(1, { message: t('Should not be empty') }),
     regex_group_index_values: z.string().min(1, { message: t('Should not be empty') }),
   });
 
   const contractOutputElementObject = z.object({
-    contract_output_element_id: z.string().optional(),
+    ...editing && { contract_output_element_id: z.string() },
     contract_output_element_is_finding: z.boolean().optional(),
     contract_output_element_name: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_key: z.string().min(1, { message: t('Should not be empty') }),
-    contract_output_element_type: z.string().min(1, { message: t('Should not be empty') }),
+    contract_output_element_type: z.enum(['text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials'], { message: t('Should not be empty') }),
     contract_output_element_tags: z.string().array().optional(),
     contract_output_element_rule: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_regex_groups: z.array(regexGroupObject),
   });
   const outputParserObject = z.object({
-    output_parser_id: z.string().optional(),
+    ...editing && { output_parser_id: z.string() },
     output_parser_mode: z.enum(['STDOUT'], { message: t('Should not be empty') }),
     output_parser_type: z.enum(['REGEX'], { message: t('Should not be empty') }),
     output_parser_contract_output_elements: z.array(contractOutputElementObject),
@@ -103,7 +103,7 @@ const PayloadForm = ({
       label: z.string(),
     }).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_execution_arch: z.enum(['x86_64', 'arm64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }).describe('Commands-tab'),
-    payload_cleanup_command: z.string().optional(),
+    payload_cleanup_command: z.string().optional().describe('Commands-tab'),
     payload_cleanup_executor: z.string().optional(),
     payload_arguments: z.array(payloadArgumentZodObject).optional().describe('Commands-tab'),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional().describe('Commands-tab'),
