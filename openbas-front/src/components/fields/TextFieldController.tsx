@@ -1,17 +1,20 @@
-import { TextField } from '@mui/material';
+import { TextField, type TextFieldVariants } from '@mui/material';
 import { type CSSProperties } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 interface Props {
   name: string;
-  label: string;
+  label?: string;
   multiline?: boolean;
   rows?: number;
   required?: boolean;
   style?: CSSProperties;
+  variant?: TextFieldVariants;
+  placeholder?: string;
+  size?: 'medium' | 'small';
 }
 
-const TextFieldController = ({ name, label, multiline, rows, required, style = {} }: Props) => {
+const TextFieldController = ({ name, label, multiline, rows, required, style = {}, size, variant, placeholder = '' }: Props) => {
   const { control } = useFormContext();
 
   return (
@@ -21,14 +24,18 @@ const TextFieldController = ({ name, label, multiline, rows, required, style = {
       render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
-          label={label}
+          label={label || ''}
           fullWidth
           error={!!error}
           helperText={error ? error.message : null}
           multiline={multiline}
           rows={rows}
-          style={style}
+          aria-label={label}
           required={required}
+          placeholder={placeholder}
+          style={style}
+          variant={variant || 'standard'}
+          size={size || 'medium'}
         />
       )}
     />
