@@ -1,7 +1,6 @@
 import { TextField, type TextFieldVariants } from '@mui/material';
 import { type CSSProperties } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { makeStyles } from 'tss-react/mui';
 
 interface Props {
   name: string;
@@ -15,11 +14,8 @@ interface Props {
   size?: 'medium' | 'small';
 }
 
-const useStyles = makeStyles()(theme => ({ root: { '& .MuiOutlinedInput-root': { background: theme.palette.background.code } } }));
-
 const TextFieldController = ({ name, label, multiline, rows, required, style = {}, size, variant, placeholder = '' }: Props) => {
   const { control } = useFormContext();
-  const { classes } = useStyles();
 
   return (
     <Controller
@@ -29,7 +25,6 @@ const TextFieldController = ({ name, label, multiline, rows, required, style = {
         <TextField
           {...field}
           label={label || ''}
-          className={classes.root}
           fullWidth
           error={!!error}
           helperText={error ? error.message : null}
