@@ -1,12 +1,12 @@
 import { CancelOutlined } from '@mui/icons-material';
 import { IconButton, TextField } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { emptyFilterGroup } from '../../../../../components/common/queryable/filter/FilterUtils';
-import useFiltersState from '../../../../../components/common/queryable/filter/useFiltersState';
+import { buildFilter } from '../../../../../components/common/queryable/filter/FilterUtils';
 import { useFormatter } from '../../../../../components/i18n';
-import { type DateHistogramSeries, type FilterGroup, type StructuralHistogramSeries } from '../../../../../utils/api-types';
+import { type DateHistogramSeries, type StructuralHistogramSeries } from '../../../../../utils/api-types';
 import FilterFieldBaseEntity from './FilterFieldBaseEntity';
 
 const useStyles = makeStyles()(theme => ({
@@ -39,6 +39,7 @@ const WidgetCreationSeries: FunctionComponent<{
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
+  const theme = useTheme();
 
   const [label, setLabel] = useState<string>(series.name ?? '');
   const onChangeLabel = (label: string) => {
@@ -49,13 +50,21 @@ const WidgetCreationSeries: FunctionComponent<{
     });
   };
 
-  const onChangeFilterGroup = (filterGroup: FilterGroup) => {
+  const [entity, setEntity] = useState<string | null>(null);
+  const onChangeEntity = (entity: string | null) => {
+    setEntity(entity);
     onChange({
       ...series,
-      filter: filterGroup,
+      filter: entity === null
+        ? undefined
+        : {
+            mode: 'and',
+            filters: [
+              buildFilter('base_entity', [entity], 'eq'),
+            ],
+          },
     });
   };
-  const [filterGroup, helpers] = useFiltersState(emptyFilterGroup, undefined, onChangeFilterGroup);
 
   const handleRemoveSeries = () => {
     onRemove(index);
@@ -80,15 +89,12 @@ const WidgetCreationSeries: FunctionComponent<{
         variant="standard"
         fullWidth
         label={t('Label (entities)')}
-        style={{ marginTop: 10 }}
         value={label}
         onChange={e => onChangeLabel(e.target.value)}
       />
-      <FilterFieldBaseEntity
-        filterGroup={filterGroup}
-        helpers={helpers}
-        style={{ marginTop: 20 }}
-      />
+      <div style={{ marginTop: theme.spacing(2) }}>
+        <FilterFieldBaseEntity value={entity} onChange={onChangeEntity} />
+      </div>
     </div>
   );
 };
