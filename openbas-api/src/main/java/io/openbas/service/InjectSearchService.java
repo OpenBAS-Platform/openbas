@@ -15,6 +15,7 @@ import io.openbas.database.repository.AssetRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.rest.atomic_testing.form.*;
+import io.openbas.rest.payload.output.PayloadSimple;
 import io.openbas.rest.inject.output.InjectOutput;
 import io.openbas.utils.AtomicTestingUtils;
 import io.openbas.utils.InjectMapper;

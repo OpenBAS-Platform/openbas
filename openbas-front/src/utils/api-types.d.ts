@@ -636,6 +636,25 @@ export interface ContractOutputElementInput {
   contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
+/** Represents the rules for parsing the output of an execution. */
+export interface ContractOutputElementSimple {
+  contract_output_element_id?: string;
+  /** Represents a unique key identifier. */
+  contract_output_element_key?: string;
+  /** Represents the name of the rule. */
+  contract_output_element_name?: string;
+  /** @uniqueItems true */
+  contract_output_element_regex_groups?: RegexGroupSimple[];
+  /** The rule to apply for parsing the output, for example, can be a regex. */
+  contract_output_element_rule?: string;
+  contract_output_element_tags?: string[];
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials"
+   */
+  contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+}
+
 export interface CreateUserInput {
   /** True if the user is admin */
   user_admin?: boolean;
@@ -2402,6 +2421,17 @@ export interface OutputParserInput {
   output_parser_type: "REGEX";
 }
 
+/** Represents a single output parser */
+export interface OutputParserSimple {
+  /** @uniqueItems true */
+  output_parser_contract_output_elements?: ContractOutputElementSimple[];
+  output_parser_id?: string;
+  /** Mode of parser, which output will be parsed, for now only STDOUT is supported */
+  output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
+  /** Type of parser, for now only REGEX is supported */
+  output_parser_type?: "REGEX";
+}
+
 export interface PageAssetGroupOutput {
   content?: AssetGroupOutput[];
   empty?: boolean;
@@ -3255,6 +3285,15 @@ export interface RegexGroupInput {
   regex_group_index_values: string;
 }
 
+/** Represents the groups defined by the regex pattern. */
+export interface RegexGroupSimple {
+  /** Represents the field name of specific captured groups. */
+  regex_group_field?: string;
+  regex_group_id?: string;
+  /** Represents the indexes of specific captured groups. */
+  regex_group_index_values?: string;
+}
+
 export interface RenewTokenInput {
   token_id: string;
 }
@@ -3642,13 +3681,6 @@ export interface StatusPayloadOutput {
   executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   executable_file?: StatusPayloadDocument;
   file_drop_file?: StatusPayloadDocument;
-  network_traffic_ip_dst: string;
-  network_traffic_ip_src: string;
-  /** @format int32 */
-  network_traffic_port_dst: number;
-  /** @format int32 */
-  network_traffic_port_src: number;
-  network_traffic_protocol: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPatternSimple[];
   payload_cleanup_executor?: string;
@@ -3658,6 +3690,8 @@ export interface StatusPayloadOutput {
   payload_external_id?: string;
   payload_name?: string;
   payload_obfuscator?: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParserSimple[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */

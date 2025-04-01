@@ -18,7 +18,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
-import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/AtomicTestingPayloadInfo';
+import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/payload_info/AtomicTestingPayloadInfo';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
 import { PermissionsContext, type PermissionsContextType } from '../../../common/Context';
 import InjectHeader from '../../../injects/InjectHeader';

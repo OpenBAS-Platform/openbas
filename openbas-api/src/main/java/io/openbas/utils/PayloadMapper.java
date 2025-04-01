@@ -9,7 +9,11 @@ import static java.util.Optional.ofNullable;
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
 import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
+import io.openbas.rest.payload.output.output_parser.ContractOutputElementSimple;
+import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
+import io.openbas.rest.payload.output.output_parser.RegexGroupSimple;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
@@ -67,6 +71,49 @@ public class PayloadMapper {
         .orElse(null);
   }
 
+  private Set<RegexGroupSimple> toRegexGroupSimple(Set<RegexGroup> regexGroups) {
+    return regexGroups.stream()
+        .map(
+            regexGroup ->
+                RegexGroupSimple.builder()
+                    .id(regexGroup.getId())
+                    .field(regexGroup.getField())
+                    .indexValues(regexGroup.getIndexValues())
+                    .build())
+        .collect(Collectors.toSet());
+  }
+
+  private Set<ContractOutputElementSimple> toContractOutputElementsSimple(
+      Set<ContractOutputElement> contractElements) {
+    return contractElements.stream()
+        .map(
+            contractElement ->
+                ContractOutputElementSimple.builder()
+                    .id(contractElement.getId())
+                    .rule(contractElement.getRule())
+                    .name(contractElement.getName())
+                    .key(contractElement.getKey())
+                    .type(contractElement.getType())
+                    .tagIds(contractElement.getTags().stream().map(Tag::getId).toList())
+                    .regexGroups(toRegexGroupSimple(contractElement.getRegexGroups()))
+                    .build())
+        .collect(Collectors.toSet());
+  }
+
+  private Set<OutputParserSimple> toOutputParsersSimple(Set<OutputParser> outputParsers) {
+    return outputParsers.stream()
+        .map(
+            parser ->
+                OutputParserSimple.builder()
+                    .id(parser.getId())
+                    .mode(parser.getMode())
+                    .type(parser.getType())
+                    .contractOutputElement(
+                        toContractOutputElementsSimple(parser.getContractOutputElements()))
+                    .build())
+        .collect(Collectors.toSet());
+  }
+
   private void populatePayloadDetails(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder,
       Payload payload,
@@ -80,8 +127,9 @@ public class PayloadMapper {
         .type(payload.getType())
         .collectorType(payload.getCollectorType())
         .description(payload.getDescription())
+        .tags(payload.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .platforms(payload.getPlatforms())
-        .payloadOutputParser(payload.getOutputParsers())
+        .payloadOutputParsers(toOutputParsersSimple(payload.getOutputParsers()))
         .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
         .executableArch(injectorContract.getArch());
   }
@@ -156,7 +204,10 @@ public class PayloadMapper {
 
     Payload payload = injectorContract.getPayload();
     if (payload != null) {
-      builder.collectorType(payload.getCollectorType());
+      builder
+          .collectorType(payload.getCollectorType())
+          .payloadOutputParsers(toOutputParsersSimple(payload.getOutputParsers()))
+          .tags(payload.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
     }
 
     return builder.build();
