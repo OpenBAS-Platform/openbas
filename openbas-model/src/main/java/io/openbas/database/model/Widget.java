@@ -27,7 +27,9 @@ public class Widget implements Base {
 
   public enum WidgetType {
     @JsonProperty("vertical-barchart")
-    VERTICAL_BAR_CHART("vertical-barchart");
+    VERTICAL_BAR_CHART("vertical-barchart"),
+    @JsonProperty("matrix-mitre")
+    MATRIX_MITRE_CHART("matrix-mitre");
 
     public final String type;
 

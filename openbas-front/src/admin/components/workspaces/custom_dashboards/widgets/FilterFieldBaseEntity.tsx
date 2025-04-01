@@ -28,7 +28,7 @@ const FilterFieldBaseEntity: FunctionComponent<Props> = ({
     engineSchemas().then((response: { data: PropertySchemaDTO[] }) => {
       const entities = Array.from(new Set(
         response.data.map(d => d.schema_property_entity),
-      ));
+      )).filter(e => e !== 'esbase');
       setOptions(entities.map(entity => ({
         id: entity,
         label: t(entity),

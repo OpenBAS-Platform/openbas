@@ -9,7 +9,7 @@ import { type EsSeriesData, type Widget } from '../../../../../utils/api-types';
 import { verticalBarsChartOptions } from '../../../../../utils/Charts';
 import { isEmptyField, isNotEmptyField } from '../../../../../utils/utils';
 
-interface WidgetTemporalVizProps {widget: Widget;}
+interface WidgetTemporalVizProps { widget: Widget }
 
 const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
   const theme = useTheme();
