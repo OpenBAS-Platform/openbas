@@ -143,7 +143,6 @@ public class ExecutableInjectService {
     if (contract.getPayload() == null) {
       throw new ElementNotFoundException("Payload not found");
     }
-
     Payload payloadToExecute = payloadService.generateDuplicatedPayload(contract.getPayload());
 
     // prerequisite
@@ -193,7 +192,6 @@ public class ExecutableInjectService {
     if (contract.getPayload().getTypeEnum().equals(PayloadType.COMMAND)) {
       Command payloadCommand = (Command) payloadToExecute;
       payloadCommand.setExecutor(((Command) contract.getPayload()).getExecutor());
-
       payloadCommand.setContent(
           processAndEncodeCommand(
               payloadCommand.getContent(),
