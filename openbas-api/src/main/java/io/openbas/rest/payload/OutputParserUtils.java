@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -20,48 +21,49 @@ public class OutputParserUtils {
   private final ContractOutputElementUtils contractOutputElementUtils;
 
   public <T> void copyOutputParsers(Set<T> inputParsers, Payload target, boolean copyId) {
-    if (inputParsers != null) {
-      Set<OutputParser> outputParsers =
-          inputParsers.stream()
-              .map(
-                  inputParser -> {
-                    OutputParser outputParser = new OutputParser();
-                    outputParser.setPayload(target);
-
-                    Instant now = now();
-                    outputParser.setCreatedAt(now);
-                    outputParser.setUpdatedAt(now);
-
-                    // Handle contract output elements based on the input type
-                    if (inputParser instanceof OutputParserInput) {
-                      OutputParserInput parserInput = (OutputParserInput) inputParser;
-                      if (!copyId) {
-                        outputParser.setId(null);
-                      } else {
-                        outputParser.setId(parserInput.getId());
-                      }
-                      outputParser.setType(parserInput.getType());
-                      outputParser.setMode(parserInput.getMode());
-                      contractOutputElementUtils.copyContractOutputElements(
-                          parserInput.getContractOutputElements(), outputParser, copyId);
-                    } else if (inputParser instanceof OutputParser) {
-                      OutputParser parser = (OutputParser) inputParser;
-                      if (!copyId) {
-                        outputParser.setId(null);
-                      } else {
-                        outputParser.setId(parser.getId());
-                      }
-                      outputParser.setType(parser.getType());
-                      outputParser.setMode(parser.getMode());
-                      contractOutputElementUtils.copyContractOutputElements(
-                          parser.getContractOutputElements(), outputParser, copyId);
-                    }
-
-                    return outputParser;
-                  })
-              .collect(Collectors.toSet());
-
-      target.setOutputParsers(new HashSet<>(outputParsers));
+    if (inputParsers == null) {
+      return;
     }
+    Instant now = now();
+    Set<OutputParser> outputParsers =
+        inputParsers.stream()
+            .map(inputParser -> copyOutputParser(inputParser, target, copyId, now))
+            .collect(Collectors.toSet());
+
+    target.setOutputParsers(new HashSet<>(outputParsers));
+  }
+
+  private <T> OutputParser copyOutputParser(
+      T inputParser, Payload target, boolean copyId, Instant now) {
+    OutputParser outputParser = new OutputParser();
+    outputParser.setPayload(target);
+    outputParser.setCreatedAt(now);
+    outputParser.setUpdatedAt(now);
+    if (inputParser instanceof OutputParserInput) {
+      copyFromParserInput((OutputParserInput) inputParser, outputParser, copyId);
+    } else if (inputParser instanceof OutputParser) {
+      copyFromParserEntity((OutputParser) inputParser, outputParser, copyId);
+    }
+    return outputParser;
+  }
+
+  private void copyFromParserInput(
+      OutputParserInput parserInput, OutputParser outputParser, boolean copyId) {
+    BeanUtils.copyProperties(parserInput, outputParser, "id", "contractOutputElements");
+    if (copyId) {
+      outputParser.setId(parserInput.getId());
+    }
+    contractOutputElementUtils.copyContractOutputElements(
+        parserInput.getContractOutputElements(), outputParser, copyId);
+  }
+
+  private void copyFromParserEntity(
+      OutputParser parser, OutputParser outputParser, boolean copyId) {
+    BeanUtils.copyProperties(parser, outputParser, "id", "contractOutputElements");
+    if (copyId) {
+      outputParser.setId(parser.getId());
+    }
+    contractOutputElementUtils.copyContractOutputElements(
+        parser.getContractOutputElements(), outputParser, copyId);
   }
 }

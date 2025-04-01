@@ -8,7 +8,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.database.model.*;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.*;
+import io.openbas.utils.StringUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -112,13 +114,30 @@ public class PayloadUtils {
     }
   }
 
-  // -- COPY PROPERTIES --
+  public <T extends Payload> void duplicateCommonProperties(
+      @org.jetbrains.annotations.NotNull final T origin,
+      @org.jetbrains.annotations.NotNull T duplicate) {
+    BeanUtils.copyProperties(
+        origin, duplicate, "outputParsers", "tags", "attackPatterns", "arguments", "prerequisites");
+    duplicate.setId(null);
+    duplicate.setName(StringUtils.duplicateString(origin.getName()));
+    duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
+    duplicate.setExternalId(null);
+    duplicate.setArguments(new ArrayList<>(origin.getArguments()));
+    duplicate.setPrerequisites(new ArrayList<>(origin.getPrerequisites()));
+    duplicate.setTags(new HashSet<>(origin.getTags()));
+    duplicate.setCollector(null);
+    duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
+    duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
+    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate, false);
+  }
+
   public Payload copyProperties(Object payloadInput, Payload target, boolean copyId) {
     if (payloadInput == null) {
       throw new IllegalArgumentException("Input payload cannot be null");
     }
 
-    BeanUtils.copyProperties(payloadInput, target);
+    BeanUtils.copyProperties(payloadInput, target, "outputParsers", "tags", "attackPatterns");
 
     if (payloadInput instanceof PayloadCreateInput) {
       outputParserUtils.copyOutputParsers(

@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -25,61 +26,49 @@ public class ContractOutputElementUtils {
 
   public void copyContractOutputElements(
       Set<?> inputElements, OutputParser outputParser, boolean copyId) {
-    if (inputElements != null) {
-      Set<ContractOutputElement> contractOutputElements =
-          inputElements.stream()
-              .map(
-                  inputElement -> {
-                    ContractOutputElement contractOutputElement = new ContractOutputElement();
-                    contractOutputElement.setOutputParser(outputParser);
-
-                    Instant now = now();
-                    contractOutputElement.setCreatedAt(now);
-                    contractOutputElement.setUpdatedAt(now);
-
-                    if (inputElement instanceof ContractOutputElementInput) {
-                      ContractOutputElementInput contractOutputElementInput =
-                          (ContractOutputElementInput) inputElement;
-                      if (!copyId) {
-                        contractOutputElement.setId(null);
-                      } else {
-                        contractOutputElement.setId(contractOutputElementInput.getId());
-                      }
-                      contractOutputElement.setRule(contractOutputElementInput.getRule());
-                      contractOutputElement.setType(contractOutputElementInput.getType());
-                      contractOutputElement.setKey(contractOutputElementInput.getKey());
-                      contractOutputElement.setName(contractOutputElementInput.getName());
-                      contractOutputElement.setTags(
-                          iterableToSet(
-                              tagRepository.findAllById(contractOutputElementInput.getTagIds())));
-                      regexGroupUtils.copyRegexGroups(
-                          contractOutputElementInput.getRegexGroups(),
-                          contractOutputElement,
-                          copyId);
-                    } else {
-                      ContractOutputElement contractOutputElementInstance =
-                          (ContractOutputElement) inputElement;
-                      if (!copyId) {
-                        contractOutputElement.setId(null);
-                      } else {
-                        contractOutputElement.setId(contractOutputElementInstance.getId());
-                      }
-                      contractOutputElement.setRule(contractOutputElementInstance.getRule());
-                      contractOutputElement.setType(contractOutputElementInstance.getType());
-                      contractOutputElement.setKey(contractOutputElementInstance.getKey());
-                      contractOutputElement.setName(contractOutputElementInstance.getName());
-                      contractOutputElement.setTags(
-                          new HashSet<>(contractOutputElementInstance.getTags()));
-                      regexGroupUtils.copyRegexGroups(
-                          contractOutputElementInstance.getRegexGroups(),
-                          contractOutputElement,
-                          copyId);
-                    }
-                    return contractOutputElement;
-                  })
-              .collect(Collectors.toSet());
-
-      outputParser.setContractOutputElements(new HashSet<>(contractOutputElements));
+    if (inputElements == null || outputParser == null) {
+      return;
     }
+    Instant now = now();
+    Set<ContractOutputElement> contractOutputElements =
+        inputElements.stream()
+            .map(inputElement -> copyContractOutputElement(inputElement, outputParser, copyId, now))
+            .collect(Collectors.toSet());
+
+    outputParser.setContractOutputElements(contractOutputElements);
+  }
+
+  private ContractOutputElement copyContractOutputElement(
+      Object inputElement, OutputParser outputParser, boolean copyId, Instant now) {
+    ContractOutputElement contractOutputElement = new ContractOutputElement();
+    contractOutputElement.setOutputParser(outputParser);
+    contractOutputElement.setCreatedAt(now);
+    contractOutputElement.setUpdatedAt(now);
+    if (inputElement instanceof ContractOutputElementInput) {
+      copyFromInput((ContractOutputElementInput) inputElement, contractOutputElement, copyId);
+    } else if (inputElement instanceof ContractOutputElement) {
+      copyFromEntity((ContractOutputElement) inputElement, contractOutputElement, copyId);
+    }
+    return contractOutputElement;
+  }
+
+  private void copyFromInput(
+      ContractOutputElementInput input,
+      ContractOutputElement contractOutputElement,
+      boolean copyId) {
+    BeanUtils.copyProperties(input, contractOutputElement, "id", "tags", "regexGroups");
+    contractOutputElement.setId(copyId ? input.getId() : null);
+    if (tagRepository != null) {
+      contractOutputElement.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
+    }
+    regexGroupUtils.copyRegexGroups(input.getRegexGroups(), contractOutputElement, copyId);
+  }
+
+  private void copyFromEntity(
+      ContractOutputElement existing, ContractOutputElement contractOutputElement, boolean copyId) {
+    BeanUtils.copyProperties(existing, contractOutputElement, "id", "tags", "regexGroups");
+    contractOutputElement.setId(copyId ? existing.getId() : null);
+    contractOutputElement.setTags(new HashSet<>(existing.getTags()));
+    regexGroupUtils.copyRegexGroups(existing.getRegexGroups(), contractOutputElement, copyId);
   }
 }

@@ -28,8 +28,7 @@ import io.openbas.injector_contract.fields.ContractAssetGroup;
 import io.openbas.injector_contract.fields.ContractChoiceInformation;
 import io.openbas.injector_contract.fields.ContractExpectations;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
-import io.openbas.rest.payload.OutputParserUtils;
-import io.openbas.utils.StringUtils;
+import io.openbas.rest.payload.PayloadUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -54,7 +53,7 @@ public class PayloadService {
   private final InjectorContractRepository injectorContractRepository;
   private final AttackPatternRepository attackPatternRepository;
   private final ExpectationBuilderService expectationBuilderService;
-  private final OutputParserUtils outputParserUtils;
+  private final PayloadUtils payloadUtils;
 
   public void updateInjectorContractsForPayload(Payload payload) {
     List<Injector> injectors = this.injectorRepository.findAllByPayloads(true);
@@ -185,69 +184,36 @@ public class PayloadService {
       case COMMAND -> {
         Command originCommand = (Command) Hibernate.unproxy(originalPayload);
         Command duplicateCommand = new Command();
-        duplicateCommonProperties(originCommand, duplicateCommand);
-        duplicateCommand.setType(originCommand.getType());
-        duplicateCommand.setContent(originCommand.getContent());
-        duplicateCommand.setExecutor(originCommand.getExecutor());
+        payloadUtils.duplicateCommonProperties(originCommand, duplicateCommand);
         yield duplicateCommand;
       }
       case EXECUTABLE -> {
         Executable originExecutable = (Executable) Hibernate.unproxy(originalPayload);
         Executable duplicateExecutable = new Executable();
-        duplicateCommonProperties(originExecutable, duplicateExecutable);
+        payloadUtils.duplicateCommonProperties(originExecutable, duplicateExecutable);
         duplicateExecutable.setExecutableFile(originExecutable.getExecutableFile());
         yield duplicateExecutable;
       }
       case FILE_DROP -> {
         FileDrop originFileDrop = (FileDrop) Hibernate.unproxy(originalPayload);
         FileDrop duplicateFileDrop = new FileDrop();
-        duplicateCommonProperties(originFileDrop, duplicateFileDrop);
+        payloadUtils.duplicateCommonProperties(originFileDrop, duplicateFileDrop);
         duplicateFileDrop.setFileDropFile(originFileDrop.getFileDropFile());
         yield duplicateFileDrop;
       }
       case DNS_RESOLUTION -> {
         DnsResolution originDnsResolution = (DnsResolution) Hibernate.unproxy(originalPayload);
         DnsResolution duplicateDnsResolution = new DnsResolution();
-        duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
-        duplicateDnsResolution.setHostname(originDnsResolution.getHostname());
+        payloadUtils.duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
         yield duplicateDnsResolution;
       }
       case NETWORK_TRAFFIC -> {
         NetworkTraffic originNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(originalPayload);
         NetworkTraffic duplicateNetworkTraffic = new NetworkTraffic();
-        duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
-        duplicateNetworkTraffic.setIpDst(originNetworkTraffic.getIpDst());
-        duplicateNetworkTraffic.setIpSrc(originNetworkTraffic.getIpSrc());
-        duplicateNetworkTraffic.setPortDst(originNetworkTraffic.getPortDst());
-        duplicateNetworkTraffic.setPortSrc(originNetworkTraffic.getPortSrc());
-        duplicateNetworkTraffic.setProtocol(originNetworkTraffic.getProtocol());
+        payloadUtils.duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
         yield duplicateNetworkTraffic;
       }
-      default ->
-          throw new IllegalStateException("Unexpected value: " + originalPayload.getTypeEnum());
     };
-  }
-
-  private <T extends Payload> void duplicateCommonProperties(
-      @org.jetbrains.annotations.NotNull final T origin,
-      @org.jetbrains.annotations.NotNull T duplicate) {
-    duplicate.setId(null);
-    duplicate.setName(StringUtils.duplicateString(origin.getName()));
-    duplicate.setDescription(StringUtils.duplicateString(origin.getDescription()));
-    duplicate.setPlatforms(origin.getPlatforms());
-    duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
-    duplicate.setCleanupCommand(origin.getCleanupCommand());
-    duplicate.setCleanupExecutor(origin.getCleanupExecutor());
-    duplicate.setElevationRequired(origin.isElevationRequired());
-    duplicate.setArguments(origin.getArguments());
-    duplicate.setPrerequisites(origin.getPrerequisites());
-    duplicate.setExternalId(null);
-    duplicate.setExecutionArch(origin.getExecutionArch());
-    duplicate.setTags(new HashSet<>(origin.getTags()));
-    duplicate.setCollector(null);
-    duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
-    duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
-    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate, false);
   }
 
   public void deprecateNonProcessedPayloadsByCollector(
