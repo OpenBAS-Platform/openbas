@@ -114,8 +114,7 @@ public class ExecutionExecutorService {
 
   private void launchExecutorContextForAgent(Inject inject, Agent agent) throws AgentException {
     try {
-      Endpoint assetEndpoint =
-          (Endpoint) agent.getAsset(); // TODO test for OpenBAS, Crowdstrike (and Caldera ?)
+      Endpoint assetEndpoint = (Endpoint) agent.getAsset();
       ExecutorContextService executorContextService =
           context.getBean(agent.getExecutor().getName(), ExecutorContextService.class);
       executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
