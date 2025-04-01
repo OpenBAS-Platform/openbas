@@ -5,17 +5,14 @@ import static java.time.Instant.now;
 
 import io.openbas.database.model.ContractOutputElement;
 import io.openbas.database.model.OutputParser;
-import io.openbas.database.repository.ContractOutputElementRepository;
 import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.payload.form.ContractOutputElementInput;
-import io.openbas.rest.payload.form.OutputParserInput;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -24,7 +21,6 @@ import org.springframework.stereotype.Component;
 public class ContractOutputElementUtils {
 
   private final TagRepository tagRepository;
-  private final ContractOutputElementRepository contractOutputElementRepository;
   private final RegexGroupUtils regexGroupUtils;
 
   public void copyContractOutputElements(
@@ -35,10 +31,6 @@ public class ContractOutputElementUtils {
               .map(
                   inputElement -> {
                     ContractOutputElement contractOutputElement = new ContractOutputElement();
-                    BeanUtils.copyProperties(inputElement, contractOutputElement);
-                    if (!copyId) {
-                      contractOutputElement.setId(null);
-                    }
                     contractOutputElement.setOutputParser(outputParser);
 
                     Instant now = now();
@@ -48,6 +40,15 @@ public class ContractOutputElementUtils {
                     if (inputElement instanceof ContractOutputElementInput) {
                       ContractOutputElementInput contractOutputElementInput =
                           (ContractOutputElementInput) inputElement;
+                      if (!copyId) {
+                        contractOutputElement.setId(null);
+                      } else {
+                        contractOutputElement.setId(contractOutputElementInput.getId());
+                      }
+                      contractOutputElement.setRule(contractOutputElementInput.getRule());
+                      contractOutputElement.setType(contractOutputElementInput.getType());
+                      contractOutputElement.setKey(contractOutputElementInput.getKey());
+                      contractOutputElement.setName(contractOutputElementInput.getName());
                       contractOutputElement.setTags(
                           iterableToSet(
                               tagRepository.findAllById(contractOutputElementInput.getTagIds())));
@@ -58,37 +59,27 @@ public class ContractOutputElementUtils {
                     } else {
                       ContractOutputElement contractOutputElementInstance =
                           (ContractOutputElement) inputElement;
+                      if (!copyId) {
+                        contractOutputElement.setId(null);
+                      } else {
+                        contractOutputElement.setId(contractOutputElementInstance.getId());
+                      }
+                      contractOutputElement.setRule(contractOutputElementInstance.getRule());
+                      contractOutputElement.setType(contractOutputElementInstance.getType());
+                      contractOutputElement.setKey(contractOutputElementInstance.getKey());
+                      contractOutputElement.setName(contractOutputElementInstance.getName());
                       contractOutputElement.setTags(
-                          iterableToSet(new HashSet<>(contractOutputElementInstance.getTags())));
+                          new HashSet<>(contractOutputElementInstance.getTags()));
                       regexGroupUtils.copyRegexGroups(
-                          contractOutputElement.getRegexGroups(), contractOutputElement, copyId);
+                          contractOutputElementInstance.getRegexGroups(),
+                          contractOutputElement,
+                          copyId);
                     }
                     return contractOutputElement;
                   })
               .collect(Collectors.toSet());
 
-      outputParser.setContractOutputElements(contractOutputElements);
+      outputParser.setContractOutputElements(new HashSet<>(contractOutputElements));
     }
-  }
-
-  public void removeOrphanContractOutputElements(Set<OutputParserInput> outputParserInputs) {
-    outputParserInputs.stream()
-        .forEach(
-            outputParserInput -> {
-              Set<ContractOutputElementInput> contractOutputElementInputToBeUpdated =
-                  outputParserInput.getContractOutputElements().stream()
-                      .filter(coe -> coe.getId() != null)
-                      .collect(Collectors.toSet());
-              if (contractOutputElementInputToBeUpdated.isEmpty()) {
-                contractOutputElementRepository.deleteByOutPutParserId(outputParserInput.getId());
-              }
-              contractOutputElementRepository.deleteByOutPutParserAndIdNotIn(
-                  outputParserInput.getId(),
-                  contractOutputElementInputToBeUpdated.stream()
-                      .map(ContractOutputElementInput::getId)
-                      .collect(Collectors.toList()));
-
-              regexGroupUtils.removeOrphanRegexGroups(contractOutputElementInputToBeUpdated);
-            });
   }
 }

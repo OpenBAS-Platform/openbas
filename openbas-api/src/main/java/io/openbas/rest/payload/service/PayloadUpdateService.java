@@ -5,9 +5,11 @@ import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
+import io.openbas.database.repository.AttackPatternRepository;
+import io.openbas.database.repository.DocumentRepository;
+import io.openbas.database.repository.PayloadRepository;
+import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.rest.payload.OutputParserUtils;
 import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpdateInput;
 import jakarta.transaction.Transactional;
@@ -28,7 +30,6 @@ public class PayloadUpdateService {
   private final AttackPatternRepository attackPatternRepository;
   private final PayloadRepository payloadRepository;
   private final DocumentRepository documentRepository;
-  private final OutputParserUtils outputParserUtils;
 
   @Transactional(rollbackOn = Exception.class)
   public Payload updatePayload(String payloadId, PayloadUpdateInput input) {
@@ -38,8 +39,6 @@ public class PayloadUpdateService {
         fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     payload.setUpdatedAt(Instant.now());
-
-    outputParserUtils.removeOrphanOutputParsers(input.getOutputParsers(), payload.getId());
 
     return update(input, payload);
   }

@@ -3,14 +3,13 @@ package io.openbas.rest.payload;
 import static java.time.Instant.now;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.OutputParserRepository;
 import io.openbas.rest.payload.form.*;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class OutputParserUtils {
 
-  private final OutputParserRepository outputParserRepository;
   private final ContractOutputElementUtils contractOutputElementUtils;
 
   public <T> void copyOutputParsers(Set<T> inputParsers, Payload target, boolean copyId) {
@@ -28,10 +26,6 @@ public class OutputParserUtils {
               .map(
                   inputParser -> {
                     OutputParser outputParser = new OutputParser();
-                    BeanUtils.copyProperties(inputParser, outputParser);
-                    if (!copyId) {
-                      outputParser.setId(null);
-                    }
                     outputParser.setPayload(target);
 
                     Instant now = now();
@@ -41,10 +35,24 @@ public class OutputParserUtils {
                     // Handle contract output elements based on the input type
                     if (inputParser instanceof OutputParserInput) {
                       OutputParserInput parserInput = (OutputParserInput) inputParser;
+                      if (!copyId) {
+                        outputParser.setId(null);
+                      } else {
+                        outputParser.setId(parserInput.getId());
+                      }
+                      outputParser.setType(parserInput.getType());
+                      outputParser.setMode(parserInput.getMode());
                       contractOutputElementUtils.copyContractOutputElements(
                           parserInput.getContractOutputElements(), outputParser, copyId);
                     } else if (inputParser instanceof OutputParser) {
                       OutputParser parser = (OutputParser) inputParser;
+                      if (!copyId) {
+                        outputParser.setId(null);
+                      } else {
+                        outputParser.setId(parser.getId());
+                      }
+                      outputParser.setType(parser.getType());
+                      outputParser.setMode(parser.getMode());
                       contractOutputElementUtils.copyContractOutputElements(
                           parser.getContractOutputElements(), outputParser, copyId);
                     }
@@ -53,22 +61,7 @@ public class OutputParserUtils {
                   })
               .collect(Collectors.toSet());
 
-      target.setOutputParsers(outputParsers);
+      target.setOutputParsers(new HashSet<>(outputParsers));
     }
-  }
-
-  public void removeOrphanOutputParsers(
-      Set<OutputParserInput> outputParserInputs, String payloadId) {
-
-    Set<OutputParserInput> toBeUpdated =
-        outputParserInputs.stream().filter(op -> op.getId() != null).collect(Collectors.toSet());
-
-    if (toBeUpdated.isEmpty()) {
-      outputParserRepository.deleteByPayloadId(payloadId);
-    }
-    outputParserRepository.deleteByPayloadIdAndIdNotIn(
-        payloadId, toBeUpdated.stream().map(OutputParserInput::getId).collect(Collectors.toList()));
-
-    contractOutputElementUtils.removeOrphanContractOutputElements(toBeUpdated);
   }
 }

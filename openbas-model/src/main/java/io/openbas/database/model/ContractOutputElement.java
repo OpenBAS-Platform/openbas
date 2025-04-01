@@ -51,7 +51,11 @@ public class ContractOutputElement implements Base {
   @NotBlank
   private String name;
 
-  @OneToMany(mappedBy = "contractOutputElement", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToMany(
+      mappedBy = "contractOutputElement",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("contract_output_element_regex_groups")
   private Set<RegexGroup> regexGroups = new HashSet<>();
 
@@ -85,6 +89,18 @@ public class ContractOutputElement implements Base {
   @JsonProperty("contract_output_element_updated_at")
   @NotNull
   private Instant updatedAt = now();
+
+  public void setRegexGroups(final Set<RegexGroup> regexGroups) {
+    this.regexGroups.clear();
+    regexGroups.forEach(this::addRegexGroup);
+  }
+
+  public void addRegexGroup(final RegexGroup regexGroup) {
+    if (regexGroup != null) {
+      regexGroup.setContractOutputElement(this);
+      this.regexGroups.add(regexGroup);
+    }
+  }
 
   @Override
   public int hashCode() {

@@ -6,7 +6,6 @@ import static io.openbas.rest.payload.PayloadUtils.validateArchitecture;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
-import io.openbas.rest.payload.OutputParserUtils;
 import io.openbas.rest.payload.PayloadUtils;
 import io.openbas.rest.payload.form.PayloadUpsertInput;
 import jakarta.transaction.Transactional;
@@ -29,7 +28,6 @@ public class PayloadUpsertService {
   private final PayloadRepository payloadRepository;
   private final CollectorRepository collectorRepository;
   private final DocumentRepository documentRepository;
-  private final OutputParserUtils outputParserUtils;
 
   @Transactional(rollbackOn = Exception.class)
   public Payload upsertPayload(PayloadUpsertInput input) {
@@ -46,9 +44,6 @@ public class PayloadUpsertService {
                   input.getAttackPatternsExternalIds())));
       existingPayload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
       existingPayload.setUpdatedAt(Instant.now());
-
-      outputParserUtils.removeOrphanOutputParsers(
-          input.getOutputParsers(), existingPayload.getId());
 
       return updatePayloadFromUpsert(input, existingPayload);
     } else {

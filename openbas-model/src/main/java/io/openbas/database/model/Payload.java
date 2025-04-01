@@ -205,7 +205,11 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
-  @OneToMany(mappedBy = "payload", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @OneToMany(
+      mappedBy = "payload",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   @JsonProperty("payload_output_parsers")
   private Set<OutputParser> outputParsers = new HashSet<>();
 
@@ -235,5 +239,17 @@ public class Payload implements Base {
     this.name = name;
     this.id = id;
     this.type = type;
+  }
+
+  public void setOutputParsers(final Set<OutputParser> outputParsers) {
+    this.outputParsers.clear();
+    outputParsers.forEach(this::addOutputParser);
+  }
+
+  public void addOutputParser(OutputParser outputParser) {
+    if (outputParser != null) {
+      outputParser.setPayload(this);
+      this.outputParsers.add(outputParser);
+    }
   }
 }
