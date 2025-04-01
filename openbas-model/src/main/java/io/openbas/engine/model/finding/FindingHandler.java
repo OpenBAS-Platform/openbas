@@ -47,8 +47,8 @@ public class FindingHandler implements Handler<EsFinding> {
               esFinding.setFinding_type(finding.getFinding_type());
               esFinding.setFinding_field(finding.getFinding_field());
               esFinding.setFinding_value(finding.getFinding_value());
-              esFinding.setFinding_inject_side(finding.getFinding_inject_id());
-              esFinding.setFinding_scenario_side(finding.getInject_scenario());
+              esFinding.setBase_inject_side(finding.getFinding_inject_id());
+              esFinding.setBase_scenario_side(finding.getInject_scenario());
               return esFinding;
             })
         .toList();

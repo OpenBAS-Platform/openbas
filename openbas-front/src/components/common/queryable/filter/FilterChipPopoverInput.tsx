@@ -47,12 +47,11 @@ export const BasicTextInput: FunctionComponent<Props> = ({
   );
 };
 
-export const BasicSelectInput: FunctionComponent<Props & { propertySchema: PropertySchemaDTO } & { multiple: boolean }> = ({
+export const BasicSelectInput: FunctionComponent<Props & { propertySchema: PropertySchemaDTO }> = ({
   filter,
   helpers,
   propertySchema,
   contextId,
-  multiple,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -72,15 +71,11 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
   }, []);
 
   const onClick = (optionId: string) => {
-    if (multiple) {
-      const isIncluded = filter.values?.includes(optionId);
-      const newValues = isIncluded
-        ? (filter.values?.filter(v => v !== optionId) ?? [])
-        : [...(filter.values ?? []), optionId];
-      helpers.handleAddMultipleValueFilter(filter.key, newValues);
-    } else {
-      helpers.handleAddMultipleValueFilter(filter.key, [optionId]);
-    }
+    const isIncluded = filter.values?.includes(optionId);
+    const newValues = isIncluded
+      ? (filter.values?.filter(v => v !== optionId) ?? [])
+      : [...(filter.values ?? []), optionId];
+    helpers.handleAddMultipleValueFilter(filter.key, newValues);
   };
 
   return (
@@ -88,7 +83,7 @@ export const BasicSelectInput: FunctionComponent<Props & { propertySchema: Prope
       selectOnFocus
       openOnFocus
       autoHighlight
-      multiple={multiple}
+      multiple
       noOptionsText={t('No available options')}
       options={options}
       getOptionLabel={option => option.label ?? ''}
@@ -173,13 +168,9 @@ export const FilterChipPopoverInput: FunctionComponent<Props & { propertySchema:
     if (filter?.operator && ['empty', 'not_empty'].includes(filter.operator)) {
       return null;
     }
-    // Base entity
-    if (propertySchema.schema_property_name.includes('base_entity')) {
-      return (<BasicSelectInput propertySchema={propertySchema} filter={filter} helpers={helpers} contextId={contextId} multiple={false} />);
-    }
     // Select field
     if (propertySchema.schema_property_values || propertySchema.schema_property_has_dynamic_value) {
-      return (<BasicSelectInput propertySchema={propertySchema} filter={filter} helpers={helpers} contextId={contextId} multiple={true} />);
+      return (<BasicSelectInput propertySchema={propertySchema} filter={filter} helpers={helpers} contextId={contextId} />);
     }
     // Simple text field
     return (<BasicTextInput filter={filter} helpers={helpers} contextId={contextId} />);
