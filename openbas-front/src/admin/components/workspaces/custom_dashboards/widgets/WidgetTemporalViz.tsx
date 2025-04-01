@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material/styles';
-import React, { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 
 import { series } from '../../../../../actions/dashboards/dashboard-action';
@@ -7,9 +7,9 @@ import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsSeriesData, type Widget } from '../../../../../utils/api-types';
 import { verticalBarsChartOptions } from '../../../../../utils/Charts';
-import { isNotEmptyField } from '../../../../../utils/utils';
+import { isEmptyField, isNotEmptyField } from '../../../../../utils/utils';
 
-interface WidgetTemporalVizProps { widget: Widget }
+interface WidgetTemporalVizProps {widget: Widget;}
 
 const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
   const theme = useTheme();
@@ -20,6 +20,8 @@ const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
     series(widget.widget_id).then((response) => {
       if (response.data && isNotEmptyField(response.data.at(0)) && isNotEmptyField(response.data.at(0).data)) {
         setTemporalVizData(response.data.at(0).data);
+        setLoading(false);
+      } else if (response.data && isNotEmptyField(response.data.at(0)) && isEmptyField(response.data.at(0).data)) {
         setLoading(false);
       }
     });

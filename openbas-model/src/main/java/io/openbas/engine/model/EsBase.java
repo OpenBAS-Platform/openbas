@@ -26,7 +26,18 @@ public class EsBase {
   @Queryable(label = "updated at", filterable = true, sortable = true)
   private Instant base_updated_at;
 
-  // Base for ACL
+  // -- SIDE --
+
+  @Queryable(label = "inject", filterable = true, sortable = true)
+  private String base_inject_side; // Must finish by _side
+
+  @Queryable(label = "simulation", filterable = true, sortable = true)
+  private String base_simulation_side; // Must finish by _side
+
+  @Queryable(label = "scenario", filterable = true, sortable = true)
+  private String base_scenario_side; // Must finish by _side
+
+  // -- Base for ACL --
   private List<String> base_restrictions;
 
   // To support logical side deletions

@@ -115,10 +115,6 @@ export const OperatorKeyValues: { [key: string]: string } = {
 };
 
 export const availableOperators = (propertySchema: PropertySchemaDTO) => {
-  // Base entity
-  if (propertySchema.schema_property_name.includes('base_entity')) {
-    return ['eq'];
-  }
   // Date
   if (propertySchema.schema_property_type.includes('instant')) {
     return ['gt', 'gte', 'lt', 'lte', 'empty', 'not_empty'];
