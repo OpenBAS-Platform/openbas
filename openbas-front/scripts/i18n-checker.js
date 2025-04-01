@@ -6,7 +6,12 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 
-const __dirname = `${path.dirname(__filename)}/src`;
+const __dirname = `${path.dirname(__filename)}/../src`;
+
+const escapeString = (inputString) => {
+  // Escape special regex characters
+  return inputString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
 
 // -- Retrieve i18n lang keys --
 
@@ -31,11 +36,12 @@ const checkLanguageSupport = (lang) => {
   const match = (filePath) => {
     try {
       const data = fs.readFileSync(filePath, { encoding: 'utf8' });
-      const regexp = /(?<![a-zA-Z])t\('([\w\s]+)'\)/g;
+      const regexp = /(?<![a-zA-Z])t\('([^']+)'\)/g;
       const matches = [...data.matchAll(regexp)];
       matches.forEach((m) => {
-        const regexWithQuote = `"${m[1]}":`;
-        const regexWithoutQuote = `${m[1]}:`;
+        const escapedMatch = escapeString(m[1]);
+        const regexWithQuote = `"${escapedMatch}":`;
+        const regexWithoutQuote = `${escapedMatch}:`;
         if (!langI18n.match(regexWithQuote) && !langI18n.match(regexWithoutQuote)) {
           results.push(m[1]);
         }

@@ -126,7 +126,7 @@
     "auto-translation:cn": "i18n-auto-translation -a deepl-free -p ./src/utils/lang/en.json -t zh -k $SUBSCRIPTION_KEY",
     "extract-translation": "node scripts/extract-i18n-keyword.js",
     "sort-translation": "node scripts/sort-translation-files.js",
-    "i18n-checker": "node i18n-checker.js",
+    "i18n-checker": "node scripts/i18n-checker.js",
     "start": "vite",
     "deprecated-start": "node builder/dev/dev.js",
     "build": "node builder/prod/prod.js",

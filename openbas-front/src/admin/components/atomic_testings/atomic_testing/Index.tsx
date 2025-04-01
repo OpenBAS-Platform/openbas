@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from '@mui/material';
+import { Alert, AlertTitle, Box, Tab, Tabs } from '@mui/material';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 import { interval } from 'rxjs';
@@ -41,6 +41,8 @@ const Index = () => {
   const { t } = useFormatter();
   const location = useLocation();
   let tabValue = location.pathname;
+  const [pristine, setPristine] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   // Fetching data
   const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
@@ -53,17 +55,27 @@ const Index = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetchInjectResultOverviewOutput(injectId).then((result: { data: InjectResultOverviewOutput }) => {
       setInjectResultOverviewOutput(result.data);
+    }).finally(() => {
+      setLoading(false);
+      setPristine(false);
     });
   }, [injectId]);
 
   useEffect(() => {
     const subscription = interval$.subscribe(() => {
+      setLoading(true);
       fetchInjectResultOverviewOutput(injectId).then((result: { data: InjectResultOverviewOutput }) => {
         if (result.data.inject_updated_at !== injectResultOverviewOutput?.inject_updated_at) {
           setInjectResultOverviewOutput(result.data);
         }
+      }).catch(() => {
+        subscription.unsubscribe();
+      }).finally(() => {
+        setLoading(false);
+        setPristine(false);
       });
     });
     return () => {
@@ -71,98 +83,105 @@ const Index = () => {
     };
   }, [injectResultOverviewOutput]);
 
-  if (injectResultOverviewOutput) {
-    if (location.pathname.includes(`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`)) {
-      tabValue = `/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`;
-    }
+  if (pristine && loading) {
+    return <Loader />;
+  }
+
+  if (!injectResultOverviewOutput) {
     return (
-      <TeamContext.Provider value={teamContextForAtomicTesting()}>
-        <InjectResultOverviewOutputContext.Provider value={{
-          injectResultOverviewOutput,
-          updateInjectResultOverviewOutput,
-        }}
-        >
-          <Breadcrumbs
-            variant="object"
-            elements={[
-              {
-                label: t('Atomic testings'),
-                link: '/admin/atomic_testings',
-              },
-              {
-                label: injectResultOverviewOutput.inject_title,
-                current: true,
-              },
-            ]}
-          />
-          <AtomicTestingHeader />
-          <Box
-            sx={{
-              borderBottom: 1,
-              borderColor: 'divider',
-              marginBottom: 4,
-            }}
-          >
-            <Tabs value={tabValue}>
-              <Tab
-                component={Link}
-                to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}`}
-                value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}`}
-                label={t('Overview')}
-                className={classes.item}
-              />
-              {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
-                || injectResultOverviewOutput.inject_type === 'openbas_nmap') && (
-                <Tab
-                  component={Link}
-                  to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
-                  value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
-                  label={t('Findings')}
-                  className={classes.item}
-                />
-              )}
-              <Tab
-                component={Link}
-                to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
-                value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
-                label={t('Execution details')}
-                className={classes.item}
-              />
-              {
-                injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
-                  <Tab
-                    component={Link}
-                    to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
-                    value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
-                    label={t('Payload info')}
-                    className={classes.item}
-                  />
-                )
-              }
-            </Tabs>
-          </Box>
-          <Suspense fallback={<Loader />}>
-            <Routes>
-              <Route path="" element={errorWrapper(AtomicTesting)()} />
-              {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
-                || injectResultOverviewOutput.inject_type === 'openbas_nmap')
-              && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
-              <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
-              {injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
-                <Route
-                  path="payload_info"
-                  element={errorWrapper(AtomicTestingPayloadInfo)()}
-                />
-              )}
-              {/* Not found */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </InjectResultOverviewOutputContext.Provider>
-      </TeamContext.Provider>
+      <Alert severity="warning">
+        <AlertTitle>{t('Warning')}</AlertTitle>
+        {t('Atomic testing is currently unavailable or you do not have sufficient permissions to access it.')}
+      </Alert>
     );
   }
-  return <Loader />;
+
+  if (location.pathname.includes(`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`)) {
+    tabValue = `/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`;
+  }
+  return (
+    <TeamContext.Provider value={teamContextForAtomicTesting()}>
+      <InjectResultOverviewOutputContext.Provider value={{
+        injectResultOverviewOutput,
+        updateInjectResultOverviewOutput,
+      }}
+      >
+        <Breadcrumbs
+          variant="object"
+          elements={[
+            {
+              label: t('Atomic testings'),
+              link: '/admin/atomic_testings',
+            },
+            {
+              label: injectResultOverviewOutput.inject_title,
+              current: true,
+            },
+          ]}
+        />
+        <AtomicTestingHeader />
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            marginBottom: 4,
+          }}
+        >
+          <Tabs value={tabValue}>
+            <Tab
+              component={Link}
+              to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}`}
+              value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}`}
+              label={t('Overview')}
+              className={classes.item}
+            />
+            {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+                || injectResultOverviewOutput.inject_type === 'openbas_nmap') && (<Tab
+              component={Link}
+              to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
+              value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
+              label={t('Findings')}
+              className={classes.item}
+            />
+            )}<Tab
+              component={Link}
+              to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
+              value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
+              label={t('Execution details')}
+              className={classes.item}
+            />
+            {
+              injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
+                <Tab
+                  component={Link}
+                  to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
+                  value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/payload_info`}
+                  label={t('Payload info')}
+                  className={classes.item}
+                />
+              )
+            }
+          </Tabs>
+        </Box>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="" element={errorWrapper(AtomicTesting)()} />{(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+                || injectResultOverviewOutput.inject_type === 'openbas_nmap')
+            && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
+            <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
+            {injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
+              <Route
+                path="payload_info"
+                element={errorWrapper(AtomicTestingPayloadInfo)()}
+              />
+            )}
+            {/* Not found */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </InjectResultOverviewOutputContext.Provider>
+    </TeamContext.Provider>
+  );
 };
 
 export default Index;
