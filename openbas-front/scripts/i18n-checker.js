@@ -9,8 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = `${path.dirname(__filename)}/../src`;
 
 const escapeString = (inputString) => {
-  // Escape special regex characters
-  return inputString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return inputString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll('"', '\\\\"');
 };
 
 // -- Retrieve i18n lang keys --
@@ -40,8 +39,8 @@ const checkLanguageSupport = (lang) => {
       const matches = [...data.matchAll(regexp)];
       matches.forEach((m) => {
         const escapedMatch = escapeString(m[1]);
-        const regexWithQuote = `"${escapedMatch}":`;
-        const regexWithoutQuote = `${escapedMatch}:`;
+        const regexWithQuote = new RegExp(String.raw`"${escapedMatch}":`, 'g');
+        const regexWithoutQuote = new RegExp(String.raw`${escapedMatch}:`, 'g');
         if (!langI18n.match(regexWithQuote) && !langI18n.match(regexWithoutQuote)) {
           results.push(m[1]);
         }
