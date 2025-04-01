@@ -51,7 +51,11 @@ public class ExecutionExecutorService {
     // if launchExecutorContextForAgent fail for every agent we throw to manually set injectStatus
     // to error
     if (atOneTraceAdded.get()) {
-      this.injectStatusRepository.save(injectStatus);
+      try {
+        this.injectStatusRepository.save(injectStatus);
+      }catch (Exception e) {
+       log.warning(e.getMessage());
+      }
     }
     if (!atLeastOneExecution.get()) {
       throw new ExecutionExecutorException("No asset executed");
