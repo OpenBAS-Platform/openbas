@@ -18,6 +18,7 @@ import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
 import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
+import AtomicTestingFindings from '../../../atomic_testings/atomic_testing/AtomicTestingFindings';
 import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/payload_info/AtomicTestingPayloadInfo';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
 import { PermissionsContext, type PermissionsContextType } from '../../../common/Context';
@@ -114,6 +115,16 @@ const InjectIndexComponent: FunctionComponent<{
               label={t('Overview')}
               className={classes.item}
             />
+            {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+              || injectResultOverviewOutput.inject_type === 'openbas_nmap') && (
+              <Tab
+                component={Link}
+                to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/findings`)}
+                value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/findings`}
+                label={t('Findings')}
+                className={classes.item}
+              />
+            )}
             <Tab
               component={Link}
               to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`)}
@@ -137,6 +148,9 @@ const InjectIndexComponent: FunctionComponent<{
         <Suspense fallback={<Loader />}>
           <Routes>
             <Route path="" element={errorWrapper(AtomicTesting)()} />
+            { (injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+              || injectResultOverviewOutput.inject_type === 'openbas_nmap')
+            && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
             <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
             { injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
               && <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />}
