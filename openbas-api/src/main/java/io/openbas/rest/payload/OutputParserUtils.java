@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OutputParserUtils {
 
+  private final OutputParserRepository outputParserRepository;
   private final ContractOutputElementUtils contractOutputElementUtils;
 
   public <T> void copyOutputParsers(Set<T> inputParsers, Payload target, boolean copyId) {
