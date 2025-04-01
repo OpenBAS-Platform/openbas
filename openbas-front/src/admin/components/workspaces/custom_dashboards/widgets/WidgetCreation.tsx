@@ -62,6 +62,7 @@ const WidgetCreation: FunctionComponent<{
   customDashboardId: string;
   widgets: Widget[];
   initialValues?: WidgetInput;
+  onCreate: (widget: Widget) => void;
 }> = ({
   customDashboardId,
   widgets,
@@ -74,6 +75,7 @@ const WidgetCreation: FunctionComponent<{
       series: [{ name: '' }],
     },
   },
+  onCreate,
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -155,6 +157,7 @@ const WidgetCreation: FunctionComponent<{
   const onCancel = () => {
     reset(initialValues);
     setActiveStep(0);
+    toggleDialog();
   };
 
   const onSubmit = async (input: WidgetInputForm) => {
@@ -174,7 +177,9 @@ const WidgetCreation: FunctionComponent<{
       ...input,
       widget_layout: layout,
     };
-    await createCustomDashboardWidget(customDashboardId, finalInput);
+    await createCustomDashboardWidget(customDashboardId, finalInput).then((result) => {
+      onCreate(result.data);
+    });
     toggleDialog();
     reset(initialValues);
     setActiveStep(0);

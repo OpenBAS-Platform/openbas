@@ -3,6 +3,7 @@ package io.openbas.rest.custom_dashboard;
 import static io.openbas.rest.custom_dashboard.CustomDashboardApi.CUSTOM_DASHBOARDS_URI;
 
 import io.openbas.database.model.Widget;
+import io.openbas.database.model.WidgetLayout;
 import io.openbas.rest.custom_dashboard.form.WidgetInput;
 import io.openbas.rest.helper.RestBehavior;
 import jakarta.validation.Valid;
@@ -51,6 +52,16 @@ public class CustomDashboardWidgetApi extends RestBehavior {
     Widget existingWidget = this.widgetService.widget(id, widgetId);
     Widget updatedWidget = input.toWidget(existingWidget);
     return ResponseEntity.ok(this.widgetService.updateWidget(updatedWidget));
+  }
+
+  @PutMapping("/{widgetId}/layout")
+  public ResponseEntity<Widget> updateWidgetLayout(
+      @PathVariable @NotBlank final String id,
+      @PathVariable @NotBlank final String widgetId,
+      @RequestBody @Valid @NotNull final WidgetLayout layout) {
+    Widget existingWidget = this.widgetService.widget(id, widgetId);
+    existingWidget.setLayout(layout);
+    return ResponseEntity.ok(this.widgetService.updateWidget(existingWidget));
   }
 
   @DeleteMapping("/{widgetId}")

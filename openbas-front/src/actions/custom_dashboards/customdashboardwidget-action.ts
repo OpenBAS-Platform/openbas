@@ -1,8 +1,15 @@
-import { simplePostCall } from '../../utils/Action';
-import { type WidgetInput } from '../../utils/api-types';
+import { simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
+import { type WidgetInput, type WidgetLayout } from '../../utils/api-types';
 import { CUSTOM_DASHBOARD_URI } from './customdashboard-action';
 
-// eslint-disable-next-line import/prefer-default-export
 export const createCustomDashboardWidget = (customDashboardId: string, input: WidgetInput) => {
   return simplePostCall(`${CUSTOM_DASHBOARD_URI}/${customDashboardId}/widgets`, input);
+};
+
+export const updateCustomDashboardWidgetLayout = (customDashboardId: string, widgetId: string, input: WidgetLayout) => {
+  return simplePutCall(`${CUSTOM_DASHBOARD_URI}/${customDashboardId}/widgets/${widgetId}/layout`, input, {}, true, false);
+};
+
+export const deleteCustomDashboardWidget = (customDashboardId: string, widgetId: string) => {
+  return simpleDelCall(`${CUSTOM_DASHBOARD_URI}/${customDashboardId}/widgets/${widgetId}`);
 };

@@ -91,8 +91,10 @@ const WidgetCreationParameters: FunctionComponent<{
           return (
             <Autocomplete
               options={options}
-              value={options.find(o => o.label === field.value)}
+              value={options.find(o => o.label === field.value) ?? null}
               onChange={(_, value) => field.onChange(value?.id)}
+              getOptionLabel={option => option.label ?? ''}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={params => (
                 <TextField
                   {...params}
