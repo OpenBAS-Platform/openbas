@@ -1,15 +1,17 @@
 import { Alert, AlertTitle, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useState } from 'react';
-import RGL, { WidthProvider } from 'react-grid-layout';
+import RGL, { type Layout, WidthProvider } from 'react-grid-layout';
 import { useParams } from 'react-router';
 
 import { customDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
+import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_dashboards/customdashboardwidget-action';
 import { ErrorBoundary } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
-import { type CustomDashboard } from '../../../../utils/api-types';
+import { type CustomDashboard, type Widget } from '../../../../utils/api-types';
 import WidgetCreation from './widgets/WidgetCreation';
+import WidgetPopover from './widgets/WidgetPopover';
 import WidgetTemporalViz from './widgets/WidgetTemporalViz';
 
 const CustomDashboardComponent = () => {
@@ -40,8 +42,36 @@ const CustomDashboardComponent = () => {
     };
   }, []);
 
-  const onLayoutChange = () => {
-    // TODO implement
+  const handleWidgetCreate = (newWidget: Widget) => {
+    setCustomDashboardValue((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        custom_dashboard_widgets: [...(prev.custom_dashboard_widgets ?? []), newWidget],
+      };
+    });
+  };
+  const handleWidgetDelete = (widgetId: string) => {
+    setCustomDashboardValue((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        custom_dashboard_widgets: (prev.custom_dashboard_widgets ?? []).filter(w => w.widget_id !== widgetId),
+      };
+    });
+  };
+
+  const onLayoutChange = async (layouts: Layout[]) => {
+    await Promise.all(
+      layouts.map(layout =>
+        updateCustomDashboardWidgetLayout(customDashboardId, layout.i, {
+          widget_layout_h: layout.h,
+          widget_layout_w: layout.w,
+          widget_layout_x: layout.x,
+          widget_layout_y: layout.y,
+        }),
+      ),
+    );
   };
 
   if (loading) {
@@ -101,6 +131,12 @@ const CustomDashboardComponent = () => {
               style={paperStyle}
               variant="outlined"
             >
+              <WidgetPopover
+                className="noDrag"
+                customDashboardId={customDashboardId}
+                widgetId={widget.widget_id}
+                onDelete={widgetId => handleWidgetDelete(widgetId)}
+              />
               <ErrorBoundary>
                 {widget.widget_id === idToResize ? (<div />) : (
                   <>
@@ -120,6 +156,7 @@ const CustomDashboardComponent = () => {
       <WidgetCreation
         customDashboardId={customDashboardId}
         widgets={customDashboardValue?.custom_dashboard_widgets ?? []}
+        onCreate={widget => handleWidgetCreate(widget)}
       />
     </div>
   );
