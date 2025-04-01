@@ -1,5 +1,5 @@
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { type CSSProperties, type FunctionComponent, useState } from 'react';
+import { type CSSProperties, type FunctionComponent, useContext, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -12,7 +12,15 @@ import useBodyItemsStyles from '../../../../components/common/queryable/style/st
 import { useQueryableWithLocalStorage } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import FindingIcon from '../../../../components/FindingIcon';
 import ItemTags from '../../../../components/ItemTags';
-import { type Finding, type InjectResultOverviewOutput } from '../../../../utils/api-types';
+import ItemTargets from '../../../../components/ItemTargets';
+import {
+  type Finding,
+  type InjectResultOverviewOutput, type TargetSimple,
+} from '../../../../utils/api-types';
+import {
+  InjectResultOverviewOutputContext,
+  type InjectResultOverviewOutputContextType,
+} from '../InjectResultOverviewOutputContext';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -21,13 +29,13 @@ const useStyles = makeStyles()(() => ({
 
 const inlineStyles: Record<string, CSSProperties> = {
   finding_type: { width: '10%' },
+  finding_field: { width: '10%' },
   finding_value: {
     width: '30%',
-    display: 'flex',
-    alignItems: 'center',
     cursor: 'default',
   },
-  finding_labels: { width: '35%' },
+  finding_assets: { width: '10%' },
+  finding_tags: { width: '10%' },
 };
 
 const AtomicTestingFindings: FunctionComponent = () => {
@@ -36,6 +44,15 @@ const AtomicTestingFindings: FunctionComponent = () => {
   const bodyItemsStyles = useBodyItemsStyles();
 
   const availableFilterNames = ['finding_type'];
+  const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
+  const assetsMap = new Map<string, TargetSimple>();
+  injectResultOverviewOutput?.inject_targets.forEach((target) => {
+    assetsMap.set(target.id, {
+      target_id: target.id,
+      target_name: target.name,
+      target_type: target.targetType,
+    } as TargetSimple);
+  });
 
   // Query param
   const [searchParams] = useSearchParams();
@@ -56,18 +73,28 @@ const AtomicTestingFindings: FunctionComponent = () => {
       value: (finding: Finding) => finding.finding_type,
     },
     {
+      field: 'finding_field',
+      label: 'Key',
+      isSortable: true,
+      value: (finding: Finding) => finding.finding_field,
+    },
+    {
       field: 'finding_value',
       label: 'Value',
       isSortable: true,
       value: (finding: Finding) => finding.finding_value,
     },
     {
-      field: 'finding_labels',
-      label: 'Asset',
+      field: 'finding_assets',
+      label: 'Target',
       isSortable: false,
-      value: (finding: Finding) => {
-        return (<ItemTags variant="list" tags={finding.finding_labels} />);
-      },
+      value: (finding: Finding) => <ItemTargets targets={(finding.finding_assets || []).map(assetId => assetsMap.get(assetId)) as TargetSimple[]} />,
+    },
+    {
+      field: 'finding_tags',
+      label: 'Tags',
+      isSortable: false,
+      value: (finding: Finding) => <ItemTags variant="list" tags={finding.finding_tags} />,
     },
   ];
 
@@ -77,15 +104,14 @@ const AtomicTestingFindings: FunctionComponent = () => {
         fetch={searchPaginationInput => searchFindingsForInjects(injectId, searchPaginationInput)}
         searchPaginationInput={searchPaginationInput}
         setContent={setFindings}
-        entityPrefix="asset"
+        entityPrefix="finding"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
       />
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
-          style={{ paddingTop: 0 }}
-          secondaryAction={<>&nbsp;</>}
+          style={{ padding: 0 }}
         >
           <ListItemIcon />
           <ListItemText
@@ -98,40 +124,35 @@ const AtomicTestingFindings: FunctionComponent = () => {
             )}
           />
         </ListItem>
-        {findings.map((finding: Finding) => {
-          return (
-            <ListItem
-              key={finding.finding_id}
-              classes={{ root: classes.item }}
-              divider={true}
-              disablePadding={true}
-            >
-              <ListItemButton>
-                <ListItemIcon>
-                  <FindingIcon findingType={finding.finding_type} tooltip={true} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div style={bodyItemsStyles.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          style={{
-                            ...bodyItemsStyles.bodyItem,
-                            ...inlineStyles[header.field],
-                          }}
-                        >
-                          {header.value(finding)}
-                        </div>
-                      ))}
+        {findings.map((finding: Finding) => (
+          <ListItem
+            key={finding.finding_id}
+            classes={{ root: classes.item }}
+            divider={true}
+            disablePadding={true}
+          >
+            <ListItemIcon>
+              <FindingIcon findingType={finding.finding_type} tooltip={true} />
+            </ListItemIcon>
+            <ListItemText
+              primary={(
+                <div style={bodyItemsStyles.bodyItems}>
+                  {headers.map(header => (
+                    <div
+                      key={header.field}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles[header.field],
+                      }}
+                    >
+                      {header.value(finding)}
                     </div>
-                  )}
-                />
-              </ListItemButton>
-            </ListItem>
-          )
-          ;
-        })}
+                  ))}
+                </div>
+              )}
+            />
+          </ListItem>
+        ))}
       </List>
     </>
   );
