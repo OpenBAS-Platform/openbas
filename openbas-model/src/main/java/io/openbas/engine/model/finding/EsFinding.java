@@ -21,12 +21,4 @@ public class EsFinding extends EsBase {
   @Queryable(label = "field", filterable = true, sortable = true)
   private String finding_field;
 
-  @Queryable(label = "inject", filterable = true, sortable = true)
-  private String finding_inject_side; // Must finish by _side
-
-  @Queryable(label = "simulation", filterable = true, sortable = true)
-  private String finding_simulation_side; // Must finish by _side
-
-  @Queryable(label = "scenario", filterable = true, sortable = true)
-  private String finding_scenario_side; // Must finish by _side
 }
