@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -280,7 +279,7 @@ public class EndpointService {
       } else {
         agent =
             updateExistingEndpointAndCreateAgent(
-                (Endpoint) Hibernate.unproxy(existingAgents.getFirst().getAsset()), agentInput);
+                (Endpoint) existingAgents.getFirst().getAsset(), agentInput);
       }
     } else {
       // Check if endpoint exists
@@ -294,7 +293,7 @@ public class EndpointService {
     }
     // If agent is not temporary and not the same version as the platform => Create an upgrade task
     // for the agent
-    Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    Endpoint endpoint = (Endpoint) agent.getAsset();
     if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(
@@ -355,7 +354,7 @@ public class EndpointService {
   }
 
   private Agent updateExistingAgent(Agent agent, AgentRegisterInput input) {
-    Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    Endpoint endpoint = (Endpoint) agent.getAsset();
     setUpdatedEndpointAttributes(endpoint, input);
     updateEndpoint(endpoint);
     setUpdatedAgentAttributes(agent, input, endpoint);
@@ -384,6 +383,9 @@ public class EndpointService {
   }
 
   private void setNewAgentAttributes(AgentRegisterInput input, Agent agent) {
+    if (CROWDSTRIKE_EXECUTOR_TYPE.equals(input.getExecutor().getType())) {
+      agent.setId(input.getExternalReference());
+    }
     agent.setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
     agent.setDeploymentMode(
         input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);

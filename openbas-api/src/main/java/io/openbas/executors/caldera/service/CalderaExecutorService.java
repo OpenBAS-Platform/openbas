@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import lombok.extern.java.Log;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -208,7 +207,7 @@ public class CalderaExecutorService implements Runnable {
   }
 
   private void updateExistingAgent(Agent agent, AgentRegisterInput input) {
-    Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    Endpoint endpoint = (Endpoint) agent.getAsset();
     endpoint.setHostname(input.getHostname());
     endpoint.setIps(EndpointMapper.mergeAddressArrays(endpoint.getIps(), input.getIps()));
     endpointService.updateEndpoint(endpoint);
