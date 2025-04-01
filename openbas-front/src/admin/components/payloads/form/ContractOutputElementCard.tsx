@@ -65,6 +65,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
     const updatedGroups = fields.map((field) => {
       const existingGroup = regexGroups.find(group => group.regex_group_field === field);
       return {
+        regex_group_id: existingGroup?.regex_group_id || '',
         regex_group_field: field,
         regex_group_index_values: existingGroup?.regex_group_index_values || '',
       };
@@ -101,7 +102,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
         style={{ gridColumn: 'span 4' }}
         name={`${prefixName}.${index}.contract_output_element_rule` as const}
         required
-        adornmentLabel={'\\gm'}
+        adornmentLabel="/gm"
       />
       {regexGroups.length > 0 && (
         <Typography className={classes.outputValueTitle} variant="h3">
