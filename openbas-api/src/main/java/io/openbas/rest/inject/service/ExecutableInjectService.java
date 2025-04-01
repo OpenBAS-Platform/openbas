@@ -15,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -123,7 +122,6 @@ public class ExecutableInjectService {
     return Base64.getEncoder().encodeToString(computedCommand.getBytes());
   }
 
-  @Transactional
   public Payload getExecutablePayloadAndUpdateInjectStatus(String injectId, String agentId)
       throws Exception {
     Payload payloadToExecute = getExecutablePayloadInject(injectId);
@@ -146,11 +144,7 @@ public class ExecutableInjectService {
       throw new ElementNotFoundException("Payload not found");
     }
 
-    // here we create an entity but we dont save it and that generate some problems with hibernate
     Payload payloadToExecute = payloadService.generateDuplicatedPayload(contract.getPayload());
-
-    // How can I create a copy and not an entity? hibernate is crazy with this..
-    // Payload payloadToExecute = contract.getPayload();
 
     // prerequisite
     List<PayloadPrerequisite> prerequisiteList = new ArrayList<>();
@@ -210,7 +204,6 @@ public class ExecutableInjectService {
       return payloadCommand;
     }
 
-    // Here we need juste send a copy (not an entity)
     return payloadToExecute;
   }
 }
