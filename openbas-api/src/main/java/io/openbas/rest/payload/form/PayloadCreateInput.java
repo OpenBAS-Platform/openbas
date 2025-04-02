@@ -14,12 +14,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Set;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class PayloadCreateInput {
 
   @NotBlank(message = MANDATORY_MESSAGE)
@@ -85,4 +85,8 @@ public class PayloadCreateInput {
 
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsIds = new ArrayList<>();
+
+  @JsonProperty("payload_output_parsers")
+  @Schema(description = "Set of output parsers")
+  private Set<OutputParserInput> outputParsers = new HashSet<>();
 }

@@ -152,13 +152,7 @@ public class EndpointService {
     // Check if agent exists (only 1 agent can be found for Crowdstrike and Tanium)
     List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
     if (!existingAgents.isEmpty()) {
-      Agent existingAgent = existingAgents.getFirst();
-      if (input.isActive()) {
-        updateExistingAgent(existingAgent, input);
-      } else {
-        // Delete inactive agent
-        handleInactiveAgent(existingAgent);
-      }
+      updateExistingAgent(existingAgents.getFirst(), input);
     } else {
       // Check if endpoint exists
       Optional<Endpoint> existingEndpoint =
@@ -305,20 +299,6 @@ public class EndpointService {
         input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);
     agent.setExecutedByUser(input.getExecutedByUser());
     agent.setExecutor(input.getExecutor());
-  }
-
-  private void handleInactiveAgent(Agent existingAgent) {
-    if ((now().toEpochMilli() - existingAgent.getLastSeen().toEpochMilli()) > DELETE_TTL) {
-      log.info(
-          "Found stale endpoint "
-              + existingAgent.getAsset().getName()
-              + ", deleting the "
-              + existingAgent.getExecutor().getType()
-              + " agent "
-              + existingAgent.getExecutedByUser()
-              + " in it...");
-      this.agentService.deleteAgent(existingAgent.getId());
-    }
   }
 
   private AgentRegisterInput toAgentEndpoint(EndpointRegisterInput input) {

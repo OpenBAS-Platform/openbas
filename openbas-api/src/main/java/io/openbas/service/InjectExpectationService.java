@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,7 +46,6 @@ public class InjectExpectationService {
   private final AssetGroupService assetGroupService;
   private final EndpointService endpointService;
   private final CollectorRepository collectorRepository;
-  private final AgentService agentService;
 
   @Resource protected ObjectMapper mapper;
 
@@ -546,7 +546,9 @@ public class InjectExpectationService {
   }
 
   private boolean isSuccess(List<InjectExpectation> expectations, boolean isGroup) {
-    if (expectations.isEmpty()) return false;
+    if (expectations.isEmpty()) {
+      return false;
+    }
     return isGroup
         ? expectations.stream().anyMatch(e -> e.getExpectedScore().equals(e.getScore()))
         : expectations.stream().allMatch(e -> e.getExpectedScore().equals(e.getScore()));
@@ -644,6 +646,17 @@ public class InjectExpectationService {
 
   // -- PREVENTION --
 
+  public List<InjectExpectation> preventionExpectationsNotExpired(final Integer expirationTime) {
+    return this.injectExpectationRepository.findAll(
+        Specification.where(
+            InjectExpectationSpecification.type(PREVENTION)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
+                .and(
+                    InjectExpectationSpecification.from(
+                        Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
+  }
+
   public List<InjectExpectation> preventionExpectationsNotFill(@NotBlank final String source) {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(PREVENTION)))
@@ -664,6 +677,17 @@ public class InjectExpectationService {
 
   // -- DETECTION --
 
+  public List<InjectExpectation> detectionExpectationsNotExpired(final Integer expirationTime) {
+    return this.injectExpectationRepository.findAll(
+        Specification.where(
+            InjectExpectationSpecification.type(DETECTION)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
+                .and(
+                    InjectExpectationSpecification.from(
+                        Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
+  }
+
   public List<InjectExpectation> detectionExpectationsNotFill(@NotBlank final String source) {
     return this.injectExpectationRepository
         .findAll(Specification.where(InjectExpectationSpecification.type(DETECTION)))
@@ -683,6 +707,17 @@ public class InjectExpectationService {
   }
 
   // -- MANUAL
+
+  public List<InjectExpectation> manualExpectationsNotExpired(final Integer expirationTime) {
+    return this.injectExpectationRepository.findAll(
+        Specification.where(
+            InjectExpectationSpecification.type(MANUAL)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
+                .and(
+                    InjectExpectationSpecification.from(
+                        Instant.now().minus(expirationTime, ChronoUnit.MINUTES)))));
+  }
 
   public List<InjectExpectation> manualExpectationsNotFill(@NotBlank final String source) {
     return this.injectExpectationRepository

@@ -390,7 +390,10 @@ SHA512: ca07dc1d0a5297e29327e483f4f35dadb254d96a16a5c33da5ad048e6965a3863d621518
               severity="info"
               style={{ marginTop: theme.spacing(1) }}
             >
-              {t('You should add "Log on as a service" policy if you are installing as a user.')}
+              {`${t('You should add "Log on as a service" policy if you are installing as a user.')} ${t('For further details, refer to the')} `}
+              <a target="_blank" href="https://learn.microsoft.com/en-us/system-center/scsm/enable-service-log-on-sm?view=sc-sm-2025" rel="noreferrer">
+                {t('Windows documentation.')}
+              </a>
             </Alert>
           )
         }

@@ -158,7 +158,7 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
         open={deletion}
         handleClose={() => setDeletion(false)}
         handleSubmit={submitDelete}
-        text={t('Do you want to delete the asset group ?')}
+        text={t('Do you want to delete the asset group?')}
       />
 
       {inline ? (

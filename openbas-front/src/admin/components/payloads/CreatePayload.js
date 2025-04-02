@@ -1,6 +1,5 @@
-import { Add, DnsOutlined } from '@mui/icons-material';
-import { Fab, List, ListItemButton, ListItemIcon, ListItemText, Step, StepButton, Stepper } from '@mui/material';
-import { ApplicationCogOutline, Console, FileImportOutline, LanConnect } from 'mdi-material-ui';
+import { Add } from '@mui/icons-material';
+import { Fab } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
@@ -10,7 +9,7 @@ import { withStyles } from 'tss-react/mui';
 import { addPayload } from '../../../actions/payloads/payload-actions';
 import Drawer from '../../../components/common/Drawer';
 import inject18n from '../../../components/i18n';
-import PayloadForm from './PayloadForm';
+import PayloadForm from './PayloadForm.tsx';
 
 const styles = () => ({
   createButton: {
@@ -23,11 +22,7 @@ const styles = () => ({
 class CreatePayload extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      open: false,
-      activeStep: 0,
-      selectedType: null,
-    };
+    this.state = { open: false };
   }
 
   handleOpen() {
@@ -39,13 +34,6 @@ class CreatePayload extends Component {
       open: false,
       activeStep: 0,
       selectedType: null,
-    });
-  }
-
-  handleSelectType(type) {
-    this.setState({
-      selectedType: type,
-      activeStep: 1,
     });
   }
 
@@ -62,7 +50,6 @@ class CreatePayload extends Component {
     }
 
     const inputValues = R.pipe(
-      R.assoc('payload_type', this.state.selectedType),
       R.assoc('payload_source', 'MANUAL'),
       R.assoc('payload_status', 'VERIFIED'),
       R.assoc('payload_platforms', R.pluck('id', data.payload_platforms)),
@@ -83,64 +70,9 @@ class CreatePayload extends Component {
       });
   }
 
-  renderTypes() {
-    const { t } = this.props;
-    return (
-      <List>
-        <ListItemButton
-          divider={true}
-          onClick={this.handleSelectType.bind(this, 'Command')}
-        >
-          <ListItemIcon color="primary">
-            <Console color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t('Command Line')} />
-        </ListItemButton>
-        <ListItemButton
-          divider={true}
-          onClick={this.handleSelectType.bind(this, 'Executable')}
-        >
-          <ListItemIcon color="primary">
-            <ApplicationCogOutline color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t('Executable')} />
-        </ListItemButton>
-        <ListItemButton
-          divider={true}
-          onClick={this.handleSelectType.bind(this, 'FileDrop')}
-        >
-          <ListItemIcon color="primary">
-            <FileImportOutline color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t('File Drop')} />
-        </ListItemButton>
-        <ListItemButton
-          divider={true}
-          onClick={this.handleSelectType.bind(this, 'DnsResolution')}
-        >
-          <ListItemIcon color="primary">
-            <DnsOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t('DNS Resolution')} />
-        </ListItemButton>
-        <ListItemButton
-          divider={true}
-          onClick={this.handleSelectType.bind(this, 'NetworkTraffic')}
-          disabled={true}
-        >
-          <ListItemIcon color="primary">
-            <LanConnect color="primary" />
-          </ListItemIcon>
-          <ListItemText primary={t('Network Traffic')} />
-        </ListItemButton>
-      </List>
-    );
-  }
-
   render() {
     const { classes, t } = this.props;
-    const { open, activeStep, selectedType } = this.state;
-    const steps = [t('Select the type'), t('Create the payload')];
+    const { open } = this.state;
 
     return (
       <>
@@ -157,24 +89,11 @@ class CreatePayload extends Component {
           handleClose={this.handleClose.bind(this)}
           title={t('Create a new payload')}
         >
-          <>
-            <Stepper activeStep={activeStep} style={{ marginBottom: 20 }}>
-              {steps.map((label, index) => (
-                <Step key={label}>
-                  <StepButton color="inherit" onClick={() => this.setState({ activeStep: index })}>{label}</StepButton>
-                </Step>
-              ))}
-            </Stepper>
-            {activeStep === 0 && this.renderTypes()}
-            {activeStep === 1 && (
-              <PayloadForm
-                editing={false}
-                onSubmit={this.onSubmit.bind(this)}
-                handleClose={this.handleClose.bind(this)}
-                type={selectedType}
-              />
-            )}
-          </>
+          <PayloadForm
+            editing={false}
+            onSubmit={this.onSubmit.bind(this)}
+            handleClose={this.handleClose.bind(this)}
+          />
         </Drawer>
       </>
     );

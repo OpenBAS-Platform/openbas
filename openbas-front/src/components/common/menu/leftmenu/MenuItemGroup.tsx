@@ -52,9 +52,9 @@ const MenuItemGroup: FunctionComponent<Props> = ({ item, state, helpers }) => {
           <>
             <ListItemText
               primary={t(item.label)}
+              sx={{ pl: 1 }}
               slotProps={{
                 primary: {
-                  padding: '1px 0 0 15px',
                   fontWeight: 500,
                   fontSize: 14,
                 },

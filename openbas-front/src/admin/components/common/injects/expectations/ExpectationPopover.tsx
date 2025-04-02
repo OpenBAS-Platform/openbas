@@ -122,7 +122,7 @@ const ExpectationPopover: FunctionComponent<ExpectationPopoverProps> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this expectation ?')}
+            {t('Do you want to delete this expectation?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -95,7 +95,7 @@ const VariablePopover: FunctionComponent<Props> = ({
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete the variable ?')}
+            {t('Do you want to delete the variable?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

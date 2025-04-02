@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Component } from 'react';
@@ -55,6 +56,7 @@ class InjectForm extends Component {
   render() {
     const {
       t,
+      theme,
       control,
       register,
       classes,
@@ -63,36 +65,59 @@ class InjectForm extends Component {
     } = this.props;
     return (
       <div>
+        <Typography
+          variant="h5"
+          style={{
+            fontWeight: 500,
+            marginTop: theme.spacing(2),
+          }}
+        >
+          {t('Title')}
+        </Typography>
         <TextField
           variant="standard"
           inputProps={register('inject_title')}
           fullWidth={true}
-          label={t('Title')}
           disabled={disabled}
           control={control}
         />
+        <Typography
+          variant="h5"
+          style={{
+            fontWeight: 500,
+            marginTop: theme.spacing(2),
+          }}
+        >
+          {t('Description')}
+        </Typography>
         <TextField
           variant="standard"
           inputProps={register('inject_description')}
           fullWidth={true}
           multiline={true}
           rows={2}
-          label={t('Description')}
-          style={{ marginTop: 20 }}
+          style={{ marginTop: theme.spacing(2) }}
           disabled={disabled}
           control={control}
         />
+        <Typography
+          variant="h5"
+          style={{
+            fontWeight: 500,
+            marginTop: theme.spacing(2),
+          }}
+        >
+          {t('Tags')}
+        </Typography>
         <Controller
           control={control}
           name="inject_tags"
-          render={({ field: { onChange, value } }) => (
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
             <TagField
-              name="inject_tags"
-              label={t('Tags')}
               fieldValue={value ?? []}
               fieldOnChange={onChange}
-              style={{ marginTop: 20 }}
-              errors={{}}
+              style={{ marginTop: theme.spacing(2) }}
+              error={error}
             />
           )}
         />
@@ -142,6 +167,7 @@ InjectForm.propTypes = {
   isAtomic: PropTypes.bool,
   classes: PropTypes.object,
   t: PropTypes.func,
+  theme: PropTypes.func,
 };
 
 export default R.compose(inject18n, Component => withStyles(Component, styles))(InjectForm);

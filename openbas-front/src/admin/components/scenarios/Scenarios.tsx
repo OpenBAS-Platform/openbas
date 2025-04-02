@@ -220,11 +220,11 @@ const Scenarios = () => {
         {
           loading
             ? <PaginatedListLoader Icon={MovieFilterOutlined} headers={headers} headerStyles={inlineStyles} />
-            : scenarios.map((scenario: Scenario, index) => {
+            : scenarios.map((scenario: Scenario) => {
                 return (
                   <ListItem
                     key={scenario.scenario_id}
-                    divider={scenarios.length !== index + 1}
+                    divider
                     secondaryAction={(
                       <ScenarioPopover
                         scenario={scenario}

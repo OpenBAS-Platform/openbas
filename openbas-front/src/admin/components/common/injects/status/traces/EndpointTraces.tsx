@@ -42,7 +42,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
       }}
       >
         <Typography margin="0" variant="h3">{t('Type')}</Typography>
-        <Typography variant="body2">{t('Endpoint').toUpperCase()}</Typography>
+        <Typography variant="body2">{t('Endpoint')}</Typography>
       </div>
       <div style={{
         display: 'flex',

@@ -2,7 +2,7 @@ import { AddOutlined, LabelOutlined } from '@mui/icons-material';
 import { Autocomplete as MuiAutocomplete, Box, Dialog, DialogContent, DialogTitle, IconButton, TextField } from '@mui/material';
 import * as R from 'ramda';
 import { type CSSProperties, type FunctionComponent, useState } from 'react';
-import { type FieldErrors } from 'react-hook-form';
+import { type GlobalError } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import { type TagHelper, type UserHelper } from '../../actions/helper';
@@ -27,21 +27,19 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface Props {
-  name: string;
-  label: string;
+  label?: string;
   fieldValue: string[];
   fieldOnChange: (values: string[]) => void;
-  errors: FieldErrors;
-  style: CSSProperties;
+  error?: GlobalError;
+  style?: CSSProperties;
 }
 
 const TagField: FunctionComponent<Props> = ({
-  name,
   label,
   fieldValue,
   fieldOnChange,
-  errors,
-  style,
+  error,
+  style = {},
 }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -123,22 +121,30 @@ const TagField: FunctionComponent<Props> = ({
             variant="standard"
             fullWidth
             style={style}
-            error={!!errors[name]}
+            error={!!error}
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    <IconButton
+                      style={{
+                        position: 'absolute',
+                        right: '35px',
+                      }}
+                      onClick={() => handleOpenTagCreation()}
+                    >
+                      <AddOutlined />
+                    </IconButton>
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              },
+            }}
           />
         )}
         classes={{ clearIndicator: classes.autoCompleteIndicator }}
       />
-      <IconButton
-        onClick={() => handleOpenTagCreation()}
-        edge="end"
-        style={{
-          position: 'absolute',
-          top: 30,
-          right: 35,
-        }}
-      >
-        <AddOutlined />
-      </IconButton>
       {userAdmin && (
         <Dialog
           open={tagCreation}
