@@ -12,7 +12,6 @@ import { fetchTags } from '../actions/Tag';
 import { errorWrapper } from '../components/Error';
 import Loader from '../components/Loader';
 import NotFound from '../components/NotFound';
-import SystemBanners from '../public/components/systembanners/SystemBanners';
 import { computeBannerSettings } from '../public/components/systembanners/utils';
 import { useHelper } from '../store';
 import { useAppDispatch } from '../utils/hooks';

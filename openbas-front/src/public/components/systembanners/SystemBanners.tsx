@@ -6,8 +6,6 @@ import { type PlatformSettings } from '../../../utils/api-types';
 import { isEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 import { computeBanners } from './utils';
 
-export const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
-
 /* eslint-disable */
 /* Avoid auto-lint removal using --fix with false positive finding of: */
 const useStyles = makeStyles()((theme) => ({

@@ -1,15 +1,13 @@
 import {
+  Alert,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
   FormGroup,
   TextField,
 } from '@mui/material';
-import Alert from '@mui/material/Alert';
 import { type FunctionComponent, useState } from 'react';
 
 import { updatePlatformEnterpriseEditionParameters } from '../../../../actions/Application';
