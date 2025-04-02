@@ -4,7 +4,7 @@ import { makeStyles } from 'tss-react/mui';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemCopy from '../../../../../components/ItemCopy';
 import ItemTags from '../../../../../components/ItemTags';
-import { type OutputParser } from '../../../../../utils/api-types';
+import { type OutputParserSimple } from '../../../../../utils/api-types';
 
 const useStyles = makeStyles()(theme => ({
   paperContainer: {
@@ -30,7 +30,7 @@ const useStyles = makeStyles()(theme => ({
   },
 }));
 
-interface Props { outputParsers: OutputParser[] }
+interface Props { outputParsers: OutputParserSimple[] }
 
 const OutputParserInfoCard = ({ outputParsers }: Props) => {
   const { t } = useFormatter();
@@ -45,7 +45,7 @@ const OutputParserInfoCard = ({ outputParsers }: Props) => {
 
   return (
     <Paper className={`paper ${classes.paperContainer}`} variant="outlined">
-      {outputParsers.map((outputParser: OutputParser) => (
+      {outputParsers.map((outputParser: OutputParserSimple) => (
         <>
           <Typography variant="h3" gutterBottom>{t('Output mode')}</Typography>
           <Typography variant="h3" gutterBottom>{t('Parsing')}</Typography>

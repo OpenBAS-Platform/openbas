@@ -3,10 +3,9 @@ package io.openbas.utils;
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
 import io.openbas.rest.inject.output.InjectTestStatusOutput;
+import io.openbas.rest.payload.output.PayloadSimple;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import io.openbas.rest.payload.output.PayloadSimple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
