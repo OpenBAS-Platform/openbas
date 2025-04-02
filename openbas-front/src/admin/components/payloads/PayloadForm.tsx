@@ -57,13 +57,13 @@ const PayloadForm = ({
   };
 
   const regexGroupObject = z.object({
-    ...editing && { regex_group_id: z.string() },
+    ...editing && { regex_group_id: z.string().optional() },
     regex_group_field: z.string().min(1, { message: t('Should not be empty') }),
     regex_group_index_values: z.string().min(1, { message: t('Should not be empty') }),
   });
 
   const contractOutputElementObject = z.object({
-    ...editing && { contract_output_element_id: z.string() },
+    ...editing && { contract_output_element_id: z.string().optional() },
     contract_output_element_is_finding: z.boolean().optional(),
     contract_output_element_name: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_key: z.string().min(1, { message: t('Should not be empty') }),

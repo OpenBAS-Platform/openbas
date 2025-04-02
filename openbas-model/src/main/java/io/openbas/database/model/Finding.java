@@ -64,6 +64,10 @@ public class Finding implements Base {
   @JsonProperty("finding_labels")
   private String[] labels;
 
+  @Column(name = "finding_name")
+  @JsonProperty("finding_name")
+  protected String name;
+
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
