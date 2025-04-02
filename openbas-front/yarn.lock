@@ -8426,13 +8426,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mdi-material-ui@npm:7.9.3":
-  version: 7.9.3
-  resolution: "mdi-material-ui@npm:7.9.3"
+"mdi-material-ui@npm:7.9.4":
+  version: 7.9.4
+  resolution: "mdi-material-ui@npm:7.9.4"
   peerDependencies:
-    "@mui/material": ^5.0.0 || ^6.0.0
+    "@mui/material": ^5.0.0 || ^6.0.0 || ^7.0.0
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/67d9e037be721a4440ffa113a44794d22d02888229b5407d0b38826eece6bfddec4f54a4bfe93b9afc03a363e3ee567e9036cf18d24473a7f95c29c3ef1b806b
+  checksum: 10c0/a3d925dbef3bf0c0a173e052488e8ed7aad496dfe14d39c164b42c9ff21bf34b63e6ea743c5ac549f2c23d95a08ae5654e852109480f1dc320a22b5581502f12
   languageName: node
   linkType: hard
 
@@ -9414,7 +9414,7 @@ __metadata:
     i18n-auto-translation: "npm:2.1.2"
     js-file-download: "npm:0.4.12"
     jsdom: "npm:26.0.0"
-    mdi-material-ui: "npm:7.9.3"
+    mdi-material-ui: "npm:7.9.4"
     moment: "npm:2.30.1"
     moment-timezone: "npm:0.5.48"
     monocart-coverage-reports: "npm:2.12.3"
