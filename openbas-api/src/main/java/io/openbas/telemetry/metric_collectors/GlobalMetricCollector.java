@@ -24,6 +24,6 @@ public class GlobalMetricCollector {
   }
 
   private long isEnterpriseEdition() {
-    return eeService.getEnterpriseEditionInfoFromPem().isLicenseValidated() ? 1 : 0;
+    return eeService.getEnterpriseEditionInfo().isLicenseValidated() ? 1 : 0;
   }
 }

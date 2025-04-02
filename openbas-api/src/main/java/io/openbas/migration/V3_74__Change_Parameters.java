@@ -13,6 +13,7 @@ public class V3_74__Change_Parameters extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
-    select.execute("alter table parameters alter column parameter_value type text using parameter_value::text;");
+    select.execute(
+        "alter table parameters alter column parameter_value type text using parameter_value::text;");
   }
 }

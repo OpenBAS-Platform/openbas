@@ -13,10 +13,12 @@ import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
 import io.openbas.ee.Ee;
+import io.openbas.ee.License;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.*;
 import io.openbas.rest.settings.response.OAuthProvider;
@@ -302,7 +304,7 @@ public class PlatformSettingsService {
         expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
     // License
-    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfoFromPem());
+    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfo());
     return platformSettings;
   }
 
@@ -353,12 +355,17 @@ public class PlatformSettingsService {
   }
 
   public PlatformSettings updateSettingsEnterpriseEdition(
-      SettingsEnterpriseEditionUpdateInput input) {
+      SettingsEnterpriseEditionUpdateInput input) throws Exception {
     Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(
-        resolveFromMap(
-            dbSettings, PLATFORM_ENTERPRISE_LICENSE.key(), input.getEnterpriseEdition()));
+    String certPem = input.getEnterpriseEdition();
+    if (certPem != null && !certPem.isEmpty()) {
+      License license = eeService.verifyCertificate(certPem);
+      if (!license.isLicenseValidated()) {
+        throw new BadRequestException("Invalid certificate");
+      }
+    }
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_LICENSE.key(), certPem));
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }
