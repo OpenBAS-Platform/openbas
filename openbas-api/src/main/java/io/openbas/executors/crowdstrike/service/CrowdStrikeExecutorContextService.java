@@ -5,16 +5,12 @@ import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorServic
 
 import io.openbas.database.model.*;
 import io.openbas.executors.ExecutorContextService;
-import io.openbas.executors.ExecutorHelper;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.regex.Matcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -23,9 +19,6 @@ import org.springframework.stereotype.Service;
 @Service(CROWDSTRIKE_EXECUTOR_NAME)
 @RequiredArgsConstructor
 public class CrowdStrikeExecutorContextService extends ExecutorContextService {
-
-  private static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
-  private static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
 
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
@@ -55,48 +48,21 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
-    String scriptName;
-    String implantLocation;
-    switch (platform) {
-      case Windows -> {
-        scriptName = this.crowdStrikeExecutorConfig.getWindowsScriptName();
-        implantLocation =
-            "$location="
-                + IMPLANT_LOCATION_WINDOWS
-                + ExecutorHelper.IMPLANT_BASE_NAME
-                + UUID.randomUUID()
-                + "\";md $location -ea 0;[Environment]::CurrentDirectory";
-      }
-      case Linux, MacOS -> {
-        scriptName = this.crowdStrikeExecutorConfig.getUnixScriptName();
-        implantLocation =
-            "location="
-                + IMPLANT_LOCATION_UNIX
-                + ExecutorHelper.IMPLANT_BASE_NAME
-                + UUID.randomUUID()
-                + ";mkdir -p $location;filename=";
-      }
-      default -> throw new RuntimeException("Unsupported platform: " + platform);
-    }
+    String scriptName =
+        switch (platform) {
+          case Windows -> this.crowdStrikeExecutorConfig.getWindowsScriptName();
+          case Linux, MacOS -> this.crowdStrikeExecutorConfig.getUnixScriptName();
+          default -> throw new RuntimeException("Unsupported platform: " + platform);
+        };
 
     String executorCommandKey = platform.name() + "." + arch.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
 
     command = replaceArgs(platform, command, inject.getId(), agent.getId());
-    command =
-        platform == Endpoint.PLATFORM_TYPE.Windows
-            ? command.replaceFirst(
-                "\\$?x=.+location=.+;\\[Environment]::CurrentDirectory",
-                Matcher.quoteReplacement(implantLocation))
-            : command.replaceFirst(
-                "\\$?x=.+location=.+;filename=", Matcher.quoteReplacement(implantLocation));
-
-    String commandEncoded =
-        platform == Endpoint.PLATFORM_TYPE.Windows
-            ? Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_16LE))
-            : Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_8));
 
     this.crowdStrikeExecutorClient.executeAction(
-        agent.getExternalReference(), scriptName, commandEncoded);
+        agent.getExternalReference(),
+        scriptName,
+        Base64.getEncoder().encodeToString(command.getBytes()));
   }
 }
