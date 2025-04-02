@@ -86,8 +86,9 @@ public class FindingService {
 
   public void computeFindings(InjectExecutionInput input, Inject inject, Agent agent) {
     // Used for inject with payload
-    extractFindingsFromRawOutput(input, inject, agent);
-
+    if (agent != null) {
+      extractFindingsFromRawOutput(input, inject, agent);
+    }
     // Used for injectors
     extractFindingsFromStructuredOutput(input, inject);
   }

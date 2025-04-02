@@ -1,5 +1,6 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
@@ -18,6 +19,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -137,17 +139,38 @@ public class InjectStatusService {
 
   public void handleInjectExecutionCallback(
       String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    Inject inject = null;
 
-    Agent agent =
-        agentId == null
-            ? null
-            : agentRepository.findById(agentId).orElseThrow(ElementNotFoundException::new);
+    try {
+      inject =
+          injectRepository
+              .findById(injectId)
+              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
 
-    updateInjectStatus(agent, inject, input);
+      Agent agent =
+          (agentId == null)
+              ? null
+              : agentRepository
+                  .findById(agentId)
+                  .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
 
-    // -- FINDINGS --
-    findingService.computeFindings(input, inject, agent);
+      // -- UPDATE STATUS --
+      updateInjectStatus(agent, inject, input);
+
+      // -- FINDINGS --
+      findingService.computeFindings(input, inject, agent);
+
+    } catch (Exception e) {
+      log.log(Level.SEVERE, e.getMessage());
+      if (inject != null) {
+        inject
+            .getStatus()
+            .ifPresent(
+                status ->
+                    status.addTrace(
+                        getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE)));
+      }
+    }
   }
 
   public ExecutionStatus computeStatus(List<ExecutionTraces> traces) {
