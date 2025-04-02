@@ -73,7 +73,7 @@ const PayloadForm = ({
     contract_output_element_regex_groups: z.array(regexGroupObject),
   });
   const outputParserObject = z.object({
-    ...editing && { output_parser_id: z.string() },
+    ...editing && { output_parser_id: z.string().optional() },
     output_parser_mode: z.enum(['STDOUT'], { message: t('Should not be empty') }),
     output_parser_type: z.enum(['REGEX'], { message: t('Should not be empty') }),
     output_parser_contract_output_elements: z.array(contractOutputElementObject),
