@@ -27,6 +27,7 @@ const PlatformFieldController: FunctionComponent<Props> = ({
   name,
   label,
   required,
+  style = {},
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -60,6 +61,7 @@ const PlatformFieldController: FunctionComponent<Props> = ({
           options={platformsOptions}
           openOnFocus
           autoHighlight
+          style={style}
           noOptionsText={t('No available options')}
           slotProps={{ chip: { sx: { maxHeight: '24px' } } }}
           renderInput={
