@@ -7,6 +7,8 @@ import java.util.Objects;
 
 public class EsUtils {
 
+  private EsUtils() {}
+
   public static List<String> buildRestrictions(String... ids) {
     List<String> restrictions = new ArrayList<>();
     List<String> filters = Arrays.stream(ids).filter(Objects::nonNull).toList();

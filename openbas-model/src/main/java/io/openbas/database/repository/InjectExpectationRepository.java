@@ -5,6 +5,7 @@ import io.openbas.database.raw.RawInjectExpectation;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -197,4 +198,43 @@ public interface InjectExpectationRepository
   // We don't include expectations for players, only for the team, if applicable
   List<RawInjectExpectation> rawForComputeGlobalByExerciseIds(
       @Param("exerciseIds") Set<String> exerciseIds);
+
+  // -- INDEXING --
+
+  @Query(
+      value =
+          """
+    SELECT
+      ie.inject_expectation_id,
+      ie.inject_expectation_name,
+      ie.inject_expectation_description,
+      ie.inject_expectation_type,
+      ie.inject_expectation_results,
+      ie.inject_expectation_score,
+      ie.inject_expectation_expected_score,
+      ie.inject_expiration_time,
+      ie.inject_expectation_group,
+      ie.inject_expectation_created_at,
+      ie.inject_expectation_updated_at,
+      ie.exercise_id,
+      ie.inject_id,
+      ie.user_id,
+      ie.team_id,
+      ie.agent_id,
+      ie.asset_id,
+      ie.asset_group_id
+    FROM injects_expectations ie
+    LEFT JOIN exercises ex ON ex.exercise_id = ie.exercise_id
+    LEFT JOIN injects i ON i.inject_id = ie.inject_id
+    LEFT JOIN users u ON u.user_id = ie.user_id
+    LEFT JOIN teams t ON t.team_id = ie.team_id
+    LEFT JOIN agents agent ON agent.agent_id = ie.agent_id
+    LEFT JOIN assets asset ON asset.asset_id = ie.asset_id
+    LEFT JOIN asset_groups ag ON ag.asset_group_id = ie.asset_group_id
+    WHERE ie.inject_expectation_updated_at > :from
+    ORDER BY ie.inject_expectation_updated_at
+    LIMIT 500
+    """,
+      nativeQuery = true)
+  List<RawInjectExpectation> findForIndexing(@Param("from") Instant from);
 }

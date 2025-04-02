@@ -4,6 +4,8 @@ import io.openbas.engine.model.finding.EsFinding;
 import io.openbas.engine.model.finding.FindingHandler;
 import io.openbas.engine.model.inject.EsInject;
 import io.openbas.engine.model.inject.InjectHandler;
+import io.openbas.engine.model.injectexpectation.EsInjectExpectation;
+import io.openbas.engine.model.injectexpectation.InjectExpectationHandler;
 import io.openbas.engine.model.scenario.EsScenario;
 import io.openbas.engine.model.scenario.ScenarioHandler;
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public class EsEngine {
     models.add(new EsModel<>(EsFinding.class, context.getBean(FindingHandler.class)));
     models.add(new EsModel<>(EsScenario.class, context.getBean(ScenarioHandler.class)));
     models.add(new EsModel<>(EsInject.class, context.getBean(InjectHandler.class)));
+    models.add(
+        new EsModel<>(EsInjectExpectation.class, context.getBean(InjectExpectationHandler.class)));
     return models;
   }
 }

@@ -247,6 +247,18 @@ public class ElasticDriver {
                 // .dateNanos(new DateNanosProperty.Builder().build())
                 .date(new DateProperty.Builder().build())
                 .build());
+      } else if (fieldType == Boolean.class) {
+        mappings.put(
+            field.getName(),
+            new Property.Builder().boolean_(new BooleanProperty.Builder().build()).build());
+      } else if (fieldType == Double.class) {
+        mappings.put(
+            field.getName(),
+            new Property.Builder().double_(new DoubleNumberProperty.Builder().build()).build());
+      } else if (fieldType == Long.class) {
+        mappings.put(
+            field.getName(),
+            new Property.Builder().long_(new LongNumberProperty.Builder().build()).build());
       } else {
         throw new RuntimeException("Unsupported field type: " + fieldType);
       }
