@@ -1,8 +1,7 @@
 package io.openbas.ee;
 
-import java.time.Instant;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,27 +54,49 @@ public class License {
   @JsonProperty("license_is_by_configuration")
   private boolean isLicenseByConfiguration = false;
 
+  @JsonProperty("license_is_extra_expiration")
+  private boolean extraExpiration = false;
+
   @JsonProperty("license_extra_expiration_days")
   private long extraExpirationDays = 0;
 
   @Override
   public String toString() {
-    return "License{" +
-            "isLicenseEnterprise=" + isLicenseEnterprise +
-            ", isValidCert=" + isValidCert +
-            ", type='" + type + '\'' +
-            ", creator='" + creator + '\'' +
-            ", isValidProduct=" + isValidProduct +
-            ", customer='" + customer + '\'' +
-            ", platform='" + platform + '\'' +
-            ", isPlatformMatch=" + isPlatformMatch +
-            ", isGlobalLicense=" + isGlobalLicense +
-            ", isLicenseExpired=" + isLicenseExpired +
-            ", startDate=" + startDate +
-            ", expirationDate=" + expirationDate +
-            ", isLicensePrevention=" + isLicensePrevention +
-            ", isLicenseValidated=" + isLicenseValidated +
-            ", isLicenseByConfiguration=" + isLicenseByConfiguration +
-            '}';
+    return "License{"
+        + "isLicenseEnterprise="
+        + isLicenseEnterprise
+        + ", isValidCert="
+        + isValidCert
+        + ", type='"
+        + type
+        + '\''
+        + ", creator='"
+        + creator
+        + '\''
+        + ", isValidProduct="
+        + isValidProduct
+        + ", customer='"
+        + customer
+        + '\''
+        + ", platform='"
+        + platform
+        + '\''
+        + ", isPlatformMatch="
+        + isPlatformMatch
+        + ", isGlobalLicense="
+        + isGlobalLicense
+        + ", isLicenseExpired="
+        + isLicenseExpired
+        + ", startDate="
+        + startDate
+        + ", expirationDate="
+        + expirationDate
+        + ", isLicensePrevention="
+        + isLicensePrevention
+        + ", isLicenseValidated="
+        + isLicenseValidated
+        + ", isLicenseByConfiguration="
+        + isLicenseByConfiguration
+        + '}';
   }
 }

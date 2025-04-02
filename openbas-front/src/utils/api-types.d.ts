@@ -3003,6 +3003,8 @@ export interface PayloadsDeprecateInput {
   payload_external_ids: string[];
 }
 
+export type BannerMessage = Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>
+
 export interface PlatformSettings {
   /** True if Saml2 is enabled */
   auth_saml2_enable?: boolean;
@@ -3071,7 +3073,7 @@ export interface PlatformSettings {
   /** Type of AI (mistralai or openai) */
   platform_ai_type?: string;
   /** Map of the messages to display on the screen by their level (the level available are DEBUG, INFO, WARN, ERROR, FATAL) */
-  platform_banner_by_level?: Record<string, string[]>;
+  platform_banner_by_level?: BannerMessage;
   /** Base URL of the platform */
   platform_base_url?: string;
   /** Definition of the dark theme */
@@ -3925,6 +3927,7 @@ export interface PlatformLicense {
   license_is_prevention: boolean
   license_is_validated: boolean
   license_is_by_configuration: boolean
+  license_is_extra_expiration: boolean
   license_extra_expiration_days: number
 }
 

@@ -12,6 +12,7 @@ import { errorWrapper } from './components/Error';
 import Loader from './components/Loader';
 import Message from './components/Message';
 import NotFound from './components/NotFound';
+import SystemBanners from './public/components/systembanners/SystemBanners';
 import { useHelper } from './store';
 import { useAppDispatch } from './utils/hooks';
 import { UserContext } from './utils/hooks/useAuth';
@@ -63,6 +64,7 @@ const Root = () => {
           <ConnectedThemeProvider>
             <CssBaseline />
             <Message />
+            <SystemBanners settings={settings} />
             <Suspense fallback={<Loader />}>
               <Routes>
                 <Route

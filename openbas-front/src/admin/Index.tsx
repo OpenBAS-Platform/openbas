@@ -77,7 +77,6 @@ const Index = () => {
   const { bannerHeight } = computeBannerSettings(settings);
   return (
     <>
-      <SystemBanners settings={settings} />
       <Box
         sx={{
           display: 'flex',
