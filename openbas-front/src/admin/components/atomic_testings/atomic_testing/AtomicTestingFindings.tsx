@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, type FunctionComponent, useContext, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
