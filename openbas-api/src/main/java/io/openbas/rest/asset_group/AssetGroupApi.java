@@ -7,23 +7,31 @@ import static io.openbas.helper.StreamHelper.iterableToSet;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.AssetGroup;
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
+import io.openbas.database.specification.EndpointSpecification;
+import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.rest.asset_group.form.UpdateAssetsOnAssetGroupInput;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.service.AssetGroupService;
+import io.openbas.service.EndpointService;
+import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +43,9 @@ import org.springframework.web.bind.annotation.*;
 public class AssetGroupApi extends RestBehavior {
 
   public static final String ASSET_GROUP_URI = "/api/asset_groups";
+  private final EndpointService endpointService;
+  private final EndpointMapper endpointMapper;
+
 
   private final AssetGroupService assetGroupService;
   private final AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService;
@@ -63,6 +74,19 @@ public class AssetGroupApi extends RestBehavior {
   public Page<AssetGroupOutput> assetGroups(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return this.assetGroupCriteriaBuilderService.assetGroupPagination(searchPaginationInput);
+  }
+
+  @PostMapping(ASSET_GROUP_URI + "/{assetGroupId}/assets/search")
+  public Page<EndpointOutput> endpointsFromAssetGroup(
+      @RequestBody @Valid SearchPaginationInput searchPaginationInput,
+      @PathVariable @NotBlank final String assetGroupId) {
+    Page<Endpoint> endpointPage = endpointService.searchEndpoints(
+        EndpointSpecification.findEndpointsForAssetGroup(assetGroupId), searchPaginationInput);
+    // Convert the Page of Endpoint to a Page of EndpointOutput
+    List<EndpointOutput> endpointOutputs =
+        endpointPage.getContent().stream().map(endpointMapper::toEndpointOutput).toList();
+    return new PageImpl<>(
+        endpointOutputs, endpointPage.getPageable(), endpointPage.getTotalElements());
   }
 
   @PostMapping(ASSET_GROUP_URI + "/find")

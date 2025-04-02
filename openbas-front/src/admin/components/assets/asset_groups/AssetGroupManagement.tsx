@@ -1,21 +1,19 @@
 import { CloseRounded } from '@mui/icons-material';
 import { IconButton, Typography } from '@mui/material';
-import { type FunctionComponent } from 'react';
+import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
+import { fetchAssetGroup, searchEndpointsFromAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { type AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
 import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
-import { fetchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { type UserHelper } from '../../../../actions/helper';
-import SearchFilter from '../../../../components/SearchFilter';
+import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
+import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useHelper } from '../../../../store';
-import { type AssetGroup, type Endpoint } from '../../../../utils/api-types';
+import { type AssetGroup, type Endpoint, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
-import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import TagsFilter from '../../common/filters/TagsFilter';
-import { type EndpointStoreWithType } from '../endpoints/endpoint';
 import EndpointPopover from '../endpoints/EndpointPopover';
 import EndpointsList from '../endpoints/EndpointsList';
 import AssetGroupAddEndpoints from './AssetGroupAddEndpoints';
@@ -66,30 +64,35 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { assetGroup, endpointsMap, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointHelper & UserHelper) => ({
+  const { assetGroup, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointHelper & UserHelper) => ({
     assetGroup: helper.getAssetGroup(assetGroupId),
     endpointsMap: helper.getEndpointsMap(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   useDataLoader(() => {
     dispatch(fetchAssetGroup(assetGroupId));
-    dispatch(fetchEndpoints());
   });
 
-  // Assets
+  // Pagination
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
 
-  const getAssetFromMap = (assets: string[]) => assets?.filter((endpointId: string) => !!endpointsMap[endpointId]).map((endpointId: string) => endpointsMap[endpointId]);
+  const availableFilterNames = [
+    'endpoint_platform',
+    'endpoint_arch',
+    'asset_tags',
+  ];
+  const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
 
-  const filteringAssets = useSearchAnFilter('asset', 'name', ['name']);
-  const assets = getAssetFromMap(assetGroup?.asset_group_assets ?? [])?.map(a => ({
-    ...a,
-    type: 'static',
-  }))
-    .concat(getAssetFromMap(assetGroup?.asset_group_dynamic_assets ?? [])?.map(a => ({
-      ...a,
-      type: 'dynamic',
-    })));
-  const sortedAsset: EndpointStoreWithType[] = filteringAssets.filterAndSort(assets);
+  const paginationComponent = (
+    <PaginationComponentV2
+      fetch={((searchPaginationInput: SearchPaginationInput) => searchEndpointsFromAssetGroup(searchPaginationInput, assetGroupId))}
+      searchPaginationInput={searchPaginationInput}
+      setContent={setEndpoints}
+      entityPrefix="endpoint"
+      availableFilterNames={availableFilterNames}
+      queryableHelpers={queryableHelpers}
+    />
+  );
 
   return (
     <>
@@ -106,30 +109,14 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         <Typography variant="h6" classes={{ root: classes.title }}>
           {assetGroup?.asset_group_name}
         </Typography>
-        <div className={classes.parameters}>
-          <div className={classes.tags}>
-            <TagsFilter
-              onAddTag={filteringAssets.handleAddTag}
-              onRemoveTag={filteringAssets.handleRemoveTag}
-              currentTags={filteringAssets.tags}
-              thin
-            />
-          </div>
-          <div className={classes.search}>
-            <SearchFilter
-              fullWidth
-              onChange={filteringAssets.handleSearch}
-              keyword={filteringAssets.keyword}
-            />
-          </div>
-        </div>
+        {paginationComponent}
         <div className="clearfix" />
       </div>
       <EndpointsList
-        endpoints={sortedAsset}
+        endpoints={endpoints}
         actions={userAdmin
           ? (
-              // @ts-expect-error: Endpoint property handle by EndpointsList
+            // @ts-expect-error: Endpoint property handle by EndpointsList
               <EndpointPopover
                 inline
                 assetGroupId={assetGroup?.asset_group_id}
