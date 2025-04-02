@@ -28,14 +28,14 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const inlineStyles: Record<string, CSSProperties> = {
-  finding_type: { width: '10%' },
-  finding_field: { width: '10%' },
+  finding_type: { width: '20%' },
+  finding_field: { width: '20%' },
   finding_value: {
     width: '30%',
     cursor: 'default',
   },
   finding_assets: { width: '10%' },
-  finding_tags: { width: '10%' },
+  finding_tags: { width: '20%' },
 };
 
 const AtomicTestingFindings: FunctionComponent = () => {
@@ -86,7 +86,7 @@ const AtomicTestingFindings: FunctionComponent = () => {
     },
     {
       field: 'finding_assets',
-      label: 'Target',
+      label: 'Asset',
       isSortable: false,
       value: (finding: Finding) => <ItemTargets targets={(finding.finding_assets || []).map(assetId => assetsMap.get(assetId)) as TargetSimple[]} />,
     },
