@@ -205,10 +205,6 @@ public class PlatformSettingsService {
     // Build authenticated user settings
     OpenBASPrincipal user = currentUser();
     if (user != null) {
-      platformSettings.setPlatformEnterpriseEdition(
-          ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key()))
-              .map(Setting::getValue)
-              .orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue()));
       platformSettings.setPlatformWhitemark(
           ofNullable(dbSettings.get(PLATFORM_WHITEMARK.key()))
               .map(Setting::getValue)
@@ -306,13 +302,7 @@ public class PlatformSettingsService {
         expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
     // License
-    String platformInstanceId = ofNullable(dbSettings.get(PLATFORM_INSTANCE.key()))
-            .map(Setting::getValue)
-            .orElse(PLATFORM_INSTANCE.defaultValue());
-    String pemConfig = ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_LICENSE.key()))
-            .map(Setting::getValue)
-            .orElse(PLATFORM_ENTERPRISE_LICENSE.defaultValue());
-    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfoFromPem(platformInstanceId, pemConfig));
+    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfoFromPem());
     return platformSettings;
   }
 
@@ -368,7 +358,7 @@ public class PlatformSettingsService {
     List<Setting> settingsToSave = new ArrayList<>();
     settingsToSave.add(
         resolveFromMap(
-            dbSettings, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
+            dbSettings, PLATFORM_ENTERPRISE_LICENSE.key(), input.getEnterpriseEdition()));
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }
