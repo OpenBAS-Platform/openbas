@@ -31,7 +31,6 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   private static final String AGENT_ID_VARIABLE = "$agentID";
   private static final String WINDOWS_EXTERNAL_REFERENCE =
       "$agentID=[System.BitConverter]::ToString(((Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CSAgent\\Sim').AG)).ToLower() -replace '-','';";
-  // TODO
   private static final String LINUX_EXTERNAL_REFERENCE =
       "agentID=$(sudo /opt/CrowdStrike/falconctl -g --aid | sed 's/aid=\"//g' | sed 's/\".//g');";
   private static final String MAC_EXTERNAL_REFERENCE =
@@ -46,9 +45,9 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       @NotNull final Agent agent) {}
 
   public void launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) {
+      Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
     if (!this.crowdStrikeExecutorConfig.isEnable()) {
-      throw new RuntimeException("CrowdStrike executor is not enabled"); // TODO test exception
+      throw new RuntimeException("CrowdStrike executor is not enabled");
     }
 
     Injector injector =
@@ -59,7 +58,6 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
     List<CrowdStrikeAction> actions = new ArrayList<>();
-
     List<Agent> withoutPlatformAgents =
         agents.stream()
             .filter(
@@ -117,12 +115,33 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
             injector,
             inject.getId()));
 
-    actions.forEach(
-        action ->
-            this.crowdStrikeExecutorClient.executeAction(
-                action.getAgents().stream().map(Agent::getId).toList(),
-                action.getScriptName(),
-                action.getCommandEncoded()));
+    executeActions(actions);
+  }
+
+  private void executeActions(List<CrowdStrikeAction> actions) throws InterruptedException {
+    for (CrowdStrikeAction action : actions) {
+      int paginationLimit = this.crowdStrikeExecutorConfig.getApiBatchExecutionActionPagination();
+      if (action.getAgents().size() > paginationLimit) {
+        int numberOfExecution = Math.ceilDiv(action.getAgents().size(), paginationLimit);
+        int fromIndex = 0;
+        int toIndex = paginationLimit;
+        for (int callNumber = 0; callNumber < numberOfExecution; callNumber += 1) {
+          this.crowdStrikeExecutorClient.executeAction(
+              action.getAgents().subList(fromIndex, toIndex).stream().map(Agent::getId).toList(),
+              action.getScriptName(),
+              action.getCommandEncoded());
+          fromIndex = toIndex;
+          toIndex = Math.min(action.getAgents().size(), fromIndex + paginationLimit);
+          Thread.sleep(1000);
+        }
+      } else {
+        this.crowdStrikeExecutorClient.executeAction(
+            action.getAgents().stream().map(Agent::getId).toList(),
+            action.getScriptName(),
+            action.getCommandEncoded());
+        Thread.sleep(1000);
+      }
+    }
   }
 
   private List<CrowdStrikeAction> getWindowsActions(
@@ -149,8 +168,6 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
               Matcher.quoteReplacement(implantLocation));
       actionWindows.setCommandEncoded(
           Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_8)));
-      // TODO for each to paginate like other branch
-      //agents.subList(0, this.crowdStrikeExecutorConfig.getApiBatchExecutionActionPagination());
       actionWindows.setAgents(agents);
       actions.add(actionWindows);
     }
@@ -166,7 +183,6 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       actionLinux.setCommandEncoded(
           getUnixCommand(
               Endpoint.PLATFORM_TYPE.Linux, injector, injectId, LINUX_EXTERNAL_REFERENCE));
-      // TODO for each to paginate
       actionLinux.setAgents(agents);
       actions.add(actionLinux);
     }
@@ -181,7 +197,6 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       actionMac.setScriptName(this.crowdStrikeExecutorConfig.getUnixScriptName());
       actionMac.setCommandEncoded(
           getUnixCommand(Endpoint.PLATFORM_TYPE.MacOS, injector, injectId, MAC_EXTERNAL_REFERENCE));
-      // TODO for each to paginate
       actionMac.setAgents(agents);
       actions.add(actionMac);
     }
