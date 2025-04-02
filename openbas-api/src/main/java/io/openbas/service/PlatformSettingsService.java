@@ -12,6 +12,7 @@ import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
+import io.openbas.ee.Ee;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
@@ -49,6 +50,7 @@ public class PlatformSettingsService {
   private OpenCTIConfig openCTIConfig;
   private AiConfig aiConfig;
   private CalderaExecutorConfig calderaExecutorConfig;
+  private Ee eeService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
@@ -88,6 +90,11 @@ public class PlatformSettingsService {
   @Autowired
   public void setContext(ApplicationContext context) {
     this.context = context;
+  }
+
+  @Autowired
+  public void setEeService(Ee eeService) {
+    this.eeService = eeService;
   }
 
   // -- PROVIDERS --
@@ -173,7 +180,6 @@ public class PlatformSettingsService {
   public PlatformSettings findSettings() {
     Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     PlatformSettings platformSettings = new PlatformSettings();
-
     // Build anonymous settings
     platformSettings.setPlatformOpenIdProviders(buildOpenIdProviders());
     platformSettings.setPlatformSaml2Providers(buildSaml2Providers());
@@ -299,6 +305,14 @@ public class PlatformSettingsService {
     platformSettings.setExpectationDefaultScoreValue(
         expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
+    // License
+    String platformInstanceId = ofNullable(dbSettings.get(PLATFORM_INSTANCE.key()))
+            .map(Setting::getValue)
+            .orElse(PLATFORM_INSTANCE.defaultValue());
+    String pemConfig = ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_LICENSE.key()))
+            .map(Setting::getValue)
+            .orElse(PLATFORM_ENTERPRISE_LICENSE.defaultValue());
+    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfoFromPem(platformInstanceId, pemConfig));
     return platformSettings;
   }
 
