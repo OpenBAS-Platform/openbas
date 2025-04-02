@@ -28,6 +28,8 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   private static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
   private static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
 
+  private static final int SLEEP_INTERVAL_BATCH_EXECUTIONS = 1000;
+
   private static final String AGENT_ID_VARIABLE = "$agentID";
   private static final String WINDOWS_EXTERNAL_REFERENCE =
       "$agentID=[System.BitConverter]::ToString(((Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CSAgent\\Sim').AG)).ToLower() -replace '-','';";
@@ -73,7 +75,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
             inject.getId()));
     // Set implant script for Linux CS agents
     actions.addAll(
-        setLinuxActions(
+        getLinuxActions(
             agents.stream()
                 .filter(
                     agent ->
@@ -83,9 +85,9 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
                 .toList(),
             injector,
             inject.getId()));
-    // Set implant script for Mac CS agents
+    // Set implant script for MacOS CS agents
     actions.addAll(
-        setMacActions(
+        getMacOSActions(
             agents.stream()
                 .filter(
                     agent ->
@@ -139,14 +141,14 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
               action.getCommandEncoded());
           fromIndex = toIndex;
           toIndex = Math.min(action.getAgents().size(), fromIndex + paginationLimit);
-          Thread.sleep(1000);
+          Thread.sleep(SLEEP_INTERVAL_BATCH_EXECUTIONS);
         }
       } else {
         this.crowdStrikeExecutorClient.executeAction(
             action.getAgents().stream().map(Agent::getId).toList(),
             action.getScriptName(),
             action.getCommandEncoded());
-        Thread.sleep(1000);
+        Thread.sleep(SLEEP_INTERVAL_BATCH_EXECUTIONS);
       }
     }
   }
@@ -181,7 +183,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
     return actions;
   }
 
-  private List<CrowdStrikeAction> setLinuxActions(
+  private List<CrowdStrikeAction> getLinuxActions(
       List<Agent> agents, Injector injector, String injectId) {
     List<CrowdStrikeAction> actions = new ArrayList<>();
     if (!agents.isEmpty()) {
@@ -196,7 +198,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
     return actions;
   }
 
-  private List<CrowdStrikeAction> setMacActions(
+  private List<CrowdStrikeAction> getMacOSActions(
       List<Agent> agents, Injector injector, String injectId) {
     List<CrowdStrikeAction> actions = new ArrayList<>();
     if (!agents.isEmpty()) {
