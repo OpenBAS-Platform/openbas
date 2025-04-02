@@ -15,14 +15,23 @@ on:
         type: string
         default: ''
         required: true
+    secrets:
+      RELEASE_TOKEN:
+        required: true
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: openbas
     steps:
       - name: checkout repo content
         uses: actions/checkout@v4
+        with:
+          repository: OpenBAS-Platform/openbas
+          ref: ${{ inputs.branch_platform }}
       - name: setup python
         uses: actions/setup-python@v5
         with:
@@ -33,4 +42,4 @@ jobs:
           if [ -f scripts/requirements.txt ]; then pip install -r scripts/requirements.txt; fi
       - name: execute py script # run file
         run: |
-          python scripts/release.py ${{ github.event.inputs.branch_platform }} ${{ github.event.inputs.previous_version }} ${{ github.event.inputs.new_version }} ${{ github.token }}
+          python scripts/release.py ${{ inputs.branch_platform }} ${{ inputs.previous_version }} ${{ inputs.new_version }} ${{ secrets.RELEASE_TOKEN }}
