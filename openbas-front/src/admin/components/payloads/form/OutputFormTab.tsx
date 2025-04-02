@@ -78,9 +78,9 @@ const OutputFormTab = () => {
         </Button>
       </div>
 
-      {contractOutputElements.map((_, contractOutputElementIndex) => (
+      {contractOutputElements.map((contracOutputElement, contractOutputElementIndex) => (
         <ContractOutputElementCard
-          key={`contract-output-element-${contractOutputElementIndex}`}
+          key={contracOutputElement.id} // DO NOT REMOVE, it's used to remove contractOutput from list
           prefixName={outputParserName}
           index={contractOutputElementIndex}
           remove={outputElementRemove}
