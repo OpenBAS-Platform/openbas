@@ -27,7 +27,6 @@ const PlatformFieldController: FunctionComponent<Props> = ({
   name,
   label,
   required,
-  style = {},
 }) => {
   // Standard hooks
   const { classes } = useStyles();
