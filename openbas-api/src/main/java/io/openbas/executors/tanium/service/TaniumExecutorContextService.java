@@ -30,7 +30,7 @@ public class TaniumExecutorContextService extends ExecutorContextService {
       throws AgentException {
 
     if (!this.taniumExecutorConfig.isEnable()) {
-      throw new AgentException("Tanium executor is not enabled", agent);
+      throw new AgentException("Fatal error: Tanium executor is not enabled", agent);
     }
 
     Endpoint.PLATFORM_TYPE platform = assetEndpoint.getPlatform();

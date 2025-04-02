@@ -73,7 +73,7 @@ public class CalderaExecutorContextService extends ExecutorContextService {
       throws AgentException {
 
     if (!this.calderaExecutorConfig.isEnable()) {
-      throw new AgentException("Caldera executor is not enabled", agent);
+      throw new AgentException("Fatal error: Caldera executor is not enabled", agent);
     }
 
     inject
