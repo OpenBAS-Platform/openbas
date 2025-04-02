@@ -33,9 +33,9 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       "$agentID=[System.BitConverter]::ToString(((Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CSAgent\\Sim').AG)).ToLower() -replace '-','';";
   // TODO
   private static final String LINUX_EXTERNAL_REFERENCE =
-      "sudo /opt/CrowdStrike/falconctl -g --aid | sed 's/aid= //g'";
+      "agentID=$(sudo /opt/CrowdStrike/falconctl -g --aid | sed 's/aid=\"//g' | sed 's/\".//g');";
   private static final String MAC_EXTERNAL_REFERENCE =
-      "agentID=sudo /Applications/Falcon.app/Contents/Resources/falconctl stats | grep agentID | sed 's/agentID: //g' | tr '[:upper:]' '[:lower:]' | sed 's/-//g'";
+      "agentID=$(sudo /Applications/Falcon.app/Contents/Resources/falconctl stats | grep agentID | sed 's/agentID: //g' | tr '[:upper:]' '[:lower:]' | sed 's/-//g');";
 
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
@@ -150,7 +150,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       actionWindows.setCommandEncoded(
           Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_8)));
       // TODO for each to paginate like other branch
-      agents.subList(0, this.crowdStrikeExecutorConfig.getApiBatchExecutionActionPagination());
+      //agents.subList(0, this.crowdStrikeExecutorConfig.getApiBatchExecutionActionPagination());
       actionWindows.setAgents(agents);
       actions.add(actionWindows);
     }
