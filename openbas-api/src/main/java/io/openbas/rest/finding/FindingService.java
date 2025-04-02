@@ -191,8 +191,9 @@ public class FindingService {
 
   private void extractFindings(Inject inject, Asset asset, String trace) {
     List<Finding> findings = new ArrayList<>();
-    Optional.ofNullable(inject.getPayload())
-        .map(p -> p.get().getOutputParsers())
+    inject
+        .getPayload()
+        .map(Payload::getOutputParsers)
         .ifPresent(
             outputParsers ->
                 outputParsers.forEach(
