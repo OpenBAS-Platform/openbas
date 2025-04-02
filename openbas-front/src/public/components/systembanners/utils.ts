@@ -1,7 +1,8 @@
 import { type BannerMessage, type PlatformSettings } from '../../../utils/api-types';
 import { utcDate } from '../../../utils/Time';
 import { isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
-import { SYSTEM_BANNER_HEIGHT_PER_MESSAGE } from './SystemBanners';
+
+const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
 
 export const computeBanners = (settings: PlatformSettings) => {
   let bannerLevel = settings.platform_banner_by_level;
