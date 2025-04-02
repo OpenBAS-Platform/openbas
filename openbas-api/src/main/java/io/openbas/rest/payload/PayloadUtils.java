@@ -12,6 +12,7 @@ import io.openbas.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
@@ -123,8 +124,12 @@ public class PayloadUtils {
     duplicate.setName(StringUtils.duplicateString(origin.getName()));
     duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
     duplicate.setExternalId(null);
-    duplicate.setArguments(new ArrayList<>(origin.getArguments()));
-    duplicate.setPrerequisites(new ArrayList<>(origin.getPrerequisites()));
+    duplicate.setArguments(
+        Optional.ofNullable(origin.getArguments()).map(ArrayList::new).orElseGet(ArrayList::new));
+    duplicate.setPrerequisites(
+        Optional.ofNullable(origin.getPrerequisites())
+            .map(ArrayList::new)
+            .orElseGet(ArrayList::new));
     duplicate.setTags(new HashSet<>(origin.getTags()));
     duplicate.setCollector(null);
     duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
