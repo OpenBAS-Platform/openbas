@@ -28,8 +28,7 @@ import io.openbas.injector_contract.fields.ContractAssetGroup;
 import io.openbas.injector_contract.fields.ContractChoiceInformation;
 import io.openbas.injector_contract.fields.ContractExpectations;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
-import io.openbas.rest.payload.OutputParserUtils;
-import io.openbas.utils.StringUtils;
+import io.openbas.rest.payload.PayloadUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,7 +38,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -55,7 +53,7 @@ public class PayloadService {
   private final InjectorContractRepository injectorContractRepository;
   private final AttackPatternRepository attackPatternRepository;
   private final ExpectationBuilderService expectationBuilderService;
-  private final OutputParserUtils outputParserUtils;
+  private final PayloadUtils payloadUtils;
 
   public void updateInjectorContractsForPayload(Payload payload) {
     List<Injector> injectors = this.injectorRepository.findAllByPayloads(true);
@@ -183,53 +181,39 @@ public class PayloadService {
 
   public Payload generateDuplicatedPayload(Payload originalPayload) {
     return switch (originalPayload.getTypeEnum()) {
-      case PayloadType.COMMAND -> {
+      case COMMAND -> {
         Command originCommand = (Command) Hibernate.unproxy(originalPayload);
         Command duplicateCommand = new Command();
-        duplicateCommonProperties(originCommand, duplicateCommand);
+        payloadUtils.duplicateCommonProperties(originCommand, duplicateCommand);
         yield duplicateCommand;
       }
-      case PayloadType.EXECUTABLE -> {
+      case EXECUTABLE -> {
         Executable originExecutable = (Executable) Hibernate.unproxy(originalPayload);
         Executable duplicateExecutable = new Executable();
-        duplicateCommonProperties(originExecutable, duplicateExecutable);
+        payloadUtils.duplicateCommonProperties(originExecutable, duplicateExecutable);
         duplicateExecutable.setExecutableFile(originExecutable.getExecutableFile());
         yield duplicateExecutable;
       }
-      case PayloadType.FILE_DROP -> {
+      case FILE_DROP -> {
         FileDrop originFileDrop = (FileDrop) Hibernate.unproxy(originalPayload);
         FileDrop duplicateFileDrop = new FileDrop();
-        duplicateCommonProperties(originFileDrop, duplicateFileDrop);
+        payloadUtils.duplicateCommonProperties(originFileDrop, duplicateFileDrop);
+        duplicateFileDrop.setFileDropFile(originFileDrop.getFileDropFile());
         yield duplicateFileDrop;
       }
-      case PayloadType.DNS_RESOLUTION -> {
+      case DNS_RESOLUTION -> {
         DnsResolution originDnsResolution = (DnsResolution) Hibernate.unproxy(originalPayload);
         DnsResolution duplicateDnsResolution = new DnsResolution();
-        duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
+        payloadUtils.duplicateCommonProperties(originDnsResolution, duplicateDnsResolution);
         yield duplicateDnsResolution;
       }
-      case PayloadType.NETWORK_TRAFFIC -> {
+      case NETWORK_TRAFFIC -> {
         NetworkTraffic originNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(originalPayload);
         NetworkTraffic duplicateNetworkTraffic = new NetworkTraffic();
-        duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
+        payloadUtils.duplicateCommonProperties(originNetworkTraffic, duplicateNetworkTraffic);
         yield duplicateNetworkTraffic;
       }
     };
-  }
-
-  private <T extends Payload> void duplicateCommonProperties(
-      @org.jetbrains.annotations.NotNull final T origin,
-      @org.jetbrains.annotations.NotNull T duplicate) {
-    BeanUtils.copyProperties(origin, duplicate);
-    duplicate.setId(null);
-    duplicate.setName(StringUtils.duplicateString(origin.getName()));
-    duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
-    duplicate.setTags(new HashSet<>(origin.getTags()));
-    duplicate.setExternalId(null);
-    duplicate.setCollector(null);
-    duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
-    duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
-    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate);
   }
 
   public void deprecateNonProcessedPayloadsByCollector(

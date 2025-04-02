@@ -1,11 +1,10 @@
 package io.openbas.rest.payload;
 
-import static io.openbas.helper.StreamHelper.iterableToSet;
 import static java.time.Instant.now;
 
 import io.openbas.database.model.*;
-import io.openbas.database.repository.TagRepository;
 import io.openbas.rest.payload.form.*;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,94 +18,52 @@ import org.springframework.stereotype.Component;
 @Component
 public class OutputParserUtils {
 
-  private final TagRepository tagRepository;
+  private final ContractOutputElementUtils contractOutputElementUtils;
 
-  public <T> void copyOutputParsers(Set<T> inputParsers, Payload target) {
-    if (inputParsers != null) {
-      Set<OutputParser> outputParsers =
-          inputParsers.stream()
-              .map(
-                  inputParser -> {
-                    OutputParser outputParser = new OutputParser();
-                    BeanUtils.copyProperties(inputParser, outputParser);
-                    outputParser.setId(null);
-                    outputParser.setPayload(target);
-                    outputParser.setCreatedAt(now());
-                    outputParser.setUpdatedAt(now());
-
-                    // Handle contract output elements based on the input type
-                    if (inputParser instanceof OutputParserInput) {
-                      OutputParserInput parserInput = (OutputParserInput) inputParser;
-                      copyContractOutputElements(
-                          parserInput.getContractOutputElements(), outputParser);
-                    } else if (inputParser instanceof OutputParser) {
-                      OutputParser parser = (OutputParser) inputParser;
-                      copyContractOutputElements(parser.getContractOutputElements(), outputParser);
-                    }
-
-                    return outputParser;
-                  })
-              .collect(Collectors.toSet());
-
-      target.setOutputParsers(outputParsers);
+  public <T> void copyOutputParsers(Set<T> inputParsers, Payload target, boolean copyId) {
+    if (inputParsers == null) {
+      return;
     }
+    Instant now = now();
+    Set<OutputParser> outputParsers =
+        inputParsers.stream()
+            .map(inputParser -> copyOutputParser(inputParser, target, copyId, now))
+            .collect(Collectors.toSet());
+
+    target.setOutputParsers(new HashSet<>(outputParsers));
   }
 
-  private void copyContractOutputElements(Set<?> inputElements, OutputParser outputParser) {
-    if (inputElements != null) {
-      Set<ContractOutputElement> contractOutputElements =
-          inputElements.stream()
-              .map(
-                  inputElement -> {
-                    ContractOutputElement contractOutputElement = new ContractOutputElement();
-                    BeanUtils.copyProperties(inputElement, contractOutputElement);
-                    contractOutputElement.setId(null);
-                    contractOutputElement.setOutputParser(outputParser);
-                    contractOutputElement.setCreatedAt(now());
-                    contractOutputElement.setUpdatedAt(now());
-
-                    if (inputElement instanceof ContractOutputElementInput) {
-                      ContractOutputElementInput contractOutputElementInput =
-                          (ContractOutputElementInput) inputElement;
-                      contractOutputElement.setTags(
-                          iterableToSet(
-                              tagRepository.findAllById(contractOutputElementInput.getTagIds())));
-                      copyRegexGroups(
-                          contractOutputElementInput.getRegexGroups(), contractOutputElement);
-                    } else {
-                      ContractOutputElement contractOutputElementInstance =
-                          (ContractOutputElement) inputElement;
-                      contractOutputElement.setTags(
-                          iterableToSet(new HashSet<>(contractOutputElementInstance.getTags())));
-                      copyRegexGroups(
-                          contractOutputElement.getRegexGroups(), contractOutputElement);
-                    }
-                    return contractOutputElement;
-                  })
-              .collect(Collectors.toSet());
-
-      outputParser.setContractOutputElements(contractOutputElements);
+  private <T> OutputParser copyOutputParser(
+      T inputParser, Payload target, boolean copyId, Instant now) {
+    OutputParser outputParser = new OutputParser();
+    outputParser.setPayload(target);
+    outputParser.setCreatedAt(now);
+    outputParser.setUpdatedAt(now);
+    if (inputParser instanceof OutputParserInput) {
+      copyFromParserInput((OutputParserInput) inputParser, outputParser, copyId);
+    } else if (inputParser instanceof OutputParser) {
+      copyFromParserEntity((OutputParser) inputParser, outputParser, copyId);
     }
+    return outputParser;
   }
 
-  private void copyRegexGroups(Set<?> inputElements, ContractOutputElement contractOutputElement) {
-    if (inputElements != null) {
-      Set<RegexGroup> regexGroups =
-          inputElements.stream()
-              .map(
-                  inputElement -> {
-                    RegexGroup regexGroup = new RegexGroup();
-                    BeanUtils.copyProperties(inputElement, regexGroup);
-                    regexGroup.setId(null);
-                    regexGroup.setContractOutputElement(contractOutputElement);
-                    regexGroup.setCreatedAt(now());
-                    regexGroup.setUpdatedAt(now());
-
-                    return regexGroup;
-                  })
-              .collect(Collectors.toSet());
-
-      contractOutputElement.setRegexGroups(regexGroups);
+  private void copyFromParserInput(
+      OutputParserInput parserInput, OutputParser outputParser, boolean copyId) {
+    BeanUtils.copyProperties(parserInput, outputParser, "id", "contractOutputElements");
+    if (copyId) {
+      outputParser.setId(parserInput.getId());
     }
+    contractOutputElementUtils.copyContractOutputElements(
+        parserInput.getContractOutputElements(), outputParser, copyId);
+  }
+
+  private void copyFromParserEntity(
+      OutputParser parser, OutputParser outputParser, boolean copyId) {
+    BeanUtils.copyProperties(parser, outputParser, "id", "contractOutputElements");
+    if (copyId) {
+      outputParser.setId(parser.getId());
+    }
+    contractOutputElementUtils.copyContractOutputElements(
+        parser.getContractOutputElements(), outputParser, copyId);
   }
 }

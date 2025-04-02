@@ -307,7 +307,7 @@ class GroupPopover extends Component {
                       {t('Read/Write')}
                     </TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
-                      {t('Read Only')}
+                      {t('Read only')}
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -383,7 +383,7 @@ class GroupPopover extends Component {
                       {t('Read/Write')}
                     </TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
-                      {t('Read Only')}
+                      {t('Read only')}
                     </TableCell>
                   </TableRow>
                 </TableHead>
