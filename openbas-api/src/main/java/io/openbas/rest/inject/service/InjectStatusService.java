@@ -1,6 +1,5 @@
 package io.openbas.rest.inject.service;
 
-import static io.openbas.database.model.ExecutionTraces.getNewErrorTrace;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionAction;
 import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
@@ -166,9 +165,19 @@ public class InjectStatusService {
         inject
             .getStatus()
             .ifPresent(
-                status ->
-                    status.addTrace(
-                        getNewErrorTrace(e.getMessage(), ExecutionTraceAction.COMPLETE)));
+                status -> {
+                  ExecutionTraces trace =
+                      new ExecutionTraces(
+                          status,
+                          ExecutionTraceStatus.ERROR,
+                          null,
+                          e.getMessage(),
+                          ExecutionTraceAction.COMPLETE,
+                          null,
+                          Instant.now());
+                  status.addTrace(trace);
+                });
+        injectRepository.save(inject);
       }
     }
   }
