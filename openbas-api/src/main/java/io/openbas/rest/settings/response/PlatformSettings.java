@@ -45,10 +45,6 @@ public class PlatformSettings {
   @Schema(description = "Language of the platform")
   private String platformLang;
 
-  @JsonProperty("platform_enterprise_edition")
-  @Schema(description = "'true' if the platform has Enterprise Edition activated")
-  private String platformEnterpriseEdition;
-
   @JsonProperty("platform_whitemark")
   @Schema(description = "'true' if the platform has the whitemark activated")
   private String platformWhitemark;

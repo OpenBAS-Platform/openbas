@@ -1,21 +1,32 @@
 package io.openbas.ee;
 
-import static io.openbas.ee.Pem.*;
+import io.openbas.config.OpenBASConfig;
+import io.openbas.database.model.Setting;
+import io.openbas.database.repository.SettingRepository;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import java.security.cert.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import io.openbas.config.OpenBASConfig;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Service;
+import static io.openbas.database.model.SettingKeys.PLATFORM_ENTERPRISE_LICENSE;
+import static io.openbas.database.model.SettingKeys.PLATFORM_INSTANCE;
+import static io.openbas.ee.Pem.*;
+import static io.openbas.helper.StreamHelper.fromIterable;
+import static java.util.Optional.ofNullable;
 
 @Service
 public class Ee {
@@ -26,6 +37,13 @@ public class Ee {
 
   @Resource
   private OpenBASConfig openBASConfig;
+
+  private SettingRepository settingRepository;
+
+  @Autowired
+  public void setSettingRepository(SettingRepository settingRepository) {
+    this.settingRepository = settingRepository;
+  }
 
   public String getInSubject(X509Certificate caCert, String variable) throws Exception {
     String dn = caCert.getSubjectX500Principal().getName();
@@ -58,14 +76,26 @@ public class Ee {
     }
   }
 
-  public License getEnterpriseEditionInfoFromPem(String instanceId, String pem) {
+  private Map<String, Setting> mapOfSettings(@NotBlank List<Setting> settings) {
+    return settings.stream().collect(Collectors.toMap(Setting::getKey, Function.identity()));
+  }
+
+  public License getEnterpriseEditionInfoFromPem() {
+    Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
+    String instanceId = ofNullable(dbSettings.get(PLATFORM_INSTANCE.key()))
+            .map(Setting::getValue)
+            .orElse(PLATFORM_INSTANCE.defaultValue());
+    String pem = ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_LICENSE.key()))
+            .map(Setting::getValue)
+            .orElse(PLATFORM_ENTERPRISE_LICENSE.defaultValue());
+
     String pemFromConfig = openBASConfig.getApplicationLicense();
-    boolean isLicenseByConfig = pemFromConfig != null && !pemFromConfig.isEmpty();
-    String certificatePem = isLicenseByConfig ? pemFromConfig : pem;
-    if (certificatePem == null || certificatePem.isEmpty()) {
-        throw new IllegalArgumentException("Certificate Pem is null or empty");
-    }
+    boolean isLicenseByConfig = pemFromConfig != null && !pemFromConfig.trim().isEmpty();
+    String certificatePem = isLicenseByConfig ? pemFromConfig.trim() : pem.trim();
     try {
+      if (certificatePem.isEmpty()) {
+        throw new IllegalArgumentException("Certificate Pem is null or empty");
+      }
       X509Certificate x509License = parseCert(certificatePem);
       X509Certificate caCert = getCaCert();
       boolean verifyCertificate = verifyCertificate(x509License, caCert);

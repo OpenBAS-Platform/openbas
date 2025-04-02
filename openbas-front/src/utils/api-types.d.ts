@@ -3077,7 +3077,7 @@ export interface PlatformSettings {
   /** Definition of the dark theme */
   platform_dark_theme?: ThemeInput;
   /** 'true' if the platform has Enterprise Edition activated */
-  platform_enterprise_edition?: string;
+  platform_license: PlatformLicense;
   /** Language of the platform */
   platform_lang?: string;
   /** Definition of the dark theme */
@@ -3562,8 +3562,7 @@ export interface SecurityPlatformUpsertInput {
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {
-  /** 'true' if enterprise edition is activated */
-  platform_enterprise_edition: string;
+  platform_enterprise_license: string;
 }
 
 export interface SettingsPlatformWhitemarkUpdateInput {
@@ -3908,6 +3907,25 @@ export interface ThemeInput {
   primary_color?: string;
   /** Secondary color of the theme */
   secondary_color?: string;
+}
+
+export interface PlatformLicense {
+  license_is_enterprise: boolean
+  license_is_valid_cert: boolean
+  license_type: string
+  license_creator: string
+  license_is_valid_product: boolean
+  license_customer: string
+  license_platform: string
+  license_is_platform_match: boolean
+  license_is_global: boolean
+  license_is_expired: boolean
+  license_start_date: string
+  license_expiration_date: string
+  license_is_prevention: boolean
+  license_is_validated: boolean
+  license_is_by_configuration: boolean
+  license_extra_expiration_days: number
 }
 
 export interface Token {

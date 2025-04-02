@@ -5,7 +5,6 @@ public enum SettingKeys {
   DEFAULT_LANG("platform_lang", "auto"),
   PLATFORM_CONSENT_MESSAGE("platform_consent_message", ""),
   PLATFORM_CONSENT_CONFIRM_TEXT("platform_consent_confirm_text", ""),
-  PLATFORM_ENTERPRISE_EDITION("platform_enterprise_edition", "false"),
   PLATFORM_ENTERPRISE_LICENSE("platform_enterprise_license", ""),
   PLATFORM_LOGIN_MESSAGE(
       "platform_login_message",
