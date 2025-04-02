@@ -50,6 +50,7 @@ public class OutputParser implements Base {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   @JsonProperty("output_parser_contract_output_elements")
+  @NotNull
   private Set<ContractOutputElement> contractOutputElements = new HashSet<>();
 
   @Column(name = "output_parser_created_at")

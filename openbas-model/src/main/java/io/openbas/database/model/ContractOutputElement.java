@@ -57,6 +57,7 @@ public class ContractOutputElement implements Base {
       cascade = CascadeType.ALL,
       orphanRemoval = true)
   @JsonProperty("contract_output_element_regex_groups")
+  @NotNull
   private Set<RegexGroup> regexGroups = new HashSet<>();
 
   @Column(name = "contract_output_element_key")

@@ -116,8 +116,7 @@ public class PayloadUtils {
   }
 
   public <T extends Payload> void duplicateCommonProperties(
-      @org.jetbrains.annotations.NotNull final T origin,
-      @org.jetbrains.annotations.NotNull T duplicate) {
+      @NotNull final T origin, @NotNull T duplicate) {
     BeanUtils.copyProperties(
         origin, duplicate, "outputParsers", "tags", "attackPatterns", "arguments", "prerequisites");
     duplicate.setId(null);
