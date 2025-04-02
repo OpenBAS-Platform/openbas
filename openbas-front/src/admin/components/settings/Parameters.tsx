@@ -1,4 +1,5 @@
-import { Alert, Button, Grid, List, ListItem, ListItemText, Paper, Switch, TextField, Typography } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, List, ListItem, ListItemText, Paper, Switch, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import {
@@ -39,6 +40,7 @@ const Parameters = () => {
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const { t, fldt } = useFormatter();
+  const [openEEChanges, setOpenEEChanges] = useState(false);
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
   const isEnterpriseEditionActivated = settings.platform_license.license_is_enterprise;
   const isEnterpriseEditionByConfig = settings.platform_license.license_is_by_configuration;
@@ -92,21 +94,10 @@ const Parameters = () => {
       {isEnterpriseEditionActivated && (
         <Grid container={true} spacing={3} style={{ marginBottom: 23 }}>
           <Grid item xs={6}>
-            <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+            <Typography variant="h4" gutterBottom={true}>
               {t('Enterprise Edition')}
             </Typography>
-            {!isEnterpriseEditionByConfig && (
-              <div style={{
-                float: 'right',
-                marginTop: 4,
-                position: 'relative',
-              }}
-              >
-
-              </div>
-            )}
-            <div className="clearfix" />
-            <Paper classes={{ root: classes.paper }} variant="outlined" className="paper-for-grid" style={{ marginTop: 6 }}>
+            <Paper classes={{ root: classes.paper }} variant="outlined" className="paper-for-grid">
               <List style={{ marginTop: -20 }}>
                 <ListItem divider={true}>
                   <ListItemText primary={t('Organization')} />
@@ -136,28 +127,70 @@ const Parameters = () => {
             </Paper>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="h4" gutterBottom={true} style={{ float: 'left' }}>
+            <Typography variant="h4" gutterBottom={true}>
               {t('License')}
             </Typography>
             {!isEnterpriseEditionByConfig && (
               <div style={{
                 float: 'right',
-                marginTop: 2,
+                marginTop: -34,
                 position: 'relative',
               }}
               >
                 {!isEnterpriseEdition ? (
                   <EnterpriseEditionButton inLine={true} />
                 ) : (
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => updateEnterpriseEdition({ platform_enterprise_license: '' })}
-                    classes={{ root: classes.button }}
-                  >
-                    {t('Disable Enterprise Edition')}
-                  </Button>
+                  <>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => setOpenEEChanges(true)}
+                      classes={{ root: classes.button }}
+                    >
+                      {t('Disable Enterprise Edition')}
+                    </Button>
+                    <Dialog
+                      slotProps={{ paper: { elevation: 1 } }}
+                      open={openEEChanges}
+                      keepMounted
+                      onClose={() => setOpenEEChanges(false)}
+                    >
+                      <DialogTitle>{t('Disable Enterprise Edition')}</DialogTitle>
+                      <DialogContent>
+                        <DialogContentText>
+                          <Alert
+                            severity="warning"
+                            variant="outlined"
+                            color="error"
+                          >
+                            {t('You are about to disable the "Enterprise Edition" mode. Please note that this action will disable access to certain advanced features.')}
+                            <br />
+                            <br />
+                            <strong>{t('However, your existing data will remain intact and will not be lost.')}</strong>
+                          </Alert>
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button
+                          onClick={() => {
+                            setOpenEEChanges(false);
+                          }}
+                        >
+                          {t('Cancel')}
+                        </Button>
+                        <Button
+                          color="secondary"
+                          onClick={() => {
+                            setOpenEEChanges(false);
+                            updateEnterpriseEdition({ platform_enterprise_license: '' });
+                          }}
+                        >
+                          {t('Validate')}
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </>
                 )}
               </div>
             )}
@@ -211,7 +244,7 @@ const Parameters = () => {
       <Grid container={true} spacing={3} style={{ marginBottom: 23 }}>
         <Grid item xs={6}>
           <Typography variant="h4" gutterBottom={true}>{t('Configuration')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 3' }}>
+          <Paper variant="outlined" classes={{ root: classes.paper }} style={{ minHeight: 340 }} sx={{ gridColumn: 'span 3' }}>
             <ParametersForm
               onSubmit={onUpdate}
               initialValues={{
