@@ -153,6 +153,7 @@ public class FindingUtils {
               newFinding.setField(contractOutputElement.getKey());
               newFinding.setType(contractOutputElement.getType());
               newFinding.setValue(finalValue);
+              newFinding.setName(contractOutputElement.getName());
               newFinding.setTags(new HashSet<>(contractOutputElement.getTags()));
               return newFinding;
             });
