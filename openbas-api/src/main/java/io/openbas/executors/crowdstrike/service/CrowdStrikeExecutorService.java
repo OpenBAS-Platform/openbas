@@ -109,15 +109,7 @@ public class CrowdStrikeExecutorService implements Runnable {
       crowdStrikeResourceGroup = this.client.hostGroup(hostGroup);
       if (crowdStrikeResourceGroup.getErrors() != null
           && !crowdStrikeResourceGroup.getErrors().isEmpty()) {
-        CrowdstrikeError e = crowdStrikeResourceGroup.getErrors().getFirst();
-        log.log(
-            Level.SEVERE,
-            "Error occurred while getting Crowdstrike hostGroup API request for id "
-                + hostGroup
-                + ". Code: "
-                + e.getCode()
-                + ", message: "
-                + e.getMessage());
+        logErrors(crowdStrikeResourceGroup.getErrors(), hostGroup);
         continue;
       }
       List<CrowdStrikeDevice> devices = this.client.devices(hostGroup);
@@ -150,6 +142,22 @@ public class CrowdStrikeExecutorService implements Runnable {
   }
 
   // -- PRIVATE --
+
+  private void logErrors(List<CrowdstrikeError> errors, String hostGroup) {
+    StringBuilder msg =
+        new StringBuilder(
+            "Error occurred while getting Crowdstrike hostGroup API request for id "
+                + hostGroup
+                + ".");
+    for (CrowdstrikeError error : errors) {
+      msg.append("\nCode: ")
+          .append(error.getCode())
+          .append(", message: ")
+          .append(error.getMessage())
+          .append(".");
+    }
+    log.log(Level.SEVERE, msg.toString());
+  }
 
   private List<AgentRegisterInput> toAgentEndpoint(@NotNull final List<CrowdStrikeDevice> devices) {
     return devices.stream()

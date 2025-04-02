@@ -56,15 +56,7 @@ public class CrowdStrikeExecutorClient {
       List<CrowdStrikeDevice> hosts = new ArrayList<>();
       ResourcesHosts partialResults = getResourcesHosts(offset, hostGroup);
       if (partialResults.getErrors() != null && !partialResults.getErrors().isEmpty()) {
-        CrowdstrikeError e = partialResults.getErrors().getFirst();
-        log.log(
-            Level.SEVERE,
-            "Error occurred while getting Crowdstrike devices API request for hostGroup id "
-                + hostGroup
-                + ". Code: "
-                + e.getCode()
-                + ", message: "
-                + e.getMessage());
+        logErrors(partialResults.getErrors(), hostGroup);
         return hosts;
       } else if (partialResults.getResources() == null) {
         return hosts;
@@ -89,6 +81,22 @@ public class CrowdStrikeExecutorClient {
       log.log(Level.SEVERE, "Unexpected error occurred. Error: {}", e.getMessage());
       throw new RuntimeException(e);
     }
+  }
+
+  private void logErrors(List<CrowdstrikeError> errors, String hostGroup) {
+    StringBuilder msg =
+        new StringBuilder(
+            "Error occurred while getting Crowdstrike devices API request for hostGroup id "
+                + hostGroup
+                + ".");
+    for (CrowdstrikeError error : errors) {
+      msg.append("\nCode: ")
+          .append(error.getCode())
+          .append(", message: ")
+          .append(error.getMessage())
+          .append(".");
+    }
+    log.log(Level.SEVERE, msg.toString());
   }
 
   private ResourcesHosts getResourcesHosts(int offset, String hostGroup) {
