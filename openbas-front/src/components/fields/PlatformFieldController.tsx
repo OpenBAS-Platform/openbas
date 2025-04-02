@@ -61,6 +61,7 @@ const PlatformFieldController: FunctionComponent<Props> = ({
           options={platformsOptions}
           openOnFocus
           autoHighlight
+          style={style}
           noOptionsText={t('No available options')}
           slotProps={{ chip: { sx: { maxHeight: '24px' } } }}
           renderInput={
