@@ -166,12 +166,12 @@ public class FindingUtils {
       ContractOutputType type, Map<String, List<String>> fieldValuesMap) {
     switch (type) {
       case Credentials:
-        String username = String.join(" ", fieldValuesMap.getOrDefault("username", List.of("")));
-        String password = String.join(" ", fieldValuesMap.getOrDefault("password", List.of("")));
+        String username = buildString(fieldValuesMap, "username");
+        String password = buildString(fieldValuesMap, "password");
         return username + ":" + password;
       case PortsScan:
-        String host = String.join(" ", fieldValuesMap.getOrDefault("host", List.of("")));
-        String port = String.join(" ", fieldValuesMap.getOrDefault("port", List.of("")));
+        String host = buildString(fieldValuesMap, "host");
+        String port = buildString(fieldValuesMap, "port");
         String service =
             fieldValuesMap.getOrDefault("service", List.of("")).isEmpty()
                 ? ""
@@ -182,5 +182,9 @@ public class FindingUtils {
             .map(list -> String.join(" ", list))
             .collect(Collectors.joining(" "));
     }
+  }
+
+  private String buildString(Map<String, List<String>> fieldValuesMap, String key) {
+    return String.join(" ", fieldValuesMap.getOrDefault(key, List.of("")));
   }
 }
