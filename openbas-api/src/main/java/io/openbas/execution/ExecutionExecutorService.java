@@ -10,6 +10,8 @@ import io.openbas.rest.exception.AgentException;
 import io.openbas.rest.inject.service.InjectService;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.ApplicationContext;
@@ -36,7 +38,7 @@ public class ExecutionExecutorService {
     List<Agent> crowdstrikeAgents =
         agents.stream()
             .filter(agent -> CROWDSTRIKE_EXECUTOR_TYPE.equals(agent.getExecutor().getType()))
-            .toList();
+            .collect(Collectors.toList());
     agents.removeAll(crowdstrikeAgents);
 
     InjectStatus injectStatus =
@@ -45,6 +47,7 @@ public class ExecutionExecutorService {
     AtomicBoolean atLeastOneTraceAdded = new AtomicBoolean(false);
     // Manage inactive agents
     if (!inactiveAgents.isEmpty()) {
+      // TODO test
       inactiveAgents.forEach(
           agent ->
               injectStatus.addTrace(
