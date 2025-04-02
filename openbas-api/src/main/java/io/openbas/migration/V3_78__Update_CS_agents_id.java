@@ -7,7 +7,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_77__Update_CS_agents_id extends BaseJavaMigration {
+public class V3_78__Update_CS_agents_id extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {

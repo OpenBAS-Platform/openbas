@@ -188,7 +188,7 @@ public class EndpointService {
       for (Agent agentToUpdate : agentsToUpdate) {
         final AgentRegisterInput inputToSave =
             inputsByExternalReference.get(agentToUpdate.getExternalReference());
-        endpointToSave = (Endpoint) Hibernate.unproxy(agentToUpdate.getAsset());
+        endpointToSave = (Endpoint) agentToUpdate.getAsset();
         setUpdatedEndpointAttributes(endpointToSave, inputToSave);
         agentToUpdate.setAsset(endpointToSave);
         agentToUpdate.setLastSeen(inputToSave.getLastSeen());

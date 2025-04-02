@@ -29,7 +29,8 @@ public class ExecutionExecutorService {
   public void launchExecutorContext(Inject inject) {
     // First, get the agents of this injects
     List<Agent> agents = this.injectService.getAgentsByInject(inject);
-    // Filter each list to do something for each specific case and then remove the specific agents from the main "agents" list to execute payloads at the end for the remaining "normal" agents
+    // Filter each list to do something for each specific case and then remove the specific agents
+    // from the main "agents" list to execute payloads at the end for the remaining "normal" agents
     List<Agent> inactiveAgents = agents.stream().filter(agent -> !agent.isActive()).toList();
     agents.removeAll(inactiveAgents);
     List<Agent> withoutExecutorAgent =
