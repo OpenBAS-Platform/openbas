@@ -605,7 +605,7 @@ export interface ContractOutputElement {
   contract_output_element_key: string;
   contract_output_element_name: string;
   /** @uniqueItems true */
-  contract_output_element_regex_groups: RegexGroup[];
+  contract_output_element_regex_groups?: RegexGroup[];
   contract_output_element_rule: string;
   contract_output_element_tags?: string[];
   contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -1204,7 +1204,6 @@ export interface Finding {
   finding_inject_id?: string;
   /** @deprecated */
   finding_labels?: string[];
-  finding_name?: string;
   finding_tags?: string[];
   finding_teams?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -2379,7 +2378,7 @@ export interface OrganizationUpdateInput {
 export interface OutputParser {
   listened?: boolean;
   /** @uniqueItems true */
-  output_parser_contract_output_elements: ContractOutputElement[];
+  output_parser_contract_output_elements?: ContractOutputElement[];
   /** @format date-time */
   output_parser_created_at: string;
   output_parser_id: string;
@@ -3643,6 +3642,13 @@ export interface StatusPayloadOutput {
   executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   executable_file?: StatusPayloadDocument;
   file_drop_file?: StatusPayloadDocument;
+  network_traffic_ip_dst: string;
+  network_traffic_ip_src: string;
+  /** @format int32 */
+  network_traffic_port_dst: number;
+  /** @format int32 */
+  network_traffic_port_src: number;
+  network_traffic_protocol: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPatternSimple[];
   payload_cleanup_executor?: string;
@@ -3652,8 +3658,6 @@ export interface StatusPayloadOutput {
   payload_external_id?: string;
   payload_name?: string;
   payload_obfuscator?: string;
-  /** @uniqueItems true */
-  payload_output_parser?: OutputParser[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */
