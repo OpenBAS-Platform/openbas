@@ -47,7 +47,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   public void launchBatchExecutorSubprocess(
       Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
     if (!this.crowdStrikeExecutorConfig.isEnable()) {
-      throw new RuntimeException("CrowdStrike executor is not enabled");
+      throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
     }
 
     Injector injector =
@@ -57,7 +57,49 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
+    manageWithoutPlatformAgents(agents, injectStatus);
     List<CrowdStrikeAction> actions = new ArrayList<>();
+    // Set implant script for Windows CS agents
+    actions.addAll(
+        getWindowsActions(
+            agents.stream()
+                .filter(
+                    agent ->
+                        ((Endpoint) agent.getAsset())
+                            .getPlatform()
+                            .equals(Endpoint.PLATFORM_TYPE.Windows))
+                .toList(),
+            injector,
+            inject.getId()));
+    // Set implant script for Linux CS agents
+    actions.addAll(
+        setLinuxActions(
+            agents.stream()
+                .filter(
+                    agent ->
+                        ((Endpoint) agent.getAsset())
+                            .getPlatform()
+                            .equals(Endpoint.PLATFORM_TYPE.Linux))
+                .toList(),
+            injector,
+            inject.getId()));
+    // Set implant script for Mac CS agents
+    actions.addAll(
+        setMacActions(
+            agents.stream()
+                .filter(
+                    agent ->
+                        ((Endpoint) agent.getAsset())
+                            .getPlatform()
+                            .equals(Endpoint.PLATFORM_TYPE.MacOS))
+                .toList(),
+            injector,
+            inject.getId()));
+    // Launch payloads with CS API
+    executeActions(actions);
+  }
+
+  private void manageWithoutPlatformAgents(List<Agent> agents, InjectStatus injectStatus) {
     List<Agent> withoutPlatformAgents =
         agents.stream()
             .filter(
@@ -80,47 +122,12 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
           ExecutionTraceAction.COMPLETE,
           agent);
     }
-
-    actions.addAll(
-        getWindowsActions(
-            agents.stream()
-                .filter(
-                    agent ->
-                        ((Endpoint) agent.getAsset())
-                            .getPlatform()
-                            .equals(Endpoint.PLATFORM_TYPE.Windows))
-                .toList(),
-            injector,
-            inject.getId()));
-    actions.addAll(
-        setLinuxActions(
-            agents.stream()
-                .filter(
-                    agent ->
-                        ((Endpoint) agent.getAsset())
-                            .getPlatform()
-                            .equals(Endpoint.PLATFORM_TYPE.Linux))
-                .toList(),
-            injector,
-            inject.getId()));
-    actions.addAll(
-        setMacActions(
-            agents.stream()
-                .filter(
-                    agent ->
-                        ((Endpoint) agent.getAsset())
-                            .getPlatform()
-                            .equals(Endpoint.PLATFORM_TYPE.MacOS))
-                .toList(),
-            injector,
-            inject.getId()));
-
-    executeActions(actions);
   }
 
   private void executeActions(List<CrowdStrikeAction> actions) throws InterruptedException {
     for (CrowdStrikeAction action : actions) {
       int paginationLimit = this.crowdStrikeExecutorConfig.getApiBatchExecutionActionPagination();
+      // Pagination with 1s wait if needed because each implant will call OpenBAS API to set traces
       if (action.getAgents().size() > paginationLimit) {
         int numberOfExecution = Math.ceilDiv(action.getAgents().size(), paginationLimit);
         int fromIndex = 0;
