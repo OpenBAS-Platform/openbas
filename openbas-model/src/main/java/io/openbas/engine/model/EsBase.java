@@ -37,6 +37,21 @@ public class EsBase {
   @Queryable(label = "scenario", filterable = true, sortable = true)
   private String base_scenario_side; // Must finish by _side
 
+  @Queryable(label = "user", filterable = true, sortable = true)
+  private String base_user_side; // Must finish by _side
+
+  @Queryable(label = "team", filterable = true, sortable = true)
+  private String base_team_side; // Must finish by _side
+
+  @Queryable(label = "agent", filterable = true, sortable = true)
+  private String base_agent_side; // Must finish by _side
+
+  @Queryable(label = "asset", filterable = true, sortable = true)
+  private String base_asset_side; // Must finish by _side
+
+  @Queryable(label = "asset group", filterable = true, sortable = true)
+  private String base_asset_group_side; // Must finish by _side
+
   // -- Base for ACL --
   private List<String> base_restrictions;
 

@@ -20,5 +20,4 @@ public class EsFinding extends EsBase {
 
   @Queryable(label = "field", filterable = true, sortable = true)
   private String finding_field;
-
 }
