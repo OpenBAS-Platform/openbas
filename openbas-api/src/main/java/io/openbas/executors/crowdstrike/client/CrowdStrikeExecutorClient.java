@@ -240,18 +240,21 @@ public class CrowdStrikeExecutorClient {
           new FutureCallback<>() {
             @Override
             public void completed(SimpleHttpResponse simpleHttpResponse) {
-              System.out.println(simpleHttpResponse.getCode());
-              System.out.println(simpleHttpResponse.getBody());
+              log.log(Level.INFO, "Success to get Crowdstrike response from " + uri);
             }
 
             @Override
             public void failed(Exception e) {
-              System.out.println(e);
+              log.log(
+                  Level.SEVERE,
+                  "Failed to get Crowdstrike response from " + uri + ". Error: " + e.getMessage());
             }
 
             @Override
             public void cancelled() {
-              System.out.println("cancelled");
+              log.log(
+                  Level.WARNING,
+                  "Failed to get Crowdstrike response from " + uri + " because of cancel.");
             }
           });
     } catch (IOException e) {
