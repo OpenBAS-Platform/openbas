@@ -1,21 +1,19 @@
 package io.openbas.executors.crowdstrike.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
-import io.openbas.executors.crowdstrike.model.Authentication;
-import io.openbas.executors.crowdstrike.model.CrowdStrikeSession;
-import io.openbas.executors.crowdstrike.model.ResourcesHosts;
-import io.openbas.executors.crowdstrike.model.ResourcesSession;
+import io.openbas.executors.crowdstrike.model.*;
+import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -38,6 +36,7 @@ public class CrowdStrikeExecutorClient {
 
   private static final Integer AUTH_TIMEOUT = 300;
   private static final String OAUTH_URI = "/oauth2/token";
+  private static final String HOST_GROUPS_URI = "/devices/entities/host-groups/v1";
   private static final String ENDPOINTS_URI = "/devices/combined/host-group-members/v1";
   private static final String SESSION_URI = "/real-time-response/entities/sessions/v1";
   private static final String REAL_TIME_RESPONSE_URI =
@@ -51,19 +50,95 @@ public class CrowdStrikeExecutorClient {
 
   // -- ENDPOINTS --
 
-  public ResourcesHosts devices() {
+  public List<CrowdStrikeDevice> devices(String hostGroup) {
     try {
-      String jsonResponse =
-          this.get(ENDPOINTS_URI + "?id=" + this.config.getHostGroup() + "&limit=5000");
-      return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
-    } catch (JsonProcessingException e) {
-      log.log(Level.SEVERE, "Failed to parse JSON response. Error: {}", e.getMessage());
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      log.log(Level.SEVERE, "I/O error occurred during API request. Error: {}", e.getMessage());
-      throw new RuntimeException(e);
+      int offset = 0;
+      List<CrowdStrikeDevice> hosts = new ArrayList<>();
+      ResourcesHosts partialResults = getResourcesHosts(offset, hostGroup);
+      if (partialResults.getErrors() != null && !partialResults.getErrors().isEmpty()) {
+        logErrors(partialResults.getErrors(), hostGroup);
+        return hosts;
+      } else if (partialResults.getResources() == null) {
+        return hosts;
+      } else {
+        hosts.addAll(partialResults.getResources());
+      }
+      int numberOfExecution =
+          Math.ceilDiv(
+              partialResults.getMeta().getPagination().getTotal(),
+              partialResults.getMeta().getPagination().getLimit());
+      for (int callNumber = 1; callNumber < numberOfExecution; callNumber += 1) {
+        offset += partialResults.getMeta().getPagination().getLimit();
+        partialResults = getResourcesHosts(offset, hostGroup);
+        if (partialResults.getResources() == null) {
+          return hosts;
+        } else {
+          hosts.addAll(partialResults.getResources());
+        }
+      }
+      return hosts;
     } catch (Exception e) {
       log.log(Level.SEVERE, "Unexpected error occurred. Error: {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void logErrors(List<CrowdstrikeError> errors, String hostGroup) {
+    StringBuilder msg =
+        new StringBuilder(
+            "Error occurred while getting Crowdstrike devices API request for hostGroup id "
+                + hostGroup
+                + ".");
+    for (CrowdstrikeError error : errors) {
+      msg.append("\nCode: ")
+          .append(error.getCode())
+          .append(", message: ")
+          .append(error.getMessage())
+          .append(".");
+    }
+    log.log(Level.SEVERE, msg.toString());
+  }
+
+  private ResourcesHosts getResourcesHosts(int offset, String hostGroup) {
+    final String formattedDateTime =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(ZoneOffset.UTC)
+            .format(Instant.now().minusMillis(EndpointService.DELETE_TTL));
+    String fqlFilter =
+        URLEncoder.encode(
+            "last_seen:>'" + formattedDateTime + "'+hostname:!null", StandardCharsets.UTF_8);
+    String jsonResponse;
+    try {
+      jsonResponse =
+          this.get(
+              ENDPOINTS_URI
+                  + "?id="
+                  + hostGroup
+                  + "&limit=5000"
+                  + "&offset="
+                  + offset
+                  + "&filter="
+                  + fqlFilter);
+      return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+    } catch (Exception e) {
+      log.log(
+          Level.SEVERE,
+          "Error occurred during Crowdstrike getResourcesHosts API request. Error: {}",
+          e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  public ResourcesGroups hostGroup(String hostGroup) {
+    String jsonResponse;
+    try {
+      jsonResponse = this.get(HOST_GROUPS_URI + "?ids=" + hostGroup);
+      return this.objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+    } catch (Exception e) {
+      log.log(
+          Level.SEVERE,
+          "Error occurred during Crowdstrike hostGroup API request. Error: {}",
+          e.getMessage());
       throw new RuntimeException(e);
     }
   }

@@ -30,6 +30,13 @@ public interface AgentRepository
       @Param("privilege") String privilege,
       @Param("executor") String executor);
 
+  @Query(
+      value =
+          "SELECT a.* FROM agents a left join executors ex on a.agent_executor = ex.executor_id "
+              + "where ex.executor_type = :executor",
+      nativeQuery = true)
+  List<Agent> findByExecutorType(@Param("executor") String executor);
+
   List<Agent> findByExternalReference(String externalReference);
 
   /**

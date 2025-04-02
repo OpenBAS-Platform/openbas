@@ -37,8 +37,16 @@ public class AgentService {
     return agentRepository.findForExecution();
   }
 
+  public List<Agent> getAgentsByExecutorType(String executor) {
+    return agentRepository.findByExecutorType(executor);
+  }
+
   public Agent createOrUpdateAgent(@NotNull final Agent agent) {
     return this.agentRepository.save(agent);
+  }
+
+  public Iterable<Agent> saveAllAgents(List<Agent> agents) {
+    return agentRepository.saveAll(agents);
   }
 
   public void deleteAgent(@NotBlank final String agentId) {
