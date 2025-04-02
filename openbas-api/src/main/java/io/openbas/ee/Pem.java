@@ -19,7 +19,7 @@ public class Pem {
     }
   }
 
-  private static String OPENBAS_CA_PEM =
+  private static final String OPENBAS_CA_PEM =
       "-----BEGIN CERTIFICATE-----\n"
           + "MIIFZjCCA06gAwIBAgIBADANBgkqhkiG9w0BAQsFADBeMRkwFwYDVQQDExBGaWxp\n"
           + "Z3JhbiBDQSBDRVJUMQswCQYDVQQGEwJGUjEOMAwGA1UEBxMFUGFyaXMxETAPBgNV\n"

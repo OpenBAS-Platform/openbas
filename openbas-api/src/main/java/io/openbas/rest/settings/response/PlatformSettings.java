@@ -3,6 +3,7 @@ package io.openbas.rest.settings.response;
 import static lombok.AccessLevel.NONE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.ee.License;
 import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.PolicyInput;
 import io.openbas.rest.settings.form.ThemeInput;
@@ -220,4 +221,9 @@ public class PlatformSettings {
   @JsonProperty("default_reply_to")
   @Schema(description = "Reply to mail to use by default for injects")
   private String defaultReplyTo;
+
+  // LICENSE
+  @JsonProperty("platform_license")
+  @Schema(description = "Platform licensing")
+  private License platformLicense;
 }
