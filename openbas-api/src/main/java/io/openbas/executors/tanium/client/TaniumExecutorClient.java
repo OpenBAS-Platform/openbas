@@ -114,7 +114,7 @@ public class TaniumExecutorClient {
       httpPost.setEntity(entity);
       return httpClient.execute(httpPost, response -> EntityUtils.toString(response.getEntity()));
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response");
+      throw new ClientProtocolException("Unexpected response", e);
     }
   }
 }

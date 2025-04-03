@@ -186,7 +186,7 @@ public class CrowdStrikeExecutorClient {
       httpGet.addHeader("Authorization", "Bearer " + this.token);
       return httpClient.execute(httpGet, response -> EntityUtils.toString(response.getEntity()));
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + uri);
+      throw new ClientProtocolException("Unexpected response for request on: " + uri, e);
     }
   }
 
@@ -205,7 +205,7 @@ public class CrowdStrikeExecutorClient {
       httpPost.setEntity(entity);
       return httpClient.execute(httpPost, response -> EntityUtils.toString(response.getEntity()));
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response");
+      throw new ClientProtocolException("Unexpected response", e);
     }
   }
 
@@ -226,7 +226,7 @@ public class CrowdStrikeExecutorClient {
       this.token = auth.getAccess_token();
       this.lastAuthentication = Instant.now();
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response");
+      throw new ClientProtocolException("Unexpected response", e);
     }
   }
 }
