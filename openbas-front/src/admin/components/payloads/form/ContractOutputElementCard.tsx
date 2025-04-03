@@ -71,7 +71,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
       };
     });
 
-    setValue(`${prefixName}.${index}.contract_output_element_regex_groups`, updatedGroups);
+    setValue(`${prefixName}.${index}.contract_output_element_regex_groups`, updatedGroups.sort((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)));
   }, [selectedContractOutputElementType]);
 
   return (
@@ -109,7 +109,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
           {`${t('Output value')}`}
         </Typography>
       )}
-      {regexGroups.sort((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)).map((field, indexField) => (
+      {regexGroups.map((field, indexField) => (
         <div
           style={{
             gridColumn: 'span 4',
