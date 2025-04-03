@@ -251,7 +251,7 @@ public class InjectStatusService {
   public void batchInjectExecutionCallback(InjectExecutionCallback input) {
     callbacksWaiting.add(input);
     if(callbacksWaiting.size() > 1000) {
-      executorService.execute(() -> {
+      executorService.submit(() -> {
         scheduledTask.cancel(false);
         List<InjectExecutionCallback> callbacks = new ArrayList<>(callbacksWaiting);
         callbacksWaiting.clear();
@@ -260,6 +260,8 @@ public class InjectStatusService {
           handleInjectExecutionCallback(callbacks);
         } catch (RuntimeException e) {
           log.severe(e.getMessage());
+        } finally {
+          Thread.currentThread().interrupt();
         }
       });
     } else {
@@ -272,6 +274,8 @@ public class InjectStatusService {
             handleInjectExecutionCallback(callbacks);
           } catch (RuntimeException e) {
             log.severe(e.getMessage());
+          } finally {
+            Thread.currentThread().interrupt();
           }
         }, 10, TimeUnit.SECONDS);
       }
