@@ -605,7 +605,7 @@ export interface ContractOutputElement {
   contract_output_element_key: string;
   contract_output_element_name: string;
   /** @uniqueItems true */
-  contract_output_element_regex_groups?: RegexGroup[];
+  contract_output_element_regex_groups: RegexGroup[];
   contract_output_element_rule: string;
   contract_output_element_tags?: string[];
   contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -1223,6 +1223,7 @@ export interface Finding {
   finding_inject_id?: string;
   /** @deprecated */
   finding_labels?: string[];
+  finding_name?: string;
   finding_tags?: string[];
   finding_teams?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -2397,7 +2398,7 @@ export interface OrganizationUpdateInput {
 export interface OutputParser {
   listened?: boolean;
   /** @uniqueItems true */
-  output_parser_contract_output_elements?: ContractOutputElement[];
+  output_parser_contract_output_elements: ContractOutputElement[];
   /** @format date-time */
   output_parser_created_at: string;
   output_parser_id: string;

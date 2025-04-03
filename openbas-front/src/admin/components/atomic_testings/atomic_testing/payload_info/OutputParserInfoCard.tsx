@@ -61,7 +61,10 @@ const OutputParserInfoCard = ({ outputParsers }: Props) => {
               <Typography variant="h3" gutterBottom>{t('Tags')}</Typography>
               <Typography variant="body2">{contractOutput.contract_output_element_name}</Typography>
               <Typography variant="body2">{contractOutput.contract_output_element_key}</Typography>
-              <Typography variant="body2">{contractOutput.contract_output_element_type}</Typography>
+              <Typography variant="body2">
+                {contractOutput.contract_output_element_type
+                  ? t(contractOutput.contract_output_element_type.charAt(0).toUpperCase() + contractOutput.contract_output_element_type.slice(1)) : ''}
+              </Typography>
               <ItemTags variant="reduced-view" tags={contractOutput.contract_output_element_tags} />
 
               <Typography className="allWidth newLine" variant="h3" gutterBottom>{t('Regex group rules')}</Typography>
@@ -74,7 +77,10 @@ const OutputParserInfoCard = ({ outputParsers }: Props) => {
               <Box className={`allWidth ${classes.regexGroupContainer}`}>
                 {(contractOutput.contract_output_element_regex_groups || []).map(group => (
                   <>
-                    <Typography variant="h3" gutterBottom>{group.regex_group_field}</Typography>
+                    <Typography variant="h3" gutterBottom>
+                      {group.regex_group_field
+                        ? t(group.regex_group_field.charAt(0).toUpperCase() + group.regex_group_field.slice(1)) : ''}
+                    </Typography>
                     <pre style={{ margin: 0 }} key={group.regex_group_index_values}>
                       <ItemCopy content={group.regex_group_index_values ?? ' '} />
                     </pre>
