@@ -12,7 +12,7 @@ import PaginationComponentV2 from '../../../../components/common/queryable/pagin
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useHelper } from '../../../../store';
-import { type AssetGroup, type Endpoint, type SearchPaginationInput } from '../../../../utils/api-types';
+import { type AssetGroup, type Endpoint, type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import EndpointPopover from '../endpoints/EndpointPopover';
@@ -76,7 +76,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   });
 
   // Pagination
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const [endpoints, setEndpoints] = useState<EndpointOutput[]>([]);
 
   const availableFilterNames = [
     'endpoint_platform',
