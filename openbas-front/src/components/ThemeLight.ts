@@ -10,7 +10,7 @@ const EE_COLOR = '#0c7e69';
 export const THEME_LIGHT_DEFAULT_BACKGROUND = '#f8f8f8';
 const THEME_LIGHT_DEFAULT_PRIMARY = '#001bda';
 const THEME_LIGHT_DEFAULT_SECONDARY = '#0c7e69';
-const THEME_LIGHT_DEFAULT_ACCENT = '#d9d9d9';
+const THEME_LIGHT_DEFAULT_ACCENT = '#eeeeee';
 const THEME_LIGHT_DEFAULT_PAPER = '#ffffff';
 const THEME_LIGHT_DEFAULT_NAV = '#ffffff';
 
@@ -57,7 +57,7 @@ const ThemeLight = (
       nav: nav || THEME_LIGHT_DEFAULT_NAV,
       accent: accent || '#d3eaff',
       shadow: 'rgba(0, 0, 0, .05)',
-      code: '#c0dfff',
+      code: accent || THEME_LIGHT_DEFAULT_ACCENT,
       paperInCard: '#f7f7f7',
     },
   },
@@ -145,7 +145,7 @@ const ThemeLight = (
           'pre': {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#000000 !important',
-            background: `${accent || '#c0dfff'} !important`,
+            background: `${accent || THEME_LIGHT_DEFAULT_ACCENT} !important`,
           },
           'code': {
             fontFamily: 'Consolas, monaco, monospace',
