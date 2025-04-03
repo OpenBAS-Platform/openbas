@@ -1,3 +1,4 @@
+import { HelpOutlineOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
 import { type CSSProperties, type FunctionComponent, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -9,6 +10,7 @@ import { buildSearchPagination } from '../../../components/common/queryable/Quer
 import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import ItemStatus from '../../../components/ItemStatus';
+import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type InjectTestStatusOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import InjectIcon from '../common/injects/InjectIcon';
 import InjectTestDetail from './InjectTestDetail';
@@ -106,10 +108,16 @@ const InjectTestList: FunctionComponent<Props> = ({
   const [tests, setTests] = useState<InjectTestStatusOutput[] | null>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({}));
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const searchInjectTestsToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchInjectTests(exerciseOrScenarioId, input).finally(() => setLoading(false));
+  };
+
   return (
     <>
       <PaginationComponent
-        fetch={input => searchInjectTests(exerciseOrScenarioId, input)}
+        fetch={searchInjectTestsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setTests}
       >
@@ -140,51 +148,53 @@ const InjectTestList: FunctionComponent<Props> = ({
             )}
           />
         </ListItem>
-        {tests?.map((test) => {
-          return (
-            <ListItem
-              key={test.status_id}
-              divider
-              secondaryAction={(
-                <InjectTestPopover
-                  injectTest={test}
-                  onTest={result =>
-                    setTests(tests?.map(existing => existing.status_id !== result.status_id ? existing : result))}
-                  onDelete={injectStatusId => setTests(tests.filter(existing => (existing.status_id !== injectStatusId)))}
-                />
-              )}
-              disablePadding
-            >
-              <ListItemButton
-                classes={{ root: classes.item }}
-                onClick={() => setSelectedTest(test)}
-                selected={test.status_id === selectedTest?.status_id}
-              >
-                <ListItemIcon>
-                  <InjectIcon
-                    type={test.inject_type}
-                    variant="list"
+        {loading
+          ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+          : tests?.map((test) => {
+            return (
+              <ListItem
+                key={test.status_id}
+                divider
+                secondaryAction={(
+                  <InjectTestPopover
+                    injectTest={test}
+                    onTest={result =>
+                      setTests(tests?.map(existing => existing.status_id !== result.status_id ? existing : result))}
+                    onDelete={injectStatusId => setTests(tests.filter(existing => (existing.status_id !== injectStatusId)))}
                   />
-                </ListItemIcon>
-                <ListItemText
-                  primary={(
-                    <div className={classes.bodyItems}>
-                      {headers.map(header => (
-                        <div
-                          key={header.field}
-                          className={classes.bodyItem}
-                          style={inlineStyles[header.field]}
-                        >
-                          {header.value(test)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+                )}
+                disablePadding
+              >
+                <ListItemButton
+                  classes={{ root: classes.item }}
+                  onClick={() => setSelectedTest(test)}
+                  selected={test.status_id === selectedTest?.status_id}
+                >
+                  <ListItemIcon>
+                    <InjectIcon
+                      type={test.inject_type}
+                      variant="list"
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div className={classes.bodyItems}>
+                        {headers.map(header => (
+                          <div
+                            key={header.field}
+                            className={classes.bodyItem}
+                            style={inlineStyles[header.field]}
+                          >
+                            {header.value(test)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         {!tests ? (<Empty message={t('No data available')} />) : null}
       </List>
       {
