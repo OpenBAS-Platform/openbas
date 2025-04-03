@@ -1,5 +1,6 @@
 import { CloseRounded } from '@mui/icons-material';
 import { IconButton, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -61,6 +62,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { classes } = useStyles();
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   // Fetching data
@@ -109,9 +111,12 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         <Typography variant="h6" classes={{ root: classes.title }}>
           {assetGroup?.asset_group_name}
         </Typography>
-        {paginationComponent}
         <div className="clearfix" />
       </div>
+      <div style={{ padding: theme.spacing(1) }}>
+        {paginationComponent}
+      </div>
+
       <EndpointsList
         endpoints={endpoints}
         actions={userAdmin
