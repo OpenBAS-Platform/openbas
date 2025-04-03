@@ -11,7 +11,7 @@ import { IntlProvider } from 'react-intl';
 
 import { type LoggedHelper } from '../actions/helper';
 import { useHelper } from '../store';
-import locale, { DEFAULT_LANG } from '../utils/BrowserLanguage';
+import { DEFAULT_LANG } from '../utils/BrowserLanguage';
 import enOpenBAS from '../utils/lang/en.json';
 import frOpenBAS from '../utils/lang/fr.json';
 import zhOpenBAS from '../utils/lang/zh.json';
@@ -41,25 +41,22 @@ const momentMap = {
 export let LANG = DEFAULT_LANG;
 
 const AppIntlProvider: FunctionComponent<{ children: ReactElement }> = ({ children }) => {
-  const { platformName, lang }: {
+  const { platformName, userLang }: {
     platformName: string;
-    lang: string;
+    userLang: Lang;
   } = useHelper((helper: LoggedHelper) => {
-    const me = helper.getMe();
-    const settings = helper.getPlatformSettings();
-    const name = settings.platform_name ?? 'OpenBAS - Crisis Drills Planning Platform';
-    const rawPlatformLang = settings.platform_lang ?? 'auto';
-    const rawUserLang = me?.user_lang ?? 'auto';
-    const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
-    const userLang = rawUserLang !== 'auto' ? rawUserLang : platformLang;
+    const platformName = helper.getPlatformName();
+    const userLang = helper.getUserLang();
+
     return {
-      platformName: name,
-      lang: userLang,
+      platformName,
+      userLang,
     };
   });
-  LANG = lang;
-  const baseMessages: Record<string, string> = obasLocaleMap[lang as Lang] || obasLocaleMap[DEFAULT_LANG];
-  const momentLocale = momentMap[lang as Lang];
+
+  LANG = userLang;
+  const baseMessages: Record<string, string> = obasLocaleMap[userLang] || obasLocaleMap[DEFAULT_LANG];
+  const momentLocale = momentMap[userLang];
   moment.locale(momentLocale);
   useEffect(() => {
     document.title = platformName;
@@ -67,9 +64,9 @@ const AppIntlProvider: FunctionComponent<{ children: ReactElement }> = ({ childr
 
   return (
     <IntlProvider
-      locale={lang}
+      locale={userLang}
       defaultLocale={DEFAULT_LANG}
-      key={lang}
+      key={userLang}
       messages={baseMessages}
       onError={(err) => {
         if (err.code === 'MISSING_TRANSLATION') {
@@ -80,7 +77,7 @@ const AppIntlProvider: FunctionComponent<{ children: ReactElement }> = ({ childr
     >
       <LocalizationProvider
         dateAdapter={AdapterDateFns}
-        adapterLocale={dateFnsLocaleMap[lang as Lang]}
+        adapterLocale={dateFnsLocaleMap[userLang]}
       >
         {children}
       </LocalizationProvider>
