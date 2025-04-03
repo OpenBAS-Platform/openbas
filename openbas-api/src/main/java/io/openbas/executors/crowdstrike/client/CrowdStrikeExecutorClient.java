@@ -21,23 +21,16 @@ import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.hc.client5.http.ClientProtocolException;
-import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
-import org.apache.hc.client5.http.async.methods.SimpleResponseConsumer;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
-import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
-import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.apache.hc.core5.http.nio.AsyncRequestProducer;
-import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
-import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -160,7 +153,7 @@ public class CrowdStrikeExecutorClient {
       Map<String, Object> bodySession = new HashMap<>();
       bodySession.put("host_ids", devicesId);
       bodySession.put("queue_offline", false);
-      String jsonSessionResponse = this.post(SESSION_URI, bodySession);
+      String jsonSessionResponse = this.postSync(SESSION_URI, bodySession);
       ResourcesSession session =
           this.objectMapper.readValue(jsonSessionResponse, new TypeReference<>() {});
       if (session == null) {
@@ -219,47 +212,15 @@ public class CrowdStrikeExecutorClient {
     }
   }
 
-  private void postAsync(@NotBlank final String uri, @NotNull final Map<String, Object> body)
+  private String postSync(@NotBlank final String uri, @NotNull final Map<String, Object> body)
       throws IOException {
-    if (this.lastAuthentication.isBefore(Instant.now().minusSeconds(AUTH_TIMEOUT))) {
-      this.authenticate();
-    }
-    try (CloseableHttpAsyncClient httpClient = HttpAsyncClients.createDefault()) {
-      httpClient.start();
-      AsyncRequestProducer producer =
-          AsyncRequestBuilder.post()
-              .setUri(this.config.getApiUrl() + uri)
-              .addHeader("Authorization", "Bearer " + this.token)
-              .addHeader("content-type", "application/json")
-              .setEntity(this.objectMapper.writeValueAsString(body))
-              .build();
-      AsyncResponseConsumer<SimpleHttpResponse> consumer = SimpleResponseConsumer.create();
-      httpClient.execute(
-          producer,
-          consumer,
-          new FutureCallback<>() {
-            @Override
-            public void completed(SimpleHttpResponse simpleHttpResponse) {
-              log.log(Level.INFO, "Success to get Crowdstrike response from " + uri);
-            }
+    return post(uri, body);
+  }
 
-            @Override
-            public void failed(Exception e) {
-              log.log(
-                  Level.SEVERE,
-                  "Failed to get Crowdstrike response from " + uri + ". Error: " + e.getMessage());
-            }
-
-            @Override
-            public void cancelled() {
-              log.log(
-                  Level.WARNING,
-                  "Failed to get Crowdstrike response from " + uri + " because of cancel.");
-            }
-          });
-    } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response");
-    }
+  @Async
+  protected void postAsync(@NotBlank final String uri, @NotNull final Map<String, Object> body)
+      throws IOException {
+    post(uri, body);
   }
 
   private void authenticate() throws IOException {
