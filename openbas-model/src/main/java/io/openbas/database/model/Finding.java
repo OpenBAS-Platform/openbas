@@ -40,7 +40,7 @@ public class Finding implements Base {
   @NotBlank
   private String id;
 
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "finding_field", nullable = false)
   @JsonProperty("finding_field")
   @NotBlank
@@ -53,7 +53,7 @@ public class Finding implements Base {
   @NotNull
   protected ContractOutputType type;
 
-  @Queryable(sortable = true)
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "finding_value", nullable = false)
   @JsonProperty("finding_value")
   @NotBlank
