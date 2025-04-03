@@ -1,4 +1,5 @@
 import { Button } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 
@@ -8,6 +9,7 @@ import OldAttackPatternField from '../../../../../components/OldAttackPatternFie
 const InjectorContractForm = (props) => {
   const { onSubmit, initialValues, editing, handleClose } = props;
   const { t } = useFormatter();
+  const theme = useTheme();
   return (
     <Form
       keepDirtyOnReinitialize={true}
@@ -26,6 +28,7 @@ const InjectorContractForm = (props) => {
             label={t('Attack patterns')}
             values={values}
             setFieldValue={form.mutators.setValue}
+            style={{ marginTop: theme.spacing(1) }}
           />
           <div style={{
             float: 'right',
