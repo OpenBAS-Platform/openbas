@@ -12,7 +12,7 @@ import { useHelper } from '../../../store';
 import { type AttackPattern, type Command, type DnsResolution, type Executable, type FileDrop, type Payload as PayloadType, type PayloadArgument, type PayloadPrerequisite } from '../../../utils/api-types';
 import { emptyFilled } from '../../../utils/String';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()(theme => ({
   chip: {
     fontSize: 12,
     height: 25,
@@ -20,6 +20,12 @@ const useStyles = makeStyles()(() => ({
     textTransform: 'uppercase',
     borderRadius: 4,
     width: 180,
+  },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    gap: theme.spacing(2),
   },
 }));
 
