@@ -58,6 +58,7 @@ const ThemeLight = (
       accent: accent || '#d3eaff',
       shadow: 'rgba(0, 0, 0, .05)',
       code: '#c0dfff',
+      paperInCard: '#f7f7f7',
     },
   },
   typography: {

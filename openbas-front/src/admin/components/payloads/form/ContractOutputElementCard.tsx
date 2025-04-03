@@ -47,7 +47,6 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
   const regexGroups: RegexGroup[] = watch(`${prefixName}.${index}.contract_output_element_regex_groups`);
 
   type ContractOutputElementType = ContractOutputElement['contract_output_element_type'];
-
   const contractOutputElementTypes: ContractOutputElementType[] = [
     'text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials',
   ];
@@ -73,6 +72,11 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
 
     setValue(`${prefixName}.${index}.contract_output_element_regex_groups`, updatedGroups);
   }, [selectedContractOutputElementType]);
+
+  const getRegexIndexesValueName = (fieldName: string) => {
+    const indexField = regexGroups.findIndex(r => r.regex_group_field === fieldName);
+    return `${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`;
+  };
 
   return (
     <Card className={classes.outputParserElement} variant="outlined">
@@ -106,10 +110,10 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
       />
       {regexGroups.length > 0 && (
         <Typography className={classes.outputValueTitle} variant="h3">
-          {`${t('Output value')} *`}
+          {`${t('Output value')}`}
         </Typography>
       )}
-      {regexGroups.sort((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)).map((field, indexField) => (
+      {regexGroups.toSorted((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)).map((field, indexField) => (
         <div
           style={{
             gridColumn: 'span 4',
@@ -128,7 +132,7 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
           >
             {t(field.regex_group_field.charAt(0).toUpperCase() + field.regex_group_field.slice(1))}
           </Typography>
-          <TextFieldController size="small" placeholder={`$${indexField + 1}`} variant="outlined" name={`${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`} required />
+          <TextFieldController size="small" placeholder={`$${indexField + 1}`} variant="outlined" name={getRegexIndexesValueName(field.regex_group_field)} required />
         </div>
       ))}
     </Card>

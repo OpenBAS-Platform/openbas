@@ -22,6 +22,7 @@ declare module '@mui/material/styles' {
     accent: string;
     shadow: string;
     code: string;
+    paperInCard: string;
   }
   interface PaletteColor {
     background: string;
@@ -35,6 +36,7 @@ declare module '@mui/material/styles' {
     chip: PaletteColor;
     ee: PaletteColor;
     ai: PaletteColor;
+    card: { paper: string };
   }
   interface PaletteOptions {
     chip: PaletteColorOptions;

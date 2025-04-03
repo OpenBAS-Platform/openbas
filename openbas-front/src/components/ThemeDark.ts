@@ -58,6 +58,7 @@ const ThemeDark = (
       accent: accent || THEME_DARK_DEFAULT_ACCENT,
       shadow: 'rgba(255, 255, 255, 0)',
       code: '#01478d',
+      paperInCard: paper || THEME_DARK_DEFAULT_PAPER,
     },
   },
   typography: {

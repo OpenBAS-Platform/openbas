@@ -2,6 +2,7 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.*;
+import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.util.ArrayList;
@@ -67,6 +68,6 @@ public class StatusPayloadOutput {
   @JsonProperty("dns_resolution_hostname")
   private String hostname;
 
-  @JsonProperty("payload_output_parser")
-  private Set<OutputParser> payloadOutputParser = Set.of();
+  @JsonProperty("payload_output_parsers")
+  private Set<OutputParserSimple> payloadOutputParsers;
 }
