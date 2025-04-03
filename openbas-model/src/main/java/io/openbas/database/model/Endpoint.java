@@ -7,19 +7,13 @@ import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import io.openbas.annotation.Ipv4OrIpv6Constraint;
 import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiModelDeserializer;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.*;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 @EqualsAndHashCode(callSuper = true)
@@ -119,8 +113,7 @@ public class Endpoint extends Asset {
     this.hostname = hostname.toLowerCase();
   }
 
-  public Endpoint() {
-  }
+  public Endpoint() {}
 
   public Endpoint(String id, String type, String name, PLATFORM_TYPE platform) {
     super(id, type, name);
