@@ -34,14 +34,13 @@ public class FindingOutput {
   protected String value;
 
   @JsonProperty("finding_name")
+  @NotBlank
   protected String name;
 
-  // -- AUDIT --
   @JsonProperty("finding_created_at")
   @NotNull
   private Instant creationDate = now();
 
-  // Relation
   @JsonProperty("finding_tags")
   private Set<String> tagIds = new HashSet<>();
 
