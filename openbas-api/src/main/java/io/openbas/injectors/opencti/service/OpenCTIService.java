@@ -62,7 +62,7 @@ public class OpenCTIService {
             }
           });
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + config.getUrl());
+      throw new ClientProtocolException("Unexpected response for request on: " + config.getUrl(), e);
     }
   }
 
@@ -100,7 +100,7 @@ public class OpenCTIService {
             }
           });
     } catch (IOException e) {
-      throw new ClientProtocolException("Unexpected response for request on: " + config.getUrl());
+      throw new ClientProtocolException("Unexpected response for request on: " + config.getUrl(), e);
     }
   }
 }
