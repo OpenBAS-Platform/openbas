@@ -298,6 +298,7 @@ const Endpoints = () => {
       <List>
         <ListItem
           classes={{ root: classes.itemHead }}
+          divider={false}
           style={{ paddingTop: 0 }}
           secondaryAction={<>&nbsp;</>}
         >
@@ -334,6 +335,7 @@ const Endpoints = () => {
               disablePadding
             >
               <ListItemButton
+                classes={{ root: classes.item }}
                 component={Link}
                 to={`/admin/assets/endpoints/${endpoint.asset_id}`}
               >
