@@ -46,8 +46,9 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       @NotNull final Endpoint assetEndpoint,
       @NotNull final Agent agent) {}
 
-  public void launchBatchExecutorSubprocess(
+  public List<Agent> launchBatchExecutorSubprocess(
       Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
+    List<Agent> csAgents = new ArrayList<>(agents);
     if (!this.crowdStrikeExecutorConfig.isEnable()) {
       throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
     }
@@ -59,51 +60,35 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
             .orElseThrow(
                 () -> new UnsupportedOperationException("Inject does not have a contract"));
 
-    manageWithoutPlatformAgents(agents, injectStatus);
+    csAgents = manageWithoutPlatformAgents(csAgents, injectStatus);
     List<CrowdStrikeAction> actions = new ArrayList<>();
     // Set implant script for Windows CS agents
     actions.addAll(
         getWindowsActions(
-            agents.stream()
-                .filter(
-                    agent ->
-                        ((Endpoint) agent.getAsset())
-                            .getPlatform()
-                            .equals(Endpoint.PLATFORM_TYPE.Windows))
-                .toList(),
-            injector,
-            inject.getId()));
+            getAgentsFromOS(csAgents, Endpoint.PLATFORM_TYPE.Windows), injector, inject.getId()));
     // Set implant script for Linux CS agents
     actions.addAll(
         getLinuxActions(
-            agents.stream()
-                .filter(
-                    agent ->
-                        ((Endpoint) agent.getAsset())
-                            .getPlatform()
-                            .equals(Endpoint.PLATFORM_TYPE.Linux))
-                .toList(),
-            injector,
-            inject.getId()));
+            getAgentsFromOS(csAgents, Endpoint.PLATFORM_TYPE.Linux), injector, inject.getId()));
     // Set implant script for MacOS CS agents
     actions.addAll(
         getMacOSActions(
-            agents.stream()
-                .filter(
-                    agent ->
-                        ((Endpoint) agent.getAsset())
-                            .getPlatform()
-                            .equals(Endpoint.PLATFORM_TYPE.MacOS))
-                .toList(),
-            injector,
-            inject.getId()));
+            getAgentsFromOS(csAgents, Endpoint.PLATFORM_TYPE.MacOS), injector, inject.getId()));
     // Launch payloads with CS API
     executeActions(actions);
+    return csAgents;
   }
 
-  private void manageWithoutPlatformAgents(List<Agent> agents, InjectStatus injectStatus) {
+  private List<Agent> getAgentsFromOS(List<Agent> agents, Endpoint.PLATFORM_TYPE platform) {
+    return agents.stream()
+        .filter(agent -> ((Endpoint) agent.getAsset()).getPlatform().equals(platform))
+        .toList();
+  }
+
+  private List<Agent> manageWithoutPlatformAgents(List<Agent> agents, InjectStatus injectStatus) {
+    List<Agent> csAgents = new ArrayList<>(agents);
     List<Agent> withoutPlatformAgents =
-        agents.stream()
+        csAgents.stream()
             .filter(
                 agent ->
                     ((Endpoint) agent.getAsset()).getPlatform() == null
@@ -111,7 +96,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
                             == Endpoint.PLATFORM_TYPE.Unknown
                         || ((Endpoint) agent.getAsset()).getArch() == null)
             .toList();
-    agents.removeAll(withoutPlatformAgents);
+    csAgents.removeAll(withoutPlatformAgents);
     // Agents with no platform or unknown platform
     for (Agent agent : withoutPlatformAgents) {
       injectStatus.addTrace(
@@ -124,6 +109,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
           ExecutionTraceAction.COMPLETE,
           agent);
     }
+    return csAgents;
   }
 
   private void executeActions(List<CrowdStrikeAction> actions) throws InterruptedException {
@@ -176,7 +162,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
               "\\$?x=.+location=.+;\\[Environment]::CurrentDirectory",
               Matcher.quoteReplacement(implantLocation));
       actionWindows.setCommandEncoded(
-          Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_8)));
+          Base64.getEncoder().encodeToString(command.getBytes(StandardCharsets.UTF_16LE)));
       actionWindows.setAgents(agents);
       actions.add(actionWindows);
     }

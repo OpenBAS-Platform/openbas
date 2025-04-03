@@ -10,6 +10,7 @@ import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.integrations.InjectorService;
 import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,8 +96,10 @@ public class CalderaExecutorContextService extends ExecutorContextService {
             });
   }
 
-  public void launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) {}
+  public List<Agent> launchBatchExecutorSubprocess(
+      Inject inject, List<Agent> agents, InjectStatus injectStatus) {
+    return new ArrayList<>();
+  }
 
   public void launchExecutorClear(@NotNull final Injector injector, @NotNull final Agent agent) {
     if (this.injectorExecutorAbilities.containsKey(injector.getId())) {

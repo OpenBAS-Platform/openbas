@@ -7,6 +7,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.executors.ExecutorContextService;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -57,6 +58,8 @@ public class OpenBASExecutorContextService extends ExecutorContextService {
     assetAgentJobRepository.save(assetAgentJob);
   }
 
-  public void launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) {}
+  public List<Agent> launchBatchExecutorSubprocess(
+      Inject inject, List<Agent> agents, InjectStatus injectStatus) {
+    return new ArrayList<>();
+  }
 }
