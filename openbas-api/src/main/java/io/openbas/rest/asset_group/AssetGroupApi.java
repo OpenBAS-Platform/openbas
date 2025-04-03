@@ -25,9 +25,7 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -45,7 +43,6 @@ public class AssetGroupApi extends RestBehavior {
   public static final String ASSET_GROUP_URI = "/api/asset_groups";
   private final EndpointService endpointService;
   private final EndpointMapper endpointMapper;
-
 
   private final AssetGroupService assetGroupService;
   private final AssetGroupCriteriaBuilderService assetGroupCriteriaBuilderService;
@@ -80,8 +77,9 @@ public class AssetGroupApi extends RestBehavior {
   public Page<EndpointOutput> endpointsFromAssetGroup(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput,
       @PathVariable @NotBlank final String assetGroupId) {
-    Page<Endpoint> endpointPage = endpointService.searchEndpoints(
-        EndpointSpecification.findEndpointsForAssetGroup(assetGroupId), searchPaginationInput);
+    Page<Endpoint> endpointPage =
+        endpointService.searchEndpoints(
+            EndpointSpecification.findEndpointsForAssetGroup(assetGroupId), searchPaginationInput);
     // Convert the Page of Endpoint to a Page of EndpointOutput
     List<EndpointOutput> endpointOutputs =
         endpointPage.getContent().stream().map(endpointMapper::toEndpointOutput).toList();
