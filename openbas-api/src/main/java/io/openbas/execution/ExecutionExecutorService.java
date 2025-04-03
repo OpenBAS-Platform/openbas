@@ -78,7 +78,9 @@ public class ExecutionExecutorService {
     try {
       ExecutorContextService executorContextService =
           context.getBean(CROWDSTRIKE_EXECUTOR_NAME, ExecutorContextService.class);
-      executorContextService.launchBatchExecutorSubprocess(inject, crowdstrikeAgents, injectStatus);
+      crowdstrikeAgents =
+          executorContextService.launchBatchExecutorSubprocess(
+              inject, crowdstrikeAgents, injectStatus);
       atLeastOneExecution.set(true);
     } catch (Exception e) {
       crowdstrikeAgents.forEach(

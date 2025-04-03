@@ -9,6 +9,7 @@ import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.rest.exception.AgentException;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,8 @@ public class TaniumExecutorContextService extends ExecutorContextService {
         Base64.getEncoder().encodeToString(command.getBytes()));
   }
 
-  public void launchBatchExecutorSubprocess(
-      Inject inject, List<Agent> agents, InjectStatus injectStatus) {}
+  public List<Agent> launchBatchExecutorSubprocess(
+      Inject inject, List<Agent> agents, InjectStatus injectStatus) {
+    return new ArrayList<>();
+  }
 }
