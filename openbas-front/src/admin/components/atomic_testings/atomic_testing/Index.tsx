@@ -136,14 +136,16 @@ const Index = () => {
               className={classes.item}
             />
             {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
-                || injectResultOverviewOutput.inject_type === 'openbas_nmap') && (<Tab
-              component={Link}
-              to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
-              value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
-              label={t('Findings')}
-              className={classes.item}
-            />
-            )}<Tab
+              || injectResultOverviewOutput.inject_type === 'openbas_nmap') && (
+              <Tab
+                component={Link}
+                to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
+                value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/findings`}
+                label={t('Findings')}
+                className={classes.item}
+              />
+            )}
+            <Tab
               component={Link}
               to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
               value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
@@ -165,8 +167,9 @@ const Index = () => {
         </Box>
         <Suspense fallback={<Loader />}>
           <Routes>
-            <Route path="" element={errorWrapper(AtomicTesting)()} />{(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
-                || injectResultOverviewOutput.inject_type === 'openbas_nmap')
+            <Route path="" element={errorWrapper(AtomicTesting)()} />
+            {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
+              || injectResultOverviewOutput.inject_type === 'openbas_nmap')
             && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
             <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
             {injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
