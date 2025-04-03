@@ -2,9 +2,9 @@ import { ReportProblem } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../components/i18n';
+import { type PlatformSettings } from '../../../utils/api-types';
 import { isEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
-
-export const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
+import { computeBanners } from './utils';
 
 /* eslint-disable */
 /* Avoid auto-lint removal using --fix with false positive finding of: */
@@ -15,7 +15,6 @@ const useStyles = makeStyles()((theme) => ({
     width: '100%',
     alignContent: 'center',
     textAlign: 'center',
-    padding: '5px',
   },
   bannerTop: {
     top: 0,
@@ -47,14 +46,14 @@ const useStyles = makeStyles()((theme) => ({
 /* end banner classes needing eslint-disable */
 /* eslint-enable */
 
-const SystemBanners = (settings: { settings: { platform_banner_by_level: Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]> } }) => {
+const SystemBanners = (settings: { settings: PlatformSettings }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
-  const bannerLevel = settings.settings.platform_banner_by_level;
+  const bannerLevel = computeBanners(settings.settings);
   let numberOfElements = 0;
-  if (settings.settings.platform_banner_by_level !== undefined) {
-    for (const currentBannerLevel of recordEntries(settings.settings.platform_banner_by_level)) {
+  if (bannerLevel !== undefined) {
+    for (const currentBannerLevel of recordEntries(bannerLevel)) {
       numberOfElements += currentBannerLevel[1].length;
     }
   }
@@ -64,7 +63,7 @@ const SystemBanners = (settings: { settings: { platform_banner_by_level: Record<
 
   return (
     <div>
-      {recordKeys(settings.settings.platform_banner_by_level).map((key) => {
+      {recordKeys(bannerLevel).map((key) => {
         const topBannerClasses = [
           classes.banner,
           classes.bannerTop,
@@ -73,7 +72,7 @@ const SystemBanners = (settings: { settings: { platform_banner_by_level: Record<
 
         return (
           <div key={key} className={topBannerClasses}>
-            {settings.settings.platform_banner_by_level[key].map((message) => {
+            {bannerLevel[key].map((message) => {
               return (
                 <div key={`${key}.${message}`} className={classes.container}>
                   <ReportProblem color="error" fontSize="small" style={{ marginRight: 8 }} />

@@ -102,7 +102,7 @@ const Login = () => {
     : settings?.platform_light_theme?.logo_login_url;
 
   const isWhitemarkEnable = settings.platform_whitemark === 'true'
-    && settings.platform_enterprise_edition === 'true';
+    && settings.platform_license?.license_is_validated === true;
 
   // POLICIES
   const loginMessage = settings.platform_policies?.platform_login_message;

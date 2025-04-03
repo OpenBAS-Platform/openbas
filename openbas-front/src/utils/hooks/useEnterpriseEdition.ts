@@ -17,7 +17,7 @@ import useAuth from './useAuth';
 
 const useEnterpriseEdition = (): boolean => {
   const { settings } = useAuth();
-  return settings.platform_enterprise_edition === 'true';
+  return settings.platform_license?.license_is_validated === true;
 };
 
 export default useEnterpriseEdition;
