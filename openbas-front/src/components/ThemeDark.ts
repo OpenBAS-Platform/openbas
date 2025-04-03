@@ -150,7 +150,7 @@ const ThemeDark = (
           'pre': {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#ffffff !important',
-            background: `${accent || '#01478d'} !important`,
+            background: `${accent || THEME_DARK_DEFAULT_ACCENT} !important`,
           },
           'code': {
             fontFamily: 'Consolas, monaco, monospace',
