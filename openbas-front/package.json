@@ -77,7 +77,7 @@
     "@playwright/test": "1.51.1",
     "@stylistic/eslint-plugin": "4.2.0",
     "@testing-library/dom": "10.4.0",
-    "@testing-library/react": "16.2.0",
+    "@testing-library/react": "16.3.0",
     "@types/d3-hierarchy": "3.1.7",
     "@types/node": "22.13.14",
     "@types/pdfmake": "0.2.11",
