@@ -8,7 +8,9 @@ import io.openbas.database.model.Endpoint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.Set;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,4 +53,8 @@ public class EndpointOutput {
   @Schema(description = "Tags")
   @JsonProperty("asset_tags")
   private Set<String> tags;
+
+  @Schema(description = "The endpoint was added statiscally or not")
+  @JsonProperty("is_static")
+  private Boolean isStatic;
 }

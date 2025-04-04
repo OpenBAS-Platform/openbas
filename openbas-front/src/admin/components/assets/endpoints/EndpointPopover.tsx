@@ -81,7 +81,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
     label: 'Remove from the inject',
     action: () => onRemoveEndpointFromInject(endpoint.asset_id),
   });
-  if ((assetGroupId && endpoint.asset_type !== 'dynamic')) entries.push({
+  if ((assetGroupId && endpoint.is_static)) entries.push({
     label: 'Remove from the asset group',
     action: () => handleRemoveFromAssetGroup(),
   });
