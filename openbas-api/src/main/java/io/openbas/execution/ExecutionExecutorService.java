@@ -124,6 +124,7 @@ public class ExecutionExecutorService {
           context.getBean(agent.getExecutor().getName(), ExecutorContextService.class);
       executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
     } catch (Exception e) {
+      log.severe(e.getMessage());
       throw new AgentException("Fatal error: " + e.getMessage(), agent);
     }
   }
