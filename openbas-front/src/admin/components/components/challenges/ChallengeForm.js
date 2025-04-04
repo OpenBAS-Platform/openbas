@@ -1,5 +1,5 @@
 import { ArrowDropDownOutlined, ArrowDropUpOutlined, AttachmentOutlined, ControlPointOutlined, DeleteOutlined } from '@mui/icons-material';
-import { Button, Grid, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
+import { Button, GridLegacy, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, MenuItem, Typography } from '@mui/material';
 import arrayMutators from 'final-form-arrays';
 import { useState } from 'react';
 import { Form } from 'react-final-form';
@@ -196,8 +196,8 @@ const ChallengeForm = (props) => {
             fullWidth={true}
             style={{ marginTop: 20 }}
           />
-          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-            <Grid item={true} xs={6}>
+          <GridLegacy container={true} spacing={3} style={{ marginTop: 0 }}>
+            <GridLegacy item={true} xs={6}>
               <OldTextField
                 name="challenge_score"
                 fullWidth
@@ -205,8 +205,8 @@ const ChallengeForm = (props) => {
                 label={t('Score')}
                 inputProps={{ min: 0 }}
               />
-            </Grid>
-            <Grid item={true} xs={6}>
+            </GridLegacy>
+            <GridLegacy item={true} xs={6}>
               <OldTextField
                 name="challenge_max_attempts"
                 fullWidth
@@ -214,8 +214,8 @@ const ChallengeForm = (props) => {
                 label={t('Max number of attempts')}
                 inputProps={{ min: 0 }}
               />
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
           <TagField
             name="challenge_tags"
             label={t('Tags')}

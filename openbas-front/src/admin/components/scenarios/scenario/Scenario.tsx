@@ -1,5 +1,5 @@
 import { PlayArrowOutlined } from '@mui/icons-material';
-import { Avatar, Button, Chip, Grid, Paper, Typography } from '@mui/material';
+import { Avatar, Button, Chip, GridLegacy, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { type Dispatch, type SetStateAction, useState } from 'react';
@@ -116,8 +116,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
         </div>
         <Typography variant="h4" style={{ alignContent: 'center' }}>{t('Latest 10 Finished Simulations')}</Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          <Grid container spacing={3}>
-            <Grid item xs={12} style={{ paddingTop: 10 }}>
+          <GridLegacy container spacing={3}>
+            <GridLegacy item xs={12} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -129,8 +129,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 source={scenario.scenario_description}
                 limit={300}
               />
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -139,8 +139,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 {t('Severity')}
               </Typography>
               <ItemSeverity severity={scenario.scenario_severity} label={t(scenario.scenario_severity ?? 'Unknown')} />
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -149,8 +149,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 {t('Category')}
               </Typography>
               <ItemCategory category={scenario.scenario_category} label={t(scenario.scenario_category ?? 'Unknown')} />
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -159,8 +159,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 {t('Main Focus')}
               </Typography>
               <ItemMainFocus mainFocus={scenario.scenario_main_focus} label={t(scenario.scenario_main_focus ?? 'Unknown')} />
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -169,8 +169,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                 {t('Tags')}
               </Typography>
               <ItemTags tags={scenario.scenario_tags} limit={10} />
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -183,8 +183,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
               ) : scenario.scenario_platforms.map(
                 (platform: string) => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
               )}
-            </Grid>
-            <Grid item xs={4} style={{ paddingTop: 10 }}>
+            </GridLegacy>
+            <GridLegacy item xs={4} style={{ paddingTop: 10 }}>
               <Typography
                 variant="h3"
                 gutterBottom
@@ -202,8 +202,8 @@ const Scenario = ({ setOpenInstantiateSimulationAndStart }: { setOpenInstantiate
                   label={killChainPhase.phase_name}
                 />
               ))}
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
         </Paper>
         <Paper classes={{ root: classes.paper }} variant="outlined">
           <ScenarioDistributionByExercise scenarioId={scenarioId} />

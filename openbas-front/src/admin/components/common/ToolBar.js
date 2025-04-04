@@ -14,7 +14,7 @@ import {
   Button,
   Drawer,
   FormControl,
-  Grid,
+  GridLegacy,
   IconButton,
   InputLabel,
   MenuItem,
@@ -709,8 +709,8 @@ class ToolBar extends Component {
                     >
                       <CancelOutlined fontSize="small" />
                     </IconButton>
-                    <Grid container={true} spacing={3}>
-                      <Grid item={true} xs={3}>
+                    <GridLegacy container={true} spacing={3}>
+                      <GridLegacy item={true} xs={3}>
                         <FormControl className={classes.formControl}>
                           <InputLabel>{t('Action type')}</InputLabel>
                           <Select
@@ -729,17 +729,17 @@ class ToolBar extends Component {
                             <MenuItem value="REMOVE">{t('Remove')}</MenuItem>
                           </Select>
                         </FormControl>
-                      </Grid>
-                      <Grid item={true} xs={3}>
+                      </GridLegacy>
+                      <GridLegacy item={true} xs={3}>
                         <FormControl className={classes.formControl}>
                           <InputLabel>{t('Field')}</InputLabel>
                           {this.renderFieldOptions(i)}
                         </FormControl>
-                      </Grid>
-                      <Grid item={true} xs={6}>
+                      </GridLegacy>
+                      <GridLegacy item={true} xs={6}>
                         {this.renderValuesOptions(i)}
-                      </Grid>
-                    </Grid>
+                      </GridLegacy>
+                    </GridLegacy>
                   </div>
                 ))}
               <div className={classes.add}>

@@ -1,5 +1,5 @@
 import { ContentPasteGoOutlined, DeleteSweepOutlined, VisibilityOutlined } from '@mui/icons-material';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid2, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
 import { type ChangeEvent, type FunctionComponent, useContext, useState } from 'react';
 
 import Transition from '../../../../components/common/Transition';
@@ -103,8 +103,8 @@ const Lessons: FunctionComponent<Props> = ({
           }
         </Typography>
         <Paper variant="outlined" sx={{ padding: theme.spacing(3) }}>
-          <Grid2 container spacing={3}>
-            <Grid2 size={{ xs: 6 }}>
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">{t('Questionnaire mode')}</Typography>
               <FormControlLabel
                 control={(
@@ -123,8 +123,8 @@ const Lessons: FunctionComponent<Props> = ({
                 )}
                 label={t('Anonymize answers')}
               />
-            </Grid2>
-            <Grid2 size={{ xs: 6 }}>
+            </Grid>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">{t('Template')}</Typography>
               <Button
                 startIcon={<ContentPasteGoOutlined />}
@@ -134,8 +134,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Apply')}
               </Button>
-            </Grid2>
-            <Grid2 size={{ xs: 6 }}>
+            </Grid>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">{t('Check')}</Typography>
               <Button
                 startIcon={<VisibilityOutlined />}
@@ -146,8 +146,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Preview')}
               </Button>
-            </Grid2>
-            <Grid2 size={{ xs: 6 }}>
+            </Grid>
+            <Grid size={{ xs: 6 }}>
               <Typography variant="h3">
                 {t('Categories and questions')}
               </Typography>
@@ -159,8 +159,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Clear out')}
               </Button>
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
         </Paper>
         <LessonsObjectives
           objectives={objectives}

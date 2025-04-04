@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, AlertTitle, Autocomplete, Button, Chip, Grid, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
+import { Alert, AlertTitle, Autocomplete, Button, Chip, GridLegacy, MenuItem, TextField as MuiTextField, Typography } from '@mui/material';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { type FunctionComponent, useState } from 'react';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
@@ -94,8 +94,8 @@ const ExerciseForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
-      <Grid container spacing={2}>
-        <Grid item xs={7}>
+      <GridLegacy container spacing={2}>
+        <GridLegacy item xs={7}>
           <SelectField
             variant="standard"
             fullWidth={true}
@@ -112,8 +112,8 @@ const ExerciseForm: FunctionComponent<Props> = ({
               </MenuItem>
             ))}
           </SelectField>
-        </Grid>
-        <Grid item xs={5}>
+        </GridLegacy>
+        <GridLegacy item xs={5}>
           <SelectField
             variant="standard"
             fullWidth={true}
@@ -143,8 +143,8 @@ const ExerciseForm: FunctionComponent<Props> = ({
               {t('Strategic Reaction')}
             </MenuItem>
           </SelectField>
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
 
       <SelectField
         variant="standard"

@@ -1,5 +1,5 @@
 import { CastOutlined, CheckCircleOutlineOutlined, HistoryToggleOffOutlined, PersonOutlined } from '@mui/icons-material';
-import { Grid, LinearProgress, linearProgressClasses, List, ListItem, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
+import { GridLegacy, LinearProgress, linearProgressClasses, List, ListItem, ListItemIcon, ListItemText, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -230,26 +230,26 @@ const Comcheck = () => {
   }));
   return (
     <div className={classes.root}>
-      <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
-        <Grid item={true} xs={6} style={{ marginTop: -14 }}>
+      <GridLegacy container={true} spacing={3} style={{ marginTop: -14 }}>
+        <GridLegacy item={true} xs={6} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={4}>
+            <GridLegacy container={true} spacing={3}>
+              <GridLegacy item={true} xs={4}>
                 <Typography variant="h3">{t('Name')}</Typography>
                 {comcheck?.comcheck_name}
-              </Grid>
-              <Grid item={true} xs={4}>
+              </GridLegacy>
+              <GridLegacy item={true} xs={4}>
                 <Typography variant="h3">{t('Start date')}</Typography>
                 {fldt(comcheck?.comcheck_start_date)}
-              </Grid>
-              <Grid item={true} xs={4}>
+              </GridLegacy>
+              <GridLegacy item={true} xs={4}>
                 <Typography variant="h3">{t('End date')}</Typography>
                 {fldt(comcheck?.comcheck_end_date)}
-              </Grid>
-            </Grid>
+              </GridLegacy>
+            </GridLegacy>
           </Paper>
-        </Grid>
-        <Grid item={true} xs={6} style={{ marginTop: -14 }}>
+        </GridLegacy>
+        <GridLegacy item={true} xs={6} style={{ marginTop: -14 }}>
           <Paper
             variant="outlined"
             classes={{ root: classes.metric }}
@@ -277,8 +277,8 @@ const Comcheck = () => {
               />
             </div>
           </Paper>
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
       <Paper
         variant="outlined"
         classes={{ root: classes.paperList }}

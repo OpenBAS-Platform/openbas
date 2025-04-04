@@ -1,5 +1,5 @@
 import { AccountCircleOutlined, AppsOutlined, ImportantDevicesOutlined } from '@mui/icons-material';
-import { AppBar, Badge, Box, Grid, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
+import { AppBar, Badge, Box, GridLegacy, IconButton, Menu, MenuItem, Popover, Toolbar, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
@@ -241,8 +241,8 @@ const TopBar: FunctionComponent = () => {
               }}
               >
                 <div className={classes.subtitle}>{t('Filigran eXtended Threat Management')}</div>
-                <Grid container={true} spacing={3}>
-                  <Grid item={true} xs={6}>
+                <GridLegacy container={true} spacing={3}>
+                  <GridLegacy item={true} xs={6}>
                     <Tooltip title={settings.xtm_opencti_enable && settings.xtm_opencti_url ? t('Platform connected') : t('Get OpenCTI now')}>
                       <a
                         className={classes.xtmItem}
@@ -257,8 +257,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenCTI')}</div>
                       </a>
                     </Tooltip>
-                  </Grid>
-                  <Grid item={true} xs={6}>
+                  </GridLegacy>
+                  <GridLegacy item={true} xs={6}>
                     <Tooltip title={t('Current platform')}>
                       <a className={classes.xtmItemCurrent}>
                         <Badge variant="dot" color="success">
@@ -267,8 +267,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenBAS')}</div>
                       </a>
                     </Tooltip>
-                  </Grid>
-                  <Grid item={true} xs={6}>
+                  </GridLegacy>
+                  <GridLegacy item={true} xs={6}>
                     <Tooltip title={t('Platform under construction, subscribe to update!')}>
                       <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer" onClick={handleCloseXtm}>
                         <Badge variant="dot" color="info">
@@ -277,8 +277,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenERM')}</div>
                       </a>
                     </Tooltip>
-                  </Grid>
-                  <Grid item={true} xs={6}>
+                  </GridLegacy>
+                  <GridLegacy item={true} xs={6}>
                     <Tooltip title={t('Platform under construction, subscribe to update!')}>
                       <a className={classes.xtmItem} href="https://filigran.io" target="_blank" rel="noreferrer" onClick={handleCloseXtm}>
                         <Badge variant="dot" color="info">
@@ -287,8 +287,8 @@ const TopBar: FunctionComponent = () => {
                         <div className={classes.product}>{t('OpenMTD')}</div>
                       </a>
                     </Tooltip>
-                  </Grid>
-                </Grid>
+                  </GridLegacy>
+                </GridLegacy>
               </Box>
             </Popover>
             <IconButton

@@ -1,5 +1,5 @@
 import { BallotOutlined, ContactMailOutlined, ContentPasteGoOutlined, DeleteSweepOutlined, SpeakerNotesOutlined, SportsScoreOutlined, VisibilityOutlined } from '@mui/icons-material';
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, Grid, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, GridLegacy, Link, Paper, Radio, RadioGroup, Switch, Typography, useTheme } from '@mui/material';
 import * as R from 'ramda';
 import { type ChangeEvent, type FunctionComponent, useContext, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -205,16 +205,16 @@ const Lessons: FunctionComponent<Props> = ({
         <Typography variant="h4">{t('Parameters')}</Typography>
         <Typography variant="h4">{t('Control')}</Typography>
         <Paper variant="outlined" sx={{ padding: theme.spacing(2) }}>
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
+          <GridLegacy container spacing={3}>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Start date')}</Typography>
               {nsdt(source.start_date)}
-            </Grid>
-            <Grid item xs={6}>
+            </GridLegacy>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('End date')}</Typography>
               {nsdt(source.end_date)}
-            </Grid>
-            <Grid item xs={6}>
+            </GridLegacy>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Duration')}</Typography>
               {getHoursDiff(
                 source.start_date
@@ -226,18 +226,18 @@ const Lessons: FunctionComponent<Props> = ({
               )}
               {' '}
               {t('hours')}
-            </Grid>
-            <Grid item xs={6}>
+            </GridLegacy>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Team')}</Typography>
               {source.users_number}
               {' '}
               {t('players')}
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
         </Paper>
         <Paper variant="outlined" sx={{ padding: theme.spacing(2) }}>
-          <Grid container spacing={3}>
-            <Grid item xs={6}>
+          <GridLegacy container spacing={3}>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Questionnaire mode')}</Typography>
               <FormControlLabel
                 control={(
@@ -250,8 +250,8 @@ const Lessons: FunctionComponent<Props> = ({
                 )}
                 label={t('Anonymize answers')}
               />
-            </Grid>
-            <Grid item xs={6}>
+            </GridLegacy>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Template')}</Typography>
               <Button
                 startIcon={<ContentPasteGoOutlined />}
@@ -261,8 +261,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Apply')}
               </Button>
-            </Grid>
-            <Grid item xs={6}>
+            </GridLegacy>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Check')}</Typography>
               <Button
                 startIcon={<VisibilityOutlined />}
@@ -273,8 +273,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Preview')}
               </Button>
-            </Grid>
-            <Grid item xs={6}>
+            </GridLegacy>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">
                 {t('Categories and questions')}
               </Typography>
@@ -286,8 +286,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Clear out')}
               </Button>
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
         </Paper>
         <Paper variant="outlined" sx={{ padding: theme.spacing(2) }}>
           <Alert severity="info">
@@ -295,8 +295,8 @@ const Lessons: FunctionComponent<Props> = ({
               'Sending the questionnaire will emit an email to each player with a unique link to access and fill it.',
             )}
           </Alert>
-          <Grid container spacing={3} style={{ marginTop: 0 }}>
-            <Grid item xs={6}>
+          <GridLegacy container spacing={3} style={{ marginTop: 0 }}>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Questionnaire')}</Typography>
               <Button
                 startIcon={<ContentPasteGoOutlined />}
@@ -306,8 +306,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Send')}
               </Button>
-            </Grid>
-            <Grid item xs={6}>
+            </GridLegacy>
+            <GridLegacy item xs={6}>
               <Typography variant="h3">{t('Answers')}</Typography>
               <Button
                 startIcon={<ContentPasteGoOutlined />}
@@ -317,8 +317,8 @@ const Lessons: FunctionComponent<Props> = ({
               >
                 {t('Reset')}
               </Button>
-            </Grid>
-          </Grid>
+            </GridLegacy>
+          </GridLegacy>
         </Paper>
       </div>
       <div style={{

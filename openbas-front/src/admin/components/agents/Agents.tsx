@@ -1,4 +1,4 @@
-import { Alert, Dialog, DialogContent, DialogTitle, Grid2, Step, StepButton, Stepper } from '@mui/material';
+import { Alert, Dialog, DialogContent, DialogTitle, Grid, Step, StepButton, Stepper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
 
@@ -78,16 +78,16 @@ const Executors = () => {
         <a href="https://docs.openbas.io/latest/deployment/ecosystem/executors/?h=agent#deploy-agents" target="_blank" rel="noreferrer">{t('in the documentation')}</a>
         .
       </Alert>
-      <Grid2 container spacing={3}>
+      <Grid container spacing={3}>
         {sortedExecutors.map((executor: Executor) => (
-          <Grid2 key={executor.executor_id} style={{ width: '20%' }}>
+          <Grid key={executor.executor_id} style={{ width: '20%' }}>
             <ExecutorSelector
               executor={executor}
               setSelectedExecutor={setSelectedExecutor}
             />
-          </Grid2>
+          </Grid>
         ))}
-      </Grid2>
+      </Grid>
       <Dialog
         open={selectedExecutor !== null}
         slots={{ transition: Transition }}

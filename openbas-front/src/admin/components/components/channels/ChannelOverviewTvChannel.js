@@ -1,4 +1,4 @@
-import { Card, CardHeader, Grid, Skeleton, Typography } from '@mui/material';
+import { Card, CardHeader, GridLegacy, Skeleton, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { makeStyles } from 'tss-react/mui';
 
@@ -54,8 +54,8 @@ const ChannelOverviewTvChannel = ({ channel }) => {
       >
         {channel.channel_description}
       </Typography>
-      <Grid container={true} spacing={3}>
-        <Grid item={true} xs={8}>
+      <GridLegacy container={true} spacing={3}>
+        <GridLegacy item={true} xs={8}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
               avatar={(
@@ -82,8 +82,8 @@ const ChannelOverviewTvChannel = ({ channel }) => {
               variant="rectangular"
             />
           </Card>
-        </Grid>
-        <Grid item={true} xs={4}>
+        </GridLegacy>
+        <GridLegacy item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
               avatar={(
@@ -136,10 +136,10 @@ const ChannelOverviewTvChannel = ({ channel }) => {
               variant="rectangular"
             />
           </Card>
-        </Grid>
-      </Grid>
-      <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-        <Grid item={true} xs={4}>
+        </GridLegacy>
+      </GridLegacy>
+      <GridLegacy container={true} spacing={3} style={{ marginTop: 0 }}>
+        <GridLegacy item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
               avatar={(
@@ -166,8 +166,8 @@ const ChannelOverviewTvChannel = ({ channel }) => {
               variant="rectangular"
             />
           </Card>
-        </Grid>
-        <Grid item={true} xs={4}>
+        </GridLegacy>
+        <GridLegacy item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
               avatar={(
@@ -194,8 +194,8 @@ const ChannelOverviewTvChannel = ({ channel }) => {
               variant="rectangular"
             />
           </Card>
-        </Grid>
-        <Grid item={true} xs={4}>
+        </GridLegacy>
+        <GridLegacy item={true} xs={4}>
           <Card sx={{ width: '100%' }}>
             <CardHeader
               avatar={(
@@ -222,8 +222,8 @@ const ChannelOverviewTvChannel = ({ channel }) => {
               variant="rectangular"
             />
           </Card>
-        </Grid>
-      </Grid>
+        </GridLegacy>
+      </GridLegacy>
     </div>
   );
 };
