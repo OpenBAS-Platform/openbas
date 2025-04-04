@@ -1245,6 +1245,22 @@ export interface FindingInput {
   finding_value: string;
 }
 
+export interface FindingOutput {
+  /** @uniqueItems true */
+  finding_assets?: EndpointOutput[];
+  /** @format date-time */
+  finding_created_at: string;
+  finding_field: string;
+  finding_id: string;
+  finding_name: string;
+  finding_scenario?: ScenarioSimple;
+  finding_simulation?: ExerciseSimple;
+  /** @uniqueItems true */
+  finding_tags?: string[];
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  finding_value: string;
+}
+
 export interface FlagInput {
   flag_type: string;
   flag_value: string;
@@ -2512,8 +2528,8 @@ export interface PageExerciseSimple {
   totalPages?: number;
 }
 
-export interface PageFinding {
-  content?: Finding[];
+export interface PageFindingOutput {
+  content?: FindingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;

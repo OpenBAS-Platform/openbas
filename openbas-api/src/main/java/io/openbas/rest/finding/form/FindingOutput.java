@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
+import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.scenario.form.ScenarioSimple;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -45,11 +46,14 @@ public class FindingOutput {
   @JsonProperty("finding_tags")
   private Set<String> tagIds;
 
-  @JsonProperty("finding_scenario")
-  private ScenarioSimple scenario;
+  @JsonProperty("finding_inject")
+  private InjectSimple inject;
 
   @JsonProperty("finding_simulation")
   private ExerciseSimple simulation;
+
+  @JsonProperty("finding_scenario")
+  private ScenarioSimple scenario;
 
   @JsonProperty("finding_assets")
   private Set<EndpointOutput> endpoints;
