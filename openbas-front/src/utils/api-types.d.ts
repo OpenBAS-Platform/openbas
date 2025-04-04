@@ -848,6 +848,18 @@ export interface EndpointRegisterInput {
   seenIp?: string;
 }
 
+export interface EndpointSimple {
+  /** Asset Id */
+  asset_id: string;
+  /** Asset name */
+  asset_name: string;
+  /**
+   * Tags
+   * @uniqueItems true
+   */
+  asset_tags?: string[];
+}
+
 export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
@@ -1247,7 +1259,7 @@ export interface FindingInput {
 
 export interface FindingOutput {
   /** @uniqueItems true */
-  finding_assets?: EndpointOutput[];
+  finding_assets?: EndpointSimple[];
   /** @format date-time */
   finding_created_at: string;
   finding_field: string;
