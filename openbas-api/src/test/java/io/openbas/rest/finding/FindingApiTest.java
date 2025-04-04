@@ -49,7 +49,7 @@ class FindingApiTest extends IntegrationTest {
 
     SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().build();
 
-    performCallbackRequest(FINDING_URI + "/search/", searchPaginationInput);
+    performCallbackRequest(FINDING_URI + "/search", searchPaginationInput);
   }
 
   @DisplayName("Search findings by simulation")
