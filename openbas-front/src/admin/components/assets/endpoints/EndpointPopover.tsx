@@ -1,20 +1,16 @@
 import { type FunctionComponent, useState } from 'react';
 
 import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
-import { deleteEndpoint, updateEndpoint } from '../../../../actions/assets/endpoint-actions';
+import { deleteEndpoint } from '../../../../actions/assets/endpoint-actions';
 import ButtonPopover from '../../../../components/common/ButtonPopover';
-import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
-import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { type EndpointOutput, type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
+import { type EndpointOutput, type EndpointOverviewOutput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { type EndpointStoreWithType } from './endpoint';
-import EndpointForm from './EndpointForm';
 
 export interface EndpointPopoverProps {
   inline?: boolean;
-  endpoint: EndpointOutput & { type: string };
+  endpoint: EndpointOutput;
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
@@ -31,8 +27,6 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
   assetGroupEndpointIds,
   onRemoveEndpointFromInject,
   onRemoveEndpointFromAssetGroup,
-  openEditOnInit = false,
-  onUpdate,
   onDelete,
 }) => {
   // Standard hooks
