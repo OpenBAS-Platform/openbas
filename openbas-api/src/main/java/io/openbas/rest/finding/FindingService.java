@@ -61,11 +61,10 @@ public class FindingService {
     return this.findingRepository.save(finding);
   }
 
-  public Iterable<Finding> createFindings(
-      @NotNull final List<Finding> findings, @NotBlank final String injectId) {
-    Inject inject = this.injectService.inject(injectId);
+  public List<Finding> createFindings(
+      @NotNull final List<Finding> findings, @NotBlank final Inject inject) {
     findings.forEach((finding) -> finding.setInject(inject));
-    return this.findingRepository.saveAll(findings);
+    return findings;
   }
 
   public Finding updateFinding(@NotNull final Finding finding, @NotNull final String injectId) {
