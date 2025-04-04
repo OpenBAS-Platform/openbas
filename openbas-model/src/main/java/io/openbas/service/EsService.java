@@ -111,9 +111,8 @@ public class EsService {
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
-    // TODO MUST BE PART OF QUERYABLE IN THE SCHEMA
-    String elasticField =
-        field.endsWith("_id") || field.endsWith("_side") ? (field + ".keyword") : field;
+    PropertySchema propertyField = getIndexingSchema().get(field);
+    String elasticField = propertyField.isKeyword() ? (field + ".keyword") : field;
     switch (operator) {
       case eq:
         List<Query> queryList =
@@ -379,7 +378,7 @@ public class EsService {
                     String key = b.key().stringValue();
                     String label = isSideAggregation ? resolutions.get(key) : key;
                     String seriesKey = label != null ? label : "deleted";
-                    return new EsSeriesData(seriesKey, b.docCount());
+                    return new EsSeriesData(key, seriesKey, b.docCount());
                   })
               .toList();
       return new EsSeries(config.getName(), data);
@@ -441,7 +440,10 @@ public class EsService {
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
       List<EsSeriesData> data =
           buckets.array().stream()
-              .map(b -> new EsSeriesData(Instant.ofEpochMilli(b.key()).toString(), b.docCount()))
+              .map(
+                  b ->
+                      new EsSeriesData(
+                          b.keyAsString(), Instant.ofEpochMilli(b.key()).toString(), b.docCount()))
               .toList();
       return new EsSeries(config.getName(), data);
     } catch (IOException e) {

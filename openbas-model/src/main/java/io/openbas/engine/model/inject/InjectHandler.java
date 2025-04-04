@@ -40,11 +40,11 @@ public class InjectHandler implements Handler<EsInject> {
               // Specific
               esInject.setInject_title(inject.getInject_title());
               esInject.setInject_status(inject.getInject_status_name());
-              esInject.setInject_scenario_side(inject.getInject_scenario());
-              esInject.setInject_simulation_side(inject.getInject_Exercise());
-              esInject.setAttack_patterns_side(inject.getInject_attack_patterns());
-              esInject.setKill_chain_phases_side(inject.getInject_kill_chain_phases());
-              esInject.setContract_side(inject.getInject_injector_contract());
+              esInject.setBase_scenario_side(inject.getInject_scenario());
+              esInject.setBase_simulation_side(inject.getInject_Exercise());
+              esInject.setBase_attack_patterns_side(inject.getInject_attack_patterns());
+              esInject.setBase_kill_chain_phases_side(inject.getInject_kill_chain_phases());
+              esInject.setBase_inject_contract_side(inject.getInject_injector_contract());
               return esInject;
             })
         .toList();
