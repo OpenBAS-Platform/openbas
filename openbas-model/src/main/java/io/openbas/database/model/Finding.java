@@ -65,6 +65,7 @@ public class Finding implements Base {
   @JsonProperty("finding_labels")
   private String[] labels;
 
+  @Queryable(filterable = true, sortable = true)
   @Column(name = "finding_name")
   @JsonProperty("finding_name")
   protected String name;
@@ -77,6 +78,7 @@ public class Finding implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("finding_tags")
+  @Queryable(filterable = true, searchable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
   // -- RELATION --
@@ -114,6 +116,7 @@ public class Finding implements Base {
       inverseJoinColumns = @JoinColumn(name = "asset_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("finding_assets")
+  @Queryable(filterable = true, searchable = true, dynamicValues = true, path = "assets.id")
   private List<Asset> assets = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
