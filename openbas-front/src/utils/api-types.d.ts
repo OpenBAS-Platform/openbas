@@ -1252,6 +1252,7 @@ export interface FindingOutput {
   finding_created_at: string;
   finding_field: string;
   finding_id: string;
+  finding_inject?: InjectSimple;
   finding_name: string;
   finding_scenario?: ScenarioSimple;
   finding_simulation?: ExerciseSimple;
@@ -1766,6 +1767,13 @@ export interface InjectResultOverviewOutput {
   injects_documents?: string[];
   /** Tags */
   injects_tags?: string[];
+}
+
+export interface InjectSimple {
+  inject_id: string;
+  /** @uniqueItems true */
+  inject_tags?: string[];
+  inject_title: string;
 }
 
 export interface InjectStatus {
