@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.IntegrationTest;
+import io.openbas.database.model.Filters;
 import io.openbas.utils.fixtures.PaginationFixture;
 import io.openbas.utils.fixtures.composers.EndpointComposer;
 import io.openbas.utils.fixtures.composers.ExerciseComposer;
@@ -16,6 +17,7 @@ import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -47,9 +49,69 @@ class FindingApiTest extends IntegrationTest {
   @WithMockAdminUser
   public void given_a_search_input_should_return_page_of_findings() throws Exception {
 
-    SearchPaginationInput searchPaginationInput = PaginationFixture.getDefault().build();
+    SearchPaginationInput input = new SearchPaginationInput();
+    Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+    filterGroup.setMode(Filters.FilterMode.and);
 
-    performCallbackRequest(FINDING_URI + "/search", searchPaginationInput);
+    Filters.Filter name = new Filters.Filter();
+    name.setKey("findings_name");
+    name.setMode(Filters.FilterMode.and);
+    name.setValues(List.of("Port"));
+    name.setOperator(Filters.FilterOperator.contains);
+
+    Filters.Filter type = new Filters.Filter();
+    type.setKey("findings_type");
+    type.setMode(Filters.FilterMode.and);
+    type.setValues(List.of("PortScan"));
+    type.setOperator(Filters.FilterOperator.contains);
+
+    Filters.Filter value = new Filters.Filter();
+    value.setKey("findings_value");
+    value.setMode(Filters.FilterMode.and);
+    value.setValues(List.of("0.0.0.0:135 (LISTENING)"));
+    value.setOperator(Filters.FilterOperator.contains);
+
+    Filters.Filter createdAt = new Filters.Filter();
+    createdAt.setKey("findings_created_at");
+    createdAt.setMode(Filters.FilterMode.and);
+    createdAt.setValues(List.of("2025-04-01T22:00:00.000Z"));
+    createdAt.setOperator(Filters.FilterOperator.eq);
+
+    Filters.Filter tags = new Filters.Filter();
+    tags.setKey("findings_tags");
+    tags.setMode(Filters.FilterMode.and);
+    tags.setValues(List.of("a4ec8889-792f-43b3-a3f2-241aa4bc6cf8"));
+    tags.setOperator(Filters.FilterOperator.contains);
+
+    Filters.Filter inject = new Filters.Filter();
+    inject.setKey("findings_inject");
+    inject.setMode(Filters.FilterMode.and);
+    inject.setValues(List.of("40485dde-61b5-4c27-9251-da5a377d8f8a"));
+    inject.setOperator(Filters.FilterOperator.contains);
+
+    Filters.Filter endpoint = new Filters.Filter();
+    endpoint.setKey("findings_endpoint");
+    endpoint.setMode(Filters.FilterMode.and);
+    endpoint.setValues(List.of("40485dde-61b5-4c27-9251-da5a377d8f8a"));
+    endpoint.setOperator(Filters.FilterOperator.contains);
+
+    Filters.Filter simulation = new Filters.Filter();
+    simulation.setKey("findings_simulation");
+    simulation.setMode(Filters.FilterMode.and);
+    simulation.setValues(List.of("40485dde-61b5-4c27-9251-da5a377d8f8a"));
+    simulation.setOperator(Filters.FilterOperator.contains);
+
+    Filters.Filter scenario = new Filters.Filter();
+    scenario.setKey("findings_scenario");
+    scenario.setMode(Filters.FilterMode.and);
+    scenario.setValues(List.of("40485dde-61b5-4c27-9251-da5a377d8f8a"));
+    scenario.setOperator(Filters.FilterOperator.contains);
+
+    filterGroup.setFilters(
+        List.of(name, type, value, createdAt, tags, inject, endpoint, simulation, scenario));
+    input.setFilterGroup(filterGroup);
+
+    performCallbackRequest(FINDING_URI + "/search", input);
   }
 
   @DisplayName("Search findings by simulation")
