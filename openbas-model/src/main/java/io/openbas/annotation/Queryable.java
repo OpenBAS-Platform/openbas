@@ -16,7 +16,7 @@ public @interface Queryable {
 
   boolean sortable() default false;
 
-  String label() default "";
+  String label() default ""; // FIXME: use it on filter
 
   String path() default "";
 

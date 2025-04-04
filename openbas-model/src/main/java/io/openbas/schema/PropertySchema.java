@@ -38,6 +38,7 @@ public class PropertySchema {
   private final String label;
   private final String entity;
   private final String[] paths;
+  private final boolean keyword;
 
   @Singular("propertySchema")
   private final List<PropertySchema> propertiesSchema;

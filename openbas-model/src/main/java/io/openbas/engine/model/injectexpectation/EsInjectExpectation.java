@@ -1,5 +1,6 @@
 package io.openbas.engine.model.injectexpectation;
 
+import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import io.openbas.engine.model.EsBase;
@@ -8,19 +9,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Indexable(index = "expectation-inject", label = "Inject expectation") // Caused by:
-// co.elastic.clients.elasticsearch._types.ElasticsearchException:
-// [es/indices.put_index_template] failed:
-// [illegal_argument_exception] index template
-// [openbas_inject-expectation] has index patterns
-// [openbas_inject-expectation*] matching patterns from existing
-// templates [openbas_inject] with patterns (openbas_inject =>
-// [openbas_inject*]) that have the same priority [0], multiple index
-// templates may not match during index creation, please use a
-// different priority
+@Indexable(index = "expectation-inject", label = "Inject expectation")
 public class EsInjectExpectation extends EsBase {
+  /* Every attribute must be uniq, so prefixed with the entity type! */
 
   @Queryable(label = "type", filterable = true)
+  @EsQueryable(keyword = true)
   private String inject_expectation_type;
 
   @Queryable(label = "name", filterable = true, sortable = true)
@@ -43,4 +37,8 @@ public class EsInjectExpectation extends EsBase {
 
   @Queryable(label = "group", filterable = true)
   private Boolean inject_expectation_group;
+
+  @Queryable(label = "status", filterable = true)
+  @EsQueryable(keyword = true)
+  private String inject_expectation_status;
 }

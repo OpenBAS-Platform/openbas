@@ -1,18 +1,11 @@
 package io.openbas.database.repository;
 
 import io.openbas.database.model.Finding;
-
-import java.util.Date;
-import jakarta.validation.constraints.NotBlank;
-
 import io.openbas.database.raw.RawFinding;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.List;
-
-import io.openbas.database.raw.RawFinding;
 import java.util.Optional;
-
-import io.openbas.database.raw.RawFinding;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -27,6 +20,8 @@ public interface FindingRepository
   List<Finding> findAllByInjectId(@NotNull final String injectId);
 
   Optional<Finding> findByInjectIdAndValue(@NotBlank final String id, @NotBlank final String value);
+
+  // -- INDEXING --
 
   @Query(
       value =

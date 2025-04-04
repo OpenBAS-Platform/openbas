@@ -1,7 +1,7 @@
 import { simpleCall, simpleDelCall, simplePostCall, simplePutCall } from '../../utils/Action';
 import type { CustomDashboardInput, SearchPaginationInput } from '../../utils/api-types';
 
-export const CUSTOM_DASHBOARD_URI = '/api/custom_dashboards';
+export const CUSTOM_DASHBOARD_URI = '/api/custom-dashboards';
 
 export const createCustomDashboard = (input: CustomDashboardInput) => {
   return simplePostCall(CUSTOM_DASHBOARD_URI, input);
