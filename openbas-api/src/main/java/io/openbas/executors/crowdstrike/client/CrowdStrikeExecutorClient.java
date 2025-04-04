@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.*;
+import io.openbas.executors.crowdstrike.model.Authentication;
+import io.openbas.executors.crowdstrike.model.ResourcesHosts;
+import io.openbas.executors.crowdstrike.model.ResourcesSession;
 import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +30,7 @@ import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -38,9 +42,9 @@ public class CrowdStrikeExecutorClient {
   private static final String OAUTH_URI = "/oauth2/token";
   private static final String HOST_GROUPS_URI = "/devices/entities/host-groups/v1";
   private static final String ENDPOINTS_URI = "/devices/combined/host-group-members/v1";
-  private static final String SESSION_URI = "/real-time-response/entities/sessions/v1";
+  private static final String SESSION_URI = "/real-time-response/combined/batch-init-session/v1";
   private static final String REAL_TIME_RESPONSE_URI =
-      "/real-time-response/entities/active-responder-command/v1";
+      "/real-time-response/combined/batch-active-responder-command/v1";
 
   private final CrowdStrikeExecutorConfig config;
   private final ObjectMapper objectMapper = new ObjectMapper();
@@ -143,23 +147,22 @@ public class CrowdStrikeExecutorClient {
     }
   }
 
-  public void executeAction(String deviceId, String scriptName, String command) {
+  public void executeAction(List<String> devicesId, String scriptName, String command) {
     try {
       // Open remote session
       Map<String, Object> bodySession = new HashMap<>();
-      bodySession.put("device_id", deviceId);
+      bodySession.put("host_ids", devicesId);
       bodySession.put("queue_offline", false);
-      String jsonSessionResponse = this.post(SESSION_URI, bodySession);
-      ResourcesSession sessions =
+      String jsonSessionResponse = this.postSync(SESSION_URI, bodySession);
+      ResourcesSession session =
           this.objectMapper.readValue(jsonSessionResponse, new TypeReference<>() {});
-      CrowdStrikeSession session = sessions.getResources().getFirst();
       if (session == null) {
         log.log(Level.SEVERE, "Cannot get the session on the selected device");
         throw new RuntimeException("Cannot get the session on the selected device");
       }
       // Execute the command
       Map<String, Object> bodyCommand = new HashMap<>();
-      bodyCommand.put("session_id", session.getSession_id());
+      bodyCommand.put("batch_id", session.getBatch_id());
       bodyCommand.put("base_command", "runscript");
       bodyCommand.put(
           "command_string",
@@ -168,7 +171,7 @@ public class CrowdStrikeExecutorClient {
               + "\"  -CommandLine=```'{\"command\":\""
               + command
               + "\"}'```");
-      this.post(REAL_TIME_RESPONSE_URI, bodyCommand);
+      this.postAsync(REAL_TIME_RESPONSE_URI, bodyCommand);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -207,6 +210,17 @@ public class CrowdStrikeExecutorClient {
     } catch (IOException e) {
       throw new ClientProtocolException("Unexpected response", e);
     }
+  }
+
+  private String postSync(@NotBlank final String uri, @NotNull final Map<String, Object> body)
+      throws IOException {
+    return post(uri, body);
+  }
+
+  @Async
+  protected void postAsync(@NotBlank final String uri, @NotNull final Map<String, Object> body)
+      throws IOException {
+    post(uri, body);
   }
 
   private void authenticate() throws IOException {
