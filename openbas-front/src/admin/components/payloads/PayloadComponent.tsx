@@ -1,4 +1,4 @@
-import { Chip, GridLegacy, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
+import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -57,12 +57,16 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
   };
 
   return (
-    <GridLegacy container spacing={3}>
-      <GridLegacy item xs={12} style={{ paddingTop: 10 }}>
+    <div className={classes.container}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: theme.spacing(1),
+      }}
+      >
         <Typography
           variant="h2"
           gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
         >
           {selectedPayload?.payload_name}
         </Typography>
@@ -70,84 +74,101 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="body2"
           gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
         >
           {emptyFilled(selectedPayload?.payload_description)}
         </Typography>
-      </GridLegacy>
+      </div>
 
-      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
+      <div style={{ display: 'flex' }}>
+        <div style={{
+          width: '50%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(2),
+        }}
         >
-          {t('Platforms')}
-        </Typography>
-        {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
-          <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
-        ) : selectedPayload?.payload_platforms?.map(
-          platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
+          <Typography
+            variant="h3"
+            gutterBottom
+          >
+            {t('Platforms')}
+          </Typography>
+          {(selectedPayload?.payload_platforms ?? []).length === 0 ? (
+            <PlatformIcon platform={t('No inject in this scenario')} tooltip width={25} />
+          ) : selectedPayload?.payload_platforms?.map(
+            platform => <PlatformIcon key={platform} platform={platform} tooltip width={25} marginRight={theme.spacing(2)} />,
+          )}
+          {(selectedPayload?.payload_execution_arch) && (
+            <>
+              <Typography
+                variant="h3"
+                gutterBottom
+              >
+                {t('Architecture')}
+              </Typography>
+              {t(selectedPayload?.payload_execution_arch)}
+            </>
+          )}
+          <Typography
+            variant="h3"
+            gutterBottom
+          >
+            {t('Tags')}
+          </Typography>
+          <ItemTags
+            variant="reduced-view"
+            tags={selectedPayload?.payload_tags}
+          />
+        </div>
+        <div style={{
+          width: '50%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(1),
+        }}
+        >
+          <Typography
+            variant="h3"
+            gutterBottom
+          >
+            {t('Attack patterns')}
+          </Typography>
+          {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap[attackPatternId]).map((attackPattern: AttackPattern) => (
+            <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
+              <Chip
+                variant="outlined"
+                classes={{ root: classes.chip }}
+                color="primary"
+                label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
+              />
+            </Tooltip>
+          ))}
+          <Typography
+            variant="h3"
+            gutterBottom
+            style={{ marginTop: theme.spacing(2) }}
+          >
+            {t('External ID')}
+          </Typography>
+          {emptyFilled(selectedPayload?.payload_external_id)}
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: theme.spacing(1),
+      }}
+      >
+        {selectedPayload?.payload_type === 'Command' && (
+          <Typography
+            variant="h3"
+            gutterBottom
+          >
+            {t('Command executor')}
+          </Typography>
         )}
-        {(selectedPayload?.payload_execution_arch) && (
-          <>
-            <Typography
-              variant="h3"
-              gutterBottom
-              style={{ marginTop: theme.spacing(2) }}
-            >
-              {t('Architecture')}
-            </Typography>
-            {t(selectedPayload?.payload_execution_arch)}
-          </>
-        )}
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
-        >
-          {t('Tags')}
-        </Typography>
-        <ItemTags
-          variant="reduced-view"
-          tags={selectedPayload?.payload_tags}
-        />
-      </GridLegacy>
-      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
-        >
-          {t('Attack patterns')}
-        </Typography>
-        {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap[attackPatternId]).map((attackPattern: AttackPattern) => (
-          <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
-            <Chip
-              variant="outlined"
-              classes={{ root: classes.chip }}
-              color="primary"
-              label={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}
-            />
-          </Tooltip>
-        ))}
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
-        >
-          {t('External ID')}
-        </Typography>
-        {emptyFilled(selectedPayload?.payload_external_id)}
-      </GridLegacy>
-      <GridLegacy item xs={12} style={{ paddingTop: 10 }}>
-        <Typography
-          variant="h3"
-          gutterBottom
-          style={{ marginTop: 20 }}
-        >
-          {t('Command executor')}
-        </Typography>
+
         {selectedPayload?.payload_type === 'Command' && selectedPayload.command_executor && (
           <>{selectedPayload.command_executor}</>
         )}
@@ -156,7 +177,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
             <Typography
               variant="h3"
               gutterBottom
-              style={{ marginTop: theme.spacing(2) }}
+              marginTop={theme.spacing(2)}
             >
               {t('Attack command')}
             </Typography>
@@ -169,7 +190,6 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
         >
           {t('Arguments')}
         </Typography>
@@ -220,7 +240,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
+          marginTop={theme.spacing(2)}
         >
           {t('Prerequisites')}
         </Typography>
@@ -280,7 +300,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
+          marginTop={theme.spacing(2)}
         >
           {t('Cleanup executor')}
         </Typography>
@@ -288,15 +308,15 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
         <Typography
           variant="h3"
           gutterBottom
-          style={{ marginTop: theme.spacing(2) }}
+          marginTop={theme.spacing(2)}
         >
           {t('Cleanup command')}
         </Typography>
         {selectedPayload?.payload_cleanup_command && selectedPayload?.payload_cleanup_command.length > 0
           ? <pre><ItemCopy content={selectedPayload?.payload_cleanup_command} /></pre> : '-'}
 
-      </GridLegacy>
-    </GridLegacy>
+      </div>
+    </div>
   );
 };
 
