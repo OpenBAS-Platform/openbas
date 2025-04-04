@@ -181,6 +181,7 @@ export interface AssetGroup {
   asset_group_dynamic_assets?: string[];
   /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
+  asset_group_external_reference?: string;
   asset_group_id: string;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -1238,6 +1239,22 @@ export interface FindingInput {
   finding_field: string;
   finding_inject_id?: string;
   finding_labels?: string[];
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  finding_value: string;
+}
+
+export interface FindingOutput {
+  /** @uniqueItems true */
+  finding_assets?: EndpointOutput[];
+  /** @format date-time */
+  finding_created_at: string;
+  finding_field: string;
+  finding_id: string;
+  finding_name: string;
+  finding_scenario?: ScenarioSimple;
+  finding_simulation?: ExerciseSimple;
+  /** @uniqueItems true */
+  finding_tags?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   finding_value: string;
 }
@@ -2509,8 +2526,8 @@ export interface PageExerciseSimple {
   totalPages?: number;
 }
 
-export interface PageFinding {
-  content?: Finding[];
+export interface PageFindingOutput {
+  content?: FindingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
