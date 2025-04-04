@@ -18,5 +18,5 @@ public interface RawFinding {
 
   String getFinding_inject_id();
 
-  String getInject_scenario(); // FIXME: simulation ?
+  String getInject_scenario();
 }

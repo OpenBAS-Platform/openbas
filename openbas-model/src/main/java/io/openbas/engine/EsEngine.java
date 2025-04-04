@@ -1,14 +1,8 @@
 package io.openbas.engine;
 
-import io.openbas.engine.model.finding.EsFinding;
-import io.openbas.engine.model.finding.FindingHandler;
-import io.openbas.engine.model.inject.EsInject;
-import io.openbas.engine.model.inject.InjectHandler;
-import io.openbas.engine.model.injectexpectation.EsInjectExpectation;
-import io.openbas.engine.model.injectexpectation.InjectExpectationHandler;
-import io.openbas.engine.model.scenario.EsScenario;
-import io.openbas.engine.model.scenario.ScenarioHandler;
-import java.util.ArrayList;
+import io.openbas.engine.model.EsBase;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -24,13 +18,35 @@ public class EsEngine {
     this.context = context;
   }
 
-  public List<EsModel<?>> getModels() {
-    List<EsModel<?>> models = new ArrayList<>();
-    models.add(new EsModel<>(EsFinding.class, context.getBean(FindingHandler.class)));
-    models.add(new EsModel<>(EsScenario.class, context.getBean(ScenarioHandler.class)));
-    models.add(new EsModel<>(EsInject.class, context.getBean(InjectHandler.class)));
-    models.add(
-        new EsModel<>(EsInjectExpectation.class, context.getBean(InjectExpectationHandler.class)));
-    return models;
+  // TODO: need to be tested
+
+  public <T extends EsBase> List<EsModel<T>> getModels() {
+    return context.getBeansOfType(Handler.class).entrySet().stream()
+        .map(
+            entry -> {
+              Handler<T> handler = entry.getValue();
+              Class<T> clazz = resolveGenericType(handler);
+              if (clazz == null) {
+                throw new IllegalStateException(
+                    "Cannot resolve generic type for handler " + entry.getKey());
+              }
+              return new EsModel<>(clazz, handler);
+            })
+        .toList();
+  }
+
+  @SuppressWarnings("rawtypes")
+  private <T extends EsBase> Class<T> resolveGenericType(Handler handler) {
+    for (Type iface : handler.getClass().getGenericInterfaces()) {
+      if (iface instanceof ParameterizedType pType) {
+        if (pType.getRawType().equals(Handler.class)) {
+          Type actualType = pType.getActualTypeArguments()[0];
+          if (actualType instanceof Class<?> cls && EsBase.class.isAssignableFrom(cls)) {
+            return (Class<T>) cls;
+          }
+        }
+      }
+    }
+    return null;
   }
 }

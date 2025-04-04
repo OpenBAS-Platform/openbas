@@ -2,18 +2,11 @@ package io.openbas.database.repository;
 
 import io.openbas.database.model.ContractOutputType;
 import io.openbas.database.model.Finding;
-
-import java.util.Date;
-import jakarta.validation.constraints.NotBlank;
-
 import io.openbas.database.raw.RawFinding;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.List;
-
-import io.openbas.database.raw.RawFinding;
 import java.util.Optional;
-
-import io.openbas.database.raw.RawFinding;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -35,6 +28,8 @@ public interface FindingRepository
       @NotBlank @Param("value") String value,
       @NotNull @Param("type") ContractOutputType type,
       @NotBlank @Param("key") String key);
+
+  // -- INDEXING --
 
   @Query(
       value =

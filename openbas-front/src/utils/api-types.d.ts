@@ -749,7 +749,6 @@ export interface CreateUserInput {
 }
 
 export interface CustomDashboard {
-  custom_dashboard_content?: CustomDashboardContent;
   /** @format date-time */
   custom_dashboard_created_at: string;
   custom_dashboard_description?: string;
@@ -1042,6 +1041,7 @@ export interface EsSeries {
 }
 
 export interface EsSeriesData {
+  key?: string;
   label?: string;
   /** @format int64 */
   value?: number;
@@ -4629,15 +4629,14 @@ export interface Widget {
   widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "matrix-mitre";
+  widget_type: "vertical-barchart" | "security-coverage";
   /** @format date-time */
   widget_updated_at: string;
 }
 
 export interface WidgetInput {
   widget_config: DateHistogramWidget | StructuralHistogramWidget;
-  widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "matrix-mitre";
+  widget_type: "vertical-barchart" | "security-coverage";
 }
 
 export interface WidgetLayout {

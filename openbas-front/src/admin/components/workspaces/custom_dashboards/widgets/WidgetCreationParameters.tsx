@@ -1,22 +1,23 @@
-import { Autocomplete, FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
+import { Autocomplete, MenuItem, TextField } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { type FunctionComponent, useEffect, useState } from 'react';
 import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-hook-form';
 
 import { engineSchemas } from '../../../../../actions/schema/schema-action';
 import { useFormatter } from '../../../../../components/i18n';
-import { type PropertySchemaDTO, type WidgetInput } from '../../../../../utils/api-types';
+import { type PropertySchemaDTO, type Widget, type WidgetInput } from '../../../../../utils/api-types';
 import { type Option } from '../../../../../utils/Option';
-
-export type WidgetInputForm = Omit<WidgetInput, 'widget_id' | 'widget_layout'>;
+import { getAvailableFields, getAvailableModes } from './WidgetUtils';
 
 const WidgetCreationParameters: FunctionComponent<{
-  control: Control<WidgetInputForm>;
-  setValue: UseFormSetValue<WidgetInputForm>;
-}> = ({ control, setValue }) => {
+  widgetType: Widget['widget_type'];
+  control: Control<WidgetInput>;
+  setValue: UseFormSetValue<WidgetInput>;
+}> = ({ widgetType, control, setValue }) => {
   // Standard hooks
   const { t } = useFormatter();
 
+  // -- WATCH --
   const mode = useWatch({
     control,
     name: 'widget_config.mode',
@@ -26,7 +27,16 @@ const WidgetCreationParameters: FunctionComponent<{
     name: 'widget_config.interval',
   });
 
-  const [options, setOptions] = useState<Option[]>([]);
+  // -- HANDLE MODE --
+  const availableModes = getAvailableModes(widgetType);
+  useEffect(() => {
+    if (availableModes.length === 1) {
+      setValue('widget_config.mode', availableModes[0]); // If only one mode is available, hide the field and set it automatically
+    }
+  }, []);
+
+  // -- HANDLE FIELDS --
+  const [fieldOptions, setFieldOptions] = useState<Option[]>([]);
 
   useEffect(() => {
     engineSchemas().then((response: { data: PropertySchemaDTO[] }) => {
@@ -40,9 +50,15 @@ const WidgetCreationParameters: FunctionComponent<{
             }]),
         ).values(),
       );
-      setOptions(newOptions);
+      const availableFields = getAvailableFields(widgetType);
+      const finalOptions = newOptions.filter(o => availableFields.includes(o.id));
+      setFieldOptions(finalOptions);
+      if (finalOptions.length === 1) {
+        setValue('widget_config.field', newOptions[0].id); // If only one option is available, hide the field and set it automatically
+      }
     });
   }, [mode]);
+
   useEffect(() => {
     if (mode === 'temporal' && !interval) {
       setValue('widget_config.interval', 'day');
@@ -65,53 +81,59 @@ const WidgetCreationParameters: FunctionComponent<{
           />
         )}
       />
-      <Controller
-        control={control}
-        name="widget_config.mode"
-        render={({ field }) => (
-          <TextField
-            {...field}
-            select
-            variant="standard"
-            fullWidth
-            label={t('Mode')}
-            sx={{ mt: 2 }}
-            value={field.value ?? ''}
-            onChange={e => field.onChange(e.target.value)}
-          >
-            <MenuItem value="structural">{t('Structural')}</MenuItem>
-            <MenuItem value="temporal">{t('Temporal')}</MenuItem>
-          </TextField>
+      {availableModes.length > 1
+        && (
+          <Controller
+            control={control}
+            name="widget_config.mode"
+            render={({ field }) => (
+              <TextField
+                {...field}
+                select
+                variant="standard"
+                fullWidth
+                label={t('Mode')}
+                sx={{ mt: 2 }}
+                value={field.value ?? ''}
+                onChange={e => field.onChange(e.target.value)}
+                required={true}
+              >
+                {availableModes.map(mode => <MenuItem key={mode} value={mode}>{t(mode)}</MenuItem>)}
+              </TextField>
+            )}
+          />
         )}
-      />
-      <Controller
-        control={control}
-        name="widget_config.field"
-        render={({ field, fieldState }) => {
-          return (
-            <Autocomplete
-              options={options}
-              value={options.find(o => o.label === field.value) ?? null}
-              onChange={(_, value) => field.onChange(value?.id)}
-              getOptionLabel={option => option.label ?? ''}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  label={t('Field')}
-                  variant="standard"
-                  fullWidth
-                  sx={{ mt: 2 }}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  required={true}
+      {fieldOptions.length > 1
+        && (
+          <Controller
+            control={control}
+            name="widget_config.field"
+            render={({ field, fieldState }) => {
+              return (
+                <Autocomplete
+                  options={fieldOptions}
+                  value={fieldOptions.find(o => o.label === field.value) ?? null}
+                  onChange={(_, value) => field.onChange(value?.id)}
+                  getOptionLabel={option => option.label ?? ''}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      label={t('Field')}
+                      variant="standard"
+                      fullWidth
+                      sx={{ mt: 2 }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                      required={true}
+                    />
+                  )}
+                  freeSolo={false}
                 />
-              )}
-              freeSolo={false}
-            />
-          );
-        }}
-      />
+              );
+            }}
+          />
+        )}
       {mode === 'temporal' && (
         <>
           <Controller
@@ -179,38 +201,40 @@ const WidgetCreationParameters: FunctionComponent<{
           />
         </>
       )}
-      <Controller
-        control={control}
-        name="widget_config.stacked"
-        render={({ field }) => (
-          <FormControlLabel
-            style={{ marginTop: 20 }}
-            control={(
-              <Switch
-                checked={field.value ?? false}
-                onChange={field.onChange}
-              />
-            )}
-            label={t('Stacked')}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="widget_config.display_legend"
-        render={({ field }) => (
-          <FormControlLabel
-            style={{ marginTop: 20 }}
-            control={(
-              <Switch
-                checked={field.value ?? false}
-                onChange={field.onChange}
-              />
-            )}
-            label={t('Display legend')}
-          />
-        )}
-      />
+      {/* TODO: not functionnal for now */}
+      {/* <Controller */}
+      {/*  control={control} */}
+      {/*  name="widget_config.stacked" */}
+      {/*  render={({ field }) => ( */}
+      {/*    <FormControlLabel */}
+      {/*      style={{ marginTop: 20 }} */}
+      {/*      control={( */}
+      {/*        <Switch */}
+      {/*          checked={field.value ?? false} */}
+      {/*          onChange={field.onChange} */}
+      {/*        /> */}
+      {/*      )} */}
+      {/*      label={t('Stacked')} */}
+      {/*    /> */}
+      {/*  )} */}
+      {/* /> */}
+      {/* TODO: not functionnal for now */}
+      {/* <Controller */}
+      {/*  control={control} */}
+      {/*  name="widget_config.display_legend" */}
+      {/*  render={({ field }) => ( */}
+      {/*    <FormControlLabel */}
+      {/*      style={{ marginTop: 20 }} */}
+      {/*      control={( */}
+      {/*        <Switch */}
+      {/*          checked={field.value ?? false} */}
+      {/*          onChange={field.onChange} */}
+      {/*        /> */}
+      {/*      )} */}
+      {/*      label={t('Display legend')} */}
+      {/*    /> */}
+      {/*  )} */}
+      {/* /> */}
     </>
   );
 };
