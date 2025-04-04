@@ -63,4 +63,18 @@ public class InjectExpectationTrace implements Base {
   @JsonProperty("inject_expectation_trace_updated_at")
   @NotNull
   private Instant updatedAt = now();
+
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof InjectExpectationTrace that)) return false;
+
+    if (this.id != null && this.id.equals(that.id)) {
+      return true;
+    }
+
+    return this.injectExpectation.equals(that.injectExpectation)
+            && this.securityPlatform.equals(that.securityPlatform)
+            && this.alertLink.equals(that.alertLink)
+            && this.alertName.equals(that.alertName);
+  }
 }

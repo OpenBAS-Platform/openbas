@@ -27,7 +27,7 @@ public class InjectExpectationTraceApi extends RestBehavior {
   private final CollectorRepository collectorRepository;
 
   @PostMapping()
-  public InjectExpectationTrace createInjectExpectationTraceForCollector(
+  public void createInjectExpectationTraceForCollector(
       @Valid @RequestBody InjectExpectationTraceInput input) {
     InjectExpectationTrace injectExpectationTrace = new InjectExpectationTrace();
     injectExpectationTrace.setUpdateAttributes(input);
@@ -40,7 +40,9 @@ public class InjectExpectationTraceApi extends RestBehavior {
             .findById(input.getSourceId())
             .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
     injectExpectationTrace.setSecurityPlatform(collector.getSecurityPlatform());
-    return this.injectExpectationTraceService.createInjectExpectationTrace(injectExpectationTrace);
+    //return this.injectExpectationTraceService.createInjectExpectationTrace(injectExpectationTrace);
+
+    this.injectExpectationTraceService.batchInsertInjectExecutionTracesCallback(injectExpectationTrace);
   }
 
   @GetMapping()
