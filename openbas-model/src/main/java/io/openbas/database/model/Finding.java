@@ -138,4 +138,16 @@ public class Finding implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("finding_users")
   private List<User> users = new ArrayList<>();
+
+  @JsonProperty("finding_simulation")
+  @Queryable(filterable = true, dynamicValues = true, path = "finding.inject.exercise.id")
+  public Exercise getSimulation() {
+    return getInject().getExercise();
+  }
+
+  @JsonProperty("finding_scenario")
+  @Queryable(filterable = true, dynamicValues = true, path = "finding.inject.scenario.id")
+  public Scenario getScenario() {
+    return getInject().getScenario();
+  }
 }
