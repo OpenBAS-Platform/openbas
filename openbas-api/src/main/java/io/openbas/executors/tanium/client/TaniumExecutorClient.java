@@ -5,8 +5,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.executors.tanium.model.DataEndpoints;
+import io.openbas.service.EndpointService;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -34,11 +38,18 @@ public class TaniumExecutorClient {
 
   public DataEndpoints endpoints() {
     try {
+      final String formattedDateTime =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+              .withZone(ZoneOffset.UTC)
+              .format(Instant.now().minusMillis(EndpointService.DELETE_TTL));
+      // https://help.tanium.com/bundle/ug_gateway_cloud/page/gateway/filter_syntax.html
       String query =
           "{\n"
-              + "\tendpoints(filter: {memberOf: {id: "
+              + "\tendpoints(filter: {any: false, filters: [{memberOf: {id: "
               + this.config.getComputerGroupId()
-              + "}}) {\n"
+              + "}}, {path: \"eidLastSeen\", op: GT, value: \""
+              + formattedDateTime
+              + "\"}]}) {\n"
               + "    edges {\n"
               + "      node {\n"
               + "        id\n"
