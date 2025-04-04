@@ -2,6 +2,7 @@ package io.openbas.utils;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.*;
+import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.inject.output.InjectTestStatusOutput;
 import io.openbas.rest.payload.output.PayloadSimple;
 import java.util.*;
@@ -225,6 +226,14 @@ public class InjectMapper {
         .id(attackPattern.getId())
         .name(attackPattern.getName())
         .externalId(attackPattern.getExternalId())
+        .build();
+  }
+
+  public InjectSimple toInjectSimple(Inject inject) {
+    return InjectSimple.builder()
+        .id(inject.getId())
+        .title(inject.getTitle())
+        .tags(inject.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet()))
         .build();
   }
 }

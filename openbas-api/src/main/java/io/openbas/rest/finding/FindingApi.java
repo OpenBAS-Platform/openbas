@@ -1,6 +1,5 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
 import io.openbas.database.model.Finding;
@@ -40,15 +39,17 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping("/injects/{injectId}/search")
-  public Page<Finding> findingsByInject(
+  public Page<FindingOutput> findingsByInject(
       @PathVariable @NotNull final String injectId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
-        (Specification<Finding> specification, Pageable pageable) ->
-            this.findingRepository.findAll(
-                FindingSpecification.findFindingsForInject(injectId).and(specification), pageable),
-        handleEndpointFilter(searchPaginationInput),
-        Finding.class);
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.findFindingsForInject(injectId).and(specification),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
   }
 
   @GetMapping("/{id}")
