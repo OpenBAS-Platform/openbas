@@ -336,7 +336,7 @@ const Endpoints = () => {
                             inline
                             endpoint={{
                               ...endpoint,
-                              type: 'static',
+                              is_static: true,
                             }}
                             onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
                           />

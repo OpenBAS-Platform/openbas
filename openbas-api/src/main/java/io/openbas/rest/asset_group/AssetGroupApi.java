@@ -4,7 +4,6 @@ import static io.openbas.database.model.User.ROLE_USER;
 import static io.openbas.database.specification.AssetGroupSpecification.fromIds;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
-import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 
 import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.AssetGroup;
@@ -26,15 +25,12 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.List;
 import java.util.Objects;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,17 +81,23 @@ public class AssetGroupApi extends RestBehavior {
 
     Page<Endpoint> endpointPage =
         endpointService.searchManagedEndpoints(
-            EndpointSpecification.findEndpointsForAssetGroup(assetGroupId), assetGroupId, searchPaginationInput);
+            EndpointSpecification.findEndpointsForAssetGroup(assetGroupId),
+            assetGroupId,
+            searchPaginationInput);
     // Convert the Page of Endpoint to a Page of EndpointOutput
     List<EndpointOutput> endpointOutputs =
-        endpointPage.getContent().stream().map(endpoint -> {
-          Boolean isPresent = endpoint.getAssetGroups().stream().map(AssetGroup::getId)
-              .anyMatch(id -> Objects.equals(id,
-                  assetGroupId));
-          EndpointOutput endpointOutput = endpointMapper.toEndpointOutput(endpoint);
-          endpointOutput.setIsStatic(isPresent);
-          return endpointOutput;
-        }).toList();
+        endpointPage.getContent().stream()
+            .map(
+                endpoint -> {
+                  Boolean isPresent =
+                      endpoint.getAssetGroups().stream()
+                          .map(AssetGroup::getId)
+                          .anyMatch(id -> Objects.equals(id, assetGroupId));
+                  EndpointOutput endpointOutput = endpointMapper.toEndpointOutput(endpoint);
+                  endpointOutput.setIsStatic(isPresent);
+                  return endpointOutput;
+                })
+            .toList();
     return new PageImpl<>(
         endpointOutputs, endpointPage.getPageable(), endpointPage.getTotalElements());
   }
