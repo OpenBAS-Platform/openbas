@@ -79,7 +79,7 @@
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.2.0",
     "@types/d3-hierarchy": "3.1.7",
-    "@types/node": "22.13.14",
+    "@types/node": "22.14.0",
     "@types/pdfmake": "0.2.11",
     "@types/qs": "6",
     "@types/react": "19.0.12",
