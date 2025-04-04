@@ -2,6 +2,7 @@ package io.openbas.utils;
 
 import io.openbas.database.model.Finding;
 import io.openbas.rest.finding.form.FindingOutput;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -32,8 +33,14 @@ public class FindingMapper {
                 .map(asset -> endpointMapper.toEndpointOutput(asset))
                 .collect(Collectors.toSet()))
         .inject(injectMapper.toInjectSimple(finding.getInject()))
-        .simulation(exerciseMapper.toExerciseSimple(finding.getInject().getExercise()))
-        .scenario(scenarioMapper.toScenarioSimple(finding.getInject().getScenario()))
+        .simulation(
+            Optional.ofNullable(finding.getInject().getExercise())
+                .map(exercise -> exerciseMapper.toExerciseSimple(exercise))
+                .orElse(null))
+        .scenario(
+            Optional.ofNullable(finding.getInject().getScenario())
+                .map(scenario -> scenarioMapper.toScenarioSimple(scenario))
+                .orElse(null))
         .tagIds(finding.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet()))
         .creationDate(finding.getCreationDate())
         .build();
