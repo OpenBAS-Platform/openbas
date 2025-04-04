@@ -1,5 +1,6 @@
 package io.openbas.service;
 
+import static io.openbas.database.model.Filters.isEmptyFilterGroup;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -147,14 +148,14 @@ public class EndpointService {
       Specification<Endpoint> spec, String assetGroupId, SearchPaginationInput searchPaginationInput) {
     AssetGroup assetGroup = assetGroupRepository.findById(assetGroupId).get();
     Specification<Endpoint> specificationDynamic = computeFilterGroupJpa(assetGroup.getDynamicFilter());
-    if (specificationDynamic != null) {
+    if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
       Specification<Endpoint> specificationDynamicWithInjection = specificationDynamic.and(
           EndpointSpecification.findEndpointsForInjection());
       Specification<Endpoint> specificationStatic = spec.and(EndpointSpecification.findEndpointsForInjection());
       return buildPaginationJPA(
           (Specification<Endpoint> specification, Pageable pageable) ->
               this.endpointRepository.findAll(
-                  specificationDynamicWithInjection.or(specificationStatic).and(specification),
+                  Specification.where(specificationDynamicWithInjection.or(specificationStatic)).and(specification),
                   pageable),
           handleEndpointFilter(searchPaginationInput),
           Endpoint.class);

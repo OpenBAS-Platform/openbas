@@ -28,6 +28,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -87,7 +88,14 @@ public class AssetGroupApi extends RestBehavior {
             EndpointSpecification.findEndpointsForAssetGroup(assetGroupId), assetGroupId, searchPaginationInput);
     // Convert the Page of Endpoint to a Page of EndpointOutput
     List<EndpointOutput> endpointOutputs =
-        endpointPage.getContent().stream().map(endpointMapper::toEndpointOutput).toList();
+        endpointPage.getContent().stream().map(endpoint -> {
+          Boolean isPresent = endpoint.getAssetGroups().stream().map(AssetGroup::getId)
+              .anyMatch(id -> Objects.equals(id,
+                  assetGroupId));
+          EndpointOutput endpointOutput = endpointMapper.toEndpointOutput(endpoint);
+          endpointOutput.setIsStatic(isPresent);
+          return endpointOutput;
+        }).toList();
     return new PageImpl<>(
         endpointOutputs, endpointPage.getPageable(), endpointPage.getTotalElements());
   }
