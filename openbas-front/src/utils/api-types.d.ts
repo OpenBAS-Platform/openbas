@@ -181,6 +181,7 @@ export interface AssetGroup {
   asset_group_dynamic_assets?: string[];
   /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
+  asset_group_external_reference?: string;
   asset_group_id: string;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -845,6 +846,18 @@ export interface EndpointRegisterInput {
   seenIp?: string;
 }
 
+export interface EndpointSimple {
+  /** Asset Id */
+  asset_id: string;
+  /** Asset name */
+  asset_name: string;
+  /**
+   * Tags
+   * @uniqueItems true
+   */
+  asset_tags?: string[];
+}
+
 export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
@@ -1238,6 +1251,23 @@ export interface FindingInput {
   finding_field: string;
   finding_inject_id?: string;
   finding_labels?: string[];
+  finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  finding_value: string;
+}
+
+export interface FindingOutput {
+  /** @uniqueItems true */
+  finding_assets?: EndpointSimple[];
+  /** @format date-time */
+  finding_created_at: string;
+  finding_field: string;
+  finding_id: string;
+  finding_inject?: InjectSimple;
+  finding_name: string;
+  finding_scenario?: ScenarioSimple;
+  finding_simulation?: ExerciseSimple;
+  /** @uniqueItems true */
+  finding_tags?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
   finding_value: string;
 }
@@ -1747,6 +1777,13 @@ export interface InjectResultOverviewOutput {
   injects_documents?: string[];
   /** Tags */
   injects_tags?: string[];
+}
+
+export interface InjectSimple {
+  inject_id: string;
+  /** @uniqueItems true */
+  inject_tags?: string[];
+  inject_title: string;
 }
 
 export interface InjectStatus {
@@ -2509,8 +2546,8 @@ export interface PageExerciseSimple {
   totalPages?: number;
 }
 
-export interface PageFinding {
-  content?: Finding[];
+export interface PageFindingOutput {
+  content?: FindingOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
