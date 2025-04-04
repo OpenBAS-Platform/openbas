@@ -6,12 +6,10 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 
 import io.openbas.database.model.Agent;
+import io.openbas.database.model.Asset;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Tag;
-import io.openbas.rest.asset.endpoint.form.AgentOutput;
-import io.openbas.rest.asset.endpoint.form.EndpointOutput;
-import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
-import io.openbas.rest.asset.endpoint.form.ExecutorOutput;
+import io.openbas.rest.asset.endpoint.form.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +30,14 @@ public class EndpointMapper {
         .platform(endpoint.getPlatform())
         .arch(endpoint.getArch())
         .tags(endpoint.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
+        .build();
+  }
+
+  public EndpointSimple toEndpointOutput(Asset asset) {
+    return EndpointSimple.builder()
+        .id(asset.getId())
+        .name(asset.getName())
+        .tags(asset.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .build();
   }
 
