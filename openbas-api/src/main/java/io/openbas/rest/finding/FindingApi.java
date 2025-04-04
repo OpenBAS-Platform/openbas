@@ -52,6 +52,34 @@ public class FindingApi extends RestBehavior {
         .map(findingMapper::toFindingOutput);
   }
 
+  @PostMapping("/exercises/{simulationId}/search")
+  public Page<FindingOutput> findingsBySimulation(
+      @PathVariable @NotNull final String simulationId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.findFindingsForSimulation(simulationId).and(specification),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
+  @PostMapping("/scenarios/{scenarioId}/search")
+  public Page<FindingOutput> findingsByScenario(
+      @PathVariable @NotNull final String scenarioId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.findFindingsForScenario(scenarioId).and(specification),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<Finding> finding(@PathVariable @NotNull final String id) {
     return ResponseEntity.ok(this.findingService.finding(id));
