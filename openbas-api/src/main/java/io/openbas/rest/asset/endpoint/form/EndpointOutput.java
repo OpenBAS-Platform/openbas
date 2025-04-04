@@ -8,9 +8,7 @@ import io.openbas.database.model.Endpoint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.Set;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

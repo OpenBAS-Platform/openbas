@@ -23,7 +23,6 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
@@ -54,8 +52,7 @@ public class EndpointService {
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
@@ -145,26 +142,31 @@ public class EndpointService {
   }
 
   public Page<Endpoint> searchManagedEndpoints(
-      Specification<Endpoint> spec, String assetGroupId, SearchPaginationInput searchPaginationInput) {
+      Specification<Endpoint> spec,
+      String assetGroupId,
+      SearchPaginationInput searchPaginationInput) {
     AssetGroup assetGroup = assetGroupRepository.findById(assetGroupId).get();
-    Specification<Endpoint> specificationDynamic = computeFilterGroupJpa(assetGroup.getDynamicFilter());
+    Specification<Endpoint> specificationDynamic =
+        computeFilterGroupJpa(assetGroup.getDynamicFilter());
     if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
-      Specification<Endpoint> specificationDynamicWithInjection = specificationDynamic.and(
-          EndpointSpecification.findEndpointsForInjection());
-      Specification<Endpoint> specificationStatic = spec.and(EndpointSpecification.findEndpointsForInjection());
+      Specification<Endpoint> specificationDynamicWithInjection =
+          specificationDynamic.and(EndpointSpecification.findEndpointsForInjection());
+      Specification<Endpoint> specificationStatic =
+          spec.and(EndpointSpecification.findEndpointsForInjection());
       return buildPaginationJPA(
           (Specification<Endpoint> specification, Pageable pageable) ->
               this.endpointRepository.findAll(
-                  Specification.where(specificationDynamicWithInjection.or(specificationStatic)).and(specification),
+                  Specification.where(specificationDynamicWithInjection.or(specificationStatic))
+                      .and(specification),
                   pageable),
           handleEndpointFilter(searchPaginationInput),
           Endpoint.class);
     } else {
-      Specification<Endpoint> specificationStatic = spec.and(EndpointSpecification.findEndpointsForInjection());
+      Specification<Endpoint> specificationStatic =
+          spec.and(EndpointSpecification.findEndpointsForInjection());
       return buildPaginationJPA(
           (Specification<Endpoint> specification, Pageable pageable) ->
-              this.endpointRepository.findAll(specificationStatic.and(specification),
-                  pageable),
+              this.endpointRepository.findAll(specificationStatic.and(specification), pageable),
           handleEndpointFilter(searchPaginationInput),
           Endpoint.class);
     }

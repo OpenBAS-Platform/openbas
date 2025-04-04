@@ -6,16 +6,13 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.validation.constraints.NotBlank;
-
 import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
 public class EndpointSpecification {
 
-  private EndpointSpecification() {
-  }
+  private EndpointSpecification() {}
 
   public static Specification<Endpoint> findEndpointsForInjection() {
     return (root, query, criteriaBuilder) -> {
@@ -32,8 +29,7 @@ public class EndpointSpecification {
       Join<Endpoint, AssetGroup> assetGroupJoin = root.join("assetGroups", JoinType.LEFT);
       query.groupBy(root.get("id"));
       query.distinct(true);
-      return criteriaBuilder.and(
-          criteriaBuilder.equal(assetGroupJoin.get("id"), assetGroupId));
+      return criteriaBuilder.and(criteriaBuilder.equal(assetGroupJoin.get("id"), assetGroupId));
     };
   }
 
