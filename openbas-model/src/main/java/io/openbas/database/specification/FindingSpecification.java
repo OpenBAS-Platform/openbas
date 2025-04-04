@@ -21,4 +21,8 @@ public class FindingSpecification {
   public static Specification<Finding> findFindingsForScenario(@NotNull final String scenarioId) {
     return (root, query, cb) -> cb.equal(root.get("inject").get("scenario").get("id"), scenarioId);
   }
+
+  public static Specification<Finding> findFindingsForEndpoint(@NotNull final String endpointId) {
+    return (root, query, cb) -> cb.equal(root.get("assets").get("id"), endpointId);
+  }
 }

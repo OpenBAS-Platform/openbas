@@ -80,6 +80,20 @@ public class FindingApi extends RestBehavior {
         .map(findingMapper::toFindingOutput);
   }
 
+  @PostMapping("/endpoints/{endpointId}/search")
+  public Page<FindingOutput> findingsByEndpoint(
+      @PathVariable @NotNull final String endpointId,
+      @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
+    return buildPaginationJPA(
+            (Specification<Finding> specification, Pageable pageable) ->
+                this.findingRepository.findAll(
+                    FindingSpecification.findFindingsForEndpoint(endpointId).and(specification),
+                    pageable),
+            searchPaginationInput,
+            Finding.class)
+        .map(findingMapper::toFindingOutput);
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<Finding> finding(@PathVariable @NotNull final String id) {
     return ResponseEntity.ok(this.findingService.finding(id));
