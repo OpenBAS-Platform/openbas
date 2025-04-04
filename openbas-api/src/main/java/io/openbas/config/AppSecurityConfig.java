@@ -124,8 +124,6 @@ public class AppSecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/reset/**")
                     .permitAll()
-                    .requestMatchers("/api/injects/execution/**")
-                    .permitAll()
                     .requestMatchers("/api/**")
                     .authenticated()
                     .anyRequest()

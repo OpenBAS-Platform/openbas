@@ -5,10 +5,12 @@ import static io.openbas.utils.InjectExecutionUtils.convertExecutionStatus;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.AgentRepository;
+import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.finding.FindingService;
+import io.openbas.rest.inject.form.InjectExecutionCallback;
 import io.openbas.rest.inject.form.InjectExecutionInput;
 import io.openbas.rest.inject.form.InjectUpdateStatusInput;
 import io.openbas.utils.InjectUtils;
@@ -16,9 +18,12 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -34,6 +39,12 @@ public class InjectStatusService {
   private final InjectUtils injectUtils;
   private final InjectStatusRepository injectStatusRepository;
   private final FindingService findingService;
+  private final FindingRepository findingRepository;
+
+  ScheduledFuture<?> scheduledTask = null;
+  final BlockingQueue<InjectExecutionCallback> callbacksWaiting = new LinkedBlockingQueue<>();
+
+  private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(20);
 
   public List<InjectStatus> findPendingInjectStatusByType(String injectType) {
     return this.injectStatusRepository.pendingForInjectType(injectType);
@@ -126,59 +137,91 @@ public class InjectStatusService {
     computeExecutionTraceStatusIfNeeded(injectStatus, executionTraces, agent);
     injectStatus.addTrace(executionTraces);
 
-    synchronized (inject.getId()) {
-      if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
-          && (agent == null || isAllInjectAgentsExecuted(inject))) {
-        updateFinalInjectStatus(injectStatus);
-      }
-
-      injectRepository.save(inject);
+    if (executionTraces.getAction().equals(ExecutionTraceAction.COMPLETE)
+        && (agent == null || isAllInjectAgentsExecuted(inject))) {
+      updateFinalInjectStatus(injectStatus);
     }
   }
 
-  public void handleInjectExecutionCallback(
-      String injectId, String agentId, InjectExecutionInput input) {
-    Inject inject = null;
+  public void handleInjectExecutionCallback(List<InjectExecutionCallback> inputs) {
+    Map<String, Inject> injectMap = injectRepository
+            .findAllById(inputs.stream().map(InjectExecutionCallback::getInjectId).toList())
+            .stream()
+            .collect(Collectors.toMap(Inject::getId, inject -> inject));
 
-    try {
-      inject =
-          injectRepository
-              .findById(injectId)
-              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
+    Map<String, Agent> agentMap = StreamSupport.stream(agentRepository
+            .findAllById(inputs.stream().map(InjectExecutionCallback::getAgentId).toList())
+            .spliterator(), false)
+            .collect(Collectors.toMap(Agent::getId, agent -> agent));
 
-      Agent agent =
-          (agentId == null)
-              ? null
-              : agentRepository
-                  .findById(agentId)
-                  .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
+    Set<Inject> injectsList = new HashSet<>();
+    List<Finding> findingsList = new ArrayList<>();
 
-      // -- UPDATE STATUS --
-      updateInjectStatus(agent, inject, input);
+    for (InjectExecutionCallback injectExecutionCallback : inputs) {
+      Inject inject = null;
 
-      // -- FINDINGS --
-      findingService.computeFindings(input, inject, agent);
+      try {
+        inject = injectMap.get(injectExecutionCallback.getInjectId());
 
-    } catch (Exception e) {
-      log.log(Level.SEVERE, e.getMessage());
-      if (inject != null) {
-        inject
-            .getStatus()
-            .ifPresent(
-                status -> {
-                  ExecutionTraces trace =
-                      new ExecutionTraces(
-                          status,
-                          ExecutionTraceStatus.ERROR,
-                          null,
-                          e.getMessage(),
-                          ExecutionTraceAction.COMPLETE,
-                          null,
-                          Instant.now());
-                  status.addTrace(trace);
-                });
-        injectRepository.save(inject);
+        Agent agent = agentMap.get(injectExecutionCallback.getAgentId());
+
+        // -- UPDATE STATUS --
+        updateInjectStatus(agent, inject, injectExecutionCallback.getInjectExecutionInput());
+
+        // -- FINDINGS --
+        findingsList.addAll(findingService.computeFindings(injectExecutionCallback.getInjectExecutionInput(), inject, agent));
+
+      } catch (Exception e) {
+        log.log(Level.SEVERE, e.getMessage());
+        if (inject != null) {
+          inject
+                  .getStatus()
+                  .ifPresent(
+                          status -> {
+                            ExecutionTraces trace =
+                                    new ExecutionTraces(
+                                            status,
+                                            ExecutionTraceStatus.ERROR,
+                                            null,
+                                            e.getMessage(),
+                                            ExecutionTraceAction.COMPLETE,
+                                            null,
+                                            Instant.now());
+                            status.addTrace(trace);
+                          });
+        }
+      } finally {
+        if(inject != null) {
+          injectsList.add(inject);
+        }
       }
+    }
+    injectRepository.saveAll(injectsList);
+    findingRepository.saveAll(findingsList);
+  }
+
+  public void batchInjectExecutionCallback(InjectExecutionCallback input) {
+    callbacksWaiting.add(input);
+    if(callbacksWaiting.size() > 1000) {
+      scheduledTask = null;
+      executorService.submit(() -> {
+        scheduledTask.cancel(true);
+        batchInsert();
+      });
+    } else {
+      if(scheduledTask == null) {
+        scheduledTask = executorService.schedule(this::batchInsert, 10, TimeUnit.SECONDS);
+      }
+    }
+  }
+
+  private void batchInsert() {
+    try {
+      List<InjectExecutionCallback> callbacks = new ArrayList<>();
+      callbacksWaiting.drainTo(callbacks);
+      handleInjectExecutionCallback(callbacks);
+    } catch (RuntimeException e) {
+      log.severe(e.getMessage());
     }
   }
 

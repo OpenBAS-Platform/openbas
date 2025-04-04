@@ -83,13 +83,15 @@ public class FindingService {
 
   // -- EXTRACTION FINDINGS --
 
-  public void computeFindings(InjectExecutionInput input, Inject inject, Agent agent) {
+  public List<Finding> computeFindings(InjectExecutionInput input, Inject inject, Agent agent) {
+    List<Finding> findingList = new ArrayList<>();
     // Used for inject with payload
     if (agent != null) {
-      extractFindingsFromRawOutput(input, inject, agent);
+      findingList = extractFindingsFromRawOutput(input, inject, agent);
     }
     // Used for injectors
     extractFindingsFromStructuredOutput(input, inject);
+    return findingList;
   }
 
   // -- STRUCTURED OUTPUT --
@@ -134,7 +136,7 @@ public class FindingService {
                 }
               });
         }
-        this.createFindings(findings, inject.getId());
+        this.createFindings(findings, inject);
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
@@ -173,23 +175,25 @@ public class FindingService {
 
   // -- RAW OUTPUT --
 
-  public void extractFindingsFromRawOutput(InjectExecutionInput input, Inject inject, Agent agent) {
+  public List<Finding> extractFindingsFromRawOutput(InjectExecutionInput input, Inject inject, Agent agent) {
+    List<Finding> findingList = new ArrayList<>();
     if (ExecutionTraceAction.EXECUTION.equals(convertExecutionAction(input.getAction()))) {
       inject
           .getPayload()
           .ifPresent(
               payload -> {
                 if (payload.getOutputParsers() != null && !payload.getOutputParsers().isEmpty()) {
-                  extractFindings(inject, agent.getAsset(), input.getMessage());
+                  findingList.addAll(extractFindings(inject, agent.getAsset(), input.getMessage()));
                 } else {
                   log.info(
                       "No output parsers available for payload used in inject:" + inject.getId());
                 }
               });
     }
+    return findingList;
   }
 
-  private void extractFindings(Inject inject, Asset asset, String trace) {
+  private List<Finding> extractFindings(Inject inject, Asset asset, String trace) {
     List<Finding> findings = new ArrayList<>();
     inject
         .getPayload()
@@ -216,6 +220,6 @@ public class FindingService {
                       }
                     }));
 
-    findingRepository.saveAll(findings);
+    return findings;
   }
 }
