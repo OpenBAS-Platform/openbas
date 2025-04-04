@@ -19,7 +19,16 @@ import {
 const AtomicTestingFindings: FunctionComponent = () => {
   const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
 
-  const availableFilterNames = ['finding_type'];
+  const availableFilterNames = [
+    'finding_type',
+    'finding_value',
+    'finding_name',
+    'finding_tags',
+    'finding_inject',
+    'finding_created_at',
+    'finding_assets',
+  ];
+
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
   const assetsMap = new Map<string, TargetSimple>();
   injectResultOverviewOutput?.inject_targets.forEach((target) => {
