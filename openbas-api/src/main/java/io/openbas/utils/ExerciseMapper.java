@@ -2,6 +2,7 @@ package io.openbas.utils;
 
 import static java.util.Collections.emptyList;
 
+import io.openbas.database.model.Exercise;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
@@ -141,6 +142,20 @@ public class ExerciseMapper {
     simple.setStatus(ExerciseStatus.valueOf(rawExercise.getExercise_status()));
     simple.setStart(rawExercise.getExercise_start_date());
     simple.setUpdatedAt(rawExercise.getExercise_updated_at());
+
+    return simple;
+  }
+
+  public ExerciseSimple toExerciseSimple(Exercise exercise) {
+    ExerciseSimple simple = new ExerciseSimple();
+    simple.setId(exercise.getId());
+    simple.setName(exercise.getName());
+    simple.setTagIds(
+        exercise.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet()));
+    simple.setCategory(exercise.getCategory());
+    simple.setSubtitle(exercise.getSubtitle());
+    simple.setStatus(exercise.getStatus());
+    simple.setUpdatedAt(exercise.getUpdatedAt());
 
     return simple;
   }
