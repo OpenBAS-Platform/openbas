@@ -1,4 +1,4 @@
-package io.openbas.utils.schema;
+package io.openbas.schema;
 
 import static lombok.AccessLevel.NONE;
 import static org.springframework.util.StringUtils.hasText;
@@ -6,6 +6,7 @@ import static org.springframework.util.StringUtils.hasText;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +35,10 @@ public class PropertySchema {
 
   private final JoinTable joinTable;
   private final String path;
+  private final String label;
+  private final String entity;
   private final String[] paths;
+  private final boolean keyword;
 
   @Singular("propertySchema")
   private final List<PropertySchema> propertiesSchema;
@@ -47,6 +51,18 @@ public class PropertySchema {
   @Getter
   public static class JoinTable {
     private final String joinOn;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    PropertySchema that = (PropertySchema) o;
+    return Objects.equals(name, that.name) && Objects.equals(type, that.type);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, type);
   }
 
   // -- VALIDATION --

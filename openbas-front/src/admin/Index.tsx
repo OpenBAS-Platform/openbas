@@ -35,6 +35,8 @@ const Teams = lazy(() => import('./components/teams/Index'));
 const IndexComponents = lazy(() => import('./components/components/Index'));
 const IndexIntegrations = lazy(() => import('./components/integrations/Index'));
 const IndexAgents = lazy(() => import('./components/agents/Agents'));
+const CustomDashboards = lazy(() => import('./components/workspaces/custom_dashboards/CustomDashboards'));
+const IndexCustomDashboard = lazy(() => import('./components/workspaces/custom_dashboards/Index'));
 const Payloads = lazy(() => import('./components/payloads/Payloads'));
 const IndexSettings = lazy(() => import('./components/settings/Index'));
 
@@ -105,6 +107,8 @@ const Index = () => {
               <Route path="assets/*" element={errorWrapper(Assets)()} />
               <Route path="teams/*" element={errorWrapper(Teams)()} />
               <Route path="components/*" element={errorWrapper(IndexComponents)()} />
+              <Route path="workspaces/custom_dashboards" element={errorWrapper(CustomDashboards)()} />
+              <Route path="workspaces/custom_dashboards/:customDashboardId/*" element={errorWrapper(IndexCustomDashboard)()} />
               <Route path="payloads" element={errorWrapper(Payloads)()} />
               <Route path="integrations/*" element={errorWrapper(IndexIntegrations)()} />
               <Route path="agents/*" element={errorWrapper(IndexAgents)()} />
