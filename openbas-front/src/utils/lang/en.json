@@ -547,6 +547,8 @@
   "finding_tags": "Tags",
   "finding_type": "Type",
   "finding_value": "Value",
+  "finding_scenario": "Scenario",
+  "finding_simulation": "Simulation",
   "Findings": "Findings",
   "Finished": "Finished",
   "First": "First",
