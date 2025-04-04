@@ -1,6 +1,5 @@
 package io.openbas.rest.finding;
 
-import static io.openbas.utils.ArchitectureFilterUtils.handleArchitectureFilter;
 import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
@@ -8,7 +7,9 @@ import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
 import io.openbas.rest.finding.form.FindingInput;
+import io.openbas.rest.finding.form.FindingOutput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.utils.FindingMapper;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -27,16 +28,15 @@ public class FindingApi extends RestBehavior {
   private final FindingRepository findingRepository;
 
   private final FindingService findingService;
+  private final FindingMapper findingMapper;
 
   // -- CRUD --
 
   @PostMapping("/search")
-  public Page<Finding> findings(
+  public Page<FindingOutput> findings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
-    return buildPaginationJPA(
-        this.findingRepository::findAll,
-        handleArchitectureFilter(searchPaginationInput),
-        Finding.class);
+    return buildPaginationJPA(this.findingRepository::findAll, searchPaginationInput, Finding.class)
+        .map(findingMapper::toFindingOutput);
   }
 
   @PostMapping("/injects/{injectId}/search")
