@@ -3,6 +3,7 @@ package io.openbas.schema;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import jakarta.persistence.Column;
@@ -15,7 +16,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -186,6 +190,14 @@ public class SchemaUtils {
         } else if (hasText(queryable.path()) || queryable.paths().length > 0) {
           builder.type(queryable.clazz()); // Override
         }
+      }
+    } else if (annotation.annotationType().equals(EsQueryable.class)) {
+      EsQueryable esQueryable =
+          member instanceof Field
+              ? ((Field) member).getAnnotation(EsQueryable.class)
+              : ((Method) member).getAnnotation(EsQueryable.class);
+      if (esQueryable != null) {
+        builder.keyword(esQueryable.keyword());
       }
     } else if (annotation.annotationType().equals(JoinTable.class)) {
       builder.joinTable(

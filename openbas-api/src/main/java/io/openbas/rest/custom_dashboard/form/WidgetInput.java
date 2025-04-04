@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.Widget;
+import io.openbas.database.model.Widget.WidgetType;
 import io.openbas.database.model.WidgetLayout;
 import io.openbas.engine.api.HistogramWidget;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +18,7 @@ public class WidgetInput {
 
   @JsonProperty("widget_type")
   @NotNull(message = MANDATORY_MESSAGE)
-  private Widget.WidgetType type;
+  private WidgetType type;
 
   @JsonProperty("widget_config")
   @NotNull(message = MANDATORY_MESSAGE)

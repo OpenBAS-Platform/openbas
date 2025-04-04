@@ -24,7 +24,8 @@ import io.openbas.engine.Handler;
 import io.openbas.engine.api.*;
 import io.openbas.engine.api.DateHistogramWidget.DateHistogramSeries;
 import io.openbas.engine.api.StructuralHistogramWidget.StructuralHistogramSeries;
-import io.openbas.engine.model.*;
+import io.openbas.engine.model.EsBase;
+import io.openbas.engine.model.EsSearch;
 import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
@@ -32,45 +33,33 @@ import io.openbas.schema.SchemaUtils;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class EsService {
 
   private static final Logger LOGGER = Logger.getLogger(EsService.class.getName());
   private final List<String> BASE_FIELDS = List.of("base_id", "base_entity", "base_representative");
 
-  private EsEngine esEngine;
-  private ElasticsearchClient elasticClient;
-  private IndexingStatusRepository indexingStatusRepository;
-  private EngineConfig engineConfig;
+  private final EsEngine esEngine;
+  private final ElasticsearchClient elasticClient;
+  private final IndexingStatusRepository indexingStatusRepository;
+  private final EngineConfig engineConfig;
 
-  @Autowired
-  public void setEngineConfig(EngineConfig engineConfig) {
-    this.engineConfig = engineConfig;
-  }
+  private static final ConcurrentHashMap<String, PropertySchema> cacheMap =
+      new ConcurrentHashMap<>();
 
-  @Autowired
-  public void setEsEngine(EsEngine esEngine) {
-    this.esEngine = esEngine;
-  }
-
-  @Autowired
-  public void setElasticClient(ElasticsearchClient elasticClient) {
-    this.elasticClient = elasticClient;
-  }
-
-  @Autowired
-  public void setIndexingStatusRepository(IndexingStatusRepository indexingStatusRepository) {
-    this.indexingStatusRepository = indexingStatusRepository;
-  }
-
-  // TODO ADD IN CONSTRUCTOR OR CACHE
+  // TODO Test cache
   private Map<String, PropertySchema> getIndexingSchema() {
+    if (!cacheMap.isEmpty()) {
+      return cacheMap;
+    }
     Set<PropertySchema> properties =
         esEngine.getModels().stream()
             .flatMap(
@@ -83,7 +72,8 @@ public class EsService {
                 })
             .filter(PropertySchema::isFilterable)
             .collect(Collectors.toSet());
-    return properties.stream().collect(Collectors.toMap(PropertySchema::getName, prop -> prop));
+    properties.forEach(p -> cacheMap.putIfAbsent(p.getName(), p));
+    return cacheMap;
   }
 
   private FieldValue toVal(String field, String value, Map<String, String> parameters) {
@@ -111,9 +101,8 @@ public class EsService {
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
-    // TODO MUST BE PART OF QUERYABLE IN THE SCHEMA
-    String elasticField =
-        field.endsWith("_id") || field.endsWith("_side") ? (field + ".keyword") : field;
+    PropertySchema propertyField = getIndexingSchema().get(field);
+    String elasticField = propertyField.isKeyword() ? (field + ".keyword") : field;
     switch (operator) {
       case eq:
         List<Query> queryList =
@@ -244,8 +233,8 @@ public class EsService {
   // endregion
 
   // region indexing
-  public void bulkParallelProcessing() {
-    List<EsModel<?>> models = this.esEngine.getModels();
+  public <T extends EsBase> void bulkParallelProcessing() {
+    List<EsModel<T>> models = this.esEngine.getModels();
     LOGGER.info("Executing bulk parallel processing for " + models.size() + " models");
     models.stream()
         .parallel()
@@ -379,7 +368,7 @@ public class EsService {
                     String key = b.key().stringValue();
                     String label = isSideAggregation ? resolutions.get(key) : key;
                     String seriesKey = label != null ? label : "deleted";
-                    return new EsSeriesData(seriesKey, b.docCount());
+                    return new EsSeriesData(key, seriesKey, b.docCount());
                   })
               .toList();
       return new EsSeries(config.getName(), data);
@@ -441,7 +430,10 @@ public class EsService {
           response.aggregations().get(aggregationKey).dateHistogram().buckets();
       List<EsSeriesData> data =
           buckets.array().stream()
-              .map(b -> new EsSeriesData(Instant.ofEpochMilli(b.key()).toString(), b.docCount()))
+              .map(
+                  b ->
+                      new EsSeriesData(
+                          b.keyAsString(), Instant.ofEpochMilli(b.key()).toString(), b.docCount()))
               .toList();
       return new EsSeries(config.getName(), data);
     } catch (IOException e) {

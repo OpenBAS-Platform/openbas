@@ -6,7 +6,10 @@ import { useFormatter } from '../../../../../components/i18n';
 import { type Widget } from '../../../../../utils/api-types';
 import { renderWidgetIcon, widgetVisualizationTypes } from './WidgetUtils';
 
-const WidgetCreationTypes: FunctionComponent<{ onChange: (type: Widget['widget_type']) => void }> = ({ onChange }) => {
+const WidgetCreationTypes: FunctionComponent<{
+  value: Widget['widget_type'];
+  onChange: (type: Widget['widget_type']) => void;
+}> = ({ value, onChange }) => {
   // Standard hooks
   const { t } = useFormatter();
   const theme = useTheme();
@@ -19,32 +22,36 @@ const WidgetCreationTypes: FunctionComponent<{ onChange: (type: Widget['widget_t
         gridTemplateColumns: '1fr 1fr 1fr',
       }}
     >
-      {widgetVisualizationTypes.map(visualizationType => (
-        <Card
-          key={visualizationType.category}
-          variant="outlined"
-          style={{
-            height: 100,
-            textAlign: 'center',
-          }}
-        >
-          <CardActionArea
-            onClick={() => onChange(visualizationType.category)}
-            aria-label={t(visualizationType.name)}
+      {widgetVisualizationTypes.map((visualizationType) => {
+        const isSelected = value === visualizationType.category;
+        return (
+          <Card
+            key={visualizationType.category}
+            variant="outlined"
+            style={{
+              height: 100,
+              textAlign: 'center',
+              borderColor: isSelected ? `${theme.palette.primary.main}` : undefined,
+            }}
           >
-            <CardContent>
-              {renderWidgetIcon(visualizationType.category, 'large')}
-              <Typography
-                gutterBottom
-                variant="body1"
-                sx={{ mt: 1 }}
-              >
-                {t(visualizationType.name)}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-      ))}
+            <CardActionArea
+              onClick={() => onChange(visualizationType.category)}
+              aria-label={t(visualizationType.name)}
+            >
+              <CardContent>
+                {renderWidgetIcon(visualizationType.category, 'large')}
+                <Typography
+                  gutterBottom
+                  variant="body1"
+                  sx={{ mt: 1 }}
+                >
+                  {t(visualizationType.name)}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        );
+      })}
     </div>
   );
 };

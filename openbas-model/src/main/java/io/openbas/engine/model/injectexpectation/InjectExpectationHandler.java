@@ -1,8 +1,10 @@
 package io.openbas.engine.model.injectexpectation;
 
 import static io.openbas.engine.EsUtils.buildRestrictions;
+import static io.openbas.helper.InjectExpectationHelper.computeStatus;
 import static org.springframework.util.StringUtils.hasText;
 
+import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.engine.Handler;
@@ -64,6 +66,15 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
                   injectExpectation.getInject_expectation_type());
               esInjectExpectation.setInject_expectation_results(
                   injectExpectation.getInject_expectation_results());
+
+              InjectExpectation injectExpectationTmp = new InjectExpectation();
+              injectExpectationTmp.setScore(injectExpectation.getInject_expectation_score());
+              injectExpectationTmp.setExpectedScore(
+                  injectExpectation.getInject_expectation_expected_score());
+
+              esInjectExpectation.setInject_expectation_status(
+                  String.valueOf(computeStatus(injectExpectationTmp)));
+
               esInjectExpectation.setInject_expectation_score(
                   injectExpectation.getInject_expectation_score());
               esInjectExpectation.setInject_expectation_expected_score(
@@ -80,6 +91,9 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
               esInjectExpectation.setBase_agent_side(injectExpectation.getAgent_id());
               esInjectExpectation.setBase_asset_side(injectExpectation.getAsset_id());
               esInjectExpectation.setBase_asset_group_side(injectExpectation.getAsset_group_id());
+              esInjectExpectation.setBase_asset_group_side(injectExpectation.getAsset_group_id());
+              esInjectExpectation.setBase_attack_patterns_side(
+                  injectExpectation.getAttack_pattern_ids());
               return esInjectExpectation;
             })
         .toList();

@@ -1,6 +1,7 @@
 package io.openbas.database.raw;
 
 import java.time.Instant;
+import java.util.Set;
 
 public interface RawInjectExpectation {
 
@@ -39,4 +40,6 @@ public interface RawInjectExpectation {
   String getAsset_id();
 
   String getAsset_group_id();
+
+  Set<String> getAttack_pattern_ids();
 }

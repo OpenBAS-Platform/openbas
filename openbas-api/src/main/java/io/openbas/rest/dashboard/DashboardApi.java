@@ -52,50 +52,22 @@ public class DashboardApi extends RestBehavior {
   }
 
   @GetMapping(DASHBOARD_URI + "/series/{widgetId}")
-  public List<EsSeries> series(@PathVariable String widgetId) {
+  public List<EsSeries> series(@PathVariable final String widgetId) {
     Widget widget = this.widgetService.widget(widgetId);
     if (TEMPORAL.equals(widget.getHistogramWidget().getMode())) {
       DateHistogramWidget config = (DateHistogramWidget) widget.getHistogramWidget();
-
-      // TODO GET full config from saved widget
-      // Hardcoded for now
-      // Try to fetch a date histogram
-      //      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
-      //      Filters.Filter filter = new Filters.Filter();
-      //      filter.setKey("base_entity");
-      //      filter.setOperator(Filters.FilterOperator.eq);
-      //      filter.setValues(List.of("finding"));
-      //      filterGroup.setFilters(List.of(filter));
       Map<String, String> parameters = new HashMap<>();
       Instant end = Instant.now();
       Instant start = end.minus(30, ChronoUnit.DAYS);
+      // FIXME: date is hardcoded
       parameters.put("$start", start.toString());
       parameters.put("$end", end.toString());
-      // Try to fetch a date histogram
-      //      DateHistogramConfig config = new DateHistogramConfig("series01", filterGroup);
-      //      config.setStart("$start");
-      //      config.setEnd("$end");
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       DateHistogramRuntime runtime = new DateHistogramRuntime(config, parameters);
       return esService.multiDateHistogram(userWithAuth, runtime);
     } else if (STRUCTURAL.equals(widget.getHistogramWidget().getMode())) {
       StructuralHistogramWidget config = (StructuralHistogramWidget) widget.getHistogramWidget();
-
-      // TODO GET full config from saved widget
-      // Hardcoded for now
-      // Try to fetch a date histogram
-      //      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
-      //      Filters.Filter filter = new Filters.Filter();
-      //      filter.setKey("base_entity");
-      //      filter.setOperator(Filters.FilterOperator.eq);
-      //      filter.setValues(List.of("$type"));
-      //      filterGroup.setFilters(List.of(filter));
       Map<String, String> parameters = new HashMap<>();
-      parameters.put("$type", "finding");
-      // Try to fetch a structural histogram
-      //      StructuralHistogramConfig structuralConfig =
-      //          new StructuralHistogramConfig("series01", filterGroup);
-      //      structuralConfig.setField("finding_scenario_side"); // finding_scenario_side
       RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
       StructuralHistogramRuntime runtime = new StructuralHistogramRuntime(config, parameters);
       return esService.multiTermHistogram(userWithAuth, runtime);
@@ -104,7 +76,7 @@ public class DashboardApi extends RestBehavior {
   }
 
   @GetMapping(DASHBOARD_URI + "/search/{search}")
-  public List<EsSearch> search(@PathVariable String search) {
+  public List<EsSearch> search(@PathVariable final String search) {
     RawUserAuth userWithAuth = userRepository.getUserWithAuth(currentUser().getId());
     return esService.search(userWithAuth, search, null);
   }

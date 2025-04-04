@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("isAdmin()")
 public class CustomDashboardApi extends RestBehavior {
 
-  public static final String CUSTOM_DASHBOARDS_URI = "/api/custom_dashboards";
+  public static final String CUSTOM_DASHBOARDS_URI = "/api/custom-dashboards";
   private final CustomDashboardService customDashboardService;
 
   // -- CRUD --

@@ -25,7 +25,7 @@ const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
         setLoading(false);
       }
     });
-  }, []);
+  }, [widget]);
 
   if (loading) {
     return <Loader variant="inElement" />;

@@ -8,6 +8,7 @@ import { buildFilter } from '../../../../../components/common/queryable/filter/F
 import { useFormatter } from '../../../../../components/i18n';
 import { type DateHistogramSeries, type StructuralHistogramSeries } from '../../../../../utils/api-types';
 import FilterFieldBaseEntity from './FilterFieldBaseEntity';
+import { BASE_ENTITY_FILTER_KEY } from './WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   step_entity: {
@@ -50,7 +51,7 @@ const WidgetCreationSeries: FunctionComponent<{
     });
   };
 
-  const [entity, setEntity] = useState<string | null>(null);
+  const [entity, setEntity] = useState<string | null>(series.filter?.filters?.find(f => f.key === BASE_ENTITY_FILTER_KEY)?.values?.[0] ?? null);
   const onChangeEntity = (entity: string | null) => {
     setEntity(entity);
     onChange({
@@ -60,7 +61,7 @@ const WidgetCreationSeries: FunctionComponent<{
         : {
             mode: 'and',
             filters: [
-              buildFilter('base_entity', [entity], 'eq'),
+              buildFilter(BASE_ENTITY_FILTER_KEY, [entity], 'eq'),
             ],
           },
     });

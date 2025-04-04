@@ -20,6 +20,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.openbas.config.EngineConfig;
 import io.openbas.engine.EsEngine;
 import io.openbas.engine.EsModel;
+import io.openbas.engine.model.EsBase;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -267,7 +268,7 @@ public class ElasticDriver {
   }
 
   @Bean
-  public ElasticsearchClient elasticClient() throws Exception {
+  public <T extends EsBase> ElasticsearchClient elasticClient() throws Exception {
     LOGGER.info("Creating ElasticClient");
     ElasticsearchClient elasticClient = getElasticClient();
     // Try to client configuration
@@ -275,8 +276,8 @@ public class ElasticDriver {
       InfoResponse info = elasticClient.info();
       LOGGER.info("ElasticClient ready for " + info.name() + " - " + info.version());
     } catch (Exception e) {
-      LOGGER.severe("Error activating engine: " + e);
-      return elasticClient;
+      LOGGER.severe("Error activating Elasticsearch engine: " + e.getMessage());
+      throw new IllegalStateException("Failed to connect to Elasticsearch", e);
     }
     // TODO enable telemetry ?
     // https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/opentelemetry.html
@@ -289,7 +290,7 @@ public class ElasticDriver {
     // If version of the model stored in elastic is different from the db version
     // Index + template must be removed and recreated
     // last_updated_at for the type must be reset to reindex the full data.
-    List<EsModel<?>> models = this.esEngine.getModels();
+    List<EsModel<T>> models = this.esEngine.getModels();
     models.stream()
         .parallel()
         .forEach(

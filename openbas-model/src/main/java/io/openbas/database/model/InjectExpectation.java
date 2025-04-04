@@ -6,7 +6,6 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
-import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -91,7 +90,6 @@ public class InjectExpectation implements Base {
   private Double score;
 
   @JsonProperty("inject_expectation_status")
-  @Queryable(filterable = true)
   public EXPECTATION_STATUS getResponse() {
     return computeStatus(this);
   }

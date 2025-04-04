@@ -10,15 +10,15 @@ import { getCurrentSeriesLimit } from './WidgetUtils';
 
 const WidgetCreationSeriesList: FunctionComponent<{
   widgetType: Widget['widget_type'];
-  value: DateHistogramSeries[] | StructuralHistogramSeries[];
+  currentSeries: DateHistogramSeries[] | StructuralHistogramSeries[];
   onChange: (series: DateHistogramSeries[] | StructuralHistogramSeries[]) => void;
   onSubmit: () => void;
-}> = ({ widgetType, value = [], onChange, onSubmit }) => {
+}> = ({ widgetType, currentSeries = [], onChange, onSubmit }) => {
   // Standard hooks
   const { t } = useFormatter();
 
   const onChangeSeries = (index: number, series: DateHistogramSeries | StructuralHistogramSeries) => {
-    const newDatas = value.map((data, n) => {
+    const newDatas = currentSeries.map((data, n) => {
       if (n === index) {
         return series;
       }
@@ -28,13 +28,13 @@ const WidgetCreationSeriesList: FunctionComponent<{
   };
 
   const handleRemoveSeries = (index: number) => {
-    const newSeries = Array.from(value);
+    const newSeries = Array.from(currentSeries);
     newSeries.splice(index, 1);
     onChange(newSeries);
   };
   const handleAddSeries = () => {
     onChange([
-      ...value,
+      ...currentSeries,
       {
         name: '',
         filter: emptyFilterGroup,
@@ -44,7 +44,7 @@ const WidgetCreationSeriesList: FunctionComponent<{
 
   return (
     <div style={{ marginTop: 20 }}>
-      {value.map((series, index) => {
+      {currentSeries.map((series, index) => {
         return (
           <WidgetCreationSeries
             key={index}
@@ -58,7 +58,7 @@ const WidgetCreationSeriesList: FunctionComponent<{
       <div style={{ display: 'flex' }}>
         <Button
           variant="contained"
-          disabled={getCurrentSeriesLimit(widgetType) === value.length}
+          disabled={getCurrentSeriesLimit(widgetType) === currentSeries.length}
           color="secondary"
           size="small"
           onClick={handleAddSeries}

@@ -6,7 +6,7 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 @Component
-public class V3_75__Add_Custom_Dashboard extends BaseJavaMigration {
+public class V3_79__Add_Custom_Dashboard extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
@@ -18,9 +18,8 @@ public class V3_75__Add_Custom_Dashboard extends BaseJavaMigration {
                   custom_dashboard_id varchar(255) NOT NULL CONSTRAINT custom_dashboards_pkey PRIMARY KEY,
                   custom_dashboard_name VARCHAR(255) NOT NULL,
                   custom_dashboard_description VARCHAR(255),
-                  custom_dashboard_content JSONB,
-                  custom_dashboard_created_at TIMESTAMP DEFAULT now(),
-                  custom_dashboard_updated_at TIMESTAMP DEFAULT now()
+                  custom_dashboard_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+                  custom_dashboard_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
               );
               """);
       // Widgets table
@@ -32,8 +31,8 @@ public class V3_75__Add_Custom_Dashboard extends BaseJavaMigration {
                       widget_config JSONB,
                       widget_layout JSONB,
                       widget_custom_dashboard varchar(255) constraint custom_dashboards_pkey references custom_dashboards on delete cascade,
-                      widget_created_at TIMESTAMP DEFAULT now(),
-                      widget_updated_at TIMESTAMP DEFAULT now()
+                      widget_created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+                      widget_updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
                   );
               """);
     }

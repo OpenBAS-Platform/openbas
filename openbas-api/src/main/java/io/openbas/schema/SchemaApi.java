@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -19,12 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping
 public class SchemaApi extends RestBehavior {
 
-  private EsEngine esEngine;
-
-  @Autowired
-  public void setEsEngine(EsEngine esEngine) {
-    this.esEngine = esEngine;
-  }
+  private final EsEngine esEngine;
 
   @PostMapping("/api/schemas/{className}")
   public List<PropertySchemaDTO> schemas(

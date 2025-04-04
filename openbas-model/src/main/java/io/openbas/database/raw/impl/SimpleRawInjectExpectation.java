@@ -3,6 +3,7 @@ package io.openbas.database.raw.impl;
 import io.openbas.database.raw.RawInjectExpectation;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,4 +37,5 @@ public class SimpleRawInjectExpectation implements RawInjectExpectation {
   public String inject_expectation_results;
   public Long inject_expiration_time;
   public Instant inject_expectation_updated_at;
+  public Set<String> attack_pattern_ids;
 }

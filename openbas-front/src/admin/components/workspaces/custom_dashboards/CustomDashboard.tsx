@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Paper } from '@mui/material';
+import { Alert, AlertTitle, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useEffect, useMemo, useState } from 'react';
 import RGL, { type Layout, WidthProvider } from 'react-grid-layout';
@@ -12,6 +12,7 @@ import Loader from '../../../../components/Loader';
 import { type CustomDashboard, type Widget } from '../../../../utils/api-types';
 import WidgetCreation from './widgets/WidgetCreation';
 import WidgetPopover from './widgets/WidgetPopover';
+import WidgetStructuralViz from './widgets/WidgetStructuralViz';
 import WidgetTemporalViz from './widgets/WidgetTemporalViz';
 
 const CustomDashboardComponent = () => {
@@ -48,6 +49,21 @@ const CustomDashboardComponent = () => {
       return {
         ...prev,
         custom_dashboard_widgets: [...(prev.custom_dashboard_widgets ?? []), newWidget],
+      };
+    });
+  };
+  const handleWidgetUpdate = (widget: Widget) => {
+    setCustomDashboardValue((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        custom_dashboard_widgets: (prev.custom_dashboard_widgets ?? []).map((w) => {
+          if (w.widget_id === widget.widget_id) {
+            return widget;
+          } else {
+            return w;
+          }
+        }),
       };
     });
   };
@@ -131,17 +147,21 @@ const CustomDashboardComponent = () => {
               style={paperStyle}
               variant="outlined"
             >
+              <Typography variant="h3">
+                {widget.widget_config.title}
+              </Typography>
               <WidgetPopover
                 className="noDrag"
                 customDashboardId={customDashboardId}
-                widgetId={widget.widget_id}
+                widget={widget}
+                onUpdate={widget => handleWidgetUpdate(widget)}
                 onDelete={widgetId => handleWidgetDelete(widgetId)}
               />
               <ErrorBoundary>
                 {widget.widget_id === idToResize ? (<div />) : (
                   <>
                     {widget.widget_config.mode === 'structural' && (
-                      <WidgetTemporalViz widget={widget} />
+                      <WidgetStructuralViz widget={widget} />
                     )}
                     {widget.widget_config.mode === 'temporal' && (
                       <WidgetTemporalViz widget={widget} />
