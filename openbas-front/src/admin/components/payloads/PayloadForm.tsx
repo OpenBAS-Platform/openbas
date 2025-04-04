@@ -6,16 +6,18 @@ import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
 import { useFormatter } from '../../../components/i18n';
-import type { PayloadCreateInput } from '../../../utils/api-types';
-import type { Option } from '../../../utils/Option';
+import { type Command, type DnsResolution, type Executable, type FileDrop } from '../../../utils/api-types';
 import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
 import OutputFormTab from './form/OutputFormTab';
 
-type PayloadCreateInputForm = Omit<PayloadCreateInput, 'payload_source' | 'payload_status' | 'payload_platforms' | 'executable_file'> & {
-  payload_platforms: Option[];
-  executable_file: Option | undefined;
-};
+type PayloadCreateInputForm = Omit<Command | Executable | FileDrop | DnsResolution,
+  'payload_source' | 'payload_status' | 'executable_file' | 'payload_created_at' | 'payload_id' | 'payload_updated_at' | 'payload_type' | 'payload_platforms' | 'output_parser_mode'> & {
+    executable_file?: string;
+    payload_type: 'Command' | 'Executable' | 'FileDrop' | 'DnsResolution';
+    payload_platforms: ('Linux' | 'Windows' | 'MacOS')[];
+    output_parser_mode: 'STDOUT';
+  };
 
 interface Props {
   onSubmit: SubmitHandler<PayloadCreateInputForm>;
@@ -29,7 +31,7 @@ const PayloadForm = ({
   handleClose,
   editing,
   initialValues = {
-    payload_type: '',
+    payload_type: undefined,
     payload_name: '',
     payload_platforms: [],
     payload_description: '',
@@ -45,6 +47,7 @@ const PayloadForm = ({
     payload_arguments: [],
     payload_prerequisites: [],
     payload_output_parsers: [],
+    payload_execution_arch: 'ALL_ARCHITECTURES',
   },
 }: Props) => {
   const { t } = useFormatter();
@@ -82,7 +85,7 @@ const PayloadForm = ({
   const payloadPrerequisiteZodObject = z.object({
     executor: z.string().min(1, { message: t('Should not be empty') }),
     get_command: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().nullish(),
+    description: z.string().optional(),
     check_command: z.string().optional(),
   });
 
@@ -90,7 +93,7 @@ const PayloadForm = ({
     default_value: z.string().nonempty(t('Should not be empty')),
     key: z.string().min(1, { message: t('Should not be empty') }),
     type: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().nullish(),
+    description: z.string().optional(),
   });
 
   const baseSchema = {
@@ -98,40 +101,41 @@ const PayloadForm = ({
     payload_description: z.string().optional().describe('General-tab'),
     payload_attack_patterns: z.string().array().optional(),
     payload_tags: z.string().array().optional(),
-    payload_platforms: z.object({
-      id: z.string(),
-      label: z.string(),
-    }).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
+    payload_platforms: z.enum(['Linux', 'Windows', 'MacOS']).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_execution_arch: z.enum(['x86_64', 'arm64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }).describe('Commands-tab'),
-    payload_cleanup_command: z.string().optional().describe('Commands-tab'),
-    payload_cleanup_executor: z.string().optional(),
+    payload_cleanup_command: z.string().optional().nullish().describe('Commands-tab'),
+    payload_cleanup_executor: z.string().optional().nullish(),
     payload_arguments: z.array(payloadArgumentZodObject).optional().describe('Commands-tab'),
     payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional().describe('Commands-tab'),
     payload_output_parsers: z.array(outputParserObject).optional().describe('Output-tab'),
+    // these will be override depending on the payload type
+    // command_content: z.string().optional().nullish(),
+    // command_executor: z.string().optional().nullish(),
+    // dns_resolution_hostname: z.string().optional(),
+    // executable_file: z.string().optional(),
+    // file_drop_file: z.string().optional(),
+    payload_type: z.enum(['Command', 'Executable', 'FileDrop', 'DnsResolution']),
   };
 
   const commandSchema = z.object({
     ...baseSchema,
-    payload_type: z.literal('Command').describe('Commands-tab'),
+    payload_type: z.enum(['Command', 'Executable', 'FileDrop', 'DnsResolution']).optional().describe('Commands-tab'),
     command_executor: z.string().min(1, { message: 'Should not be empty' }).describe('Commands-tab'),
     command_content: z.string().min(1, { message: 'Should not be empty' }).describe('Commands-tab'),
   });
   const executableSchema = z.object({
     ...baseSchema,
-    payload_type: z.literal('Executable').describe('Commands-tab'),
-    executable_file: z.object({
-      id: z.string().min(1, { message: t('Should not be empty') }),
-      label: z.string().min(1, { message: t('Should not be empty') }),
-    }).describe('Commands-tab'),
+    // payload_type: z.literal('Executable').optional().describe('Commands-tab'),
+    executable_file: z.string().optional().describe('Commands-tab'),
   });
   const fileDropSchema = z.object({
     ...baseSchema,
-    payload_type: z.literal('FileDrop').describe('Commands-tab'),
+    // payload_type: z.literal('FileDrop').optional().describe('Commands-tab'),
     file_drop_file: z.string().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
   });
   const dnsResolutionSchema = z.object({
     ...baseSchema,
-    payload_type: z.literal('DnsResolution').describe('Commands-tab'),
+    // payload_type: z.literal('DnsResolution').optional().describe('Commands-tab'),
     dns_resolution_hostname: z.string().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
   });
 

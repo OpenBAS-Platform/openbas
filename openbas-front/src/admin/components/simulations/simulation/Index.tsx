@@ -22,7 +22,6 @@ import ExerciseDatePopover from './ExerciseDatePopover';
 import ExerciseHeader from './ExerciseHeader';
 
 const Simulation = lazy(() => import('./overview/SimulationComponent'));
-const Comcheck = lazy(() => import('./controls/Comcheck'));
 const Lessons = lazy(() => import('./lessons/SimulationLessons'));
 const SimulationDefinition = lazy(() => import('./SimulationDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
@@ -141,7 +140,6 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
           <Suspense fallback={<Loader />}>
             <Routes>
               <Route path="" element={errorWrapper(Simulation)()} />
-              <Route path="controls/comchecks/:comcheckId" element={errorWrapper(Comcheck)()} />
               <Route path="definition" element={errorWrapper(SimulationDefinition)()} />
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />

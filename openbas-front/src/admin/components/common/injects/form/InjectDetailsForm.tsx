@@ -23,6 +23,12 @@ import InjectCardComponent from '../InjectCardComponent';
 import InjectDefinition from './InjectDefinition';
 import InjectForm from './InjectForm';
 
+type InjectInputForm = Omit<InjectInput, 'inject_depends_duration'> & {
+  inject_depends_duration_days: number;
+  inject_depends_duration_hours: number;
+  inject_depends_duration_minutes: number;
+};
+
 interface Props {
   injectContractIcon: React.ReactNode | undefined;
   injectHeaderAction: React.ReactNode;
@@ -266,7 +272,7 @@ const InjectDetailsForm = ({
     getValues,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm({
+  } = useForm<InjectInputForm>({
     mode: 'onTouched',
     resolver: zodResolver(
       z.object({
