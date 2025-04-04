@@ -51,4 +51,8 @@ public class EndpointOutput {
   @Schema(description = "Tags")
   @JsonProperty("asset_tags")
   private Set<String> tags;
+
+  @Schema(description = "The endpoint was added statiscally or not")
+  @JsonProperty("is_static")
+  private Boolean isStatic;
 }

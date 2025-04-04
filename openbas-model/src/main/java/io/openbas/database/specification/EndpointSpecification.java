@@ -1,7 +1,10 @@
 package io.openbas.database.specification;
 
+import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +20,16 @@ public class EndpointSpecification {
       return criteriaBuilder.and(
           criteriaBuilder.isNull(root.get("agents").get("parent")),
           criteriaBuilder.isNull(root.get("agents").get("inject")));
+    };
+  }
+
+  public static Specification<Endpoint> findEndpointsForAssetGroup(
+      @NotNull final String assetGroupId) {
+    return (root, query, criteriaBuilder) -> {
+      Join<Endpoint, AssetGroup> assetGroupJoin = root.join("assetGroups", JoinType.LEFT);
+      query.groupBy(root.get("id"));
+      query.distinct(true);
+      return criteriaBuilder.and(criteriaBuilder.equal(assetGroupJoin.get("id"), assetGroupId));
     };
   }
 
