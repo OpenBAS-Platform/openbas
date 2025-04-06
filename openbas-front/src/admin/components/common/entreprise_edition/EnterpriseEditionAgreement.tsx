@@ -45,7 +45,7 @@ const EnterpriseEditionAgreement: FunctionComponent<
       </DialogTitle>
       <DialogContent>
         <Alert severity="info" style={{ marginTop: 15 }}>
-          {t('OpenCTI Enterprise Edition requires a license key to be enabled. Filigran provides a free-to-use license for development and research purposes as well as for charity organizations.')}
+          {t('OpenBAS Enterprise Edition requires a license key to be enabled. Filigran provides a free-to-use license for development and research purposes as well as for charity organizations.')}
           <br />
           <br />
           {t('To obtain a license, please')}

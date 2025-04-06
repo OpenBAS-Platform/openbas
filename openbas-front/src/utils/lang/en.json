@@ -556,6 +556,8 @@
   "Flag is not correct! Try again...": "Flag is not correct! Try again...",
   "Flag type": "Flag type",
   "Flags": "Flags",
+  "To obtain a license, please": "To obtain a license, please",
+  "OpenBAS Enterprise Edition requires a license key to be enabled. Filigran provides a free-to-use license for development and research purposes as well as for charity organizations.": "OpenBAS Enterprise Edition requires a license key to be enabled. Filigran provides a free-to-use license for development and research purposes as well as for charity organizations.",
   "For further details, refer to the": "For further details, refer to the",
   "For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.": "For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.",
   "Form request data": "Form request data",

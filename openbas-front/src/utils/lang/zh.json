@@ -556,6 +556,8 @@
   "Flag is not correct! Try again...": "Flag不正确!请重试...",
   "Flag type": "Flag类型",
   "Flags": "Flag组",
+  "To obtain a license, please": "要获得许可证，请",
+  "OpenBAS Enterprise Edition requires a license key to be enabled. Filigran provides a free-to-use license for development and research purposes as well as for charity organizations.": "OpenBAS 企业版需要许可证密钥才能启用。Filigran 为开发、研究和慈善机构提供免费使用许可证。",
   "For further details, refer to the": "有关更多详情，请参考",
   "For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.": "目前，以下代码或脚本不会在启动时添加代理。请确保将其添加到 rc.local 或其他文件中以使其持久化。我们将在不久的将来发布适当的包。",
   "Form request data": "申请表数据",

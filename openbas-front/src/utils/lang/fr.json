@@ -556,6 +556,8 @@
   "Flag is not correct! Try again...": "Le flag est incorrect! Merci de rééssayer...",
   "Flag type": "Type de flag",
   "Flags": "Flags",
+  "To obtain a license, please": "Pour obtenir une licence, veuillez",
+  "OpenBAS Enterprise Edition requires a license key to be enabled. Filigran provides a free-to-use license for development and research purposes as well as for charity organizations.": "OpenBAS Enterprise Edition nécessite une clé de licence pour être activé. Filigran peux fournir une licence d'utilisation gratuite à des fins de développement et de recherche ainsi qu'à des organisations caritatives.",
   "For further details, refer to the": "Pour plus de détails, reportez-vous à",
   "For the moment, the following snippet or script will not add the agent at boot. Please be sure to add it in rc.local or other files to make it persistent. We will release proper packages in the near future.": "Pour le moment, l'extrait ou le script suivant n'ajoutera pas l'agent au démarrage. Veuillez l'ajouter dans rc.local ou dans d'autres fichiers pour le rendre persistant. Nous publierons des packages appropriés dans un avenir proche.",
   "Form request data": "Données de formulaire de la requête",
