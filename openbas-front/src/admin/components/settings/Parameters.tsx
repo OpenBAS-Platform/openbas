@@ -93,7 +93,7 @@ const Parameters = () => {
 
       {isEnterpriseEditionActivated && (
         <Grid container={true} spacing={3} style={{ marginBottom: 23 }}>
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Typography variant="h4" gutterBottom={true}>
               {t('Enterprise Edition')}
             </Typography>
@@ -126,7 +126,7 @@ const Parameters = () => {
               </List>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
+          <Grid size={{ xs: 6 }}>
             <Typography variant="h4" gutterBottom={true}>
               {t('License')}
             </Typography>
@@ -242,7 +242,7 @@ const Parameters = () => {
       )}
 
       <Grid container={true} spacing={3} style={{ marginBottom: 23 }}>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <Typography variant="h4" gutterBottom={true}>{t('Configuration')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }} style={{ minHeight: 340 }} sx={{ gridColumn: 'span 3' }}>
             <ParametersForm
@@ -255,7 +255,7 @@ const Parameters = () => {
             />
           </Paper>
         </Grid>
-        <Grid item xs={6}>
+        <Grid size={{ xs: 6 }}>
           <Typography variant="h4" gutterBottom={true}>{t('OpenBAS platform')}</Typography>
           <Paper
             variant="outlined"
@@ -320,19 +320,19 @@ const Parameters = () => {
       </Grid>
 
       <Grid container={true} spacing={3} style={{ marginBottom: 23 }}>
-        <Grid item xs={4}>
+        <Grid size={{ xs: 4 }}>
           <Typography style={{ gridColumn: 'span 2' }} className={classes.marginTop} variant="h4">{t('Dark theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 2' }}>
             <ThemeForm onSubmit={onUpdateDarkParameters} initialValues={initialValuesDark} />
           </Paper>
         </Grid>
-        <Grid item xs={4}>
+        <Grid size={{ xs: 4 }}>
           <Typography className={classes.marginTop} style={{ gridColumn: 'span 2' }} variant="h4">{t('Light theme')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 2' }}>
             <ThemeForm onSubmit={onUpdateLigthParameters} initialValues={initialValuesLight} />
           </Paper>
         </Grid>
-        <Grid item xs={4}>
+        <Grid size={{ xs: 4 }}>
           <Typography className={classes.marginTop} style={{ gridColumn: 'span 2' }} variant="h4">{t('Tools')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 2' }}>
             <List style={{ paddingTop: 0 }}>
