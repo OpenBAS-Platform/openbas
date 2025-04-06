@@ -72,7 +72,8 @@ const EnterpriseEditionAgreement: FunctionComponent<
           />
         </FormGroup>
         <div style={{ marginTop: 15 }}>
-          {t('By enabling the OpenBAS Enterprise Edition, you (and your organization) agrees to the OpenBAS Enterprise Edition (EE) ')}
+          {t('By enabling the OpenBAS Enterprise Edition, you (and your organization) agrees to the OpenBAS Enterprise Edition (EE)')}
+          &nbsp;
           <a href="https://github.com/OpenBAS-Platform/openbas/blob/master/LICENSE" target="_blank" rel="noreferrer">{t('license terms and conditions of usage')}</a>
           .
         </div>
