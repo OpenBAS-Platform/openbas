@@ -10,7 +10,6 @@ import io.openbas.database.model.AssetGroup;
 import io.openbas.database.model.Endpoint;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.repository.TagRepository;
-import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.rest.asset.endpoint.form.EndpointOutput;
 import io.openbas.rest.asset_group.form.AssetGroupInput;
 import io.openbas.rest.asset_group.form.AssetGroupOutput;
@@ -80,10 +79,7 @@ public class AssetGroupApi extends RestBehavior {
       @PathVariable @NotBlank final String assetGroupId) {
 
     Page<Endpoint> endpointPage =
-        endpointService.searchManagedEndpoints(
-            EndpointSpecification.findEndpointsForAssetGroup(assetGroupId),
-            assetGroupId,
-            searchPaginationInput);
+        endpointService.searchManagedEndpoints(assetGroupId, searchPaginationInput);
     // Convert the Page of Endpoint to a Page of EndpointOutput
     List<EndpointOutput> endpointOutputs =
         endpointPage.getContent().stream()

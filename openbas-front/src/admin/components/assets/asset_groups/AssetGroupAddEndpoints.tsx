@@ -4,6 +4,7 @@ import { updateAssetsOnAssetGroup } from '../../../../actions/asset_groups/asset
 import ButtonCreate from '../../../../components/common/ButtonCreate';
 import { useFormatter } from '../../../../components/i18n';
 import { type AssetGroup } from '../../../../utils/api-types';
+import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { type UserStore } from '../../teams/players/Player';
 import EndpointsDialogAdding from '../endpoints/EndpointsDialogAdding';
@@ -37,6 +38,7 @@ const AssetGroupAddEndpoints: FunctionComponent<Props> = ({
         if (result.result) {
           if (onUpdate) {
             const created = result.entities.asset_groups[result.result];
+            MESSAGING$.notifySuccess('The element has been successfully updated');
             onUpdate(created);
           }
           setOpen(false);

@@ -6,6 +6,7 @@ import ButtonPopover from '../../../../components/common/ButtonPopover';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import { useFormatter } from '../../../../components/i18n';
 import { type EndpointOutput, type EndpointOverviewOutput } from '../../../../utils/api-types';
+import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
 
 export interface EndpointPopoverProps {
@@ -46,6 +47,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
       ).then(() => {
         if (onRemoveEndpointFromAssetGroup) {
           onRemoveEndpointFromAssetGroup(endpoint.asset_id);
+          MESSAGING$.notifySuccess('The element has been successfully updated');
         }
         setRemovalFromAssetGroup(false);
       });
