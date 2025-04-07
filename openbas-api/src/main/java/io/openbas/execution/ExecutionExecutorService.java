@@ -33,9 +33,9 @@ public class ExecutionExecutorService {
     // from the main "agents" list to execute payloads at the end for the remaining "normal" agents
     List<Agent> inactiveAgents = agents.stream().filter(agent -> !agent.isActive()).toList();
     agents.removeAll(inactiveAgents);
-    List<Agent> withoutExecutorAgent =
+    List<Agent> agentsWithoutExecutor =
         agents.stream().filter(agent -> agent.getExecutor() == null).toList();
-    agents.removeAll(withoutExecutorAgent);
+    agents.removeAll(agentsWithoutExecutor);
     List<Agent> crowdstrikeAgents =
         agents.stream()
             .filter(agent -> CROWDSTRIKE_EXECUTOR_TYPE.equals(agent.getExecutor().getType()))
@@ -61,8 +61,8 @@ public class ExecutionExecutorService {
       atLeastOneTraceAdded.set(true);
     }
     // Manage without executor agents
-    if (!withoutExecutorAgent.isEmpty()) {
-      inactiveAgents.forEach(
+    if (!agentsWithoutExecutor.isEmpty()) {
+      agentsWithoutExecutor.forEach(
           agent ->
               injectStatus.addTrace(
                   ExecutionTraceStatus.ERROR,
@@ -83,6 +83,7 @@ public class ExecutionExecutorService {
               inject, crowdstrikeAgents, injectStatus);
       atLeastOneExecution.set(true);
     } catch (Exception e) {
+      log.severe("Crowdstrike launchBatchExecutorSubprocess error: " + e.getMessage());
       crowdstrikeAgents.forEach(
           agent ->
               injectStatus.addTrace(
@@ -99,6 +100,7 @@ public class ExecutionExecutorService {
             launchExecutorContextForAgent(inject, agent);
             atLeastOneExecution.set(true);
           } catch (AgentException e) {
+            log.severe("launchExecutorContextForAgent error: " + e.getMessage());
             injectStatus.addTrace(
                 ExecutionTraceStatus.ERROR,
                 e.getMessage(),
