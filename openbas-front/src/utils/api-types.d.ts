@@ -1230,6 +1230,8 @@ export interface FilterGroup {
 }
 
 export interface Finding {
+  /** @uniqueItems true */
+  finding_asset_groups?: AssetGroup[];
   finding_assets?: string[];
   /** @format date-time */
   finding_created_at: string;
