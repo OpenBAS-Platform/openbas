@@ -34,7 +34,7 @@ public class FindingMapper {
                 .collect(Collectors.toSet()))
         .assetGroups(
             finding.getAssetGroups().stream()
-                .map(assetGroup -> assetGroupMapper.toAssetGroupOutput(assetGroup))
+                .map(assetGroup -> assetGroupMapper.toAssetGroupSimple(assetGroup))
                 .collect(Collectors.toSet()))
         .inject(injectMapper.toInjectSimple(finding.getInject()))
         .simulation(
