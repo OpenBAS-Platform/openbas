@@ -1,5 +1,6 @@
 package io.openbas.utils;
 
+import io.openbas.database.model.Endpoint;
 import io.openbas.database.model.Finding;
 import io.openbas.rest.finding.form.FindingOutput;
 import java.util.Optional;
@@ -12,8 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Log
 public class FindingMapper {
-
-  public static final String ENDPOINT = "Endpoint";
 
   private final EndpointMapper endpointMapper;
   private final ExerciseMapper exerciseMapper;
@@ -29,7 +28,7 @@ public class FindingMapper {
         .name(finding.getName())
         .endpoints(
             finding.getAssets().stream()
-                .filter(asset -> asset.getType().equals(ENDPOINT))
+                .filter(asset -> asset instanceof Endpoint)
                 .map(asset -> endpointMapper.toEndpointOutput(asset))
                 .collect(Collectors.toSet()))
         .inject(injectMapper.toInjectSimple(finding.getInject()))

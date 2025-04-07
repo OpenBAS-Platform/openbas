@@ -83,12 +83,12 @@ public class Finding implements Base {
 
   // -- RELATION --
 
-  @Queryable(filterable = true, sortable = true)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "finding_inject_id")
   @JsonProperty("finding_inject_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @Schema(type = "string")
+  @Queryable(filterable = true, sortable = true, path = "inject.id")
   private Inject inject;
 
   // -- AUDIT --
@@ -140,13 +140,13 @@ public class Finding implements Base {
   private List<User> users = new ArrayList<>();
 
   @JsonProperty("finding_simulation")
-  @Queryable(filterable = true, dynamicValues = true, path = "finding.inject.exercise.id")
+  @Queryable(filterable = true, dynamicValues = true, path = "inject.exercise.id")
   public Exercise getSimulation() {
     return getInject().getExercise();
   }
 
   @JsonProperty("finding_scenario")
-  @Queryable(filterable = true, dynamicValues = true, path = "finding.inject.scenario.id")
+  @Queryable(filterable = true, dynamicValues = true, path = "inject.scenario.id")
   public Scenario getScenario() {
     return getInject().getScenario();
   }
