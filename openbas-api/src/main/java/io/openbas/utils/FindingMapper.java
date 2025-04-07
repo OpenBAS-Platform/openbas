@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class FindingMapper {
 
   private final EndpointMapper endpointMapper;
+  private final AssetGroupMapper assetGroupMapper;
   private final ExerciseMapper exerciseMapper;
   private final ScenarioMapper scenarioMapper;
   private final InjectMapper injectMapper;
@@ -29,7 +30,11 @@ public class FindingMapper {
         .endpoints(
             finding.getAssets().stream()
                 .filter(asset -> asset instanceof Endpoint)
-                .map(asset -> endpointMapper.toEndpointOutput(asset))
+                .map(asset -> endpointMapper.toEndpointSimple(asset))
+                .collect(Collectors.toSet()))
+        .assetGroups(
+            finding.getAssetGroups().stream()
+                .map(assetGroup -> assetGroupMapper.toAssetGroupOutput(assetGroup))
                 .collect(Collectors.toSet()))
         .inject(injectMapper.toInjectSimple(finding.getInject()))
         .simulation(
