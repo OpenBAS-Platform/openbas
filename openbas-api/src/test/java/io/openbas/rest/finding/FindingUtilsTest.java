@@ -267,4 +267,24 @@ class FindingUtilsTest {
         findingUtils.buildFinding(inject, asset2, contractOutputElement, value);
     assertEquals(2, updatedFinding.getAssets().size());
   }
+
+  @Test
+  @DisplayName("Should have one assets for a finding")
+  void given_a_finding_already_existent_with_same_asset_should_have_one_assets() {
+    Inject inject = getDefaultInject();
+    Asset asset1 = createDefaultAsset("asset1");
+    String value = "value-already-existent";
+    ContractOutputElement contractOutputElement = getDefaultContractOutputElement();
+
+    Finding finding1 = new Finding();
+    finding1.setValue(value);
+    finding1.getAssets().add(asset1);
+
+    when(findingRepository.findByInjectIdAndValue(inject.getId(), value))
+        .thenReturn(Optional.of(finding1));
+
+    Finding updatedFinding =
+        findingUtils.buildFinding(inject, asset1, contractOutputElement, value);
+    assertEquals(1, updatedFinding.getAssets().size());
+  }
 }
