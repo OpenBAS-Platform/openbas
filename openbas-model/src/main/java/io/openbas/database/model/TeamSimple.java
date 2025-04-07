@@ -4,7 +4,6 @@ import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openbas.annotation.Queryable;
 import io.openbas.database.raw.RawTeam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -26,7 +25,6 @@ public class TeamSimple {
 
   @NotBlank
   @JsonProperty("team_name")
-  @Queryable(searchable = true)
   @Schema(description = "Name of the team")
   private String name;
 

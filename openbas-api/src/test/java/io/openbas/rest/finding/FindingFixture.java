@@ -12,6 +12,7 @@ public class FindingFixture {
   public static Finding createDefaultTextFinding() {
     Finding finding = new Finding();
     finding.setType(ContractOutputType.Text);
+    finding.setName("Text");
     finding.setField(TEXT_FIELD);
     finding.setValue("text_value");
     finding.setLabels(new String[] {"reconnaissance phase"});
@@ -21,6 +22,7 @@ public class FindingFixture {
   public static Finding createDefaultIPV6Finding() {
     Finding finding = new Finding();
     finding.setType(ContractOutputType.IPv6);
+    finding.setName("Ipv6");
     finding.setField(IPV6_FIELD);
     finding.setValue("2001:0000:130F:0000:0000:09C0:876A:130B");
     return finding;
@@ -29,6 +31,7 @@ public class FindingFixture {
   public static Finding createDefaultFindingCredentials() {
     Finding finding = new Finding();
     finding.setType(ContractOutputType.Credentials);
+    finding.setName("Credentials");
     finding.setField(CREDENTIALS_FIELD);
     finding.setValue("admin:admin");
     return finding;
