@@ -40,6 +40,7 @@ class FindingApiTest extends IntegrationTest {
   @Autowired private MockMvc mvc;
 
   @Autowired private FindingComposer findingComposer;
+  @Autowired private AssetGroupComposer assetGroupComposer;
   @Autowired private EndpointComposer endpointComposer;
   @Autowired private InjectComposer injectComposer;
   @Autowired private ScenarioComposer scenarioComposer;
@@ -48,8 +49,10 @@ class FindingApiTest extends IntegrationTest {
   @Autowired private TagComposer tagComposer;
   private Exercise savedSimulation;
   private Scenario savedScenario;
+  private AssetGroup savedAssetGroup;
   private Endpoint savedEndpoint;
   private InjectComposer.Composer injectComposer1;
+  private EndpointComposer.Composer endpointComposer1;
 
   @BeforeEach
   void setup() {
@@ -69,10 +72,18 @@ class FindingApiTest extends IntegrationTest {
             .persist()
             .get();
 
+    endpointComposer1 = endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
+
     savedEndpoint =
-        endpointComposer
-            .forEndpoint(EndpointFixture.createEndpoint())
+        endpointComposer1
             .withAgent(agentComposer.forAgent(AgentFixture.createDefaultAgentService()))
+            .persist()
+            .get();
+
+    savedAssetGroup =
+        assetGroupComposer
+            .forAssetGroup(AssetGroupFixture.createDefaultAssetGroup("asset-group"))
+            .withAsset(endpointComposer1)
             .persist()
             .get();
   }
@@ -95,7 +106,8 @@ class FindingApiTest extends IntegrationTest {
             savedFinding,
             savedSimulation,
             savedScenario,
-            savedEndpoint);
+            savedEndpoint,
+            savedAssetGroup);
 
     performCallbackRequest(FINDING_URI + "/search", input)
         .andExpect(jsonPath("$.content.[0].finding_type").value(savedFinding.getType().label))
@@ -126,7 +138,13 @@ class FindingApiTest extends IntegrationTest {
             .get();
     SearchPaginationInput input =
         buildDefaultFilters(
-            ContractOutputType.IPv6, "IPv6", savedFinding, savedSimulation, null, savedEndpoint);
+            ContractOutputType.IPv6,
+            "IPv6",
+            savedFinding,
+            savedSimulation,
+            null,
+            savedEndpoint,
+            null);
 
     performCallbackRequest(FINDING_URI + "/exercises/" + savedSimulation.getId() + "/search", input)
         .andExpect(jsonPath("$.content.[0].finding_type").value(savedFinding.getType().label))
@@ -153,7 +171,8 @@ class FindingApiTest extends IntegrationTest {
             savedFinding,
             null,
             savedScenario,
-            savedEndpoint);
+            savedEndpoint,
+            savedAssetGroup);
 
     performCallbackRequest(FINDING_URI + "/scenarios/" + savedScenario.getId() + "/search", input)
         .andExpect(
@@ -175,7 +194,7 @@ class FindingApiTest extends IntegrationTest {
             .get();
     SearchPaginationInput input =
         buildDefaultFilters(
-            ContractOutputType.Text, "Text", savedFinding, null, null, savedEndpoint);
+            ContractOutputType.Text, "Text", savedFinding, null, null, savedEndpoint, null);
 
     performCallbackRequest(FINDING_URI + "/endpoints/" + savedEndpoint.getId() + "/search", input)
         .andExpect(
@@ -190,7 +209,8 @@ class FindingApiTest extends IntegrationTest {
       Finding finding,
       Exercise simulation,
       Scenario scenario,
-      Endpoint endpoint) {
+      Endpoint endpoint,
+      AssetGroup assetGroup) {
     SearchPaginationInput input = new SearchPaginationInput();
     Filters.FilterGroup group = new Filters.FilterGroup();
     group.setMode(Filters.FilterMode.and);
@@ -214,6 +234,18 @@ class FindingApiTest extends IntegrationTest {
             Filters.FilterOperator.contains,
             List.of(finding.getInject().getId())));
 
+    if (assetGroup != null) {
+      filters.add(
+          buildFilter(
+              "finding_asset_groups",
+              Filters.FilterOperator.contains,
+              List.of(assetGroup.getId())));
+    }
+    if (endpoint != null) {
+      filters.add(
+          buildFilter(
+              "finding_assets", Filters.FilterOperator.contains, List.of(endpoint.getId())));
+    }
     if (endpoint != null) {
       filters.add(
           buildFilter(

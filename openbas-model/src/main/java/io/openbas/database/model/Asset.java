@@ -4,6 +4,7 @@ import static jakarta.persistence.DiscriminatorType.STRING;
 import static java.time.Instant.now;
 import static lombok.AccessLevel.NONE;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openbas.annotation.Queryable;
@@ -65,6 +66,10 @@ public class Asset implements Base {
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("asset_tags")
   private Set<Tag> tags = new HashSet<>();
+
+  @JsonIgnore
+  @ManyToMany(mappedBy = "assets")
+  private Set<AssetGroup> assetGroups = new HashSet<>();
 
   // -- AUDIT --
 

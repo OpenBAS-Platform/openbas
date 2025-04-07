@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -149,5 +150,13 @@ public class Finding implements Base {
   @Queryable(filterable = true, dynamicValues = true, path = "inject.scenario.id")
   public Scenario getScenario() {
     return getInject().getScenario();
+  }
+
+  @JsonProperty("finding_asset_groups")
+  @Queryable(filterable = true, dynamicValues = true, path = "assets.assetGroups.id")
+  public Set<AssetGroup> getAssetGroups() {
+    return getAssets().stream()
+        .flatMap(asset -> asset.getAssetGroups().stream())
+        .collect(Collectors.toSet());
   }
 }
