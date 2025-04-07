@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 
 import { searchFindingsForSimulations } from '../../../../../actions/findings/finding-actions';
-import type { Exercise, SearchPaginationInput } from '../../../../../utils/api-types';
+import type { Exercise, FindingOutput, SearchPaginationInput } from '../../../../../utils/api-types';
 import FindingList from '../../../findings/FindingList';
 
 const SimulationFindings = () => {
@@ -14,9 +14,22 @@ const SimulationFindings = () => {
   const search = (input: SearchPaginationInput) => {
     return searchFindingsForSimulations(exerciseId, input);
   };
+  const additionalHeaders = [
+    {
+      field: 'finding_inject',
+      label: 'Inject',
+      isSortable: false,
+      value: (finding: FindingOutput) => finding.finding_inject?.inject_title,
+    },
+  ];
 
   return (
-    <FindingList searchFindings={search} additionalFilterNames={additionalFilterNames} />
+    <FindingList
+      filterLocalStorageKey="simulation-findings"
+      searchFindings={search}
+      additionalHeaders={additionalHeaders}
+      additionalFilterNames={additionalFilterNames}
+    />
   );
 };
 export default SimulationFindings;

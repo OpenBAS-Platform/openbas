@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 
 import { searchFindingsForScenarios } from '../../../../../actions/findings/finding-actions';
 import type {
+  FindingOutput,
   Scenario,
   SearchPaginationInput,
 } from '../../../../../utils/api-types';
@@ -19,8 +20,22 @@ const ScenarioFindings = () => {
     return searchFindingsForScenarios(scenarioId, input);
   };
 
+  const additionalHeaders = [
+    {
+      field: 'finding_simulation',
+      label: 'Simulation',
+      isSortable: false,
+      value: (finding: FindingOutput) => finding.finding_simulation?.exercise_name || '-',
+    },
+  ];
+
   return (
-    <FindingList searchFindings={search} additionalFilterNames={additionalFilterNames} />
+    <FindingList
+      filterLocalStorageKey="scenario-findings"
+      searchFindings={search}
+      additionalHeaders={additionalHeaders}
+      additionalFilterNames={additionalFilterNames}
+    />
   );
 };
 export default ScenarioFindings;
