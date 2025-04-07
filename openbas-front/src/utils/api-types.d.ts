@@ -1263,6 +1263,8 @@ export interface FindingInput {
 
 export interface FindingOutput {
   /** @uniqueItems true */
+  finding_asset_groups?: AssetGroupOutput[];
+  /** @uniqueItems true */
   finding_assets?: EndpointSimple[];
   /** @format date-time */
   finding_created_at: string;
