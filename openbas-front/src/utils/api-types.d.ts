@@ -1239,6 +1239,8 @@ export interface Finding {
   /** @deprecated */
   finding_labels?: string[];
   finding_name?: string;
+  finding_scenario?: Scenario;
+  finding_simulation?: Exercise;
   finding_tags?: string[];
   finding_teams?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
