@@ -3,6 +3,7 @@ package io.openbas.rest.finding.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
 import io.openbas.rest.asset.endpoint.form.EndpointSimple;
+import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.scenario.form.ScenarioSimple;
@@ -57,4 +58,7 @@ public class FindingOutput {
 
   @JsonProperty("finding_assets")
   private Set<EndpointSimple> endpoints;
+
+  @JsonProperty("finding_asset_groups")
+  private Set<AssetGroupOutput> assetGroups;
 }

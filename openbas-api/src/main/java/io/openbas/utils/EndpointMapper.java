@@ -33,7 +33,7 @@ public class EndpointMapper {
         .build();
   }
 
-  public EndpointSimple toEndpointOutput(Asset asset) {
+  public EndpointSimple toEndpointSimple(Asset asset) {
     return EndpointSimple.builder()
         .id(asset.getId())
         .name(asset.getName())
