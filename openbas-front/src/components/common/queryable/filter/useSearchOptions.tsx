@@ -46,6 +46,7 @@ const useSearchOptions = () => {
       case 'payload_tags':
       case 'scenario_tags':
       case 'team_tags':
+      case 'finding_tags':
       case 'user_tags':
         searchTagAsOption(search).then((response) => {
           setOptions(response.data);

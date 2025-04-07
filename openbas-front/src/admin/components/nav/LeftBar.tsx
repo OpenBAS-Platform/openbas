@@ -1,5 +1,31 @@
-import { DashboardOutlined, DescriptionOutlined, DevicesOtherOutlined, DnsOutlined, DomainOutlined, Groups3Outlined, GroupsOutlined, HubOutlined, MovieFilterOutlined, OnlinePredictionOutlined, PersonOutlined, RowingOutlined, SchoolOutlined, SettingsOutlined, SmartButtonOutlined, SubscriptionsOutlined, TerminalOutlined } from '@mui/icons-material';
-import { NewspaperVariantMultipleOutline, PostOutline, SecurityNetwork, SelectGroup, Target } from 'mdi-material-ui';
+import {
+  DashboardOutlined,
+  DescriptionOutlined,
+  DevicesOtherOutlined,
+  DnsOutlined,
+  DomainOutlined,
+  FindInPage,
+  Groups3Outlined,
+  GroupsOutlined,
+  HubOutlined,
+  MovieFilterOutlined,
+  OnlinePredictionOutlined,
+  PersonOutlined,
+  RowingOutlined,
+  SchoolOutlined,
+  SettingsOutlined,
+  SmartButtonOutlined,
+  SubscriptionsOutlined,
+  TerminalOutlined,
+} from '@mui/icons-material';
+import {
+  Binoculars,
+  NewspaperVariantMultipleOutline,
+  PostOutline,
+  SecurityNetwork,
+  SelectGroup,
+  Target,
+} from 'mdi-material-ui';
 
 import { type UserHelper } from '../../../actions/helper';
 import LeftMenu from '../../../components/common/menu/leftmenu/LeftMenu';
@@ -17,6 +43,15 @@ const LeftBar = () => {
           path: `/admin`,
           icon: () => (<DashboardOutlined />),
           label: 'Home',
+        },
+      ],
+    },
+    {
+      items: [
+        {
+          path: '/admin/findings',
+          icon: () => (<Binoculars />),
+          label: 'Findings',
         },
       ],
     },

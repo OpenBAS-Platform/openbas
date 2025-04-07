@@ -23,6 +23,7 @@ import InjectIndex from './components/simulations/simulation/injects/InjectIndex
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const IndexProfile = lazy(() => import('./components/profile/Index'));
 const FullTextSearch = lazy(() => import('./components/search/FullTextSearch'));
+const Findings = lazy(() => import('./components/findings/Findings'));
 const Exercises = lazy(() => import('./components/simulations/Simulations'));
 const IndexExercise = lazy(() => import('./components/simulations/simulation/Index'));
 const AtomicTestings = lazy(() => import('./components/atomic_testings/AtomicTestings'));
@@ -93,6 +94,7 @@ const Index = () => {
               <Route path="profile/*" element={errorWrapper(IndexProfile)()} />
               <Route path="" element={errorWrapper(Dashboard)()} />
               <Route path="fulltextsearch" element={errorWrapper(FullTextSearch)()} />
+              <Route path="findings" element={errorWrapper(Findings)()} />
               <Route path="simulations" element={errorWrapper(Exercises)()} />
               <Route path="simulations/:exerciseId/*" element={errorWrapper(IndexExercise)()} />
               <Route path="simulations/:exerciseId/injects/:injectId/*" element={errorWrapper(InjectIndex)()} />
