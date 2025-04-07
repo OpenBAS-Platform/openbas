@@ -9,11 +9,12 @@ import Empty from '../../../../../components/Empty';
 import ExpandableMarkdown from '../../../../../components/ExpandableMarkdown';
 import { useFormatter } from '../../../../../components/i18n';
 import ItemTags from '../../../../../components/ItemTags';
+import ItemTargets from '../../../../../components/ItemTargets';
 import PlatformIcon from '../../../../../components/PlatformIcon';
 import { useHelper } from '../../../../../store';
 import {
-  type EndpointOverviewOutput as EndpointType,
-  type SearchPaginationInput,
+  type EndpointOverviewOutput as EndpointType, type FindingOutput,
+  type SearchPaginationInput, type TargetSimple,
 } from '../../../../../utils/api-types';
 import { emptyFilled, formatIp, formatMacAddress } from '../../../../../utils/String';
 import FindingList from '../../../findings/FindingList';
@@ -44,6 +45,34 @@ const Endpoint = () => {
   const additionalFilterNames = [
     'finding_inject',
     'finding_simulation',
+  ];
+
+  const additionalHeaders = [
+    {
+      field: 'finding_inject',
+      label: 'Inject',
+      isSortable: false,
+      value: (finding: FindingOutput) => finding.finding_inject?.inject_title,
+    },
+    {
+      field: 'finding_simulation',
+      label: 'Simulation',
+      isSortable: false,
+      value: (finding: FindingOutput) => finding.finding_simulation?.exercise_name || '-',
+    },
+    {
+      field: 'finding_asset_groups',
+      label: 'Asset groups',
+      isSortable: false,
+      value: (finding: FindingOutput) => (
+        <ItemTargets targets={(finding.finding_asset_groups || []).map(group => ({
+          target_id: group.asset_group_id,
+          target_name: group.asset_group_name,
+          target_type: 'ASSETS_GROUPS',
+        })) as TargetSimple[]}
+        />
+      ),
+    },
   ];
 
   const search = (input: SearchPaginationInput) => {
@@ -104,7 +133,12 @@ const Endpoint = () => {
       </Paper>
       <Typography variant="h4">{t('Findings')}</Typography>
       <Paper className="paper" variant="outlined">
-        <FindingList searchFindings={search} additionalFilterNames={additionalFilterNames} />
+        <FindingList
+          filterLocalStorageKey="endpoint-findings"
+          searchFindings={search}
+          additionalHeaders={additionalHeaders}
+          additionalFilterNames={additionalFilterNames}
+        />
       </Paper>
     </div>
   );

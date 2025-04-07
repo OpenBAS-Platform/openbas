@@ -24,23 +24,14 @@ const useStyles = makeStyles()(() => ({
   item: { height: 50 },
 }));
 
-const inlineStyles: Record<string, CSSProperties> = {
-  finding_type: { width: '20%' },
-  finding_value: {
-    width: '30%',
-    cursor: 'default',
-  },
-  finding_assets: { width: '10%' },
-  finding_tags: { width: '20%' },
-};
-
 interface Props {
   searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
+  filterLocalStorageKey: string;
 }
 
-const FindingList = ({ searchFindings, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
+const FindingList = ({ searchFindings, filterLocalStorageKey, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
   const dispatch = useAppDispatch();
@@ -56,14 +47,14 @@ const FindingList = ({ searchFindings, additionalHeaders = [], additionalFilterN
     'finding_tags',
     'finding_assets',
     'finding_created_at',
-    // asset_group ?? TODO
+    // 'finding_assets_groups', // TODO: not working
     ...additionalFilterNames,
   ];
 
   // const [search] = searchParams.getAll('search'); // TODO???
 
   const [findings, setFindings] = useState<FindingOutput[]>([]);
-  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage('finding', buildSearchPagination({
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(filterLocalStorageKey, buildSearchPagination({
     sorts: initSorting('finding_created_at'),
     // textSearch: search,
   }));
@@ -109,6 +100,18 @@ const FindingList = ({ searchFindings, additionalHeaders = [], additionalFilterN
     },
     ...additionalHeaders,
   ];
+
+  const basis = `${100 / headers.length}%`;
+  const inlineStyles: Record<string, CSSProperties> = ({
+    finding_type: { width: basis },
+    finding_value: { width: basis },
+    finding_assets: { width: basis },
+    finding_tags: { width: basis },
+    ...additionalHeaders.reduce((acc, header) => {
+      acc[header.field] = { width: basis };
+      return acc;
+    }, {} as Record<string, CSSProperties>),
+  });
 
   return (
     <>
