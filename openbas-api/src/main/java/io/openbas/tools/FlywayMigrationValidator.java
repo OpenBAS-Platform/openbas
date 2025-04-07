@@ -6,9 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -35,7 +33,7 @@ public class FlywayMigrationValidator {
         return;
       }
 
-      Map<String, List<String>> versionToFiles = new HashMap<>();
+      List<String> versions = new ArrayList<>();
 
       try (Stream<Path> files = Files.walk(migrationDir)) {
         files
@@ -49,22 +47,15 @@ public class FlywayMigrationValidator {
                   Matcher matcher = VERSION_PATTERN.matcher(fileName);
                   if (matcher.matches()) {
                     String version = matcher.group(1).replace('_', '.');
-                    versionToFiles.computeIfAbsent(version, k -> new ArrayList<>()).add(fileName);
+                    if (versions.contains(version)) {
+                      throw new IllegalStateException(
+                          "Duplicate Flyway migration version found: " + version);
+                    } else {
+                      versions.add(version);
+                    }
                   }
                 });
       }
-
-      versionToFiles.entrySet().stream()
-          .filter(e -> e.getValue().size() > 1)
-          .findAny()
-          .ifPresent(
-              e -> {
-                throw new IllegalStateException(
-                    "Duplicate Flyway migration version found: "
-                        + e.getKey()
-                        + " → "
-                        + e.getValue());
-              });
 
     } catch (URISyntaxException | IOException e) {
       throw new RuntimeException("Error during Flyway migration validation", e);
