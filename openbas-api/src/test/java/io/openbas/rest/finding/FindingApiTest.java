@@ -246,11 +246,6 @@ class FindingApiTest extends IntegrationTest {
           buildFilter(
               "finding_assets", Filters.FilterOperator.contains, List.of(endpoint.getId())));
     }
-    if (endpoint != null) {
-      filters.add(
-          buildFilter(
-              "finding_assets", Filters.FilterOperator.contains, List.of(endpoint.getId())));
-    }
     if (simulation != null) {
       filters.add(
           buildFilter(

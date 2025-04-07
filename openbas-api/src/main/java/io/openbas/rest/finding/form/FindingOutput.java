@@ -3,7 +3,7 @@ package io.openbas.rest.finding.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ContractOutputType;
 import io.openbas.rest.asset.endpoint.form.EndpointSimple;
-import io.openbas.rest.asset_group.form.AssetGroupOutput;
+import io.openbas.rest.asset_group.form.AssetGroupSimple;
 import io.openbas.rest.exercise.form.ExerciseSimple;
 import io.openbas.rest.inject.output.InjectSimple;
 import io.openbas.rest.scenario.form.ScenarioSimple;
@@ -30,15 +30,15 @@ public class FindingOutput {
 
   @JsonProperty("finding_type")
   @NotNull
-  protected ContractOutputType type;
+  private ContractOutputType type;
 
   @JsonProperty("finding_value")
   @NotBlank
-  protected String value;
+  private String value;
 
   @JsonProperty("finding_name")
   @NotBlank
-  protected String name;
+  private String name;
 
   @JsonProperty("finding_created_at")
   @NotNull
@@ -60,5 +60,5 @@ public class FindingOutput {
   private Set<EndpointSimple> endpoints;
 
   @JsonProperty("finding_asset_groups")
-  private Set<AssetGroupOutput> assetGroups;
+  private Set<AssetGroupSimple> assetGroups;
 }

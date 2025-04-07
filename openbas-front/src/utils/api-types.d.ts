@@ -210,6 +210,15 @@ export interface AssetGroupOutput {
   asset_group_tags?: string[];
 }
 
+export interface AssetGroupSimple {
+  /** Filter object to search within filterable attributes */
+  asset_group_dynamic_filter?: FilterGroup;
+  asset_group_id: string;
+  asset_group_name: string;
+  /** @uniqueItems true */
+  asset_group_tags?: string[];
+}
+
 /** Full contract */
 export interface AtomicInjectorContractOutput {
   convertedContent?: object;
@@ -1263,7 +1272,7 @@ export interface FindingInput {
 
 export interface FindingOutput {
   /** @uniqueItems true */
-  finding_asset_groups?: AssetGroupOutput[];
+  finding_asset_groups?: AssetGroupSimple[];
   /** @uniqueItems true */
   finding_assets?: EndpointSimple[];
   /** @format date-time */

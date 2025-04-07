@@ -47,7 +47,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, additionalHeaders 
     'finding_tags',
     'finding_assets',
     'finding_created_at',
-    // 'finding_assets_groups', // TODO: not working
+    // 'finding_asset_groups', // TODO: not working
     ...additionalFilterNames,
   ];
 
