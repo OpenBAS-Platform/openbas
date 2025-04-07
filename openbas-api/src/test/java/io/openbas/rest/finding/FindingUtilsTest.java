@@ -273,6 +273,7 @@ class FindingUtilsTest {
   void given_a_finding_already_existent_with_same_asset_should_have_one_assets() {
     Inject inject = getDefaultInject();
     Asset asset1 = createDefaultAsset("asset1");
+    asset1.setId("asset1");
     String value = "value-already-existent";
     ContractOutputElement contractOutputElement = getDefaultContractOutputElement();
 
