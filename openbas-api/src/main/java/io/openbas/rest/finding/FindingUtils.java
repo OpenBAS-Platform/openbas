@@ -158,7 +158,12 @@ public class FindingUtils {
               return newFinding;
             });
 
-    finding.getAssets().add(asset);
+    boolean isNewAsset =
+        finding.getAssets().stream().noneMatch(a -> a.getId().equals(asset.getId()));
+
+    if (isNewAsset) {
+      finding.getAssets().add(asset);
+    }
     return finding;
   }
 

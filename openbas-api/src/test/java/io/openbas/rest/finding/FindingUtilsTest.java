@@ -34,6 +34,8 @@ class FindingUtilsTest {
           + "  TCP    192.168.1.10:135            0.0.0.0:0              LISTENING\n"
           + "  TCP    176.125.125.10:445            0.0.0.0:0              LISTENING\n"
           + "  TCP    192.168.12.12:902            0.0.0.0:0              LISTENING\n";
+  public static final String ASSET_1 = "asset1";
+  public static final String ASSET_2 = "asset2";
 
   @Mock private FindingRepository findingRepository;
 
@@ -251,8 +253,10 @@ class FindingUtilsTest {
   @DisplayName("Should have two assets for a finding")
   void given_a_finding_already_existent_with_one_asset_should_have_two_assets() {
     Inject inject = getDefaultInject();
-    Asset asset1 = createDefaultAsset("asset1");
-    Asset asset2 = createDefaultAsset("asset2");
+    Asset asset1 = createDefaultAsset(ASSET_1);
+    asset1.setId(ASSET_1);
+    Asset asset2 = createDefaultAsset(ASSET_2);
+    asset2.setId(ASSET_2);
     String value = "value-already-existent";
     ContractOutputElement contractOutputElement = getDefaultContractOutputElement();
 
@@ -266,5 +270,26 @@ class FindingUtilsTest {
     Finding updatedFinding =
         findingUtils.buildFinding(inject, asset2, contractOutputElement, value);
     assertEquals(2, updatedFinding.getAssets().size());
+  }
+
+  @Test
+  @DisplayName("Should have one assets for a finding")
+  void given_a_finding_already_existent_with_same_asset_should_have_one_assets() {
+    Inject inject = getDefaultInject();
+    Asset asset1 = createDefaultAsset(ASSET_1);
+    asset1.setId(ASSET_1);
+    String value = "value-already-existent";
+    ContractOutputElement contractOutputElement = getDefaultContractOutputElement();
+
+    Finding finding1 = new Finding();
+    finding1.setValue(value);
+    finding1.getAssets().add(asset1);
+
+    when(findingRepository.findByInjectIdAndValue(inject.getId(), value))
+        .thenReturn(Optional.of(finding1));
+
+    Finding updatedFinding =
+        findingUtils.buildFinding(inject, asset1, contractOutputElement, value);
+    assertEquals(1, updatedFinding.getAssets().size());
   }
 }
