@@ -109,7 +109,6 @@ const CustomDashboardComponent = () => {
     padding: theme.spacing(2),
     borderRadius: 4,
     display: 'relative',
-    overflow: 'hidden',
   };
 
   return (
