@@ -3,6 +3,7 @@ package io.openbas.database.specification;
 import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
 
 import io.openbas.database.model.Exercise;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Path;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,5 +26,9 @@ public class ExerciseSpecification {
 
   public static Specification<Exercise> fromScenario(@NotNull final String scenarioId) {
     return (root, query, cb) -> cb.equal(root.get("scenario").get("id"), scenarioId);
+  }
+
+  public static Specification<Exercise> byName(@Nullable final String searchText) {
+    return UtilsSpecification.byName(searchText, "name");
   }
 }

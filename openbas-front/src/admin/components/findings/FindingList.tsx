@@ -48,7 +48,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
 
   const [findings, setFindings] = useState<FindingOutput[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(filterLocalStorageKey, buildSearchPagination({
-    sorts: initSorting('finding_created_at'),
+    sorts: initSorting('finding_created_at', 'DESC'),
     textSearch: search,
   }));
 

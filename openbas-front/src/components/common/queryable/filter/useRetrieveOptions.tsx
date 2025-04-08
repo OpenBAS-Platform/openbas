@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { searchAssetGroupByIdAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
+import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
@@ -64,6 +65,12 @@ const useRetrieveOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'finding_simulation':
+        searchExerciseByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'finding_scenario' :
       case 'exercise_scenario':
         searchScenarioByIdAsOption(ids).then((response) => {
           setOptions(response.data);
