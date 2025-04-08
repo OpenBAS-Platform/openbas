@@ -6,13 +6,13 @@ import { makeStyles } from 'tss-react/mui';
 
 import { fetchAssetGroup, searchEndpointsFromAssetGroup } from '../../../../actions/asset_groups/assetgroup-action';
 import { type AssetGroupsHelper } from '../../../../actions/asset_groups/assetgroup-helper';
-import { type EndpointHelper } from '../../../../actions/assets/asset-helper';
 import { type UserHelper } from '../../../../actions/helper';
+import { type Page } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useHelper } from '../../../../store';
-import { type AssetGroup, type Endpoint, type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
+import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import EndpointPopover from '../endpoints/EndpointPopover';
@@ -50,15 +50,11 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   assetGroupId: string;
   handleClose: () => void;
-  onUpdate?: (result: AssetGroup) => void;
-  onRemoveEndpointFromAssetGroup?: (assetId: Endpoint['asset_id']) => void;
 }
 
 const AssetGroupManagement: FunctionComponent<Props> = ({
   assetGroupId,
   handleClose,
-  onUpdate,
-  onRemoveEndpointFromAssetGroup,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -66,7 +62,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const dispatch = useAppDispatch();
 
   // Fetching data
-  const { assetGroup, userAdmin } = useHelper((helper: AssetGroupsHelper & EndpointHelper & UserHelper) => ({
+  const { assetGroup, userAdmin } = useHelper((helper: AssetGroupsHelper & UserHelper) => ({
     assetGroup: helper.getAssetGroup(assetGroupId),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
@@ -84,16 +80,17 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   ];
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
 
-  const paginationComponent = (
-    <PaginationComponentV2
-      fetch={((searchPaginationInput: SearchPaginationInput) => searchEndpointsFromAssetGroup(searchPaginationInput, assetGroupId))}
-      searchPaginationInput={searchPaginationInput}
-      setContent={setEndpoints}
-      entityPrefix="endpoint"
-      availableFilterNames={availableFilterNames}
-      queryableHelpers={queryableHelpers}
-    />
-  );
+  const onRemoveEndpointFromList = (asset: EndpointOutput) => {
+    setEndpoints(endpoints.toSpliced(endpoints.indexOf(asset), 1));
+  };
+
+  const onUpdateList = () => {
+    searchEndpointsFromAssetGroup(searchPaginationInput, assetGroupId).then((result: { data: Page<EndpointOutput> }) => {
+      const { data } = result;
+      setEndpoints(data.content);
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(data.totalElements);
+    });
+  };
 
   return (
     <>
@@ -113,7 +110,14 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
         <div className="clearfix" />
       </div>
       <div style={{ padding: theme.spacing(1) }}>
-        {paginationComponent}
+        <PaginationComponentV2
+          fetch={((searchPaginationInput: SearchPaginationInput) => searchEndpointsFromAssetGroup(searchPaginationInput, assetGroupId))}
+          searchPaginationInput={searchPaginationInput}
+          setContent={setEndpoints}
+          entityPrefix="endpoint"
+          availableFilterNames={availableFilterNames}
+          queryableHelpers={queryableHelpers}
+        />
       </div>
 
       <EndpointsList
@@ -125,7 +129,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
                 inline
                 assetGroupId={assetGroup?.asset_group_id}
                 assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-                onRemoveEndpointFromAssetGroup={onRemoveEndpointFromAssetGroup}
+                onRemoveEndpointFromAssetGroup={onRemoveEndpointFromList}
               />
             )
           : <span> &nbsp; </span>}
@@ -135,7 +139,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
           <AssetGroupAddEndpoints
             assetGroupId={assetGroup?.asset_group_id}
             assetGroupEndpointIds={assetGroup?.asset_group_assets ?? []}
-            onUpdate={onUpdate}
+            onUpdate={onUpdateList}
           />
         )}
     </>

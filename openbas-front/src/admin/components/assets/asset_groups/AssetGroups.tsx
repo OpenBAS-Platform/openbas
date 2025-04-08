@@ -294,13 +294,6 @@ const AssetGroups = () => {
           <AssetGroupManagement
             assetGroupId={selectedAssetGroupId}
             handleClose={() => setSelectedAssetGroupId(undefined)}
-            onUpdate={result => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
-            onRemoveEndpointFromAssetGroup={assetId => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== selectedAssetGroupId
-              ? ag
-              : {
-                  ...ag,
-                  asset_group_assets: ag?.asset_group_assets?.toSpliced(ag?.asset_group_assets?.indexOf(assetId), 1),
-                })))}
           />
         )}
       </MuiDrawer>

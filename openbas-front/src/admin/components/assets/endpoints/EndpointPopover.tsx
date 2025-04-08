@@ -7,12 +7,7 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import {
-  type EndpointOutput,
-  type EndpointOverviewOutput,
-  type EndpointUpdateInput,
-} from '../../../../utils/api-types';
-import { MESSAGING$ } from '../../../../utils/Environment';
+import { type EndpointOutput, type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import EndpointForm from './EndpointForm';
 
@@ -22,7 +17,7 @@ export interface EndpointPopoverProps {
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
-  onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
+  onRemoveEndpointFromAssetGroup?: (asset: EndpointOutput) => void;
   openEditOnInit?: boolean;
   onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
@@ -85,8 +80,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
         updateAssetsOnAssetGroup(assetGroupId, { asset_group_assets: assetGroupEndpointIds?.filter(id => id !== endpoint.asset_id) }),
       ).then(() => {
         if (onRemoveEndpointFromAssetGroup) {
-          onRemoveEndpointFromAssetGroup(endpoint.asset_id);
-          MESSAGING$.notifySuccess('The element has been successfully updated');
+          onRemoveEndpointFromAssetGroup(endpoint);
         }
         setRemovalFromAssetGroup(false);
       });

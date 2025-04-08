@@ -28,7 +28,6 @@ export interface AssetGroupPopoverProps {
   assetGroup: AssetGroup | AssetGroupOutput;
   onRemoveAssetGroupFromList?: (assetGroupId: string) => void;
   removeAssetGroupFromListMessage?: string;
-  onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
   openEditOnInit?: boolean;
   onUpdate?: (result: AssetGroup) => void;
   onDelete?: (result: string) => void;
@@ -39,7 +38,6 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
   assetGroup,
   onRemoveAssetGroupFromList,
   removeAssetGroupFromListMessage = 'Remove from the inject',
-  onRemoveEndpointFromAssetGroup,
   openEditOnInit = false,
   onUpdate,
   onDelete,
@@ -214,8 +212,6 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
           {selected !== undefined && (
             <AssetGroupManagement
               assetGroupId={assetGroup.asset_group_id}
-              onUpdate={onUpdate}
-              onRemoveEndpointFromAssetGroup={onRemoveEndpointFromAssetGroup}
               handleClose={() => setSelected(false)}
             />
           )}
