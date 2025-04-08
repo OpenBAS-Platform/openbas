@@ -1,12 +1,15 @@
 package io.openbas.rest.exercise.form;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.time.Instant.now;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -21,23 +24,29 @@ import lombok.Setter;
 
 @Setter
 @Getter
+@JsonInclude(NON_NULL)
 public class ExerciseSimple {
 
+  @Schema(description = "Exercise Id")
   @JsonProperty("exercise_id")
   @NotBlank
   private String id;
 
+  @Schema(description = "Exercise Id")
   @JsonProperty("exercise_name")
   @NotBlank
   private String name;
 
+  @Schema(description = "Exercise status")
   @JsonProperty("exercise_status")
   @Enumerated(EnumType.STRING)
   private ExerciseStatus status;
 
+  @Schema(description = "Exercise Subtitle")
   @JsonProperty("exercise_subtitle")
   private String subtitle;
 
+  @Schema(description = "Exercise Category")
   @JsonProperty("exercise_category")
   private String category;
 
@@ -47,6 +56,7 @@ public class ExerciseSimple {
   @JsonProperty("exercise_updated_at")
   private Instant updatedAt = now();
 
+  @Schema(description = "Tags")
   @JsonProperty("exercise_tags")
   private Set<String> tagIds = new HashSet<>();
 
