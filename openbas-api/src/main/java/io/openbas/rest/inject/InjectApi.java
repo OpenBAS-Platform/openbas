@@ -3,6 +3,7 @@ package io.openbas.rest.inject;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.CommunicationSpecification.fromInject;
+import static io.openbas.database.specification.InjectSpecification.byTitle;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
@@ -29,6 +30,7 @@ import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.*;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.*;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.ServletOutputStream;
@@ -595,6 +597,25 @@ public class InjectApi extends RestBehavior {
     // Bulk delete
     this.injectService.deleteAll(injectsToDelete);
     return injectsToDelete;
+  }
+
+  // -- OPTION --
+  @GetMapping(INJECT_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return fromIterable(
+            this.injectRepository.findAll(
+                byTitle(searchText), Sort.by(Sort.Direction.ASC, "title")))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle()))
+        .toList();
+  }
+
+  @PostMapping(INJECT_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.injectRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle()))
+        .toList();
   }
 
   /**
