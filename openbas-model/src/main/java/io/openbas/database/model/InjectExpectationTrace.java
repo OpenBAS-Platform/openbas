@@ -11,6 +11,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.Objects;
+
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -63,4 +65,39 @@ public class InjectExpectationTrace implements Base {
   @JsonProperty("inject_expectation_trace_updated_at")
   @NotNull
   private Instant updatedAt = now();
+
+  /**
+   * Compute object equality. Two traces are equal if they have the same id, inject expectation, security platform, name and link.
+   * Trace dates are irrelevant for equality for now.
+   * @param o object to compare to
+   * @return equality result
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    InjectExpectationTrace that = (InjectExpectationTrace) o;
+    return Objects.equals(getId(), that.getId()) && Objects.equals(getInjectExpectation(), that.getInjectExpectation()) && Objects.equals(getSecurityPlatform(), that.getSecurityPlatform()) && Objects.equals(getAlertName(), that.getAlertName()) && Objects.equals(getAlertLink(), that.getAlertLink());
+  }
+
+  /**
+   * Compute object equality without the ID. Two traces are equal if they have the same inject expectation, security platform, name and link.
+   * Trace dates are irrelevant for equality for now.
+   * @param o object to compare to
+   * @return equality result
+   */
+  public boolean equalsExcludingId(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    InjectExpectationTrace that = (InjectExpectationTrace) o;
+    return Objects.equals(getInjectExpectation(), that.getInjectExpectation()) && Objects.equals(getSecurityPlatform(), that.getSecurityPlatform()) && Objects.equals(getAlertName(), that.getAlertName()) && Objects.equals(getAlertLink(), that.getAlertLink());
+  }
+
+  /**
+   * Compute hash code. Hash is computed on id, inject expectation, security platform, name and link.
+   * Trace dates are irrelevant for now.
+   * @return hash code
+   */
+  @Override
+  public int hashCode() {
+    return Objects.hash(getId(), getInjectExpectation(), getSecurityPlatform(), getAlertName(), getAlertLink());
+  }
 }
