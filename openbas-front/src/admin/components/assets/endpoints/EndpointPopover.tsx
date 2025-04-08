@@ -7,15 +7,18 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
+import {
+  type EndpointOutput,
+  type EndpointOverviewOutput,
+  type EndpointUpdateInput,
+} from '../../../../utils/api-types';
 import { MESSAGING$ } from '../../../../utils/Environment';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { type EndpointStoreWithType } from './endpoint';
 import EndpointForm from './EndpointForm';
 
 export interface EndpointPopoverProps {
   inline?: boolean;
-  endpoint: EndpointStoreWithType;
+  endpoint: EndpointOutput & EndpointOverviewOutput;
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
