@@ -1,9 +1,9 @@
 import { HubOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { type CSSProperties, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
-import { fetchTags } from '../../../actions/Tag';
 import { initSorting, type Page } from '../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
@@ -16,8 +16,6 @@ import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../utils/api-types';
-import { useAppDispatch } from '../../../utils/hooks';
-import useDataLoader from '../../../utils/hooks/useDataLoader';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
@@ -29,37 +27,32 @@ interface Props {
   additionalHeaders?: Header[];
   additionalFilterNames?: string[];
   filterLocalStorageKey: string;
+  contextId?: string;
 }
 
-const FindingList = ({ searchFindings, filterLocalStorageKey, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
+const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
-  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState<boolean>(true);
-
-  useDataLoader(() => {
-    dispatch(fetchTags());
-  });
 
   const availableFilterNames = [
     'finding_name',
     'finding_type',
     'finding_tags',
-    'finding_assets',
     'finding_created_at',
-    // 'finding_asset_groups', // TODO: not working
     ...additionalFilterNames,
   ];
 
-  // const [search] = searchParams.getAll('search'); // TODO???
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
 
   const [findings, setFindings] = useState<FindingOutput[]>([]);
   const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(filterLocalStorageKey, buildSearchPagination({
     sorts: initSorting('finding_created_at'),
-    // textSearch: search,
+    textSearch: search,
   }));
 
-  const search = (input: SearchPaginationInput) => {
+  const searchFindingsToload = (input: SearchPaginationInput) => {
     setLoading(true);
     return searchFindings(input).finally(() => {
       setLoading(false);
@@ -116,12 +109,13 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, additionalHeaders 
   return (
     <>
       <PaginationComponentV2
-        fetch={search}
+        fetch={searchFindingsToload}
         searchPaginationInput={searchPaginationInput}
         setContent={setFindings}
         entityPrefix="finding"
         availableFilterNames={availableFilterNames}
         queryableHelpers={queryableHelpers}
+        contextId={contextId}
       />
       <List>
         <ListItem

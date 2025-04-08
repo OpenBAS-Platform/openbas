@@ -12,6 +12,7 @@ const ScenarioFindings = () => {
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   const additionalFilterNames = [
+    'finding_assets',
     'finding_inject',
     'finding_simulation',
   ];
@@ -35,6 +36,7 @@ const ScenarioFindings = () => {
       searchFindings={search}
       additionalHeaders={additionalHeaders}
       additionalFilterNames={additionalFilterNames}
+      contextId={scenarioId}
     />
   );
 };

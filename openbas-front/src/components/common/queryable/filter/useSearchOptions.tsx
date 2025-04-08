@@ -52,11 +52,13 @@ const useSearchOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'finding_asset_groups':
       case 'inject_asset_groups':
         searchAssetGroupAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });
         break;
+      case 'finding_assets':
       case 'inject_assets':
         searchEndpointAsOption(search, contextId).then((response) => {
           setOptions(response.data);

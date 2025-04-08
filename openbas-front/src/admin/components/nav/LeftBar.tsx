@@ -4,7 +4,6 @@ import {
   DevicesOtherOutlined,
   DnsOutlined,
   DomainOutlined,
-  FindInPage,
   Groups3Outlined,
   GroupsOutlined,
   HubOutlined,
