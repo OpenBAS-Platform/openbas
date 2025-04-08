@@ -251,6 +251,10 @@ public class Inject implements Base, Injection {
   @JsonSerialize(using = MultiModelDeserializer.class)
   private List<InjectExpectation> expectations = new ArrayList<>();
 
+  @JsonIgnore
+  @OneToMany(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Finding> findings = new ArrayList<>();
+
   @Getter @Setter @Transient private boolean isListened = true;
 
   // region transient
@@ -275,6 +279,7 @@ public class Inject implements Base, Injection {
     this.status = null;
     this.communications.clear();
     this.expectations.clear();
+    this.findings.clear();
   }
 
   @JsonProperty("inject_users_number")
