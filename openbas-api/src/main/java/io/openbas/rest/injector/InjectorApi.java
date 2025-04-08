@@ -16,6 +16,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.openbas.config.RabbitmqConfig;
 import io.openbas.database.model.AttackPattern;
+import io.openbas.database.model.ExecutionTraceStatus;
 import io.openbas.database.model.Injector;
 import io.openbas.database.model.InjectorContract;
 import io.openbas.database.repository.AttackPatternRepository;
@@ -23,6 +24,9 @@ import io.openbas.database.repository.InjectorContractRepository;
 import io.openbas.database.repository.InjectorRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.inject.form.InjectExecutionAction;
+import io.openbas.rest.inject.form.InjectExecutionInput;
+import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.rest.injector.form.InjectorCreateInput;
 import io.openbas.rest.injector.form.InjectorUpdateInput;
 import io.openbas.rest.injector.response.InjectorConnection;
@@ -39,9 +43,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
 import java.util.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -53,6 +57,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Log
 @RestController
+@RequiredArgsConstructor
 public class InjectorApi extends RestBehavior {
 
   public static final String INJECT0R_URI = "/api/injectors";
@@ -68,33 +73,11 @@ public class InjectorApi extends RestBehavior {
 
   @Resource private RabbitmqConfig rabbitmqConfig;
 
-  private AttackPatternRepository attackPatternRepository;
-
-  private InjectorRepository injectorRepository;
-
-  private InjectorContractRepository injectorContractRepository;
-
-  private FileService fileService;
-
-  @Autowired
-  public void setFileService(FileService fileService) {
-    this.fileService = fileService;
-  }
-
-  @Autowired
-  public void setAttackPatternRepository(AttackPatternRepository attackPatternRepository) {
-    this.attackPatternRepository = attackPatternRepository;
-  }
-
-  @Autowired
-  public void setInjectorRepository(InjectorRepository injectorRepository) {
-    this.injectorRepository = injectorRepository;
-  }
-
-  @Autowired
-  public void setInjectorContractRepository(InjectorContractRepository injectorContractRepository) {
-    this.injectorContractRepository = injectorContractRepository;
-  }
+  private final AttackPatternRepository attackPatternRepository;
+  private final InjectorRepository injectorRepository;
+  private final InjectorContractRepository injectorContractRepository;
+  private final FileService fileService;
+  private final InjectStatusService injectStatusService;
 
   @GetMapping("/api/injectors")
   public Iterable<Injector> injectors() {
@@ -361,12 +344,18 @@ public class InjectorApi extends RestBehavior {
       value = "/api/implant/openbas/{platform}/{architecture}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public @ResponseBody ResponseEntity<byte[]> getOpenBasImplant(
-      @PathVariable String platform, @PathVariable String architecture) throws IOException {
+      @PathVariable String platform,
+      @PathVariable String architecture,
+      @RequestParam(required = false) final String injectId,
+      @RequestParam(required = false) final String agentId)
+      throws IOException {
     if (!AVAILABLE_PLATFORMS.contains(platform)) {
-      throw new IllegalArgumentException("Platform invalid : " + platform);
+      setImplantErrorTrace(
+          injectId, agentId, "Unable to download the implant. Platform invalid : " + platform);
     }
     if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
-      throw new IllegalArgumentException("Architecture invalid : " + architecture);
+      setImplantErrorTrace(
+          injectId, agentId, "Unable to download the implant. Architecture invalid : " + platform);
     }
 
     InputStream in = null;
@@ -394,6 +383,17 @@ public class InjectorApi extends RestBehavior {
           .body(IOUtils.toByteArray(in));
     }
     throw new UnsupportedOperationException("Implant " + platform + " executable not supported");
+  }
+
+  private void setImplantErrorTrace(String injectId, String agentId, String message) {
+    if (injectId != null && injectId.isBlank() && agentId != null && agentId.isBlank()) {
+      InjectExecutionInput input = new InjectExecutionInput();
+      input.setMessage(message);
+      input.setStatus(ExecutionTraceStatus.ERROR.name());
+      input.setAction(InjectExecutionAction.complete);
+      injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+    }
+    throw new IllegalArgumentException(message);
   }
 
   // -- OPTION --
