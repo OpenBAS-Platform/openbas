@@ -278,6 +278,7 @@ const InjectForm = ({
   useEffect(() => {
     const initialValues = getInitialValues();
     setDefaultValues(initialValues);
+    console.log('default value --', initialValues);
     reset(initialValues, { keepDirtyValues: true });
   }, [injectorContractContent]);
 
