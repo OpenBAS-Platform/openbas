@@ -3,6 +3,7 @@ package io.openbas.rest.exercise;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
+import static io.openbas.database.specification.ExerciseSpecification.byName;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -32,6 +33,7 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +52,7 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -361,6 +364,25 @@ public class ExerciseApi extends RestBehavior {
     exercise.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
     exercise.setLogoLight(documentRepository.findById(input.getLogoLight()).orElse(null));
     return exerciseRepository.save(exercise);
+  }
+
+  // -- OPTION --
+  @GetMapping(EXERCISE_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsByName(
+      @RequestParam(required = false) final String searchText) {
+    return fromIterable(
+            this.exerciseRepository.findAll(
+                byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
+        .stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
+  }
+
+  @PostMapping(EXERCISE_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.exerciseRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/lessons")
