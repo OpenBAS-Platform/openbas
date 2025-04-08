@@ -73,6 +73,7 @@ public class V1_DataImporter implements Importer {
   private final PayloadCreationService payloadCreationService;
   private final AttackPatternRepository attackPatternRepository;
   private final KillChainPhaseRepository killChainPhaseRepository;
+
   // endregion
 
   private String handleInjectContent(
@@ -1043,7 +1044,8 @@ public class V1_DataImporter implements Importer {
     }
     PayloadCreateInput payloadCreateInput = buildPayload(payloadNode);
 
-    List<String> attackPatternIds = importAttackPatterns(payloadNode.get("payload_attack_patterns_details"));
+    List<String> attackPatternIds =
+        importAttackPatterns(payloadNode.get("payload_attack_patterns_details"));
     payloadCreateInput.setAttackPatternsIds(attackPatternIds);
 
     Payload payload = this.payloadCreationService.createPayload(payloadCreateInput);
@@ -1063,15 +1065,18 @@ public class V1_DataImporter implements Importer {
   }
 
   private List<String> importAttackPatterns(@NotNull final JsonNode attackPatternsNode) {
-    List<String>  attackPatternIds = new ArrayList<>();
-    for(JsonNode attackPatternNode: attackPatternsNode) {
+    List<String> attackPatternIds = new ArrayList<>();
+    for (JsonNode attackPatternNode : attackPatternsNode) {
       JsonNode attackPatternExternalIdNode = attackPatternNode.get("attack_pattern_external_id");
       String attackPatternExternalId = attackPatternExternalIdNode.textValue();
-      Optional<AttackPattern> optionalExistingAttackPattern = attackPatternRepository.findByExternalId(attackPatternExternalId);
-      if(optionalExistingAttackPattern.isPresent()) {
+      Optional<AttackPattern> optionalExistingAttackPattern =
+          attackPatternRepository.findByExternalId(attackPatternExternalId);
+      if (optionalExistingAttackPattern.isPresent()) {
         attackPatternIds.add(optionalExistingAttackPattern.get().getId());
       } else {
-        List<KillChainPhase> killChainPhases = importKillChainPhases(attackPatternNode.get("attack_patterns_kill_chain_phases_details"));
+        List<KillChainPhase> killChainPhases =
+            importKillChainPhases(
+                attackPatternNode.get("attack_patterns_kill_chain_phases_details"));
         AttackPattern attackPattern = buildAttackPattern(attackPatternNode, killChainPhases);
         attackPatternIds.add(attackPatternRepository.save(attackPattern).getId());
       }
@@ -1079,24 +1084,28 @@ public class V1_DataImporter implements Importer {
     return attackPatternIds;
   }
 
-  private AttackPattern buildAttackPattern(@NotNull final JsonNode attackPatternNode,
-                                           List<KillChainPhase> killChainPhases){
+  private AttackPattern buildAttackPattern(
+      @NotNull final JsonNode attackPatternNode, List<KillChainPhase> killChainPhases) {
     AttackPattern attackPattern = new AttackPattern();
     attackPattern.setKillChainPhases(killChainPhases);
     attackPattern.setExternalId(attackPatternNode.get("attack_pattern_external_id").textValue());
     attackPattern.setName(attackPatternNode.get("attack_pattern_name").textValue());
     attackPattern.setDescription(attackPatternNode.get("attack_pattern_description").textValue());
     attackPattern.setStixId(attackPatternNode.get("attack_pattern_stix_id").textValue());
-    attackPattern.setPermissionsRequired(jsonNodeToStringArray(attackPatternNode.get("attack_pattern_permissions_required")));
-    attackPattern.setPlatforms(jsonNodeToStringArray(attackPatternNode.get("attack_pattern_platforms")));
+    attackPattern.setPermissionsRequired(
+        jsonNodeToStringArray(attackPatternNode.get("attack_pattern_permissions_required")));
+    attackPattern.setPlatforms(
+        jsonNodeToStringArray(attackPatternNode.get("attack_pattern_platforms")));
     return attackPattern;
   }
+
   private List<KillChainPhase> importKillChainPhases(@NotNull final JsonNode killChainPhasesNode) {
     List<KillChainPhase> killChainPhases = new ArrayList<>();
-    for(JsonNode killChainPhaseNode: killChainPhasesNode) {
+    for (JsonNode killChainPhaseNode : killChainPhasesNode) {
       JsonNode killChainPhaseExternalIdNode = killChainPhaseNode.get("phase_external_id");
       String killChainPhaseExternalId = killChainPhaseExternalIdNode.textValue();
-      Optional<KillChainPhase> killChainPhaseOptional = killChainPhaseRepository.findByExternalId(killChainPhaseExternalId);
+      Optional<KillChainPhase> killChainPhaseOptional =
+          killChainPhaseRepository.findByExternalId(killChainPhaseExternalId);
       if (killChainPhaseOptional.isPresent()) {
         killChainPhases.add(killChainPhaseOptional.get());
       } else {
@@ -1107,7 +1116,7 @@ public class V1_DataImporter implements Importer {
     return killChainPhases;
   }
 
-  private KillChainPhase buildKillChainPhase(@NotNull final JsonNode killChainPhaseNode){
+  private KillChainPhase buildKillChainPhase(@NotNull final JsonNode killChainPhaseNode) {
     KillChainPhase killChainPhase = new KillChainPhase();
     killChainPhase.setKillChainName(killChainPhaseNode.get("phase_kill_chain_name").textValue());
     killChainPhase.setShortName(killChainPhaseNode.get("phase_shortname").textValue());
@@ -1118,6 +1127,7 @@ public class V1_DataImporter implements Importer {
     killChainPhase.setOrder(killChainPhaseNode.get("phase_order").asLong());
     return killChainPhase;
   }
+
   private void importVariables(
       JsonNode importNode,
       Exercise savedExercise,
@@ -1148,10 +1158,12 @@ public class V1_DataImporter implements Importer {
   private String getNodeValue(JsonNode importNode) {
     return ofNullable(importNode).map(JsonNode::textValue).orElse(null);
   }
+
   private String[] jsonNodeToStringArray(JsonNode node) {
-    return (String[]) StreamSupport
-            .stream(node.get("datasets").spliterator(), false)
-            .collect(Collectors.toList()).toArray();
+    return (String[])
+        StreamSupport.stream(node.get("datasets").spliterator(), false)
+            .collect(Collectors.toList())
+            .toArray();
   }
 
   private static class BaseHolder implements Base {

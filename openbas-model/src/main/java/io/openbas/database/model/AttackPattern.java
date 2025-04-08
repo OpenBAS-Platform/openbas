@@ -94,11 +94,11 @@ public class AttackPattern implements Base {
   @JsonProperty("attack_pattern_kill_chain_phases")
   private List<KillChainPhase> killChainPhases = new ArrayList<>();
 
-
   @JsonProperty("attack_patterns_kill_chain_phases_details")
-  public List<KillChainPhase> getKillChainPhasesDetails(){
+  public List<KillChainPhase> getKillChainPhasesDetails() {
     return this.killChainPhases;
   }
+
   @Override
   public int hashCode() {
     return Objects.hash(id);

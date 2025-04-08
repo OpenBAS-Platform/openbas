@@ -1,31 +1,18 @@
 package io.openbas.rest.scenario.export;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import static java.time.Instant.now;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.hypersistence.utils.hibernate.type.array.StringArrayType;
-import io.hypersistence.utils.hibernate.type.basic.PostgreSQLHStoreType;
-import io.openbas.annotation.Queryable;
-import io.openbas.database.audit.ModelBaseListener;
-import io.openbas.database.converter.ContentConverter;
 import io.openbas.database.model.*;
 import io.openbas.helper.MultiIdListDeserializer;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.Type;
-
 import java.time.Instant;
 import java.util.*;
-
-import static java.time.Instant.now;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
@@ -51,7 +38,6 @@ public class InjectorContractFileExport implements Base {
 
   @JsonProperty("injector_contract_needs_executor")
   private Boolean needsExecutor = false;
-
 
   @JsonProperty("injector_contract_platforms")
   private Endpoint.PLATFORM_TYPE[] platforms = new Endpoint.PLATFORM_TYPE[0];
@@ -97,5 +83,4 @@ public class InjectorContractFileExport implements Base {
   private String getInjectorName() {
     return this.getInjector() != null ? this.getInjector().getName() : null;
   }
-
 }
