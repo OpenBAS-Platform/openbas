@@ -69,7 +69,8 @@ const SearchInput: FunctionComponent<Props> = ({
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      onSubmit?.(event.currentTarget.value);
+      const { target } = event as unknown as ChangeEvent<HTMLInputElement>;
+      onSubmit?.(target.value);
     }
   };
 

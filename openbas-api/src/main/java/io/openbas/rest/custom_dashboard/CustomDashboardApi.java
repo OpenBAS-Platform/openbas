@@ -44,24 +44,27 @@ public class CustomDashboardApi extends RestBehavior {
     return ResponseEntity.ok(this.customDashboardService.customDashboards(searchPaginationInput));
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<CustomDashboard> customDashboard(@PathVariable @NotBlank final String id) {
-    return ResponseEntity.ok(this.customDashboardService.customDashboard(id));
+  @GetMapping("/{customDashboardId}")
+  public ResponseEntity<CustomDashboard> customDashboard(
+      @PathVariable @NotBlank final String customDashboardId) {
+    return ResponseEntity.ok(this.customDashboardService.customDashboard(customDashboardId));
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/{customDashboardId}")
   public ResponseEntity<CustomDashboard> updateCustomDashboard(
-      @PathVariable @NotBlank final String id,
+      @PathVariable @NotBlank final String customDashboardId,
       @RequestBody @Valid @NotNull final CustomDashboardInput input) {
-    CustomDashboard existingCustomDashboard = this.customDashboardService.customDashboard(id);
+    CustomDashboard existingCustomDashboard =
+        this.customDashboardService.customDashboard(customDashboardId);
     CustomDashboard updatedCustomDashboard = input.toCustomDashboard(existingCustomDashboard);
     return ResponseEntity.ok(
         this.customDashboardService.updateCustomDashboard(updatedCustomDashboard));
   }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteCustomDashboard(@PathVariable @NotBlank final String id) {
-    this.customDashboardService.deleteCustomDashboard(id);
+  @DeleteMapping("/{customDashboardId}")
+  public ResponseEntity<Void> deleteCustomDashboard(
+      @PathVariable @NotBlank final String customDashboardId) {
+    this.customDashboardService.deleteCustomDashboard(customDashboardId);
     return ResponseEntity.noContent().build();
   }
 }

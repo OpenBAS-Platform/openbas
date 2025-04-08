@@ -13,13 +13,13 @@ export const widgetVisualizationTypes: {
   fields?: string[];
   steps: StepType[];
 }[] = [
-  {
-    name: 'Vertical Bar',
-    category: 'vertical-barchart',
-    seriesLimit: 5,
-    modes: ['structural', 'temporal'],
-    steps: ['Visualization', 'Filters', 'Parameters'],
-  },
+  // {
+  //   name: 'Vertical Bar',
+  //   category: 'vertical-barchart',
+  //   seriesLimit: 5,
+  //   modes: ['structural', 'temporal'],
+  //   steps: ['Visualization', 'Filters', 'Parameters'],
+  // },
   {
     name: 'Matrix mitre',
     category: 'security-coverage',

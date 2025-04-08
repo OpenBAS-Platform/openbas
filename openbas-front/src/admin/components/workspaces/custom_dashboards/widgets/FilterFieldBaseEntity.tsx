@@ -13,6 +13,8 @@ interface Props {
   onChange: (value: string | null) => void;
 }
 
+const ENTITIES = ['expectation-inject', 'finding'];
+
 const FilterFieldBaseEntity: FunctionComponent<Props> = ({
   value,
   onChange,
@@ -28,7 +30,7 @@ const FilterFieldBaseEntity: FunctionComponent<Props> = ({
     engineSchemas().then((response: { data: PropertySchemaDTO[] }) => {
       const entities = Array.from(new Set(
         response.data.map(d => d.schema_property_entity),
-      )).filter(e => e !== 'esbase');
+      )).filter(e => ENTITIES.includes(e));
       setOptions(entities.map(entity => ({
         id: entity,
         label: t(entity),
