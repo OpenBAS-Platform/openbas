@@ -25,6 +25,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PlatformSettings {
 
+  @JsonProperty("platform_id")
+  @Schema(description = "id of the platform")
+  private String platformId;
+
   @JsonProperty("platform_name")
   @Schema(description = "Name of the platform")
   private String platformName;

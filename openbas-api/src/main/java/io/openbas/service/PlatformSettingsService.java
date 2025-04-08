@@ -213,6 +213,10 @@ public class PlatformSettingsService {
               .orElse(PLATFORM_WHITEMARK.defaultValue()));
       platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
       platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
+      platformSettings.setPlatformId(
+          ofNullable(dbSettings.get(PLATFORM_INSTANCE.key()))
+              .map(Setting::getValue)
+              .orElse(PLATFORM_INSTANCE.defaultValue()));
       platformSettings.setPlatformName(
           ofNullable(dbSettings.get(PLATFORM_NAME.key()))
               .map(Setting::getValue)

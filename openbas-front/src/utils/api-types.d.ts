@@ -3084,6 +3084,8 @@ export interface PlatformSettings {
   platform_lang?: string;
   /** Definition of the dark theme */
   platform_light_theme?: ThemeInput;
+  /** id of the platform */
+  platform_id?: string;
   /** Name of the platform */
   platform_name?: string;
   /** List of OpenID providers */

@@ -14,6 +14,7 @@ import { type LoggedHelper } from '../../../actions/helper';
 import Breadcrumbs from '../../../components/Breadcrumbs';
 import { useFormatter } from '../../../components/i18n';
 import ItemBoolean from '../../../components/ItemBoolean';
+import ItemCopy from '../../../components/ItemCopy';
 import { useHelper } from '../../../store';
 import { type PlatformSettings, type SettingsEnterpriseEditionUpdateInput, type SettingsPlatformWhitemarkUpdateInput, type SettingsUpdateInput, type ThemeInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
@@ -92,9 +93,16 @@ const Parameters = () => {
       </div>
 
       {isEnterpriseEditionActivated && (
-        <Grid container={true} spacing={3} style={{ marginBottom: 23 }}>
+        <Grid
+          container={true}
+          spacing={3}
+          style={{
+            marginBottom: 24,
+            marginTop: 24,
+          }}
+        >
           <Grid size={{ xs: 6 }}>
-            <Typography variant="h4" gutterBottom={true}>
+            <Typography style={{ marginBottom: 12 }} variant="h4" gutterBottom={true}>
               {t('Enterprise Edition')}
             </Typography>
             <Paper classes={{ root: classes.paper }} variant="outlined" className="paper-for-grid">
@@ -102,7 +110,7 @@ const Parameters = () => {
                 <ListItem divider={true}>
                   <ListItemText primary={t('Organization')} />
                   <ItemBoolean
-                    variant="large"
+                    variant="xlarge"
                     neutralLabel={settings.platform_license.license_customer}
                     status={null}
                   />
@@ -110,7 +118,7 @@ const Parameters = () => {
                 <ListItem divider={true}>
                   <ListItemText primary={t('Creator')} />
                   <ItemBoolean
-                    variant="large"
+                    variant="xlarge"
                     neutralLabel={settings.platform_license.license_creator}
                     status={null}
                   />
@@ -118,7 +126,7 @@ const Parameters = () => {
                 <ListItem divider={true}>
                   <ListItemText primary={t('Scope')} />
                   <ItemBoolean
-                    variant="large"
+                    variant="xlarge"
                     neutralLabel={settings.platform_license.license_is_global ? t('Global') : t('Current instance')}
                     status={null}
                   />
@@ -127,13 +135,13 @@ const Parameters = () => {
             </Paper>
           </Grid>
           <Grid size={{ xs: 6 }}>
-            <Typography variant="h4" gutterBottom={true}>
+            <Typography variant="h4" style={{ marginBottom: 12 }} gutterBottom={true}>
               {t('License')}
             </Typography>
             {!isEnterpriseEditionByConfig && (
               <div style={{
                 float: 'right',
-                marginTop: -34,
+                marginTop: -40,
                 position: 'relative',
               }}
               >
@@ -195,7 +203,7 @@ const Parameters = () => {
               </div>
             )}
             <div className="clearfix" />
-            <Paper classes={{ root: classes.paper }} variant="outlined" className="paper-for-grid" style={{ marginTop: 6 }}>
+            <Paper classes={{ root: classes.paper }} variant="outlined" className="paper-for-grid">
               <List style={{ marginTop: -20 }}>
                 {!settings.platform_license.license_is_expired && settings.platform_license.license_is_prevention && (
                   <ListItem divider={false}>
@@ -241,9 +249,16 @@ const Parameters = () => {
         </Grid>
       )}
 
-      <Grid container={true} spacing={3} style={{ marginBottom: 23 }}>
+      <Grid
+        container={true}
+        spacing={3}
+        style={{
+          marginTop: 24,
+          marginBottom: 24,
+        }}
+      >
         <Grid size={{ xs: 6 }}>
-          <Typography variant="h4" gutterBottom={true}>{t('Configuration')}</Typography>
+          <Typography variant="h4" style={{ marginBottom: 12 }} gutterBottom={true}>{t('Configuration')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }} style={{ minHeight: 340 }} sx={{ gridColumn: 'span 3' }}>
             <ParametersForm
               onSubmit={onUpdate}
@@ -256,12 +271,8 @@ const Parameters = () => {
           </Paper>
         </Grid>
         <Grid size={{ xs: 6 }}>
-          <Typography variant="h4" gutterBottom={true}>{t('OpenBAS platform')}</Typography>
-          <Paper
-            variant="outlined"
-            classes={{ root: classes.paper }}
-            sx={{ gridColumn: 'span 3' }}
-          >
+          <Typography variant="h4" style={{ marginBottom: 12 }} gutterBottom={true}>{t('OpenBAS platform')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 3' }}>
             <List>
               {!isEnterpriseEditionActivated && (
                 <ListItem divider={true}>
@@ -271,6 +282,18 @@ const Parameters = () => {
                   </div>
                 </ListItem>
               )}
+              <ListItem divider={true}>
+                <ListItemText primary={t('Platform identifier')} />
+                <pre
+                  style={{
+                    padding: 0,
+                    margin: 0,
+                  }}
+                  key={settings.platform_id}
+                >
+                  <ItemCopy content={settings.platform_id ?? ''} variant="inLine" />
+                </pre>
+              </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Version')} />
                 <ItemBoolean variant="large" status={null} neutralLabel={settings?.platform_version?.replace('-SNAPSHOT', '')} />
