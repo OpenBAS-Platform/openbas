@@ -18,8 +18,6 @@ public class EsEngine {
     this.context = context;
   }
 
-  // TODO: need to be tested
-
   public <T extends EsBase> List<EsModel<T>> getModels() {
     return context.getBeansOfType(Handler.class).entrySet().stream()
         .map(

@@ -34,6 +34,11 @@ const LeftBar = () => {
           icon: () => (<DashboardOutlined />),
           label: 'Home',
         },
+        {
+          path: `/admin/workspaces/custom_dashboards`,
+          icon: () => (<InsertChartOutlined />),
+          label: 'Dashboards',
+        },
       ],
     },
     {
@@ -144,11 +149,6 @@ const LeftBar = () => {
     },
     {
       items: [
-        {
-          path: `/admin/workspaces/custom_dashboards`,
-          icon: () => (<InsertChartOutlined />),
-          label: 'Dashboards',
-        },
         {
           path: `/admin/payloads`,
           icon: () => (<SubscriptionsOutlined />),

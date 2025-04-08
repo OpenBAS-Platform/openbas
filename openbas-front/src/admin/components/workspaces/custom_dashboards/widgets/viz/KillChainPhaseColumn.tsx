@@ -16,13 +16,15 @@ const useStyles = makeStyles()(theme => ({
     display: 'grid',
     gap: theme.spacing(1),
     paddingBottom: theme.spacing(1),
+    width: '180px',
   },
 }));
 
 const KillChainPhaseColumn: FunctionComponent<{
   killChainPhase: KillChainPhase;
   data: EsSeries[];
-}> = ({ killChainPhase, data }) => {
+  showCoveredOnly: boolean;
+}> = ({ killChainPhase, data, showCoveredOnly }) => {
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
@@ -33,7 +35,7 @@ const KillChainPhaseColumn: FunctionComponent<{
 
   const attackPatterns: AttackPattern[] = Object.values(attackPatternMap)
     .filter((attackPattern: AttackPattern) => attackPattern.attack_pattern_kill_chain_phases?.includes(killChainPhase.phase_id))
-    .filter((attackPattern: AttackPattern) => !attackPattern.attack_pattern_external_id.includes('.')); // Remove sub techniques
+    .filter((attackPattern: AttackPattern) => attackPattern.attack_pattern_parent === null); // Remove sub techniques
 
   const resolvedDataSuccess = resolvedData(attackPatternMap, data.at(0)?.data ?? []);
   const resolvedDataFailure = resolvedData(attackPatternMap, data.at(1)?.data ?? []);
@@ -48,14 +50,19 @@ const KillChainPhaseColumn: FunctionComponent<{
       </Typography>
       <div className={classes.column}>
         {attackPatterns.toSorted(sortAttackPattern)
-          .map(attackPattern => (
-            <AttackPatternBox
-              key={attackPattern.attack_pattern_id}
-              attackPattern={attackPattern}
-              resolvedDataSuccess={resolvedDataSuccess.filter(d => d.ttp === attackPattern.attack_pattern_external_id)}
-              resolvedDataFailure={resolvedDataFailure.filter(d => d.ttp === attackPattern.attack_pattern_external_id)}
-            />
-          ))}
+          .map((attackPattern) => {
+            const resolvedDataSuccessForTTP = resolvedDataSuccess.filter(d => d.ttp === attackPattern.attack_pattern_external_id);
+            const resolvedDataFailureForTTP = resolvedDataFailure.filter(d => d.ttp === attackPattern.attack_pattern_external_id);
+            return (
+              <AttackPatternBox
+                key={attackPattern.attack_pattern_id}
+                showCoveredOnly={showCoveredOnly}
+                attackPattern={attackPattern}
+                resolvedDataSuccess={resolvedDataSuccessForTTP}
+                resolvedDataFailure={resolvedDataFailureForTTP}
+              />
+            );
+          })}
       </div>
     </>
   );

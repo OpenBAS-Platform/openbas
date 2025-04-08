@@ -54,7 +54,7 @@ const WidgetCreationParameters: FunctionComponent<{
       const finalOptions = newOptions.filter(o => availableFields.includes(o.id));
       setFieldOptions(finalOptions);
       if (finalOptions.length === 1) {
-        setValue('widget_config.field', newOptions[0].id); // If only one option is available, hide the field and set it automatically
+        setValue('widget_config.field', finalOptions[0].id); // If only one option is available, hide the field and set it automatically
       }
     });
   }, [mode]);
