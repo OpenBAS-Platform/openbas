@@ -54,6 +54,8 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
     DateHistogramWidget widgetConfig = new DateHistogramWidget();
     widgetConfig.setTitle(name);
     input.setHistogramWidget(widgetConfig);
+    WidgetLayout widgetLayout = new WidgetLayout();
+    input.setWidgetLayout(widgetLayout);
 
     // -- EXECUTE & ASSERT --
     mockMvc
@@ -62,7 +64,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(input)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.widget_parameters.widget_parameters_title").value(name));
+        .andExpect(jsonPath("$.widget_config.title").value(name));
   }
 
   @Test
@@ -77,7 +79,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
         .perform(get(CUSTOM_DASHBOARDS_URI + "/" + customDashboard.getId() + "/widgets"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(1))
-        .andExpect(jsonPath("$[0].widget_parameters.widget_parameters_title").value(NAME));
+        .andExpect(jsonPath("$[0].widget_config.title").value(NAME));
   }
 
   @Test
@@ -97,7 +99,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
                     + "/widgets/"
                     + composer.get().getId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.widget_parameters.widget_parameters_title").value(NAME));
+        .andExpect(jsonPath("$.widget_config.title").value(NAME));
   }
 
   @Test
@@ -124,7 +126,7 @@ class CustomDashboardWidgetApiTest extends IntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(widget)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.widget_parameters.widget_parameters_title").value(NAME))
+        .andExpect(jsonPath("$.widget_config.title").value(NAME))
         .andExpect(jsonPath("$.widget_layout.widget_layout_x").value(10));
   }
 
