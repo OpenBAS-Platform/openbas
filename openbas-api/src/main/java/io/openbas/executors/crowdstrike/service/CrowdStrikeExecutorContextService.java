@@ -31,12 +31,17 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   private static final int SLEEP_INTERVAL_BATCH_EXECUTIONS = 1000;
 
   private static final String AGENT_ID_VARIABLE = "$agentID";
+  private static final String ARCH_VARIABLE = "$architecture";
+
   private static final String WINDOWS_EXTERNAL_REFERENCE =
       "$agentID=[System.BitConverter]::ToString(((Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CSAgent\\Sim').AG)).ToLower() -replace '-','';";
   private static final String LINUX_EXTERNAL_REFERENCE =
       "agentID=$(sudo /opt/CrowdStrike/falconctl -g --aid | sed 's/aid=\"//g' | sed 's/\".//g');";
   private static final String MAC_EXTERNAL_REFERENCE =
       "agentID=$(sudo /Applications/Falcon.app/Contents/Resources/falconctl stats | grep agentID | sed 's/agentID: //g' | tr '[:upper:]' '[:lower:]' | sed 's/-//g');";
+  private static final String WINDOWS_ARCH =
+      "switch ($env:PROCESSOR_ARCHITECTURE) { \"AMD64\" {$architecture = \"x86_64\"; Break} \"ARM64\" {$architecture = \"arm64\"; Break} \"x86\" { switch ($env:PROCESSOR_ARCHITEW6432) { \"AMD64\" {$architecture = \"x86_64\"; Break} \"ARM64\" {$architecture = \"arm64\"; Break} } } };";
+  private static final String UNIX_ARCH = "architecture=$(uname -m);";
 
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
@@ -155,7 +160,10 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       // x86_64 by default in the register because CS API doesn't provide the platform architecture
       String executorCommandKey = platform.name() + "." + Endpoint.PLATFORM_ARCH.x86_64.name();
       String command = injector.getExecutorCommands().get(executorCommandKey);
-      command = WINDOWS_EXTERNAL_REFERENCE + command;
+      command =
+          WINDOWS_ARCH
+              + WINDOWS_EXTERNAL_REFERENCE
+              + command.replace(Endpoint.PLATFORM_ARCH.x86_64.name(), ARCH_VARIABLE);
       command = replaceArgs(platform, command, injectId, AGENT_ID_VARIABLE);
       command =
           command.replaceFirst(
@@ -212,7 +220,10 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
     // x86_64 by default in the register because CS API doesn't provide the platform architecture
     String executorCommandKey = platform.name() + "." + Endpoint.PLATFORM_ARCH.x86_64.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
-    command = externalReferenceVariable + command;
+    command =
+        UNIX_ARCH
+            + externalReferenceVariable
+            + command.replace(Endpoint.PLATFORM_ARCH.x86_64.name(), ARCH_VARIABLE);
     command = replaceArgs(platform, command, injectId, AGENT_ID_VARIABLE);
     command =
         command.replaceFirst(

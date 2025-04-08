@@ -606,7 +606,7 @@
   "Headers": "头部",
   "Hello": "你好",
   "here": "此处",
-  "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable.": "喺呢度，你可以下載並安裝執行程序中提供嘅模擬代理。 根據你啟用嘅集成，其中一些集成可能不可用。",
+  "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable. Each agent can be installed on Windows, Linux and MacOS OS using x86_64 or arm64 architectures.": "在这里，您可以下载并安装执行器中可用的模拟代理。根据您启用的集成，其中一些可能不可用。每个代理都可安装在使用 x86_64 或 arm64 架构的 Windows、Linux 和 MacOS 操作系统上。",
   "Hide timeline": "隐藏时间线",
   "High": "高",
   "Home": "主页",
