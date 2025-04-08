@@ -9,6 +9,7 @@ import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.openbas.helper.MultiIdListDeserializer;
+import io.openbas.helper.MultiIdSetDeserializer;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -16,7 +17,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -55,10 +58,21 @@ public class Finding implements Base {
   @NotBlank
   protected String value;
 
+  @Deprecated
   @Type(StringArrayType.class)
   @Column(name = "finding_labels", columnDefinition = "text[]")
   @JsonProperty("finding_labels")
   private String[] labels;
+
+  @ArraySchema(schema = @Schema(type = "string"))
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "findings_tags",
+      joinColumns = @JoinColumn(name = "finding_id"),
+      inverseJoinColumns = @JoinColumn(name = "tag_id"))
+  @JsonSerialize(using = MultiIdSetDeserializer.class)
+  @JsonProperty("finding_tags")
+  private Set<Tag> tags = new HashSet<>();
 
   // -- RELATION --
 

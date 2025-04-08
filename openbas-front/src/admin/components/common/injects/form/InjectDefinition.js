@@ -440,6 +440,7 @@ class InjectDefinition extends Component {
   render() {
     const {
       t,
+      theme,
       classes,
       setValue,
       values,
@@ -561,6 +562,7 @@ class InjectDefinition extends Component {
             <Typography
               variant="h5"
               style={{
+                marginTop: theme.spacing(2),
                 fontWeight: 500,
                 float: 'left',
               }}
@@ -1026,6 +1028,7 @@ class InjectDefinition extends Component {
 InjectDefinition.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
+  theme: PropTypes.func,
   injectId: PropTypes.string,
   inject: PropTypes.object,
   fetchInjectTeams: PropTypes.func,

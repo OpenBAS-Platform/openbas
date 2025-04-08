@@ -122,7 +122,7 @@ const XlsMapperPopover: FunctionComponent<Props> = ({
         open={openDelete}
         handleClose={handleCloseDelete}
         handleSubmit={submitDelete}
-        text={t('Do you want to delete this XLS mapper ?')}
+        text={t('Do you want to delete this XLS mapper?')}
       />
     </>
   );

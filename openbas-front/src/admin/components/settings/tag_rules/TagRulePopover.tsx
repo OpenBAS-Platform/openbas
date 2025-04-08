@@ -15,6 +15,7 @@ interface Props {
   onUpdate?: (result: TagRuleOutput) => void;
   tagRule: TagRuleOutput;
 }
+
 const TagRulePopover: FunctionComponent<Props> = ({
   onDelete, onUpdate,
   tagRule,
@@ -72,7 +73,7 @@ const TagRulePopover: FunctionComponent<Props> = ({
         open={openDelete}
         handleClose={handleCloseDelete}
         handleSubmit={submitDelete}
-        text={t('Do you want to delete this asset rule ?')}
+        text={t('Do you want to delete this asset rule?')}
       />
     </>
   );

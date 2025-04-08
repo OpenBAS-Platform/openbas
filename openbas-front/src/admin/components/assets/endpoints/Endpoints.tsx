@@ -276,7 +276,9 @@ const Endpoints = () => {
         <a href={`${settings.platform_base_url}/admin/agents`} target="_blank" rel="noopener noreferrer">
           {t('agent installation page')}
         </a>
-        {t(' and in our ')}
+        &nbsp;
+        {t('and in our')}
+        &nbsp;
         <a href="https://docs.openbas.io" target="_blank" rel="noreferrer">
           {t('documentation')}
         </a>

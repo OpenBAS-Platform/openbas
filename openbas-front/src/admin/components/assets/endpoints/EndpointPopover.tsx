@@ -164,7 +164,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
         open={deletion}
         handleClose={() => setDeletion(false)}
         handleSubmit={submitDelete}
-        text={`${t('Do you want to delete the endpoint:')} ${endpoint.asset_name} ?`}
+        text={`${t('Do you want to delete the endpoint:')} ${endpoint.asset_name}?`}
       />
     </>
   );

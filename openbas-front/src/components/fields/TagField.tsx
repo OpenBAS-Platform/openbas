@@ -27,7 +27,7 @@ const useStyles = makeStyles()(() => ({
 }));
 
 interface Props {
-  label: string;
+  label?: string;
   fieldValue: string[];
   fieldOnChange: (values: string[]) => void;
   error?: GlobalError;

@@ -10,13 +10,14 @@ import io.openbas.database.model.PayloadPrerequisite;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Set;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class PayloadUpdateInput {
+
   @NotBlank(message = MANDATORY_MESSAGE)
   @JsonProperty("payload_name")
   private String name;
@@ -67,4 +68,8 @@ public class PayloadUpdateInput {
 
   @JsonProperty("payload_attack_patterns")
   private List<String> attackPatternsIds = new ArrayList<>();
+
+  @JsonProperty("payload_output_parsers")
+  @Schema(description = "Set of output parsers")
+  private Set<OutputParserInput> outputParsers = new HashSet<>();
 }

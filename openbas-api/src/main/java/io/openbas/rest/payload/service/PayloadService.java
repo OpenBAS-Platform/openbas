@@ -23,8 +23,12 @@ import io.openbas.helper.SupportedLanguage;
 import io.openbas.injector_contract.Contract;
 import io.openbas.injector_contract.ContractConfig;
 import io.openbas.injector_contract.ContractDef;
-import io.openbas.injector_contract.fields.*;
+import io.openbas.injector_contract.fields.ContractAsset;
+import io.openbas.injector_contract.fields.ContractAssetGroup;
+import io.openbas.injector_contract.fields.ContractChoiceInformation;
+import io.openbas.injector_contract.fields.ContractExpectations;
 import io.openbas.injectors.openbas.util.OpenBASObfuscationMap;
+import io.openbas.rest.payload.OutputParserUtils;
 import io.openbas.utils.StringUtils;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
@@ -51,6 +55,7 @@ public class PayloadService {
   private final InjectorContractRepository injectorContractRepository;
   private final AttackPatternRepository attackPatternRepository;
   private final ExpectationBuilderService expectationBuilderService;
+  private final OutputParserUtils outputParserUtils;
 
   public void updateInjectorContractsForPayload(Payload payload) {
     List<Injector> injectors = this.injectorRepository.findAllByPayloads(true);
@@ -224,6 +229,7 @@ public class PayloadService {
     duplicate.setCollector(null);
     duplicate.setSource(Payload.PAYLOAD_SOURCE.MANUAL);
     duplicate.setStatus(Payload.PAYLOAD_STATUS.UNVERIFIED);
+    outputParserUtils.copyOutputParsers(origin.getOutputParsers(), duplicate);
   }
 
   public void deprecateNonProcessedPayloadsByCollector(

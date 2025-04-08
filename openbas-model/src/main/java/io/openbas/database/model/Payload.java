@@ -54,7 +54,6 @@ import org.hibernate.annotations.UuidGenerator;
 public class Payload implements Base {
 
   private static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_PAYLOAD = 1;
-  protected static final int DEFAULT_NUMBER_OF_ACTIONS_FOR_EXECUTABLE = 2;
 
   public enum PAYLOAD_SOURCE {
     COMMUNITY,
@@ -210,6 +209,10 @@ public class Payload implements Base {
   public List<AttackPattern> getAttackPatternsDetails(){
     return this.attackPatterns;
   }
+  
+  @OneToMany(mappedBy = "payload", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JsonProperty("payload_output_parsers")
+  private Set<OutputParser> outputParsers = new HashSet<>();
 
   @JsonProperty("payload_collector_type")
   public String getCollectorType() {

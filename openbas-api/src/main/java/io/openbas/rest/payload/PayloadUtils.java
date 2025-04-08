@@ -1,19 +1,27 @@
 package io.openbas.rest.payload;
 
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.arm64;
+import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.x86_64;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.model.Payload;
-import io.openbas.database.model.PayloadArgument;
-import io.openbas.database.model.PayloadPrerequisite;
-import io.openbas.rest.payload.form.PayloadCreateInput;
+import io.openbas.database.model.*;
+import io.openbas.rest.exception.BadRequestException;
+import io.openbas.rest.payload.form.*;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
+@Log
+@RequiredArgsConstructor
+@Component
 public class PayloadUtils {
 
-  private PayloadUtils() {}
+  private final OutputParserUtils outputParserUtils;
 
   public static PayloadCreateInput buildPayload(@NotNull final JsonNode payloadNode) {
     PayloadCreateInput payloadCreateInput = new PayloadCreateInput();
@@ -93,5 +101,38 @@ public class PayloadUtils {
     payloadCreateInput.setTagIds(new ArrayList<>());
     payloadCreateInput.setAttackPatternsIds(new ArrayList<>());
     return payloadCreateInput;
+  }
+
+  public static void validateArchitecture(String payloadType, Payload.PAYLOAD_EXECUTION_ARCH arch) {
+    if (arch == null) {
+      throw new BadRequestException("Payload architecture cannot be null.");
+    }
+    if (Executable.EXECUTABLE_TYPE.equals(payloadType) && (arch != x86_64 && arch != arm64)) {
+      throw new BadRequestException("Executable architecture must be x86_64 or arm64.");
+    }
+  }
+
+  // -- COPY PROPERTIES --
+  public Payload copyProperties(Object payloadInput, Payload target) {
+    if (payloadInput == null) {
+      throw new IllegalArgumentException("Input payload cannot be null");
+    }
+
+    BeanUtils.copyProperties(payloadInput, target);
+
+    if (payloadInput instanceof PayloadCreateInput) {
+      outputParserUtils.copyOutputParsers(
+          ((PayloadCreateInput) payloadInput).getOutputParsers(), target);
+    } else if (payloadInput instanceof PayloadUpdateInput) {
+      outputParserUtils.copyOutputParsers(
+          ((PayloadUpdateInput) payloadInput).getOutputParsers(), target);
+    } else if (payloadInput instanceof PayloadUpsertInput) {
+      outputParserUtils.copyOutputParsers(
+          ((PayloadUpsertInput) payloadInput).getOutputParsers(), target);
+    } else {
+      throw new IllegalArgumentException("Unsupported payload input type");
+    }
+
+    return target;
   }
 }

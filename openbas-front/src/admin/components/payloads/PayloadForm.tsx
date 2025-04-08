@@ -153,8 +153,8 @@ const PayloadForm = ({
         style={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100%',
-          gap: theme.spacing(1),
+          minHeight: '100%',
+          gap: theme.spacing(2),
         }}
         id="payloadForm"
         noValidate // disabled tooltip
@@ -185,18 +185,18 @@ const PayloadForm = ({
         >
           <Button
             variant="contained"
-            onClick={handleClose}
-            disabled={isSubmitting}
-          >
-            {t('Cancel')}
-          </Button>
-          <Button
-            variant="contained"
             color="secondary"
             type="submit"
             disabled={isSubmitting || !isDirty}
           >
             {editing ? t('Update') : t('Create')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
+            {t('Cancel')}
           </Button>
         </div>
       </form>

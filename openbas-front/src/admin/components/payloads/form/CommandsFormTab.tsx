@@ -93,23 +93,23 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
 
   return (
     <>
-      <SelectFieldController name="payload_type" label={t('Type')} items={payloadTypesItems} isLabelAligned required disabled={disabledPayloadType} />
+      <SelectFieldController name="payload_type" label={t('Type')} items={payloadTypesItems} required disabled={disabledPayloadType} />
       {type && type != '' && (
         <div style={{
-          display: 'flex',
-          alignItems: 'start',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
           gap: theme.spacing(2),
         }}
         >
-          <PlatformFieldController style={{ width: '50%' }} name="payload_platforms" label={t('Platforms')} required />
-          <SelectFieldController disabled={!(type == 'Command' || type == 'Executable')} style={{ width: '50%' }} name="payload_execution_arch" label={t('Architecture')} items={architecturesItems} required />
+          <SelectFieldController disabled={!(type == 'Command' || type == 'Executable')} name="payload_execution_arch" label={t('Architecture')} items={architecturesItems} required />
+          <PlatformFieldController name="payload_platforms" label={t('Platforms')} required />
         </div>
       )}
 
       {type === 'Command' && (
         <>
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Attack command')}</Typography>
-          <SelectFieldController name="command_executor" label={t('Executor')} items={executorsItems} isLabelAligned required />
+          <SelectFieldController name="command_executor" label={t('Executor')} items={executorsItems} required />
           <TextFieldController multiline rows={3} name="command_content" label={t('Command content')} required />
         </>
       )}
@@ -240,7 +240,7 @@ const CommandsFormTab = ({ disabledPayloadType = false }: Props) => {
 
           {/* CLEANUP */}
           <Typography variant="h5" marginTop={theme.spacing(3)}>{t('Cleanup command')}</Typography>
-          <SelectFieldController name="payload_cleanup_executor" label={t('Executor')} items={executorsItems} isLabelAligned />
+          <SelectFieldController name="payload_cleanup_executor" label={t('Executor')} items={executorsItems} />
           <TextFieldController multiline rows={3} name="payload_cleanup_command" label={t('Cleanup command')} />
         </>
       )}

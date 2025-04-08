@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -65,9 +66,9 @@ public class InjectResultOverviewOutput {
   @JsonProperty("inject_kill_chain_phases")
   private List<KillChainPhaseSimple> killChainPhases;
 
-  @Schema(description = "Attack pattern")
-  @JsonProperty("inject_attack_patterns")
-  private List<AttackPatternSimple> attackPatterns;
+  @Schema(description = "Tags")
+  @JsonProperty("inject_tags")
+  private Set<String> tags;
 
   @Schema(description = "Indicates whether the inject is ready for use")
   @JsonProperty("inject_ready")
