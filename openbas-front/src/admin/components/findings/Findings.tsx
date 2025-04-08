@@ -5,7 +5,7 @@ import FindingList from './FindingList';
 const Findings = () => {
   const additionalFilterNames = [
     'finding_assets',
-    'finding_inject',
+    'finding_inject_id',
     'finding_scenario',
     'finding_simulation',
   ];

@@ -9,7 +9,7 @@ const SimulationFindings = () => {
 
   const additionalFilterNames = [
     'finding_assets',
-    'finding_inject',
+    'finding_inject_id',
   ];
 
   const search = (input: SearchPaginationInput) => {
