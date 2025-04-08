@@ -210,12 +210,16 @@ export interface AssetGroupOutput {
   asset_group_tags?: string[];
 }
 
+/** Asset groups linked to endpoints */
 export interface AssetGroupSimple {
-  /** Filter object to search within filterable attributes */
-  asset_group_dynamic_filter?: FilterGroup;
+  /** Asset group Id */
   asset_group_id: string;
+  /** Asset group Name */
   asset_group_name: string;
-  /** @uniqueItems true */
+  /**
+   * Tags
+   * @uniqueItems true
+   */
   asset_group_tags?: string[];
 }
 
@@ -648,21 +652,21 @@ export interface ContractOutputElementInput {
 
 /** Represents the rules for parsing the output of an execution. */
 export interface ContractOutputElementSimple {
-  contract_output_element_id?: string;
+  contract_output_element_id: string;
   /** Represents a unique key identifier. */
-  contract_output_element_key?: string;
+  contract_output_element_key: string;
   /** Represents the name of the rule. */
-  contract_output_element_name?: string;
+  contract_output_element_name: string;
   /** @uniqueItems true */
-  contract_output_element_regex_groups?: RegexGroupSimple[];
+  contract_output_element_regex_groups: RegexGroupSimple[];
   /** The rule to apply for parsing the output, for example, can be a regex. */
-  contract_output_element_rule?: string;
+  contract_output_element_rule: string;
   contract_output_element_tags?: string[];
   /**
    * Represents the data type being extracted.
    * @example "text, number, port, portscan, ipv4, ipv6, credentials"
    */
-  contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
 export interface CreateUserInput {
@@ -857,6 +861,7 @@ export interface EndpointRegisterInput {
   seenIp?: string;
 }
 
+/** Endpoint linked to finding */
 export interface EndpointSimple {
   /** Asset Id */
   asset_id: string;
@@ -1102,15 +1107,23 @@ export interface ExerciseInput {
 }
 
 export interface ExerciseSimple {
+  /** Exercise Category */
   exercise_category?: string;
   exercise_global_score: ExpectationResultsByType[];
+  /** Exercise Id */
   exercise_id: string;
+  /** Exercise Id */
   exercise_name: string;
   /** @format date-time */
   exercise_start_date?: string;
+  /** Exercise status */
   exercise_status?: "SCHEDULED" | "CANCELED" | "RUNNING" | "PAUSED" | "FINISHED";
+  /** Exercise Subtitle */
   exercise_subtitle?: string;
-  /** @uniqueItems true */
+  /**
+   * Tags
+   * @uniqueItems true
+   */
   exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
   /** @format date-time */
@@ -1271,21 +1284,40 @@ export interface FindingInput {
 }
 
 export interface FindingOutput {
-  /** @uniqueItems true */
+  /**
+   * Asset groups linked to endpoints
+   * @uniqueItems true
+   */
   finding_asset_groups?: AssetGroupSimple[];
-  /** @uniqueItems true */
-  finding_assets?: EndpointSimple[];
+  /**
+   * Endpoint linked to finding
+   * @uniqueItems true
+   */
+  finding_assets: EndpointSimple[];
   /** @format date-time */
   finding_created_at: string;
+  /** Finding field that corresponds to the key of the output parser */
   finding_field: string;
+  /** Finding Id */
   finding_id: string;
-  finding_inject?: InjectSimple;
+  /** Inject linked to finding */
+  finding_inject: InjectSimple;
+  /** Finding Name */
   finding_name: string;
+  /** Scenario linked to inject */
   finding_scenario?: ScenarioSimple;
   finding_simulation?: ExerciseSimple;
-  /** @uniqueItems true */
+  /**
+   * Tags that correspond to the output parser tags
+   * @uniqueItems true
+   */
   finding_tags?: string[];
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials"
+   */
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+  /** Finding Value */
   finding_value: string;
 }
 
@@ -1796,10 +1828,16 @@ export interface InjectResultOverviewOutput {
   injects_tags?: string[];
 }
 
+/** Inject linked to finding */
 export interface InjectSimple {
+  /** Inject Id */
   inject_id: string;
-  /** @uniqueItems true */
+  /**
+   * Tags
+   * @uniqueItems true
+   */
   inject_tags?: string[];
+  /** Inject Title */
   inject_title: string;
 }
 
@@ -2479,12 +2517,12 @@ export interface OutputParserInput {
 /** Represents a single output parser */
 export interface OutputParserSimple {
   /** @uniqueItems true */
-  output_parser_contract_output_elements?: ContractOutputElementSimple[];
-  output_parser_id?: string;
+  output_parser_contract_output_elements: ContractOutputElementSimple[];
+  output_parser_id: string;
   /** Mode of parser, which output will be parsed, for now only STDOUT is supported */
-  output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
+  output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
   /** Type of parser, for now only REGEX is supported */
-  output_parser_type?: "REGEX";
+  output_parser_type: "REGEX";
 }
 
 export interface PageAssetGroupOutput {
@@ -3347,10 +3385,10 @@ export interface RegexGroupInput {
 /** Represents the groups defined by the regex pattern. */
 export interface RegexGroupSimple {
   /** Represents the field name of specific captured groups. */
-  regex_group_field?: string;
-  regex_group_id?: string;
+  regex_group_field: string;
+  regex_group_id: string;
   /** Represents the indexes of specific captured groups. */
-  regex_group_index_values?: string;
+  regex_group_index_values: string;
 }
 
 export interface RenewTokenInput {
@@ -3524,6 +3562,7 @@ export interface ScenarioRecurrenceInput {
   scenario_recurrence_start?: string;
 }
 
+/** Scenario linked to inject */
 export interface ScenarioSimple {
   scenario_id?: string;
   scenario_name?: string;
