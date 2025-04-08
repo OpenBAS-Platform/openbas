@@ -12,7 +12,7 @@ import PaginationComponentV2 from '../../../../components/common/queryable/pagin
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
 import { useHelper } from '../../../../store';
-import { type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
+import { type AssetGroup, type Endpoint, type EndpointOutput, type SearchPaginationInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import EndpointPopover from '../endpoints/EndpointPopover';
@@ -50,11 +50,15 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   assetGroupId: string;
   handleClose: () => void;
+  onUpdate?: (result: AssetGroup) => void;
+  onRemoveEndpointFromAssetGroup?: (assetId: Endpoint['asset_id']) => void;
 }
 
 const AssetGroupManagement: FunctionComponent<Props> = ({
   assetGroupId,
   handleClose,
+  onUpdate,
+  onRemoveEndpointFromAssetGroup,
 }) => {
   // Standard hooks
   const { classes } = useStyles();
@@ -81,10 +85,16 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({}));
 
   const onRemoveEndpointFromList = (asset: EndpointOutput) => {
-    setEndpoints(endpoints.toSpliced(endpoints.indexOf(asset), 1));
+    setEndpoints(endpoints.toSpliced(endpoints.findIndex(endpoint => endpoint.asset_id === asset.asset_id), 1));
+    if (onRemoveEndpointFromAssetGroup) {
+      onRemoveEndpointFromAssetGroup(asset.asset_id);
+    }
   };
 
-  const onUpdateList = () => {
+  const onUpdateList = (result: AssetGroup) => {
+    if (onUpdate) {
+      onUpdate(result);
+    }
     searchEndpointsFromAssetGroup(searchPaginationInput, assetGroupId).then((result: { data: Page<EndpointOutput> }) => {
       const { data } = result;
       setEndpoints(data.content);
