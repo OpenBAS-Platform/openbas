@@ -1,7 +1,6 @@
 package io.openbas.utils.fixtures;
 
 import io.openbas.database.raw.RawInjectExpectation;
-
 import java.time.Instant;
 import java.util.Set;
 
