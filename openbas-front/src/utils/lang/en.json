@@ -543,7 +543,6 @@
   "finding_asset_groups": "Asset groups",
   "finding_assets": "Endpoints",
   "finding_created_at": "Created at",
-  "finding_inject": "Inject",
   "finding_name": "Name",
   "finding_scenario": "Scenario",
   "finding_simulation": "Simulation",
@@ -1485,5 +1484,6 @@
   "Your file should be a XLS": "Your file should be a XLS",
   "Your overall evaluation about this question.": "Your overall evaluation about this question.",
   "your trial license online": "your trial license online",
-  "YYYY": "YYYY"
+  "YYYY": "YYYY",
+  "finding_inject_id": "Inject"
 }

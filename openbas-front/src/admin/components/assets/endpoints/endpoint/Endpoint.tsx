@@ -43,7 +43,7 @@ const Endpoint = () => {
   const { endpoint } = useHelper((helper: EndpointHelper) => ({ endpoint: helper.getEndpoint(endpointId) }));
 
   const additionalFilterNames = [
-    'finding_inject',
+    'finding_inject_id',
     'finding_simulation',
   ];
 
