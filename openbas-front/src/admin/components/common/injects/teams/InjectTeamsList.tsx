@@ -1,7 +1,8 @@
 import { GroupsOutlined } from '@mui/icons-material';
-import { ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import * as R from 'ramda';
-import { type FunctionComponent, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import { findTeams } from '../../../../../actions/teams/team-actions';
@@ -22,21 +23,16 @@ const useStyles = makeStyles()(theme => ({
   bodyItem: { fontSize: theme.typography.h3.fontSize },
 }));
 
-interface Props {
-  teamIds: Array<string>;
-  handleRemoveTeam: (teamId: string) => void;
-}
-
-const InjectTeamsList: FunctionComponent<Props> = ({
-  teamIds,
-  handleRemoveTeam,
-}) => {
+const InjectTeamsList = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { permissions } = useContext(PermissionsContext);
   const { computeTeamUsersEnabled } = useContext(TeamContext);
+  const { getValues, setValue } = useFormContext();
 
   const [teams, setTeams] = useState<TeamOutput[]>([]);
+  const teamIds = getValues('inject_teams') || [];
+
   const sortTeams = R.sortWith(
     [R.ascend(R.prop('team_name'))],
   );
@@ -44,13 +40,29 @@ const InjectTeamsList: FunctionComponent<Props> = ({
     findTeams(teamIds).then(result => setTeams(sortTeams(result.data)));
   }, [teamIds]);
 
+  const onRemoveTeamFromInject = (teamIdToRemove: string) => {
+    const teamIds = getValues('inject_teams') || [];
+    const newTeamIds = teamIds.filter((id: string) => id !== teamIdToRemove);
+    const newTeams = teams.filter(team => team.team_id !== teamIdToRemove);
+    setValue('inject_teams', newTeamIds);
+    setTeams(newTeams);
+  };
   return (
-    <>
+    <List>
       {teams.map(team => (
         <ListItem
           key={team.team_id}
           classes={{ root: classes.item }}
           divider
+          secondaryAction={(
+            <TeamPopover
+              team={team}
+              onRemoveTeamFromInject={(teamId) => {
+                onRemoveTeamFromInject(teamId);
+              }}
+              disabled={permissions.readOnly}
+            />
+          )}
         >
           <ListItemIcon>
             <GroupsOutlined />
@@ -73,16 +85,9 @@ const InjectTeamsList: FunctionComponent<Props> = ({
               </div>
             )}
           />
-          <ListItemSecondaryAction>
-            <TeamPopover
-              team={team}
-              onRemoveTeamFromInject={handleRemoveTeam}
-              disabled={permissions.readOnly}
-            />
-          </ListItemSecondaryAction>
         </ListItem>
       ))}
-    </>
+    </List>
   );
 };
 
