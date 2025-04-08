@@ -8,6 +8,7 @@ const SimulationFindings = () => {
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
   const additionalFilterNames = [
+    'finding_assets',
     'finding_inject',
   ];
 
@@ -29,6 +30,7 @@ const SimulationFindings = () => {
       searchFindings={search}
       additionalHeaders={additionalHeaders}
       additionalFilterNames={additionalFilterNames}
+      contextId={exerciseId}
     />
   );
 };

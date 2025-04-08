@@ -53,6 +53,7 @@ const useRetrieveOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'finding_assets':
       case 'inject_assets':
         searchEndpointByIdAsOption(ids).then((response) => {
           setOptions(response.data);
