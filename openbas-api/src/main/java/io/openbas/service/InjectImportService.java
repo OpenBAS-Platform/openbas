@@ -593,19 +593,34 @@ public class InjectImportService {
       if (relativeDays
           && relativeDayMatcher.groupCount() > 0
           && !relativeDayMatcher.group(1).isBlank()) {
-        injectTime.setRelativeDayNumber(Integer.parseInt(relativeDayMatcher.group(1)));
+        try {
+          injectTime.setRelativeDayNumber(Integer.parseInt(relativeDayMatcher.group(1)));
+        } catch (NumberFormatException ex) {
+          log.warning(
+              String.format("Can't format %s into an integer", relativeDayMatcher.group(1)));
+        }
       }
       injectTime.setRelativeHour(relativeHour);
       if (relativeHour
           && relativeHourMatcher.groupCount() > 0
           && !relativeHourMatcher.group(1).isBlank()) {
-        injectTime.setRelativeHourNumber(Integer.parseInt(relativeHourMatcher.group(1)));
+        try {
+          injectTime.setRelativeHourNumber(Integer.parseInt(relativeHourMatcher.group(1)));
+        } catch (NumberFormatException ex) {
+          log.warning(
+              String.format("Can't format %s into an integer", relativeHourMatcher.group(1)));
+        }
       }
       injectTime.setRelativeMinute(relativeMinute);
       if (relativeMinute
           && relativeMinuteMatcher.groupCount() > 0
           && !relativeMinuteMatcher.group(1).isBlank()) {
-        injectTime.setRelativeMinuteNumber(Integer.parseInt(relativeMinuteMatcher.group(1)));
+        try {
+          injectTime.setRelativeMinuteNumber(Integer.parseInt(relativeMinuteMatcher.group(1)));
+        } catch (NumberFormatException ex) {
+          log.warning(
+              String.format("Can't format %s into an integer", relativeMinuteMatcher.group(1)));
+        }
       }
 
       // Special case : a mix of relative day and absolute hour
@@ -981,6 +996,7 @@ public class InjectImportService {
     // First of all, are there any absolute date
     boolean allDatesAreAbsolute =
         mapInstantByRowIndex.values().stream()
+            .filter(injectTime -> !injectTime.getUnformattedDate().isBlank())
             .noneMatch(
                 injectTime ->
                     injectTime.getDate() == null
@@ -989,6 +1005,7 @@ public class InjectImportService {
                         || injectTime.isRelativeMinute());
     boolean allDatesAreRelative =
         mapInstantByRowIndex.values().stream()
+            .filter(injectTime -> !injectTime.getUnformattedDate().isBlank())
             .allMatch(
                 injectTime ->
                     injectTime.getDate() == null
