@@ -15,11 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(InjectExpectationTraceApi.INJECT_EXPECTATION_TRACES_URI)
 @PreAuthorize("isAdmin()")
+@Log
 public class InjectExpectationTraceApi extends RestBehavior {
 
   public static final String INJECT_EXPECTATION_TRACES_URI = "/api/inject-expectations-traces";
@@ -76,6 +79,7 @@ public class InjectExpectationTraceApi extends RestBehavior {
   @PostMapping("/bulk")
   public void bulkInsertInjectExpectationTraceForCollector(
           @Valid @RequestBody List<InjectExpectationTraceInput> inputs) {
+      Instant start = Instant.now();
       if (inputs.isEmpty()) {
           return;
       }
@@ -99,6 +103,8 @@ public class InjectExpectationTraceApi extends RestBehavior {
               return trace;
             }).toList();
       this.injectExpectationTraceService.bulkInsertInjectExpectationTraces(traces, oldestAlertDate.get());
+      Instant afterSelect  = Instant.now();
+      log.warning("It took " + Duration.between(start, afterSelect).toMillis() + " ms to handle " + inputs.size() + " traces");
   }
 
   @Operation(summary = "Get inject expectation traces from collector")

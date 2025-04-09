@@ -76,7 +76,7 @@ public class InjectExpectationTrace implements Base {
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) return false;
     InjectExpectationTrace that = (InjectExpectationTrace) o;
-    return Objects.equals(getId(), that.getId()) && Objects.equals(getInjectExpectation(), that.getInjectExpectation()) && Objects.equals(getSecurityPlatform(), that.getSecurityPlatform()) && Objects.equals(getAlertName(), that.getAlertName()) && Objects.equals(getAlertLink(), that.getAlertLink());
+    return Objects.equals(getInjectExpectation(), that.getInjectExpectation()) && Objects.equals(getSecurityPlatform(), that.getSecurityPlatform()) && Objects.equals(getAlertName(), that.getAlertName()) && Objects.equals(getAlertLink(), that.getAlertLink());
   }
 
   /**
@@ -98,6 +98,6 @@ public class InjectExpectationTrace implements Base {
    */
   @Override
   public int hashCode() {
-    return Objects.hash(getId(), getInjectExpectation(), getSecurityPlatform(), getAlertName(), getAlertLink());
+    return Objects.hash(getInjectExpectation(), getSecurityPlatform(), getAlertName(), getAlertLink());
   }
 }

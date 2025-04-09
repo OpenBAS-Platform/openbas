@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Log
@@ -68,21 +69,21 @@ public class InjectExpectationTraceService {
     }
   }
 
+  @Transactional
   public void bulkInsertInjectExpectationTraces(
           @NotNull List<InjectExpectationTrace> injectExpectationTraces,
           Instant deduplicationTimeStamp) {
     // Deduplication from the list first
-    List<InjectExpectationTrace> deduped = new ArrayList<>(injectExpectationTraces);
+    Set<InjectExpectationTrace> deduped = new HashSet<>(injectExpectationTraces);
     // Dedupe from DB
     Instant start = Instant.now();
-    //List<InjectExpectationTrace> fromDB = this.injectExpectationTraceRepository.findAll(InjectExpectationTracesSpecification.afterAlertDate(deduplicationTimeStamp));
-    List<InjectExpectationTrace> fromDB = this.injectExpectationTraceRepository.findAll(InjectExpectationTracesSpecification.afterAlertDate(Instant.now().plus(Duration.ofHours(2)).minus(Duration.ofMinutes(1))));
+    List<InjectExpectationTrace> fromDB1 = this.injectExpectationTraceRepository.findAll(InjectExpectationTracesSpecification.afterAlertDate(deduplicationTimeStamp));
+//    List<InjectExpectationTrace> fromDB1 = this.injectExpectationTraceRepository.findAll(InjectExpectationTracesSpecification.afterAlertDate(deduplicationTimeStamp.plus(Duration.ofHours(2)).minus(Duration.ofMinutes(1))));
+    //List<InjectExpectationTrace> fromDB1 = this.injectExpectationTraceRepository.findAll(InjectExpectationTracesSpecification.afterAlertDate(Instant.now().plus(Duration.ofHours(2)).minus(Duration.ofMinutes(1))));
+    Set<InjectExpectationTrace> fromDB = new HashSet<>(fromDB1);
     Instant afterSelect  = Instant.now();
     log.warning("It took " + Duration.between(start, afterSelect).toMillis() + " ms to fetch " + fromDB.size() + " traces");
-    fromDB.forEach(injectExpectationTrace -> {
-        // Remove the trace from the list if it exists in the DB
-        deduped.removeIf(trace -> trace.equalsExcludingId(injectExpectationTrace));
-    });
+    deduped.removeAll(fromDB);
     Instant afterDeduplication = Instant.now();
     log.warning("It took " + Duration.between(afterSelect, afterDeduplication).toMillis() + " ms to dedupe " + deduped.size() + " traces");
 
