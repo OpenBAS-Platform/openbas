@@ -387,7 +387,8 @@ public class InjectorApi extends RestBehavior {
 
   private void setImplantErrorTrace(String injectId, String agentId, String message) {
     if (injectId != null && !injectId.isBlank() && agentId != null && !agentId.isBlank()) {
-      // Create execution traces to inform that the architecture or platform are not compatible with the OpenBAS implant
+      // Create execution traces to inform that the architecture or platform are not compatible with
+      // the OpenBAS implant
       Inject inject =
           injectRepository
               .findById(injectId)
