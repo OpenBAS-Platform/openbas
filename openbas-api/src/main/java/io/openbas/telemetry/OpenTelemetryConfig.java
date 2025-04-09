@@ -53,6 +53,9 @@ public class OpenTelemetryConfig {
   @Getter private final Duration exportInterval = Duration.ofMinutes(6 * 60);
   @Autowired private Environment environment;
 
+  private static final DateTimeFormatter CREATION_DATE_FORMATTER =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
+
   @Bean
   public OpenTelemetry openTelemetry() {
     log.info("Start telemetry");
@@ -139,7 +142,7 @@ public class OpenTelemetryConfig {
         this.settingRepository.findByKey(PLATFORM_INSTANCE_CREATION.key()).orElse(new Setting());
     LocalDateTime creationDate = LocalDateTime.now();
     if(instanceCreationDate.getValue() != null) {
-      creationDate = LocalDateTime.parse(instanceCreationDate.getValue(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn"));
+      creationDate = LocalDateTime.parse(instanceCreationDate.getValue(), CREATION_DATE_FORMATTER);
     }
     ResourceBuilder resourceBuilder =
         Resource.getDefault().toBuilder()
