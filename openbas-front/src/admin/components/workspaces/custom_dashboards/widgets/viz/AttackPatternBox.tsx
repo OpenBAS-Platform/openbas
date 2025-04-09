@@ -4,6 +4,7 @@ import type { FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPattern, EsSeriesData } from '../../../../../../utils/api-types';
+import { SUCCESS_25_COLOR, SUCCESS_50_COLOR, SUCCESS_75_COLOR, SUCCESS_100_COLOR } from './MatrixMitre';
 
 const useStyles = makeStyles()(theme => ({
   button: {
@@ -22,10 +23,15 @@ const useStyles = makeStyles()(theme => ({
 }));
 
 const getBackgroundColor = (theme: Theme, success: number, failure: number): string | undefined => {
-  if (success === 0 && failure === 0) return undefined;
-  if (success > 0 && failure === 0) return theme.palette.success.main;
-  if (success === 0 && failure > 0) return theme.palette.error.main;
-  return theme.palette.warning.main;
+  const total = success + failure;
+  if (total === 0) return undefined;
+
+  const ratio = success / total;
+
+  if (ratio === 1) return SUCCESS_100_COLOR;
+  if (ratio === 0) return SUCCESS_25_COLOR;
+  if (ratio >= 0.75) return SUCCESS_75_COLOR;
+  return SUCCESS_50_COLOR;
 };
 const getTextColor = (theme: Theme, success: number, failure: number): string | undefined => {
   if (success === 0 && failure === 0) return theme.typography.h3.color;
@@ -63,7 +69,6 @@ const AttackPatternBox: FunctionComponent<{
           textAlign: 'left',
           color: textColor,
           whiteSpace: 'normal',
-          fontWeight: 'bold',
           fontSize: theme.typography.h3.fontSize,
         }}
         >
