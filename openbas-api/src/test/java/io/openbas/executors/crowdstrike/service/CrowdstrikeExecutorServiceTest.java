@@ -1,12 +1,10 @@
 package io.openbas.executors.crowdstrike.service;
 
-import static io.openbas.utils.Time.toInstant;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.openbas.database.model.*;
-import io.openbas.executors.ExecutorService;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeDevice;
@@ -16,7 +14,6 @@ import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.service.AgentService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
-import io.openbas.utils.EndpointMapper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,13 +32,9 @@ public class CrowdstrikeExecutorServiceTest {
   public static final String HOST_GROUP_CS = "hostGroupCs";
   private String DATE;
 
-  @Mock private ExecutorService executorService;
-
   @Mock private CrowdStrikeExecutorClient client;
 
   @Mock private CrowdStrikeExecutorConfig config;
-
-  @Mock private CrowdStrikeExecutorContextService crowdstrikeExecutorContextService;
 
   @Mock private AssetGroupService assetGroupService;
 
@@ -49,16 +42,10 @@ public class CrowdstrikeExecutorServiceTest {
 
   @Mock private AgentService agentService;
 
-  @Mock private Executor executor;
-
   @InjectMocks private CrowdStrikeExecutorService crowdStrikeExecutorService;
 
-  private Endpoint crowdstrikeEndpoint;
-  private Agent agentEndpoint;
   private CrowdStrikeDevice crowdstrikeAgent;
   private Executor crowdstrikeExecutor;
-  private ResourcesGroups resourcesGroups;
-  private CrowdStrikeHostGroup crowdstrikeHostGroup;
 
   private void initCsAgent() {
     crowdstrikeAgent = new CrowdStrikeDevice();
@@ -78,28 +65,6 @@ public class CrowdstrikeExecutorServiceTest {
     crowdstrikeExecutor.setType(CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE);
   }
 
-  private void initCsEndpoint() {
-    crowdstrikeEndpoint = new Endpoint();
-    crowdstrikeEndpoint.setName(crowdstrikeAgent.getHostname());
-    crowdstrikeEndpoint.setDescription("Asset collected by CS executor context.");
-    crowdstrikeEndpoint.setIps(
-        EndpointMapper.setIps(new String[] {crowdstrikeAgent.getConnection_ip()}));
-    crowdstrikeEndpoint.setHostname(crowdstrikeAgent.getHostname());
-    crowdstrikeEndpoint.setPlatform(Endpoint.PLATFORM_TYPE.Windows);
-    crowdstrikeEndpoint.setArch(Endpoint.PLATFORM_ARCH.x86_64);
-  }
-
-  private void initAgentEndpoint() {
-    agentEndpoint = new Agent();
-    agentEndpoint.setExecutor(crowdstrikeExecutor);
-    agentEndpoint.setExternalReference(crowdstrikeAgent.getDevice_id());
-    agentEndpoint.setPrivilege(io.openbas.database.model.Agent.PRIVILEGE.admin);
-    agentEndpoint.setDeploymentMode(Agent.DEPLOYMENT_MODE.service);
-    agentEndpoint.setExecutedByUser(Agent.ADMIN_SYSTEM_WINDOWS);
-    agentEndpoint.setLastSeen(toInstant(DATE));
-    agentEndpoint.setAsset(crowdstrikeEndpoint);
-  }
-
   @BeforeEach
   void setUp() {
     Instant now = Instant.now();
@@ -108,12 +73,10 @@ public class CrowdstrikeExecutorServiceTest {
     DATE = formatter.format(now);
 
     initCsAgent();
-    initCsEndpoint();
     initCsExecutor();
-    initAgentEndpoint();
 
-    resourcesGroups = new ResourcesGroups();
-    crowdstrikeHostGroup = new CrowdStrikeHostGroup();
+    ResourcesGroups resourcesGroups = new ResourcesGroups();
+    CrowdStrikeHostGroup crowdstrikeHostGroup = new CrowdStrikeHostGroup();
     crowdstrikeHostGroup.setId(HOST_GROUP_CS);
     crowdstrikeHostGroup.setName("crowdstrike");
     resourcesGroups.setResources(List.of(crowdstrikeHostGroup));
