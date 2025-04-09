@@ -112,13 +112,7 @@ const CustomDashboardComponent = () => {
   };
 
   return (
-    <div
-      id="container"
-      style={{
-        margin: '0 -20px 0 -20px',
-        marginTop: 10,
-      }}
-    >
+    <div id="container">
       <ReactGridLayout
         className="layout"
         margin={[20, 20]}
