@@ -103,14 +103,6 @@ const CustomDashboardComponent = () => {
     );
   }
 
-  const paperStyle = {
-    height: '100%',
-    margin: 0,
-    padding: theme.spacing(2),
-    borderRadius: 4,
-    display: 'relative',
-  };
-
   return (
     <div id="container">
       <ReactGridLayout
@@ -137,7 +129,13 @@ const CustomDashboardComponent = () => {
             <Paper
               key={widget.widget_id}
               data-grid={layout}
-              style={paperStyle}
+              style={{
+                margin: 0,
+                padding: theme.spacing(2),
+                borderRadius: 4,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
               variant="outlined"
             >
               <Typography variant="h3">
