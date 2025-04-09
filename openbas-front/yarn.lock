@@ -3558,11 +3558,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/eslint-plugin@npm:1.1.39":
-  version: 1.1.39
-  resolution: "@vitest/eslint-plugin@npm:1.1.39"
+"@vitest/eslint-plugin@npm:1.1.40":
+  version: 1.1.40
+  resolution: "@vitest/eslint-plugin@npm:1.1.40"
   peerDependencies:
-    "@typescript-eslint/utils": ^8.24.0
     eslint: ">= 8.57.0"
     typescript: ">= 5.0.0"
     vitest: "*"
@@ -3571,7 +3570,7 @@ __metadata:
       optional: true
     vitest:
       optional: true
-  checksum: 10c0/baaa1430800f4072c4f010a41cc9009aa2103ead53442106700cadfcbb0929362168bbb3580afc3743a9bbc391eca36956f549e1a4b7a69e57a2c59f4133804f
+  checksum: 10c0/2cc7c2242d106fdb5fd97f85b7d94466b6c5db414e38e1a7224ce446800fcd661a36148a6b4580d362398720ba0b6faec843f2cbcff04fc4ef19141d29e03f1a
   languageName: node
   linkType: hard
 
@@ -4661,12 +4660,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cronstrue@npm:2.58.0":
-  version: 2.58.0
-  resolution: "cronstrue@npm:2.58.0"
+"cronstrue@npm:2.59.0":
+  version: 2.59.0
+  resolution: "cronstrue@npm:2.59.0"
   bin:
     cronstrue: bin/cli.js
-  checksum: 10c0/d692b3ae56c8afbbd4aa5bf3a7905c6567f52f198fbb670df0a9ee08811615bf2fdd915fcf59be199b7841eec2aa3675887402a2a551e3bdc0964d967aa6b22b
+  checksum: 10c0/f04c9720eacae8cc58ee700a33ced44947c7d722f9deb8a0d0a9a9b533f493b8c2fabed0e72e6bf9d6d1e5191b7b8325e107496ed93a85a2789e57954084b055
   languageName: node
   linkType: hard
 
@@ -5093,15 +5092,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:3.2.4":
-  version: 3.2.4
-  resolution: "dompurify@npm:3.2.4"
+"dompurify@npm:3.2.5":
+  version: 3.2.5
+  resolution: "dompurify@npm:3.2.5"
   dependencies:
     "@types/trusted-types": "npm:^2.0.7"
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 10c0/6be56810fb7ad2776155c8fc2967af5056783c030094362c7d0cf1ad13f2129cf922d8eefab528a34bdebfb98e2f44b306a983ab93aefb9d6f24c18a3d027a05
+  checksum: 10c0/b564167cc588933ad2d25c185296716bdd7124e9d2a75dac76efea831bb22d1230ce5205a1ab6ce4c1010bb32ac35f7a5cb2dd16c78cbf382111f1228362aa59
   languageName: node
   linkType: hard
 
@@ -9302,18 +9301,18 @@ __metadata:
     "@typescript-eslint/utils": "npm:8.29.0"
     "@uiw/react-md-editor": "npm:4.0.5"
     "@vitejs/plugin-react": "npm:4.3.4"
-    "@vitest/eslint-plugin": "npm:1.1.39"
     "@xyflow/react": "npm:12.5.5"
+    "@vitest/eslint-plugin": "npm:1.1.40"
     apexcharts: "npm:4.5.0"
     axios: "npm:1.8.4"
     chokidar: "npm:4.0.3"
     ckeditor5: "npm:44.3.0"
     classcat: "npm:5.0.5"
-    cronstrue: "npm:2.58.0"
+    cronstrue: "npm:2.59.0"
     cross-env: "npm:7.0.3"
     d3-hierarchy: "npm:3.1.2"
     date-fns: "npm:4.1.0"
-    dompurify: "npm:3.2.4"
+    dompurify: "npm:3.2.5"
     esbuild: "npm:0.25.1"
     eslint: "npm:9.24.0"
     eslint-import-resolver-oxc: "npm:0.13.1"
