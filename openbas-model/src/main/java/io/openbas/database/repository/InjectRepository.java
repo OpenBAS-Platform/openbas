@@ -37,11 +37,11 @@ public interface InjectRepository
               + "array_agg(icap.attack_pattern_id) FILTER ( WHERE icap.attack_pattern_id IS NOT NULL ) as inject_attack_patterns, "
               + "array_agg(ap.phase_id) FILTER ( WHERE ap.phase_id IS NOT NULL ) as inject_kill_chain_phases, "
               + "coalesce(array_agg(ins.status_name) FILTER ( WHERE ins.status_name IS NOT NULL ), '{}') as inject_status_name "
-              + "FROM openbas.public.injects f "
-              + "LEFT JOIN openbas.public.injects_statuses ins ON ins.status_inject = f.inject_id "
-              + "LEFT JOIN openbas.public.injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "
-              + "LEFT JOIN openbas.public.injectors_contracts_attack_patterns icap ON icap.injector_contract_id = ic.injector_contract_id "
-              + "LEFT JOIN openbas.public.attack_patterns_kill_chain_phases ap ON ap.attack_pattern_id = icap.attack_pattern_id "
+              + "FROM injects f "
+              + "LEFT JOIN injects_statuses ins ON ins.status_inject = f.inject_id "
+              + "LEFT JOIN injectors_contracts ic ON ic.injector_contract_id = f.inject_injector_contract "
+              + "LEFT JOIN injectors_contracts_attack_patterns icap ON icap.injector_contract_id = ic.injector_contract_id "
+              + "LEFT JOIN attack_patterns_kill_chain_phases ap ON ap.attack_pattern_id = icap.attack_pattern_id "
               + "WHERE f.inject_updated_at > :from GROUP BY f.inject_id, f.inject_updated_at ORDER BY f.inject_updated_at LIMIT 500 ",
       nativeQuery = true)
   List<RawInjectIndexing> findForIndexing(@Param("from") Instant from);
