@@ -3,7 +3,8 @@ import { ChartBar } from 'mdi-material-ui';
 
 import { type Filter, type HistogramWidget, type InjectExpectation, type StructuralHistogramSeries, type Widget } from '../../../../../utils/api-types';
 
-export type StepType = ('Visualization' | 'Perspective' | 'Filters' | 'Parameters');
+export type StepType = ('Visualization' | 'Quick filters' | 'Filters' | 'Parameters');
+export const steps: StepType[] = ['Visualization', 'Quick filters', 'Filters', 'Parameters'];
 
 export const widgetVisualizationTypes: {
   name: string;
@@ -26,7 +27,7 @@ export const widgetVisualizationTypes: {
     seriesLimit: 2,
     modes: ['structural'],
     fields: ['base_attack_patterns_side'],
-    steps: ['Visualization', 'Perspective', 'Filters', 'Parameters'],
+    steps: ['Visualization', 'Quick filters', 'Parameters'],
   },
 ];
 
@@ -50,7 +51,7 @@ export const getAvailableModes = (type: Widget['widget_type']) => {
 };
 
 export const getAvailableSteps = (type: Widget['widget_type']) => {
-  return widgetVisualizationTypes.find(widget => widget.category === type)?.steps ?? [];
+  return widgetVisualizationTypes.find(widget => widget.category === type)?.steps ?? steps;
 };
 
 export const getAvailableFields = (type: Widget['widget_type']) => {

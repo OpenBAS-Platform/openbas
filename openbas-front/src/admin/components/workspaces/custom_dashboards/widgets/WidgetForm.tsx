@@ -13,9 +13,7 @@ import WidgetCreationParameters from './WidgetCreationParameters';
 import WidgetCreationPerspectives from './WidgetCreationPerspectives';
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
-import type { StepType } from './WidgetUtils';
-
-const steps: StepType[] = ['Visualization', 'Perspective', 'Filters', 'Parameters'];
+import { getAvailableSteps, steps } from './WidgetUtils';
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -61,12 +59,6 @@ const WidgetForm: FunctionComponent<Props> = ({
 }) => {
   // Standard hooks
   const { t } = useFormatter();
-
-  // Stepper
-  const [activeStep, setActiveStep] = useState(editing ? 2 : 0);
-  const nextStep = () => setActiveStep(prevActiveStep => prevActiveStep + 1);
-  const goToStep = (step: number) => step <= activeStep && setActiveStep(step);
-  const isLastStep = () => activeStep === steps.length - 1;
 
   // Form
   const widgetConfigSchema = z.discriminatedUnion('mode', [
@@ -116,6 +108,30 @@ const WidgetForm: FunctionComponent<Props> = ({
 
   const widgetType = watch('widget_type');
 
+  // Stepper
+  const availableSteps = getAvailableSteps(widgetType);
+  const [activeStep, setActiveStep] = useState(editing ? 2 : 0);
+  const nextStep = () => {
+    for (let i = activeStep + 1; i < steps.length; i++) {
+      if (availableSteps.includes(steps[i])) {
+        setActiveStep(i);
+        break;
+      }
+    }
+  };
+  const goToStep = (step: number) => {
+    if (step > activeStep) return;
+
+    for (let i = step; i >= 0; i--) {
+      if (availableSteps.includes(steps[i])) {
+        setActiveStep(i);
+        break;
+      }
+    }
+  };
+
+  const isLastStep = () => activeStep === steps.length - 1;
+
   const onCancel = () => {
     reset(initialValues);
     setActiveStep(0);
@@ -134,7 +150,7 @@ const WidgetForm: FunctionComponent<Props> = ({
       <Dialog
         open={open}
         handleClose={toggleDialog}
-        title={<StepperComponent steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
+        title={<StepperComponent widgetType={widgetType} steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
         actions={(
           <ActionsComponent
             disabled={!isLastStep()}
