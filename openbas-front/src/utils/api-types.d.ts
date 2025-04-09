@@ -181,6 +181,7 @@ export interface AssetGroup {
   asset_group_dynamic_assets?: string[];
   /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
+  asset_group_external_reference?: string;
   asset_group_id: string;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -782,6 +783,8 @@ export interface EndpointOutput {
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   /** Platform */
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+  /** The endpoint was added statiscally or not */
+  is_static?: boolean;
 }
 
 export interface EndpointOverviewOutput {

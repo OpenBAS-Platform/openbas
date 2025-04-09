@@ -51,4 +51,10 @@ public class EndpointOutput {
   @Schema(description = "Tags")
   @JsonProperty("asset_tags")
   private Set<String> tags;
+
+  @Schema(
+      description =
+          "The endpoint is associated with an asset group, either statically or dynamically.")
+  @JsonProperty("is_static")
+  private Boolean isStatic;
 }

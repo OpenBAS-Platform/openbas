@@ -1,5 +1,6 @@
 package io.openbas.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
@@ -93,6 +94,10 @@ public class Endpoint extends Asset {
   @Column(name = "endpoint_mac_addresses")
   @JsonProperty("endpoint_mac_addresses")
   private String[] macAddresses;
+
+  @ManyToMany(mappedBy = "assets", fetch = FetchType.LAZY)
+  @JsonIgnore
+  private List<AssetGroup> assetGroups = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "asset",

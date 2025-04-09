@@ -334,10 +334,7 @@ const Endpoints = () => {
                         && (
                           <EndpointPopover
                             inline
-                            endpoint={{
-                              ...endpoint,
-                              type: 'static',
-                            }}
+                            endpoint={{ ...endpoint }}
                             onDelete={result => setEndpoints(endpoints.filter(e => (e.asset_id !== result)))}
                           />
                         ))

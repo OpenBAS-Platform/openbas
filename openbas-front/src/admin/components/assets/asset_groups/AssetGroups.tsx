@@ -12,7 +12,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ClickableModeChip from '../../../../components/common/chips/ClickableModeChip';
 import ExportButton from '../../../../components/common/ExportButton';
 import FilterChipValues from '../../../../components/common/queryable/filter/FilterChipValues';
-import { initSorting } from '../../../../components/common/queryable/Page';
+import { initSorting, type Page } from '../../../../components/common/queryable/Page';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../../components/common/queryable/sort/SortHeadersComponentV2';
@@ -190,6 +190,14 @@ const AssetGroups = () => {
     return searchAssetGroups(input).finally(() => setLoading(false));
   };
 
+  const onUpdateList = () => {
+    searchAssetGroups(searchPaginationInput).then((result: { data: Page<AssetGroup> }) => {
+      const { data } = result;
+      setAssetGroups(data.content);
+      queryableHelpers.paginationHelpers.handleChangeTotalElements(data.totalElements);
+    });
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -237,15 +245,15 @@ const AssetGroups = () => {
                   secondaryAction={(
                     <AssetGroupPopover
                       assetGroup={assetGroup}
-                      onUpdate={result => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
+                      onUpdate={onUpdateList}
                       onDelete={result => setAssetGroups(assetGroups.filter(ag => (ag.asset_group_id !== result)))}
-                      onRemoveEndpointFromAssetGroup={assetId => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== assetGroup.asset_group_id
+                      openEditOnInit={assetGroup.asset_group_id === searchId}
+                      onRemoveEndpointFromAssetGroup={assetId => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== selectedAssetGroupId
                         ? ag
                         : {
                             ...ag,
                             asset_group_assets: ag?.asset_group_assets?.toSpliced(ag?.asset_group_assets?.indexOf(assetId), 1),
                           })))}
-                      openEditOnInit={assetGroup.asset_group_id === searchId}
                     />
                   )}
                   disablePadding
@@ -294,7 +302,7 @@ const AssetGroups = () => {
           <AssetGroupManagement
             assetGroupId={selectedAssetGroupId}
             handleClose={() => setSelectedAssetGroupId(undefined)}
-            onUpdate={result => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== result.asset_group_id ? ag : result)))}
+            onUpdate={onUpdateList}
             onRemoveEndpointFromAssetGroup={assetId => setAssetGroups(assetGroups.map(ag => (ag.asset_group_id !== selectedAssetGroupId
               ? ag
               : {

@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import ItemTags from '../../../../components/ItemTags';
 import PlatformIcon from '../../../../components/PlatformIcon';
-import { type EndpointStoreWithType } from './endpoint';
+import { type EndpointOutput } from '../../../../utils/api-types';
 import { type EndpointPopoverProps } from './EndpointPopover';
 
 const useStyles = makeStyles()(() => ({
@@ -39,7 +39,7 @@ const inlineStyles: Record<string, CSSProperties> = {
 };
 
 interface Props {
-  endpoints: EndpointStoreWithType[];
+  endpoints: EndpointOutput[];
   actions: ReactElement<EndpointPopoverProps>;
 }
 
@@ -51,7 +51,7 @@ const EndpointsList: FunctionComponent<Props> = ({
   const { classes } = useStyles();
   const theme = useTheme();
 
-  const component = (endpoint: EndpointStoreWithType) => {
+  const component = (endpoint: EndpointOutput) => {
     return cloneElement(actions, { endpoint });
   };
 
