@@ -355,7 +355,9 @@ public class InjectorApi extends RestBehavior {
     }
     if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
       setImplantErrorTrace(
-          injectId, agentId, "Unable to download the implant. Architecture invalid : " + platform);
+          injectId,
+          agentId,
+          "Unable to download the implant. Architecture invalid : " + architecture);
     }
 
     InputStream in = null;
@@ -386,7 +388,7 @@ public class InjectorApi extends RestBehavior {
   }
 
   private void setImplantErrorTrace(String injectId, String agentId, String message) {
-    if (injectId != null && injectId.isBlank() && agentId != null && agentId.isBlank()) {
+    if (injectId != null && !injectId.isBlank() && agentId != null && !agentId.isBlank()) {
       InjectExecutionInput input = new InjectExecutionInput();
       input.setMessage(message);
       input.setStatus(ExecutionTraceStatus.ERROR.name());
