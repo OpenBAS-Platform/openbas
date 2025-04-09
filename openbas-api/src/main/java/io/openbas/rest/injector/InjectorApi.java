@@ -15,13 +15,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.openbas.config.RabbitmqConfig;
-import io.openbas.database.model.AttackPattern;
-import io.openbas.database.model.ExecutionTraceStatus;
-import io.openbas.database.model.Injector;
-import io.openbas.database.model.InjectorContract;
-import io.openbas.database.repository.AttackPatternRepository;
-import io.openbas.database.repository.InjectorContractRepository;
-import io.openbas.database.repository.InjectorRepository;
+import io.openbas.database.model.*;
+import io.openbas.database.repository.*;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.inject.form.InjectExecutionAction;
@@ -77,6 +72,9 @@ public class InjectorApi extends RestBehavior {
   private final InjectorRepository injectorRepository;
   private final InjectorContractRepository injectorContractRepository;
   private final FileService fileService;
+  private final InjectRepository injectRepository;
+  private final AgentRepository agentRepository;
+  private final InjectStatusRepository injectStatusRepository;
   private final InjectStatusService injectStatusService;
 
   @GetMapping("/api/injectors")
@@ -389,11 +387,23 @@ public class InjectorApi extends RestBehavior {
 
   private void setImplantErrorTrace(String injectId, String agentId, String message) {
     if (injectId != null && !injectId.isBlank() && agentId != null && !agentId.isBlank()) {
+      Inject inject =
+          injectRepository
+              .findById(injectId)
+              .orElseThrow(() -> new ElementNotFoundException("Inject not found: " + injectId));
+      Agent agent =
+          agentRepository
+              .findById(agentId)
+              .orElseThrow(() -> new ElementNotFoundException("Agent not found: " + agentId));
+      InjectStatus injectStatus =
+          inject.getStatus().orElseThrow(() -> new IllegalArgumentException("Status should exist"));
+      injectStatus.addTrace(ExecutionTraceStatus.ERROR, message, ExecutionTraceAction.START, agent);
+      injectStatusRepository.save(injectStatus);
       InjectExecutionInput input = new InjectExecutionInput();
-      input.setMessage(message);
-      input.setStatus(ExecutionTraceStatus.ERROR.name());
+      input.setMessage("Execution done");
+      input.setStatus(ExecutionTraceStatus.INFO.name());
       input.setAction(InjectExecutionAction.complete);
-      injectStatusService.handleInjectExecutionCallback(injectId, agentId, input);
+      injectStatusService.updateInjectStatus(agent, inject, input);
     }
     throw new IllegalArgumentException(message);
   }
