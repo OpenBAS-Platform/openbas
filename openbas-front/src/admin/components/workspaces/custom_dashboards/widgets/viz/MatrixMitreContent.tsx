@@ -32,8 +32,7 @@ const items = [
 
 const useStyles = makeStyles()(theme => ({
   container: {
-    height: '91%', // Workaround
-    width: '100%',
+    flex: 1,
     overflow: 'auto',
     display: 'flex',
     gap: theme.spacing(1),
@@ -62,7 +61,12 @@ const MatrixMitreContent: FunctionComponent<Props> = ({ data }) => {
 
   const [showCoveredOnly, setShowCoveredOnly] = useState(false);
   return (
-    <Box display="flex" flexDirection="column" height="100%">
+    <Box
+      flex={1}
+      display="flex"
+      flexDirection="column"
+      minHeight={0}
+    >
       <div style={{
         position: 'sticky',
         display: 'flex',

@@ -1,5 +1,5 @@
 import { OpenInFullOutlined } from '@mui/icons-material';
-import { Button, Dialog, DialogContent } from '@mui/material';
+import { Button, Dialog, DialogContent, Fab } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
 
@@ -19,28 +19,10 @@ const MatrixMitre: FunctionComponent<Props> = ({ data }) => {
   const handleOpen = () => {
     if (!openDialog) setOpenDialog(true);
   };
-
   const handleClose = () => setOpenDialog(false);
 
-  return (
-    <>
-      <MatrixMitreContent data={data} />
-      <Button
-        variant="outlined"
-        color="secondary"
-        size="small"
-        onClick={handleOpen}
-        className="noDrag"
-        sx={{
-          position: 'absolute',
-          bottom: theme.spacing(2),
-          right: theme.spacing(2),
-          zIndex: 10,
-        }}
-      >
-        <OpenInFullOutlined fontSize="small" sx={{ marginRight: theme.spacing(1) }} />
-        {t('Expand widget')}
-      </Button>
+  if (openDialog) {
+    return (
       <Dialog
         open={openDialog}
         onClose={handleClose}
@@ -66,6 +48,26 @@ const MatrixMitre: FunctionComponent<Props> = ({ data }) => {
           <MatrixMitreContent data={data} />
         </DialogContent>
       </Dialog>
+    );
+  }
+
+  return (
+    <>
+      <MatrixMitreContent data={data} />
+      <Fab
+        size="small"
+        color="secondary"
+        onClick={handleOpen}
+        className="noDrag"
+        sx={{
+          position: 'absolute',
+          bottom: theme.spacing(3),
+          right: theme.spacing(3),
+          zIndex: 10,
+        }}
+      >
+        <OpenInFullOutlined />
+      </Fab>
     </>
   );
 };
