@@ -163,7 +163,10 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       command =
           WINDOWS_ARCH
               + WINDOWS_EXTERNAL_REFERENCE
-              + command.replace(Endpoint.PLATFORM_ARCH.x86_64.name(), ARCH_VARIABLE);
+              + command.replace(
+                  Endpoint.PLATFORM_ARCH.x86_64.name(),
+                  ARCH_VARIABLE
+                      + "`"); // Specific for Windows to escape the ? right after in the URL
       command = replaceArgs(platform, command, injectId, AGENT_ID_VARIABLE);
       command =
           command.replaceFirst(
