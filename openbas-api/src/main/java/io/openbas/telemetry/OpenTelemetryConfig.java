@@ -54,7 +54,7 @@ public class OpenTelemetryConfig {
   @Autowired private Environment environment;
 
   private static final DateTimeFormatter CREATION_DATE_FORMATTER =
-          DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
 
   @Bean
   public OpenTelemetry openTelemetry() {
@@ -141,7 +141,7 @@ public class OpenTelemetryConfig {
     Setting instanceCreationDate =
         this.settingRepository.findByKey(PLATFORM_INSTANCE_CREATION.key()).orElse(new Setting());
     LocalDateTime creationDate = LocalDateTime.now();
-    if(instanceCreationDate.getValue() != null) {
+    if (instanceCreationDate.getValue() != null) {
       creationDate = LocalDateTime.parse(instanceCreationDate.getValue(), CREATION_DATE_FORMATTER);
     }
     ResourceBuilder resourceBuilder =
@@ -149,7 +149,9 @@ public class OpenTelemetryConfig {
             .put(ServiceAttributes.SERVICE_NAME, "openbas-telemetry")
             .put(ServiceAttributes.SERVICE_VERSION, getRequiredProperty("info.app.version"))
             .put(stringKey("service.instance.id"), instanceId.getValue())
-            .put(stringKey("service.instance.creation"), ZonedDateTime.of(creationDate, ZoneId.systemDefault()).toInstant().toString());
+            .put(
+                stringKey("service.instance.creation"),
+                ZonedDateTime.of(creationDate, ZoneId.systemDefault()).toInstant().toString());
 
     try {
       String hostAddress = InetAddress.getLocalHost().getHostAddress();
