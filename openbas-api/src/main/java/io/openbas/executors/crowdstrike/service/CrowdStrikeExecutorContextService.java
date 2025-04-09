@@ -157,7 +157,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
               + UUID.randomUUID()
               + "\";md $location -ea 0;[Environment]::CurrentDirectory";
       Endpoint.PLATFORM_TYPE platform = Endpoint.PLATFORM_TYPE.Windows;
-      // x86_64 by default in the register because CS API doesn't provide the platform architecture
+      // x86_64 by default in the register because CS API doesn't provide the platform architecture (we update this when the download implant script is launched on the endpoint)
       String executorCommandKey = platform.name() + "." + Endpoint.PLATFORM_ARCH.x86_64.name();
       String command = injector.getExecutorCommands().get(executorCommandKey);
       command =

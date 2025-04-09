@@ -349,13 +349,13 @@ public class InjectorApi extends RestBehavior {
       throws IOException {
     if (!AVAILABLE_PLATFORMS.contains(platform)) {
       setImplantErrorTrace(
-          injectId, agentId, "Unable to download the implant. Platform invalid : " + platform);
+          injectId, agentId, "Unable to download the implant. Platform invalid: " + platform);
     }
     if (!AVAILABLE_ARCHITECTURES.contains(architecture)) {
       setImplantErrorTrace(
           injectId,
           agentId,
-          "Unable to download the implant. Architecture invalid : " + architecture);
+          "Unable to download the implant. Architecture invalid: " + architecture);
     }
 
     InputStream in = null;
@@ -387,6 +387,7 @@ public class InjectorApi extends RestBehavior {
 
   private void setImplantErrorTrace(String injectId, String agentId, String message) {
     if (injectId != null && !injectId.isBlank() && agentId != null && !agentId.isBlank()) {
+      // Create execution traces to inform that the architecture or platform are not compatible with the OpenBAS implant
       Inject inject =
           injectRepository
               .findById(injectId)
