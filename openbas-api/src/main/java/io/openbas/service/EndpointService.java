@@ -1,37 +1,5 @@
 package io.openbas.service;
 
-import io.openbas.config.OpenBASConfig;
-import io.openbas.database.model.*;
-import io.openbas.database.repository.*;
-import io.openbas.executors.model.AgentRegisterInput;
-import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
-import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
-import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.EndpointMapper;
-import io.openbas.utils.pagination.SearchPaginationInput;
-import jakarta.annotation.Resource;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static io.openbas.database.model.Filters.isEmptyFilterGroup;
 import static io.openbas.database.specification.EndpointSpecification.findEndpointsForAssetGroup;
 import static io.openbas.database.specification.EndpointSpecification.findEndpointsForInjection;
@@ -45,6 +13,37 @@ import static io.openbas.utils.pagination.PaginationUtils.buildPageable;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
+import io.openbas.config.OpenBASConfig;
+import io.openbas.database.model.*;
+import io.openbas.database.repository.*;
+import io.openbas.executors.model.AgentRegisterInput;
+import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
+import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
+import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.utils.EndpointMapper;
+import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 @RequiredArgsConstructor
 @Service
 @Log
@@ -57,8 +56,7 @@ public class EndpointService {
 
   public static String JFROG_BASE = "https://filigran.jfrog.io/artifactory";
 
-  @Resource
-  private OpenBASConfig openBASConfig;
+  @Resource private OpenBASConfig openBASConfig;
 
   @Value("${openbas.admin.token:#{null}}")
   private String adminToken;
@@ -154,12 +152,14 @@ public class EndpointService {
             .findById(assetGroupId)
             .orElseThrow(() -> new IllegalArgumentException("Asset group not found"));
 
-    Specification<Endpoint> specificationStatic = findEndpointsForAssetGroup(assetGroupId)
-        .and(findEndpointsForInjection());
+    Specification<Endpoint> specificationStatic =
+        findEndpointsForAssetGroup(assetGroupId).and(findEndpointsForInjection());
 
     if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
-      Specification<Endpoint> specificationDynamic = computeFilterGroupJpa(assetGroup.getDynamicFilter());
-      Specification<Endpoint> specificationDynamicWithInjection = specificationDynamic.and(findEndpointsForInjection());
+      Specification<Endpoint> specificationDynamic =
+          computeFilterGroupJpa(assetGroup.getDynamicFilter());
+      Specification<Endpoint> specificationDynamicWithInjection =
+          specificationDynamic.and(findEndpointsForInjection());
 
       Page<Endpoint> dynamicResult =
           buildPaginationJPA(
@@ -174,13 +174,11 @@ public class EndpointService {
                   this.endpointRepository.findAll(specificationStatic.and(specification), pageable),
               handleEndpointFilter(searchPaginationInput),
               Endpoint.class);
-      List<Endpoint> mergedContent = Stream.concat(
-              dynamicResult.getContent().stream(),
-              staticResult.getContent().stream()
-          )
-          .distinct()
-          .limit(searchPaginationInput.getSize())
-          .collect(Collectors.toList());
+      List<Endpoint> mergedContent =
+          Stream.concat(dynamicResult.getContent().stream(), staticResult.getContent().stream())
+              .distinct()
+              .limit(searchPaginationInput.getSize())
+              .collect(Collectors.toList());
 
       long total = dynamicResult.getTotalElements() + staticResult.getTotalElements();
 

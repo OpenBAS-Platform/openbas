@@ -1,32 +1,29 @@
 package io.openbas.utils.pagination;
 
+import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
+import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
+import static io.openbas.utils.pagination.SortUtilsJpa.toSortJpa;
+
 import io.openbas.database.model.Base;
 import jakarta.persistence.criteria.Join;
 import jakarta.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-
-import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
-import static io.openbas.utils.pagination.SearchUtilsJpa.computeSearchJpa;
-import static io.openbas.utils.pagination.SortUtilsJpa.toSortJpa;
-
 public class PaginationUtils {
 
-  private PaginationUtils() {
-  }
+  private PaginationUtils() {}
 
   // -- JPA --
 
   public static <T> Pageable buildPageable(
-      @NotNull final SearchPaginationInput input,
-      @NotNull final Class<T> clazz) {
+      @NotNull final SearchPaginationInput input, @NotNull final Class<T> clazz) {
     return PageRequest.of(input.getPage(), input.getSize(), toSortJpa(input.getSorts(), clazz));
   }
 
@@ -75,10 +72,11 @@ public class PaginationUtils {
   /**
    * Build PaginationJPA with a specified search specifications that replace the default ones
    *
-   * @param findAll                     the find all method
-   * @param input                       the search inputs
-   * @param clazz                       the class that we're looking for
-   * @param specificSearchSpecification the specified search specification (will replace the default ones)
+   * @param findAll the find all method
+   * @param input the search inputs
+   * @param clazz the class that we're looking for
+   * @param specificSearchSpecification the specified search specification (will replace the default
+   *     ones)
    * @return a Page of results
    */
   public static <T> Page<T> buildPaginationJPA(
