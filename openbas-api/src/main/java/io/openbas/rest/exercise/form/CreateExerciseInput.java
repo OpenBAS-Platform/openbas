@@ -1,15 +1,14 @@
 package io.openbas.rest.exercise.form;
 
+import static io.openbas.config.AppConfig.NOW_FUTURE_MESSAGE;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
-import static io.openbas.config.AppConfig.NOW_FUTURE_MESSAGE;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
