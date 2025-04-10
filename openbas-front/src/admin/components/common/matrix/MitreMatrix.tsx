@@ -6,6 +6,7 @@ import { type AttackPatternHelper } from '../../../../actions/attack_patterns/at
 import { type KillChainPhaseHelper } from '../../../../actions/kill_chain_phases/killchainphase-helper';
 import { useHelper } from '../../../../store';
 import { type AttackPattern, type InjectExpectationResultsByAttackPattern, type KillChainPhase } from '../../../../utils/api-types';
+import { sortKillChainPhase } from '../../../../utils/kill_chain_phases/kill_chain_phases';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
 import MitreMatrixDummy from './MitreMatrixDummy';
 
@@ -60,9 +61,6 @@ const MitreMatrix: FunctionComponent<Props> = ({
     .flatMap(attackPattern => (attackPattern.attack_pattern_kill_chain_phases ?? []))
     .map((killChainPhaseId: string) => killChainPhaseMap[killChainPhaseId])
     .filter(killChainPhase => !!killChainPhase));
-  const sortKillChainPhase = (k1: KillChainPhase, k2: KillChainPhase) => {
-    return (k1.phase_order ?? 0) - (k2.phase_order ?? 0);
-  };
   return (
     <div className={classes.container}>
       {[...resultKillChainPhases].sort(sortKillChainPhase)
