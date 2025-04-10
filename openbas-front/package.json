@@ -84,7 +84,7 @@
     "@types/qs": "6",
     "@types/react": "19.1.0",
     "@types/react-csv": "1.1.10",
-    "@types/react-dom": "19.1.1",
+    "@types/react-dom": "19.1.2",
     "@types/react-syntax-highlighter": "15",
     "@types/seamless-immutable": "7.1.19",
     "@typescript-eslint/utils": "8.29.0",
