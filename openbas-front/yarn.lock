@@ -6934,9 +6934,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-react-parser@npm:5.2.2":
-  version: 5.2.2
-  resolution: "html-react-parser@npm:5.2.2"
+"html-react-parser@npm:5.2.3":
+  version: 5.2.3
+  resolution: "html-react-parser@npm:5.2.3"
   dependencies:
     domhandler: "npm:5.0.3"
     html-dom-parser: "npm:5.0.13"
@@ -6948,7 +6948,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10c0/f757476308831afeba42698c83213045ce83a94577788217022528f9b52dfd2a5076f0f77acf0927ba97c2c695423c6898cef8e162134d7d1ceadc150f80b730
+  checksum: 10c0/2c23367edaabe373e7f03094a846a22ff44144a5b6c975d66ce87792267ed88b86230fbe7ac8753c0c50276de38825957c1b994d4cc341f77dfeaa75d2e0a917
   languageName: node
   linkType: hard
 
@@ -9328,7 +9328,7 @@ __metadata:
     final-form-arrays: "npm:3.1.0"
     fs-extra: "npm:11.3.0"
     globals: "npm:16.0.0"
-    html-react-parser: "npm:5.2.2"
+    html-react-parser: "npm:5.2.3"
     html-to-image: "npm:1.11.13"
     http-proxy-middleware: "npm:3.0.3"
     i18n-auto-translation: "npm:2.1.2"
