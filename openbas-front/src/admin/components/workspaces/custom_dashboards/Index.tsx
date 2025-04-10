@@ -32,7 +32,7 @@ const CustomDashboardIndexComponent: FunctionComponent<{ customDashboard: Custom
       />
       <Suspense fallback={<Loader />}>
         <Routes>
-          <Route path="" element={errorWrapper(CustomDashboard)()} />
+          <Route path="" element={errorWrapper(CustomDashboard)({ customDashboard })} />
           {/* Not found */}
           <Route path="*" element={<NotFound />} />
         </Routes>

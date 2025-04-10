@@ -29,7 +29,9 @@ public class Widget implements Base {
     @JsonProperty("vertical-barchart")
     VERTICAL_BAR_CHART("vertical-barchart"),
     @JsonProperty("security-coverage")
-    SECURITY_COVERAGE_CHART("security-coverage");
+    SECURITY_COVERAGE_CHART("security-coverage"),
+    @JsonProperty("line")
+    LINE("line");
 
     public final String type;
 

@@ -2,8 +2,9 @@ import { type FunctionComponent, useState } from 'react';
 
 import { createCustomDashboardWidget } from '../../../../../actions/custom_dashboards/customdashboardwidget-action';
 import ButtonCreate from '../../../../../components/common/ButtonCreate';
-import { type Widget, type WidgetInput } from '../../../../../utils/api-types';
+import { type Widget } from '../../../../../utils/api-types';
 import WidgetForm from './WidgetForm';
+import { type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const COL_WIDTH = 30;
 
@@ -36,7 +37,7 @@ const WidgetCreation: FunctionComponent<{
     return maxX + 4;
   };
 
-  const onSubmit = async (input: WidgetInput) => {
+  const onSubmit = async (input: WidgetInputWithoutLayout) => {
     let maxX = getMaxX();
     let maxY = getMaxY();
     if (maxX >= COL_WIDTH - 4) {
@@ -61,11 +62,16 @@ const WidgetCreation: FunctionComponent<{
   return (
     <>
       <ButtonCreate onClick={toggleDialog} />
-      <WidgetForm
-        open={open}
-        toggleDialog={toggleDialog}
-        onSubmit={onSubmit}
-      />
+      {
+        open
+        && (
+          <WidgetForm
+            open
+            toggleDialog={toggleDialog}
+            onSubmit={onSubmit}
+          />
+        )
+      }
     </>
   );
 };

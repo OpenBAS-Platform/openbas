@@ -5,8 +5,9 @@ import type { PopoverEntry } from '../../../../../components/common/ButtonPopove
 import DialogDelete from '../../../../../components/common/DialogDelete';
 import IconPopover from '../../../../../components/common/IconPopover';
 import { useFormatter } from '../../../../../components/i18n';
-import { type Widget, type WidgetInput } from '../../../../../utils/api-types';
+import { type Widget } from '../../../../../utils/api-types';
 import WidgetForm from './WidgetForm';
+import { type WidgetInputWithoutLayout } from './WidgetUtils';
 
 interface Props {
   customDashboardId: string;
@@ -33,7 +34,7 @@ const WidgetPopover: FunctionComponent<Props> = ({
     widget_type: widget.widget_type,
     widget_config: widget.widget_config,
   };
-  const onSubmit = async (input: WidgetInput) => {
+  const onSubmit = async (input: WidgetInputWithoutLayout) => {
     const finalInput = {
       ...input,
       widget_layout: widget.widget_layout,

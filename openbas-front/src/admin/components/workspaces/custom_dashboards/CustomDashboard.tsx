@@ -1,47 +1,31 @@
-import { Alert, AlertTitle, Paper, Typography } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useEffect, useMemo, useState } from 'react';
+import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import RGL, { type Layout, WidthProvider } from 'react-grid-layout';
 import { useParams } from 'react-router';
 
-import { customDashboard } from '../../../../actions/custom_dashboards/customdashboard-action';
 import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_dashboards/customdashboardwidget-action';
 import { ErrorBoundary } from '../../../../components/Error';
-import { useFormatter } from '../../../../components/i18n';
-import Loader from '../../../../components/Loader';
 import { type CustomDashboard, type Widget } from '../../../../utils/api-types';
 import WidgetCreation from './widgets/WidgetCreation';
 import WidgetPopover from './widgets/WidgetPopover';
 import WidgetStructuralViz from './widgets/WidgetStructuralViz';
 import WidgetTemporalViz from './widgets/WidgetTemporalViz';
 
-const CustomDashboardComponent = () => {
+const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashboard }> = ({ customDashboard }) => {
   // Standard hooks
   const theme = useTheme();
-  const { t } = useFormatter();
   const ReactGridLayout = useMemo(() => WidthProvider(RGL), []);
 
   const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
-  const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>();
-  const [loading, setLoading] = useState(true);
+  const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>(customDashboard);
 
   const [idToResize, setIdToResize] = useState<string | null>(null);
   const handleResize = (updatedWidget: string | null) => setIdToResize(updatedWidget);
 
   useEffect(() => {
-    customDashboard(customDashboardId).then((response) => {
-      if (response.data) {
-        setCustomDashboardValue(response.data);
-        setLoading(false);
-      }
-    });
-    const timeout = setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 1200);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, []);
+    window.dispatchEvent(new Event('resize'));
+  }, [customDashboardValue]);
 
   const handleWidgetCreate = (newWidget: Widget) => {
     setCustomDashboardValue((prev) => {
@@ -89,19 +73,6 @@ const CustomDashboardComponent = () => {
       ),
     );
   };
-
-  if (loading) {
-    return <Loader />;
-  }
-
-  if (!loading && !customDashboardValue) {
-    return (
-      <Alert severity="warning">
-        <AlertTitle>{t('Warning')}</AlertTitle>
-        {t('Custom dashboard is currently unavailable or you do not have sufficient permissions to access it.')}
-      </Alert>
-    );
-  }
 
   return (
     <div id="container">

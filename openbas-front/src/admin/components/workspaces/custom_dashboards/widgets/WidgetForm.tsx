@@ -7,13 +7,12 @@ import { z } from 'zod';
 import Dialog from '../../../../../components/common/Dialog';
 import StepperComponent from '../../../../../components/common/StepperComponent';
 import { useFormatter } from '../../../../../components/i18n';
-import { type WidgetInput } from '../../../../../utils/api-types';
 import { zodImplement } from '../../../../../utils/Zod';
 import WidgetCreationParameters from './WidgetCreationParameters';
-import WidgetCreationPerspectives from './WidgetCreationPerspectives';
+import WidgetCreationSecurityCoverageSeries from './WidgetCreationSecurityCoverageSeries';
 import WidgetCreationSeriesList from './WidgetCreationSeriesList';
 import WidgetCreationTypes from './WidgetCreationTypes';
-import { getAvailableSteps, steps } from './WidgetUtils';
+import { getAvailableSteps, steps, type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const ActionsComponent: FunctionComponent<{
   disabled: boolean;
@@ -37,8 +36,8 @@ const ActionsComponent: FunctionComponent<{
 interface Props {
   open: boolean;
   toggleDialog: () => void;
-  initialValues?: WidgetInput;
-  onSubmit: (input: WidgetInput) => Promise<void>;
+  initialValues?: WidgetInputWithoutLayout;
+  onSubmit: (input: WidgetInputWithoutLayout) => Promise<void>;
   editing?: boolean;
 }
 
@@ -95,11 +94,11 @@ const WidgetForm: FunctionComponent<Props> = ({
     watch,
     reset,
     setValue,
-  } = useForm<WidgetInput>({
+  } = useForm<WidgetInputWithoutLayout>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<WidgetInput>().with({
-        widget_type: z.enum(['vertical-barchart', 'security-coverage']),
+      zodImplement<WidgetInputWithoutLayout>().with({
+        widget_type: z.enum(['vertical-barchart', 'security-coverage', 'line']),
         widget_config: widgetConfigSchema,
       }),
     ),
@@ -122,6 +121,10 @@ const WidgetForm: FunctionComponent<Props> = ({
   const goToStep = (step: number) => {
     if (step > activeStep) return;
 
+    if (step === 0) {
+      reset(initialValues);
+    }
+
     for (let i = step; i >= 0; i--) {
       if (availableSteps.includes(steps[i])) {
         setActiveStep(i);
@@ -139,15 +142,16 @@ const WidgetForm: FunctionComponent<Props> = ({
   };
 
   const handleSubmitWithoutPropagation = () => {
-    handleSubmit(onSubmit)();
-    toggleDialog();
-    reset(initialValues);
-    setActiveStep(0);
+    handleSubmit((values) => {
+      onSubmit(values);
+      toggleDialog();
+    })();
   };
 
   return (
     <form id="widgetCreationForm">
       <Dialog
+        className="noDrag"
         open={open}
         handleClose={toggleDialog}
         title={<StepperComponent widgetType={widgetType} steps={steps} activeStep={activeStep} handlePrevious={goToStep} />}
@@ -176,44 +180,41 @@ const WidgetForm: FunctionComponent<Props> = ({
               )}
             />
           )}
-          {activeStep === 1 && (
-            <Controller
-              control={control}
-              name="widget_config.series"
-              render={({ field: { value, onChange } }) => (
-                <WidgetCreationPerspectives
-                  value={value}
-                  onChange={onChange}
-                  onSubmit={nextStep}
-                />
-              )}
-            />
-          )}
+          {activeStep === 1
+            && (widgetType === 'security-coverage'
+              ? (
+                  <Controller
+                    control={control}
+                    name="widget_config.series"
+                    render={({ field: { value, onChange } }) => (
+                      <WidgetCreationSecurityCoverageSeries
+                        value={value}
+                        onChange={onChange}
+                        onSubmit={nextStep}
+                      />
+                    )}
+                  />
+                )
+              : (
+                  <Controller
+                    control={control}
+                    name="widget_config.series"
+                    render={({ field: { value, onChange } }) => (
+                      <WidgetCreationSeriesList
+                        widgetType={widgetType}
+                        currentSeries={value}
+                        onChange={onChange}
+                        onSubmit={nextStep}
+                      />
+                    )}
+                  />
+                )
+            )}
           {activeStep === 2 && (
-            <Controller
+            <WidgetCreationParameters
+              widgetType={widgetType}
               control={control}
-              name="widget_config.series"
-              render={({ field: { value, onChange } }) => (
-                <WidgetCreationSeriesList
-                  widgetType={widgetType}
-                  currentSeries={value}
-                  onChange={onChange}
-                  onSubmit={nextStep}
-                />
-              )}
-            />
-          )}
-          {activeStep === 3 && (
-            <Controller
-              control={control}
-              name="widget_config"
-              render={() => (
-                <WidgetCreationParameters
-                  widgetType={widgetType}
-                  control={control}
-                  setValue={setValue}
-                />
-              )}
+              setValue={setValue}
             />
           )}
         </>
