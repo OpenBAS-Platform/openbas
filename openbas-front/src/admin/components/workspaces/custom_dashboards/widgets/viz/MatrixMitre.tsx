@@ -1,19 +1,32 @@
-import { OpenInFullOutlined } from '@mui/icons-material';
-import { Button, Dialog, DialogContent, Fab } from '@mui/material';
+import { Close, OpenInFullOutlined } from '@mui/icons-material';
+import { Dialog, DialogContent, DialogTitle, Fab, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
 
 import Transition from '../../../../../../components/common/Transition';
-import { useFormatter } from '../../../../../../components/i18n';
 import { type EsSeries } from '../../../../../../utils/api-types';
 import MatrixMitreContent from './MatrixMitreContent';
+import { makeStyles } from 'tss-react/mui';
 
-interface Props { data: EsSeries[] }
+const useStyles = makeStyles()(theme => ({
+  headerFull: {
+    backgroundColor: theme.palette.mode === 'light' ? theme.palette.background.default : theme.palette.background.nav,
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    padding: '10px 0',
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
+}));
 
-const MatrixMitre: FunctionComponent<Props> = ({ data }) => {
+interface Props {
+  widgetTitle: string;
+  data: EsSeries[];
+}
+
+const MatrixMitre: FunctionComponent<Props> = ({ widgetTitle, data }) => {
   // Standard hooks
   const theme = useTheme();
-  const { t } = useFormatter();
+  const { classes } = useStyles();
 
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpen = () => {
@@ -30,21 +43,18 @@ const MatrixMitre: FunctionComponent<Props> = ({ data }) => {
         PaperProps={{ elevation: 1 }}
         TransitionComponent={Transition}
       >
-        <DialogContent>
-          <Button
-            variant="outlined"
-            color="secondary"
-            size="small"
+        <DialogTitle className={classes.headerFull}>
+          <IconButton
+            aria-label="Close"
             onClick={handleClose}
-            sx={{
-              position: 'absolute',
-              bottom: theme.spacing(2),
-              right: theme.spacing(2),
-            }}
+            size="large"
+            color="primary"
           >
-            <OpenInFullOutlined fontSize="small" sx={{ marginRight: theme.spacing(1) }} />
-            {t('Reduce widget')}
-          </Button>
+            <Close fontSize="small" color="primary" />
+          </IconButton>
+          {widgetTitle}
+        </DialogTitle>
+        <DialogContent>
           <MatrixMitreContent data={data} />
         </DialogContent>
       </Dialog>

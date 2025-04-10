@@ -13,7 +13,7 @@ import lombok.Setter;
 public class EsInjectExpectation extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
 
-  @Queryable(label = "type", filterable = true)
+  @Queryable(label = "expectation inject type", filterable = true)
   @EsQueryable(keyword = true)
   private String inject_expectation_type;
 
