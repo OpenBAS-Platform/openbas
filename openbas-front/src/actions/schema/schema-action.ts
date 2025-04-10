@@ -5,7 +5,17 @@ export const filterableProperties = (clazz: string, filterNames: string[] = []) 
   return simplePostCall(uri, filterNames);
 };
 
-export const engineSchemas = () => {
-  const uri = `/api/engine/schemas`;
+export const engineSchemas = (classNames?: (string | undefined)[]) => {
+  const params = new URLSearchParams();
+
+  if (classNames && classNames.length > 0) {
+    classNames.forEach((name) => {
+      if (name) {
+        params.append('classNames', name);
+      }
+    });
+  }
+
+  const uri = `/api/engine/schemas${params.toString() ? `?${params.toString()}` : ''}`;
   return simpleCall(uri);
 };
