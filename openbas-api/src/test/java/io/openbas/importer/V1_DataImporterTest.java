@@ -9,6 +9,7 @@ import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.utils.Constants;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -38,6 +39,14 @@ class V1_DataImporterTest extends IntegrationTest {
 
   @Autowired private TagRepository tagRepository;
 
+  @Autowired private ScenarioRepository scenarioRepository;
+
+  @Autowired private PayloadRepository payloadRepository;
+
+  @Autowired private AttackPatternRepository attackPatternRepository;
+
+  @Autowired private KillChainPhaseRepository killChainPhaseRepository;
+
   private JsonNode importNode;
 
   public static final String EXERCISE_NAME =
@@ -46,6 +55,9 @@ class V1_DataImporterTest extends IntegrationTest {
   public static final String USER_EMAIL = "Romuald.Lemesle@openbas.io";
   public static final String ORGANIZATION_NAME = "Filigran";
   public static final String TAG_NAME = "crisis exercise";
+  public static final String ATTACK_PATTERN_EXTERNAL_ID = "ATTACK_PATTERN_EXTERNAL_ID";
+  public static final String KILLCHAIN_EXTERNAL_ID = "KILLCHAIN_EXTERNAL_ID";
+  public static final String PAYLOAD_EXTERNAL_ID = "PAYLOAD_EXTERNAL_ID";
 
   @BeforeAll
   public void setUp() throws Exception {
@@ -93,6 +105,50 @@ class V1_DataImporterTest extends IntegrationTest {
     this.userRepository.delete(user.get());
     this.teamRepository.delete(team.get());
     this.exerciseRepository.delete(exercise.get());
+  }
+
+  @Test
+  @Transactional
+  void testScenario_with_attackpattern() throws IOException {
+
+    MockitoAnnotations.openMocks(this);
+    ObjectMapper mapper = new ObjectMapper();
+    String jsonContent =
+        new String(
+            Files.readAllBytes(
+                Paths.get(
+                    "src/test/resources/importer-v1/import-scenario-with-attack-pattern.json")));
+    this.importNode = mapper.readTree(jsonContent);
+    this.importer.importData(this.importNode, Map.of(), null, null);
+
+    Payload payload = payloadRepository.findAll().iterator().next();
+
+    // the scenario should have one inject with one attack pattern with one killchain
+    AttackPattern attackPattern = payload.getAttackPatterns().getFirst();
+
+    KillChainPhase killChainPhase = attackPattern.getKillChainPhases().getFirst();
+    assertEquals(ATTACK_PATTERN_EXTERNAL_ID, attackPattern.getExternalId());
+    assertEquals(KILLCHAIN_EXTERNAL_ID, killChainPhase.getExternalId());
+
+    // delete scenario and payload before reimporting to verify that the killchainphase is not
+    // recreated
+    scenarioRepository.deleteAll();
+    payloadRepository.deleteAll();
+
+    this.importer.importData(this.importNode, Map.of(), null, null);
+    payload = payloadRepository.findAll().iterator().next();
+    AttackPattern attackPattern2 = payload.getAttackPatterns().getFirst();
+    KillChainPhase killChainPhase2 = attackPattern.getKillChainPhases().getFirst();
+
+    // verify that the new payload use the same attack pattern / killchain phase
+    assertEquals(attackPattern.getId(), attackPattern2.getId());
+    assertEquals(killChainPhase.getId(), killChainPhase2.getId());
+
+    // cleanup
+    scenarioRepository.deleteAll();
+    payloadRepository.deleteAll();
+    attackPatternRepository.deleteAll();
+    killChainPhaseRepository.deleteAll();
   }
 
   // -- UTILS --
