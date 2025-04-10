@@ -45,7 +45,7 @@ interface Props {
   onSubmit: () => void;
 }
 
-const WidgetCreationPerspectives: FunctionComponent<Props> = ({ value, onChange, onSubmit }) => {
+const WidgetCreationSecurityCoverageSeries: FunctionComponent<Props> = ({ value, onChange, onSubmit }) => {
   // Standard hooks
   const { t } = useFormatter();
   const { classes } = useStyles();
@@ -72,7 +72,7 @@ const WidgetCreationPerspectives: FunctionComponent<Props> = ({ value, onChange,
               aria-label={t(perspective.title)}
             >
               <CardContent className={classes.content}>
-                <Icon color="primary" style={{ fontSize: 40 }} />
+                <Icon color="primary" fontSize="large" />
                 <Typography variant="h5">{perspective.title}</Typography>
                 <Typography sx={{ textAlign: 'center' }}>{perspective.description}</Typography>
               </CardContent>
@@ -84,4 +84,4 @@ const WidgetCreationPerspectives: FunctionComponent<Props> = ({ value, onChange,
   );
 };
 
-export default WidgetCreationPerspectives;
+export default WidgetCreationSecurityCoverageSeries;

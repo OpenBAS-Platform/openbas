@@ -36,7 +36,7 @@ const WidgetCreationTypes: FunctionComponent<{
           >
             <CardActionArea
               onClick={() => onChange(visualizationType.category)}
-              aria-label={t(visualizationType.name)}
+              aria-label={t(`custom_dashboard_name_${visualizationType.category}`)}
             >
               <CardContent>
                 {renderWidgetIcon(visualizationType.category, 'large')}
@@ -45,7 +45,7 @@ const WidgetCreationTypes: FunctionComponent<{
                   variant="body1"
                   sx={{ mt: 1 }}
                 >
-                  {t(visualizationType.name)}
+                  {t(`custom_dashboard_name_${visualizationType.category}`)}
                 </Typography>
               </CardContent>
             </CardActionArea>

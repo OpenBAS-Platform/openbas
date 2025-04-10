@@ -1,33 +1,41 @@
-import { FilterNone } from '@mui/icons-material';
-import { ChartBar } from 'mdi-material-ui';
+import { TableChart } from '@mui/icons-material';
+import { ChartBar, ChartLine } from 'mdi-material-ui';
 
-import { type Filter, type HistogramWidget, type InjectExpectation, type StructuralHistogramSeries, type Widget } from '../../../../../utils/api-types';
+import {
+  type Filter,
+  type HistogramWidget,
+  type InjectExpectation,
+  type StructuralHistogramSeries,
+  type Widget,
+  type WidgetInput,
+} from '../../../../../utils/api-types';
 
-export type StepType = ('Visualization' | 'Quick filters' | 'Filters' | 'Parameters');
-export const steps: StepType[] = ['Visualization', 'Quick filters', 'Filters', 'Parameters'];
+export type WidgetInputWithoutLayout = Omit<WidgetInput, 'widget_layout'>;
+export type StepType = ('type' | 'series' | 'parameters');
+export const steps: StepType[] = ['type', 'series', 'parameters'];
+const defaultSteps: StepType[] = ['type', 'series', 'parameters'];
+const defaultModes: HistogramWidget['mode'][] = ['structural', 'temporal'];
 
 export const widgetVisualizationTypes: {
-  name: string;
   category: Widget['widget_type'];
   seriesLimit: number;
-  modes: HistogramWidget['mode'][];
+  modes?: HistogramWidget['mode'][];
   fields?: string[];
-  steps: StepType[];
+  steps?: StepType[];
 }[] = [
-  // {
-  //   name: 'Vertical Bar',
-  //   category: 'vertical-barchart',
-  //   seriesLimit: 5,
-  //   modes: ['structural', 'temporal'],
-  //   steps: ['Visualization', 'Filters', 'Parameters'],
-  // },
   {
-    name: 'Matrix mitre',
+    category: 'vertical-barchart',
+    seriesLimit: 5,
+  },
+  {
+    category: 'line',
+    seriesLimit: 5,
+  },
+  {
     category: 'security-coverage',
     seriesLimit: 2,
     modes: ['structural'],
     fields: ['base_attack_patterns_side'],
-    steps: ['Visualization', 'Quick filters', 'Parameters'],
   },
 ];
 
@@ -35,8 +43,10 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
   switch (type) {
     case 'vertical-barchart':
       return <ChartBar fontSize={fontSize} color="primary" />;
+    case 'line':
+      return <ChartLine fontSize={fontSize} color="primary" />;
     case 'security-coverage':
-      return <FilterNone fontSize={fontSize} color="primary" />;
+      return <TableChart fontSize={fontSize} color="primary" />;
     default:
       return <div />;
   }
@@ -47,15 +57,15 @@ export const getCurrentSeriesLimit = (type: Widget['widget_type']) => {
 };
 
 export const getAvailableModes = (type: Widget['widget_type']) => {
-  return widgetVisualizationTypes.find(widget => widget.category === type)?.modes ?? [];
+  return widgetVisualizationTypes.find(widget => widget.category === type)?.modes ?? defaultModes;
 };
 
 export const getAvailableSteps = (type: Widget['widget_type']) => {
-  return widgetVisualizationTypes.find(widget => widget.category === type)?.steps ?? steps;
+  return widgetVisualizationTypes.find(widget => widget.category === type)?.steps ?? defaultSteps;
 };
 
 export const getAvailableFields = (type: Widget['widget_type']) => {
-  return widgetVisualizationTypes.find(widget => widget.category === type)?.fields ?? [];
+  return widgetVisualizationTypes.find(widget => widget.category === type)?.fields ?? null;
 };
 
 // -- MATRIX MITRE --

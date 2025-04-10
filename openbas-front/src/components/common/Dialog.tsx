@@ -9,6 +9,7 @@ interface DialogProps {
   title: string;
   children: (() => ReactElement) | ReactElement | null;
   maxWidth?: Breakpoint;
+  className?: string;
   actions?: ReactElement | null;
 }
 
@@ -19,6 +20,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
   children,
   maxWidth = 'md',
                                                   actions,
+  className,
 }) => {
   let component;
   if (children) {
@@ -31,6 +33,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
 
   return (
     <DialogMUI
+      className={className}
       open={open}
       onClose={handleClose}
       fullWidth
