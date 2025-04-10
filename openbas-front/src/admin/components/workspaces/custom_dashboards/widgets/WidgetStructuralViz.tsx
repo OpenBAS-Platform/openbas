@@ -26,10 +26,21 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
     return <Loader variant="inElement" />;
   }
 
+  console.log(structuralVizData);
+
   switch (widget.widget_type) {
     case 'security-coverage':
       return (
         <MatrixMitre data={structuralVizData} />
+      );
+    case 'line':
+      return (
+
+        <div>coucou</div>
+      );
+    case 'vertical-barchart':
+      return (
+        <div>coucou 2</div>
       );
     default:
       return 'Not implemented yet';

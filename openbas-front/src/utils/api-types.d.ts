@@ -183,6 +183,7 @@ export interface AssetGroup {
   asset_group_dynamic_assets?: string[];
   /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
+  asset_group_external_reference?: string;
   asset_group_id: string;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -684,17 +685,6 @@ export interface CustomDashboard {
   custom_dashboard_updated_at: string;
   custom_dashboard_widgets?: Widget[];
   listened?: boolean;
-}
-
-export interface CustomDashboardContent {
-  /** @format int32 */
-  widget_layout_h?: number;
-  /** @format int32 */
-  widget_layout_w?: number;
-  /** @format int32 */
-  widget_layout_x?: number;
-  /** @format int32 */
-  widget_layout_y?: number;
 }
 
 export interface CustomDashboardInput {
@@ -4264,14 +4254,15 @@ export interface Widget {
   widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage";
+  widget_type: "vertical-barchart" | "security-coverage" | "line";
   /** @format date-time */
   widget_updated_at: string;
 }
 
 export interface WidgetInput {
   widget_config: DateHistogramWidget | StructuralHistogramWidget;
-  widget_type: "vertical-barchart" | "security-coverage";
+  widget_layout: WidgetLayout;
+  widget_type: "vertical-barchart" | "security-coverage" | "line";
 }
 
 export interface WidgetLayout {

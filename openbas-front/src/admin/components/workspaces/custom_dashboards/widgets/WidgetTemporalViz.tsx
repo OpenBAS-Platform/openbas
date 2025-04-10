@@ -63,6 +63,29 @@ const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
           height="100%"
         />
       );
+    case 'line':
+      return (
+        <Chart
+          options={verticalBarsChartOptions(
+            theme,
+            fld,
+            undefined,
+            false,
+            true,
+            false,
+            true,
+            'dataPoints',
+            true,
+            false,
+            undefined,
+            t('No data to display'),
+          )}
+          series={seriesData}
+          type="bar"
+          width="100%"
+          height="100%"
+        />
+      );
     default:
       return 'Not implemented yet';
   }

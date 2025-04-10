@@ -5,14 +5,14 @@ import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-
 
 import { engineSchemas } from '../../../../../actions/schema/schema-action';
 import { useFormatter } from '../../../../../components/i18n';
-import { type PropertySchemaDTO, type Widget, type WidgetInput } from '../../../../../utils/api-types';
+import { type PropertySchemaDTO, type Widget } from '../../../../../utils/api-types';
 import { type Option } from '../../../../../utils/Option';
-import { getAvailableFields, getAvailableModes } from './WidgetUtils';
+import { getAvailableFields, getAvailableModes, type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const WidgetCreationParameters: FunctionComponent<{
   widgetType: Widget['widget_type'];
-  control: Control<WidgetInput>;
-  setValue: UseFormSetValue<WidgetInput>;
+  control: Control<WidgetInputWithoutLayout>;
+  setValue: UseFormSetValue<WidgetInputWithoutLayout>;
 }> = ({ widgetType, control, setValue }) => {
   // Standard hooks
   const { t } = useFormatter();
@@ -38,6 +38,8 @@ const WidgetCreationParameters: FunctionComponent<{
   // -- HANDLE FIELDS --
   const [fieldOptions, setFieldOptions] = useState<Option[]>([]);
 
+  console.log(fieldOptions);
+
   useEffect(() => {
     engineSchemas().then((response: { data: PropertySchemaDTO[] }) => {
       const newOptions = Array.from(
@@ -51,7 +53,7 @@ const WidgetCreationParameters: FunctionComponent<{
         ).values(),
       );
       const availableFields = getAvailableFields(widgetType);
-      const finalOptions = newOptions.filter(o => availableFields.includes(o.id));
+      const finalOptions = !availableFields ? newOptions : newOptions.filter(o => availableFields.includes(o.id));
       setFieldOptions(finalOptions);
       if (finalOptions.length === 1) {
         setValue('widget_config.field', finalOptions[0].id); // If only one option is available, hide the field and set it automatically
@@ -86,7 +88,7 @@ const WidgetCreationParameters: FunctionComponent<{
           <Controller
             control={control}
             name="widget_config.mode"
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <TextField
                 {...field}
                 select
@@ -95,6 +97,8 @@ const WidgetCreationParameters: FunctionComponent<{
                 label={t('Mode')}
                 sx={{ mt: 2 }}
                 value={field.value ?? ''}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
                 onChange={e => field.onChange(e.target.value)}
                 required={true}
               >
@@ -172,6 +176,7 @@ const WidgetCreationParameters: FunctionComponent<{
                 onChange={date => field.onChange(date?.toISOString() ?? '')}
                 slotProps={{
                   textField: {
+                    required: true,
                     fullWidth: true,
                     error: !!fieldState.error,
                     helperText: fieldState.error?.message,
@@ -191,6 +196,7 @@ const WidgetCreationParameters: FunctionComponent<{
                 onChange={date => field.onChange(date?.toISOString() ?? '')}
                 slotProps={{
                   textField: {
+                    required: true,
                     fullWidth: true,
                     error: !!fieldState.error,
                     helperText: fieldState.error?.message,

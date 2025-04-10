@@ -3,6 +3,7 @@ import type { FunctionComponent } from 'react';
 
 import { getAvailableSteps, type StepType } from '../../admin/components/workspaces/custom_dashboards/widgets/WidgetUtils';
 import type { Widget } from '../../utils/api-types';
+import { useFormatter } from '../i18n';
 
 const StepperComponent: FunctionComponent<{
   widgetType: Widget['widget_type'];
@@ -10,6 +11,7 @@ const StepperComponent: FunctionComponent<{
   activeStep: number;
   handlePrevious: (index: number) => void;
 }> = ({ widgetType, steps, activeStep, handlePrevious }) => {
+  const { t } = useFormatter();
   const availableSteps = getAvailableSteps(widgetType);
 
   return (
@@ -28,7 +30,7 @@ const StepperComponent: FunctionComponent<{
                 opacity: isEnabled ? 1 : 0.5,
               }}
             >
-              {label}
+              {t(`custom_dashboard_step_${label}`)}
               {isEnabled && index < activeStep}
             </StepLabel>
           </Step>
