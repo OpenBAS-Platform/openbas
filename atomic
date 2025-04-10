@@ -1,0 +1,2020 @@
+{
+  "inject_id": "77f7e023-30d3-47f2-8d76-29ef96fe2e86",
+  "inject_title": "Bypass UAC using ComputerDefaults (PowerShell)",
+  "inject_description": "",
+  "inject_content": {
+    "expectations": [
+      {
+        "expectation_type": "PREVENTION",
+        "expectation_name": "Expect inject to be prevented",
+        "expectation_description": null,
+        "expectation_score": 100,
+        "expectation_expectation_group": false,
+        "expectation_expiration_time": 21600
+      },
+      {
+        "expectation_type": "DETECTION",
+        "expectation_name": "Expect inject to be detected",
+        "expectation_description": null,
+        "expectation_score": 100,
+        "expectation_expectation_group": false,
+        "expectation_expiration_time": 21600
+      }
+    ],
+    "obfuscator": "plain-text",
+    "executable_binary": "C:\\Windows\\System32\\cmd.exe"
+  },
+  "inject_type": "openbas_implant",
+  "injects_tags": [],
+  "injects_documents": [],
+  "inject_injector_contract": {
+    "injector_contract_id": "452916ce-d650-458c-a537-9af16184bf9b",
+    "injector_contract_content": "{\"config\":{\"type\":\"openbas_implant\",\"expose\":true,\"label\":{\"en\":\"OpenBAS Implant\",\"fr\":\"OpenBAS Implant\"},\"color_dark\":\"#000000\",\"color_light\":\"#000000\"},\"label\":{\"en\":\"Bypass UAC using ComputerDefaults (PowerShell)\",\"fr\":\"Bypass UAC using ComputerDefaults (PowerShell)\"},\"manual\":false,\"fields\":[{\"key\":\"assets\",\"label\":\"Assets\",\"mandatory\":false,\"readOnly\":false,\"mandatoryGroups\":[\"assets\",\"assetgroups\"],\"mandatoryConditionField\":null,\"mandatoryConditionValue\":null,\"linkedFields\":[],\"linkedValues\":[],\"cardinality\":\"n\",\"defaultValue\":[],\"type\":\"asset\"},{\"key\":\"assetgroups\",\"label\":\"Asset groups\",\"mandatory\":false,\"readOnly\":false,\"mandatoryGroups\":[\"assets\",\"assetgroups\"],\"mandatoryConditionField\":null,\"mandatoryConditionValue\":null,\"linkedFields\":[],\"linkedValues\":[],\"cardinality\":\"n\",\"defaultValue\":[],\"type\":\"asset-group\"},{\"key\":\"obfuscator\",\"label\":\"Obfuscators\",\"mandatory\":false,\"readOnly\":false,\"mandatoryGroups\":null,\"mandatoryConditionField\":null,\"mandatoryConditionValue\":null,\"linkedFields\":[],\"linkedValues\":[],\"cardinality\":\"1\",\"defaultValue\":[\"plain-text\"],\"choices\":[{\"label\":\"plain-text\",\"value\":\"plain-text\",\"information\":\"\"},{\"label\":\"base64\",\"value\":\"base64\",\"information\":\"CMD does not support base64 obfuscation\"}],\"type\":\"choice\"},{\"key\":\"expectations\",\"label\":\"Expectations\",\"mandatory\":false,\"readOnly\":false,\"mandatoryGroups\":null,\"mandatoryConditionField\":null,\"mandatoryConditionValue\":null,\"linkedFields\":[],\"linkedValues\":[],\"cardinality\":\"n\",\"defaultValue\":[],\"predefinedExpectations\":[{\"expectation_type\":\"PREVENTION\",\"expectation_name\":\"Expect inject to be prevented\",\"expectation_description\":null,\"expectation_score\":100.0,\"expectation_expectation_group\":false,\"expectation_expiration_time\":21600},{\"expectation_type\":\"DETECTION\",\"expectation_name\":\"Expect inject to be detected\",\"expectation_description\":null,\"expectation_score\":100.0,\"expectation_expectation_group\":false,\"expectation_expiration_time\":21600}],\"type\":\"expectation\"},{\"key\":\"executable_binary\",\"label\":\"executable_binary\",\"mandatory\":true,\"readOnly\":false,\"mandatoryGroups\":null,\"mandatoryConditionField\":null,\"mandatoryConditionValue\":null,\"linkedFields\":[],\"linkedValues\":[],\"defaultValue\":\"C:\\\\Windows\\\\System32\\\\cmd.exe\",\"type\":\"text\"}],\"variables\":[{\"key\":\"user\",\"label\":\"User that will receive the injection\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[{\"key\":\"user.id\",\"label\":\"Id of the user in the platform\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.email\",\"label\":\"Email of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.firstname\",\"label\":\"First name of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.lastname\",\"label\":\"Last name of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"user.lang\",\"label\":\"Language of the user\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]}]},{\"key\":\"exercise\",\"label\":\"Exercise of the current injection\",\"type\":\"Object\",\"cardinality\":\"1\",\"children\":[{\"key\":\"exercise.id\",\"label\":\"Id of the user in the platform\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"exercise.name\",\"label\":\"Name of the exercise\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"exercise.description\",\"label\":\"Description of the exercise\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]}]},{\"key\":\"teams\",\"label\":\"List of team name for the injection\",\"type\":\"String\",\"cardinality\":\"n\",\"children\":[]},{\"key\":\"player_uri\",\"label\":\"Player interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"challenges_uri\",\"label\":\"Challenges interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"scoreboard_uri\",\"label\":\"Scoreboard interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]},{\"key\":\"lessons_uri\",\"label\":\"Lessons learned interface platform link\",\"type\":\"String\",\"cardinality\":\"1\",\"children\":[]}],\"context\":{},\"contract_id\":\"452916ce-d650-458c-a537-9af16184bf9b\",\"contract_attack_patterns_external_ids\":[],\"is_atomic_testing\":true,\"needs_executor\":true,\"platforms\":[\"Windows\"]}",
+    "convertedContent": {
+      "config": {
+        "type": "openbas_implant",
+        "expose": true,
+        "label": {
+          "en": "OpenBAS Implant",
+          "fr": "OpenBAS Implant"
+        },
+        "color_dark": "#000000",
+        "color_light": "#000000"
+      },
+      "label": {
+        "en": "Bypass UAC using ComputerDefaults (PowerShell)",
+        "fr": "Bypass UAC using ComputerDefaults (PowerShell)"
+      },
+      "manual": false,
+      "fields": [
+        {
+          "key": "assets",
+          "label": "Assets",
+          "mandatory": false,
+          "readOnly": false,
+          "mandatoryGroups": [
+            "assets",
+            "assetgroups"
+          ],
+          "mandatoryConditionField": null,
+          "mandatoryConditionValue": null,
+          "linkedFields": [],
+          "linkedValues": [],
+          "cardinality": "n",
+          "defaultValue": [],
+          "type": "asset"
+        },
+        {
+          "key": "assetgroups",
+          "label": "Asset groups",
+          "mandatory": false,
+          "readOnly": false,
+          "mandatoryGroups": [
+            "assets",
+            "assetgroups"
+          ],
+          "mandatoryConditionField": null,
+          "mandatoryConditionValue": null,
+          "linkedFields": [],
+          "linkedValues": [],
+          "cardinality": "n",
+          "defaultValue": [],
+          "type": "asset-group"
+        },
+        {
+          "key": "obfuscator",
+          "label": "Obfuscators",
+          "mandatory": false,
+          "readOnly": false,
+          "mandatoryGroups": null,
+          "mandatoryConditionField": null,
+          "mandatoryConditionValue": null,
+          "linkedFields": [],
+          "linkedValues": [],
+          "cardinality": "1",
+          "defaultValue": [
+            "plain-text"
+          ],
+          "choices": [
+            {
+              "label": "plain-text",
+              "value": "plain-text",
+              "information": ""
+            },
+            {
+              "label": "base64",
+              "value": "base64",
+              "information": "CMD does not support base64 obfuscation"
+            }
+          ],
+          "type": "choice"
+        },
+        {
+          "key": "expectations",
+          "label": "Expectations",
+          "mandatory": false,
+          "readOnly": false,
+          "mandatoryGroups": null,
+          "mandatoryConditionField": null,
+          "mandatoryConditionValue": null,
+          "linkedFields": [],
+          "linkedValues": [],
+          "cardinality": "n",
+          "defaultValue": [],
+          "predefinedExpectations": [
+            {
+              "expectation_type": "PREVENTION",
+              "expectation_name": "Expect inject to be prevented",
+              "expectation_description": null,
+              "expectation_score": 100.0,
+              "expectation_expectation_group": false,
+              "expectation_expiration_time": 21600
+            },
+            {
+              "expectation_type": "DETECTION",
+              "expectation_name": "Expect inject to be detected",
+              "expectation_description": null,
+              "expectation_score": 100.0,
+              "expectation_expectation_group": false,
+              "expectation_expiration_time": 21600
+            }
+          ],
+          "type": "expectation"
+        },
+        {
+          "key": "executable_binary",
+          "label": "executable_binary",
+          "mandatory": true,
+          "readOnly": false,
+          "mandatoryGroups": null,
+          "mandatoryConditionField": null,
+          "mandatoryConditionValue": null,
+          "linkedFields": [],
+          "linkedValues": [],
+          "defaultValue": "C:\\Windows\\System32\\cmd.exe",
+          "type": "text"
+        }
+      ],
+      "variables": [
+        {
+          "key": "user",
+          "label": "User that will receive the injection",
+          "type": "String",
+          "cardinality": "1",
+          "children": [
+            {
+              "key": "user.id",
+              "label": "Id of the user in the platform",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            },
+            {
+              "key": "user.email",
+              "label": "Email of the user",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            },
+            {
+              "key": "user.firstname",
+              "label": "First name of the user",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            },
+            {
+              "key": "user.lastname",
+              "label": "Last name of the user",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            },
+            {
+              "key": "user.lang",
+              "label": "Language of the user",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            }
+          ]
+        },
+        {
+          "key": "exercise",
+          "label": "Exercise of the current injection",
+          "type": "Object",
+          "cardinality": "1",
+          "children": [
+            {
+              "key": "exercise.id",
+              "label": "Id of the user in the platform",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            },
+            {
+              "key": "exercise.name",
+              "label": "Name of the exercise",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            },
+            {
+              "key": "exercise.description",
+              "label": "Description of the exercise",
+              "type": "String",
+              "cardinality": "1",
+              "children": []
+            }
+          ]
+        },
+        {
+          "key": "teams",
+          "label": "List of team name for the injection",
+          "type": "String",
+          "cardinality": "n",
+          "children": []
+        },
+        {
+          "key": "player_uri",
+          "label": "Player interface platform link",
+          "type": "String",
+          "cardinality": "1",
+          "children": []
+        },
+        {
+          "key": "challenges_uri",
+          "label": "Challenges interface platform link",
+          "type": "String",
+          "cardinality": "1",
+          "children": []
+        },
+        {
+          "key": "scoreboard_uri",
+          "label": "Scoreboard interface platform link",
+          "type": "String",
+          "cardinality": "1",
+          "children": []
+        },
+        {
+          "key": "lessons_uri",
+          "label": "Lessons learned interface platform link",
+          "type": "String",
+          "cardinality": "1",
+          "children": []
+        }
+      ],
+      "context": {},
+      "contract_id": "452916ce-d650-458c-a537-9af16184bf9b",
+      "contract_attack_patterns_external_ids": [],
+      "is_atomic_testing": true,
+      "needs_executor": true,
+      "platforms": [
+        "Windows"
+      ]
+    },
+    "injector_contract_platforms": [
+      "Windows"
+    ],
+    "injector_contract_payload": {
+      "payload_id": "d9f44ba8-536f-4bce-8186-1706f417a9ef",
+      "payload_type": "Command",
+      "payload_collector_type": "openbas_atomic_red_team"
+    },
+    "injector_contract_labels": {
+      "en": "Bypass UAC using ComputerDefaults (PowerShell)",
+      "fr": "Bypass UAC using ComputerDefaults (PowerShell)"
+    }
+  },
+  "inject_status": {
+    "status_id": "5069e670-33c6-423e-bdbe-a7ced0eeaaea",
+    "status_name": "PENDING",
+    "status_main_traces": [],
+    "status_traces_by_agent": [
+      {
+        "asset_id": "01323d54-6310-4227-8a7c-670627dbaa5e",
+        "agent_id": "94579623-8dff-4c58-a155-e97f7b98ad79",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "OpenBAS Agent",
+        "agent_executor_type": "openbas_agent",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:00.368789Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:00.368789Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset ellynbsc-pro",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "3c04caf2-cdc8-490a-b940-557af740ce8e",
+        "agent_id": "1dc3aec0-a906-4b33-948c-55e08cc053c4",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "CrowdStrike",
+        "agent_executor_type": "openbas_crowdstrike",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:03.111848Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:03.111848Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset FILIGRAN-64",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "8af8cc44-fa19-4266-b5c0-e362aa38ccbb",
+        "agent_id": "d97c3633-9661-4293-a91c-329d4b85b2e8",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "CrowdStrike",
+        "agent_executor_type": "openbas_crowdstrike",
+        "tracking_sent_date": "2025-04-07T09:50:21.435334Z",
+        "tracking_end_date": "2025-04-07T09:50:25.427177Z",
+        "agent_status_name": "SUCCESS",
+        "agent_traces": [
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:25.427177Z",
+            "execution_message": "Payload completed",
+            "execution_action": "COMPLETE"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:25.263087Z",
+            "execution_message": "{\"stdout\":\"\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "CLEANUP_EXECUTION"
+          },
+          {
+            "execution_status": "INFO",
+            "execution_time": "2025-04-07T09:50:21.435334Z",
+            "execution_message": "Implant is up and starting execution",
+            "execution_action": "START"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:23.850432Z",
+            "execution_message": "{\"stdout\":\"\\r\\n\\r\\n    Hive: HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\n\\r\\n\\r\\nName                           Property                                                                                \\r\\n----                           --------                                                                                \\r\\ncommand                                                                                                                \\r\\n\\r\\nDelegateExecute : \\r\\nPSPath          : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\\\command\\r\\nPSParentPath    : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\nPSChildName     : command\\r\\nPSDrive         : HKCU\\r\\nPSProvider      : Microsoft.PowerShell.Core\\\\Registry\\r\\n\\r\\n\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "EXECUTION"
+          }
+        ]
+      },
+      {
+        "asset_id": "7782ceb7-4155-46c0-8d99-a19349d28338",
+        "agent_id": "bb0e0577-7e76-4ebb-8fb2-4e08888c9230",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "CrowdStrike",
+        "agent_executor_type": "openbas_crowdstrike",
+        "tracking_sent_date": "2025-04-07T09:50:17.354859Z",
+        "tracking_end_date": "2025-04-07T09:50:22.134109Z",
+        "agent_status_name": "SUCCESS",
+        "agent_traces": [
+          {
+            "execution_status": "INFO",
+            "execution_time": "2025-04-07T09:50:17.354859Z",
+            "execution_message": "Implant is up and starting execution",
+            "execution_action": "START"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:20.809874Z",
+            "execution_message": "{\"stdout\":\"\\r\\n\\r\\n    Hive: HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\n\\r\\n\\r\\nName                           Property                                                                                \\r\\n----                           --------                                                                                \\r\\ncommand                                                                                                                \\r\\n\\r\\nDelegateExecute : \\r\\nPSPath          : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\\\command\\r\\nPSParentPath    : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\nPSChildName     : command\\r\\nPSDrive         : HKCU\\r\\nPSProvider      : Microsoft.PowerShell.Core\\\\Registry\\r\\n\\r\\n\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "EXECUTION"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:21.971866Z",
+            "execution_message": "{\"stdout\":\"\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "CLEANUP_EXECUTION"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:22.134109Z",
+            "execution_message": "Payload completed",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "927757c6-7197-4861-832b-aa4b5e65a1c6",
+        "agent_id": "75b1681f-548d-4c10-905f-931639fdcadb",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "OpenBAS Agent",
+        "agent_executor_type": "openbas_agent",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:09.989995Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:09.989995Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset filigran-testing-win2k22-001",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "df9c50cc-6aea-419e-baf2-d69215c4dd15",
+        "agent_id": "24bc7360-7ff3-4e08-8662-0da0616505a9",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "OpenBAS Agent",
+        "agent_executor_type": "openbas_agent",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:13.190484Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:13.190484Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset OpenBAS-Windows",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "b93600b8-79bb-46d1-b40f-c6504f47f7f3",
+        "agent_id": "4c64809f-3dd3-4f65-a07e-42494bd3e4ed",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "CrowdStrike",
+        "agent_executor_type": "openbas_crowdstrike",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:10.859659Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:10.859659Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset DESKTOP-G5ILTKP",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "e2475d9a-3b55-4c2f-a97f-0a6f916e4fad",
+        "agent_id": "e4e2b8b8-fe10-41c6-a730-f8d6eb1a4b42",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "CrowdStrike",
+        "agent_executor_type": "openbas_crowdstrike",
+        "tracking_sent_date": "2025-04-07T09:50:21.939048Z",
+        "tracking_end_date": "2025-04-07T09:50:23.688476Z",
+        "agent_status_name": "SUCCESS",
+        "agent_traces": [
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:23.502890Z",
+            "execution_message": "{\"stdout\":\"\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "CLEANUP_EXECUTION"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:23.688476Z",
+            "execution_message": "Payload completed",
+            "execution_action": "COMPLETE"
+          },
+          {
+            "execution_status": "INFO",
+            "execution_time": "2025-04-07T09:50:21.939048Z",
+            "execution_message": "Implant is up and starting execution",
+            "execution_action": "START"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:22.769400Z",
+            "execution_message": "{\"stdout\":\"\\r\\n\\r\\n    Hive: HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\n\\r\\n\\r\\nName                           Property                                                                                \\r\\n----                           --------                                                                                \\r\\ncommand                                                                                                                \\r\\n\\r\\nDelegateExecute : \\r\\nPSPath          : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\\\command\\r\\nPSParentPath    : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\nPSChildName     : command\\r\\nPSDrive         : HKCU\\r\\nPSProvider      : Microsoft.PowerShell.Core\\\\Registry\\r\\n\\r\\n\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "EXECUTION"
+          }
+        ]
+      },
+      {
+        "asset_id": "81561a80-6281-40b4-bf5f-ccdc82b77bcf",
+        "agent_id": "700988c2-e566-49e6-ad38-4ebc1917f561",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "OpenBAS Agent",
+        "agent_executor_type": "openbas_agent",
+        "tracking_sent_date": "2025-04-07T09:50:31.516263Z",
+        "tracking_end_date": "2025-04-07T09:50:33.525761Z",
+        "agent_status_name": "SUCCESS",
+        "agent_traces": [
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:33.368115Z",
+            "execution_message": "{\"stdout\":\"\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "CLEANUP_EXECUTION"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:33.525761Z",
+            "execution_message": "Payload completed",
+            "execution_action": "COMPLETE"
+          },
+          {
+            "execution_status": "INFO",
+            "execution_time": "2025-04-07T09:50:31.516263Z",
+            "execution_message": "Implant is up and starting execution",
+            "execution_action": "START"
+          },
+          {
+            "execution_status": "SUCCESS",
+            "execution_time": "2025-04-07T09:50:33.003116Z",
+            "execution_message": "{\"stdout\":\"\\r\\n\\r\\n    Hive: HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\n\\r\\n\\r\\nName                           Property                                                                                \\r\\n----                           --------                                                                                \\r\\ncommand                                                                                                                \\r\\n\\r\\nDelegateExecute : \\r\\nPSPath          : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\\\command\\r\\nPSParentPath    : Microsoft.PowerShell.Core\\\\Registry::HKEY_CURRENT_USER\\\\software\\\\classes\\\\ms-settings\\\\shell\\\\open\\r\\nPSChildName     : command\\r\\nPSDrive         : HKCU\\r\\nPSProvider      : Microsoft.PowerShell.Core\\\\Registry\\r\\n\\r\\n\",\"stderr\":\"\",\"exit_code\":0}",
+            "execution_action": "EXECUTION"
+          }
+        ]
+      },
+      {
+        "asset_id": "8af8cc44-fa19-4266-b5c0-e362aa38ccbb",
+        "agent_id": "fc3615b3-60f2-46ce-a49a-36261a694c06",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "Tanium",
+        "agent_executor_type": "openbas_tanium",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:09.989980Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:09.989980Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset filigran-testing-win11-003",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "8af8cc44-fa19-4266-b5c0-e362aa38ccbb",
+        "agent_id": "eb5e34d7-db60-40b9-ba6f-86405804ce05",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "OpenBAS Agent",
+        "agent_executor_type": "openbas_agent",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:09.989949Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:09.989949Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset filigran-testing-win11-003",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      },
+      {
+        "asset_id": "d3865c83-87ce-4aac-976d-4ade981b7003",
+        "agent_id": "5b0399d2-991a-4927-9cc6-d90f2d61574a",
+        "agent_name": "nt authority\\system",
+        "agent_executor_name": "OpenBAS Agent",
+        "agent_executor_type": "openbas_agent",
+        "tracking_sent_date": null,
+        "tracking_end_date": "2025-04-07T09:50:13.190459Z",
+        "agent_status_name": "AGENT_INACTIVE",
+        "agent_traces": [
+          {
+            "execution_status": "AGENT_INACTIVE",
+            "execution_time": "2025-04-07T09:50:13.190459Z",
+            "execution_message": "Agent error: agent nt authority\\system is inactive for the asset savacano28",
+            "execution_action": "COMPLETE"
+          }
+        ]
+      }
+    ],
+    "tracking_sent_date": "2025-04-07T09:50:00Z",
+    "tracking_end_date": null
+  },
+  "inject_expectations": [
+    {
+      "inject_expectation_id": "4d33a06f-1353-4fc1-82b6-f929297d4dd3",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "efb2d234-beef-4406-bf95-77f4df502be1",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "978699cb-2461-47c8-bc92-3a6d45495da2",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "30371434-8f43-4fbd-b93b-3c9f1797c09f",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "7a8f7612-7044-4eb7-a84d-d355663c7469",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "192e32f8-9e1e-4785-86a2-0e44077d0966",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "da25e4da-e230-4be3-97c5-5350ead6a123",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "25e3d9fc-1d19-4513-b03f-155f665b2968",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "0620b400-da97-47b1-bcc9-649cc94cfbaf",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "7a031a8e-77fc-4368-93d9-e92921e45da8",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "c2015db4-2982-4b4f-8a60-5268990cd23a",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "813112f3-05ef-4dd4-a6cd-f07827c9181c",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "37923bcd-4232-4764-bf41-27ccb7337ff3",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "d00409e4-ee9c-4792-a252-f70a2ecca78b",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "d31d0923-e606-40da-ba5f-f672de8eee6b",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "6ad4deaa-c40f-40e6-910a-12930a960420",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "b376b992-0428-447f-8b36-b4552d978d02",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "7ab99850-d676-4c28-b7a5-5b4d39f0eaa1",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "b220f9e2-0a5d-44f6-a907-75643e4707fc",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "0623a010-9195-4563-bc84-26f500365de3",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "39737469-9db1-41c1-8956-939bdd33ffc4",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "1dd20d8b-ff8e-4e4a-b2ae-8524fed935da",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "9342723c-4b89-4279-9a2a-bbdc3b126390",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "8639d8be-1c0a-46dc-9b3d-3323cf7a48c2",
+      "inject_expectation_name": "Expect inject to be prevented"
+    },
+    {
+      "inject_expectation_id": "5f21411d-e41c-4531-abb4-db3a7e12bbb1",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "13b01ee6-812a-48c7-91ea-614fece36c10",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "8e414ecb-3086-40b2-8896-19f529dd1a4f",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "1226c0a5-01a0-4387-a680-2fc3492778d0",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "f94f48de-1901-4533-bc08-e6181480b68a",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "1046d447-a01e-422e-9456-cb3ab6d5b325",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "27abaa99-4a2e-49a4-8c04-647565fadf1c",
+      "inject_expectation_name": "Expect inject to be detected"
+    },
+    {
+      "inject_expectation_id": "62521a3d-5a0d-44bc-a9d3-8b5707a4194f",
+      "inject_expectation_name": "Expect inject to be detected"
+    }
+  ],
+  "inject_kill_chain_phases": [
+    {
+      "phase_id": "ad889435-c2e6-45a1-8af2-59f2373a6200",
+      "phase_name": "Defense Evasion"
+    },
+    {
+      "phase_id": "d55e9c44-4016-4d4c-896f-782be582551c",
+      "phase_name": "Privilege Escalation"
+    }
+  ],
+  "inject_tags": [],
+  "inject_ready": true,
+  "inject_updated_at": "2025-04-07T10:36:12.422051Z",
+  "inject_expectation_results": [
+    {
+      "type": "PREVENTION",
+      "avgResult": "FAILED",
+      "distribution": [
+        {
+          "id": "SUCCESS",
+          "label": "Blocked",
+          "value": 0
+        },
+        {
+          "id": "PENDING",
+          "label": "Pending",
+          "value": 11
+        },
+        {
+          "id": "PARTIAL",
+          "label": "Partially Prevented",
+          "value": 0
+        },
+        {
+          "id": "FAILED",
+          "label": "Not Prevented",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "type": "DETECTION",
+      "avgResult": "PARTIAL",
+      "distribution": [
+        {
+          "id": "SUCCESS",
+          "label": "Detected",
+          "value": 5
+        },
+        {
+          "id": "PENDING",
+          "label": "Pending",
+          "value": 0
+        },
+        {
+          "id": "PARTIAL",
+          "label": "Partially Detected",
+          "value": 0
+        },
+        {
+          "id": "FAILED",
+          "label": "Not Detected",
+          "value": 11
+        }
+      ]
+    },
+    {
+      "type": "HUMAN_RESPONSE",
+      "avgResult": "UNKNOWN",
+      "distribution": []
+    }
+  ],
+  "inject_targets": [
+    {
+      "id": "9d882310-eab9-4758-b9bb-7d2375d90d69",
+      "name": "All Windows",
+      "expectationResultsByTypes": [
+        {
+          "type": "PREVENTION",
+          "avgResult": "PENDING",
+          "distribution": [
+            {
+              "id": "SUCCESS",
+              "label": "Blocked",
+              "value": 0
+            },
+            {
+              "id": "PENDING",
+              "label": "Pending",
+              "value": 1
+            },
+            {
+              "id": "PARTIAL",
+              "label": "Partially Prevented",
+              "value": 0
+            },
+            {
+              "id": "FAILED",
+              "label": "Not Prevented",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "type": "DETECTION",
+          "avgResult": "FAILED",
+          "distribution": [
+            {
+              "id": "SUCCESS",
+              "label": "Detected",
+              "value": 0
+            },
+            {
+              "id": "PENDING",
+              "label": "Pending",
+              "value": 0
+            },
+            {
+              "id": "PARTIAL",
+              "label": "Partially Detected",
+              "value": 0
+            },
+            {
+              "id": "FAILED",
+              "label": "Not Detected",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "type": "HUMAN_RESPONSE",
+          "avgResult": "UNKNOWN",
+          "distribution": []
+        }
+      ],
+      "children": [
+        {
+          "id": "cd5f0469-ed3a-4732-a449-873b55fdc4b9",
+          "name": "BRAAVOS",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "PENDING",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Blocked",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 1
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Prevented",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Prevented",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "FAILED",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Detected",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Detected",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Detected",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [
+            {
+              "id": "05928b56-5b8d-4dd1-84e1-ba02ef67389e",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "PENDING",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 1
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_crowdstrike"
+            }
+          ],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "b93600b8-79bb-46d1-b40f-c6504f47f7f3",
+          "name": "DESKTOP-G5ILTKP",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "3c04caf2-cdc8-490a-b940-557af740ce8e",
+          "name": "FILIGRAN-64",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "7782ceb7-4155-46c0-8d99-a19349d28338",
+          "name": "FILIGRAN-TESTIN",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "PENDING",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Blocked",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 1
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Prevented",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Prevented",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "FAILED",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Detected",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Detected",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Detected",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [
+            {
+              "id": "a9c98a66-308a-4865-9f2c-5aaf557034b3",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "PENDING",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 1
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_tanium"
+            },
+            {
+              "id": "bb0e0577-7e76-4ebb-8fb2-4e08888c9230",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "SUCCESS",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 1
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_crowdstrike"
+            }
+          ],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "2c9e59cb-aa19-439d-b5b7-b7ec33ec9748",
+          "name": "MEEREEN",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "PENDING",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Blocked",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 1
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Prevented",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Prevented",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "FAILED",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Detected",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Detected",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Detected",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [
+            {
+              "id": "2e8100a1-95d9-4e6b-adfb-02166590e818",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "PENDING",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 1
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_crowdstrike"
+            }
+          ],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "df9c50cc-6aea-419e-baf2-d69215c4dd15",
+          "name": "OpenBAS-Windows",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "e2475d9a-3b55-4c2f-a97f-0a6f916e4fad",
+          "name": "WINTERFELL",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "FAILED",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Blocked",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Prevented",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Prevented",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "SUCCESS",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Detected",
+                  "value": 1
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Detected",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Detected",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [
+            {
+              "id": "e4e2b8b8-fe10-41c6-a730-f8d6eb1a4b42",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "SUCCESS",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 1
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_crowdstrike"
+            }
+          ],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "01323d54-6310-4227-8a7c-670627dbaa5e",
+          "name": "ellynbsc-pro",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "8af8cc44-fa19-4266-b5c0-e362aa38ccbb",
+          "name": "filigran-testing-win11-003",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "FAILED",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Blocked",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Prevented",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Prevented",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "SUCCESS",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Detected",
+                  "value": 1
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Detected",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Detected",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [
+            {
+              "id": "d97c3633-9661-4293-a91c-329d4b85b2e8",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "SUCCESS",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 1
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_crowdstrike"
+            }
+          ],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "927757c6-7197-4861-832b-aa4b5e65a1c6",
+          "name": "filigran-testing-win2k22-001",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "acfe246b-aa3c-49c7-b42a-0a19c2ee4070",
+          "name": "filigran-testing-win2k22-002",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "PENDING",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Blocked",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 1
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Prevented",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Prevented",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "FAILED",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Detected",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Detected",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Detected",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [
+            {
+              "id": "34de273e-0494-4376-b7a0-6a9aead46cc9",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "PENDING",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 1
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_tanium"
+            }
+          ],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "81561a80-6281-40b4-bf5f-ccdc82b77bcf",
+          "name": "gp",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "PENDING",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Blocked",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 1
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Prevented",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Prevented",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "FAILED",
+              "distribution": [
+                {
+                  "id": "SUCCESS",
+                  "label": "Detected",
+                  "value": 0
+                },
+                {
+                  "id": "PENDING",
+                  "label": "Pending",
+                  "value": 0
+                },
+                {
+                  "id": "PARTIAL",
+                  "label": "Partially Detected",
+                  "value": 0
+                },
+                {
+                  "id": "FAILED",
+                  "label": "Not Detected",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [
+            {
+              "id": "700988c2-e566-49e6-ad38-4ebc1917f561",
+              "name": "nt authority\\system",
+              "expectationResultsByTypes": [
+                {
+                  "type": "PREVENTION",
+                  "avgResult": "PENDING",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Blocked",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 1
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Prevented",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Prevented",
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "type": "DETECTION",
+                  "avgResult": "FAILED",
+                  "distribution": [
+                    {
+                      "id": "SUCCESS",
+                      "label": "Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "PENDING",
+                      "label": "Pending",
+                      "value": 0
+                    },
+                    {
+                      "id": "PARTIAL",
+                      "label": "Partially Detected",
+                      "value": 0
+                    },
+                    {
+                      "id": "FAILED",
+                      "label": "Not Detected",
+                      "value": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "HUMAN_RESPONSE",
+                  "avgResult": "UNKNOWN",
+                  "distribution": []
+                }
+              ],
+              "children": [],
+              "targetType": "AGENT",
+              "platformType": null,
+              "executorType": "openbas_agent"
+            }
+          ],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        },
+        {
+          "id": "d3865c83-87ce-4aac-976d-4ade981b7003",
+          "name": "savacano28",
+          "expectationResultsByTypes": [
+            {
+              "type": "PREVENTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "DETECTION",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            },
+            {
+              "type": "HUMAN_RESPONSE",
+              "avgResult": "UNKNOWN",
+              "distribution": []
+            }
+          ],
+          "children": [],
+          "targetType": "ASSETS",
+          "platformType": "Windows",
+          "executorType": null
+        }
+      ],
+      "targetType": "ASSETS_GROUPS",
+      "platformType": null,
+      "executorType": null
+    }
+  ]
+}
