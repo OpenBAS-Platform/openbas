@@ -15,7 +15,7 @@ public class EsFinding extends EsBase {
   @Queryable(label = "value", filterable = true, sortable = true)
   private String finding_value;
 
-  @Queryable(label = "type", filterable = true, sortable = true)
+  @Queryable(label = "finding type", filterable = true, sortable = true)
   private String finding_type;
 
   @Queryable(label = "field", filterable = true, sortable = true)

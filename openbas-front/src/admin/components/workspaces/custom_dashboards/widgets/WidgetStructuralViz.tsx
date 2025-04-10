@@ -52,7 +52,7 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
   switch (widget.widget_type) {
     case 'security-coverage':
       return (
-        <MatrixMitre data={structuralVizData} />
+        <MatrixMitre widgetTitle={!widget.widget_config.title ? 'Your widget' : widget.widget_config.title} data={structuralVizData} />
       );
     case 'vertical-barchart':
       return (
