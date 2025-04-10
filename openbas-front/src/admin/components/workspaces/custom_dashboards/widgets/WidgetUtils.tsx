@@ -3,6 +3,7 @@ import { ChartBar, ChartLine } from 'mdi-material-ui';
 
 import {
   type Filter,
+  type FilterGroup,
   type HistogramWidget,
   type InjectExpectation,
   type StructuralHistogramSeries,
@@ -68,9 +69,14 @@ export const getAvailableFields = (type: Widget['widget_type']) => {
   return widgetVisualizationTypes.find(widget => widget.category === type)?.fields ?? null;
 };
 
-// -- MATRIX MITRE --
+// -- FILTERS --
 
 export const BASE_ENTITY_FILTER_KEY = 'base_entity';
+export const getBaseEntities = (filterGroup: FilterGroup | undefined) => {
+  return filterGroup?.filters?.filter(f => f.key === BASE_ENTITY_FILTER_KEY).map(f => f.values ?? []).flat();
+};
+
+// -- MATRIX MITRE --
 const entityFilter: Filter = {
   key: BASE_ENTITY_FILTER_KEY,
   mode: 'and',

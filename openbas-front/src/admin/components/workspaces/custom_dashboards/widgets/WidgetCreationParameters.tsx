@@ -7,7 +7,7 @@ import { engineSchemas } from '../../../../../actions/schema/schema-action';
 import { useFormatter } from '../../../../../components/i18n';
 import { type PropertySchemaDTO, type Widget } from '../../../../../utils/api-types';
 import { type Option } from '../../../../../utils/Option';
-import { getAvailableFields, getAvailableModes, type WidgetInputWithoutLayout } from './WidgetUtils';
+import { getAvailableFields, getAvailableModes, getBaseEntities, type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const WidgetCreationParameters: FunctionComponent<{
   widgetType: Widget['widget_type'];
@@ -26,6 +26,11 @@ const WidgetCreationParameters: FunctionComponent<{
     control,
     name: 'widget_config.interval',
   });
+  const series = useWatch({
+    control,
+    name: 'widget_config.series',
+  });
+  const entities = series.map(v => getBaseEntities(v.filter)).flat();
 
   // -- HANDLE MODE --
   const availableModes = getAvailableModes(widgetType);
@@ -38,10 +43,8 @@ const WidgetCreationParameters: FunctionComponent<{
   // -- HANDLE FIELDS --
   const [fieldOptions, setFieldOptions] = useState<Option[]>([]);
 
-  console.log(fieldOptions);
-
   useEffect(() => {
-    engineSchemas().then((response: { data: PropertySchemaDTO[] }) => {
+    engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
       const newOptions = Array.from(
         new Map(
           response.data
