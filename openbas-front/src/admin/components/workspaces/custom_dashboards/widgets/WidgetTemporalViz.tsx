@@ -6,7 +6,7 @@ import { series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsSeriesData, type Widget } from '../../../../../utils/api-types';
-import { verticalBarsChartOptions } from '../../../../../utils/Charts';
+import { lineChartOptions, verticalBarsChartOptions } from '../../../../../utils/Charts';
 import { isEmptyField, isNotEmptyField } from '../../../../../utils/utils';
 
 interface WidgetTemporalVizProps { widget: Widget }
@@ -66,22 +66,16 @@ const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
     case 'line':
       return (
         <Chart
-          options={verticalBarsChartOptions(
+          options={lineChartOptions(
             theme,
+            true,
             fld,
+            null,
             undefined,
             false,
-            true,
-            false,
-            true,
-            'dataPoints',
-            true,
-            false,
-            undefined,
-            t('No data to display'),
           )}
           series={seriesData}
-          type="bar"
+          type="line"
           width="100%"
           height="100%"
         />
