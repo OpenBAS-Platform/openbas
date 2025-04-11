@@ -779,13 +779,13 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               return (
                                 <TableRow
                                   key={index}
-                                  hover={true}
+                                  hover={injectExpectation.inject_expectation_agent && injectExpectation.inject_expectation_status === 'SUCCESS' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && expectationResult.sourceType === 'collector'}
                                   onClick={() => {
                                     if (injectExpectation.inject_expectation_agent && injectExpectation.inject_expectation_status === 'SUCCESS' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && expectationResult.sourceType === 'collector') {
                                       handleClickSecurityPlatformResult(injectExpectation, expectationResult);
                                     }
                                   }}
-                                  sx={{ cursor: `${injectExpectation.inject_expectation_agent ? 'pointer' : 'default'}` }}
+                                  sx={{ cursor: `${injectExpectation.inject_expectation_agent && injectExpectation.inject_expectation_status === 'SUCCESS' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && expectationResult.sourceType === 'collector' ? 'pointer' : 'default'}` }}
                                   selected={expectationResult.sourceId === selectedResult?.sourceId}
                                 >
                                   <TableCell className={classes.tableFontSize}>
