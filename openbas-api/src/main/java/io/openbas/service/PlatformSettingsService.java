@@ -8,7 +8,6 @@ import static java.util.Optional.ofNullable;
 import io.openbas.config.OpenBASConfig;
 import io.openbas.config.OpenBASPrincipal;
 import io.openbas.config.RabbitmqConfig;
-import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
@@ -100,8 +99,6 @@ public class PlatformSettingsService {
     this.eeService = eeService;
   }
 
-  @Autowired private LicenseCacheManager licenseCacheManager;
-
   // -- PROVIDERS --
   private List<OAuthProvider> buildOpenIdProviders() {
     if (!this.openBASConfig.isAuthOpenidEnable()) {
@@ -183,7 +180,6 @@ public class PlatformSettingsService {
 
   // -- FIND SETTINGS --
   public PlatformSettings findSettings() {
-    System.out.println("--findSettings--");
     Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     PlatformSettings platformSettings = new PlatformSettings();
     // Build anonymous settings
@@ -312,7 +308,7 @@ public class PlatformSettingsService {
         expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
     // License
-    platformSettings.setPlatformLicense(licenseCacheManager.getEnterpriseEditionInfo());
+    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfo());
     return platformSettings;
   }
 
@@ -373,10 +369,8 @@ public class PlatformSettingsService {
         throw new BadRequestException("Invalid certificate");
       }
     }
-    System.out.println("--updateSettingsEnterpriseEdition--");
     settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_LICENSE.key(), certPem));
     settingRepository.saveAll(settingsToSave);
-    licenseCacheManager.refreshLicense();
     return findSettings();
   }
 
