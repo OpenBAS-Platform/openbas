@@ -3558,19 +3558,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/eslint-plugin@npm:1.1.40":
-  version: 1.1.40
-  resolution: "@vitest/eslint-plugin@npm:1.1.40"
+"@vitest/eslint-plugin@npm:1.1.42":
+  version: 1.1.42
+  resolution: "@vitest/eslint-plugin@npm:1.1.42"
   peerDependencies:
+    "@typescript-eslint/utils": ">= 8.24.0"
     eslint: ">= 8.57.0"
     typescript: ">= 5.0.0"
     vitest: "*"
   peerDependenciesMeta:
     typescript:
       optional: true
-    vitest:
-      optional: true
-  checksum: 10c0/2cc7c2242d106fdb5fd97f85b7d94466b6c5db414e38e1a7224ce446800fcd661a36148a6b4580d362398720ba0b6faec843f2cbcff04fc4ef19141d29e03f1a
+  checksum: 10c0/55eb0e56a514059190402a07fd1ac9786ae050bc22d6874d8fb1259feabd86e9d4bb879b8910a0a32aefb0e88740f7dfcd8d1033755aa561e04c8ead04867bf9
   languageName: node
   linkType: hard
 
@@ -6930,9 +6929,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-react-parser@npm:5.2.2":
-  version: 5.2.2
-  resolution: "html-react-parser@npm:5.2.2"
+"html-react-parser@npm:5.2.3":
+  version: 5.2.3
+  resolution: "html-react-parser@npm:5.2.3"
   dependencies:
     domhandler: "npm:5.0.3"
     html-dom-parser: "npm:5.0.13"
@@ -6944,7 +6943,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10c0/f757476308831afeba42698c83213045ce83a94577788217022528f9b52dfd2a5076f0f77acf0927ba97c2c695423c6898cef8e162134d7d1ceadc150f80b730
+  checksum: 10c0/2c23367edaabe373e7f03094a846a22ff44144a5b6c975d66ce87792267ed88b86230fbe7ac8753c0c50276de38825957c1b994d4cc341f77dfeaa75d2e0a917
   languageName: node
   linkType: hard
 
@@ -7052,9 +7051,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-proxy-middleware@npm:3.0.3":
-  version: 3.0.3
-  resolution: "http-proxy-middleware@npm:3.0.3"
+"http-proxy-middleware@npm:3.0.5":
+  version: 3.0.5
+  resolution: "http-proxy-middleware@npm:3.0.5"
   dependencies:
     "@types/http-proxy": "npm:^1.17.15"
     debug: "npm:^4.3.6"
@@ -7062,7 +7061,7 @@ __metadata:
     is-glob: "npm:^4.0.3"
     is-plain-object: "npm:^5.0.0"
     micromatch: "npm:^4.0.8"
-  checksum: 10c0/c4d68a10d8d42f02e59f7dc8249c98d1ac03aecee177b42c2d8b6a0cb6b71c6688e759e5387f4cdb570150070ca1c6808b38010cbdf67f4500a2e75671a36e05
+  checksum: 10c0/89ff3c8fe65b22b8042a6173ae1b8f77c5171f7eecf3c8b5d6dcffe3c9d688acae7bcf498cc08d1525f566dc0781efaec4e2ddc49224b1f16f020de7987a446b
   languageName: node
   linkType: hard
 
@@ -9297,7 +9296,7 @@ __metadata:
     "@typescript-eslint/utils": "npm:8.29.0"
     "@uiw/react-md-editor": "npm:4.0.5"
     "@vitejs/plugin-react": "npm:4.3.4"
-    "@vitest/eslint-plugin": "npm:1.1.40"
+    "@vitest/eslint-plugin": "npm:1.1.42"
     "@xyflow/react": "npm:12.5.1"
     apexcharts: "npm:4.5.0"
     axios: "npm:1.8.4"
@@ -9324,10 +9323,10 @@ __metadata:
     final-form-arrays: "npm:3.1.0"
     fs-extra: "npm:11.3.0"
     globals: "npm:16.0.0"
-    html-react-parser: "npm:5.2.2"
+    html-react-parser: "npm:5.2.3"
     html-to-image: "npm:1.11.13"
-    http-proxy-middleware: "npm:3.0.3"
     i18n-auto-translation: "npm:2.1.3"
+    http-proxy-middleware: "npm:3.0.5"
     js-file-download: "npm:0.4.12"
     jsdom: "npm:26.0.0"
     mdi-material-ui: "npm:7.9.4"
