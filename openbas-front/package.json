@@ -32,7 +32,7 @@
     "dompurify": "3.2.5",
     "final-form": "4.20.10",
     "final-form-arrays": "3.1.0",
-    "html-react-parser": "5.2.2",
+    "html-react-parser": "5.2.3",
     "html-to-image": "1.11.13",
     "http-proxy-middleware": "3.0.5",
     "i18n-auto-translation": "2.1.2",
