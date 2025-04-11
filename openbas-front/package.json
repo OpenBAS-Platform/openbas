@@ -82,7 +82,7 @@
     "@types/node": "22.14.0",
     "@types/pdfmake": "0.2.11",
     "@types/qs": "6",
-    "@types/react": "19.1.0",
+    "@types/react": "19.1.1",
     "@types/react-csv": "1.1.10",
     "@types/react-dom": "19.1.2",
     "@types/react-syntax-highlighter": "15",
@@ -115,7 +115,7 @@
     "vitest": "3.1.1"
   },
   "resolutions": {
-    "@types/react": "19.1.0"
+    "@types/react": "19.1.1"
   },
   "engines": {
     "node": ">= 22.11.0"
