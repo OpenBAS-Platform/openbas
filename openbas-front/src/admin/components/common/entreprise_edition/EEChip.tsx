@@ -4,22 +4,25 @@ import { makeStyles } from 'tss-react/mui';
 import { type UserHelper } from '../../../../actions/helper';
 import { useHelper } from '../../../../store';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
-import EnterpriseEditionAgreementDialog from './EnterpriseEditionAgreementDialog';
+import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
 
-const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }) => ({
+// Deprecated - https://mui.com/system/styles/basics/
+// Do not use it for new code.
+const useStyles = makeStyles()(theme => ({
   container: {
     fontSize: 'xx-small',
     height: 14,
-    display: 'flex',
+    display: 'inline-flex',
     justifyContent: 'center',
     alignItems: 'center',
     width: 21,
     margin: 'auto',
+    marginLeft: 6,
     borderRadius: theme.borderRadius,
     border: `1px solid ${theme.palette.ee.main}`,
     color: theme.palette.ee.main,
     backgroundColor: theme.palette.ee.background,
-    cursor: isClickable ? 'pointer' : 'default',
+    cursor: 'pointer',
   },
   containerFloating: {
     float: 'left',
@@ -34,7 +37,7 @@ const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }
     border: `1px solid ${theme.palette.ee.main}`,
     color: theme.palette.ee.main,
     backgroundColor: theme.palette.ee.background,
-    cursor: isClickable ? 'pointer' : 'default',
+    cursor: 'pointer',
   },
 }));
 
@@ -42,7 +45,7 @@ const EEChip = ({ clickable = true, floating = false }: {
   clickable?: boolean;
   floating?: boolean;
 }) => {
-  const { classes } = useStyles({ isClickable: clickable });
+  const { classes } = useStyles();
   const isEnterpriseEdition = useEnterpriseEdition();
   const [displayDialog, setDisplayDialog] = useState(false);
   const userAdmin = useHelper((helper: UserHelper) => {
@@ -58,7 +61,7 @@ const EEChip = ({ clickable = true, floating = false }: {
         EE
       </div>
       {userAdmin && (
-        <EnterpriseEditionAgreementDialog
+        <EnterpriseEditionAgreement
           open={displayDialog}
           onClose={() => setDisplayDialog(false)}
         />
