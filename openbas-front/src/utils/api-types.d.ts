@@ -3003,6 +3003,8 @@ export interface PayloadsDeprecateInput {
   payload_external_ids: string[];
 }
 
+export type BannerMessage = Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>
+
 export interface PlatformSettings {
   /** True if Saml2 is enabled */
   auth_saml2_enable?: boolean;
@@ -3071,17 +3073,19 @@ export interface PlatformSettings {
   /** Type of AI (mistralai or openai) */
   platform_ai_type?: string;
   /** Map of the messages to display on the screen by their level (the level available are DEBUG, INFO, WARN, ERROR, FATAL) */
-  platform_banner_by_level?: Record<string, string[]>;
+  platform_banner_by_level?: BannerMessage;
   /** Base URL of the platform */
   platform_base_url?: string;
   /** Definition of the dark theme */
   platform_dark_theme?: ThemeInput;
   /** 'true' if the platform has Enterprise Edition activated */
-  platform_enterprise_edition?: string;
+  platform_license: PlatformLicense;
   /** Language of the platform */
   platform_lang?: string;
   /** Definition of the dark theme */
   platform_light_theme?: ThemeInput;
+  /** id of the platform */
+  platform_id?: string;
   /** Name of the platform */
   platform_name?: string;
   /** List of OpenID providers */
@@ -3562,8 +3566,7 @@ export interface SecurityPlatformUpsertInput {
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {
-  /** 'true' if enterprise edition is activated */
-  platform_enterprise_edition: string;
+  platform_enterprise_license: string;
 }
 
 export interface SettingsPlatformWhitemarkUpdateInput {
@@ -3908,6 +3911,26 @@ export interface ThemeInput {
   primary_color?: string;
   /** Secondary color of the theme */
   secondary_color?: string;
+}
+
+export interface PlatformLicense {
+  license_is_enterprise: boolean
+  license_is_valid_cert: boolean
+  license_type: string
+  license_creator: string
+  license_is_valid_product: boolean
+  license_customer: string
+  license_platform: string
+  license_is_platform_match: boolean
+  license_is_global: boolean
+  license_is_expired: boolean
+  license_start_date: string
+  license_expiration_date: string
+  license_is_prevention: boolean
+  license_is_validated: boolean
+  license_is_by_configuration: boolean
+  license_is_extra_expiration: boolean
+  license_extra_expiration_days: number
 }
 
 export interface Token {

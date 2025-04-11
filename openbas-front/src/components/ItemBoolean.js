@@ -25,6 +25,15 @@ const styles = () => ({
     borderRadius: 4,
     width: 150,
   },
+  chipXLarge: {
+    fontSize: 12,
+    lineHeight: '12px',
+    height: 25,
+    marginRight: 7,
+    textTransform: 'uppercase',
+    borderRadius: 4,
+    width: 250,
+  },
   chipInList: {
     fontSize: 12,
     lineHeight: '12px',
@@ -63,6 +72,8 @@ const renderChip = (props) => {
     style = classes.chipInList;
   } else if (variant === 'large') {
     style = classes.chipLarge;
+  } else if (variant === 'xlarge') {
+    style = classes.chipXLarge;
   }
   const inlineStyles = computeInlineStyles(theme);
   if (status === true) {

@@ -21,6 +21,9 @@ public class OpenBASConfig {
   @JsonProperty("application_name")
   private String name = "OpenBAS";
 
+  @JsonProperty("application_license")
+  private String applicationLicense = "";
+
   @JsonProperty("application_base_url")
   private String baseUrl;
 

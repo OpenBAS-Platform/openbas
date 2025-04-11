@@ -1,10 +1,35 @@
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup } from '@mui/material';
+/*
+Copyright (c) 2021-2024 Filigran SAS
+
+This file is part of the OpenBAS Enterprise Edition ("EE") and is
+licensed under the OpenBAS Enterprise Edition License (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://github.com/OpenBAS-Platform/openbas/blob/master/LICENSE
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*/
+
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormGroup,
+  TextField,
+} from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
 import { updatePlatformEnterpriseEditionParameters } from '../../../../actions/Application';
 import { useFormatter } from '../../../../components/i18n';
 import { type SettingsEnterpriseEditionUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
+import { isEmptyField } from '../../../../utils/utils';
 
 interface EnterpriseEditionAgreementProps {
   open: boolean;
@@ -16,12 +41,12 @@ const EnterpriseEditionAgreement: FunctionComponent<
 > = ({ open, onClose }) => {
   const { t } = useFormatter();
   const dispatch = useAppDispatch();
-  const [enterpriseEditionConsent, setEnterpriseEditionConsent] = useState(false);
+  const [enterpriseLicense, setEnterpriseLicense] = useState('');
   const updateEnterpriseEdition = (data: SettingsEnterpriseEditionUpdateInput) => {
     dispatch(updatePlatformEnterpriseEditionParameters(data));
     onClose();
   };
-  const enableEnterpriseEdition = () => updateEnterpriseEdition({ platform_enterprise_edition: 'true' });
+  const enableEnterpriseEdition = () => updateEnterpriseEdition({ platform_enterprise_license: enterpriseLicense });
   return (
     <Dialog
       PaperProps={{ elevation: 1 }}
@@ -34,65 +59,46 @@ const EnterpriseEditionAgreement: FunctionComponent<
         {t('OpenBAS Enterprise Edition (EE) license agreement')}
       </DialogTitle>
       <DialogContent>
-        <span>
-          {t(
-            'By enabling the OpenBAS Enterprise Edition, you (and your organization) agrees to the OpenBAS Enterprise Edition (EE) supplemental license terms and conditions of usage:',
-          )}
-        </span>
-        <ul>
-          <li>
-            {t(
-              'OpenBAS EE is free-to-use for development, testing and research purposes as well as for non-profit organizations.',
-            )}
-          </li>
-          <li>
-            {t(
-              'OpenBAS EE is included for all Filigran SaaS customers without additional fee.',
-            )}
-          </li>
-          <li>
-            {t(
-              'For all other usages, you (and your organization) should have entered in a',
-            )}
-            {' '}
-            <a href="https://filigran.io/contact/" target="_blank" rel="noreferrer">
-              {t('Filigran Enterprise agreement')}
-            </a>
-            .
-          </li>
-        </ul>
-        <FormGroup>
-          <FormControlLabel
-            control={(
-              <Checkbox
-                checked={enterpriseEditionConsent}
-                disabled={false}
-                onChange={event => setEnterpriseEditionConsent(event.target.checked)}
-              />
-            )}
-            label={(
-              <>
-                <span>{t('I have read and agree to the')}</span>
-                {' '}
-                <a
-                  href="https://github.com/OpenBAS-Platform/openbas/blob/master/LICENSE"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t('OpenBAS EE license terms')}
-                </a>
-                .
-              </>
-            )}
+        <Alert severity="info" style={{ marginTop: 15 }}>
+          {t('OpenBAS Enterprise Edition requires a license key to be enabled. Filigran provides a free-to-use license for development and research purposes as well as for charity organizations.')}
+          <br />
+          <br />
+          {t('To obtain a license, please')}
+          {' '}
+          <a href="https://filigran.io/contact/" target="_blank" rel="noreferrer">{t('reach out to the Filigran team')}</a>
+          .
+          <br />
+          {t('You just need to try?')}
+          {/* eslint-disable-next-line i18next/no-literal-string */}
+          {' '}
+          Get right now
+          {' '}
+          <a href="https://filigran.io/enterprise-editions-trial/" target="_blank" rel="noreferrer">{t('your trial license online')}</a>
+          .
+        </Alert>
+        <FormGroup style={{ marginTop: 15 }}>
+          <TextField
+            onChange={event => setEnterpriseLicense(event.target.value)}
+            multiline={true}
+            fullWidth={true}
+            minRows={10}
+            placeholder={t('Paste your Filigran OpenBAS Enterprise Edition license')}
+            variant="outlined"
           />
         </FormGroup>
+        <div style={{ marginTop: 15 }}>
+          {t('By enabling the OpenBAS Enterprise Edition, you (and your organization) agrees to the OpenBAS Enterprise Edition (EE)')}
+          &nbsp;
+          <a href="https://github.com/OpenBAS-Platform/openbas/blob/master/LICENSE" target="_blank" rel="noreferrer">{t('license terms and conditions of usage')}</a>
+          .
+        </div>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t('Cancel')}</Button>
         <Button
           color="secondary"
           onClick={enableEnterpriseEdition}
-          disabled={!enterpriseEditionConsent}
+          disabled={isEmptyField((enterpriseLicense))}
         >
           {t('Enable')}
         </Button>
