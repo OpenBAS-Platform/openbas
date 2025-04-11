@@ -13,6 +13,7 @@ import io.openbas.service.FileService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ public abstract class Injector {
       }
       // If inject is too old, reject the execution
       if (isScheduledInject && !isInInjectableRange(executableInject.getInjection())) {
-        throw new UnsupportedOperationException("Inject is now too old for execution");
+        throw new UnsupportedOperationException("Inject is now too old for execution: id " + executableInject.getInjection().getId() + ", launch date " + executableInject.getInjection().getDate() + ", now date " + Instant.now());
       }
       // Process the execution
       ExecutionProcess executionProcess = process(execution, executableInject);
