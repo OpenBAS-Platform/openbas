@@ -61,7 +61,7 @@ public class PlatformSettingsApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PutMapping("/enterprise_edition")
+  @PutMapping("/enterprise-edition")
   @ApiResponses(
       value = {
         @ApiResponse(responseCode = "200", description = "The updated settings"),

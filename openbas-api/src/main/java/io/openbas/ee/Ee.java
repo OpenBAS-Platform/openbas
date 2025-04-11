@@ -114,7 +114,7 @@ public class Ee {
     license.setLicenseEnterprise(true);
     license.setValidCert(true);
     String licenseType = getExtension(x509License, LICENSE_OPTION_TYPE);
-    license.setType(licenseType);
+    license.setType(LicenseTypeEnum.valueOf(licenseType));
     boolean isValidProduct = "openbas".equals(getExtension(x509License, LICENSE_OPTION_PRODUCT));
     license.setValidProduct(isValidProduct);
     license.setCreator(getExtension(x509License, LICENSE_OPTION_CREATOR));
@@ -138,7 +138,7 @@ public class Ee {
       // If trial license, deactivation for expiration is direct
       if (!licenseType.equals("trial")) {
         Instant extraExpirationEndDate =
-            x509License.getNotBefore().toInstant().plus(3, ChronoUnit.MONTHS);
+            x509License.getNotBefore().toInstant().plus(90, ChronoUnit.DAYS);
         Instant now = Instant.now();
         boolean isLicenseExtended = now.isBefore(extraExpirationEndDate);
         license.setExtraExpiration(true);

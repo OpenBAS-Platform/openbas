@@ -27,7 +27,7 @@ export const updatePlatformPolicies = data => (dispatch) => {
 export const updatePlatformEnterpriseEditionParameters = data => (dispatch) => {
   return putReferential(
     schema.platformParameters,
-    '/api/settings/enterprise_edition',
+    '/api/settings/enterprise-edition',
     data,
   )(dispatch);
 };

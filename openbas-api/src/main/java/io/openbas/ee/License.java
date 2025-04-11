@@ -31,7 +31,7 @@ public class License {
   private boolean isValidCert = false;
 
   @JsonProperty("license_type")
-  private String type;
+  private LicenseTypeEnum type;
 
   @JsonProperty("license_creator")
   private String creator;
