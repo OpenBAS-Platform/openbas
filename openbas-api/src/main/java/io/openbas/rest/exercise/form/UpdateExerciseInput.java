@@ -1,7 +1,5 @@
 package io.openbas.rest.exercise.form;
 
-import static io.openbas.config.AppConfig.*;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
