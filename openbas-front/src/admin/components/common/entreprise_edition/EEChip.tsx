@@ -16,7 +16,7 @@ const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }
     border: `1px solid ${theme.palette.ee.main}`,
     color: theme.palette.ee.main,
     backgroundColor: theme.palette.ee.background,
-    cursor: 'pointer',
+    cursor: isClickable ?'pointer': 'default',
   },
   containerFloating: {
     float: 'left',
@@ -31,7 +31,7 @@ const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }
     border: `1px solid ${theme.palette.ee.main}`,
     color: theme.palette.ee.main,
     backgroundColor: theme.palette.ee.background,
-    cursor: 'pointer',
+    cursor: isClickable ?'pointer': 'default',
   },
 }));
 
