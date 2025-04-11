@@ -1,4 +1,4 @@
-import { type Breakpoint, Dialog as DialogMUI, DialogContent, DialogTitle } from '@mui/material';
+import { type Breakpoint, Dialog as DialogMUI, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { cloneElement, type FunctionComponent, type ReactElement } from 'react';
 
 import Transition from './Transition';
@@ -9,6 +9,7 @@ interface DialogProps {
   title: string;
   children: (() => ReactElement) | ReactElement | null;
   maxWidth?: Breakpoint;
+  action?: ReactElement | null;
 }
 
 const Dialog: FunctionComponent<DialogProps> = ({
@@ -17,6 +18,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
   title,
   children,
   maxWidth = 'md',
+  action,
 }) => {
   let component;
   if (children) {
@@ -33,11 +35,16 @@ const Dialog: FunctionComponent<DialogProps> = ({
       onClose={handleClose}
       fullWidth
       maxWidth={maxWidth}
-      PaperProps={{ elevation: 1 }}
-      TransitionComponent={Transition}
+      slots={{ transition: Transition }}
+      slotProps={{ paper: { elevation: 1 } }}
     >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{component}</DialogContent>
+      {action && (
+        <DialogActions>
+          {action}
+        </DialogActions>
+      )}
     </DialogMUI>
   );
 };

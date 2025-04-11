@@ -6,7 +6,7 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import useAI from '../../../../utils/hooks/useAI';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
-import EnterpriseEditionAgreement from './EnterpriseEditionAgreement';
+import EnterpriseEditionAgreementDialog from './EnterpriseEditionAgreementDialog';
 
 const EETooltip = ({
   children,
@@ -109,7 +109,7 @@ const EETooltip = ({
         </span>
       </Tooltip>
       {userAdmin && (
-        <EnterpriseEditionAgreement
+        <EnterpriseEditionAgreementDialog
           open={feedbackCreation}
           onClose={() => setFeedbackCreation(false)}
         />

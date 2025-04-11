@@ -1,5 +1,5 @@
 import { Breadcrumbs as MUIBreadcrumbs, Typography } from '@mui/material';
-import { type FunctionComponent } from 'react';
+import { type CSSProperties, type FunctionComponent } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
@@ -17,6 +17,7 @@ export interface BreadcrumbsElement {
 interface BreadcrumbsProps {
   variant: 'standard' | 'list' | 'object';
   elements: BreadcrumbsElement[];
+  style?: CSSProperties;
 }
 
 const useStyles = makeStyles()(() => ({
@@ -31,7 +32,7 @@ const useStyles = makeStyles()(() => ({
   breadcrumbsStandard: { marginTop: -5 },
 }));
 
-const Breadcrumbs: FunctionComponent<BreadcrumbsProps> = ({ elements, variant }) => {
+const Breadcrumbs: FunctionComponent<BreadcrumbsProps> = ({ elements, variant, style = {} }) => {
   const { classes } = useStyles();
   let className = classes.breadcrumbsStandard;
   if (variant === 'list') {
@@ -40,7 +41,7 @@ const Breadcrumbs: FunctionComponent<BreadcrumbsProps> = ({ elements, variant })
     className = classes.breadcrumbsObject;
   }
   return (
-    <MUIBreadcrumbs classes={{ root: className }}>
+    <MUIBreadcrumbs style={style} classes={{ root: className }}>
       {elements.map((element) => {
         if (element.current) {
           return (
