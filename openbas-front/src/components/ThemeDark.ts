@@ -231,6 +231,24 @@ const ThemeDark = (
         },
       },
     },
+    MuiListItem: {
+      styleOverrides: {
+        divider: {
+          '&:hover': {
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+          },
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          },
+        },
+      },
+    }
   },
 });
 
