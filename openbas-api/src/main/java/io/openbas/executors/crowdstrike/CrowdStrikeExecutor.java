@@ -36,8 +36,8 @@ public class CrowdStrikeExecutor {
             this.agentService,
             this.assetGroupService);
     if (this.config.isEnable()) {
-      // Get and create/update the Crowdstrike asset groups, assets and agents each hour (by
-      // default)
+      // Get and create/update the Crowdstrike asset groups, assets and agents each 20 minutes
+      // (by default)
       this.taskScheduler.scheduleAtFixedRate(
           service, Duration.ofSeconds(this.config.getApiRegisterInterval()));
     }
