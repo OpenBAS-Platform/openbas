@@ -119,7 +119,7 @@ public class InjectStatusService {
     }
   }
 
-  private void updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
+  public void updateInjectStatus(Agent agent, Inject inject, InjectExecutionInput input) {
     InjectStatus injectStatus = inject.getStatus().orElseThrow(ElementNotFoundException::new);
 
     ExecutionTraces executionTraces = createExecutionTrace(injectStatus, input, agent);
