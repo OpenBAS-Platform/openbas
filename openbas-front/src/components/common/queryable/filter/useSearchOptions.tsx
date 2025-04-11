@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { searchAssetGroupAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
+import { searchExerciseAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorsByNameAsOption } from '../../../../actions/injectors/injector-action';
 import { searchKillChainPhasesByNameAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationsByNameAsOption } from '../../../../actions/organizations/organization-actions';
@@ -46,16 +47,19 @@ const useSearchOptions = () => {
       case 'payload_tags':
       case 'scenario_tags':
       case 'team_tags':
+      case 'finding_tags':
       case 'user_tags':
         searchTagAsOption(search).then((response) => {
           setOptions(response.data);
         });
         break;
+      case 'finding_asset_groups':
       case 'inject_asset_groups':
         searchAssetGroupAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });
         break;
+      case 'finding_assets':
       case 'inject_assets':
         searchEndpointAsOption(search, contextId).then((response) => {
           setOptions(response.data);
@@ -66,6 +70,12 @@ const useSearchOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'finding_simulation':
+        searchExerciseAsOption(search).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'finding_scenario':
       case 'exercise_scenario':
         searchScenarioAsOption(search).then((response) => {
           setOptions(response.data);

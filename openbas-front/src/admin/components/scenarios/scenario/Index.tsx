@@ -28,6 +28,7 @@ const ScenarioDefinition = lazy(() => import('./ScenarioDefinition'));
 const Injects = lazy(() => import('./injects/ScenarioInjects'));
 const Tests = lazy(() => import('./tests/ScenarioTests'));
 const Lessons = lazy(() => import('./lessons/ScenarioLessons'));
+const ScenarioFindings = lazy(() => import('./findings/ScenarioFindings'));
 
 // eslint-disable-next-line no-underscore-dangle
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -161,6 +162,12 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                 value={`/admin/scenarios/${scenario.scenario_id}/lessons`}
                 label={t('Lessons learned')}
               />
+              <Tab
+                component={Link}
+                to={`/admin/scenarios/${scenario.scenario_id}/findings`}
+                value={`/admin/scenarios/${scenario.scenario_id}/findings`}
+                label={t('Findings')}
+              />
             </Tabs>
             <div className={classes.scheduling}>
               {!cronExpression && (
@@ -197,6 +204,7 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
               <Route path="injects" element={errorWrapper(Injects)()} />
               <Route path="tests/:statusId?" element={errorWrapper(Tests)()} />
               <Route path="lessons" element={errorWrapper(Lessons)()} />
+              <Route path="findings" element={errorWrapper(ScenarioFindings)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>

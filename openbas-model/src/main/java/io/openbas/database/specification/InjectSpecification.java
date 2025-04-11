@@ -3,6 +3,7 @@ package io.openbas.database.specification;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotBlank;
@@ -98,5 +99,9 @@ public class InjectSpecification {
   public static Specification<Inject> testable() {
     return (root, query, cb) ->
         root.get("injectorContract").get("injector").get("type").in(VALID_TESTABLE_TYPES);
+  }
+
+  public static Specification<Inject> byTitle(@Nullable final String searchText) {
+    return UtilsSpecification.byName(searchText, "title");
   }
 }
