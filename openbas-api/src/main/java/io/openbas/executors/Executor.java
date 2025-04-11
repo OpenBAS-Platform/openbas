@@ -109,7 +109,13 @@ public class Executor {
     }
     // If inject is too old, reject the execution
     if (isScheduledInject && !isInInjectableRange(inject)) {
-      throw new UnsupportedOperationException("Inject is now too old for execution: id " + inject.getId() + ", launch date " + inject.getDate() + ", now date " + Instant.now());
+      throw new UnsupportedOperationException(
+          "Inject is now too old for execution: id "
+              + inject.getId()
+              + ", launch date "
+              + inject.getDate()
+              + ", now date "
+              + Instant.now());
     }
 
     return this.execute(executableInject);
