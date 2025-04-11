@@ -33,8 +33,12 @@ const useStyles = makeStyles()(theme => ({
     padding: theme.spacing(2),
     borderRadius: 4,
   },
+  paperList: {
+    padding: `0 ${theme.spacing(2)} ${theme.spacing(2)} ${theme.spacing(2)}`,
+    borderRadius: 4,
+  },
   button: { marginBottom: theme.spacing(1) },
-  marginTop: { marginTop: theme.spacing(3) },
+  marginBottom: { marginBottom: theme.spacing(3) },
 }));
 
 const Parameters = () => {
@@ -171,7 +175,7 @@ const Parameters = () => {
             </>
           )}
 
-          <Paper style={{ gridColumn: 'span 3' }} classes={{ root: classes.paper }} variant="outlined" className="paper-for-grid">
+          <Paper style={{ gridColumn: 'span 3' }} className={`${classes.paperList} ${classes.marginBottom}`} variant="outlined">
             <List style={{ padding: 0 }}>
               <ListItem divider={true}>
                 <ListItemText primary={t('Organization')} />
@@ -199,7 +203,7 @@ const Parameters = () => {
               </ListItem>
             </List>
           </Paper>
-          <Paper style={{ gridColumn: 'span 3' }} classes={{ root: classes.paper }} variant="outlined" className="paper-for-grid">
+          <Paper style={{ gridColumn: 'span 3' }} className={`${classes.paperList} ${classes.marginBottom}`} variant="outlined">
             <List style={{ padding: 0 }}>
               {!settings.platform_license.license_is_expired && settings.platform_license.license_is_prevention && (
                 <ListItem divider={false}>
@@ -244,9 +248,9 @@ const Parameters = () => {
         </>
       )}
 
-      <Typography style={{ gridColumn: 'span 3' }} className={classes.marginTop} variant="h4" gutterBottom={true}>{t('Configuration')}</Typography>
-      <Typography style={{ gridColumn: 'span 3' }} className={classes.marginTop} variant="h4" gutterBottom={true}>{t('OpenBAS platform')}</Typography>
-      <Paper sx={{ gridColumn: 'span 3' }} variant="outlined" classes={{ root: classes.paper }} style={{ minHeight: 340 }}>
+      <Typography style={{ gridColumn: 'span 3' }} variant="h4" gutterBottom={true}>{t('Configuration')}</Typography>
+      <Typography style={{ gridColumn: 'span 3' }} variant="h4" gutterBottom={true}>{t('OpenBAS platform')}</Typography>
+      <Paper sx={{ gridColumn: 'span 3' }} variant="outlined" className={`${classes.paper} ${classes.marginBottom}`} style={{ minHeight: 340 }}>
         <ParametersForm
           onSubmit={onUpdate}
           initialValues={{
@@ -256,7 +260,7 @@ const Parameters = () => {
           }}
         />
       </Paper>
-      <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 3' }}>
+      <Paper variant="outlined" className={`${classes.paperList} ${classes.marginBottom}`} sx={{ gridColumn: 'span 3' }}>
         <List>
           {!isEnterpriseEditionActivated && (
             <ListItem sx={{ paddingTop: 0 }} divider={true}>
@@ -324,16 +328,16 @@ const Parameters = () => {
         </List>
       </Paper>
 
-      <Typography className={classes.marginTop} style={{ gridColumn: 'span 2' }} variant="h4">{t('Dark theme')}</Typography>
-      <Typography className={classes.marginTop} style={{ gridColumn: 'span 2' }} variant="h4">{t('Light theme')}</Typography>
-      <Typography className={classes.marginTop} style={{ gridColumn: 'span 2' }} variant="h4">{t('Tools')}</Typography>
+      <Typography style={{ gridColumn: 'span 2' }} variant="h4">{t('Dark theme')}</Typography>
+      <Typography style={{ gridColumn: 'span 2' }} variant="h4">{t('Light theme')}</Typography>
+      <Typography style={{ gridColumn: 'span 2' }} variant="h4">{t('Tools')}</Typography>
       <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 2' }}>
         <ThemeForm onSubmit={onUpdateDarkParameters} initialValues={initialValuesDark} />
       </Paper>
       <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 2' }}>
         <ThemeForm onSubmit={onUpdateLigthParameters} initialValues={initialValuesLight} />
       </Paper>
-      <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 2' }}>
+      <Paper variant="outlined" classes={{ root: classes.paperList }} sx={{ gridColumn: 'span 2' }}>
         <List style={{ paddingTop: 0 }}>
           <ListItem divider={true}>
             <ListItemText primary={t('JAVA Virtual Machine')} />
