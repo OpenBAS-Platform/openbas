@@ -2,6 +2,7 @@ package io.openbas.rest.log;
 
 import static io.openbas.utils.LogUtils.*;
 
+import io.github.bucket4j.Bucket;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.log.form.LogDetailsInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class LogApi extends RestBehavior {
 
   private static final Logger logger = LoggerFactory.getLogger(LogApi.class);
+
+  // https://github.com/bucket4j/bucket4j?tab=readme-ov-file
+  private static final Bucket bucket =
+      Bucket.builder()
+          .addLimit(limit -> limit.capacity(10).refillGreedy(10, Duration.ofSeconds(5)))
+          .build();
 
   @PostMapping("/api/logs")
   @Operation(
@@ -45,24 +53,29 @@ public class LogApi extends RestBehavior {
           @Valid
           @RequestBody
           LogDetailsInput logDetailsInput) {
-    LogLevel level = LogLevel.valueOf(logDetailsInput.getLevel());
+    // TODO limit body size (message, stack, level) ?
+    if (bucket.tryConsume(1)) {
+      LogLevel level = LogLevel.valueOf(logDetailsInput.getLevel());
 
-    switch (level) {
-      case WARN:
-        logger.warn(buildLogMessage(logDetailsInput, level));
-        break;
-      case INFO:
-        logger.info(buildLogMessage(logDetailsInput, level));
-        break;
-      case DEBUG:
-        logger.debug(buildLogMessage(logDetailsInput, level));
-        break;
-      case ERROR:
-      default:
-        logger.error(buildLogMessage(logDetailsInput, level));
-        break;
+      switch (level) {
+        case WARN:
+          logger.warn(buildLogMessage(logDetailsInput, level));
+          break;
+        case INFO:
+          logger.info(buildLogMessage(logDetailsInput, level));
+          break;
+        case DEBUG:
+          logger.debug(buildLogMessage(logDetailsInput, level));
+          break;
+        case ERROR:
+        default:
+          logger.error(buildLogMessage(logDetailsInput, level));
+          break;
+      }
+
+      return new ResponseEntity<>("Log message processed successfully", HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>("Too many requests", HttpStatus.TOO_MANY_REQUESTS);
     }
-
-    return new ResponseEntity<>("Log message processed successfully", HttpStatus.OK);
   }
 }
