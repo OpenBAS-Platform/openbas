@@ -606,7 +606,7 @@
   "Headers": "En-têtes",
   "Hello": "Bonjour",
   "here": "ici",
-  "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable. Each agent can be installed on Windows, Linux and MacOS using x86_64 or arm64 architectures.": "Ici, vous pouvez télécharger et installer les agents de simulation disponibles dans vos exécuteurs. En fonction des intégrations que vous avez activées, certains d'entre eux peuvent être indisponibles. Chaque agent peut être installé sur Windows, Linux et MacOS en utilisant les architectures x86_64 ou arm64.",
+  "Here, you can download and install simulation agents available in your executors. Depending on the integrations you have enabled, some of them may be unavailable. Each agent can be installed on Windows, Linux and MacOS using x86_64 or arm64 architectures.": "Ici, vous pouvez télécharger et installer les agents de simulation disponibles dans vos exécuteurs. En fonction des intégrations que vous avez activées, certains d'entre eux peuvent être indisponibles. Chaque agent peut être installé sur Windows, Linux et MacOS utilisant les architectures x86_64 ou arm64.",
   "Hide timeline": "Cacher la chronologie",
   "High": "Élevé",
   "Home": "Accueil",
