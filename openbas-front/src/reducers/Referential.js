@@ -1,66 +1,73 @@
+import { List, Map } from 'immutable';
 import * as R from 'ramda';
-import Immutable from 'seamless-immutable';
 
 import * as Constants from '../constants/ActionTypes';
 
-export const entitiesInitializer = Immutable({
-  entities: Immutable({
-    files: Immutable({}),
-    users: Immutable({}),
-    groups: Immutable({}),
-    grants: Immutable({}),
-    organizations: Immutable({}),
-    tokens: Immutable({}),
-    exercises: Immutable({}),
-    objectives: Immutable({}),
-    evaluations: Immutable({}),
-    comchecks: Immutable({}),
-    comcheckstatuses: Immutable({}),
-    channelreaders: Immutable({}),
-    challengesreaders: Immutable({}),
-    teams: Immutable({}),
-    injects: Immutable({}),
-    atomics: Immutable({}),
-    atomicdetails: Immutable({}),
-    targetresults: Immutable({}),
-    injector_contracts: Immutable({}),
-    inject_statuses: Immutable({}),
-    communications: Immutable({}),
-    logs: Immutable({}),
-    tags: Immutable({}),
-    documents: Immutable({}),
-    platformParameters: Immutable({}),
-    channels: Immutable({}),
-    payloads: Immutable({}),
-    challenges: Immutable({}),
-    articles: Immutable({}),
-    injectexpectations: Immutable({}),
-    lessonstemplates: Immutable({}),
-    lessonstemplatecategorys: Immutable({}),
-    lessonstemplatequestions: Immutable({}),
-    lessonscategorys: Immutable({}),
-    lessonsquestions: Immutable({}),
-    lessonsanswers: Immutable({}),
-    reports: Immutable({}),
-    variables: Immutable({}),
-    killchainphases: Immutable({}),
-    attackpatterns: Immutable({}),
-    endpoints: Immutable({}),
-    asset_groups: Immutable({}),
-    securityplatforms: Immutable({}),
-    scenarios: Immutable({}),
-    injectors: Immutable({}),
-    collectors: Immutable({}),
-    executors: Immutable({}),
-    mitigations: Immutable({}),
+export const entitiesInitializer = Map({
+  entities: Map({
+    files: Map({}),
+    users: Map({}),
+    groups: Map({}),
+    grants: Map({}),
+    organizations: Map({}),
+    tokens: Map({}),
+    exercises: Map({}),
+    objectives: Map({}),
+    evaluations: Map({}),
+    comchecks: Map({}),
+    comcheckstatuses: Map({}),
+    channelreaders: Map({}),
+    challengesreaders: Map({}),
+    teams: Map({}),
+    injects: Map({}),
+    atomics: Map({}),
+    atomicdetails: Map({}),
+    targetresults: Map({}),
+    injector_contracts: Map({}),
+    inject_statuses: Map({}),
+    communications: Map({}),
+    logs: Map({}),
+    tags: Map({}),
+    documents: Map({}),
+    platformParameters: Map({}),
+    channels: Map({}),
+    payloads: Map({}),
+    challenges: Map({}),
+    articles: Map({}),
+    injectexpectations: Map({}),
+    lessonstemplates: Map({}),
+    lessonstemplatecategorys: Map({}),
+    lessonstemplatequestions: Map({}),
+    lessonscategorys: Map({}),
+    lessonsquestions: Map({}),
+    lessonsanswers: Map({}),
+    reports: Map({}),
+    variables: Map({}),
+    killchainphases: Map({}),
+    attackpatterns: Map({}),
+    endpoints: Map({}),
+    asset_groups: Map({}),
+    securityplatforms: Map({}),
+    scenarios: Map({}),
+    injectors: Map({}),
+    collectors: Map({}),
+    executors: Map({}),
+    mitigations: Map({}),
   }),
 });
 
-const referential = (state = Immutable({}), action = {}) => {
+const mergeDeepOverwriteLists = (a, b) => {
+  if (b !== null && a && typeof a === 'object' && typeof a.mergeWith === 'function' && !List.isList(a)) {
+    return a.mergeWith(mergeDeepOverwriteLists, b);
+  }
+  return b;
+};
+
+const referential = (state = Map({}), action = {}) => {
   switch (action.type) {
     case Constants.DATA_UPDATE_SUCCESS:
     case Constants.DATA_FETCH_SUCCESS: {
-      return state.merge(R.dissoc('result', action.payload), { deep: true });
+      return mergeDeepOverwriteLists(state, R.dissoc('result', action.payload));
     }
     case Constants.DATA_DELETE_SUCCESS: {
       return state.setIn(
