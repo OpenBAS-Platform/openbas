@@ -43,17 +43,17 @@ const EEChip = ({ clickable = true, floating = false, onClick = undefined }: {
   const { classes } = useStyles({ isClickable: clickable });
   const isEnterpriseEdition = useEnterpriseEdition();
 
-  return (!isEnterpriseEdition && (
+  return (
     <Tooltip
       title="Enterprise Edition Feature"
       className={floating ? classes.containerFloating : classes.container}
-      onClick={() => clickable && onClick && onClick(true)}
+      onClick={() => clickable && !isEnterpriseEdition && onClick && onClick(true)}
     >
       <span>
         EE
       </span>
     </Tooltip>
-  ));
+  );
 };
 
 export default EEChip;
