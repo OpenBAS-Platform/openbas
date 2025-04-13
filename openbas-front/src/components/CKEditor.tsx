@@ -56,15 +56,15 @@ import {
 } from 'ckeditor5';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// eslint-disable-next-line import/extensions
+// eslint-disable-next-line import-x/extensions
 import en from 'ckeditor5/translations/en.js';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// eslint-disable-next-line import/extensions
+// eslint-disable-next-line import-x/extensions
 import fr from 'ckeditor5/translations/fr.js';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-// eslint-disable-next-line import/extensions
+// eslint-disable-next-line import-x/extensions
 import zh from 'ckeditor5/translations/zh.js';
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';

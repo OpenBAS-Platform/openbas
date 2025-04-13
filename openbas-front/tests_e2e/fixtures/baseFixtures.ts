@@ -39,5 +39,5 @@ const test = testBase.extend<{ autoTestFixture: string }>({
   }],
 });
 
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line import-x/prefer-default-export
 export { test };

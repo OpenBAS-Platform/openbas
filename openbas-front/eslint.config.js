@@ -1,14 +1,12 @@
-/* eslint import/no-extraneous-dependencies: 0 */
-
-// imports to not let tools report them as unused
-import 'eslint-import-resolver-oxc';
+/* eslint import-x/no-extraneous-dependencies: 0 */
 
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import vitest from '@vitest/eslint-plugin';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import customRules from 'eslint-plugin-custom-rules';
 import i18next from 'eslint-plugin-i18next';
-import importPlugin from 'eslint-plugin-import';
+import * as importXPlugin from 'eslint-plugin-import-x';
 import playwright from 'eslint-plugin-playwright';
 import react from 'eslint-plugin-react';
 import reactRefresh from 'eslint-plugin-react-refresh';
@@ -29,12 +27,12 @@ export default [
   { settings: { react: { version: 'detect' } } },
 
   // rules recommended by eslint-plugin-import
-  importPlugin.flatConfigs.recommended,
-  importPlugin.flatConfigs.typescript,
+  importXPlugin.flatConfigs.recommended,
+  importXPlugin.flatConfigs.typescript,
   {
     settings: {
-      'import/resolver': 'oxc',
-      'import/ignore': [
+      'import-x/resolver-next': [createTypeScriptImportResolver()],
+      'import-x/ignore': [
         'react-apexcharts', // ignore react-apexcharts as the default export is broken
       ],
     },
@@ -102,11 +100,11 @@ export default [
       '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: false }],
 
       // eslint-plugin-import rules
-      'import/no-named-as-default-member': 'off',
-      'import/prefer-default-export': 'error',
-      'import/no-mutable-exports': 'error',
-      'import/namespace': 'off', // off to reduce computing time for one file, on when doing yarn lint
-      'import/no-extraneous-dependencies': [
+      'import-x/no-named-as-default-member': 'off',
+      'import-x/prefer-default-export': 'error',
+      'import-x/no-mutable-exports': 'error',
+      'import-x/namespace': 'off', // off to reduce computing time for one file, on when doing yarn lint
+      'import-x/no-extraneous-dependencies': [
         'error',
         {
           devDependencies: [
@@ -183,7 +181,7 @@ export default [
     plugins: { vitest },
     rules: {
       ...vitest.configs.recommended.rules,
-      'import/no-extraneous-dependencies': [
+      'import-x/no-extraneous-dependencies': [
         'error',
         {
           devDependencies: [
@@ -202,7 +200,7 @@ export default [
     ...playwright.configs['flat/recommended'],
     rules: {
       ...playwright.configs['flat/recommended'].rules,
-      'import/no-extraneous-dependencies': [
+      'import-x/no-extraneous-dependencies': [
         'error',
         {
           devDependencies: [

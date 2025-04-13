@@ -37,7 +37,7 @@ const momentMap = {
 };
 
 // Export LANG to be used in non-React code
-// eslint-disable-next-line import/no-mutable-exports
+// eslint-disable-next-line import-x/no-mutable-exports
 export let LANG = DEFAULT_LANG;
 
 const AppIntlProvider: FunctionComponent<{ children: ReactElement }> = ({ children }) => {

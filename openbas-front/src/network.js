@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { normalize } from 'normalizr';
 
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line import-x/prefer-default-export
 export const api = (schema) => {
   const instance = axios.create({ headers: { responseType: 'json' } });
   // Intercept to apply schema and test unauthorized users

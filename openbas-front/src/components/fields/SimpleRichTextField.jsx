@@ -1,6 +1,6 @@
 import { InputLabel } from '@mui/material';
 
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import CKEditor from '../CKEditor';
 

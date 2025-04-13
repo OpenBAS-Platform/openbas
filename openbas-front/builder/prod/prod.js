@@ -1,4 +1,4 @@
-/* eslint import/no-extraneous-dependencies: 0 */
+/* eslint import-x/no-extraneous-dependencies: 0 */
 
 import fs from 'node:fs';
 

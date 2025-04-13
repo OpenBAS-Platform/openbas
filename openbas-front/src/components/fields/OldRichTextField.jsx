@@ -2,7 +2,7 @@ import { FormHelperText, InputLabel } from '@mui/material';
 import { Field } from 'react-final-form';
 import { makeStyles } from 'tss-react/mui';
 
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import TextFieldAskAI from '../../admin/components/common/form/TextFieldAskAI';
 import CKEditor from '../CKEditor';
 import { useFormatter } from '../i18n';
