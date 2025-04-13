@@ -3250,12 +3250,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:19.1.0":
-  version: 19.1.0
-  resolution: "@types/react@npm:19.1.0"
+"@types/react@npm:19.1.1":
+  version: 19.1.1
+  resolution: "@types/react@npm:19.1.1"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10c0/632fd20ee176e55801a61c5f854141b043571a3e363ef106b047b766a813a12735cbb37abb3d61d126346979f530f2ed269a60c8ef3cdee54e5e9fe4174e5dad
+  checksum: 10c0/d22417857460ade4250806135a3d1e2558737a7ae76f120f88afbc6419ab04312977a5208a70d4f85059b9493c0f1f16c9ba1483aa8ea1dad581da666c95773e
   languageName: node
   linkType: hard
 
@@ -9301,7 +9301,7 @@ __metadata:
     "@types/node": "npm:22.14.1"
     "@types/pdfmake": "npm:0.2.11"
     "@types/qs": "npm:6"
-    "@types/react": "npm:19.1.0"
+    "@types/react": "npm:19.1.1"
     "@types/react-csv": "npm:1.1.10"
     "@types/react-dom": "npm:19.1.2"
     "@types/react-syntax-highlighter": "npm:15"
