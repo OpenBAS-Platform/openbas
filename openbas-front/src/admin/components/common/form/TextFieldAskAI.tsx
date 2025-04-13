@@ -19,10 +19,10 @@ import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type MouseEvent as ReactMouseEvent, useState } from 'react';
 
 import { aiChangeTone, aiExplain, aiFixSpelling, aiGenMedia, aiGenMessage, aiGenSubject, aiMakeLonger, aiMakeShorter, aiSummarize } from '../../../../actions/AskAI';
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import SimpleRichTextField from '../../../../components/fields/SimpleRichTextField';
 import { useFormatter } from '../../../../components/i18n';
-// eslint-disable-next-line import/no-cycle
+// eslint-disable-next-line import-x/no-cycle
 import ResponseDialog from '../../../../utils/ai/ResponseDialog';
 import useAI from '../../../../utils/hooks/useAI';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
