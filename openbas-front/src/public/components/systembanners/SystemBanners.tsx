@@ -67,6 +67,7 @@ const SystemBanners = (settings: { settings: PlatformSettings }) => {
         const topBannerClasses = [
           classes.banner,
           classes.bannerTop,
+          // @ts-expect-error : should be solved in current branch
           classes[`banner_${key}`],
         ].join(' ');
 
