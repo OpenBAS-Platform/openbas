@@ -6,7 +6,7 @@ import { series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsSeries, type Widget } from '../../../../../utils/api-types';
-import { lineChartOptions, verticalBarsChartOptions } from '../../../../../utils/Charts';
+import { verticalBarsChartOptions } from '../../../../../utils/Charts';
 import { isEmptyField, isNotEmptyField } from '../../../../../utils/utils';
 import MatrixMitre from './viz/MatrixMitre';
 
@@ -33,12 +33,11 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
     return <Loader variant="inElement" />;
   }
 
-  const seriesData
-      = structuralVizData.map(({ label, data, color }) => {
+  const seriesData: ApexAxisChartSeries | ApexNonAxisChartSeries
+      = structuralVizData.map(({ label, data }) => {
         if (data) {
           return ({
             name: label,
-            color,
             data: data.map(n => ({
               x: n.label,
               y: n.value,
@@ -51,7 +50,7 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
   switch (widget.widget_type) {
     case 'security-coverage':
       return (
-        <MatrixMitre widgetTitle={!widget.widget_config.title ? 'Your widget' : widget.widget_config.title} data={structuralVizData} />
+        <MatrixMitre widgetTitle={!widget.widget_config.title ? t('Security Coverage') : widget.widget_config.title} data={structuralVizData} />
       );
     case 'vertical-barchart':
       return (
@@ -72,23 +71,6 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
           )}
           series={seriesData}
           type="bar"
-          width="100%"
-          height="100%"
-        />
-      );
-    case 'line':
-      return (
-        <Chart
-          options={lineChartOptions(
-            theme,
-            false,
-            null,
-            null,
-            undefined,
-            false,
-          )}
-          series={seriesData}
-          type="line"
           width="100%"
           height="100%"
         />

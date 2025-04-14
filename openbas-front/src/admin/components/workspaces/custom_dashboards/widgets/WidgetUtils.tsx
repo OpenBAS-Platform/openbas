@@ -30,6 +30,7 @@ export const widgetVisualizationTypes: {
   },
   {
     category: 'line',
+    modes: ['temporal'],
     seriesLimit: 5,
   },
   {
