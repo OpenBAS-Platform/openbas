@@ -47,9 +47,9 @@ const Parameters = () => {
   const { t, fldt } = useFormatter();
   const [openEEChanges, setOpenEEChanges] = useState(false);
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
-  const isEnterpriseEditionActivated = settings.platform_license.license_is_enterprise;
-  const isEnterpriseEditionByConfig = settings.platform_license.license_is_by_configuration;
-  const isEnterpriseEditionValid = settings.platform_license.license_is_validated;
+  const isEnterpriseEditionActivated = settings.platform_license?.license_is_enterprise;
+  const isEnterpriseEditionByConfig = settings.platform_license?.license_is_by_configuration;
+  const isEnterpriseEditionValid = settings.platform_license?.license_is_validated;
   const isEnterpriseEdition = settings.platform_license?.license_is_validated === true;
   useDataLoader(() => {
     dispatch(fetchPlatformParameters());
@@ -213,14 +213,14 @@ const Parameters = () => {
           </Paper>
           <Paper style={{ gridColumn: 'span 3' }} className={`${classes.paperList} ${classes.marginBottom}`} variant="outlined">
             <List style={{ padding: 0 }}>
-              {!settings.platform_license.license_is_expired && settings.platform_license.license_is_prevention && (
+              {!settings.platform_license?.license_is_expired && settings.platform_license?.license_is_prevention && (
                 <ListItem divider={false}>
                   <Alert severity="warning" variant="outlined" style={{ width: '100%' }}>
                     {t('Your Enterprise Edition license will expire in less than 3 months.')}
                   </Alert>
                 </ListItem>
               )}
-              {!settings.platform_license.license_is_validated && settings.platform_license.license_is_valid_cert && (
+              {!settings.platform_license?.license_is_validated && settings.platform_license?.license_is_valid_cert && (
                 <ListItem divider={false}>
                   <Alert severity="error" variant="outlined" style={{ width: '100%' }}>
                     {t('Your Enterprise Edition license is expired. Please contact your Filigran representative.')}
@@ -231,23 +231,23 @@ const Parameters = () => {
                 <ListItemText primary={t('Start date')} />
                 <ItemBoolean
                   variant="xlarge"
-                  label={fldt(settings.platform_license.license_start_date)}
-                  status={!settings.platform_license.license_is_expired}
+                  label={fldt(settings.platform_license?.license_start_date)}
+                  status={!settings.platform_license?.license_is_expired}
                 />
               </ListItem>
               <ListItem divider={true}>
                 <ListItemText primary={t('Expiration date')} />
                 <ItemBoolean
                   variant="xlarge"
-                  label={fldt(settings.platform_license.license_expiration_date)}
-                  status={!settings.platform_license.license_is_expired}
+                  label={fldt(settings.platform_license?.license_expiration_date)}
+                  status={!settings.platform_license?.license_is_expired}
                 />
               </ListItem>
-              <ListItem divider={!settings.platform_license.license_is_prevention}>
+              <ListItem divider={!settings.platform_license?.license_is_prevention}>
                 <ListItemText primary={t('License type')} />
                 <ItemBoolean
                   variant="large"
-                  neutralLabel={settings.platform_license.license_type}
+                  neutralLabel={settings.platform_license?.license_type}
                   status={null}
                 />
               </ListItem>
