@@ -678,7 +678,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
 
                       {
                         injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
-                            return (
+                          return (
                             <>
                               <GridLegacy item={true} xs={1} style={{ textAlign: 'end' }}>
                                 <IconButton
