@@ -12,10 +12,13 @@ import io.openbas.database.model.BannerMessage;
 import io.openbas.database.model.Setting;
 import io.openbas.database.model.Theme;
 import io.openbas.database.repository.SettingRepository;
+import io.openbas.ee.Ee;
+import io.openbas.ee.License;
 import io.openbas.executors.caldera.config.CalderaExecutorConfig;
 import io.openbas.expectation.ExpectationPropertiesConfig;
 import io.openbas.helper.RabbitMQHelper;
 import io.openbas.injectors.opencti.config.OpenCTIConfig;
+import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.settings.PreviewFeature;
 import io.openbas.rest.settings.form.*;
 import io.openbas.rest.settings.response.OAuthProvider;
@@ -49,6 +52,7 @@ public class PlatformSettingsService {
   private OpenCTIConfig openCTIConfig;
   private AiConfig aiConfig;
   private CalderaExecutorConfig calderaExecutorConfig;
+  private Ee eeService;
 
   @Value("${openbas.mail.imap.enabled}")
   private boolean imapEnabled;
@@ -88,6 +92,11 @@ public class PlatformSettingsService {
   @Autowired
   public void setContext(ApplicationContext context) {
     this.context = context;
+  }
+
+  @Autowired
+  public void setEeService(Ee eeService) {
+    this.eeService = eeService;
   }
 
   // -- PROVIDERS --
@@ -173,7 +182,6 @@ public class PlatformSettingsService {
   public PlatformSettings findSettings() {
     Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     PlatformSettings platformSettings = new PlatformSettings();
-
     // Build anonymous settings
     platformSettings.setPlatformOpenIdProviders(buildOpenIdProviders());
     platformSettings.setPlatformSaml2Providers(buildSaml2Providers());
@@ -199,16 +207,16 @@ public class PlatformSettingsService {
     // Build authenticated user settings
     OpenBASPrincipal user = currentUser();
     if (user != null) {
-      platformSettings.setPlatformEnterpriseEdition(
-          ofNullable(dbSettings.get(PLATFORM_ENTERPRISE_EDITION.key()))
-              .map(Setting::getValue)
-              .orElse(PLATFORM_ENTERPRISE_EDITION.defaultValue()));
       platformSettings.setPlatformWhitemark(
           ofNullable(dbSettings.get(PLATFORM_WHITEMARK.key()))
               .map(Setting::getValue)
               .orElse(PLATFORM_WHITEMARK.defaultValue()));
       platformSettings.setMapTileServerLight(openBASConfig.getMapTileServerLight());
       platformSettings.setMapTileServerDark(openBASConfig.getMapTileServerDark());
+      platformSettings.setPlatformId(
+          ofNullable(dbSettings.get(PLATFORM_INSTANCE.key()))
+              .map(Setting::getValue)
+              .orElse(PLATFORM_INSTANCE.defaultValue()));
       platformSettings.setPlatformName(
           ofNullable(dbSettings.get(PLATFORM_NAME.key()))
               .map(Setting::getValue)
@@ -299,6 +307,8 @@ public class PlatformSettingsService {
     platformSettings.setExpectationDefaultScoreValue(
         expectationPropertiesConfig.getDefaultExpectationScoreValue());
 
+    // License
+    platformSettings.setPlatformLicense(eeService.getEnterpriseEditionInfo());
     return platformSettings;
   }
 
@@ -349,12 +359,17 @@ public class PlatformSettingsService {
   }
 
   public PlatformSettings updateSettingsEnterpriseEdition(
-      SettingsEnterpriseEditionUpdateInput input) {
+      SettingsEnterpriseEditionUpdateInput input) throws Exception {
     Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     List<Setting> settingsToSave = new ArrayList<>();
-    settingsToSave.add(
-        resolveFromMap(
-            dbSettings, PLATFORM_ENTERPRISE_EDITION.key(), input.getEnterpriseEdition()));
+    String certPem = input.getEnterpriseEdition();
+    if (certPem != null && !certPem.isEmpty()) {
+      License license = eeService.verifyCertificate(certPem);
+      if (!license.isLicenseValidated()) {
+        throw new BadRequestException("Invalid certificate");
+      }
+    }
+    settingsToSave.add(resolveFromMap(dbSettings, PLATFORM_ENTERPRISE_LICENSE.key(), certPem));
     settingRepository.saveAll(settingsToSave);
     return findSettings();
   }

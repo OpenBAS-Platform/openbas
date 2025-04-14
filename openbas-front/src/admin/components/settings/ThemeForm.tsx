@@ -171,11 +171,7 @@ const ThemeForm: FunctionComponent<Props> = ({
         inputProps={register('logo_login_url')}
       />
 
-      <div style={{
-        float: 'right',
-        marginTop: 20,
-      }}
-      >
+      <div style={{ marginTop: 20 }}>
         <Button
           variant="contained"
           color="secondary"
