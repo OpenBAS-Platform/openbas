@@ -12,8 +12,6 @@ const ScenarioFindings = () => {
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
 
   const additionalFilterNames = [
-    'finding_assets',
-    'finding_asset_groups',
     'finding_inject_id',
     'finding_simulation',
   ];

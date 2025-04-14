@@ -8,8 +8,6 @@ const SimulationFindings = () => {
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
 
   const additionalFilterNames = [
-    'finding_assets',
-    'finding_asset_groups',
     'finding_inject_id',
   ];
 

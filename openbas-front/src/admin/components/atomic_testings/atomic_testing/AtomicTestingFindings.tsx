@@ -8,17 +8,12 @@ import FindingList from '../../findings/FindingList';
 const AtomicTestingFindings: FunctionComponent = () => {
   const { injectId } = useParams() as { injectId: InjectResultOverviewOutput['inject_id'] };
 
-  const additionalFilterNames = [
-    'finding_assets',
-    'finding_asset_groups',
-  ];
-
   const search = (input: SearchPaginationInput) => {
     return searchFindingsForInjects(injectId, input);
   };
 
   return (
-    <FindingList filterLocalStorageKey="atm-findings" additionalFilterNames={additionalFilterNames} searchFindings={search} />
+    <FindingList filterLocalStorageKey="atm-findings" searchFindings={search} />
   );
 };
 

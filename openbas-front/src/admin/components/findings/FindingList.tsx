@@ -40,6 +40,8 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
     'finding_type',
     'finding_tags',
     'finding_created_at',
+    'finding_asset_groups',
+    'finding_assets',
     ...additionalFilterNames,
   ];
 
