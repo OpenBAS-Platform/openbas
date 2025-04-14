@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,6 +40,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping("/injects/{injectId}/search")
+  @PreAuthorize("isObserver()")
   public Page<FindingOutput> findingsByInject(
       @PathVariable @NotNull final String injectId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
@@ -53,6 +55,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping("/exercises/{simulationId}/search")
+  @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Page<FindingOutput> findingsBySimulation(
       @PathVariable @NotNull final String simulationId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
@@ -67,6 +70,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping("/scenarios/{scenarioId}/search")
+  @PreAuthorize("isScenarioPlanner(#scenarioId)")
   public Page<FindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
@@ -81,6 +85,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping("/endpoints/{endpointId}/search")
+  @PreAuthorize("isObserver()")
   public Page<FindingOutput> findingsByEndpoint(
       @PathVariable @NotNull final String endpointId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
