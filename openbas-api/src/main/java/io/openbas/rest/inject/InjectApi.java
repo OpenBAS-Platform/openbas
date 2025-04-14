@@ -603,11 +603,9 @@ public class InjectApi extends RestBehavior {
 
   @GetMapping(INJECT_URI + "/findings/options")
   public List<FilterUtilsJpa.Option> optionsByTitleLinkedToFindings(
-      @RequestParam(required = false) final String searchText,
-      @RequestParam(required = false) final String simulationOrScenarioId) {
+      @RequestParam(required = false) final String searchText) {
     return injectRepository
-        .findAllBySimulationOrScenarioIdAndTitleLinkedToFindings(
-            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
+        .findAllByTitleLinkedToFindings(StringUtils.trimToNull(searchText))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle()))
         .toList();

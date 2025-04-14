@@ -73,11 +73,8 @@ export const searchScenarioInjectsSimple = (scenarioId: Scenario['scenario_id'],
 
 // -- OPTION --
 
-export const searchInjectLinkedToFindingsAsOption = (searchText: string = '', simulationOrScenarioId: string = '') => {
-  const params = {
-    searchText,
-    simulationOrScenarioId,
-  };
+export const searchInjectLinkedToFindingsAsOption = (searchText: string = '') => {
+  const params = { searchText };
   return simpleCall(`${INJECT_URI}/findings/options`, { params });
 };
 

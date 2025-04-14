@@ -109,11 +109,6 @@ public interface AssetGroupRepository
       "SELECT ag FROM Inject i"
           + " INNER JOIN i.findings f"
           + " JOIN i.assetGroups ag"
-          + " WHERE ("
-          + "   :simulationOrScenarioId is NULL"
-          + "   OR (i.exercise.id = :simulationOrScenarioId"
-          + "   OR i.exercise.scenario.id = :simulationOrScenarioId)"
-          + " ) AND (:name IS NULL OR lower(ag.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
-  List<AssetGroup> findAllBySimulationOrScenarioIdAndNameLinkedToFindings(
-      String simulationOrScenarioId, String name);
+          + " WHERE (:name IS NULL OR lower(ag.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
+  List<AssetGroup> findAllByNameLinkedToFindings(String name);
 }

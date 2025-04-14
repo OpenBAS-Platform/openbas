@@ -299,6 +299,8 @@ export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
 }
 
+export type BannerMessage = Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>
+
 interface BasePayload {
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
