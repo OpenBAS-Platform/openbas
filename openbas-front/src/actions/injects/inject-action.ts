@@ -1,7 +1,7 @@
 import { type Dispatch } from 'redux';
 
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import { type Exercise, type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput, type InjectExportRequestInput, type InjectImportInput, type Scenario, type SearchPaginationInput, } from '../../utils/api-types';
+import { type Exercise, type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput, type InjectExportRequestInput, type InjectImportInput, type Scenario, type SearchPaginationInput } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
 
@@ -69,7 +69,6 @@ export const fetchScenarioInjectsSimple = (scenarioId: Scenario['scenario_id']) 
 export const searchScenarioInjectsSimple = (scenarioId: Scenario['scenario_id'], input: SearchPaginationInput) => {
   const uri = `/api/scenarios/${scenarioId}/injects/simple`;
   return simplePostCall(uri, input);
-
 };
 
 // -- OPTION --
@@ -85,4 +84,3 @@ export const searchInjectLinkedToFindingsAsOption = (searchText: string = '', si
 export const searchInjectByIdAsOption = (ids: string[]) => {
   return simplePostCall(`${INJECT_URI}/options`, ids);
 };
-

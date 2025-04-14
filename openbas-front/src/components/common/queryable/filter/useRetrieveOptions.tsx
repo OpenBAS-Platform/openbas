@@ -5,13 +5,13 @@ import { searchEndpointByIdAsOption } from '../../../../actions/assets/endpoint-
 import { searchAttackPatternsByIdAsOption } from '../../../../actions/AttackPattern';
 import { searchExerciseByIdAsOption } from '../../../../actions/exercises/exercise-action';
 import { searchInjectorByIdAsOptions } from '../../../../actions/injectors/injector-action';
+import { searchInjectByIdAsOption } from '../../../../actions/injects/inject-action';
 import { searchKillChainPhasesByIdAsOption } from '../../../../actions/kill_chain_phases/killChainPhase-action';
 import { searchOrganizationByIdAsOptions } from '../../../../actions/organizations/organization-actions';
 import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenario-actions';
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
 import { type Option } from '../../../../utils/Option';
-import { searchInjectByIdAsOption } from '../../../../actions/injects/inject-action';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
