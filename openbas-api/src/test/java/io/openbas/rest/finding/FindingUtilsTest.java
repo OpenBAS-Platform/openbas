@@ -4,6 +4,7 @@ import static io.openbas.utils.fixtures.AssetFixture.createDefaultAsset;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
 import static io.openbas.utils.fixtures.OutputParserFixture.getDefaultContractOutputElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,7 @@ import io.openbas.database.repository.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -264,20 +266,30 @@ class FindingUtilsTest {
 
     Finding finding1 = new Finding();
     finding1.setValue(value);
-    finding1.getAssets().add(asset1);
+    finding1.setInject(inject);
+    finding1.setField(contractOutputElement.getKey());
+    finding1.setType(contractOutputElement.getType());
+    finding1.setAssets(List.of(asset1));
 
     when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
+    findingUtils.buildFinding(inject, asset2, contractOutputElement, value);
+
     ArgumentCaptor<Finding> findingCaptor = ArgumentCaptor.forClass(Finding.class);
-    verify(findingUtils).buildFinding(inject, asset2, contractOutputElement, value);
+    verify(findingRepository).save(findingCaptor.capture());
     Finding capturedFinding = findingCaptor.getValue();
+
     assertEquals(2, capturedFinding.getAssets().size());
+    Set<String> assetIds =
+        capturedFinding.getAssets().stream().map(Asset::getId).collect(Collectors.toSet());
+    assertTrue(assetIds.contains(ASSET_1));
+    assertTrue(assetIds.contains(ASSET_2));
   }
 
   @Test
-  @DisplayName("Should have one assets for a finding")
+  @DisplayName("Should have one asset for a finding")
   void given_a_finding_already_existent_with_same_asset_should_have_one_assets() {
     Inject inject = getDefaultInject();
     Asset asset1 = createDefaultAsset(ASSET_1);
@@ -287,15 +299,26 @@ class FindingUtilsTest {
 
     Finding finding1 = new Finding();
     finding1.setValue(value);
-    finding1.getAssets().add(asset1);
+    finding1.setInject(inject);
+    finding1.setField(contractOutputElement.getKey());
+    finding1.setType(contractOutputElement.getType());
+    finding1.setAssets(List.of(asset1));
 
     when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
+    findingUtils.buildFinding(inject, asset1, contractOutputElement, value);
+
+    // Capture the saved Finding
     ArgumentCaptor<Finding> findingCaptor = ArgumentCaptor.forClass(Finding.class);
-    verify(findingUtils).buildFinding(inject, asset1, contractOutputElement, value);
+    verify(findingRepository).save(findingCaptor.capture());
+
     Finding capturedFinding = findingCaptor.getValue();
-    assertEquals(1, capturedFinding.getAssets().size());
+
+    assertEquals(
+        1, capturedFinding.getAssets().size(), "There should be exactly one asset in the finding");
+    Asset onlyAsset = capturedFinding.getAssets().iterator().next();
+    assertEquals(ASSET_1, onlyAsset.getId());
   }
 }
