@@ -105,7 +105,7 @@
     "express": "4.21.2",
     "fs-extra": "11.3.0",
     "globals": "16.0.0",
-    "jsdom": "26.0.0",
+    "jsdom": "26.1.0",
     "monocart-coverage-reports": "2.12.3",
     "monocart-reporter": "2.9.17",
     "swagger-typescript-api": "13.1.0",
