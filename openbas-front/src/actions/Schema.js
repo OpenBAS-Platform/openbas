@@ -394,7 +394,7 @@ export const storeHelper = state => ({
     return state.referential.getIn(['entities', 'platformParameters', 'parameters']) || {};
   },
   getPlatformName: () => {
-    return state.referential.getIn(['entities', 'platformParameters', 'parameters', 'platform_name']) || 'OpenBAS - Crisis Drills Planning Platform';
+    return state.referential.getIn(['entities', 'platformParameters', 'parameters', 'platform_name']) || 'OpenBAS - Breach and Attack Simulation Platform';
   },
   // kill chain phases
   getKillChainPhase: id => entity(id, 'killchainphases', state),

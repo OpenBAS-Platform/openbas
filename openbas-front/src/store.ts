@@ -39,7 +39,7 @@ const initStore = () => {
 export const useHelper = (selector: any) => (() => {
   const selected = useSelector(state => selector(storeHelper(state)), R.equals);
 
-  if (selected === null || selected === undefined) {
+  if (!selected) {
     return selected;
   }
 

@@ -56,14 +56,18 @@ export const entitiesInitializer = Map({
   }),
 });
 
-const mergeDeepOverwriteLists = (a, b) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mergeDeepOverwriteLists = (a: any, b: any) => {
+  // First, check if 'b' is null to avoid overwriting 'a', even if 'a' is mergeable.
+  // Then, check if 'a' is mergeable.
   if (b !== null && a && typeof a === 'object' && typeof a.mergeWith === 'function' && !List.isList(a)) {
     return a.mergeWith(mergeDeepOverwriteLists, b);
   }
   return b;
 };
 
-const referential = (state = Map({}), action = {}) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const referential = (state: any = Map({}), action: any = {}) => {
   switch (action.type) {
     case Constants.DATA_UPDATE_SUCCESS:
     case Constants.DATA_FETCH_SUCCESS: {
