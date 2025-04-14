@@ -34,17 +34,18 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
   }
 
   const seriesData
-      = structuralVizData.map(({ label, data }) => {
+      = structuralVizData.map(({ label, data, color }) => {
         if (data) {
           return ({
-            label,
+            name: label,
+            color,
             data: data.map(n => ({
               x: n.label,
               y: n.value,
             })),
           });
         }
-        return [];
+        return { data: [] };
       });
 
   switch (widget.widget_type) {
