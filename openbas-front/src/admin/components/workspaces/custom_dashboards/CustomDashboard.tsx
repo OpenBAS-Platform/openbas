@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import RGL, { type Layout, WidthProvider } from 'react-grid-layout';
@@ -121,14 +121,19 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
               />
               <ErrorBoundary>
                 {widget.widget_id === idToResize ? (<div />) : (
-                  <>
+                  <Box
+                    flex={1}
+                    display="flex"
+                    flexDirection="column"
+                    minHeight={0}
+                  >
                     {widget.widget_config.mode === 'structural' && (
                       <WidgetStructuralViz widget={widget} />
                     )}
                     {widget.widget_config.mode === 'temporal' && (
                       <WidgetTemporalViz widget={widget} />
                     )}
-                  </>
+                  </Box>
                 )}
               </ErrorBoundary>
             </Paper>

@@ -30,6 +30,7 @@ const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
   if (loading) {
     return <Loader variant="inElement" />;
   }
+
   const seriesData = [
     {
       name: widget.widget_config.title,
@@ -39,6 +40,7 @@ const WidgetTemporalViz = ({ widget }: WidgetTemporalVizProps) => {
       })),
     },
   ];
+
   switch (widget.widget_type) {
     case 'vertical-barchart':
       return (

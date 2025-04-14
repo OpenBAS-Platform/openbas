@@ -325,7 +325,6 @@ const Endpoints = () => {
                 return (
                   <ListItem
                     key={endpoint.asset_id}
-                    classes={{ root: classes.item }}
                     divider
                     secondaryAction={
                       (userAdmin
@@ -341,6 +340,7 @@ const Endpoints = () => {
                   >
                     <ListItemButton
                       component={Link}
+                      classes={{ root: classes.item }}
                       to={`/admin/assets/endpoints/${endpoint.asset_id}`}
                     >
                       <ListItemIcon>
