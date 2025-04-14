@@ -100,8 +100,4 @@ public class InjectSpecification {
     return (root, query, cb) ->
         root.get("injectorContract").get("injector").get("type").in(VALID_TESTABLE_TYPES);
   }
-
-  public static Specification<Inject> byTitle(@Nullable final String searchText) {
-    return UtilsSpecification.byName(searchText, "title");
-  }
 }
