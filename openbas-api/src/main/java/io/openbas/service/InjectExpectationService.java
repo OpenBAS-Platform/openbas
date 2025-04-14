@@ -29,10 +29,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Log
 @RequiredArgsConstructor
 @Service
 public class InjectExpectationService {
@@ -416,6 +418,56 @@ public class InjectExpectationService {
     // end of computing
 
     return injectExpectation;
+  }
+
+  public void bulkUpdateInjectExpectation(
+      @Valid @NotNull Map<String, InjectExpectationUpdateInput> inputs) {
+    if (inputs.isEmpty()) {
+      return;
+    }
+
+    List<InjectExpectation> injectExpectations =
+        fromIterable(this.injectExpectationRepository.findAllById(inputs.keySet()));
+    Map<String, InjectExpectation> expectationsToUpdate =
+        injectExpectations.stream().collect(Collectors.toMap(InjectExpectation::getId, e -> e));
+
+    Collector collector =
+        this.collectorRepository
+            .findById(
+                inputs.values().stream()
+                    .findFirst()
+                    .orElseThrow(ElementNotFoundException::new)
+                    .getCollectorId())
+            .orElseThrow(ElementNotFoundException::new);
+
+    // Update inject expectation at agent level
+    for (Map.Entry<String, InjectExpectationUpdateInput> entry : inputs.entrySet()) {
+      String injectExpectationId = entry.getKey();
+      InjectExpectationUpdateInput input = entry.getValue();
+
+      InjectExpectation injectExpectation = expectationsToUpdate.get(injectExpectationId);
+      if (injectExpectation == null) {
+        log.severe("Inject expectation not found for ID: " + injectExpectationId);
+        continue;
+      }
+
+      injectExpectation =
+          this.computeExpectation(
+              injectExpectation,
+              collector.getId(),
+              COLLECTOR,
+              collector.getName(),
+              input.getResult(),
+              input.getIsSuccess(),
+              input.getMetadata());
+
+      Inject inject = injectExpectation.getInject();
+      // Compute potential expectations for asset
+      propagateUpdateToAssets(injectExpectation, inject, collector);
+      // Compute potential expectations for asset groups
+      propagateUpdateToAssetGroups(inject, collector);
+      // end of computing
+    }
   }
 
   private void propagateUpdateToAssets(
