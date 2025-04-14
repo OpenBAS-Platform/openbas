@@ -113,7 +113,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
               variant="h3"
               gutterBottom
             >
-              {t('Achitecture')}
+              {t('Architecture')}
             </Typography>
             <Typography
               variant="body2"
