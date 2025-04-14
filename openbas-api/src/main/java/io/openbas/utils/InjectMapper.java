@@ -230,10 +230,6 @@ public class InjectMapper {
   }
 
   public InjectSimple toInjectSimple(Inject inject) {
-    return InjectSimple.builder()
-        .id(inject.getId())
-        .title(inject.getTitle())
-        .tags(inject.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet()))
-        .build();
+    return InjectSimple.builder().id(inject.getId()).title(inject.getTitle()).build();
   }
 }

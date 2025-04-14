@@ -8,11 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.util.*;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 @Builder
 @JsonInclude(NON_NULL)
 public class InjectSimple {
@@ -26,8 +24,4 @@ public class InjectSimple {
   @JsonProperty("inject_title")
   @NotBlank
   private String title;
-
-  @Schema(description = "Tags")
-  @JsonProperty("inject_tags")
-  private Set<String> tags;
 }

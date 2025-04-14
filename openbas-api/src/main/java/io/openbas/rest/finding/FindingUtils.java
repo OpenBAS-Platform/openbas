@@ -140,6 +140,7 @@ public class FindingUtils {
       io.openbas.database.model.ContractOutputElement contractOutputElement,
       String finalValue) {
     try {
+
       Optional<Finding> optionalFinding =
           findingRepository.findByInjectIdAndValueAndTypeAndKey(
               inject.getId(),
@@ -172,7 +173,31 @@ public class FindingUtils {
       }
 
     } catch (DataIntegrityViolationException ex) {
-      log.log(Level.INFO, "Finding already saved in DDBB.", ex);
+      log.log(Level.INFO, "Race condition: finding already exists. Retrying ...", ex.getMessage());
+      // Re-fetch and try to add the asset
+      handleRaceCondition(inject, asset, contractOutputElement, finalValue);
+    }
+  }
+
+  private void handleRaceCondition(
+      Inject inject, Asset asset, ContractOutputElement contractOutputElement, String finalValue) {
+    Optional<Finding> retryFinding =
+        findingRepository.findByInjectIdAndValueAndTypeAndKey(
+            inject.getId(),
+            finalValue,
+            contractOutputElement.getType(),
+            contractOutputElement.getKey());
+
+    if (retryFinding.isPresent()) {
+      Finding existingFinding = retryFinding.get();
+      boolean isNewAsset =
+          existingFinding.getAssets().stream().noneMatch(a -> a.getId().equals(asset.getId()));
+      if (isNewAsset) {
+        existingFinding.getAssets().add(asset);
+        findingRepository.save(existingFinding);
+      }
+    } else {
+      log.warning("Retry failed: Finding still not found after race condition.");
     }
   }
 

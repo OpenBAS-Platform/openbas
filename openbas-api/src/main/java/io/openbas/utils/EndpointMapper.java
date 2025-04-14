@@ -34,11 +34,7 @@ public class EndpointMapper {
   }
 
   public EndpointSimple toEndpointSimple(Asset asset) {
-    return EndpointSimple.builder()
-        .id(asset.getId())
-        .name(asset.getName())
-        .tags(asset.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
-        .build();
+    return EndpointSimple.builder().id(asset.getId()).name(asset.getName()).build();
   }
 
   public EndpointOverviewOutput toEndpointOverviewOutput(Endpoint endpoint) {

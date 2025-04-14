@@ -52,11 +52,13 @@ class FindingApiTest extends IntegrationTest {
   private AssetGroup savedAssetGroup;
   private Endpoint savedEndpoint;
   private InjectComposer.Composer injectComposer1;
+  private ExerciseComposer.Composer simulationComposer1;
   private EndpointComposer.Composer endpointComposer1;
 
   @BeforeEach
   void setup() {
     injectComposer1 = injectComposer.forInject(InjectFixture.getDefaultInject());
+    simulationComposer1 = simulationComposer.forExercise(ExerciseFixture.getExercise());
 
     savedSimulation =
         simulationComposer
@@ -68,7 +70,7 @@ class FindingApiTest extends IntegrationTest {
     savedScenario =
         scenarioComposer
             .forScenario(ScenarioFixture.getScenario())
-            .withInject(injectComposer1)
+            .withSimulation(simulationComposer1)
             .persist()
             .get();
 
