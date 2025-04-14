@@ -44,10 +44,9 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
 
     public Composer withSimulation(ExerciseComposer.Composer simulationComposer) {
       simulationComposers.add(simulationComposer);
-      List<Exercise> tempSimulations = new ArrayList<>(this.scenario.getExercises());
-      simulationComposer.get().setScenario(scenario);
-      tempSimulations.add(simulationComposer.get());
-      this.scenario.setExercises(tempSimulations);
+      List<Exercise> simulations = this.scenario.getExercises();
+      simulations.add(simulationComposer.get());
+      this.scenario.setExercises(simulations);
       return this;
     }
 
@@ -64,6 +63,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
     public Composer persist() {
       articleComposers.forEach(ArticleComposer.Composer::persist);
       injectComposers.forEach(InjectComposer.Composer::persist);
+      simulationComposers.forEach(ExerciseComposer.Composer::persist);
       scenarioRepository.save(scenario);
       scenarioService.createScenario(scenario);
       return this;
@@ -73,6 +73,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
     public Composer delete() {
       articleComposers.forEach(ArticleComposer.Composer::delete);
       injectComposers.forEach(InjectComposer.Composer::delete);
+      simulationComposers.forEach(ExerciseComposer.Composer::delete);
       scenarioRepository.delete(scenario);
       return this;
     }

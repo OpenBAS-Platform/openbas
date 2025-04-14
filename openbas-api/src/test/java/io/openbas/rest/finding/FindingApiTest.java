@@ -15,6 +15,7 @@ import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -47,6 +48,7 @@ class FindingApiTest extends IntegrationTest {
   @Autowired private ExerciseComposer simulationComposer;
   @Autowired private AgentComposer agentComposer;
   @Autowired private TagComposer tagComposer;
+  @Autowired private EntityManager entityManager;
   private Exercise savedSimulation;
   private Scenario savedScenario;
   private AssetGroup savedAssetGroup;
@@ -58,9 +60,11 @@ class FindingApiTest extends IntegrationTest {
   @BeforeEach
   void setup() {
     injectComposer1 = injectComposer.forInject(InjectFixture.getDefaultInject());
-    simulationComposer1 = simulationComposer.forExercise(ExerciseFixture.createDefaultExercise());
 
-    savedSimulation = simulationComposer1.withInject(injectComposer1).persist().get();
+    simulationComposer1 =
+        simulationComposer
+            .forExercise(ExerciseFixture.createRunningAttackExercise())
+            .withInject(injectComposer1);
 
     savedScenario =
         scenarioComposer
@@ -68,6 +72,8 @@ class FindingApiTest extends IntegrationTest {
             .withSimulation(simulationComposer1)
             .persist()
             .get();
+
+    savedSimulation = savedScenario.getExercises().getFirst();
 
     endpointComposer1 = endpointComposer.forEndpoint(EndpointFixture.createEndpoint());
 
@@ -105,6 +111,9 @@ class FindingApiTest extends IntegrationTest {
             savedScenario,
             savedEndpoint,
             savedAssetGroup);
+
+    entityManager.flush();
+    entityManager.clear();
 
     performCallbackRequest(FINDING_URI + "/search", input)
         .andExpect(jsonPath("$.content.[0].finding_type").value(savedFinding.getType().label))
@@ -161,6 +170,7 @@ class FindingApiTest extends IntegrationTest {
             .withTag(tagComposer.forTag(TagFixture.getTagWithText("Finding")))
             .persist()
             .get();
+
     SearchPaginationInput input =
         buildDefaultFilters(
             ContractOutputType.Credentials,
@@ -170,6 +180,9 @@ class FindingApiTest extends IntegrationTest {
             savedScenario,
             savedEndpoint,
             savedAssetGroup);
+
+    entityManager.flush();
+    entityManager.clear();
 
     performCallbackRequest(FINDING_URI + "/scenarios/" + savedScenario.getId() + "/search", input)
         .andExpect(

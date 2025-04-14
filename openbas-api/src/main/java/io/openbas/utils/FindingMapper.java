@@ -1,6 +1,7 @@
 package io.openbas.utils;
 
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Finding;
 import io.openbas.rest.finding.form.FindingOutput;
 import java.util.Optional;
@@ -42,7 +43,8 @@ public class FindingMapper {
                 .map(exercise -> exerciseMapper.toExerciseSimple(exercise))
                 .orElse(null))
         .scenario(
-            Optional.ofNullable(finding.getInject().getScenario())
+            Optional.ofNullable(finding.getInject().getExercise())
+                .map(Exercise::getScenario)
                 .map(scenario -> scenarioMapper.toScenarioSimple(scenario))
                 .orElse(null))
         .tagIds(finding.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet()))
