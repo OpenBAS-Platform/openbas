@@ -70,7 +70,7 @@ public class FindingApi extends RestBehavior {
   }
 
   @PostMapping("/scenarios/{scenarioId}/search")
-  @PreAuthorize("isScenarioPlanner(#scenarioId)")
+  @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Page<FindingOutput> findingsByScenario(
       @PathVariable @NotNull final String scenarioId,
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
