@@ -5,8 +5,7 @@ import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
 import static io.openbas.utils.fixtures.OutputParserFixture.getDefaultContractOutputElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
@@ -310,15 +309,6 @@ class FindingUtilsTest {
 
     findingUtils.buildFinding(inject, asset1, contractOutputElement, value);
 
-    // Capture the saved Finding
-    ArgumentCaptor<Finding> findingCaptor = ArgumentCaptor.forClass(Finding.class);
-    verify(findingRepository).save(findingCaptor.capture());
-
-    Finding capturedFinding = findingCaptor.getValue();
-
-    assertEquals(
-        1, capturedFinding.getAssets().size(), "There should be exactly one asset in the finding");
-    Asset onlyAsset = capturedFinding.getAssets().iterator().next();
-    assertEquals(ASSET_1, onlyAsset.getId());
+    verify(findingRepository, never()).save(any());
   }
 }
