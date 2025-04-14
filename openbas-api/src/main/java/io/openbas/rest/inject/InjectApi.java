@@ -3,7 +3,6 @@ package io.openbas.rest.inject;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.specification.CommunicationSpecification.fromInject;
-import static io.openbas.database.specification.InjectSpecification.byTitle;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.rest.exercise.ExerciseApi.EXERCISE_URI;
@@ -44,6 +43,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -600,12 +600,14 @@ public class InjectApi extends RestBehavior {
   }
 
   // -- OPTION --
-  @GetMapping(INJECT_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(
-      @RequestParam(required = false) final String searchText) {
-    return fromIterable(
-            this.injectRepository.findAll(
-                byTitle(searchText), Sort.by(Sort.Direction.ASC, "title")))
+
+  @GetMapping(INJECT_URI + "/findings/options")
+  public List<FilterUtilsJpa.Option> optionsByTitleLinkedToFindings(
+      @RequestParam(required = false) final String searchText,
+      @RequestParam(required = false) final String simulationOrScenarioId) {
+    return injectRepository
+        .findAllBySimulationOrScenarioIdAndTitleLinkedToFindings(
+            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
         .stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle()))
         .toList();

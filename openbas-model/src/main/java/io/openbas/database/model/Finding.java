@@ -16,10 +16,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -41,7 +38,7 @@ public class Finding implements Base {
   @NotBlank
   private String id;
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "finding_field", nullable = false)
   @JsonProperty("finding_field")
   @NotBlank
@@ -54,7 +51,7 @@ public class Finding implements Base {
   @NotNull
   protected ContractOutputType type;
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "finding_value", nullable = false)
   @JsonProperty("finding_value")
   @NotBlank
@@ -66,7 +63,7 @@ public class Finding implements Base {
   @JsonProperty("finding_labels")
   private String[] labels;
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "finding_name")
   @JsonProperty("finding_name")
   protected String name;
@@ -89,7 +86,7 @@ public class Finding implements Base {
   @JsonProperty("finding_inject_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @Schema(type = "string")
-  @Queryable(filterable = true, sortable = true, path = "inject.id")
+  @Queryable(filterable = true, dynamicValues = true, sortable = true, path = "inject.id")
   private Inject inject;
 
   // -- AUDIT --
@@ -147,9 +144,11 @@ public class Finding implements Base {
   }
 
   @JsonProperty("finding_scenario")
-  @Queryable(filterable = true, dynamicValues = true, path = "inject.scenario.id")
+  @Queryable(filterable = true, dynamicValues = true, path = "inject.exercise.scenario.id")
   public Scenario getScenario() {
-    return getInject().getScenario();
+    return Optional.ofNullable(getInject().getExercise())
+        .map(exercise -> exercise.getScenario())
+        .orElse(null);
   }
 
   @JsonProperty("finding_asset_groups")

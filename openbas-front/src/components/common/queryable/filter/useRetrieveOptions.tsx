@@ -11,6 +11,7 @@ import { searchScenarioByIdAsOption } from '../../../../actions/scenarios/scenar
 import { searchTagByIdAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamByIdAsOption } from '../../../../actions/teams/team-actions';
 import { type Option } from '../../../../utils/Option';
+import { searchInjectByIdAsOption } from '../../../../actions/injects/inject-action';
 
 const useRetrieveOptions = () => {
   const [options, setOptions] = useState<Option[]>([]);
@@ -49,6 +50,7 @@ const useRetrieveOptions = () => {
           setOptions(response.data);
         });
         break;
+      case 'finding_asset_groups':
       case 'inject_asset_groups':
         searchAssetGroupByIdAsOption(ids).then((response) => {
           setOptions(response.data);
@@ -62,6 +64,11 @@ const useRetrieveOptions = () => {
         break;
       case 'inject_teams':
         searchTeamByIdAsOption(ids).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'finding_inject_id':
+        searchInjectByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
         break;

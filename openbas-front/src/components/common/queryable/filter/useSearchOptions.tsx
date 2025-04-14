@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { searchAssetGroupAsOption } from '../../../../actions/asset_groups/assetgroup-action';
+import { searchAssetGroupAsOption, searchAssetGroupLinkedToFindingsAsOption } from '../../../../actions/asset_groups/assetgroup-action';
 import { searchEndpointAsOption } from '../../../../actions/assets/endpoint-actions';
 import { searchAttackPatternsByNameAsOption } from '../../../../actions/AttackPattern';
 import { searchExerciseAsOption } from '../../../../actions/exercises/exercise-action';
@@ -12,6 +12,7 @@ import { searchTagAsOption } from '../../../../actions/tags/tag-action';
 import { searchTeamsAsOption } from '../../../../actions/teams/team-actions';
 import { type Option } from '../../../../utils/Option';
 import { useFormatter } from '../../../i18n';
+import { searchInjectLinkedToFindingsAsOption } from '../../../../actions/injects/inject-action';
 
 const useSearchOptions = () => {
   // Standard hooks
@@ -54,6 +55,10 @@ const useSearchOptions = () => {
         });
         break;
       case 'finding_asset_groups':
+        searchAssetGroupLinkedToFindingsAsOption(search, contextId).then((response) => {
+          setOptions(response.data);
+        });
+        break;
       case 'inject_asset_groups':
         searchAssetGroupAsOption(search, contextId).then((response) => {
           setOptions(response.data);
@@ -67,6 +72,11 @@ const useSearchOptions = () => {
         break;
       case 'inject_teams':
         searchTeamsAsOption(search, contextId).then((response) => {
+          setOptions(response.data);
+        });
+        break;
+      case 'finding_inject_id':
+        searchInjectLinkedToFindingsAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });
         break;

@@ -13,6 +13,7 @@ const ScenarioFindings = () => {
 
   const additionalFilterNames = [
     'finding_assets',
+    'finding_asset_groups',
     'finding_inject_id',
     'finding_simulation',
   ];

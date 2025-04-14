@@ -4,6 +4,7 @@ import static io.openbas.utils.fixtures.AssetFixture.createDefaultAsset;
 import static io.openbas.utils.fixtures.InjectFixture.getDefaultInject;
 import static io.openbas.utils.fixtures.OutputParserFixture.getDefaultContractOutputElement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.openbas.database.model.*;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -264,12 +266,14 @@ class FindingUtilsTest {
     finding1.setValue(value);
     finding1.getAssets().add(asset1);
 
-    when(findingRepository.findByInjectIdAndValue(inject.getId(), value))
+    when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
+            inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
-    Finding updatedFinding =
-        findingUtils.buildFinding(inject, asset2, contractOutputElement, value);
-    assertEquals(2, updatedFinding.getAssets().size());
+    ArgumentCaptor<Finding> findingCaptor = ArgumentCaptor.forClass(Finding.class);
+    verify(findingUtils).buildFinding(inject, asset2, contractOutputElement, value);
+    Finding capturedFinding = findingCaptor.getValue();
+    assertEquals(2, capturedFinding.getAssets().size());
   }
 
   @Test
@@ -285,11 +289,13 @@ class FindingUtilsTest {
     finding1.setValue(value);
     finding1.getAssets().add(asset1);
 
-    when(findingRepository.findByInjectIdAndValue(inject.getId(), value))
+    when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
+            inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
         .thenReturn(Optional.of(finding1));
 
-    Finding updatedFinding =
-        findingUtils.buildFinding(inject, asset1, contractOutputElement, value);
-    assertEquals(1, updatedFinding.getAssets().size());
+    ArgumentCaptor<Finding> findingCaptor = ArgumentCaptor.forClass(Finding.class);
+    verify(findingUtils).buildFinding(inject, asset1, contractOutputElement, value);
+    Finding capturedFinding = findingCaptor.getValue();
+    assertEquals(1, capturedFinding.getAssets().size());
   }
 }

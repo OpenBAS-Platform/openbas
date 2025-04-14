@@ -159,7 +159,7 @@ public class InjectStatusService {
       // -- FINDINGS --
       findingService.computeFindings(input, inject, agent);
 
-    } catch (Exception e) {
+    } catch (ElementNotFoundException e) {
       log.log(Level.SEVERE, e.getMessage());
       if (inject != null) {
         inject

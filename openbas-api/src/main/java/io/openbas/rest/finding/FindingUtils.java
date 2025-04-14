@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 @Log
@@ -20,12 +21,11 @@ public class FindingUtils {
 
   private final FindingRepository findingRepository;
 
-  public List<Finding> computeFindingUsingRegexRules(
+  public void computeFindingUsingRegexRules(
       Inject inject,
       Asset asset,
       String rawOutputByMode,
       Set<io.openbas.database.model.ContractOutputElement> contractOutputElements) {
-    List<Finding> findings = new ArrayList<>();
     Map<String, Pattern> patternCache = new HashMap<>();
 
     contractOutputElements.stream()
@@ -47,13 +47,10 @@ public class FindingUtils {
               while (matcher.find()) {
                 String finalValue = buildValue(contractOutputElement, matcher);
                 if (isValid(finalValue)) {
-                  Finding finding = buildFinding(inject, asset, contractOutputElement, finalValue);
-                  findings.add(finding);
+                  buildFinding(inject, asset, contractOutputElement, finalValue);
                 }
               }
             });
-
-    return findings;
   }
 
   private static boolean isValid(String finalValue) {
@@ -137,34 +134,46 @@ public class FindingUtils {
     return extractedValues;
   }
 
-  public Finding buildFinding(
+  public void buildFinding(
       Inject inject,
       Asset asset,
       io.openbas.database.model.ContractOutputElement contractOutputElement,
       String finalValue) {
-    Optional<Finding> optionalFinding =
-        findingRepository.findByInjectIdAndValue(inject.getId(), finalValue);
+    try {
+      Optional<Finding> optionalFinding =
+          findingRepository.findByInjectIdAndValueAndTypeAndKey(
+              inject.getId(),
+              finalValue,
+              contractOutputElement.getType(),
+              contractOutputElement.getKey());
 
-    Finding finding =
-        optionalFinding.orElseGet(
-            () -> {
-              Finding newFinding = new Finding();
-              newFinding.setInject(inject);
-              newFinding.setField(contractOutputElement.getKey());
-              newFinding.setType(contractOutputElement.getType());
-              newFinding.setValue(finalValue);
-              newFinding.setName(contractOutputElement.getName());
-              newFinding.setTags(new HashSet<>(contractOutputElement.getTags()));
-              return newFinding;
-            });
+      Finding finding =
+          optionalFinding.orElseGet(
+              () -> {
+                Finding newFinding = new Finding();
+                newFinding.setInject(inject);
+                newFinding.setField(contractOutputElement.getKey());
+                newFinding.setType(contractOutputElement.getType());
+                newFinding.setValue(finalValue);
+                newFinding.setName(contractOutputElement.getName());
+                newFinding.setTags(new HashSet<>(contractOutputElement.getTags()));
+                return newFinding;
+              });
 
-    boolean isNewAsset =
-        finding.getAssets().stream().noneMatch(a -> a.getId().equals(asset.getId()));
+      boolean isNewAsset =
+          finding.getAssets().stream().noneMatch(a -> a.getId().equals(asset.getId()));
 
-    if (isNewAsset) {
-      finding.getAssets().add(asset);
+      if (isNewAsset) {
+        finding.getAssets().add(asset);
+      }
+
+      if (optionalFinding.isEmpty() || isNewAsset) {
+        findingRepository.save(finding);
+      }
+
+    } catch (DataIntegrityViolationException ex) {
+      log.log(Level.INFO, "Finding already saved in DDBB.", ex);
     }
-    return finding;
   }
 
   private String formatFinalValue(

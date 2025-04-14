@@ -367,6 +367,7 @@ public class ExerciseApi extends RestBehavior {
   }
 
   // -- OPTION --
+
   @GetMapping(EXERCISE_URI + "/options")
   public List<FilterUtilsJpa.Option> optionsByName(
       @RequestParam(required = false) final String searchText) {

@@ -10,6 +10,7 @@ const AtomicTestingFindings: FunctionComponent = () => {
 
   const additionalFilterNames = [
     'finding_assets',
+    'finding_asset_groups',
   ];
 
   const search = (input: SearchPaginationInput) => {
