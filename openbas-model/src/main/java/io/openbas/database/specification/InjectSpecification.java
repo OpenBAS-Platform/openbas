@@ -3,7 +3,6 @@ package io.openbas.database.specification;
 import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.model.ExerciseStatus;
 import io.openbas.database.model.Inject;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotBlank;
