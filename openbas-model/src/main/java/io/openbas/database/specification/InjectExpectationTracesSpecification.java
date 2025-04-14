@@ -2,9 +2,8 @@ package io.openbas.database.specification;
 
 import io.openbas.database.model.InjectExpectationTrace;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.data.jpa.domain.Specification;
-
 import java.time.Instant;
+import org.springframework.data.jpa.domain.Specification;
 
 public class InjectExpectationTracesSpecification {
 

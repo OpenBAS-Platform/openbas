@@ -2,8 +2,7 @@ package io.openbas.rest;
 
 import static io.openbas.rest.inject_expectation_trace.InjectExpectationTraceApi.INJECT_EXPECTATION_TRACES_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -14,12 +13,14 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.SecurityPlatform.SECURITY_PLATFORM_TYPE;
 import io.openbas.database.repository.*;
 import io.openbas.helper.StreamHelper;
+import io.openbas.rest.inject_expectation_trace.form.BulkInjectExpectationTraceInput;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
 import io.openbas.utils.fixtures.AssetFixture;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
 import io.openbas.utils.fixtures.InjectFixture;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.*;
@@ -47,6 +48,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
   private SecurityPlatform savedSecurityPlatform;
   private InjectExpectationTrace savedInjectExpectationTrace1;
   private InjectExpectationTrace savedInjectExpectationTrace2;
+  private InjectExpectationTrace savedInjectExpectationTrace3Dupe;
 
   @BeforeEach
   void beforeEach() {
@@ -78,7 +80,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     InjectExpectationTrace iet1 = new InjectExpectationTrace();
     iet1.setInjectExpectation(savedInjectExpectation);
     iet1.setSecurityPlatform(savedSecurityPlatform);
-    iet1.setAlertDate(Instant.now());
+    iet1.setAlertDate(Instant.now().minus(1, ChronoUnit.SECONDS));
     iet1.setAlertLink("http://test-link.com");
     iet1.setAlertName("Test Alert 1");
     savedInjectExpectationTrace1 = injectExpectationTraceRepository.save(iet1);
@@ -86,10 +88,19 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     InjectExpectationTrace iet2 = new InjectExpectationTrace();
     iet2.setInjectExpectation(savedInjectExpectation);
     iet2.setSecurityPlatform(savedSecurityPlatform);
-    iet2.setAlertDate(Instant.now());
+    iet2.setAlertDate(Instant.now().minus(1, ChronoUnit.SECONDS));
     iet2.setAlertLink("http://test-link.com");
     iet2.setAlertName("Test Alert 2");
     savedInjectExpectationTrace2 = injectExpectationTraceRepository.save(iet2);
+
+    // Insert input3 duplicate
+    savedInjectExpectationTrace3Dupe = new InjectExpectationTrace();
+    savedInjectExpectationTrace3Dupe.setInjectExpectation(savedInjectExpectation);
+    savedInjectExpectationTrace3Dupe.setAlertDate(Instant.now());
+    savedInjectExpectationTrace3Dupe.setAlertLink("http://fake-link.com");
+    savedInjectExpectationTrace3Dupe.setSecurityPlatform(savedSecurityPlatform);
+    savedInjectExpectationTrace3Dupe.setAlertName("Test Alert Bulk 3 for duplicate test");
+    injectExpectationTraceRepository.save(savedInjectExpectationTrace3Dupe);
   }
 
   @DisplayName("Create an inject expectation trace for a collector")
@@ -178,7 +189,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(2, Integer.parseInt(response));
+    assertEquals(3, Integer.parseInt(response));
   }
 
   @DisplayName(
@@ -226,7 +237,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(2, Integer.parseInt(response));
+    assertEquals(3, Integer.parseInt(response));
   }
 
   @DisplayName("Bulk insert of 1 inject expectation trace for a collector")
@@ -241,25 +252,39 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     input.setSourceId(savedCollector.getId());
     input.setAlertName("Test Alert Bulk");
 
-    List<InjectExpectationTraceInput> inputs = List.of(input);
+    BulkInjectExpectationTraceInput inputBulk = new BulkInjectExpectationTraceInput();
+    inputBulk.setExpectationTraces(List.of(input));
 
     // --EXECUTE--
     mvc.perform(
-                    post(INJECT_EXPECTATION_TRACES_URI + "/bulk")
-                            .content(asJsonString(inputs))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn();
+            post(INJECT_EXPECTATION_TRACES_URI + "/bulk")
+                .content(asJsonString(inputBulk))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn();
 
     // --ASSERT--
-    List<InjectExpectationTrace> results = StreamHelper.fromIterable(injectExpectationTraceRepository.findAll((root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.like(root.get("alertName"), "%Bulk%"))));
+    List<InjectExpectationTrace> results =
+        StreamHelper.fromIterable(
+            injectExpectationTraceRepository.findAll(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.and(criteriaBuilder.like(root.get("alertName"), "%Bulk%"))));
     assertFalse(results.isEmpty());
-    assertEquals(1, results.size());
-    assertEquals(input.getAlertName(), results.get(0).getAlertName());
+    assertEquals(2, results.size());
+    assertTrue(
+        results.stream()
+            .anyMatch(
+                injectExpectationTrace ->
+                    savedInjectExpectationTrace3Dupe
+                        .getAlertName()
+                        .equals(injectExpectationTrace.getAlertName())));
+    assertTrue(
+        results.stream()
+            .anyMatch(
+                injectExpectationTrace ->
+                    input.getAlertName().equals(injectExpectationTrace.getAlertName())));
   }
-
-
 
   @DisplayName("Bulk insert of multiple inject expectation trace for a collector")
   @Test
@@ -280,21 +305,26 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     input2.setSourceId(savedCollector.getId());
     input2.setAlertName("Test Alert Bulk 2");
 
-    List<InjectExpectationTraceInput> inputs = List.of(input, input2);
+    BulkInjectExpectationTraceInput inputBulk = new BulkInjectExpectationTraceInput();
+    inputBulk.setExpectationTraces(List.of(input, input2));
 
     // --EXECUTE--
     mvc.perform(
-                    post(INJECT_EXPECTATION_TRACES_URI + "/bulk")
-                            .content(asJsonString(inputs))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn();
+            post(INJECT_EXPECTATION_TRACES_URI + "/bulk")
+                .content(asJsonString(inputBulk))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn();
 
     // --ASSERT--
-    List<InjectExpectationTrace> results = StreamHelper.fromIterable(injectExpectationTraceRepository.findAll((root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.like(root.get("alertName"), "%Bulk%"))));
+    List<InjectExpectationTrace> results =
+        StreamHelper.fromIterable(
+            injectExpectationTraceRepository.findAll(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.and(criteriaBuilder.like(root.get("alertName"), "%Bulk%"))));
     assertFalse(results.isEmpty());
-    assertEquals(2, results.size());
+    assertEquals(3, results.size());
   }
 
   @DisplayName("Bulk insert inject expectation traces for a collector with duplicates")
@@ -317,35 +347,40 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     input2.setAlertName("Test Alert Bulk 2");
 
     InjectExpectationTraceInput input3 = new InjectExpectationTraceInput();
-    input3.setInjectExpectationId(savedInjectExpectation.getId());
-    input3.setAlertDate(Instant.now());
-    input3.setAlertLink("http://fake-link.com");
-    input3.setSourceId(savedCollector.getId());
-    input3.setAlertName("Test Alert Bulk 3");
-    // Insert input3 duplicate
-    InjectExpectationTrace input3dupe = new InjectExpectationTrace();
-    input3dupe.setInjectExpectation(savedInjectExpectation);
-    input3dupe.setAlertDate(input3.getAlertDate());
-    input3dupe.setAlertLink(input3.getAlertLink());
-    input3dupe.setAlertName(input3.getAlertName());
-    input3dupe.setSecurityPlatform(savedSecurityPlatform);
-    injectExpectationTraceRepository.save(input3dupe);
+    input3.setInjectExpectationId(savedInjectExpectationTrace3Dupe.getInjectExpectation().getId());
+    input3.setAlertDate(savedInjectExpectationTrace3Dupe.getAlertDate());
+    input3.setAlertLink(savedInjectExpectationTrace3Dupe.getAlertLink());
+    input3.setSourceId(savedInjectExpectationTrace3Dupe.getSecurityPlatform().getId());
+    input3.setAlertName(savedInjectExpectationTrace3Dupe.getAlertName());
 
-    List<InjectExpectationTraceInput> inputs = List.of(input, input2, input3);
+    BulkInjectExpectationTraceInput inputBulk = new BulkInjectExpectationTraceInput();
+    inputBulk.setExpectationTraces(List.of(input, input2, input3));
 
     // --EXECUTE--
     mvc.perform(
-                    post(INJECT_EXPECTATION_TRACES_URI + "/bulk")
-                            .content(asJsonString(inputs))
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn();
+            post(INJECT_EXPECTATION_TRACES_URI + "/bulk")
+                .content(asJsonString(inputBulk))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().is2xxSuccessful())
+        .andReturn();
 
     // --ASSERT--
-    List<InjectExpectationTrace> results = StreamHelper.fromIterable(injectExpectationTraceRepository.findAll((root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.like(root.get("alertName"), "%Bulk%"))));
+    List<InjectExpectationTrace> results =
+        StreamHelper.fromIterable(
+            injectExpectationTraceRepository.findAll(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.and(criteriaBuilder.like(root.get("alertName"), "%Bulk%"))));
     assertFalse(results.isEmpty());
     assertEquals(3, results.size());
-    assertEquals(1, results.stream().filter(injectExpectationTrace -> injectExpectationTrace.getAlertName().equals("Test Alert Bulk 3")).count());
+    assertEquals(
+        1,
+        results.stream()
+            .filter(
+                injectExpectationTrace ->
+                    injectExpectationTrace
+                        .getAlertName()
+                        .equals(savedInjectExpectationTrace3Dupe.getAlertName()))
+            .count());
   }
 }
