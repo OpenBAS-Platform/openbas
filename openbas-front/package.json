@@ -108,7 +108,7 @@
     "jsdom": "26.0.0",
     "monocart-coverage-reports": "2.12.3",
     "monocart-reporter": "2.9.17",
-    "swagger-typescript-api": "13.1.0",
+    "swagger-typescript-api": "13.1.1",
     "typescript": "5.8.3",
     "typescript-eslint": "8.29.1",
     "vite": "6.2.4",
