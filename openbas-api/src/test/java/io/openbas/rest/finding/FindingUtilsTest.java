@@ -269,7 +269,7 @@ class FindingUtilsTest {
     finding1.setInject(inject);
     finding1.setField(contractOutputElement.getKey());
     finding1.setType(contractOutputElement.getType());
-    finding1.setAssets(List.of(asset1));
+    finding1.setAssets(new ArrayList<>(Arrays.asList(asset1)));
 
     when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
@@ -302,7 +302,7 @@ class FindingUtilsTest {
     finding1.setInject(inject);
     finding1.setField(contractOutputElement.getKey());
     finding1.setType(contractOutputElement.getType());
-    finding1.setAssets(List.of(asset1));
+    finding1.setAssets(new ArrayList<>(Arrays.asList(asset1)));
 
     when(findingRepository.findByInjectIdAndValueAndTypeAndKey(
             inject.getId(), value, contractOutputElement.getType(), contractOutputElement.getKey()))
