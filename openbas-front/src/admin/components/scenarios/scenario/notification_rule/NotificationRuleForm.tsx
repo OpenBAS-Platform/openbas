@@ -33,7 +33,7 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
   initialValues = {
     trigger: 'difference',
     notification_type: 'mail',
-    subject: '',
+    subject: { scenarioName }.scenarioName + ' - alert',
   },
   handleClose,
 }) => {
@@ -106,7 +106,7 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
           style={{ marginRight: 10 }}
           disabled={isSubmitting}
         >
-          {t('Cancel')}
+          {editing ? t('Delete') : t('Cancel')}
         </Button>
         <Button
           variant="contained"
