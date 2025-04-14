@@ -58,18 +58,13 @@ class FindingApiTest extends IntegrationTest {
   @BeforeEach
   void setup() {
     injectComposer1 = injectComposer.forInject(InjectFixture.getDefaultInject());
-    simulationComposer1 = simulationComposer.forExercise(ExerciseFixture.getExercise());
+    simulationComposer1 = simulationComposer.forExercise(ExerciseFixture.createDefaultExercise());
 
-    savedSimulation =
-        simulationComposer
-            .forExercise(ExerciseFixture.createDefaultExercise())
-            .withInject(injectComposer1)
-            .persist()
-            .get();
+    savedSimulation = simulationComposer1.withInject(injectComposer1).persist().get();
 
     savedScenario =
         scenarioComposer
-            .forScenario(ScenarioFixture.getScenario())
+            .forScenario(ScenarioFixture.createDefaultCrisisScenario())
             .withSimulation(simulationComposer1)
             .persist()
             .get();
