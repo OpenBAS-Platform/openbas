@@ -4038,17 +4038,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.8.3":
-  version: 1.8.3
-  resolution: "axios@npm:1.8.3"
-  dependencies:
-    follow-redirects: "npm:^1.15.6"
-    form-data: "npm:^4.0.0"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10c0/de75da9859adf0a6481d4af2b687db357a054d20f0d69b99d502b71dae3578326b1fdc0951dabaef769827484941cda93d3f89150bf9e04f05f6615fb8316780
-  languageName: node
-  linkType: hard
-
 "axios@npm:1.8.4":
   version: 1.8.4
   resolution: "axios@npm:1.8.4"
@@ -7012,7 +7001,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:2.5.2, html-entities@npm:^2.5.2":
+"html-entities@npm:2.6.0":
+  version: 2.6.0
+  resolution: "html-entities@npm:2.6.0"
+  checksum: 10c0/7c8b15d9ea0cd00dc9279f61bab002ba6ca8a7a0f3c36ed2db3530a67a9621c017830d1d2c1c65beb9b8e3436ea663e9cf8b230472e0e413359399413b27c8b7
+  languageName: node
+  linkType: hard
+
+"html-entities@npm:^2.5.2":
   version: 2.5.2
   resolution: "html-entities@npm:2.5.2"
   checksum: 10c0/f20ffb4326606245c439c231de40a7c560607f639bf40ffbfb36b4c70729fd95d7964209045f1a4e62fe17f2364cef3d6e49b02ea09016f207fde51c2211e481
@@ -7200,21 +7196,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18n-auto-translation@npm:2.1.2":
-  version: 2.1.2
-  resolution: "i18n-auto-translation@npm:2.1.2"
+"i18n-auto-translation@npm:2.1.3":
+  version: 2.1.3
+  resolution: "i18n-auto-translation@npm:2.1.3"
   dependencies:
     "@google-cloud/translate": "npm:8.5.1"
-    axios: "npm:1.8.3"
+    axios: "npm:1.8.4"
     deep-object-diff: "npm:1.1.9"
     glob: "npm:11.0.1"
-    html-entities: "npm:2.5.2"
+    html-entities: "npm:2.6.0"
     just-extend: "npm:6.2.0"
     yargs: "npm:17.7.2"
     yocto-spinner: "npm:0.2.1"
   bin:
     i18n-auto-translation: dist/src/index.js
-  checksum: 10c0/0079cf6d75959cea3340a921277bfcf4b32da19966f0b91c49d45364482262421db76eb8126cab8c9cf02cb051fd38154433de7173c697f6ff4d10c8a4c88a04
+  checksum: 10c0/ecb54ac70ccec5313dec298cce895f6c1b40d9efbe06202c785b2e372b9fe71a472d5cd7fa242c3fb0bbd42105350ab467ad0ed18431340139abeeacc9ce9569
   languageName: node
   linkType: hard
 
@@ -9461,7 +9457,7 @@ __metadata:
     html-react-parser: "npm:5.2.3"
     html-to-image: "npm:1.11.13"
     http-proxy-middleware: "npm:3.0.5"
-    i18n-auto-translation: "npm:2.1.2"
+    i18n-auto-translation: "npm:2.1.3"
     js-file-download: "npm:0.4.12"
     jsdom: "npm:26.0.0"
     mdi-material-ui: "npm:7.9.4"
