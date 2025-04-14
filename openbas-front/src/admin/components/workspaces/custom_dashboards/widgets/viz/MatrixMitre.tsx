@@ -2,11 +2,11 @@ import { Close, OpenInFullOutlined } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, Fab, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
+import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../../../components/common/Transition';
 import { type EsSeries } from '../../../../../../utils/api-types';
 import MatrixMitreContent from './MatrixMitreContent';
-import { makeStyles } from 'tss-react/mui';
 
 const useStyles = makeStyles()(theme => ({
   headerFull: {

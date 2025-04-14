@@ -34,7 +34,7 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
   }
 
   const seriesData
-      = structuralVizData.map(({ label, data, color }) => {
+      = structuralVizData.map(({ label, data }) => {
         if (data) {
           return ({
             label,
@@ -46,8 +46,6 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
         }
         return [];
       });
-
-  console.log(structuralVizData, seriesData);
 
   switch (widget.widget_type) {
     case 'security-coverage':
