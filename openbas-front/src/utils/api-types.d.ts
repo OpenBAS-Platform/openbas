@@ -216,11 +216,6 @@ export interface AssetGroupSimple {
   asset_group_id: string;
   /** Asset group Name */
   asset_group_name: string;
-  /**
-   * Tags
-   * @uniqueItems true
-   */
-  asset_group_tags?: string[];
 }
 
 /** Full contract */
@@ -978,11 +973,6 @@ export interface EndpointSimple {
   asset_id: string;
   /** Asset name */
   asset_name: string;
-  /**
-   * Tags
-   * @uniqueItems true
-   */
-  asset_tags?: string[];
 }
 
 export interface EndpointUpdateInput {
@@ -2013,11 +2003,6 @@ export interface InjectResultOverviewOutput {
 export interface InjectSimple {
   /** Inject Id */
   inject_id: string;
-  /**
-   * Tags
-   * @uniqueItems true
-   */
-  inject_tags?: string[];
   /** Inject Title */
   inject_title: string;
 }
@@ -2515,6 +2500,30 @@ export interface LessonsTemplateQuestionInput {
   lessons_template_question_explanation?: string;
   /** @format int32 */
   lessons_template_question_order: number;
+}
+
+/** Platform licensing */
+export interface License {
+  license_creator?: string;
+  license_customer?: string;
+  /** @format date-time */
+  license_expiration_date?: string;
+  /** @format int64 */
+  license_extra_expiration_days?: number;
+  license_is_by_configuration?: boolean;
+  license_is_enterprise?: boolean;
+  license_is_expired?: boolean;
+  license_is_extra_expiration?: boolean;
+  license_is_global?: boolean;
+  license_is_platform_match?: boolean;
+  license_is_prevention?: boolean;
+  license_is_valid_cert?: boolean;
+  license_is_valid_product?: boolean;
+  license_is_validated?: boolean;
+  license_platform?: string;
+  /** @format date-time */
+  license_start_date?: string;
+  license_type?: "trial" | "nfr" | "standard" | "lts";
 }
 
 export interface Log {
@@ -3331,8 +3340,6 @@ export interface PayloadsDeprecateInput {
   payload_external_ids: string[];
 }
 
-export type BannerMessage = Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>
-
 export interface PlatformSettings {
   /** True if Saml2 is enabled */
   auth_saml2_enable?: boolean;
@@ -3401,19 +3408,19 @@ export interface PlatformSettings {
   /** Type of AI (mistralai or openai) */
   platform_ai_type?: string;
   /** Map of the messages to display on the screen by their level (the level available are DEBUG, INFO, WARN, ERROR, FATAL) */
-  platform_banner_by_level?: BannerMessage;
+  platform_banner_by_level?: Record<string, string[]>;
   /** Base URL of the platform */
   platform_base_url?: string;
   /** Definition of the dark theme */
   platform_dark_theme?: ThemeInput;
-  /** 'true' if the platform has Enterprise Edition activated */
-  platform_license: PlatformLicense;
-  /** Language of the platform */
-  platform_lang?: string;
-  /** Definition of the dark theme */
-  platform_light_theme?: ThemeInput;
   /** id of the platform */
   platform_id?: string;
+  /** Language of the platform */
+  platform_lang?: string;
+  /** Platform licensing */
+  platform_license?: License;
+  /** Definition of the dark theme */
+  platform_light_theme?: ThemeInput;
   /** Name of the platform */
   platform_name?: string;
   /** List of OpenID providers */
@@ -3904,7 +3911,8 @@ export interface SecurityPlatformUpsertInput {
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {
-  platform_enterprise_license: string;
+  /** cert of enterprise edition */
+  platform_enterprise_license?: string;
 }
 
 export interface SettingsPlatformWhitemarkUpdateInput {
@@ -4264,26 +4272,6 @@ export interface ThemeInput {
   primary_color?: string;
   /** Secondary color of the theme */
   secondary_color?: string;
-}
-
-export interface PlatformLicense {
-  license_is_enterprise: boolean
-  license_is_valid_cert: boolean
-  license_type: string
-  license_creator: string
-  license_is_valid_product: boolean
-  license_customer: string
-  license_platform: string
-  license_is_platform_match: boolean
-  license_is_global: boolean
-  license_is_expired: boolean
-  license_start_date: string
-  license_expiration_date: string
-  license_is_prevention: boolean
-  license_is_validated: boolean
-  license_is_by_configuration: boolean
-  license_is_extra_expiration: boolean
-  license_extra_expiration_days: number
 }
 
 export interface Token {

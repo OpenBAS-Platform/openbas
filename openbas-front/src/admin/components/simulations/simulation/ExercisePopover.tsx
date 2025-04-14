@@ -152,7 +152,6 @@ const ExercisePopover: FunctionComponent<ExercisePopoverProps> = ({
       exercise_description: data.exercise_description,
       exercise_main_focus: data.exercise_main_focus,
       exercise_tags: data.exercise_tags,
-      exercise_start_date: data.exercise_start_date,
       exercise_mails_reply_to: data.exercise_mails_reply_to,
       exercise_mail_from: data.exercise_mail_from,
       exercise_message_header: data.exercise_message_header,
