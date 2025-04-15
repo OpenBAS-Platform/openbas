@@ -687,35 +687,42 @@ const Injects: FunctionComponent<Props> = ({
             setPresetInjectDuration(0);
           }}
           />
-          <ToolBar
-            numberOfSelectedElements={numberOfSelectedElements}
-            totalNumberOfElements={queryableHelpers.paginationHelpers.getTotalElements()}
-            selectedElements={selectedElements}
-            deSelectedElements={deSelectedElements}
-            selectAll={selectAll}
-            handleClearSelectedElements={handleClearSelectedElements}
-            teamsFromExerciseOrScenario={teams}
-            id={exerciseOrScenarioId}
-            handleUpdate={massUpdateInjects}
-            handleBulkDelete={bulkDeleteInjects}
-            handleBulkTest={massTestInjects}
-            handleExport={handleExport}
-          />
-          <CreateInject
-            title={t('Create a new inject')}
-            open={openCreateDrawer}
-            handleClose={() => setOpenCreateDrawer(false)}
-            onCreateInject={onCreateInject}
-            presetInjectDuration={presetInjectDuration}
-            // @ts-expect-error typing
-            teamsFromExerciseOrScenario={teams}
-            articlesFromExerciseOrScenario={articles}
-            variablesFromExerciseOrScenario={variables}
-            uriVariable={uriVariable}
-            allUsersNumber={allUsersNumber}
-            usersNumber={usersNumber}
-            teamsUsers={teamsUsers}
-          />
+          {
+            numberOfSelectedElements > 0 && (
+              <ToolBar
+                numberOfSelectedElements={numberOfSelectedElements}
+                totalNumberOfElements={queryableHelpers.paginationHelpers.getTotalElements()}
+                selectedElements={selectedElements}
+                deSelectedElements={deSelectedElements}
+                selectAll={selectAll}
+                handleClearSelectedElements={handleClearSelectedElements}
+                teamsFromExerciseOrScenario={teams}
+                id={exerciseOrScenarioId}
+                handleUpdate={massUpdateInjects}
+                handleBulkDelete={bulkDeleteInjects}
+                handleBulkTest={massTestInjects}
+                handleExport={handleExport}
+              />
+            )
+          }
+          {openCreateDrawer
+            && (
+              <CreateInject
+                title={t('Create a new inject')}
+                open
+                handleClose={() => setOpenCreateDrawer(false)}
+                onCreateInject={onCreateInject}
+                presetInjectDuration={presetInjectDuration}
+                // @ts-expect-error typing
+                teamsFromExerciseOrScenario={teams}
+                articlesFromExerciseOrScenario={articles}
+                variablesFromExerciseOrScenario={variables}
+                uriVariable={uriVariable}
+                allUsersNumber={allUsersNumber}
+                usersNumber={usersNumber}
+                teamsUsers={teamsUsers}
+              />
+            )}
         </>
       )}
     </>
