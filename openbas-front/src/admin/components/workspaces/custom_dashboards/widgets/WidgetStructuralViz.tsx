@@ -6,9 +6,10 @@ import { series } from '../../../../../actions/dashboards/dashboard-action';
 import { useFormatter } from '../../../../../components/i18n';
 import Loader from '../../../../../components/Loader';
 import { type EsSeries, type Widget } from '../../../../../utils/api-types';
-import { verticalBarsChartOptions } from '../../../../../utils/Charts';
+import { donutChartOptions, verticalBarsChartOptions } from '../../../../../utils/Charts';
 import { isEmptyField, isNotEmptyField } from '../../../../../utils/utils';
-import MatrixMitre from './viz/MatrixMitre';
+import SecurityCoverage from './viz/SecurityCoverage';
+import { getWidgetTitle } from './WidgetUtils';
 
 interface WidgetStructuralVizProps { widget: Widget }
 
@@ -33,24 +34,26 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
     return <Loader variant="inElement" />;
   }
 
-  const seriesData: ApexAxisChartSeries | ApexNonAxisChartSeries
-      = structuralVizData.map(({ label, data }) => {
-        if (data) {
-          return ({
-            name: label,
-            data: data.map(n => ({
-              x: n.label,
-              y: n.value,
-            })),
-          });
-        }
-        return { data: [] };
+  const seriesData = structuralVizData.map(({ label, data }) => {
+    if (data) {
+      return ({
+        name: label,
+        data: data.map(n => ({
+          x: n.label || t('-'),
+          y: n.value,
+        })),
       });
+    }
+    return { data: [] };
+  });
 
   switch (widget.widget_type) {
     case 'security-coverage':
       return (
-        <MatrixMitre widgetTitle={!widget.widget_config.title ? t('Security Coverage') : widget.widget_config.title} data={structuralVizData} />
+        <SecurityCoverage
+          widgetTitle={getWidgetTitle(widget.widget_config.title, widget.widget_type, t)}
+          data={structuralVizData}
+        />
       );
     case 'vertical-barchart':
       return (
@@ -75,6 +78,22 @@ const WidgetStructuralViz = ({ widget }: WidgetStructuralVizProps) => {
           height="100%"
         />
       );
+    case 'donut': {
+      // The seriesLimit is set to 1 for the donut.
+      const data = seriesData[0].data;
+      return (
+        <Chart
+          options={donutChartOptions({
+            theme,
+            labels: data.map(s => s?.x || t('-')),
+          })}
+          series={data.map(s => s?.y || 0)}
+          type="donut"
+          width="100%"
+          height="100%"
+        />
+      );
+    }
     default:
       return 'Not implemented yet';
   }

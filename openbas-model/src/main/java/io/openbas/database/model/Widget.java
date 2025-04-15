@@ -31,7 +31,9 @@ public class Widget implements Base {
     @JsonProperty("security-coverage")
     SECURITY_COVERAGE_CHART("security-coverage"),
     @JsonProperty("line")
-    LINE("line");
+    LINE("line"),
+    @JsonProperty("donut")
+    DONUT("donut");
 
     public final String type;
 

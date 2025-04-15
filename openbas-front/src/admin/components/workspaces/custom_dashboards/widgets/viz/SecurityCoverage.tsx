@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../../../components/common/Transition';
 import { type EsSeries } from '../../../../../../utils/api-types';
-import MatrixMitreContent from './MatrixMitreContent';
+import SecurityCoverageContent from './SecurityCoverageContent';
 
 const useStyles = makeStyles()(theme => ({
   headerFull: {
@@ -23,7 +23,7 @@ interface Props {
   data: EsSeries[];
 }
 
-const MatrixMitre: FunctionComponent<Props> = ({ widgetTitle, data }) => {
+const SecurityCoverage: FunctionComponent<Props> = ({ widgetTitle, data }) => {
   // Standard hooks
   const theme = useTheme();
   const { classes } = useStyles();
@@ -33,6 +33,8 @@ const MatrixMitre: FunctionComponent<Props> = ({ widgetTitle, data }) => {
     if (!openDialog) setOpenDialog(true);
   };
   const handleClose = () => setOpenDialog(false);
+
+  console.log(widgetTitle);
 
   if (openDialog) {
     return (
@@ -55,7 +57,7 @@ const MatrixMitre: FunctionComponent<Props> = ({ widgetTitle, data }) => {
           {widgetTitle}
         </DialogTitle>
         <DialogContent>
-          <MatrixMitreContent data={data} />
+          <SecurityCoverageContent data={data} />
         </DialogContent>
       </Dialog>
     );
@@ -63,7 +65,7 @@ const MatrixMitre: FunctionComponent<Props> = ({ widgetTitle, data }) => {
 
   return (
     <>
-      <MatrixMitreContent data={data} />
+      <SecurityCoverageContent data={data} />
       <Fab
         size="small"
         color="secondary"
@@ -82,4 +84,4 @@ const MatrixMitre: FunctionComponent<Props> = ({ widgetTitle, data }) => {
   );
 };
 
-export default MatrixMitre;
+export default SecurityCoverage;

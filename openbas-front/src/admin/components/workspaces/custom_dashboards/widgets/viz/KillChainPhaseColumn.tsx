@@ -9,7 +9,7 @@ import { useHelper } from '../../../../../../store';
 import type { AttackPattern, KillChainPhase } from '../../../../../../utils/api-types';
 import { sortAttackPattern } from '../../../../../../utils/attack_patterns/attack_patterns';
 import AttackPatternBox from './AttackPatternBox';
-import { type ResolvedTTPData } from './MatrixMitreUtils';
+import { type ResolvedTTPData } from './securityCoverageUtils';
 
 const useStyles = makeStyles()(theme => ({
   column: {

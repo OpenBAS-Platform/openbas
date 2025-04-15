@@ -67,16 +67,7 @@ const WidgetPopover: FunctionComponent<Props> = ({
   ];
 
   return (
-    <div
-      className={className}
-      style={{
-        top: 0,
-        right: 0,
-        margin: 0,
-        position: 'absolute',
-        zIndex: 1,
-      }}
-    >
+    <div className={className}>
       <IconPopover entries={entries} />
       <WidgetForm
         open={openEdit}

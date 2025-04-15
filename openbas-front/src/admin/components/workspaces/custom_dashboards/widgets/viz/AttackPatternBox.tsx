@@ -4,7 +4,7 @@ import type { FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPattern, EsSeriesData } from '../../../../../../utils/api-types';
-import { SUCCESS_25_COLOR, SUCCESS_50_COLOR, SUCCESS_75_COLOR, SUCCESS_100_COLOR } from './MatrixMitreUtils';
+import { SUCCESS_25_COLOR, SUCCESS_50_COLOR, SUCCESS_75_COLOR, SUCCESS_100_COLOR } from './securityCoverageUtils';
 
 const useStyles = makeStyles()(theme => ({
   button: {

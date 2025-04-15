@@ -771,7 +771,10 @@ export interface DateHistogramSeries {
   name?: string;
 }
 
-export type DateHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
+export type DateHistogramWidget = UtilRequiredKeys<
+  HistogramWidget,
+  "mode" | "field"
+> & {
   end: string;
   interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
   series: DateHistogramSeries[];
@@ -4154,7 +4157,10 @@ export interface StructuralHistogramSeries {
   name?: string;
 }
 
-export type StructuralHistogramWidget = UtilRequiredKeys<HistogramWidget, "mode" | "field"> & {
+export type StructuralHistogramWidget = UtilRequiredKeys<
+  HistogramWidget,
+  "mode" | "field"
+> & {
   series: StructuralHistogramSeries[];
 };
 
@@ -4618,7 +4624,7 @@ export interface Widget {
   widget_custom_dashboard?: string;
   widget_id: string;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line";
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
   /** @format date-time */
   widget_updated_at: string;
 }
@@ -4626,7 +4632,7 @@ export interface Widget {
 export interface WidgetInput {
   widget_config: DateHistogramWidget | StructuralHistogramWidget;
   widget_layout: WidgetLayout;
-  widget_type: "vertical-barchart" | "security-coverage" | "line";
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
 }
 
 export interface WidgetLayout {

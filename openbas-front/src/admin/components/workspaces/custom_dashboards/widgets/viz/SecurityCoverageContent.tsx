@@ -5,11 +5,12 @@ import { makeStyles } from 'tss-react/mui';
 
 import type { AttackPatternHelper } from '../../../../../../actions/attack_patterns/attackpattern-helper';
 import type { KillChainPhaseHelper } from '../../../../../../actions/kill_chain_phases/killchainphase-helper';
+import { useFormatter } from '../../../../../../components/i18n';
 import { useHelper } from '../../../../../../store';
 import { type AttackPattern, type EsSeries, type KillChainPhase } from '../../../../../../utils/api-types';
 import { sortKillChainPhase } from '../../../../../../utils/kill_chain_phases/kill_chain_phases';
 import KillChainPhaseColumn from './KillChainPhaseColumn';
-import { filterByKillChainPhase, resolvedData, SUCCESS_25_COLOR, SUCCESS_50_COLOR, SUCCESS_75_COLOR, SUCCESS_100_COLOR } from './MatrixMitreUtils';
+import { filterByKillChainPhase, resolvedData, SUCCESS_25_COLOR, SUCCESS_50_COLOR, SUCCESS_75_COLOR, SUCCESS_100_COLOR } from './securityCoverageUtils';
 
 const items = [
   {
@@ -42,10 +43,11 @@ const useStyles = makeStyles()(theme => ({
 
 interface Props { data: EsSeries[] }
 
-const MatrixMitreContent: FunctionComponent<Props> = ({ data }) => {
+const SecurityCoverageContent: FunctionComponent<Props> = ({ data }) => {
   // Standard hooks
   const { classes } = useStyles();
   const theme = useTheme();
+  const { t } = useFormatter();
   // Fetching data
   // eslint-disable-next-line max-len
   const { attackPatternMap, killChainPhaseMap }: {
@@ -83,7 +85,7 @@ const MatrixMitreContent: FunctionComponent<Props> = ({ data }) => {
                 color="primary"
               />
             )}
-            label="Show covered TTP only"
+            label={t('Show covered TTP only')}
           />
         </Box>
         <div>
@@ -126,4 +128,4 @@ const MatrixMitreContent: FunctionComponent<Props> = ({ data }) => {
   );
 };
 
-export default MatrixMitreContent;
+export default SecurityCoverageContent;
