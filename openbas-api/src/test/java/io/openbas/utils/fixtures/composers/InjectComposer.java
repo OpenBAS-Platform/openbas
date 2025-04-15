@@ -23,6 +23,7 @@ public class InjectComposer extends ComposerBase<Inject> {
     private Optional<InjectStatusComposer.Composer> injectStatusComposers = Optional.empty();
     private final List<DocumentComposer.Composer> documentComposers = new ArrayList<>();
     private final List<TeamComposer.Composer> teamComposers = new ArrayList<>();
+    private final List<AssetGroupComposer.Composer> assetGroupComposers = new ArrayList<>();
 
     public Composer(Inject inject) {
       this.inject = inject;
@@ -81,6 +82,15 @@ public class InjectComposer extends ComposerBase<Inject> {
       this.inject.setAssets(assets);
       return this;
     }
+
+    public Composer withAssetGroup(AssetGroupComposer.Composer assetGroupComposer) {
+      assetGroupComposers.add(assetGroupComposer);
+      List<AssetGroup> tempAssetGroups = this.inject.getAssetGroups();
+      tempAssetGroups.add(assetGroupComposer.get());
+      this.inject.setAssetGroups(tempAssetGroups);
+      return this;
+    }
+
 
     @Override
     public Composer persist() {

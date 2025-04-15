@@ -163,7 +163,7 @@ public class InjectApi extends RestBehavior {
   }
 
   @PostMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/search")
-  //@PreAuthorize("isInjectObserver(#injectId)")
+  @PreAuthorize("isInjectObserver(#injectId)")
   public Page<InjectTarget> injectTargetSearch(
       @PathVariable String injectId, @PathVariable String targetType,
       @Valid @RequestBody SearchPaginationInput input
