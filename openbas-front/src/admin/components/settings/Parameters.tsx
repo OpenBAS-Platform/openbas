@@ -102,7 +102,7 @@ const Parameters = () => {
               alignSelf: 'end',
             }}
             variant="h4"
-            gutterBottom={true}
+            gutterBottom
           >
             {t('Enterprise Edition')}
           </Typography>
@@ -112,7 +112,7 @@ const Parameters = () => {
               alignSelf: 'end',
             }}
             variant="h4"
-            gutterBottom={true}
+            gutterBottom
           >
             {t('License')}
           </Typography>
@@ -248,8 +248,8 @@ const Parameters = () => {
         </>
       )}
 
-      <Typography style={{ gridColumn: 'span 3' }} variant="h4" gutterBottom={true}>{t('Configuration')}</Typography>
-      <Typography style={{ gridColumn: 'span 3' }} variant="h4" gutterBottom={true}>{t('OpenBAS platform')}</Typography>
+      <Typography style={{ gridColumn: 'span 3' }} gutterBottom variant="h4">{t('Configuration')}</Typography>
+      <Typography style={{ gridColumn: 'span 3' }} gutterBottom variant="h4">{t('OpenBAS platform')}</Typography>
       <Paper sx={{ gridColumn: 'span 3' }} variant="outlined" className={`${classes.paper} ${classes.marginBottom}`} style={{ minHeight: 340 }}>
         <ParametersForm
           onSubmit={onUpdate}
@@ -328,9 +328,9 @@ const Parameters = () => {
         </List>
       </Paper>
 
-      <Typography style={{ gridColumn: 'span 2' }} variant="h4">{t('Dark theme')}</Typography>
-      <Typography style={{ gridColumn: 'span 2' }} variant="h4">{t('Light theme')}</Typography>
-      <Typography style={{ gridColumn: 'span 2' }} variant="h4">{t('Tools')}</Typography>
+      <Typography style={{ gridColumn: 'span 2' }} gutterBottom variant="h4">{t('Dark theme')}</Typography>
+      <Typography style={{ gridColumn: 'span 2' }} gutterBottom variant="h4">{t('Light theme')}</Typography>
+      <Typography style={{ gridColumn: 'span 2' }} gutterBottom variant="h4">{t('Tools')}</Typography>
       <Paper variant="outlined" classes={{ root: classes.paper }} sx={{ gridColumn: 'span 2' }}>
         <ThemeForm onSubmit={onUpdateDarkParameters} initialValues={initialValuesDark} />
       </Paper>
