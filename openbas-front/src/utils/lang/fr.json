@@ -614,7 +614,7 @@
   "Informal": "Informel",
   "Information": "Information",
   "Inject": "Stimuli",
-  "Inject content": "Injecter le contenu",
+  "Inject content": "Contenu du stimuli",
   "Inject context": "Contexte du stimuli",
   "Inject data": "Données du stimuli",
   "Inject details": "Détails du stimuli",
@@ -1485,5 +1485,5 @@
   "Your overall evaluation about this question.": "Votre évaluation globale de cette question.",
   "your trial license online": "votre licence d'essai en ligne",
   "YYYY": "AAAA",
-  "finding_inject_id": "Injecter"
+  "finding_inject_id": "Stimuli"
 }

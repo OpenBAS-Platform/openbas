@@ -47,7 +47,7 @@ public class FindingUtils {
                                   | Pattern.CASE_INSENSITIVE
                                   | Pattern.UNICODE_CHARACTER_CLASS);
                         } catch (PatternSyntaxException e) {
-                          log.log(Level.INFO, "Invalid regex pattern: {}", e.getMessage());
+                          log.log(Level.INFO, "Invalid regex pattern: " + r, e.getMessage());
                           return null;
                         }
                       });
