@@ -251,6 +251,12 @@ public interface InjectRepository
   @Query(
       "SELECT i FROM Inject i"
           + " INNER JOIN i.findings f"
-          + " WHERE (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
-  Set<Inject> findAllByTitleLinkedToFindings(@Param("title") String title);
+          + " WHERE "
+          + "("
+          + "   :simulationOrScenarioId is NULL"
+          + "   OR (i.exercise.id = :simulationOrScenarioId"
+          + "   OR i.exercise.scenario.id = :simulationOrScenarioId)"
+          + " )"
+          + " AND (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
+  Set<Inject> findAllByTitleLinkedToFindings(String simulationOrScenarioId, String title);
 }

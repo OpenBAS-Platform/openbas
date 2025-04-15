@@ -55,7 +55,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'finding_asset_groups':
-        searchAssetGroupLinkedToFindingsAsOption(search).then((response) => {
+        searchAssetGroupLinkedToFindingsAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });
         break;
@@ -76,7 +76,7 @@ const useSearchOptions = () => {
         });
         break;
       case 'finding_inject_id':
-        searchInjectLinkedToFindingsAsOption(search).then((response) => {
+        searchInjectLinkedToFindingsAsOption(search, contextId).then((response) => {
           setOptions(response.data);
         });
         break;
