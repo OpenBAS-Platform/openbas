@@ -189,7 +189,7 @@ const Parameters = () => {
                 <ListItemText primary={t('Organization')} />
                 <ItemBoolean
                   variant="xlarge"
-                  neutralLabel={settings.platform_license.license_customer}
+                  neutralLabel={settings.platform_license?.license_customer}
                   status={null}
                 />
               </ListItem>
@@ -197,7 +197,7 @@ const Parameters = () => {
                 <ListItemText primary={t('Creator')} />
                 <ItemBoolean
                   variant="xlarge"
-                  neutralLabel={settings.platform_license.license_creator}
+                  neutralLabel={settings.platform_license?.license_creator}
                   status={null}
                 />
               </ListItem>
@@ -205,7 +205,7 @@ const Parameters = () => {
                 <ListItemText primary={t('Scope')} />
                 <ItemBoolean
                   variant="xlarge"
-                  neutralLabel={settings.platform_license.license_is_global ? t('Global') : t('Current instance')}
+                  neutralLabel={settings.platform_license?.license_is_global ? t('Global') : t('Current instance')}
                   status={null}
                 />
               </ListItem>
