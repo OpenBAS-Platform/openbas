@@ -1,4 +1,12 @@
 package io.openbas.database.model;
 
-public class AssetGroupTarget extends BaseTarget {
+import java.util.Set;
+
+public class AssetGroupTarget extends InjectTarget {
+    public AssetGroupTarget(String id, String name, Set<String> tags) {
+        this.setId(id);
+        this.setName(name);
+        this.setTags(tags);
+        this.setTargetType("ASSETS_GROUPS");
+    }
 }

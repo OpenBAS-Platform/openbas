@@ -183,6 +183,7 @@ export interface AssetGroup {
   asset_group_dynamic_filter?: FilterGroup;
   asset_group_external_reference?: string;
   asset_group_id: string;
+  asset_group_injects?: string[];
   asset_group_name: string;
   asset_group_tags?: string[];
   /** @format date-time */
@@ -208,6 +209,14 @@ export interface AssetGroupOutput {
   asset_group_name: string;
   /** @uniqueItems true */
   asset_group_tags?: string[];
+}
+
+export interface AssetGroupTarget {
+  target_id?: string;
+  target_name?: string;
+  /** @uniqueItems true */
+  target_tags?: string[];
+  target_type?: string;
 }
 
 /** Full contract */
@@ -290,6 +299,18 @@ export interface AttackPatternUpdateInput {
 export interface AttackPatternUpsertInput {
   attack_patterns?: AttackPatternCreateInput[];
 }
+
+interface BaseInjectTarget {
+  target_id?: string;
+  target_name?: string;
+  /** @uniqueItems true */
+  target_tags?: string[];
+  target_type?: string;
+}
+
+type BaseInjectTargetTargetTypeMapping<Key, Type> = {
+  target_type: Key;
+} & Type;
 
 interface BasePayload {
   listened?: boolean;
@@ -783,7 +804,7 @@ export interface EndpointOutput {
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   /** Platform */
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
-  /** The endpoint was added statiscally or not */
+  /** The endpoint is associated with an asset group, either statically or dynamically. */
   is_static?: boolean;
 }
 
@@ -1793,6 +1814,8 @@ export interface InjectStatusSimple {
   tracking_sent_date?: string;
 }
 
+export type InjectTarget = BaseInjectTarget & BaseInjectTargetTargetTypeMapping<"ASSETS_GROUPS", AssetGroupTarget>;
+
 /** Results of expectations for each target */
 export interface InjectTargetWithResult {
   children?: InjectTargetWithResult[];
@@ -2571,6 +2594,25 @@ export interface PageGroup {
 
 export interface PageInjectResultOutput {
   content?: InjectResultOutput[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageInjectTarget {
+  content?: InjectTarget[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
