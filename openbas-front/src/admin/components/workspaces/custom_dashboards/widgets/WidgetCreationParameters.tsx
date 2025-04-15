@@ -6,7 +6,7 @@ import { type Control, Controller, type UseFormSetValue, useWatch } from 'react-
 import { engineSchemas } from '../../../../../actions/schema/schema-action';
 import { useFormatter } from '../../../../../components/i18n';
 import { type PropertySchemaDTO, type Widget } from '../../../../../utils/api-types';
-import { type Option } from '../../../../../utils/Option';
+import { type GroupOption } from '../../../../../utils/Option';
 import { getAvailableFields, getAvailableModes, getBaseEntities, type WidgetInputWithoutLayout } from './WidgetUtils';
 
 const WidgetCreationParameters: FunctionComponent<{
@@ -41,20 +41,31 @@ const WidgetCreationParameters: FunctionComponent<{
   }, []);
 
   // -- HANDLE FIELDS --
-  const [fieldOptions, setFieldOptions] = useState<Option[]>([]);
+  const [fieldOptions, setFieldOptions] = useState<GroupOption[]>([]);
 
   useEffect(() => {
     engineSchemas(entities).then((response: { data: PropertySchemaDTO[] }) => {
-      const newOptions = Array.from(
-        new Map(
-          response.data
-            .filter(d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant')
-            .map(d => [d.schema_property_name, {
-              id: d.schema_property_name,
-              label: d.schema_property_name, // FIXME: we have some identical label in back-end
-            }]),
-        ).values(),
-      );
+      const newOptions: GroupOption[] = response.data
+        .filter(d => mode === 'temporal' ? d.schema_property_type === 'instant' : d.schema_property_type !== 'instant')
+        .reduce<GroupOption[]>((acc, d) => {
+          let group = 'Specific properties';
+          if (d.schema_property_name.includes('_side')) {
+            group = 'Relationship properties';
+          } else if (d.schema_property_name.includes('base_')) {
+            group = 'Common properties';
+          }
+          acc.push({
+            id: d.schema_property_name,
+            label: d.schema_property_label,
+            group,
+          });
+          return acc;
+        }, [])
+        .sort((a, b) => {
+          if (a.group < b.group) return -1;
+          if (a.group > b.group) return 1;
+          return a.label.localeCompare(b.label);
+        });
       const availableFields = getAvailableFields(widgetType);
       const finalOptions = !availableFields ? newOptions : newOptions.filter(o => availableFields.includes(o.id));
       setFieldOptions(finalOptions);
@@ -119,7 +130,8 @@ const WidgetCreationParameters: FunctionComponent<{
               return (
                 <Autocomplete
                   options={fieldOptions}
-                  value={fieldOptions.find(o => o.label === field.value) ?? null}
+                  groupBy={option => option.group}
+                  value={fieldOptions.find(o => o.id === field.value) ?? null}
                   onChange={(_, value) => field.onChange(value?.id)}
                   getOptionLabel={option => option.label ?? ''}
                   isOptionEqualToValue={(option, value) => option.id === value.id}

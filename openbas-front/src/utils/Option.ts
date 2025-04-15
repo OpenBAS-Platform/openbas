@@ -21,6 +21,8 @@ export interface Option {
   color?: string;
 }
 
+export interface GroupOption extends Option { group: string }
+
 export const documentOptions = (
   document_ids: string[] | undefined,
   documentsMap: Record<string, Document>,
