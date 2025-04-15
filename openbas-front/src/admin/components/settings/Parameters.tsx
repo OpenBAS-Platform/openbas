@@ -116,7 +116,15 @@ const Parameters = () => {
           >
             {t('License')}
           </Typography>
-          {!isEnterpriseEditionByConfig && !isEnterpriseEdition && (<EnterpriseEditionButton />)}
+          {!isEnterpriseEditionByConfig && !isEnterpriseEdition && (
+            <EnterpriseEditionButton
+              style={{
+                marginLeft: 'auto',
+                gridColumn: 'span 2',
+              }}
+              classes={{ root: classes.button }}
+            />
+          )}
           {!isEnterpriseEditionByConfig && isEnterpriseEdition && (
             <>
               <Button
@@ -248,8 +256,36 @@ const Parameters = () => {
         </>
       )}
 
-      <Typography style={{ gridColumn: 'span 3' }} gutterBottom variant="h4">{t('Configuration')}</Typography>
-      <Typography style={{ gridColumn: 'span 3' }} gutterBottom variant="h4">{t('OpenBAS platform')}</Typography>
+      <Typography
+        style={{
+          gridColumn: 'span 3',
+          alignSelf: 'end',
+        }}
+        gutterBottom
+        variant="h4"
+      >
+        {t('Configuration')}
+      </Typography>
+      <Typography
+        style={{
+          gridColumn: 'span 1',
+          alignSelf: 'end',
+        }}
+        gutterBottom
+        variant="h4"
+      >
+        {t('OpenBAS platform')}
+      </Typography>
+      {!isEnterpriseEditionActivated && (
+        <EnterpriseEditionButton
+          style={{
+            marginLeft: 'auto',
+            gridColumn: 'span 2',
+          }}
+          classes={{ root: classes.button }}
+        />
+      )}
+
       <Paper sx={{ gridColumn: 'span 3' }} variant="outlined" className={`${classes.paper} ${classes.marginBottom}`} style={{ minHeight: 340 }}>
         <ParametersForm
           onSubmit={onUpdate}
@@ -262,14 +298,6 @@ const Parameters = () => {
       </Paper>
       <Paper variant="outlined" className={`${classes.paperList} ${classes.marginBottom}`} sx={{ gridColumn: 'span 3' }}>
         <List>
-          {!isEnterpriseEditionActivated && (
-            <ListItem sx={{ paddingTop: 0 }} divider={true}>
-              <ListItemText primary="" />
-              <div style={{ float: 'right' }}>
-                <EnterpriseEditionButton />
-              </div>
-            </ListItem>
-          )}
           <ListItem divider={true}>
             <ListItemText primary={t('Platform identifier')} />
             <pre

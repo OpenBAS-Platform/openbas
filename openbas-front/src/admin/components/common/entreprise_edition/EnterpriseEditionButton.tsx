@@ -22,7 +22,12 @@ import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
 import EnterpriseEditionAgreementDialog from './EnterpriseEditionAgreementDialog';
 
-const EnterpriseEditionButton = () => {
+interface Props {
+  style?: React.CSSProperties;
+  classes?: { [key: string]: string };
+}
+
+const EnterpriseEditionButton = ({ style = {}, classes }: Props) => {
   const { t } = useFormatter();
   const [openEnterpriseEditionConsent, setOpenEnterpriseEditionConsent] = useState(false);
   const userAdmin = useHelper((helper: UserHelper) => {
@@ -42,6 +47,8 @@ const EnterpriseEditionButton = () => {
         onClick={() => setOpenEnterpriseEditionConsent(true)}
         startIcon={<RocketLaunchOutlined />}
         disabled={!userAdmin}
+        style={style}
+        classes={classes}
       >
         {t('Manage your enterprise edition license')}
       </Button>

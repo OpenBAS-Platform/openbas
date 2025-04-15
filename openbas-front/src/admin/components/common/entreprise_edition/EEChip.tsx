@@ -1,6 +1,7 @@
 import { Tooltip } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
+import { useFormatter } from '../../../../components/i18n';
 import useEnterpriseEdition from '../../../../utils/hooks/useEnterpriseEdition';
 
 const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }) => ({
@@ -41,11 +42,12 @@ const EEChip = ({ clickable = true, floating = false, onClick = undefined }: {
   floating?: boolean;
 }) => {
   const { classes } = useStyles({ isClickable: clickable });
+  const { t } = useFormatter();
   const isEnterpriseEdition = useEnterpriseEdition();
 
   return (
     <Tooltip
-      title="Enterprise Edition Feature"
+      title={t('Enterprise Edition Feature')}
       className={floating ? classes.containerFloating : classes.container}
       onClick={() => clickable && !isEnterpriseEdition && onClick && onClick(true)}
     >
