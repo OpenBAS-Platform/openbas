@@ -37,11 +37,13 @@ public class NotificationRuleService {
   public NotificationRule createNotificationRule(final NotificationRule notificationRule) {
     User currentUser = userService.currentUser();
     if (NotificationRuleResourceType.SCENARIO.equals(notificationRule.getResourceType())) {
+      //verify if the scenario exists
       if (scenarioService.scenario(notificationRule.getResourceId()) == null) {
         new ElementNotFoundException(
             "Scenario not found with id: " + notificationRule.getResourceId());
       }
     } else {
+      //currently only scenario is supported
       throw new UnsupportedOperationException(
           "Unsupported resource type: " + notificationRule.getResourceType().name());
     }
