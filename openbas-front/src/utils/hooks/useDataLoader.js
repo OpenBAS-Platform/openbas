@@ -9,11 +9,9 @@ const EVENT_TRY_DELAY = 1500;
 const EVENT_PING_MAX_TIME = 5000;
 
 const ERROR_30S_MAX_TIME = 30000;
-const ERROR_1M_MAX_TIME = 60000;
 const ERROR_5M_MAX_TIME = 300000;
-const ERROR_500MS_DELAY = 500;
 const ERROR_2S_DELAY = 2000;
-const ERROR_8S_DELAY = 8000;
+const ERROR_10S_DELAY = 10000;
 const ERROR_30S_DELAY = 30000;
 
 // pristine is used to avoid duplicate requests at the launch of the app
@@ -77,13 +75,11 @@ const useDataLoader = (loader = () => {}, refetchArg = []) => {
       }
       const timeFromLastPingDate = new Date().getTime() - lastPingDate;
       if (timeFromLastPingDate < ERROR_30S_MAX_TIME) {
-        setTimeout(sseConnect, ERROR_500MS_DELAY);// Before 30s time to retry is 500ms
-      } else if (timeFromLastPingDate < ERROR_1M_MAX_TIME) {
-        setTimeout(sseConnect, ERROR_2S_DELAY); // Before 1 min time to retry is 2s
+        setTimeout(sseConnect, ERROR_2S_DELAY);// Before 30s time to retry is 2s
       } else if (timeFromLastPingDate < ERROR_5M_MAX_TIME) {
-        setTimeout(sseConnect, ERROR_8S_DELAY);// Before 5 min time to retry is 8s
+        setTimeout(sseConnect, ERROR_10S_DELAY); // Before 5 min time to retry is 10s
       } else {
-        setTimeout(sseConnect, ERROR_30S_DELAY); // After 5 min time to retry is 30s
+        setTimeout(sseConnect, ERROR_30S_DELAY);// After 5 min time to retry is 30s
       }
     };
     return sseClient;
