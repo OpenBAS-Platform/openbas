@@ -110,6 +110,7 @@ public class AssetGroup implements Base {
           inverseJoinColumns = @JoinColumn(name = "inject_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("asset_group_injects")
+  @Queryable(filterable = true, dynamicValues = true, path = "injects.id")
   private List<Inject> injects = new ArrayList<>();
 
   // -- AUDIT --
