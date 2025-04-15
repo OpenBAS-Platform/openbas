@@ -24,7 +24,7 @@
     "@xyflow/react": "12.5.5",
     "apexcharts": "4.5.0",
     "axios": "1.8.4",
-    "ckeditor5": "44.3.0",
+    "ckeditor5": "45.0.0",
     "classcat": "5.0.5",
     "cronstrue": "2.59.0",
     "d3-hierarchy": "3.1.2",
