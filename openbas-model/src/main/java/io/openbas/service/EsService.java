@@ -30,6 +30,8 @@ import io.openbas.engine.query.EsSeries;
 import io.openbas.engine.query.EsSeriesData;
 import io.openbas.schema.PropertySchema;
 import io.openbas.schema.SchemaUtils;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -101,8 +103,7 @@ public class EsService {
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
     Filters.FilterMode filterMode = filter.getMode();
     String field = filter.getKey();
-    PropertySchema propertyField = getIndexingSchema().get(field);
-    String elasticField = propertyField.isKeyword() ? (field + ".keyword") : field;
+    String elasticField = toElasticField(field);
     switch (operator) {
       case eq:
         List<Query> queryList =
@@ -157,7 +158,6 @@ public class EsService {
   }
 
   private Query queryFromSearch(String search) {
-    BoolQuery.Builder mainQuery = new BoolQuery.Builder();
     QueryStringQuery.Builder queryStringQuery = new QueryStringQuery.Builder();
     queryStringQuery.query(search).analyzeWildcard(true).fields(BASE_FIELDS);
     return queryStringQuery.build()._toQuery();
@@ -341,8 +341,10 @@ public class EsService {
     String aggregationKey = "term_histogram";
     try {
       String field = parameters.getOrDefault(widgetConfig.getField(), widgetConfig.getField());
+      PropertySchema propertyField = getIndexingSchema().get(field);
+      String elasticField = toElasticField(field);
       TermsAggregation termsAggregation =
-          new TermsAggregation.Builder().field(field + ".keyword").size(100).build();
+          new TermsAggregation.Builder().field(elasticField).size(100).build();
       SearchResponse<Void> response =
           elasticClient.search(
               b ->
@@ -353,29 +355,75 @@ public class EsService {
                           aggregationKey,
                           new Aggregation.Builder().terms(termsAggregation).build()),
               Void.class);
-      Buckets<StringTermsBucket> buckets =
-          response.aggregations().get(aggregationKey).sterms().buckets();
-      boolean isSideAggregation = field.endsWith("_side");
-      Map<String, String> resolutions = new HashMap<>();
-      if (isSideAggregation) {
-        List<String> ids = buckets.array().stream().map(s -> s.key().stringValue()).toList();
-        resolutions.putAll(resolveIdsRepresentative(user, ids));
+      Aggregate aggregate = response.aggregations().get(aggregationKey);
+      if (propertyField.getType() == String.class) {
+        return termHistogramSTerms(user, config, aggregate, field);
+      } else if (propertyField.getType() == Double.class) {
+        return termHistogramDTerms(config, aggregate);
+      } else if (propertyField.getType() == Long.class
+          || propertyField.getType() == Boolean.class) {
+        return termHistogramLTerms(config, aggregate);
+      } else {
+        throw new UnsupportedOperationException(
+            "Unsupported field type: " + propertyField.getType());
       }
-      List<EsSeriesData> data =
-          buckets.array().stream()
-              .map(
-                  b -> {
-                    String key = b.key().stringValue();
-                    String label = isSideAggregation ? resolutions.get(key) : key;
-                    String seriesKey = label != null ? label : "deleted";
-                    return new EsSeriesData(key, seriesKey, b.docCount());
-                  })
-              .toList();
-      return new EsSeries(config.getName(), data);
     } catch (Exception e) {
       LOGGER.severe("termHistogram exception: " + e);
     }
     return new EsSeries(config.getName());
+  }
+
+  private EsSeries termHistogramSTerms(
+      @NotNull final RawUserAuth user,
+      @NotNull final StructuralHistogramSeries config,
+      @NotNull final Aggregate aggregate,
+      @NotNull final String field) {
+    boolean isSideAggregation = field.endsWith("_side");
+    Buckets<StringTermsBucket> buckets = aggregate.sterms().buckets();
+    Map<String, String> resolutions = new HashMap<>();
+    if (isSideAggregation) {
+      List<String> ids = buckets.array().stream().map(s -> s.key().stringValue()).toList();
+      resolutions.putAll(resolveIdsRepresentative(user, ids));
+    }
+    List<EsSeriesData> data =
+        buckets.array().stream()
+            .map(
+                b -> {
+                  String key = b.key().stringValue();
+                  String label = isSideAggregation ? resolutions.get(key) : key;
+                  String seriesKey = label != null ? label : "deleted";
+                  return new EsSeriesData(key, seriesKey, b.docCount());
+                })
+            .toList();
+    return new EsSeries(config.getName(), data);
+  }
+
+  private EsSeries termHistogramDTerms(
+      @NotNull final StructuralHistogramSeries config, @NotNull final Aggregate aggregate) {
+    Buckets<DoubleTermsBucket> buckets = aggregate.dterms().buckets();
+    List<EsSeriesData> data =
+        buckets.array().stream()
+            .map(
+                b -> {
+                  String key = String.valueOf(b.key());
+                  return new EsSeriesData(key, key, b.docCount());
+                })
+            .toList();
+    return new EsSeries(config.getName(), data);
+  }
+
+  private EsSeries termHistogramLTerms(
+      @NotNull final StructuralHistogramSeries config, @NotNull final Aggregate aggregate) {
+    Buckets<LongTermsBucket> buckets = aggregate.lterms().buckets();
+    List<EsSeriesData> data =
+        buckets.array().stream()
+            .map(
+                b -> {
+                  String key = String.valueOf(b.key());
+                  return new EsSeriesData(key, key, b.docCount());
+                })
+            .toList();
+    return new EsSeries(config.getName(), data);
   }
 
   public List<EsSeries> multiTermHistogram(RawUserAuth user, StructuralHistogramRuntime runtime) {
@@ -479,5 +527,11 @@ public class EsService {
     }
     return List.of();
   }
+
   // endregion
+
+  private String toElasticField(@NotBlank final String field) {
+    PropertySchema propertyField = getIndexingSchema().get(field);
+    return propertyField.isKeyword() ? (field + ".keyword") : field;
+  }
 }
