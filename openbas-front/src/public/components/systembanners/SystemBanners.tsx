@@ -2,7 +2,7 @@ import { ReportProblem } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../components/i18n';
-import { type BannerMessage, type PlatformSettings } from '../../../utils/api-types';
+import { type PlatformSettings } from '../../../utils/api-types';
 import { isEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 import { computeBanners } from './utils';
 
