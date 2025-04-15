@@ -4,8 +4,8 @@ import { isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils
 
 const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
 
-export const computeBanners = (settings: PlatformSettings) => {
-  let bannerLevel = settings.platform_banner_by_level;
+export const computeBanners = (settings: PlatformSettings): BannerMessage => {
+  let bannerLevel = settings.platform_banner_by_level as BannerMessage;
   const ee = settings.platform_license ?? {};
   if (ee.license_is_enterprise) {
     if (!ee.license_is_validated) {
