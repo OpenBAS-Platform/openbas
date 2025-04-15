@@ -18,7 +18,7 @@ const WidgetCreationTypes: FunctionComponent<{
     <div
       style={{
         display: 'grid',
-        gap: `0px ${theme.spacing(3)}`,
+        gap: theme.spacing(3),
         gridTemplateColumns: '1fr 1fr 1fr',
       }}
     >

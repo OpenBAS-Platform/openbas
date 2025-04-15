@@ -6,15 +6,18 @@ import { useParams } from 'react-router';
 
 import { updateCustomDashboardWidgetLayout } from '../../../../actions/custom_dashboards/customdashboardwidget-action';
 import { ErrorBoundary } from '../../../../components/Error';
+import { useFormatter } from '../../../../components/i18n';
 import { type CustomDashboard, type Widget } from '../../../../utils/api-types';
 import WidgetCreation from './widgets/WidgetCreation';
 import WidgetPopover from './widgets/WidgetPopover';
 import WidgetStructuralViz from './widgets/WidgetStructuralViz';
 import WidgetTemporalViz from './widgets/WidgetTemporalViz';
+import { getWidgetTitle } from './widgets/WidgetUtils';
 
 const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashboard }> = ({ customDashboard }) => {
   // Standard hooks
   const theme = useTheme();
+  const { t } = useFormatter();
   const ReactGridLayout = useMemo(() => WidthProvider(RGL), []);
 
   const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
@@ -102,23 +105,29 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
               data-grid={layout}
               style={{
                 margin: 0,
-                padding: theme.spacing(2),
                 borderRadius: 4,
                 display: 'flex',
                 flexDirection: 'column',
               }}
               variant="outlined"
             >
-              <Typography variant="h3">
-                {widget.widget_config.title}
-              </Typography>
-              <WidgetPopover
-                className="noDrag"
-                customDashboardId={customDashboardId}
-                widget={widget}
-                onUpdate={widget => handleWidgetUpdate(widget)}
-                onDelete={widgetId => handleWidgetDelete(widgetId)}
-              />
+              <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography variant="h3" style={{ paddingLeft: theme.spacing(2) }}>
+                  {getWidgetTitle(widget.widget_config.title, widget.widget_type, t)}
+                </Typography>
+                <WidgetPopover
+                  className="noDrag"
+                  customDashboardId={customDashboardId}
+                  widget={widget}
+                  onUpdate={widget => handleWidgetUpdate(widget)}
+                  onDelete={widgetId => handleWidgetDelete(widgetId)}
+                />
+              </Box>
               <ErrorBoundary>
                 {widget.widget_id === idToResize ? (<div />) : (
                   <Box
@@ -126,6 +135,7 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                     display="flex"
                     flexDirection="column"
                     minHeight={0}
+                    padding={`0 ${theme.spacing(2)} ${theme.spacing(2)} ${theme.spacing(2)}`}
                   >
                     {widget.widget_config.mode === 'structural' && (
                       <WidgetStructuralViz widget={widget} />

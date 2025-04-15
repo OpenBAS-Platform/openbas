@@ -1,5 +1,5 @@
 import { TableChart } from '@mui/icons-material';
-import { ChartBar, ChartLine } from 'mdi-material-ui';
+import { ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
 import {
   type Filter,
@@ -31,7 +31,12 @@ export const widgetVisualizationTypes: {
   {
     category: 'line',
     modes: ['temporal'],
-    seriesLimit: 5,
+    seriesLimit: 1,
+  },
+  {
+    category: 'donut',
+    modes: ['structural'],
+    seriesLimit: 1,
   },
   {
     category: 'security-coverage',
@@ -47,6 +52,8 @@ export const renderWidgetIcon = (type: Widget['widget_type'], fontSize: 'large' 
       return <ChartBar fontSize={fontSize} color="primary" />;
     case 'line':
       return <ChartLine fontSize={fontSize} color="primary" />;
+    case 'donut':
+      return <ChartDonut fontSize={fontSize} color="primary" />;
     case 'security-coverage':
       return <TableChart fontSize={fontSize} color="primary" />;
     default:
@@ -68,6 +75,13 @@ export const getAvailableSteps = (type: Widget['widget_type']) => {
 
 export const getAvailableFields = (type: Widget['widget_type']) => {
   return widgetVisualizationTypes.find(widget => widget.category === type)?.fields ?? null;
+};
+
+export const getWidgetTitle = (widgetTitle: Widget['widget_config']['title'], type: Widget['widget_type'], t: (key: string) => string) => {
+  if (type === 'security-coverage') {
+    return !widgetTitle ? t('Security Coverage') : widgetTitle;
+  }
+  return widgetTitle || '';
 };
 
 // -- FILTERS --
