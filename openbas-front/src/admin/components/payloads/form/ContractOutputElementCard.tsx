@@ -1,7 +1,7 @@
 import { DeleteOutlined } from '@mui/icons-material';
 import { Card, IconButton, Typography } from '@mui/material';
 import { useEffect } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { makeStyles } from 'tss-react/mui';
 
 import CheckboxFieldController from '../../../../components/fields/CheckboxFieldController';
@@ -35,7 +35,7 @@ const useStyles = makeStyles()(theme => ({
 
 const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
   const { classes } = useStyles();
-  const { watch, setValue } = useFormContext();
+  const { control, watch } = useFormContext();
   const { t } = useFormatter();
 
   const defaultFields = {
@@ -44,7 +44,11 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
   };
 
   const selectedContractOutputElementType = watch(`${prefixName}.${index}.contract_output_element_type`) as keyof typeof defaultFields | undefined;
-  const regexGroups: RegexGroup[] = watch(`${prefixName}.${index}.contract_output_element_regex_groups`);
+  const { fields, append: regexGroupsAppend, remove: regexGroupsRemove } = useFieldArray({
+    control,
+    name: `${prefixName}.${index}.contract_output_element_regex_groups`,
+  });
+  const regexGroupsField = fields as (RegexGroup & { id: string })[];
 
   type ContractOutputElementType = ContractOutputElement['contract_output_element_type'];
   const contractOutputElementTypes: ContractOutputElementType[] = [
@@ -60,21 +64,19 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
     if (!selectedContractOutputElementType) return;
 
     const fields: string[] = defaultFields[selectedContractOutputElementType] || [selectedContractOutputElementType];
-
-    const updatedGroups = fields.map((field) => {
-      const existingGroup = regexGroups.find(group => group.regex_group_field === field);
-      return {
+    regexGroupsRemove();
+    fields.forEach((field) => {
+      const existingGroup = regexGroupsField.find(group => group.regex_group_field === field);
+      regexGroupsAppend({
         ...existingGroup?.regex_group_id && { regex_group_id: existingGroup?.regex_group_id },
         regex_group_field: field,
         regex_group_index_values: existingGroup?.regex_group_index_values || '',
-      };
+      });
     });
-
-    setValue(`${prefixName}.${index}.contract_output_element_regex_groups`, updatedGroups);
   }, [selectedContractOutputElementType]);
 
   const getRegexIndexesValueName = (fieldName: string) => {
-    const indexField = regexGroups.findIndex(r => r.regex_group_field === fieldName);
+    const indexField = regexGroupsField.findIndex(r => r.regex_group_field === fieldName);
     return `${prefixName}.${index}.contract_output_element_regex_groups.${indexField}.regex_group_index_values`;
   };
 
@@ -108,19 +110,19 @@ const ContractOutputElementCard = ({ prefixName, index, remove }: Props) => {
         required
         adornmentLabel="/gm"
       />
-      {regexGroups.length > 0 && (
+      {regexGroupsField.length > 0 && (
         <Typography className={classes.outputValueTitle} variant="h3">
           {`${t('Output value')}`}
         </Typography>
       )}
-      {regexGroups.toSorted((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)).map((field, indexField) => (
+      {regexGroupsField.toSorted((a, b) => a.regex_group_field.localeCompare(b.regex_group_field)).map((field, indexField) => (
         <div
           style={{
             gridColumn: 'span 4',
             display: 'grid',
             gridTemplateColumns: '1fr 5fr',
           }}
-          key={field.regex_group_field}
+          key={field.id}
         >
           <Typography
             key={field.regex_group_field}

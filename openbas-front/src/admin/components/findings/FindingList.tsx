@@ -1,5 +1,5 @@
 import { HubOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { type CSSProperties, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -72,7 +72,7 @@ const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additio
       field: 'finding_value',
       label: 'Value',
       isSortable: true,
-      value: (finding: FindingOutput) => finding.finding_value,
+      value: (finding: FindingOutput) => <Tooltip title={finding.finding_value}><span>{finding.finding_value}</span></Tooltip>,
     },
     {
       field: 'finding_tags',
