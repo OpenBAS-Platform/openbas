@@ -777,10 +777,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           <TableBody>
                             {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
                               const isResultSecurityPlatform: boolean = !!(
-                                  injectExpectation.inject_expectation_agent &&
-                                  injectExpectation.inject_expectation_status === 'SUCCESS' &&
-                                  (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') &&
-                                  expectationResult.sourceType === 'collector'
+                                injectExpectation.inject_expectation_agent
+                                && injectExpectation.inject_expectation_status === 'SUCCESS'
+                                && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected')
+                                && expectationResult.sourceType === 'collector'
                               );
                               return (
                                 <TableRow
