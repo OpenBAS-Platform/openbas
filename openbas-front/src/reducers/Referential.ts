@@ -76,7 +76,7 @@ const referential = (state: any = Map({}), action: any = {}) => {
     case Constants.DATA_DELETE_SUCCESS: {
       return state.setIn(
         ['entities', action.payload.type],
-        R.dissoc(action.payload.id, state.entities[action.payload.type]),
+        state.getIn(['entities', action.payload.type]).delete(action.payload.id),
       );
     }
     default: {
