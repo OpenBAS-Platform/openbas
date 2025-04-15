@@ -294,7 +294,7 @@ public class ExerciseApi extends RestBehavior {
 
   // region exercises
   @PostMapping(EXERCISE_URI)
-  public Exercise createExercise(@Valid @RequestBody ExerciseInput input) {
+  public Exercise createExercise(@Valid @RequestBody CreateExerciseInput input) {
     if (input == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Exercise input cannot be null");
     }

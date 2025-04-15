@@ -183,30 +183,32 @@ const ExerciseForm: FunctionComponent<Props> = ({
         setValue={setValue}
         askAi={true}
       />
-      <Controller
-        control={control}
-        name="exercise_start_date"
-        render={({ field }) => (
-          <MuiDateTimePicker
-            value={field.value ? new Date(field.value) : null}
-            label={t('Start date (optional)')}
-            minDateTime={new Date()}
-            slotProps={{
-              textField: {
-                variant: 'standard',
-                fullWidth: true,
-                style: { marginTop: 20 },
-                error: !!errors.exercise_start_date,
-                helperText: errors.exercise_start_date?.message,
-              },
-            }}
-            onChange={date => field.onChange(date?.toISOString())}
-            ampm={false}
-            format="yyyy-MM-dd HH:mm:ss"
+      {!edit
+        && (
+          <Controller
+            control={control}
+            name="exercise_start_date"
+            render={({ field }) => (
+              <MuiDateTimePicker
+                value={field.value ? new Date(field.value) : null}
+                label={t('Start date (optional)')}
+                minDateTime={new Date()}
+                slotProps={{
+                  textField: {
+                    variant: 'standard',
+                    fullWidth: true,
+                    style: { marginTop: 20 },
+                    error: !!errors.exercise_start_date,
+                    helperText: errors.exercise_start_date?.message,
+                  },
+                }}
+                onChange={date => field.onChange(date?.toISOString())}
+                ampm={false}
+                format="yyyy-MM-dd HH:mm:ss"
+              />
+            )}
           />
         )}
-      />
-
       <Controller
         control={control}
         name="exercise_tags"

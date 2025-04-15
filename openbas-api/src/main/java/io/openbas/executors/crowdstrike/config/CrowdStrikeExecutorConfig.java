@@ -19,7 +19,7 @@ public class CrowdStrikeExecutorConfig {
 
   @Getter @NotBlank private Integer apiBatchExecutionActionPagination = 2500;
 
-  @Getter @NotBlank private Integer apiRegisterInterval = 3600;
+  @Getter @NotBlank private Integer apiRegisterInterval = 1200;
 
   @Getter @NotBlank private String clientId;
 
