@@ -105,19 +105,21 @@ const AtomicTesting = () => {
     {
       key: 0,
       label: t('All targets'),
-      content: sortedTargets.length > 0 ? (
-        <List>
-          {sortedTargets.map((target) => (
-            <div key={target?.id}>
-              {renderTargetItem(target, undefined, undefined)}
-            </div>
-          ))}
-        </List>
-      ) : (
-        <Empty message={t('No target configured.')} />
-      ),
+      content: sortedTargets.length > 0
+        ? (
+            <List>
+              {sortedTargets.map(target => (
+                <div key={target?.id}>
+                  {renderTargetItem(target, undefined, undefined)}
+                </div>
+              ))}
+            </List>
+          )
+        : (
+            <Empty message={t('No target configured.')} />
+          ),
     },
-  ]
+  ];
 
   return (
     <GridLegacy
@@ -171,11 +173,11 @@ const AtomicTesting = () => {
             textColor="primary"
             className={classes.tabs}
           >
-            {tabConfig.map((tab) => (
+            {tabConfig.map(tab => (
               <Tab key={tab.key} label={tab.label} />
             ))}
           </Tabs>
-          {tabConfig.map((tab) => (
+          {tabConfig.map(tab => (
             <div key={tab.key} hidden={activeTab !== tab.key}>
               {tab.content}
             </div>
