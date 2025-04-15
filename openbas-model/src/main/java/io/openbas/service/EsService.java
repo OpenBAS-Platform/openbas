@@ -356,16 +356,13 @@ public class EsService {
                           new Aggregation.Builder().terms(termsAggregation).build()),
               Void.class);
       Aggregate aggregate = response.aggregations().get(aggregationKey);
-      if (propertyField.getType() == String.class) {
-        return termHistogramSTerms(user, config, aggregate, field);
-      } else if (propertyField.getType() == Double.class) {
+      if (propertyField.getType() == Double.class) {
         return termHistogramDTerms(config, aggregate);
       } else if (propertyField.getType() == Long.class
           || propertyField.getType() == Boolean.class) {
         return termHistogramLTerms(config, aggregate);
       } else {
-        throw new UnsupportedOperationException(
-            "Unsupported field type: " + propertyField.getType());
+        return termHistogramSTerms(user, config, aggregate, field);
       }
     } catch (Exception e) {
       LOGGER.severe("termHistogram exception: " + e);

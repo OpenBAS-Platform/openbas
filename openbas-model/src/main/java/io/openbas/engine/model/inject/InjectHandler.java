@@ -1,11 +1,14 @@
 package io.openbas.engine.model.inject;
 
 import static io.openbas.engine.EsUtils.buildRestrictions;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.raw.RawInjectIndexing;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.engine.Handler;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,11 +43,29 @@ public class InjectHandler implements Handler<EsInject> {
               // Specific
               esInject.setInject_title(inject.getInject_title());
               esInject.setInject_status(inject.getInject_status_name());
-              esInject.setBase_scenario_side(inject.getInject_scenario());
-              esInject.setBase_simulation_side(inject.getInject_Exercise());
-              esInject.setBase_attack_patterns_side(inject.getInject_attack_patterns());
-              esInject.setBase_kill_chain_phases_side(inject.getInject_kill_chain_phases());
-              esInject.setBase_inject_contract_side(inject.getInject_injector_contract());
+              // Dependencies
+              List<String> dependencies = new ArrayList<>();
+              if (hasText(inject.getInject_scenario())) {
+                dependencies.add(inject.getInject_scenario());
+                esInject.setBase_scenario_side(inject.getInject_scenario());
+              }
+              if (hasText(inject.getInject_Exercise())) {
+                dependencies.add(inject.getInject_Exercise());
+                esInject.setBase_simulation_side(inject.getInject_Exercise());
+              }
+              if (!isEmpty(inject.getInject_attack_patterns())) {
+                dependencies.addAll(inject.getInject_attack_patterns());
+                esInject.setBase_attack_patterns_side(inject.getInject_attack_patterns());
+              }
+              if (!isEmpty(inject.getInject_kill_chain_phases())) {
+                dependencies.addAll(inject.getInject_kill_chain_phases());
+                esInject.setBase_kill_chain_phases_side(inject.getInject_kill_chain_phases());
+              }
+              if (hasText(inject.getInject_injector_contract())) {
+                dependencies.add(inject.getInject_injector_contract());
+                esInject.setBase_inject_contract_side(inject.getInject_injector_contract());
+              }
+              esInject.setBase_dependencies(dependencies);
               return esInject;
             })
         .toList();
