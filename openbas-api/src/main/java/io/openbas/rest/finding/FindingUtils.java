@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -33,15 +34,26 @@ public class FindingUtils {
         .forEach(
             contractOutputElement -> {
               String regex = contractOutputElement.getRule();
+
+              // Check regex
               Pattern pattern =
                   patternCache.computeIfAbsent(
                       regex,
-                      r ->
-                          Pattern.compile(
+                      r -> {
+                        try {
+                          return Pattern.compile(
                               r,
                               Pattern.MULTILINE
                                   | Pattern.CASE_INSENSITIVE
-                                  | Pattern.UNICODE_CHARACTER_CLASS));
+                                  | Pattern.UNICODE_CHARACTER_CLASS);
+                        } catch (PatternSyntaxException e) {
+                          log.log(Level.INFO, "Invalid regex pattern: {}", e.getMessage());
+                          return null;
+                        }
+                      });
+
+              if (pattern == null) return;
+
               Matcher matcher = pattern.matcher(rawOutputByMode);
 
               while (matcher.find()) {
