@@ -4,7 +4,6 @@ import { type Schema } from 'normalizr';
 import * as R from 'ramda';
 import { createIntl, createIntlCache } from 'react-intl';
 import { type Dispatch } from 'redux';
-import Immutable from 'seamless-immutable';
 
 import { LANG } from '../components/AppIntlProvider';
 import * as Constants from '../constants/ActionTypes';
@@ -220,10 +219,10 @@ export const delReferential = (uri: string, type: string, id: string) => (dispat
     .then(() => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
-        payload: Immutable({
+        payload: {
           type,
           id,
-        }),
+        },
       });
       notifySuccess('The element has been successfully deleted');
     })
@@ -244,10 +243,10 @@ export const bulkDeleteReferential = (uri: string, type: string, data: unknown) 
     .then((response) => {
       dispatch({
         type: Constants.DATA_DELETE_SUCCESS,
-        payload: Immutable({
+        payload: {
           type,
           data,
-        }),
+        },
       });
       return response.data;
     })
