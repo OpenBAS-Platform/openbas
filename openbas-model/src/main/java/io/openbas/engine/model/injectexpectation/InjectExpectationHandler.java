@@ -2,6 +2,8 @@ package io.openbas.engine.model.injectexpectation;
 
 import static io.openbas.engine.EsUtils.buildRestrictions;
 import static io.openbas.helper.InjectExpectationHelper.computeStatus;
+import static java.lang.String.valueOf;
+import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasText;
 
 import io.openbas.database.model.InjectExpectation;
@@ -40,23 +42,6 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
               esInjectExpectation.setBase_restrictions(
                   buildRestrictions(
                       injectExpectation.getExercise_id(), injectExpectation.getInject_id()));
-              List<String> dependencies = new ArrayList<>();
-              if (hasText(injectExpectation.getExercise_id())) {
-                dependencies.add(injectExpectation.getExercise_id());
-              } else if (hasText(injectExpectation.getInject_id())) {
-                dependencies.add(injectExpectation.getInject_id());
-              } else if (hasText(injectExpectation.getUser_id())) {
-                dependencies.add(injectExpectation.getUser_id());
-              } else if (hasText(injectExpectation.getTeam_id())) {
-                dependencies.add(injectExpectation.getTeam_id());
-              } else if (hasText(injectExpectation.getAgent_id())) {
-                dependencies.add(injectExpectation.getAgent_id());
-              } else if (hasText(injectExpectation.getAsset_id())) {
-                dependencies.add(injectExpectation.getAsset_id());
-              } else if (hasText(injectExpectation.getAsset_group_id())) {
-                dependencies.add(injectExpectation.getAsset_group_id());
-              }
-              esInjectExpectation.setBase_dependencies(dependencies);
               // Specific
               esInjectExpectation.setInject_expectation_name(
                   injectExpectation.getInject_expectation_name());
@@ -71,10 +56,8 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
               injectExpectationTmp.setScore(injectExpectation.getInject_expectation_score());
               injectExpectationTmp.setExpectedScore(
                   injectExpectation.getInject_expectation_expected_score());
-
               esInjectExpectation.setInject_expectation_status(
-                  String.valueOf(computeStatus(injectExpectationTmp)));
-
+                  valueOf(computeStatus(injectExpectationTmp)));
               esInjectExpectation.setInject_expectation_score(
                   injectExpectation.getInject_expectation_score());
               esInjectExpectation.setInject_expectation_expected_score(
@@ -83,17 +66,42 @@ public class InjectExpectationHandler implements Handler<EsInjectExpectation> {
                   injectExpectation.getInject_expiration_time());
               esInjectExpectation.setInject_expectation_group(
                   injectExpectation.getInject_expectation_group());
-              // Specific side
-              esInjectExpectation.setBase_simulation_side(injectExpectation.getExercise_id());
-              esInjectExpectation.setBase_inject_side(injectExpectation.getInject_id());
-              esInjectExpectation.setBase_user_side(injectExpectation.getUser_id());
-              esInjectExpectation.setBase_team_side(injectExpectation.getTeam_id());
-              esInjectExpectation.setBase_agent_side(injectExpectation.getAgent_id());
-              esInjectExpectation.setBase_asset_side(injectExpectation.getAsset_id());
-              esInjectExpectation.setBase_asset_group_side(injectExpectation.getAsset_group_id());
-              esInjectExpectation.setBase_asset_group_side(injectExpectation.getAsset_group_id());
-              esInjectExpectation.setBase_attack_patterns_side(
-                  injectExpectation.getAttack_pattern_ids());
+              // Dependencies
+              List<String> dependencies = new ArrayList<>();
+              if (hasText(injectExpectation.getExercise_id())) {
+                dependencies.add(injectExpectation.getExercise_id());
+                esInjectExpectation.setBase_simulation_side(injectExpectation.getExercise_id());
+              }
+              if (hasText(injectExpectation.getInject_id())) {
+                dependencies.add(injectExpectation.getInject_id());
+                esInjectExpectation.setBase_inject_side(injectExpectation.getInject_id());
+              }
+              if (hasText(injectExpectation.getUser_id())) {
+                dependencies.add(injectExpectation.getUser_id());
+                esInjectExpectation.setBase_user_side(injectExpectation.getUser_id());
+              }
+              if (hasText(injectExpectation.getTeam_id())) {
+                dependencies.add(injectExpectation.getTeam_id());
+                esInjectExpectation.setBase_team_side(injectExpectation.getTeam_id());
+              }
+              if (hasText(injectExpectation.getAgent_id())) {
+                dependencies.add(injectExpectation.getAgent_id());
+                esInjectExpectation.setBase_agent_side(injectExpectation.getAgent_id());
+              }
+              if (hasText(injectExpectation.getAsset_id())) {
+                dependencies.add(injectExpectation.getAsset_id());
+                esInjectExpectation.setBase_asset_side(injectExpectation.getAsset_id());
+              }
+              if (hasText(injectExpectation.getAsset_group_id())) {
+                dependencies.add(injectExpectation.getAsset_group_id());
+                esInjectExpectation.setBase_asset_group_side(injectExpectation.getAsset_group_id());
+              }
+              if (!isEmpty(injectExpectation.getAttack_pattern_ids())) {
+                dependencies.addAll(injectExpectation.getAttack_pattern_ids());
+                esInjectExpectation.setBase_attack_patterns_side(
+                    injectExpectation.getAttack_pattern_ids());
+              }
+              esInjectExpectation.setBase_dependencies(dependencies);
               return esInjectExpectation;
             })
         .toList();

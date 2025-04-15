@@ -4,6 +4,7 @@ import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
 import io.openbas.engine.model.EsBase;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import lombok.Setter;
 @Indexable(index = "expectation-inject", label = "Inject expectation")
 public class EsInjectExpectation extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
+  /* Except relationships, they should have same name on every model! */
 
   @Queryable(label = "expectation inject type", filterable = true)
   @EsQueryable(keyword = true)
@@ -41,4 +43,38 @@ public class EsInjectExpectation extends EsBase {
   @Queryable(label = "status", filterable = true)
   @EsQueryable(keyword = true)
   private String inject_expectation_status;
+
+  // -- SIDE --
+
+  @Queryable(label = "simulation", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private String base_simulation_side; // Must finish by _side
+
+  @Queryable(label = "inject", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private String base_inject_side; // Must finish by _side
+
+  @Queryable(label = "user", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private String base_user_side; // Must finish by _side
+
+  @Queryable(label = "team", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private String base_team_side; // Must finish by _side
+
+  @Queryable(label = "agent", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private String base_agent_side; // Must finish by _side
+
+  @Queryable(label = "asset", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private String base_asset_side; // Must finish by _side
+
+  @Queryable(label = "asset group", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private String base_asset_group_side; // Must finish by _side
+
+  @Queryable(label = "attack patterns", filterable = true, sortable = true)
+  @EsQueryable(keyword = true)
+  private Set<String> base_attack_patterns_side; // Must finish by _side
 }
