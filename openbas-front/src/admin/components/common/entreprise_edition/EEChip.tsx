@@ -20,14 +20,15 @@ const useStyles = makeStyles<{ isClickable: boolean }>()((theme, { isClickable }
   },
 }));
 
-const EEChip = ({ clickable = false }: {
+const EEChip = ({ clickable = false, featureDetectedInfo = '' }: {
   clickable?: boolean;
   featureDetectedInfo?: string;
 }) => {
   const { classes } = useStyles({ isClickable: clickable });
   const { t } = useFormatter();
-  const { openDialog } = useEnterpriseEdition();
+  const { openDialog, setFeatureDetectedInfo } = useEnterpriseEdition();
   const { isValidated: isEnterpriseEdition } = useEnterpriseEdition();
+  setFeatureDetectedInfo(featureDetectedInfo);
 
   return (
     <Tooltip
