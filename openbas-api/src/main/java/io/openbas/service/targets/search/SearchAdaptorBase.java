@@ -5,11 +5,12 @@ import io.openbas.database.model.Inject;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public abstract class SearchAdaptorBase {
-  Map<String, String> fieldTranslations;
+  protected final Map<String, String> fieldTranslations = new HashMap<>();
 
   public SearchPaginationInput translate(SearchPaginationInput input, Inject scopedInject) {
     SearchPaginationInput newInput = new SearchPaginationInput();
@@ -34,7 +35,7 @@ public abstract class SearchAdaptorBase {
       injectScopeFilter.setMode(Filters.FilterMode.and);
       injectScopeFilter.setOperator(Filters.FilterOperator.eq);
       injectScopeFilter.setValues(List.of(scopedInject.getId()));
-      injectScopeFilter.setKey(fieldTranslations.get("target_inject"));
+      injectScopeFilter.setKey(fieldTranslations.get("target_injects"));
       newFilters.add(injectScopeFilter);
     }
 
@@ -44,8 +45,9 @@ public abstract class SearchAdaptorBase {
 
     // mind the sorts
     List<SortField> newSorts = new ArrayList<>();
+    SortField defaultSort = new SortField("target_name", "ASC");
     List<SortField> currentSorts =
-        input.getSorts() == null ? List.of(new SortField("target_name", "ASC")) : input.getSorts();
+        input.getSorts() == null ? List.of(defaultSort) : input.getSorts();
     for (SortField sortField : currentSorts) {
       if (fieldTranslations.containsKey(sortField.property())) {
         newSorts.add(

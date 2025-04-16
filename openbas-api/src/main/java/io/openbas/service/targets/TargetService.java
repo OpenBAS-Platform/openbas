@@ -6,8 +6,6 @@ import io.openbas.rest.asset_group.form.AssetGroupOutput;
 import io.openbas.service.targets.search.AssetGroupTargetSearchAdaptor;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

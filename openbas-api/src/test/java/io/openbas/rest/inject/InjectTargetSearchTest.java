@@ -136,8 +136,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
       }
 
       @Test
-      @DisplayName("With some asset group targets, return matching items in page")
-      public void withSomeAssetGroupTargets() throws Exception {
+      @DisplayName("With some asset group targets, return matching items in page 1")
+      public void withSomeAssetGroupTargetsPageOne() throws Exception {
         String searchTerm = "asset group target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         for (int i = 0; i < 20; i++) {
@@ -168,6 +168,58 @@ public class InjectTargetSearchTest extends IntegrationTest {
         List<AssetGroupTarget> expected =
             inject.getAssetGroups().stream()
                 .sorted(Comparator.comparing(AssetGroup::getName))
+                .limit(search.getSize())
+                .map(
+                    assetGroup ->
+                        new AssetGroupTarget(
+                            assetGroup.getId(),
+                            assetGroup.getName(),
+                            assetGroup.getTags().stream()
+                                .map(Tag::getId)
+                                .collect(Collectors.toSet())))
+                .toList();
+
+        assertThatJson(response)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .node("content")
+            .isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Test
+      @DisplayName("With some asset group targets, return matching items in page 2")
+      public void withSomeAssetGroupTargetsPageTwo() throws Exception {
+        String searchTerm = "asset group target";
+        InjectComposer.Composer injectWrapper = getInjectWrapper();
+        for (int i = 0; i < 20; i++) {
+          addAssetGroupWithName(injectWrapper, searchTerm + " " + i);
+        }
+        Inject inject = injectWrapper.persist().get();
+        entityManager.flush();
+        entityManager.clear();
+
+        SearchPaginationInput search =
+            PaginationFixture.simpleFilter(
+                "target_name", searchTerm, Filters.FilterOperator.contains);
+        search.setPage(1); // 0-based
+        String response =
+            mvc.perform(
+                    post(INJECT_URI
+                            + "/"
+                            + inject.getId()
+                            + "/targets/"
+                            + targetType.name()
+                            + "/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(search)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        List<AssetGroupTarget> expected =
+            inject.getAssetGroups().stream()
+                .sorted(Comparator.comparing(AssetGroup::getName))
+                .skip((long) search.getPage() * search.getSize())
                 .limit(search.getSize())
                 .map(
                     assetGroup ->
