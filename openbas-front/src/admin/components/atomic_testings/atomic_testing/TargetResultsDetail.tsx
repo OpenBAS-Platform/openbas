@@ -39,12 +39,12 @@ import InjectIcon from '../../common/injects/InjectIcon';
 import DetectionPreventionExpectationsValidationForm from '../../simulations/simulation/validation/expectations/DetectionPreventionExpectationsValidationForm';
 import ManualExpectationsValidationForm from '../../simulations/simulation/validation/expectations/ManualExpectationsValidationForm';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
+import ExecutionDetail from './ExecutionDetail';
 import ExpirationChip from './ExpirationChip';
 import TargetResultAlertNumber from './TargetResultAlertNumber';
 import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
 import nodeTypes from './types/nodes';
 import { type NodeResultStep } from './types/nodes/NodeResultStep';
-import ExecutionDetail from './ExecutionDetail';
 
 interface Steptarget {
   label: string;
@@ -606,11 +606,11 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           textColor="primary"
           className={classes.tabs}
         >
-          {Object.keys(sortedGroupedResults).length > 0 &&
-            Object.keys(sortedGroupedResults).map((type, index) => (
+          {Object.keys(sortedGroupedResults).length > 0
+            && Object.keys(sortedGroupedResults).map((type, index) => (
               <Tab key={index} label={t(`TYPE_${type}`)} />
             ))}
-          <Tab label={t("Execution")} />
+          <Tab label={t('Execution')} />
         </Tabs>
       </Box>
       {Object.keys(sortedGroupedResults).map((targetResult, targetResultIndex) => (
@@ -971,7 +971,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
-      <ExecutionDetail></ExecutionDetail>
+      <div style={{ paddingTop: 20 }}><ExecutionDetail /></div>
     </>
   );
 };
