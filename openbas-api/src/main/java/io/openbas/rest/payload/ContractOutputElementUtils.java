@@ -62,7 +62,7 @@ public class ContractOutputElementUtils {
 
     if (!isValidRegex(input.getRule())) {
       throw new BadRequestException(
-          "Invalid regex for contractOutputElement.rule: " + input.getRule());
+          "Invalid regex for: " + input.getRule());
     }
 
     BeanUtils.copyProperties(input, contractOutputElement, "id", "tags", "regexGroups");
@@ -78,7 +78,7 @@ public class ContractOutputElementUtils {
 
     if (!isValidRegex(existing.getRule())) {
       throw new BadRequestException(
-          "Invalid regex for contractOutputElement.rule: " + existing.getRule());
+          "Invalid regex for: " + existing.getRule());
     }
 
     BeanUtils.copyProperties(existing, contractOutputElement, "id", "tags", "regexGroups");
