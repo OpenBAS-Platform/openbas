@@ -9,6 +9,7 @@ import io.openbas.rest.notification_rule.form.NotificationRuleMapper;
 import io.openbas.rest.notification_rule.form.NotificationRuleOutput;
 import io.openbas.rest.notification_rule.form.UpdateNotificationRuleInput;
 import io.openbas.service.NotificationRuleService;
+import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,14 +37,17 @@ public class NotificationRuleApi {
   public static final String NOTIFICATION_RULE_URI = "/api/notification-rules";
 
   private final NotificationRuleService notificationRuleService;
+  private final UserService userService;
   private final NotificationRuleMapper notificationRuleMapper;
 
   public NotificationRuleApi(
       NotificationRuleService notificationRuleService,
-      NotificationRuleMapper notificationRuleMapper) {
+      NotificationRuleMapper notificationRuleMapper,
+      UserService userService) {
     super();
     this.notificationRuleService = notificationRuleService;
     this.notificationRuleMapper = notificationRuleMapper;
+    this.userService = userService;
   }
 
   @Secured(ROLE_ADMIN)
@@ -57,6 +62,25 @@ public class NotificationRuleApi {
         .findById(notificationRuleId)
         .map(notificationRuleMapper::toNotificationRuleOutput)
         .orElse(null);
+  }
+
+  @Secured(ROLE_ADMIN)
+  @LogExecutionTime
+  @GetMapping(NOTIFICATION_RULE_URI + "/resource/{resourceId}")
+  @Operation(
+      description = "Get NotificationRule by resource id for the current user",
+      summary = "Get NotificationRule by resource id")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The NotificationRule")})
+  public List<NotificationRuleOutput> findNotificationRuleByResource(
+      @PathVariable
+          @NotBlank
+          @Schema(description = "Resource id of the resource associated with the notification rule")
+          final String resourceId) {
+    return notificationRuleService
+        .findNotificationRuleByResourceAndUser(resourceId, userService.currentUser().getId())
+        .stream()
+        .map(notificationRuleMapper::toNotificationRuleOutput)
+        .collect(Collectors.toList());
   }
 
   @Secured(ROLE_ADMIN)
@@ -96,10 +120,10 @@ public class NotificationRuleApi {
   @Transactional(rollbackFor = Exception.class)
   @Operation(summary = "Create NotificationRule", description = "Create a NotificationRule")
   @ApiResponses(
-          value = {
-                  @ApiResponse(responseCode = "200", description = "NotificationRule created"),
-                  @ApiResponse(responseCode = "404", description = "Resource not found")
-          })
+      value = {
+        @ApiResponse(responseCode = "200", description = "NotificationRule created"),
+        @ApiResponse(responseCode = "404", description = "Resource not found")
+      })
   public NotificationRuleOutput createNotificationRule(
       @Valid @RequestBody final CreateNotificationRuleInput input) {
     return notificationRuleMapper.toNotificationRuleOutput(
