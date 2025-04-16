@@ -1,5 +1,7 @@
 package io.openbas.rest.inject.service;
 
+import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
+import static io.openbas.executors.tanium.service.TaniumExecutorService.TANIUM_EXECUTOR_TYPE;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AgentUtils.isPrimaryAgent;
@@ -11,17 +13,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.InjectDocumentRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.database.repository.TeamRepository;
 import io.openbas.database.specification.InjectSpecification;
+import io.openbas.ee.Ee;
 import io.openbas.injector_contract.fields.ContractFieldType;
 import io.openbas.rest.atomic_testing.form.InjectResultOverviewOutput;
 import io.openbas.rest.document.DocumentService;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.exception.ElementNotFoundException;
+import io.openbas.rest.exception.LicenseRestrictionException;
 import io.openbas.rest.inject.form.InjectBulkProcessingInput;
 import io.openbas.rest.inject.form.InjectBulkUpdateOperation;
 import io.openbas.rest.inject.form.InjectBulkUpdateSupportedOperations;
@@ -42,6 +47,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -50,6 +56,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -62,8 +69,10 @@ import org.springframework.util.CollectionUtils;
 public class InjectService {
 
   private final TeamRepository teamRepository;
+  private final AgentService agentService;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
+  private final Ee eeService;
   private final InjectRepository injectRepository;
   private final InjectDocumentRepository injectDocumentRepository;
   private final InjectStatusRepository injectStatusRepository;
@@ -76,6 +85,7 @@ public class InjectService {
   private final DocumentService documentService;
 
   @Resource protected ObjectMapper mapper;
+  @Autowired private LicenseCacheManager licenseCacheManager;
 
   private SecurityExpression getAmbientSecurityExpression() {
     return ((SecurityExpressionHandler) methodSecurityExpressionHandler).getSecurityExpression();
@@ -267,9 +277,41 @@ public class InjectService {
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
+  public void checkInjectLaunchable(Inject inject) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return;
+    }
+    List<Agent> agents = this.getAgentsByInject(inject);
+
+    boolean hasCrowdstrike = false;
+    boolean hasTanium = false;
+    for (Agent agent : agents) {
+      String type = agent.getExecutor().getType();
+      if (type.equals(CROWDSTRIKE_EXECUTOR_TYPE)) {
+        hasCrowdstrike = true;
+      } else if (type.equals(TANIUM_EXECUTOR_TYPE)) {
+        hasTanium = true;
+      }
+      if (hasCrowdstrike && hasTanium) {
+        break;
+      }
+    }
+    if (hasTanium && hasCrowdstrike) {
+      throw new LicenseRestrictionException(
+          "Some asset will be executed through the Crowdstrike and Tanium executors");
+    } else if (hasTanium) {
+      throw new LicenseRestrictionException(
+          "Some asset will be executed through the Tanium executor");
+    } else if (hasCrowdstrike) {
+      throw new LicenseRestrictionException(
+          "Some asset will be executed through the Crowdstrike executor");
+    }
+  }
+
   @Transactional
   public InjectResultOverviewOutput launch(String id) {
     Inject inject = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
+    this.checkInjectLaunchable(inject);
     inject.clean();
     inject.setUpdatedAt(Instant.now());
     Inject savedInject = saveInjectAndStatusAsQueuing(inject);
@@ -279,6 +321,7 @@ public class InjectService {
   @Transactional
   public InjectResultOverviewOutput relaunch(String id) {
     Inject duplicatedInject = findAndDuplicateInject(id);
+    this.checkInjectLaunchable(duplicatedInject);
     Inject savedInject = saveInjectAndStatusAsQueuing(duplicatedInject);
     delete(id);
     return injectMapper.toInjectResultOverviewOutput(savedInject);
@@ -610,18 +653,24 @@ public class InjectService {
     List<Agent> agents = new ArrayList<>();
     Set<String> agentIds = new HashSet<>();
 
-    resolveAllAssetsToExecute(inject).stream()
-        .map(assetToExecute -> (Endpoint) Hibernate.unproxy(assetToExecute.asset()))
+    Consumer<Asset> extractAgents =
+        asset -> {
+          List<Agent> collectedAgents =
+              Optional.ofNullable(((Endpoint) Hibernate.unproxy(asset)).getAgents())
+                  .orElse(Collections.emptyList());
+          for (Agent agent : collectedAgents) {
+            if (isPrimaryAgent(agent) && !agentIds.contains(agent.getId())) {
+              agents.add(agent);
+              agentIds.add(agent.getId());
+            }
+          }
+        };
+
+    new ArrayList<>(inject.getAssets()).forEach(extractAgents);
+    inject.getAssetGroups().stream()
         .flatMap(
-            endpoint -> Optional.ofNullable(endpoint.getAgents()).stream().flatMap(List::stream))
-        .filter(agent -> isPrimaryAgent(agent))
-        .forEach(
-            agent -> {
-              if (!agentIds.contains(agent.getId())) {
-                agents.add(agent);
-                agentIds.add(agent.getId());
-              }
-            });
+            assetGroup -> this.assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
+        .forEach(extractAgents);
 
     return agents;
   }

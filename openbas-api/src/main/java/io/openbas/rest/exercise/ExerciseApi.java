@@ -336,6 +336,7 @@ public class ExerciseApi extends RestBehavior {
       String message = "Change date is only possible in scheduling state";
       throw new InputValidationException("exercise_start_date", message);
     }
+    exerciseService.checkExerciseLaunchable(exercise);
     exercise.setUpdateAttributes(input);
     return exerciseRepository.save(exercise);
   }
@@ -597,6 +598,7 @@ public class ExerciseApi extends RestBehavior {
     // In case of manual start
     if (ExerciseStatus.SCHEDULED.equals(exercise.getStatus())
         && ExerciseStatus.RUNNING.equals(status)) {
+      exerciseService.checkExerciseLaunchable(exercise);
       Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
       exercise.setStart(nextMinute);
       actionMetricCollector.addSimulationPlayedCount();
