@@ -12,6 +12,7 @@ import static org.mockito.Mockito.*;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
@@ -44,6 +45,7 @@ class ScenarioServiceTest {
   @Autowired InjectRepository injectRepository;
 
   @Mock ScenarioRepository mockScenarioRepository;
+  @Mock Ee eeService;
   @Mock GrantService grantService;
   @Mock VariableService variableService;
   @Mock ChallengeService challengeService;
@@ -65,26 +67,26 @@ class ScenarioServiceTest {
   @BeforeEach
   void setUp() {
     scenarioService =
-        scenarioService =
-            new ScenarioService(
-                scenarioRepository,
-                teamRepository,
-                userRepository,
-                documentRepository,
-                scenarioTeamUserRepository,
-                articleRepository,
-                exerciseMapper,
-                actionMetricCollector,
-                grantService,
-                variableService,
-                challengeService,
-                teamService,
-                fileService,
-                injectDuplicateService,
-                tagRuleService,
-                injectService,
-                injectRepository,
-                lessonsCategoryRepository);
+        new ScenarioService(
+            scenarioRepository,
+            teamRepository,
+            userRepository,
+            documentRepository,
+            scenarioTeamUserRepository,
+            articleRepository,
+            exerciseMapper,
+            actionMetricCollector,
+            eeService,
+            grantService,
+            variableService,
+            challengeService,
+            teamService,
+            fileService,
+            injectDuplicateService,
+            tagRuleService,
+            injectService,
+            injectRepository,
+            lessonsCategoryRepository);
   }
 
   void setUpWithMockRepository() {
@@ -98,6 +100,7 @@ class ScenarioServiceTest {
             articleRepository,
             exerciseMapper,
             actionMetricCollector,
+            eeService,
             grantService,
             variableService,
             challengeService,
