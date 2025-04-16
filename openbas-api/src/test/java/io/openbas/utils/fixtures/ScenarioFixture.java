@@ -35,7 +35,6 @@ public class ScenarioFixture {
     if (scenarioInjects != null) {
       scenario.setInjects(scenarioInjects);
     }
-    scenario.setExercises(new ArrayList<>());
     return scenario;
   }
 
@@ -46,7 +45,6 @@ public class ScenarioFixture {
     scenario.setSubtitle("A crisis scenario");
     scenario.setFrom("scenario@mail.fr");
     scenario.setCategory("crisis-communication");
-    scenario.setExercises(new ArrayList<>());
     return scenario;
   }
 
@@ -58,7 +56,6 @@ public class ScenarioFixture {
     scenario.setFrom("scenario@mail.fr");
     scenario.setCategory("incident-response");
     scenario.setSeverity(critical);
-    scenario.setExercises(new ArrayList<>());
     return scenario;
   }
 }
