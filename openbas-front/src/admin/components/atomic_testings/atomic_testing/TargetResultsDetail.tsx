@@ -606,6 +606,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
             {Object.keys(sortedGroupedResults).map((type, index) => (
               <Tab key={index} label={t(`TYPE_${type}`)} />
             ))}
+            <Tab label={t("Execution")}></Tab>
           </Tabs>
         </Box>
       )}
