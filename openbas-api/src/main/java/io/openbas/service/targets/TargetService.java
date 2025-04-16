@@ -1,4 +1,4 @@
-package io.openbas.service;
+package io.openbas.service.targets;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.asset_group.AssetGroupCriteriaBuilderService;
@@ -75,7 +75,7 @@ public class TargetService {
           newFilter.setKey("asset_group_name");
           convertedFilters.add(newFilter);
           break;
-      case "target_tags":
+        case "target_tags":
           newFilter.setMode(filter.getMode());
           newFilter.setValues(filter.getValues());
           newFilter.setOperator(filter.getOperator());
