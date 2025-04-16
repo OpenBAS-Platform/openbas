@@ -21,6 +21,7 @@ public class InjectTarget {
   private String id;
 
   @JsonProperty("target_name")
+  @Queryable(filterable = true, searchable = true, sortable = true)
   private String name;
 
   @JsonProperty("target_tags")

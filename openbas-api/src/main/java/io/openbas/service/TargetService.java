@@ -66,13 +66,20 @@ public class TargetService {
     Filters.FilterGroup newFilterGroup = new Filters.FilterGroup();
     List<Filters.Filter> convertedFilters = new ArrayList<>();
     for (Filters.Filter filter : filterGroup.getFilters()) {
+      Filters.Filter newFilter = new Filters.Filter();
       switch (filter.getKey()) {
         case "target_name":
-          Filters.Filter newFilter = new Filters.Filter();
           newFilter.setMode(filter.getMode());
           newFilter.setValues(filter.getValues());
           newFilter.setOperator(filter.getOperator());
           newFilter.setKey("asset_group_name");
+          convertedFilters.add(newFilter);
+          break;
+      case "target_tags":
+          newFilter.setMode(filter.getMode());
+          newFilter.setValues(filter.getValues());
+          newFilter.setOperator(filter.getOperator());
+          newFilter.setKey("asset_group_tags");
           convertedFilters.add(newFilter);
           break;
         default:

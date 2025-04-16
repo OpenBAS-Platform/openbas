@@ -138,9 +138,10 @@ public class InjectTargetSearchTest extends IntegrationTest {
       @Test
       @DisplayName("With some asset group targets, return matching items in page")
       public void withSomeAssetGroupTargets() throws Exception {
+        String searchTerm = "asset group target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         for (int i = 0; i < 20; i++) {
-          addAssetGroupWithName(injectWrapper, "asset group " + i);
+          addAssetGroupWithName(injectWrapper, searchTerm + " " + i);
         }
         Inject inject = injectWrapper.persist().get();
         entityManager.flush();
@@ -148,7 +149,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
         SearchPaginationInput search =
             PaginationFixture.simpleFilter(
-                "target_name", "asset group", Filters.FilterOperator.contains);
+                "target_name", searchTerm, Filters.FilterOperator.contains);
         String response =
             mvc.perform(
                     post(INJECT_URI

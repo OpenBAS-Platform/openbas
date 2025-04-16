@@ -41,6 +41,7 @@ const useRetrieveOptions = () => {
       case 'inject_tags':
       case 'payload_tags':
       case 'scenario_tags':
+      case 'target_tags':
       case 'team_tags':
       case 'user_tags':
         searchTagByIdAsOption(ids).then((response) => {
