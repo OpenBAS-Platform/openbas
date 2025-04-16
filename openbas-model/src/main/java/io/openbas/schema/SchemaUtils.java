@@ -172,10 +172,13 @@ public class SchemaUtils {
               ? ((Field) member).getAnnotation(Queryable.class)
               : ((Method) member).getAnnotation(Queryable.class);
       if (queryable != null) {
-        String entity =
-            clazz.isAnnotationPresent(Indexable.class)
-                ? clazz.getAnnotation(Indexable.class).index()
-                : clazz.getSimpleName().toLowerCase();
+        String entity;
+        if (clazz.isAnnotationPresent(Indexable.class)) {
+          Indexable indexable = clazz.getAnnotation(Indexable.class);
+          entity = hasText(indexable.ref()) ? indexable.ref() : indexable.index();
+        } else {
+          entity = clazz.getSimpleName();
+        }
         builder
             .searchable(queryable.searchable())
             .filterable(queryable.filterable())
