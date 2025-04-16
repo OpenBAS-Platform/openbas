@@ -12,11 +12,15 @@ import io.openbas.database.repository.InjectExpectationRepository;
 import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.helper.InjectHelper;
+import io.openbas.notification.model.NotificationEvent;
+import io.openbas.notification.model.NotificationEventType;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
+import io.openbas.service.NotificationEventService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import jakarta.annotation.Resource;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +55,7 @@ public class InjectsExecutionJob implements Job {
   private final InjectStatusService injectStatusService;
   private final io.openbas.executors.Executor executor;
   private final ActionMetricCollector actionMetricCollector;
+  private final NotificationEventService notificationEventService;
 
   private final List<ExecutionStatus> executionStatusesNotReady =
       List.of(
@@ -83,15 +88,32 @@ public class InjectsExecutionJob implements Job {
   public void handleAutoClosingExercises() {
     // Change status of finished exercises.
     List<Exercise> mustBeFinishedExercises = exerciseRepository.thatMustBeFinished();
-    exerciseRepository.saveAll(
-        mustBeFinishedExercises.stream()
-            .peek(
-                exercise -> {
-                  exercise.setStatus(ExerciseStatus.FINISHED);
-                  exercise.setEnd(now());
-                  exercise.setUpdatedAt(now());
-                })
-            .toList());
+    List<Exercise> exercisesFinished =
+        exerciseRepository.saveAll(
+            mustBeFinishedExercises.stream()
+                .peek(
+                    exercise -> {
+                      exercise.setStatus(ExerciseStatus.FINISHED);
+                      exercise.setEnd(now());
+                      exercise.setUpdatedAt(now());
+                    })
+                .toList());
+
+    // send notification
+    exercisesFinished.stream()
+        .filter(
+            ex ->
+                ex.getScenario()
+                    != null) // only send notification for exercise associated to a scenario
+        .forEach(
+            ex ->
+                notificationEventService.sendNotificationEventWithDelay(
+                    NotificationEvent.builder()
+                        .eventType(NotificationEventType.SIMULATION_COMPLETED)
+                        .resourceType(NotificationRuleResourceType.SCENARIO)
+                        .resourceId(ex.getScenario().getId())
+                        .timestamp(Instant.now())
+                        .build(), 5L)); // add a 1 hour delay
   }
 
   private void executeInject(ExecutableInject executableInject)

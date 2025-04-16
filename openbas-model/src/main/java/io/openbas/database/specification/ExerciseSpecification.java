@@ -1,10 +1,12 @@
 package io.openbas.database.specification;
 
+import static io.openbas.database.model.ExerciseStatus.FINISHED;
 import static io.openbas.database.model.ExerciseStatus.SCHEDULED;
 
 import io.openbas.database.model.Exercise;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.criteria.Path;
+import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -30,5 +32,19 @@ public class ExerciseSpecification {
 
   public static Specification<Exercise> byName(@Nullable final String searchText) {
     return UtilsSpecification.byName(searchText, "name");
+  }
+
+  // -- BASIC PROPERTY --
+
+  public static Specification<Exercise> finished() {
+    return (root, query, cb) -> cb.equal(root.get("status"), FINISHED);
+  }
+
+  public static Specification<Exercise> closestBefore(@NotNull final Instant instant) {
+    return (root, query, cb) -> {
+      assert query != null;
+      query.orderBy(cb.desc(root.get("end")));
+      return cb.lessThan(root.get("end"), instant);
+    };
   }
 }
