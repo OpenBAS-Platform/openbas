@@ -61,11 +61,15 @@ public class PlatformSettingsApi extends RestBehavior {
   }
 
   @Secured(ROLE_ADMIN)
-  @PutMapping("/enterprise_edition")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The updated settings")})
+  @PutMapping("/enterprise-edition")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "The updated settings"),
+        @ApiResponse(responseCode = "400", description = "Invalid certificate")
+      })
   @Operation(summary = "Update EE settings", description = "Update the enterprise edition settings")
   public PlatformSettings updateSettingsEnterpriseEdition(
-      @Valid @RequestBody SettingsEnterpriseEditionUpdateInput input) {
+      @Valid @RequestBody SettingsEnterpriseEditionUpdateInput input) throws Exception {
     return platformSettingsService.updateSettingsEnterpriseEdition(input);
   }
 

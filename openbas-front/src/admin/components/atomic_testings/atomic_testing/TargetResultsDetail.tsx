@@ -776,16 +776,22 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           </TableHead>
                           <TableBody>
                             {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                              const isResultSecurityPlatform: boolean = !!(
+                                injectExpectation.inject_expectation_agent
+                                && injectExpectation.inject_expectation_status === 'SUCCESS'
+                                && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected')
+                                && expectationResult.sourceType === 'collector'
+                              );
                               return (
                                 <TableRow
                                   key={index}
-                                  hover={true}
+                                  hover={isResultSecurityPlatform}
                                   onClick={() => {
-                                    if (injectExpectation.inject_expectation_agent && injectExpectation.inject_expectation_status === 'SUCCESS' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && expectationResult.sourceType === 'collector') {
+                                    if (isResultSecurityPlatform) {
                                       handleClickSecurityPlatformResult(injectExpectation, expectationResult);
                                     }
                                   }}
-                                  sx={{ cursor: `${injectExpectation.inject_expectation_agent ? 'pointer' : 'default'}` }}
+                                  sx={{ cursor: `${isResultSecurityPlatform ? 'pointer' : 'default'}` }}
                                   selected={expectationResult.sourceId === selectedResult?.sourceId}
                                 >
                                   <TableCell className={classes.tableFontSize}>
