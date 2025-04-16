@@ -54,6 +54,10 @@ public abstract class SearchAdaptorBase {
             new SortField(fieldTranslations.get(sortField.property()), sortField.direction()));
       }
     }
+
+    if (newSorts.isEmpty()) {
+      newSorts.add(defaultSort);
+    }
     newInput.setSorts(newSorts);
 
     // copy the rest of the attributes
