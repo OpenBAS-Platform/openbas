@@ -7,18 +7,17 @@ import Dialog from '../../../../components/common/Dialog';
 import DialogDelete from '../../../../components/common/DialogDelete';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
+import { type EndpointOutput, type EndpointOverviewOutput, type EndpointUpdateInput } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
-import { type EndpointStoreWithType } from './endpoint';
 import EndpointForm from './EndpointForm';
 
 export interface EndpointPopoverProps {
   inline?: boolean;
-  endpoint: EndpointStoreWithType;
+  endpoint: EndpointOutput & EndpointOverviewOutput;
   assetGroupId?: string;
   assetGroupEndpointIds?: string[];
   onRemoveEndpointFromInject?: (assetId: string) => void;
-  onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
+  onRemoveEndpointFromAssetGroup?: (asset: EndpointOutput) => void;
   openEditOnInit?: boolean;
   onUpdate?: (result: EndpointOverviewOutput) => void;
   onDelete?: (result: string) => void;
@@ -81,7 +80,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
         updateAssetsOnAssetGroup(assetGroupId, { asset_group_assets: assetGroupEndpointIds?.filter(id => id !== endpoint.asset_id) }),
       ).then(() => {
         if (onRemoveEndpointFromAssetGroup) {
-          onRemoveEndpointFromAssetGroup(endpoint.asset_id);
+          onRemoveEndpointFromAssetGroup(endpoint);
         }
         setRemovalFromAssetGroup(false);
       });
@@ -115,7 +114,7 @@ const EndpointPopover: FunctionComponent<EndpointPopoverProps> = ({
     label: 'Remove from the inject',
     action: () => onRemoveEndpointFromInject(endpoint.asset_id),
   });
-  if ((assetGroupId && endpoint.type !== 'dynamic')) entries.push({
+  if ((assetGroupId && endpoint.is_static)) entries.push({
     label: 'Remove from the asset group',
     action: () => handleRemoveFromAssetGroup(),
   });

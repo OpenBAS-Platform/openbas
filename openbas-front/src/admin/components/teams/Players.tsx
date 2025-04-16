@@ -1,4 +1,4 @@
-import { PersonOutlined } from '@mui/icons-material';
+import { HelpOutlineOutlined, PersonOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
@@ -18,8 +18,9 @@ import { useQueryableWithLocalStorage } from '../../../components/common/queryab
 import { type Header } from '../../../components/common/SortHeadersList';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
+import PaginatedListLoader from '../../../components/PaginatedListLoader';
 import { useHelper } from '../../../store';
-import { type PlayerOutput } from '../../../utils/api-types';
+import { type PlayerOutput, type SearchPaginationInput } from '../../../utils/api-types';
 import { useAppDispatch } from '../../../utils/hooks';
 import useDataLoader from '../../../utils/hooks/useDataLoader';
 import CreatePlayer from './players/CreatePlayer';
@@ -125,6 +126,12 @@ const Players = () => {
     exportFileName: `${t('Players')}.csv`,
   };
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const searchPlayersToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchPlayers(input).finally(() => setLoading(false));
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -135,7 +142,7 @@ const Players = () => {
         }]}
       />
       <PaginationComponentV2
-        fetch={searchPlayers}
+        fetch={searchPlayersToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setPlayers}
         entityPrefix="user"
@@ -163,42 +170,44 @@ const Players = () => {
             )}
           />
         </ListItem>
-        {players.map((player: PlayerOutput) => (
-          <ListItem
-            key={player.user_id}
-            classes={{ root: classes.item }}
-            divider
-          >
-            <ListItemIcon>
-              <PersonOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={(
-                <div style={bodyItemsStyles.bodyItems}>
-                  {headers.map(header => (
-                    <div
-                      key={header.field}
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles[header.field],
-                      }}
-                    >
-                      {header.value?.(player)}
+        {loading
+          ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+          : players.map((player: PlayerOutput) => (
+              <ListItem
+                key={player.user_id}
+                classes={{ root: classes.item }}
+                divider
+              >
+                <ListItemIcon>
+                  <PersonOutlined color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={(
+                    <div style={bodyItemsStyles.bodyItems}>
+                      {headers.map(header => (
+                        <div
+                          key={header.field}
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles[header.field],
+                          }}
+                        >
+                          {header.value?.(player)}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-            />
-            <ListItemSecondaryAction>
-              <PlayerPopover
-                user={player}
-                openEditOnInit={player.user_id === searchId}
-                onUpdate={result => setPlayers(players.map(p => (p.user_id !== result.user_id ? p : result)))}
-                onDelete={result => setPlayers(players.filter(p => (p.user_id !== result)))}
-              />
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
+                  )}
+                />
+                <ListItemSecondaryAction>
+                  <PlayerPopover
+                    user={player}
+                    openEditOnInit={player.user_id === searchId}
+                    onUpdate={result => setPlayers(players.map(p => (p.user_id !== result.user_id ? p : result)))}
+                    onDelete={result => setPlayers(players.filter(p => (p.user_id !== result)))}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
       </List>
       {isPlanner
         && (

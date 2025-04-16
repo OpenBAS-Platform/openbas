@@ -39,6 +39,7 @@ public class PayloadUpdateService {
         fromIterable(attackPatternRepository.findAllById(input.getAttackPatternsIds())));
     payload.setTags(iterableToSet(tagRepository.findAllById(input.getTagIds())));
     payload.setUpdatedAt(Instant.now());
+
     return update(input, payload);
   }
 
@@ -49,13 +50,13 @@ public class PayloadUpdateService {
     switch (payloadType) {
       case COMMAND:
         Command payloadCommand = (Command) Hibernate.unproxy(existingPayload);
-        payloadUtils.copyProperties(input, payloadCommand);
+        payloadUtils.copyProperties(input, payloadCommand, true);
         payloadCommand = payloadRepository.save(payloadCommand);
         this.payloadService.updateInjectorContractsForPayload(payloadCommand);
         return payloadCommand;
       case EXECUTABLE:
         Executable payloadExecutable = (Executable) Hibernate.unproxy(existingPayload);
-        payloadUtils.copyProperties(input, payloadExecutable);
+        payloadUtils.copyProperties(input, payloadExecutable, true);
         payloadExecutable.setExecutableFile(
             documentRepository.findById(input.getExecutableFile()).orElseThrow());
         payloadExecutable = payloadRepository.save(payloadExecutable);
@@ -63,7 +64,7 @@ public class PayloadUpdateService {
         return payloadExecutable;
       case FILE_DROP:
         FileDrop payloadFileDrop = (FileDrop) Hibernate.unproxy(existingPayload);
-        payloadUtils.copyProperties(input, payloadFileDrop);
+        payloadUtils.copyProperties(input, payloadFileDrop, true);
         payloadFileDrop.setFileDropFile(
             documentRepository.findById(input.getFileDropFile()).orElseThrow());
         payloadFileDrop = payloadRepository.save(payloadFileDrop);
@@ -71,13 +72,13 @@ public class PayloadUpdateService {
         return payloadFileDrop;
       case DNS_RESOLUTION:
         DnsResolution payloadDnsResolution = (DnsResolution) Hibernate.unproxy(existingPayload);
-        payloadUtils.copyProperties(input, payloadDnsResolution);
+        payloadUtils.copyProperties(input, payloadDnsResolution, true);
         payloadDnsResolution = payloadRepository.save(payloadDnsResolution);
         this.payloadService.updateInjectorContractsForPayload(payloadDnsResolution);
         return payloadDnsResolution;
       case NETWORK_TRAFFIC:
         NetworkTraffic payloadNetworkTraffic = (NetworkTraffic) Hibernate.unproxy(existingPayload);
-        payloadUtils.copyProperties(input, payloadNetworkTraffic);
+        payloadUtils.copyProperties(input, payloadNetworkTraffic, true);
         payloadNetworkTraffic = payloadRepository.save(payloadNetworkTraffic);
         this.payloadService.updateInjectorContractsForPayload(payloadNetworkTraffic);
         return payloadNetworkTraffic;

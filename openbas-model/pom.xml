@@ -46,7 +46,7 @@
         <dependency>
             <groupId>io.hypersistence</groupId>
             <artifactId>hypersistence-utils-hibernate-63</artifactId>
-            <version>3.9.5</version>
+            <version>3.9.9</version>
         </dependency>
         <dependency>
             <groupId>io.minio</groupId>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations-jakarta</artifactId>
-            <version>2.2.29</version>
+            <version>2.2.30</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

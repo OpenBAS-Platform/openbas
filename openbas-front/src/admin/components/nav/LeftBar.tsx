@@ -160,9 +160,8 @@ const LeftBar = () => {
           href: 'settings',
           subItems: [
             {
-              link: '/admin/settings',
+              link: '/admin/settings/parameters',
               label: 'Parameters',
-              exact: true,
             },
             {
               link: '/admin/settings/security',

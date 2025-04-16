@@ -7,7 +7,7 @@ import {
   SportsScoreOutlined,
   VisibilityOutlined,
 } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader, Chip, Grid, IconButton, Tooltip } from '@mui/material';
+import { Avatar, Button, Card, CardContent, CardHeader, Chip, GridLegacy, IconButton, Tooltip } from '@mui/material';
 import { useContext } from 'react';
 import { Link } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
@@ -95,10 +95,10 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
         )}
         />
       )}
-      <Grid container={true} spacing={3}>
+      <GridLegacy container={true} spacing={3}>
         {sortedChallenges.map((challenge, index) => {
           return (
-            <Grid key={challenge.challenge_id} item={true} xs={4} style={index < 3 ? { paddingTop: 0 } : undefined}>
+            <GridLegacy key={challenge.challenge_id} item={true} xs={4} style={index < 3 ? { paddingTop: 0 } : undefined}>
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
@@ -166,10 +166,10 @@ const ContextualChallenges = ({ challenges, linkToInjects }) => {
                   </div>
                 </CardContent>
               </Card>
-            </Grid>
+            </GridLegacy>
           );
         })}
-      </Grid>
+      </GridLegacy>
     </>
   );
 };

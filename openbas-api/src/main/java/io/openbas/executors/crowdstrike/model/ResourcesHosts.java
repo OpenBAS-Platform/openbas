@@ -9,4 +9,6 @@ import lombok.Data;
 public class ResourcesHosts {
 
   private List<CrowdStrikeDevice> resources;
+  private CrowdstrikeMeta meta;
+  private List<CrowdstrikeError> errors;
 }

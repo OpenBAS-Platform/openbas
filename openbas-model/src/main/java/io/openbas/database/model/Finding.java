@@ -40,6 +40,7 @@ public class Finding implements Base {
   @NotBlank
   private String id;
 
+  @Queryable(sortable = true)
   @Column(name = "finding_field", nullable = false)
   @JsonProperty("finding_field")
   @NotBlank
@@ -52,7 +53,7 @@ public class Finding implements Base {
   @NotNull
   protected ContractOutputType type;
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(sortable = true)
   @Column(name = "finding_value", nullable = false)
   @JsonProperty("finding_value")
   @NotBlank
@@ -63,6 +64,10 @@ public class Finding implements Base {
   @Column(name = "finding_labels", columnDefinition = "text[]")
   @JsonProperty("finding_labels")
   private String[] labels;
+
+  @Column(name = "finding_name")
+  @JsonProperty("finding_name")
+  protected String name;
 
   @ArraySchema(schema = @Schema(type = "string"))
   @ManyToMany(fetch = FetchType.LAZY)

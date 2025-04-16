@@ -217,7 +217,6 @@ const InjectResultList: FunctionComponent<Props> = ({
                 return (
                   <ListItem
                     key={injectResultOutput.inject_id}
-                    classes={{ root: classes.item }}
                     divider
                     secondaryAction={showActions ? (
                       <AtomicTestingPopover
@@ -231,6 +230,7 @@ const InjectResultList: FunctionComponent<Props> = ({
                   >
                     <ListItemButton
                       component={Link}
+                      classes={{ root: classes.item }}
                       to={goTo(injectResultOutput.inject_id)}
                     >
                       <ListItemIcon>

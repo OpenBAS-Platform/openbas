@@ -22,6 +22,8 @@ export interface LoggedHelper {
   logged: () => any;
   getMe: () => User;
   getPlatformSettings: () => PlatformSettings;
+  getPlatformName: () => string;
+  getUserLang: () => string;
 }
 
 export interface ChallengeHelper {

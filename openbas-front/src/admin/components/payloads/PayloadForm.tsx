@@ -10,6 +10,7 @@ import type { PayloadCreateInput } from '../../../utils/api-types';
 import type { Option } from '../../../utils/Option';
 import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
+import OutputFormTab from './form/OutputFormTab';
 
 type PayloadCreateInputForm = Omit<PayloadCreateInput, 'payload_source' | 'payload_status' | 'payload_platforms' | 'executable_file'> & {
   payload_platforms: Option[];
@@ -43,16 +44,40 @@ const PayloadForm = ({
     payload_tags: [],
     payload_arguments: [],
     payload_prerequisites: [],
+    payload_output_parsers: [],
   },
 }: Props) => {
   const { t } = useFormatter();
   const theme = useTheme();
-  const tabs = ['General', 'Commands'];
+  const tabs = ['General', 'Commands', 'Output'];
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
   const handleActiveTabChange = (_: SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
   };
+
+  const regexGroupObject = z.object({
+    ...editing && { regex_group_id: z.string().optional() },
+    regex_group_field: z.string().min(1, { message: t('Should not be empty') }),
+    regex_group_index_values: z.string().min(1, { message: t('Should not be empty') }),
+  });
+
+  const contractOutputElementObject = z.object({
+    ...editing && { contract_output_element_id: z.string().optional() },
+    contract_output_element_is_finding: z.boolean().optional(),
+    contract_output_element_name: z.string().min(1, { message: t('Should not be empty') }),
+    contract_output_element_key: z.string().min(1, { message: t('Should not be empty') }),
+    contract_output_element_type: z.enum(['text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials'], { message: t('Should not be empty') }),
+    contract_output_element_tags: z.string().array().optional(),
+    contract_output_element_rule: z.string().min(1, { message: t('Should not be empty') }),
+    contract_output_element_regex_groups: z.array(regexGroupObject),
+  });
+  const outputParserObject = z.object({
+    ...editing && { output_parser_id: z.string().optional() },
+    output_parser_mode: z.enum(['STDOUT'], { message: t('Should not be empty') }),
+    output_parser_type: z.enum(['REGEX'], { message: t('Should not be empty') }),
+    output_parser_contract_output_elements: z.array(contractOutputElementObject),
+  });
 
   const payloadPrerequisiteZodObject = z.object({
     executor: z.string().min(1, { message: t('Should not be empty') }),
@@ -78,10 +103,11 @@ const PayloadForm = ({
       label: z.string(),
     }).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_execution_arch: z.enum(['x86_64', 'arm64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }).describe('Commands-tab'),
-    payload_cleanup_command: z.string().optional(),
+    payload_cleanup_command: z.string().optional().describe('Commands-tab'),
     payload_cleanup_executor: z.string().optional(),
-    payload_arguments: z.array(payloadArgumentZodObject).optional(),
-    payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional(),
+    payload_arguments: z.array(payloadArgumentZodObject).optional().describe('Commands-tab'),
+    payload_prerequisites: z.array(payloadPrerequisiteZodObject).optional().describe('Commands-tab'),
+    payload_output_parsers: z.array(outputParserObject).optional().describe('Output-tab'),
   };
 
   const commandSchema = z.object({
@@ -174,6 +200,10 @@ const PayloadForm = ({
 
         {activeTab === 'Commands' && (
           <CommandsFormTab disabledPayloadType={editing} />
+        )}
+
+        {activeTab === 'Output' && (
+          <OutputFormTab />
         )}
 
         <div style={{

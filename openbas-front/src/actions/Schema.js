@@ -1,6 +1,8 @@
 import { schema } from 'normalizr';
 import * as R from 'ramda';
 
+import locale from '../utils/BrowserLanguage.js';
+
 export const document = new schema.Entity(
   'documents',
   {},
@@ -256,10 +258,12 @@ export const arrayOfMitigations = new schema.Array(mitigation);
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
-const maps = (key, state) => state.referential.entities[key].asMutable({ deep: true });
-const entities = (key, state) => Object.values(maps(key, state));
-const entity = (id, key, state) => state.referential.entities[key][id]?.asMutable({ deep: true });
-const me = state => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
+const maps = (key, state) => state.referential.getIn(['entities', key]);
+const entities = (key, state) => maps(key, state).valueSeq();
+const entity = (id, key, state) => state.referential.getIn(['entities', key, id]);
+const me = (state) => {
+  return state.referential.getIn(['entities', 'users', state.app.getIn(['logged', 'user'])]);
+};
 
 const getInjectWithParsedInjectorContractContent = (i) => {
   if (!i) {
@@ -283,12 +287,19 @@ const getInjectsWithParsedInjectorContractContent = (injects) => {
 };
 
 export const storeHelper = state => ({
-  logged: () => state.app.logged,
+  logged: () => state.app.get('logged'),
   getMe: () => me(state),
   getMeTokens: () => entities('tokens', state).filter(
     t => t.token_user === me(state)?.user_id,
   ),
-  getStatistics: () => state.referential.entities.statistics?.openbas?.asMutable({ deep: true }),
+  getUserLang: () => {
+    const rawPlatformLang = state.referential.getIn(['entities', 'platformParameters', 'parameters', 'platform_lang']) ?? 'auto';
+    const rawUserLang = me(state)?.user_lang ?? 'auto';
+    const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
+    const userLang = rawUserLang !== 'auto' ? rawUserLang : platformLang;
+    return userLang;
+  },
+  getStatistics: () => state.referential.getIn(['entities', 'statistics', 'openbas']),
   // exercises
   getExercises: () => entities('exercises', state),
   getExercisesMap: () => maps('exercises', state),
@@ -380,7 +391,10 @@ export const storeHelper = state => ({
   getTeams: () => entities('teams', state),
   getTeamsMap: () => maps('teams', state),
   getPlatformSettings: () => {
-    return state.referential.entities.platformParameters.parameters?.asMutable({ deep: true }) || {};
+    return state.referential.getIn(['entities', 'platformParameters', 'parameters']) || {};
+  },
+  getPlatformName: () => {
+    return state.referential.getIn(['entities', 'platformParameters', 'parameters', 'platform_name']) || 'OpenBAS - Breach and Attack Simulation Platform';
   },
   // kill chain phases
   getKillChainPhase: id => entity(id, 'killchainphases', state),

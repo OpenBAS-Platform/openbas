@@ -1,5 +1,5 @@
 import { ReplyOutlined } from '@mui/icons-material';
-import { Button, Dialog, DialogContent, DialogTitle, Grid, Paper, Typography } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, GridLegacy, Paper, Typography } from '@mui/material';
 import * as R from 'ramda';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -151,54 +151,54 @@ const Inject = () => {
     return (
       <div className={classes.container}>
         <AnimationMenu exerciseId={exerciseId} />
-        <Grid container={true} spacing={3}>
-          <Grid item={true} xs={6} style={{ marginTop: -10 }}>
+        <GridLegacy container={true} spacing={3}>
+          <GridLegacy item={true} xs={6} style={{ marginTop: -10 }}>
             <Typography variant="h4">{t('Inject context')}</Typography>
             <Paper variant="outlined" classes={{ root: classes.paper }}>
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={6}>
+              <GridLegacy container={true} spacing={3}>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">{t('Title')}</Typography>
                   {inject.inject_title}
-                </Grid>
-                <Grid item={true} xs={6}>
+                </GridLegacy>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">{t('Description')}</Typography>
                   {inject.inject_description}
-                </Grid>
-                <Grid item={true} xs={6}>
+                </GridLegacy>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">{t('Sent at')}</Typography>
                   {fndt(inject.inject_sent_at)}
-                </Grid>
-                <Grid item={true} xs={6}>
+                </GridLegacy>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">
                     {t('Sender email address')}
                   </Typography>
                   {exercise.exercise_mail_from}
-                </Grid>
-              </Grid>
+                </GridLegacy>
+              </GridLegacy>
             </Paper>
-          </Grid>
-          <Grid item={true} xs={6} style={{ marginTop: -10 }}>
+          </GridLegacy>
+          <GridLegacy item={true} xs={6} style={{ marginTop: -10 }}>
             <Typography variant="h4">{t('Inject details')}</Typography>
             <Paper variant="outlined" classes={{ root: classes.paper }}>
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={6}>
+              <GridLegacy container={true} spacing={3}>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">{t('Targeted players')}</Typography>
                   {inject.inject_users_number}
-                </Grid>
-                <Grid item={true} xs={6}>
+                </GridLegacy>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">{t('Tags')}</Typography>
                   <ItemTags tags={inject.inject_tags} />
-                </Grid>
-                <Grid item={true} xs={6}>
+                </GridLegacy>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">{t('Documents')}</Typography>
-                </Grid>
-                <Grid item={true} xs={6}>
+                </GridLegacy>
+                <GridLegacy item={true} xs={6}>
                   <Typography variant="h3">{t('Teams')}</Typography>
-                </Grid>
-              </Grid>
+                </GridLegacy>
+              </GridLegacy>
             </Paper>
-          </Grid>
-        </Grid>
+          </GridLegacy>
+        </GridLegacy>
         <br />
         <div style={{ marginTop: 40 }}>
           <Typography variant="h4" style={{ float: 'left' }}>

@@ -2,19 +2,15 @@ package io.openbas.rest.atomic_testing.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.*;
+import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Singular;
+import lombok.*;
 
-@Setter
-@Getter
+@Data
 @Builder
 public class StatusPayloadOutput {
 
@@ -72,23 +68,6 @@ public class StatusPayloadOutput {
   @JsonProperty("dns_resolution_hostname")
   private String hostname;
 
-  @JsonProperty("network_traffic_ip_src")
-  @NotNull
-  private String ipSrc;
-
-  @JsonProperty("network_traffic_ip_dst")
-  @NotNull
-  private String ipDst;
-
-  @JsonProperty("network_traffic_port_src")
-  @NotNull
-  private Integer portSrc;
-
-  @JsonProperty("network_traffic_port_dst")
-  @NotNull
-  private Integer portDst;
-
-  @JsonProperty("network_traffic_protocol")
-  @NotNull
-  private String protocol;
+  @JsonProperty("payload_output_parsers")
+  private Set<OutputParserSimple> payloadOutputParsers;
 }

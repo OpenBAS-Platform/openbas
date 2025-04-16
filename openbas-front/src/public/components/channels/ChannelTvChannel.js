@@ -1,5 +1,5 @@
 import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, ShareOutlined } from '@mui/icons-material';
-import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, Grid, Typography } from '@mui/material';
+import { Avatar, Button, Card, CardContent, CardHeader, CardMedia, GridLegacy, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as R from 'ramda';
 import { makeStyles } from 'tss-react/mui';
@@ -101,9 +101,9 @@ const ChannelTvChannel = ({ channelReader }) => {
           <Empty message={t('No media pressure entry in this channel yet.')} />
         </div>
       )}
-      <Grid container={true} spacing={3} style={{ marginTop: 10 }}>
+      <GridLegacy container={true} spacing={3} style={{ marginTop: 10 }}>
         {firstArticle && (
-          <Grid item={true} xs={headArticles.length > 0 ? 8 : 12}>
+          <GridLegacy item={true} xs={headArticles.length > 0 ? 8 : 12}>
             <Card
               variant="outlined"
               classes={{ root: classes.card }}
@@ -121,9 +121,9 @@ const ChannelTvChannel = ({ channelReader }) => {
                 title={firstArticle.article_author || t('Unknown')}
                 subheader={fldt(firstArticle.article_virtual_publication)}
               />
-              <Grid container={true} spacing={3}>
+              <GridLegacy container={true} spacing={3}>
                 {firstArticleVideos.map(doc => (
-                  <Grid
+                  <GridLegacy
                     key={doc.document_id}
                     item={true}
                     xs={firstArticleColumns}
@@ -134,9 +134,9 @@ const ChannelTvChannel = ({ channelReader }) => {
                       src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                       controls={true}
                     />
-                  </Grid>
+                  </GridLegacy>
                 ))}
-              </Grid>
+              </GridLegacy>
               <CardContent style={{ marginBottom: 30 }}>
                 <Typography
                   gutterBottom
@@ -172,10 +172,10 @@ const ChannelTvChannel = ({ channelReader }) => {
                 </div>
               </CardContent>
             </Card>
-          </Grid>
+          </GridLegacy>
         )}
         {headArticles.length > 0 && (
-          <Grid item={true} xs={4}>
+          <GridLegacy item={true} xs={4}>
             {headArticles.map((article, index) => {
               const videos = article.article_documents
                 .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
@@ -206,18 +206,18 @@ const ChannelTvChannel = ({ channelReader }) => {
                     title={article.article_author || t('Unknown')}
                     subheader={fldt(article.article_virtual_publication)}
                   />
-                  <Grid container={true} spacing={3}>
+                  <GridLegacy container={true} spacing={3}>
                     {videos.map(doc => (
-                      <Grid key={doc.document_id} item={true} xs={columns}>
+                      <GridLegacy key={doc.document_id} item={true} xs={columns}>
                         <CardMedia
                           component="video"
                           height="100"
                           src={`${baseUri}/documents/${doc.document_id}/file${queryParams}`}
                           controls={true}
                         />
-                      </Grid>
+                      </GridLegacy>
                     ))}
-                  </Grid>
+                  </GridLegacy>
                   <CardContent style={{ marginBottom: 30 }}>
                     <Typography
                       gutterBottom
@@ -258,10 +258,10 @@ const ChannelTvChannel = ({ channelReader }) => {
                 </Card>
               );
             })}
-          </Grid>
+          </GridLegacy>
         )}
-      </Grid>
-      <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+      </GridLegacy>
+      <GridLegacy container={true} spacing={3} style={{ marginTop: 0 }}>
         {otherArticles.map((article) => {
           const videos = article.article_documents
             .map(docId => (documentsMap[docId] ? documentsMap[docId] : undefined))
@@ -276,7 +276,7 @@ const ChannelTvChannel = ({ channelReader }) => {
             columns = 3;
           }
           return (
-            <Grid key={article.article_id} item={true} xs={4}>
+            <GridLegacy key={article.article_id} item={true} xs={4}>
               <Card
                 variant="outlined"
                 classes={{ root: classes.card }}
@@ -294,18 +294,18 @@ const ChannelTvChannel = ({ channelReader }) => {
                   title={article.article_author || t('Unknown')}
                   subheader={fldt(article.article_virtual_publication)}
                 />
-                <Grid container={true} spacing={3}>
+                <GridLegacy container={true} spacing={3}>
                   {videos.map(doc => (
-                    <Grid key={doc.document_id} item={true} xs={columns}>
+                    <GridLegacy key={doc.document_id} item={true} xs={columns}>
                       <CardMedia
                         component="video"
                         height="150"
                         src={`{baseUri}/documents/${doc.document_id}/file${queryParams}`}
                         controls={true}
                       />
-                    </Grid>
+                    </GridLegacy>
                   ))}
-                </Grid>
+                </GridLegacy>
                 <CardContent style={{ marginBottom: 30 }}>
                   <Typography
                     gutterBottom
@@ -344,10 +344,10 @@ const ChannelTvChannel = ({ channelReader }) => {
                   </div>
                 </CardContent>
               </Card>
-            </Grid>
+            </GridLegacy>
           );
         })}
-      </Grid>
+      </GridLegacy>
     </div>
   );
 };

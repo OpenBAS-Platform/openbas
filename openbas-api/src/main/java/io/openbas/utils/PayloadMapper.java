@@ -4,13 +4,16 @@ import static io.openbas.database.model.Command.COMMAND_TYPE;
 import static io.openbas.database.model.DnsResolution.DNS_RESOLUTION_TYPE;
 import static io.openbas.database.model.Executable.EXECUTABLE_TYPE;
 import static io.openbas.database.model.FileDrop.FILE_DROP_TYPE;
-import static io.openbas.database.model.NetworkTraffic.NETWORK_TRAFFIC_TYPE;
 import static java.util.Optional.ofNullable;
 
 import io.openbas.database.model.*;
 import io.openbas.rest.atomic_testing.form.AttackPatternSimple;
 import io.openbas.rest.atomic_testing.form.StatusPayloadOutput;
+import io.openbas.rest.payload.output.output_parser.ContractOutputElementSimple;
+import io.openbas.rest.payload.output.output_parser.OutputParserSimple;
+import io.openbas.rest.payload.output.output_parser.RegexGroupSimple;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
@@ -68,6 +71,49 @@ public class PayloadMapper {
         .orElse(null);
   }
 
+  private Set<RegexGroupSimple> toRegexGroupSimple(Set<RegexGroup> regexGroups) {
+    return regexGroups.stream()
+        .map(
+            regexGroup ->
+                RegexGroupSimple.builder()
+                    .id(regexGroup.getId())
+                    .field(regexGroup.getField())
+                    .indexValues(regexGroup.getIndexValues())
+                    .build())
+        .collect(Collectors.toSet());
+  }
+
+  private Set<ContractOutputElementSimple> toContractOutputElementsSimple(
+      Set<ContractOutputElement> contractElements) {
+    return contractElements.stream()
+        .map(
+            contractElement ->
+                ContractOutputElementSimple.builder()
+                    .id(contractElement.getId())
+                    .rule(contractElement.getRule())
+                    .name(contractElement.getName())
+                    .key(contractElement.getKey())
+                    .type(contractElement.getType())
+                    .tagIds(contractElement.getTags().stream().map(Tag::getId).toList())
+                    .regexGroups(toRegexGroupSimple(contractElement.getRegexGroups()))
+                    .build())
+        .collect(Collectors.toSet());
+  }
+
+  private Set<OutputParserSimple> toOutputParsersSimple(Set<OutputParser> outputParsers) {
+    return outputParsers.stream()
+        .map(
+            parser ->
+                OutputParserSimple.builder()
+                    .id(parser.getId())
+                    .mode(parser.getMode())
+                    .type(parser.getType())
+                    .contractOutputElement(
+                        toContractOutputElementsSimple(parser.getContractOutputElements()))
+                    .build())
+        .collect(Collectors.toSet());
+  }
+
   private void populatePayloadDetails(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder,
       Payload payload,
@@ -81,7 +127,9 @@ public class PayloadMapper {
         .type(payload.getType())
         .collectorType(payload.getCollectorType())
         .description(payload.getDescription())
+        .tags(payload.getTags().stream().map(Tag::getId).collect(Collectors.toSet()))
         .platforms(payload.getPlatforms())
+        .payloadOutputParsers(toOutputParsersSimple(payload.getOutputParsers()))
         .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
         .executableArch(injectorContract.getArch());
   }
@@ -100,9 +148,6 @@ public class PayloadMapper {
         break;
       case DNS_RESOLUTION_TYPE:
         handleDnsResolutionType(builder, (DnsResolution) Hibernate.unproxy(payload));
-        break;
-      case NETWORK_TRAFFIC_TYPE:
-        handleNetworkTrafficType(builder, (NetworkTraffic) Hibernate.unproxy(payload));
         break;
       default:
         break;
@@ -137,17 +182,6 @@ public class PayloadMapper {
     builder.hostname(payloadDnsResolution.getHostname());
   }
 
-  private void handleNetworkTrafficType(
-      StatusPayloadOutput.StatusPayloadOutputBuilder builder,
-      NetworkTraffic payloadNetworkTraffic) {
-    builder
-        .protocol(payloadNetworkTraffic.getProtocol())
-        .portSrc(payloadNetworkTraffic.getPortSrc())
-        .portDst(payloadNetworkTraffic.getPortDst())
-        .ipSrc(payloadNetworkTraffic.getIpSrc())
-        .ipDst(payloadNetworkTraffic.getIpDst());
-  }
-
   private StatusPayloadOutput populateExecutedPayload(
       StatusPayloadOutput.StatusPayloadOutputBuilder builder,
       StatusPayload statusPayload,
@@ -161,11 +195,6 @@ public class PayloadMapper {
         .executableFile(statusPayload.getExecutableFile())
         .fileDropFile(statusPayload.getFileDropFile())
         .hostname(statusPayload.getHostname())
-        .ipSrc(statusPayload.getIpSrc())
-        .ipDst(statusPayload.getIpDst())
-        .portSrc(statusPayload.getPortSrc())
-        .portDst(statusPayload.getPortDst())
-        .protocol(statusPayload.getProtocol())
         .attackPatterns(toAttackPatternSimples(injectorContract.getAttackPatterns()))
         .executableArch(injectorContract.getArch())
         .name(statusPayload.getName())
@@ -175,7 +204,10 @@ public class PayloadMapper {
 
     Payload payload = injectorContract.getPayload();
     if (payload != null) {
-      builder.collectorType(payload.getCollectorType());
+      builder
+          .collectorType(payload.getCollectorType())
+          .payloadOutputParsers(toOutputParsersSimple(payload.getOutputParsers()))
+          .tags(payload.getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
     }
 
     return builder.build();

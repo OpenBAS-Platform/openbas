@@ -1,4 +1,4 @@
-package io.openbas.utils;
+package io.openbas.injects.atomic_testing;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -8,6 +8,8 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAsset;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.rest.atomic_testing.form.InjectTargetWithResult;
+import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.RawAssetFixture;
 import io.openbas.utils.fixtures.RawAssetGroupFixture;
 import java.util.List;

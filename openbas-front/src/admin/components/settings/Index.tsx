@@ -14,7 +14,8 @@ import Users from './users/Users';
 
 const Index = () => (
   <Routes>
-    <Route path="" element={errorWrapper(Parameters)()} />
+    <Route path="" element={<Navigate to="parameters" replace={true} />} />
+    <Route path="parameters" element={errorWrapper(Parameters)()} />
     <Route path="security" element={<Navigate to="groups" replace={true} />} />
     <Route path="security/groups" element={errorWrapper(Groups)()} />
     <Route path="security/users" element={errorWrapper(Users)()} />

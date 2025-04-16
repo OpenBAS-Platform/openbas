@@ -1,4 +1,4 @@
-import { DescriptionOutlined, RowingOutlined } from '@mui/icons-material';
+import { DescriptionOutlined, HelpOutlineOutlined, RowingOutlined } from '@mui/icons-material';
 import { Chip, List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText, Tooltip } from '@mui/material';
 import * as R from 'ramda';
 import { useState } from 'react';
@@ -16,6 +16,7 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style.js';
 import { useFormatter } from '../../../../components/i18n';
 import ItemTags from '../../../../components/ItemTags';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader.js';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import CreateDocument from './CreateDocument';
@@ -140,6 +141,12 @@ const Documents = () => {
     exportFileName: `${t('Documents')}.csv`,
   };
 
+  const [loading, setLoading] = useState(true);
+  const searchDocumentsToLoad = (input) => {
+    setLoading(true);
+    return searchDocuments(input).finally(() => setLoading(false));
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -150,7 +157,7 @@ const Documents = () => {
         }]}
       />
       <PaginationComponent
-        fetch={searchDocuments}
+        fetch={searchDocumentsToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setDocuments}
         exportProps={exportProps}
@@ -184,140 +191,142 @@ const Documents = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {documents.map(document => (
-          <ListItem
-            key={document.document_id}
-            divider={true}
-            secondaryAction={(
-              <DocumentPopover
-                document={document}
-                disabled={!userAdmin}
-                onUpdate={result => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
-                onDelete={result => setDocuments(documents.filter(d => (d.document_id !== result)))}
-                scenariosAndExercisesFetched
-                inList
-              />
-            )}
-            disablePadding
-          >
-            <ListItemButton
-              classes={{ root: classes.item }}
-              component="a"
-              href={`/api/documents/${document.document_id}/file`}
-            >
-              <ListItemIcon>
-                <DescriptionOutlined color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <div style={bodyItemsStyles.bodyItems}>
-                    <div
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles.document_name,
-                      }}
-                    >
-                      {document.document_name}
-                    </div>
-                    <div
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles.document_description,
-                      }}
-                    >
-                      {document.document_description}
-                    </div>
-                    <div
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles.document_exercises,
-                      }}
-                    >
-                      {R.take(3, document.document_exercises).map((e, i) => {
-                        const exercise = exercisesMap[e];
-                        if (exercise === undefined) return <div key={i} />;
-                        return (
-                          <Tooltip
-                            key={i}
-                            title={exercise.exercise_name}
-                          >
-                            <Chip
-                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
-                              classes={{ root: classes.exercise }}
-                              variant="outlined"
-                              label={exercise.exercise_name}
-                              clickable={true}
-                              onClick={
-                                (event) => {
-                                  // prevent parent link from triggering
-                                  event.stopPropagation();
-                                  event.preventDefault();
-                                  navigate(`/admin/simulations/${exercise.exercise_id}`);
-                                }
-                              }
-                            />
-                          </Tooltip>
-                        );
-                      })}
-                    </div>
-                    <div
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles.document_scenarios,
-                      }}
-                    >
-                      {R.take(3, document.document_scenarios).map((e, i) => {
-                        const scenario = scenariosMap[e];
-                        if (scenario === undefined) return <div key={i} />;
-                        return (
-                          <Tooltip
-                            key={i}
-                            title={scenario.scenario_name}
-                          >
-                            <Chip
-                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
-                              classes={{ root: classes.scenario }}
-                              variant="outlined"
-                              label={scenario.scenario_name}
-                              clickable={true}
-                              onClick={
-                                (event) => {
-                                  // prevent parent link from triggering
-                                  event.stopPropagation();
-                                  event.preventDefault();
-                                  navigate(`/admin/scenarios/${scenario.scenario_id}`);
-                                }
-                              }
-                            />
-                          </Tooltip>
-                        );
-                      })}
-                    </div>
-                    <div
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles.document_type,
-                      }}
-                    >
-                      <DocumentType
-                        type={document.document_type}
-                        variant="list"
-                      />
-                    </div>
-                    <div
-                      style={{
-                        ...bodyItemsStyles.bodyItem,
-                        ...inlineStyles.document_tags,
-                      }}
-                    >
-                      <ItemTags variant="list" tags={document.document_tags} />
-                    </div>
-                  </div>
+        {loading
+          ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+          : documents.map(document => (
+              <ListItem
+                key={document.document_id}
+                divider={true}
+                secondaryAction={(
+                  <DocumentPopover
+                    document={document}
+                    disabled={!userAdmin}
+                    onUpdate={result => setDocuments(documents.map(d => (d.document_id !== result.document_id ? d : result)))}
+                    onDelete={result => setDocuments(documents.filter(d => (d.document_id !== result)))}
+                    scenariosAndExercisesFetched
+                    inList
+                  />
                 )}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+                disablePadding
+              >
+                <ListItemButton
+                  classes={{ root: classes.item }}
+                  component="a"
+                  href={`/api/documents/${document.document_id}/file`}
+                >
+                  <ListItemIcon>
+                    <DescriptionOutlined color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div style={bodyItemsStyles.bodyItems}>
+                        <div
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles.document_name,
+                          }}
+                        >
+                          {document.document_name}
+                        </div>
+                        <div
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles.document_description,
+                          }}
+                        >
+                          {document.document_description}
+                        </div>
+                        <div
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles.document_exercises,
+                          }}
+                        >
+                          {R.take(3, document.document_exercises).map((e, i) => {
+                            const exercise = exercisesMap[e];
+                            if (exercise === undefined) return <div key={i} />;
+                            return (
+                              <Tooltip
+                                key={i}
+                                title={exercise.exercise_name}
+                              >
+                                <Chip
+                                  icon={<RowingOutlined style={{ fontSize: 12 }} />}
+                                  classes={{ root: classes.exercise }}
+                                  variant="outlined"
+                                  label={exercise.exercise_name}
+                                  clickable={true}
+                                  onClick={
+                                    (event) => {
+                                    // prevent parent link from triggering
+                                      event.stopPropagation();
+                                      event.preventDefault();
+                                      navigate(`/admin/simulations/${exercise.exercise_id}`);
+                                    }
+                                  }
+                                />
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                        <div
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles.document_scenarios,
+                          }}
+                        >
+                          {R.take(3, document.document_scenarios).map((e, i) => {
+                            const scenario = scenariosMap[e];
+                            if (scenario === undefined) return <div key={i} />;
+                            return (
+                              <Tooltip
+                                key={i}
+                                title={scenario.scenario_name}
+                              >
+                                <Chip
+                                  icon={<RowingOutlined style={{ fontSize: 12 }} />}
+                                  classes={{ root: classes.scenario }}
+                                  variant="outlined"
+                                  label={scenario.scenario_name}
+                                  clickable={true}
+                                  onClick={
+                                    (event) => {
+                                    // prevent parent link from triggering
+                                      event.stopPropagation();
+                                      event.preventDefault();
+                                      navigate(`/admin/scenarios/${scenario.scenario_id}`);
+                                    }
+                                  }
+                                />
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                        <div
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles.document_type,
+                          }}
+                        >
+                          <DocumentType
+                            type={document.document_type}
+                            variant="list"
+                          />
+                        </div>
+                        <div
+                          style={{
+                            ...bodyItemsStyles.bodyItem,
+                            ...inlineStyles.document_tags,
+                          }}
+                        >
+                          <ItemTags variant="list" tags={document.document_tags} />
+                        </div>
+                      </div>
+                    )}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
       </List>
       {userAdmin && (
         <CreateDocument

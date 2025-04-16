@@ -14,6 +14,9 @@ import lombok.Data;
 @Data
 public class ContractOutputElementInput {
 
+  @JsonProperty("contract_output_element_id")
+  private String id;
+
   @JsonProperty("contract_output_element_is_finding")
   @Schema(
       description =

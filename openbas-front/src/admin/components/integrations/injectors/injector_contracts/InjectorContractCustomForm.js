@@ -1,4 +1,4 @@
-import { Button, Grid, Switch, TextField as MUITextField, Typography } from '@mui/material';
+import { Button, GridLegacy, Switch, TextField as MUITextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
@@ -128,8 +128,8 @@ const InjectorContractForm = (props) => {
                 >
                   {field.label}
                 </Typography>
-                <Grid container={true} spacing={3}>
-                  <Grid item={true} xs={6}>
+                <GridLegacy container={true} spacing={3}>
+                  <GridLegacy item={true} xs={6}>
                     <Typography
                       variant="h4"
                       gutterBottom={true}
@@ -138,8 +138,8 @@ const InjectorContractForm = (props) => {
                       {t('Type')}
                     </Typography>
                     {field.type}
-                  </Grid>
-                  <Grid item={true} xs={6}>
+                  </GridLegacy>
+                  <GridLegacy item={true} xs={6}>
                     <Typography
                       variant="h4"
                       gutterBottom={true}
@@ -155,8 +155,8 @@ const InjectorContractForm = (props) => {
                         [field.key]: { readOnly: event.target.checked },
                       })}
                     />
-                  </Grid>
-                </Grid>
+                  </GridLegacy>
+                </GridLegacy>
                 <Typography
                   variant="h4"
                   gutterBottom={true}

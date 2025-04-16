@@ -54,6 +54,9 @@ div.break {
   word-break: break-word;
 }
 
+.paper{
+  padding: 20px;
+}
 /* region markdown */
 
 div.markdown p {

@@ -1,5 +1,5 @@
-import { Divider, Grid, List, Paper, Typography } from '@mui/material';
-import { Fragment, useContext, useEffect, useState } from 'react';
+import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Fragment, type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import Empty from '../../../../components/Empty';
@@ -38,6 +38,7 @@ const useStyles = makeStyles()(() => ({
     height: '99%',
     left: '-10px',
   },
+  tabs: { marginLeft: 'auto' },
 }));
 
 const AtomicTesting = () => {
@@ -48,6 +49,7 @@ const AtomicTesting = () => {
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
   const filtering = useSearchAnFilter('', 'name', ['name']);
+  const [activeTab, setActiveTab] = useState(0);
 
   // Fetching data
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
@@ -64,6 +66,14 @@ const AtomicTesting = () => {
     setCurrentParentTarget(currentParent);
     setUpperParentTarget(upperParentTarget);
   };
+
+  const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
+  useEffect(() => {
+    setActiveTab(0);
+  });
 
   const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
     return (
@@ -91,19 +101,39 @@ const AtomicTesting = () => {
     return <Loader variant="inElement" />;
   }
 
+  const tabConfig = [
+    {
+      key: 0,
+      label: t('All targets'),
+      content: sortedTargets.length > 0
+        ? (
+            <List>
+              {sortedTargets.map(target => (
+                <div key={target?.id}>
+                  {renderTargetItem(target, undefined, undefined)}
+                </div>
+              ))}
+            </List>
+          )
+        : (
+            <Empty message={t('No target configured.')} />
+          ),
+    },
+  ];
+
   return (
-    <Grid
+    <GridLegacy
       container
       spacing={3}
       classes={{ container: classes.gridContainer }}
     >
-      <Grid item xs={6} style={{ paddingTop: 10 }}>
+      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
         <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
           {t('Information')}
         </Typography>
         <AtomicTestingInformation injectResultOverviewOutput={injectResultOverviewOutput} />
-      </Grid>
-      <Grid item xs={6} style={{ paddingTop: 10 }}>
+      </GridLegacy>
+      <GridLegacy item xs={6} style={{ paddingTop: 10 }}>
         <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
           {t('Results')}
         </Typography>
@@ -117,8 +147,8 @@ const AtomicTesting = () => {
         >
           <ResponsePie expectationResultsByTypes={injectResultOverviewOutput.inject_expectation_results} />
         </Paper>
-      </Grid>
-      <Grid item xs={6} style={{ marginTop: 30 }}>
+      </GridLegacy>
+      <GridLegacy item xs={6} style={{ marginTop: 30 }}>
         <Typography variant="h4" gutterBottom style={{ float: 'left' }} sx={{ mb: 1 }}>
           {t('Targets')}
         </Typography>
@@ -136,20 +166,25 @@ const AtomicTesting = () => {
         </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {sortedTargets.length > 0 ? (
-            <List>
-              {sortedTargets.map(target => (
-                <div key={target?.id}>
-                  {renderTargetItem(target, undefined, undefined)}
-                </div>
-              ))}
-            </List>
-          ) : (
-            <Empty message={t('No target configured.')} />
-          )}
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            indicatorColor="primary"
+            textColor="primary"
+            className={classes.tabs}
+          >
+            {tabConfig.map(tab => (
+              <Tab key={tab.key} label={tab.label} />
+            ))}
+          </Tabs>
+          {tabConfig.map(tab => (
+            <div key={tab.key} hidden={activeTab !== tab.key}>
+              {tab.content}
+            </div>
+          ))}
         </Paper>
-      </Grid>
-      <Grid item xs={6} style={{ marginTop: 29 }}>
+      </GridLegacy>
+      <GridLegacy item xs={6} style={{ marginTop: 29 }}>
         <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
           {t('Results by target')}
         </Typography>
@@ -168,8 +203,8 @@ const AtomicTesting = () => {
             <Empty message={t('No target data available.')} />
           )}
         </Paper>
-      </Grid>
-    </Grid>
+      </GridLegacy>
+    </GridLegacy>
   )
   ;
 };

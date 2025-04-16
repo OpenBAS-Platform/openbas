@@ -27,8 +27,8 @@ export interface AssetGroupPopoverProps {
   inline?: boolean;
   assetGroup: AssetGroup | AssetGroupOutput;
   onRemoveAssetGroupFromList?: (assetGroupId: string) => void;
-  removeAssetGroupFromListMessage?: string;
   onRemoveEndpointFromAssetGroup?: (assetId: string) => void;
+  removeAssetGroupFromListMessage?: string;
   openEditOnInit?: boolean;
   onUpdate?: (result: AssetGroup) => void;
   onDelete?: (result: string) => void;
@@ -38,8 +38,8 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
   inline,
   assetGroup,
   onRemoveAssetGroupFromList,
-  removeAssetGroupFromListMessage = 'Remove from the inject',
   onRemoveEndpointFromAssetGroup,
+  removeAssetGroupFromListMessage = 'Remove from the inject',
   openEditOnInit = false,
   onUpdate,
   onDelete,
@@ -211,12 +211,12 @@ const AssetGroupPopover: FunctionComponent<AssetGroupPopoverProps> = ({
           onClose={() => setSelected(false)}
           elevation={1}
         >
-          {selected !== undefined && (
+          {selected && (
             <AssetGroupManagement
               assetGroupId={assetGroup.asset_group_id}
+              handleClose={() => setSelected(false)}
               onUpdate={onUpdate}
               onRemoveEndpointFromAssetGroup={onRemoveEndpointFromAssetGroup}
-              handleClose={() => setSelected(false)}
             />
           )}
         </MuiDrawer>

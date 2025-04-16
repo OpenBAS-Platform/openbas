@@ -1,4 +1,4 @@
-import { ChevronRightOutlined, SchoolOutlined } from '@mui/icons-material';
+import { ChevronRightOutlined, HelpOutlineOutlined, SchoolOutlined } from '@mui/icons-material';
 import { List, ListItem, ListItemButton, ListItemIcon, ListItemSecondaryAction, ListItemText } from '@mui/material';
 import { type CSSProperties, useState } from 'react';
 import { Link } from 'react-router';
@@ -13,6 +13,7 @@ import { initSorting } from '../../../../components/common/queryable/Page';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import useBodyItemsStyles from '../../../../components/common/queryable/style/style';
 import { useFormatter } from '../../../../components/i18n';
+import PaginatedListLoader from '../../../../components/PaginatedListLoader';
 import { useHelper } from '../../../../store';
 import { type LessonsTemplate, type SearchPaginationInput } from '../../../../utils/api-types';
 import CreateLessonsTemplate from './CreateLessonsTemplate';
@@ -61,6 +62,12 @@ const LessonsTemplates = () => {
   const [lessonTemplates, setLessonTemplates] = useState<LessonsTemplate[]>([]);
   const [searchPaginationInput, setSearchPaginationInput] = useState<SearchPaginationInput>(buildSearchPagination({ sorts: initSorting('lessons_template_name') }));
 
+  const [loading, setLoading] = useState<boolean>(true);
+  const searchLessonsTemplatesToLoad = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchLessonsTemplates(input).finally(() => setLoading(false));
+  };
+
   return (
     <>
       <Breadcrumbs
@@ -71,7 +78,7 @@ const LessonsTemplates = () => {
         }]}
       />
       <PaginationComponent
-        fetch={searchLessonsTemplates}
+        fetch={searchLessonsTemplatesToLoad}
         searchPaginationInput={searchPaginationInput}
         setContent={setLessonTemplates}
       />
@@ -94,41 +101,43 @@ const LessonsTemplates = () => {
           />
           <ListItemSecondaryAction />
         </ListItem>
-        {lessonTemplates.map((lessonsTemplate) => {
-          return (
-            <ListItemButton
-              key={lessonsTemplate.lessonstemplate_id}
-              classes={{ root: classes.item }}
-              divider
-              component={Link}
-              to={`/admin/components/lessons/${lessonsTemplate.lessonstemplate_id}`}
-            >
-              <ListItemIcon>
-                <SchoolOutlined color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={(
-                  <div style={bodyItemsStyles.bodyItems}>
-                    {headers.map(header => (
-                      <div
-                        key={header.field}
-                        style={{
-                          ...bodyItemsStyles.bodyItem,
-                          ...inlineStyles[header.field],
-                        }}
-                      >
-                        {header.value(lessonsTemplate)}
+        {loading
+          ? <PaginatedListLoader Icon={HelpOutlineOutlined} headers={headers} headerStyles={inlineStyles} />
+          : lessonTemplates.map((lessonsTemplate) => {
+              return (
+                <ListItemButton
+                  key={lessonsTemplate.lessonstemplate_id}
+                  classes={{ root: classes.item }}
+                  divider
+                  component={Link}
+                  to={`/admin/components/lessons/${lessonsTemplate.lessonstemplate_id}`}
+                >
+                  <ListItemIcon>
+                    <SchoolOutlined color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={(
+                      <div style={bodyItemsStyles.bodyItems}>
+                        {headers.map(header => (
+                          <div
+                            key={header.field}
+                            style={{
+                              ...bodyItemsStyles.bodyItem,
+                              ...inlineStyles[header.field],
+                            }}
+                          >
+                            {header.value(lessonsTemplate)}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
-              />
-              <ListItemSecondaryAction>
-                <ChevronRightOutlined />
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          );
-        })}
+                    )}
+                  />
+                  <ListItemSecondaryAction>
+                    <ChevronRightOutlined />
+                  </ListItemSecondaryAction>
+                </ListItemButton>
+              );
+            })}
       </List>
       {userAdmin && <CreateLessonsTemplate onCreate={result => setLessonTemplates([result, ...lessonTemplates])} />}
     </>

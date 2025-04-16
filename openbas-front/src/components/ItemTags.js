@@ -2,7 +2,7 @@ import { Chip, Slide, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useHelper } from '../store';
@@ -50,10 +50,11 @@ const ItemTags = (props) => {
     style = `${classes.tag} ${classes.tagInList}`;
     truncateLimit = 6;
   }
-  const resolvedTags = useHelper((helper) => {
-    const allTags = helper.getTags() ?? [];
-    return allTags.filter(tag => (tags ?? []).includes(tag.tag_id));
+  const { allTags } = useHelper((helper) => {
+    const allTags = helper.getTags();
+    return { allTags };
   });
+  const resolvedTags = useMemo(() => allTags.filter(tag => (tags ?? []).includes(tag.tag_id)), [allTags, tags]);
   const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], resolvedTags);
 
   const visibleTags = getVisibleItems(orderedTags, limit);

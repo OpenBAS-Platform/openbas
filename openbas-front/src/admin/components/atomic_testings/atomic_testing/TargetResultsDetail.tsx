@@ -7,7 +7,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  Grid,
+  GridLegacy,
   IconButton,
   Menu,
   MenuItem,
@@ -623,17 +623,17 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
               return (
                 <div key={injectExpectation.inject_expectation_id} style={{ marginTop: 20 }}>
                   <Paper variant="outlined" classes={{ root: classes.paperResults }}>
-                    <Grid container={true} spacing={2} style={{ alignItems: 'baseline' }}>
-                      <Grid item={true} xs={6}>
+                    <GridLegacy container={true} spacing={2} style={{ alignItems: 'baseline' }}>
+                      <GridLegacy item={true} xs={6}>
                         <Typography variant="h5">
                           {injectExpectation.inject_expectation_type}
                           {' '}
                           {injectExpectation.inject_expectation_type === 'MANUAL' && (t('Expectation'))}
                         </Typography>
-                      </Grid>
+                      </GridLegacy>
                       {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 ? (
 
-                        <Grid item={true} xs={5} sx={{ textAlign: 'end' }}>
+                        <GridLegacy item={true} xs={5} sx={{ textAlign: 'end' }}>
                           {
                             injectExpectation.inject_expectation_status === 'SUCCESS' && injectExpectation.inject_expectation_type === 'PREVENTION' && (
                               <ItemResult label="Prevented" status="Prevented" />
@@ -660,10 +660,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                             )
                           }
                           <Tooltip title={t('Score')}><Chip classes={{ root: classes.score }} label={injectExpectation.inject_expectation_score} /></Tooltip>
-                        </Grid>
+                        </GridLegacy>
                       )
                         : (
-                            <Grid item={true} xs={5} sx={{ textAlign: 'end' }}>
+                            <GridLegacy item={true} xs={5} sx={{ textAlign: 'end' }}>
                               {
                                 injectExpectation.inject_expectation_created_at && (
                                   <ExpirationChip
@@ -672,7 +672,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                   />
                                 )
                               }
-                            </Grid>
+                            </GridLegacy>
 
                           )}
 
@@ -680,7 +680,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                         injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
                           return (
                             <>
-                              <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
+                              <GridLegacy item={true} xs={1} style={{ textAlign: 'end' }}>
                                 <IconButton
                                   color="primary"
                                   onClick={(ev) => {
@@ -711,7 +711,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                     {t('Delete')}
                                   </MenuItem>
                                 </Menu>
-                              </Grid>
+                              </GridLegacy>
 
                             </>
                           );
@@ -723,7 +723,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           && injectExpectation.inject_expectation_results
                           && injectExpectation.inject_expectation_results.length === 0))
                         && (
-                          <Grid item={true} xs={1} style={{ textAlign: 'end' }}>
+                          <GridLegacy item={true} xs={1} style={{ textAlign: 'end' }}>
                             <Tooltip title={t('Add a result')}>
                               <IconButton
                                 aria-label="Add"
@@ -746,10 +746,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                               </IconButton>
                             </Tooltip>
 
-                          </Grid>
+                          </GridLegacy>
                         )}
 
-                    </Grid>
+                    </GridLegacy>
                     <div className={classes.flexContainer}>
                       <div>
                         <Typography variant="h4">
@@ -776,16 +776,22 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           </TableHead>
                           <TableBody>
                             {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult, index) => {
+                              const isResultSecurityPlatform: boolean = !!(
+                                injectExpectation.inject_expectation_agent
+                                && injectExpectation.inject_expectation_status === 'SUCCESS'
+                                && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected')
+                                && expectationResult.sourceType === 'collector'
+                              );
                               return (
                                 <TableRow
                                   key={index}
-                                  hover={true}
+                                  hover={isResultSecurityPlatform}
                                   onClick={() => {
-                                    if (injectExpectation.inject_expectation_agent && injectExpectation.inject_expectation_status === 'SUCCESS' && (expectationResult.result === 'Prevented' || expectationResult.result === 'Detected') && expectationResult.sourceType === 'collector') {
+                                    if (isResultSecurityPlatform) {
                                       handleClickSecurityPlatformResult(injectExpectation, expectationResult);
                                     }
                                   }}
-                                  sx={{ cursor: `${injectExpectation.inject_expectation_agent ? 'pointer' : 'default'}` }}
+                                  sx={{ cursor: `${isResultSecurityPlatform ? 'pointer' : 'default'}` }}
                                   selected={expectationResult.sourceId === selectedResult?.sourceId}
                                 >
                                   <TableCell className={classes.tableFontSize}>

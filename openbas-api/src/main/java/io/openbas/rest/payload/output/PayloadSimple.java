@@ -1,4 +1,4 @@
-package io.openbas.rest.atomic_testing.form;
+package io.openbas.rest.payload.output;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;

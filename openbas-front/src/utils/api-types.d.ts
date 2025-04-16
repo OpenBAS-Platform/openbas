@@ -181,6 +181,7 @@ export interface AssetGroup {
   asset_group_dynamic_assets?: string[];
   /** Filter object to search within filterable attributes */
   asset_group_dynamic_filter?: FilterGroup;
+  asset_group_external_reference?: string;
   asset_group_id: string;
   asset_group_name: string;
   asset_group_tags?: string[];
@@ -605,7 +606,7 @@ export interface ContractOutputElement {
   contract_output_element_key: string;
   contract_output_element_name: string;
   /** @uniqueItems true */
-  contract_output_element_regex_groups?: RegexGroup[];
+  contract_output_element_regex_groups: RegexGroup[];
   contract_output_element_rule: string;
   contract_output_element_tags?: string[];
   contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -616,6 +617,7 @@ export interface ContractOutputElement {
 
 /** List of Contract output elements */
 export interface ContractOutputElementInput {
+  contract_output_element_id?: string;
   /** Indicates whether this contract output element can be used to generate a finding */
   contract_output_element_is_finding: boolean;
   /** Key */
@@ -633,6 +635,25 @@ export interface ContractOutputElementInput {
   contract_output_element_tags?: string[];
   /** Contract Output element type, can be: text, number, port, IPV6, IPV4, portscan, credentials */
   contract_output_element_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
+}
+
+/** Represents the rules for parsing the output of an execution. */
+export interface ContractOutputElementSimple {
+  contract_output_element_id?: string;
+  /** Represents a unique key identifier. */
+  contract_output_element_key?: string;
+  /** Represents the name of the rule. */
+  contract_output_element_name?: string;
+  /** @uniqueItems true */
+  contract_output_element_regex_groups?: RegexGroupSimple[];
+  /** The rule to apply for parsing the output, for example, can be a regex. */
+  contract_output_element_rule?: string;
+  contract_output_element_tags?: string[];
+  /**
+   * Represents the data type being extracted.
+   * @example "text, number, port, portscan, ipv4, ipv6, credentials"
+   */
+  contract_output_element_type?: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
 }
 
 export interface CreateUserInput {
@@ -762,6 +783,8 @@ export interface EndpointOutput {
   endpoint_arch: "x86_64" | "arm64" | "Unknown";
   /** Platform */
   endpoint_platform: "Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown";
+  /** The endpoint was added statiscally or not */
+  is_static?: boolean;
 }
 
 export interface EndpointOverviewOutput {
@@ -1203,6 +1226,7 @@ export interface Finding {
   finding_inject_id?: string;
   /** @deprecated */
   finding_labels?: string[];
+  finding_name?: string;
   finding_tags?: string[];
   finding_teams?: string[];
   finding_type: "text" | "number" | "port" | "portscan" | "ipv4" | "ipv6" | "credentials";
@@ -2377,7 +2401,7 @@ export interface OrganizationUpdateInput {
 export interface OutputParser {
   listened?: boolean;
   /** @uniqueItems true */
-  output_parser_contract_output_elements?: ContractOutputElement[];
+  output_parser_contract_output_elements: ContractOutputElement[];
   /** @format date-time */
   output_parser_created_at: string;
   output_parser_id: string;
@@ -2394,10 +2418,22 @@ export interface OutputParserInput {
    * @uniqueItems true
    */
   output_parser_contract_output_elements: ContractOutputElementInput[];
+  output_parser_id?: string;
   /** Paser Mode: STDOUT, STDERR, READ_FILE */
   output_parser_mode: "STDOUT" | "STDERR" | "READ_FILE";
   /** Parser Type: REGEX */
   output_parser_type: "REGEX";
+}
+
+/** Represents a single output parser */
+export interface OutputParserSimple {
+  /** @uniqueItems true */
+  output_parser_contract_output_elements?: ContractOutputElementSimple[];
+  output_parser_id?: string;
+  /** Mode of parser, which output will be parsed, for now only STDOUT is supported */
+  output_parser_mode?: "STDOUT" | "STDERR" | "READ_FILE";
+  /** Type of parser, for now only REGEX is supported */
+  output_parser_type?: "REGEX";
 }
 
 export interface PageAssetGroupOutput {
@@ -2967,6 +3003,8 @@ export interface PayloadsDeprecateInput {
   payload_external_ids: string[];
 }
 
+export type BannerMessage = Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>
+
 export interface PlatformSettings {
   /** True if Saml2 is enabled */
   auth_saml2_enable?: boolean;
@@ -3035,17 +3073,19 @@ export interface PlatformSettings {
   /** Type of AI (mistralai or openai) */
   platform_ai_type?: string;
   /** Map of the messages to display on the screen by their level (the level available are DEBUG, INFO, WARN, ERROR, FATAL) */
-  platform_banner_by_level?: Record<string, string[]>;
+  platform_banner_by_level?: BannerMessage;
   /** Base URL of the platform */
   platform_base_url?: string;
   /** Definition of the dark theme */
   platform_dark_theme?: ThemeInput;
   /** 'true' if the platform has Enterprise Edition activated */
-  platform_enterprise_edition?: string;
+  platform_license: PlatformLicense;
   /** Language of the platform */
   platform_lang?: string;
   /** Definition of the dark theme */
   platform_light_theme?: ThemeInput;
+  /** id of the platform */
+  platform_id?: string;
   /** Name of the platform */
   platform_name?: string;
   /** List of OpenID providers */
@@ -3248,8 +3288,18 @@ export interface RegexGroup {
 export interface RegexGroupInput {
   /** Field */
   regex_group_field: string;
+  regex_group_id?: string;
   /** Index of the group from the regex match: $index0$index1 */
   regex_group_index_values: string;
+}
+
+/** Represents the groups defined by the regex pattern. */
+export interface RegexGroupSimple {
+  /** Represents the field name of specific captured groups. */
+  regex_group_field?: string;
+  regex_group_id?: string;
+  /** Represents the indexes of specific captured groups. */
+  regex_group_index_values?: string;
 }
 
 export interface RenewTokenInput {
@@ -3516,8 +3566,7 @@ export interface SecurityPlatformUpsertInput {
 }
 
 export interface SettingsEnterpriseEditionUpdateInput {
-  /** 'true' if enterprise edition is activated */
-  platform_enterprise_edition: string;
+  platform_enterprise_license: string;
 }
 
 export interface SettingsPlatformWhitemarkUpdateInput {
@@ -3639,13 +3688,6 @@ export interface StatusPayloadOutput {
   executable_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   executable_file?: StatusPayloadDocument;
   file_drop_file?: StatusPayloadDocument;
-  network_traffic_ip_dst: string;
-  network_traffic_ip_src: string;
-  /** @format int32 */
-  network_traffic_port_dst: number;
-  /** @format int32 */
-  network_traffic_port_src: number;
-  network_traffic_protocol: string;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: AttackPatternSimple[];
   payload_cleanup_executor?: string;
@@ -3655,6 +3697,8 @@ export interface StatusPayloadOutput {
   payload_external_id?: string;
   payload_name?: string;
   payload_obfuscator?: string;
+  /** @uniqueItems true */
+  payload_output_parsers?: OutputParserSimple[];
   payload_platforms?: ("Linux" | "Windows" | "MacOS" | "Container" | "Service" | "Generic" | "Internal" | "Unknown")[];
   payload_prerequisites?: PayloadPrerequisite[];
   /** @uniqueItems true */
@@ -3867,6 +3911,26 @@ export interface ThemeInput {
   primary_color?: string;
   /** Secondary color of the theme */
   secondary_color?: string;
+}
+
+export interface PlatformLicense {
+  license_is_enterprise: boolean
+  license_is_valid_cert: boolean
+  license_type: string
+  license_creator: string
+  license_is_valid_product: boolean
+  license_customer: string
+  license_platform: string
+  license_is_platform_match: boolean
+  license_is_global: boolean
+  license_is_expired: boolean
+  license_start_date: string
+  license_expiration_date: string
+  license_is_prevention: boolean
+  license_is_validated: boolean
+  license_is_by_configuration: boolean
+  license_is_extra_expiration: boolean
+  license_extra_expiration_days: number
 }
 
 export interface Token {

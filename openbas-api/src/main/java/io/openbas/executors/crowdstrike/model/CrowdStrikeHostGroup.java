@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CrowdStrikeSession {
+public class CrowdStrikeHostGroup {
 
-  private String session_id;
-  private String device_id;
+  private String id;
+  private String name;
+  private String description;
 }

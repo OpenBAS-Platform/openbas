@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 public class RegexGroupInput {
 
+  @JsonProperty("regex_group_id")
+  private String id;
+
   @JsonProperty("regex_group_field")
   @Schema(description = "Field")
   @NotBlank

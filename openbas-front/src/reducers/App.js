@@ -1,8 +1,8 @@
-import Immutable from 'seamless-immutable';
+import { Map } from 'immutable';
 
 import * as Constants from '../constants/ActionTypes';
 
-const app = (state = Immutable({}), action = {}) => {
+const app = (state = Map({}), action = {}) => {
   switch (action.type) {
     case Constants.IDENTITY_LOGIN_SUCCESS: {
       const user = action.payload.entities.users[action.payload.result];

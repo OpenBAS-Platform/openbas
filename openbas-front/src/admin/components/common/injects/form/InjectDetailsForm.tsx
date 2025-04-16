@@ -352,6 +352,7 @@ const InjectDetailsForm = ({
             style={{
               width: '100%',
               height: theme.spacing(5),
+              marginTop: theme.spacing(2),
             }}
           >
             {openDetails ? <ArrowDropUpOutlined fontSize="large" /> : <ArrowDropDownOutlined fontSize="large" />}

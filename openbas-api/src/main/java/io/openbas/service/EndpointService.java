@@ -1,21 +1,18 @@
 package io.openbas.service;
 
+import static io.openbas.database.model.Filters.isEmptyFilterGroup;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
 import static io.openbas.executors.openbas.OpenBASExecutor.OPENBAS_EXECUTOR_ID;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.ArchitectureFilterUtils.handleEndpointFilter;
+import static io.openbas.utils.FilterUtilsJpa.computeFilterGroupJpa;
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 import static java.time.Instant.now;
 
 import io.openbas.config.OpenBASConfig;
-import io.openbas.database.model.Agent;
-import io.openbas.database.model.AssetAgentJob;
-import io.openbas.database.model.Endpoint;
-import io.openbas.database.repository.AssetAgentJobRepository;
-import io.openbas.database.repository.EndpointRepository;
-import io.openbas.database.repository.ExecutorRepository;
-import io.openbas.database.repository.TagRepository;
+import io.openbas.database.model.*;
+import io.openbas.database.repository.*;
 import io.openbas.database.specification.EndpointSpecification;
 import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
@@ -32,12 +29,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -72,9 +68,11 @@ public class EndpointService {
 
   private final EndpointRepository endpointRepository;
   private final ExecutorRepository executorRepository;
+  private final AssetGroupRepository assetGroupRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
   private final TagRepository tagRepository;
   private final AgentService agentService;
+  private final AssetService assetService;
 
   // -- CRUD --
   public Endpoint createEndpoint(@NotNull final Endpoint endpoint) {
@@ -109,6 +107,10 @@ public class EndpointService {
     return this.endpointRepository.findByAtleastOneMacAddress(macAddresses).stream().findFirst();
   }
 
+  public List<Endpoint> findEndpointsByMacAddresses(final String[] macAddresses) {
+    return this.endpointRepository.findByAtleastOneMacAddress(macAddresses);
+  }
+
   public List<Endpoint> endpoints() {
     return fromIterable(this.endpointRepository.findAll());
   }
@@ -139,6 +141,40 @@ public class EndpointService {
         Endpoint.class);
   }
 
+  public Page<Endpoint> searchManagedEndpoints(
+      String assetGroupId, SearchPaginationInput searchPaginationInput) {
+    AssetGroup assetGroup =
+        assetGroupRepository
+            .findById(assetGroupId)
+            .orElseThrow(() -> new IllegalArgumentException("Asset group not found"));
+    Specification<Endpoint> specificationDynamic =
+        computeFilterGroupJpa(assetGroup.getDynamicFilter());
+    if (!isEmptyFilterGroup(assetGroup.getDynamicFilter())) {
+      Specification<Endpoint> specificationDynamicWithInjection =
+          specificationDynamic.and(EndpointSpecification.findEndpointsForInjection());
+      Specification<Endpoint> specificationStatic =
+          EndpointSpecification.findEndpointsForAssetGroup(assetGroupId)
+              .and(EndpointSpecification.findEndpointsForInjection());
+      return buildPaginationJPA(
+          (Specification<Endpoint> specification, Pageable pageable) ->
+              this.endpointRepository.findAll(
+                  Specification.where(specificationDynamicWithInjection.or(specificationStatic))
+                      .and(specification),
+                  pageable),
+          handleEndpointFilter(searchPaginationInput),
+          Endpoint.class);
+    } else {
+      Specification<Endpoint> specificationStatic =
+          EndpointSpecification.findEndpointsForAssetGroup(assetGroupId)
+              .and(EndpointSpecification.findEndpointsForInjection());
+      return buildPaginationJPA(
+          (Specification<Endpoint> specification, Pageable pageable) ->
+              this.endpointRepository.findAll(specificationStatic.and(specification), pageable),
+          handleEndpointFilter(searchPaginationInput),
+          Endpoint.class);
+    }
+  }
+
   public Endpoint updateEndpoint(
       @NotBlank final String endpointId, @NotNull final EndpointUpdateInput input) {
     Endpoint toUpdate = this.endpoint(endpointId);
@@ -149,7 +185,7 @@ public class EndpointService {
 
   // -- INSTALLATION AGENT --
   public void registerAgentEndpoint(AgentRegisterInput input) {
-    // Check if agent exists (only 1 agent can be found for Crowdstrike and Tanium)
+    // Check if agent exists (only 1 agent can be found for Tanium)
     List<Agent> existingAgents = agentService.findByExternalReference(input.getExternalReference());
     if (!existingAgents.isEmpty()) {
       updateExistingAgent(existingAgents.getFirst(), input);
@@ -163,6 +199,93 @@ public class EndpointService {
         createNewEndpointAndAgent(input);
       }
     }
+  }
+
+  public List<Asset> syncAgentsEndpoints(
+      List<AgentRegisterInput> inputs, List<Agent> existingAgents) {
+    List<Agent> agentsToSave = new ArrayList<>();
+    List<Asset> endpointsToSave = new ArrayList<>();
+    Endpoint endpointToSave;
+    Agent agentToSave;
+    // Update agents/endpoints with external reference
+    Set<String> inputsExternalRefs =
+        inputs.stream().map(AgentRegisterInput::getExternalReference).collect(Collectors.toSet());
+    if (!inputsExternalRefs.isEmpty()) {
+      Set<Agent> agentsToUpdate =
+          existingAgents.stream()
+              .filter(agent -> inputsExternalRefs.contains(agent.getExternalReference()))
+              .collect(Collectors.toSet());
+      Map<String, AgentRegisterInput> inputsByExternalReference =
+          inputs.stream()
+              .collect(
+                  Collectors.toMap(AgentRegisterInput::getExternalReference, agent2 -> agent2));
+      for (Agent agentToUpdate : agentsToUpdate) {
+        final AgentRegisterInput inputToSave =
+            inputsByExternalReference.get(agentToUpdate.getExternalReference());
+        endpointToSave = (Endpoint) agentToUpdate.getAsset();
+        setUpdatedEndpointAttributes(endpointToSave, inputToSave);
+        agentToUpdate.setAsset(endpointToSave);
+        agentToUpdate.setLastSeen(inputToSave.getLastSeen());
+        endpointsToSave.add(endpointToSave);
+        agentsToSave.add(agentToUpdate);
+        inputs.removeIf(
+            input -> input.getExternalReference().equals(inputToSave.getExternalReference()));
+      }
+    }
+    // Update agents/endpoints with mac address
+    String[] inputsMacAddresses =
+        inputs.stream().map(AgentRegisterInput::getMacAddresses).toList().stream()
+            .flatMap(Arrays::stream)
+            .toArray(String[]::new);
+    if (inputsMacAddresses.length > 0) {
+      List<Endpoint> endpointsToUpdate = findEndpointsByMacAddresses(inputsMacAddresses);
+      Optional<AgentRegisterInput> optionalInputToSave;
+      for (Endpoint endpointToUpdate : endpointsToUpdate) {
+        optionalInputToSave =
+            inputs.stream()
+                .filter(
+                    input ->
+                        Arrays.stream(endpointToUpdate.getMacAddresses())
+                            .anyMatch(
+                                macAddress ->
+                                    Arrays.asList(input.getMacAddresses()).contains(macAddress)))
+                .findFirst();
+        if (optionalInputToSave.isPresent()) {
+          // If no existing agent Crowdstrike in this endpoint, add to it
+          if (existingAgents.stream()
+              .noneMatch(agent -> agent.getAsset().getId().equals(endpointToUpdate.getId()))) {
+            final AgentRegisterInput inputToSave = optionalInputToSave.get();
+            setUpdatedEndpointAttributes(endpointToUpdate, inputToSave);
+            agentToSave = new Agent();
+            setNewAgentAttributes(inputToSave, agentToSave);
+            setUpdatedAgentAttributes(agentToSave, inputToSave, endpointToUpdate);
+            endpointsToSave.add(endpointToUpdate);
+            agentsToSave.add(agentToSave);
+            inputs.removeIf(
+                input -> Arrays.equals(input.getMacAddresses(), inputToSave.getMacAddresses()));
+          }
+        }
+      }
+    }
+    // Create new agents/endpoints
+    if (!inputs.isEmpty()) {
+      for (AgentRegisterInput inputToUpdate : inputs) {
+        endpointToSave = new Endpoint();
+        endpointToSave.setUpdateAttributes(inputToUpdate);
+        endpointToSave.setIps(inputToUpdate.getIps());
+        endpointToSave.setSeenIp(inputToUpdate.getSeenIp());
+        endpointToSave.setMacAddresses(inputToUpdate.getMacAddresses());
+        endpointsToSave.add(endpointToSave);
+        agentToSave = new Agent();
+        setNewAgentAttributes(inputToUpdate, agentToSave);
+        setUpdatedAgentAttributes(agentToSave, inputToUpdate, endpointToSave);
+        agentsToSave.add(agentToSave);
+      }
+    }
+    // Save all in database
+    List<Asset> endpoints = fromIterable(assetService.saveAllAssets(endpointsToSave));
+    agentService.saveAllAgents(agentsToSave);
+    return endpoints;
   }
 
   public Endpoint register(final EndpointRegisterInput input) throws IOException {
@@ -190,7 +313,7 @@ public class EndpointService {
       } else {
         agent =
             updateExistingEndpointAndCreateAgent(
-                (Endpoint) Hibernate.unproxy(existingAgents.getFirst().getAsset()), agentInput);
+                (Endpoint) existingAgents.getFirst().getAsset(), agentInput);
       }
     } else {
       // Check if endpoint exists
@@ -204,7 +327,7 @@ public class EndpointService {
     }
     // If agent is not temporary and not the same version as the platform => Create an upgrade task
     // for the agent
-    Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    Endpoint endpoint = (Endpoint) agent.getAsset();
     if (agent.getParent() == null && !agent.getVersion().equals(version)) {
       AssetAgentJob assetAgentJob = new AssetAgentJob();
       assetAgentJob.setCommand(
@@ -265,7 +388,7 @@ public class EndpointService {
   }
 
   private Agent updateExistingAgent(Agent agent, AgentRegisterInput input) {
-    Endpoint endpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
+    Endpoint endpoint = (Endpoint) agent.getAsset();
     setUpdatedEndpointAttributes(endpoint, input);
     updateEndpoint(endpoint);
     setUpdatedAgentAttributes(agent, input, endpoint);
@@ -294,6 +417,9 @@ public class EndpointService {
   }
 
   private void setNewAgentAttributes(AgentRegisterInput input, Agent agent) {
+    if (CROWDSTRIKE_EXECUTOR_TYPE.equals(input.getExecutor().getType())) {
+      agent.setId(input.getExternalReference());
+    }
     agent.setPrivilege(input.isElevated() ? Agent.PRIVILEGE.admin : Agent.PRIVILEGE.standard);
     agent.setDeploymentMode(
         input.isService() ? Agent.DEPLOYMENT_MODE.service : Agent.DEPLOYMENT_MODE.session);

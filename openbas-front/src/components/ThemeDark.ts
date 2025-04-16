@@ -57,6 +57,8 @@ const ThemeDark = (
       nav: nav || THEME_DARK_DEFAULT_NAV,
       accent: accent || THEME_DARK_DEFAULT_ACCENT,
       shadow: 'rgba(255, 255, 255, 0)',
+      code: accent || THEME_DARK_DEFAULT_ACCENT,
+      paperInCard: paper || THEME_DARK_DEFAULT_PAPER,
     },
   },
   typography: {
@@ -148,7 +150,7 @@ const ThemeDark = (
           'pre': {
             fontFamily: 'Consolas, monaco, monospace',
             color: '#ffffff !important',
-            background: `${accent || '#01478d'} !important`,
+            background: `${accent || THEME_DARK_DEFAULT_ACCENT} !important`,
           },
           'code': {
             fontFamily: 'Consolas, monaco, monospace',
