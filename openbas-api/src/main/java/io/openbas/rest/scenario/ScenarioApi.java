@@ -233,6 +233,9 @@ public class ScenarioApi extends RestBehavior {
       @PathVariable @NotBlank final String scenarioId,
       @Valid @RequestBody final ScenarioRecurrenceInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
+    if (input.getRecurrenceStart() != null) {
+      this.scenarioService.checkScenarioLaunchable(scenario);
+    }
     scenario.setUpdateAttributes(input);
     return this.scenarioService.updateScenario(scenario);
   }
@@ -284,6 +287,7 @@ public class ScenarioApi extends RestBehavior {
   public Exercise createRunningExerciseFromScenario(
       @PathVariable @NotBlank final String scenarioId) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
+    this.scenarioService.checkScenarioLaunchable(scenario);
     return scenarioToExerciseService.toExercise(
         scenario, now().truncatedTo(MINUTES).plus(1, MINUTES), true);
   }

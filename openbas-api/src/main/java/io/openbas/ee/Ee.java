@@ -149,6 +149,23 @@ public class Ee {
     return license;
   }
 
+  public boolean isLicenseActive(License license) {
+    boolean isActivated =
+        license.isLicenseValidated()
+            && Instant.now().isBefore(license.getExpirationDate())
+            && Instant.now()
+                .isBefore(
+                    license
+                        .getExpirationDate()
+                        .plus(license.getExtraExpirationDays(), ChronoUnit.DAYS));
+    return isActivated;
+  }
+
+  /**
+   * This should not be called directly. Prefer to use the license Cache Manager:
+   *
+   * @see(LicenseCacheManager#getEnterpriseEditionInfo)
+   */
   public License getEnterpriseEditionInfo() {
     Map<String, Setting> dbSettings = mapOfSettings(fromIterable(this.settingRepository.findAll()));
     String pem =

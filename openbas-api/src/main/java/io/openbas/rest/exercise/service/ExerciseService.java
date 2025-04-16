@@ -16,10 +16,12 @@ import static java.util.Optional.ofNullable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.config.OpenBASConfig;
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.raw.RawExerciseSimple;
 import io.openbas.database.raw.RawInjectExpectation;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.atomic_testing.form.TargetSimple;
 import io.openbas.rest.exception.ElementNotFoundException;
@@ -30,10 +32,7 @@ import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.rest.scenario.service.ScenarioStatisticService;
 import io.openbas.rest.team.output.TeamOutput;
-import io.openbas.service.GrantService;
-import io.openbas.service.TagRuleService;
-import io.openbas.service.TeamService;
-import io.openbas.service.VariableService;
+import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.*;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
@@ -52,6 +51,7 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -69,6 +69,7 @@ public class ExerciseService {
 
   @PersistenceContext private EntityManager entityManager;
 
+  private final Ee eeService;
   private final GrantService grantService;
   private final InjectDuplicateService injectDuplicateService;
   private final TeamService teamService;
@@ -99,6 +100,7 @@ public class ExerciseService {
   private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
+  @Autowired private LicenseCacheManager licenseCacheManager;
 
   // endregion
 
@@ -372,6 +374,13 @@ public class ExerciseService {
     setComputedAttributesWithEmptyGlobalScore(result.exercises());
 
     return getExerciseSimples(specificationCount, pageable, result);
+  }
+
+  public void checkExerciseLaunchable(Exercise exercise) {
+    if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      return;
+    }
+    exercise.getInjects().forEach(injectService::checkInjectLaunchable);
   }
 
   public boolean checkIfTagRulesApplies(

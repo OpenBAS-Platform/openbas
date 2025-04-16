@@ -296,6 +296,10 @@ public class InjectApi extends RestBehavior {
         exerciseRepository.findById(exerciseId).orElseThrow(ElementNotFoundException::new);
     Inject inject = updateInject(injectId, input);
 
+    if (exercise.getStart().isPresent()) {
+      this.injectService.checkInjectLaunchable(inject);
+    }
+
     // If Documents not yet linked directly to the exercise, attached it
     inject
         .getDocuments()
@@ -550,7 +554,9 @@ public class InjectApi extends RestBehavior {
       @Valid @RequestBody @NotNull InjectInput input) {
     Scenario scenario = this.scenarioService.scenario(scenarioId);
     Inject inject = updateInject(injectId, input);
-
+    if (scenario.getRecurrenceStart() != null) {
+      this.injectService.checkInjectLaunchable(inject);
+    }
     // If Documents not yet linked directly to the exercise, attached it
     inject
         .getDocuments()

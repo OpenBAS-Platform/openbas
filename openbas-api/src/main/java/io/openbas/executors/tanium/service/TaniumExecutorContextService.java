@@ -3,17 +3,21 @@ package io.openbas.executors.tanium.service;
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
 import static io.openbas.executors.tanium.service.TaniumExecutorService.TANIUM_EXECUTOR_NAME;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.ee.Ee;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.rest.exception.AgentException;
+import io.openbas.rest.exception.LicenseRestrictionException;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
@@ -21,14 +25,28 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TaniumExecutorContextService extends ExecutorContextService {
 
+  private final Ee eeService;
   private final TaniumExecutorConfig taniumExecutorConfig;
   private final TaniumExecutorClient taniumExecutorClient;
+
+  @Autowired private LicenseCacheManager licenseCacheManager;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
       @NotNull final Endpoint assetEndpoint,
       @NotNull final Agent agent)
       throws AgentException {
+    if (!eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      inject
+          .getStatus()
+          .ifPresent(
+              status ->
+                  status.addInfoTrace(
+                      "LICENSE RESTRICTION - Some asset will be executed through the Tanium executor",
+                      ExecutionTraceAction.EXECUTION));
+      throw new LicenseRestrictionException(
+          "LICENSE RESTRICTION - Asset will be executed through the Tanium executor");
+    }
 
     if (!this.taniumExecutorConfig.isEnable()) {
       throw new AgentException("Fatal error: Tanium executor is not enabled", agent);
