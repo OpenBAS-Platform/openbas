@@ -96,8 +96,8 @@ steps:
       - yarn install
       - yarn generate-types-from-api
       - |
-        if ! yarn check-ts; then
-           echo "⚠️ Forgot to generate types! Please run `yarn run generate-types-from-api` before committing."; && exit 1
+        if git diff --name-only | grep -q './src/utils/api-types.d.ts'; then
+          echo "⚠️ Forgot to generate types! Please run `yarn run generate-types-from-api` before committing."; exit 1;
         fi
     depends_on:
       - app-e2e
