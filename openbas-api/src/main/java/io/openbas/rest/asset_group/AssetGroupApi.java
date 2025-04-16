@@ -164,12 +164,7 @@ public class AssetGroupApi extends RestBehavior {
   public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
       @RequestParam(required = false) final String searchText,
       @RequestParam(required = false) final String simulationOrScenarioId) {
-    return assetGroupRepository
-        .findAllByNameLinkedToFindings(
-            StringUtils.trimToNull(simulationOrScenarioId), StringUtils.trimToNull(searchText))
-        .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-        .toList();
+    return assetGroupService.getOptionsByNameLinkedToFindings(searchText, simulationOrScenarioId);
   }
 
   @PostMapping(ASSET_GROUP_URI + "/options")

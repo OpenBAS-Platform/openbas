@@ -32,12 +32,8 @@ import io.openbas.service.TagRuleService;
 import io.openbas.service.TeamService;
 import io.openbas.service.VariableService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
-import io.openbas.utils.AtomicTestingUtils;
+import io.openbas.utils.*;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
-import io.openbas.utils.ExerciseMapper;
-import io.openbas.utils.InjectMapper;
-import io.openbas.utils.ResultUtils;
-import io.openbas.utils.TargetType;
 import jakarta.annotation.Resource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -424,6 +420,25 @@ public class ExerciseService {
     List<ExerciseSimple> exercises = execution(query);
 
     return new CriteriaBuilderAndExercises(cb, exercises);
+  }
+
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
+      String searchText, String simulationOrScenarioId) {
+    String trimmedSearchText = org.apache.commons.lang3.StringUtils.trimToNull(searchText);
+    String trimmedSimulationOrScenarioId =
+        org.apache.commons.lang3.StringUtils.trimToNull(simulationOrScenarioId);
+
+    Set<Exercise> results;
+
+    if (trimmedSimulationOrScenarioId == null) {
+      results = exerciseRepository.findAllByNameLinkedToFindings(trimmedSearchText);
+    } else {
+      results =
+          exerciseRepository.findAllByNameLinkedToFindingsWithContext(
+              trimmedSimulationOrScenarioId, trimmedSearchText);
+    }
+
+    return results.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName())).toList();
   }
 
   private record CriteriaBuilderAndExercises(CriteriaBuilder cb, List<ExerciseSimple> exercises) {}

@@ -152,7 +152,6 @@ public class FindingUtils {
       io.openbas.database.model.ContractOutputElement contractOutputElement,
       String finalValue) {
     try {
-
       Optional<Finding> optionalFinding =
           findingRepository.findByInjectIdAndValueAndTypeAndKey(
               inject.getId(),

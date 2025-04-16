@@ -3,7 +3,6 @@ package io.openbas.rest.exercise;
 import static io.openbas.config.SessionHelper.currentUser;
 import static io.openbas.database.model.User.ROLE_ADMIN;
 import static io.openbas.database.model.User.ROLE_USER;
-import static io.openbas.database.specification.ExerciseSpecification.byName;
 import static io.openbas.database.specification.ExerciseSpecification.findGrantedFor;
 import static io.openbas.database.specification.TeamSpecification.fromExercise;
 import static io.openbas.helper.StreamHelper.fromIterable;
@@ -52,7 +51,6 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -368,15 +366,11 @@ public class ExerciseApi extends RestBehavior {
 
   // -- OPTION --
 
-  @GetMapping(EXERCISE_URI + "/options")
-  public List<FilterUtilsJpa.Option> optionsByName(
-      @RequestParam(required = false) final String searchText) {
-    return fromIterable(
-            this.exerciseRepository.findAll(
-                byName(searchText), Sort.by(Sort.Direction.ASC, "name")))
-        .stream()
-        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
-        .toList();
+  @GetMapping(EXERCISE_URI + "/findings/options")
+  public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
+      @RequestParam(required = false) final String searchText,
+      @RequestParam(required = false) final String scenarioId) {
+    return exerciseService.getOptionsByNameLinkedToFindings(searchText, scenarioId);
   }
 
   @PostMapping(EXERCISE_URI + "/options")
