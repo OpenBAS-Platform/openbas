@@ -1,5 +1,5 @@
 import { AddOutlined } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { type FunctionComponent } from 'react';
 
 import { emptyFilterGroup } from '../../../../../components/common/queryable/filter/FilterUtils';
@@ -43,52 +43,52 @@ const WidgetCreationSeriesList: FunctionComponent<{
   };
 
   return (
-    <div style={{ marginTop: 20 }}>
-      {currentSeries.map((series, index) => {
-        return (
-          <WidgetCreationSeries
-            key={index}
-            index={index}
-            series={series}
-            onChange={series => onChangeSeries(index, series)}
-            onRemove={handleRemoveSeries}
-          />
-        );
-      })}
-      <div style={{ display: 'flex' }}>
-        <Button
-          variant="contained"
-          disabled={getCurrentSeriesLimit(widgetType) === currentSeries.length}
-          color="secondary"
-          size="small"
-          onClick={handleAddSeries}
-          style={{
-            width: '100%',
-            height: 20,
-            flex: 1,
-          }}
-        >
-          <AddOutlined fontSize="small" />
-        </Button>
-      </div>
+    <Box marginTop={2}>
+      <Box
+        display="grid"
+        gap={2}
+      >
+        {currentSeries.map((series, index) => {
+          return (
+            <WidgetCreationSeries
+              key={index}
+              index={index}
+              series={series}
+              onChange={series => onChangeSeries(index, series)}
+              onRemove={handleRemoveSeries}
+            />
+          );
+        })}
+        <div style={{ display: 'flex' }}>
+          <Button
+            variant="contained"
+            disabled={getCurrentSeriesLimit(widgetType) === currentSeries.length}
+            color="secondary"
+            onClick={handleAddSeries}
+            style={{
+              flex: 1,
+              height: 20,
+            }}
+          >
+            <AddOutlined fontSize="small" />
+          </Button>
+        </div>
+      </Box>
       <div style={{
-        marginTop: 20,
-        textAlign: 'center',
+        display: 'flex',
+        justifyContent: 'center',
       }}
       >
         <Button
           variant="contained"
           color="primary"
-          style={{
-            marginTop: 20,
-            textAlign: 'center',
-          }}
+          sx={{ marginTop: 5 }}
           onClick={onSubmit}
         >
           {t('Validate')}
         </Button>
       </div>
-    </div>
+    </Box>
   );
 };
 

@@ -1,7 +1,6 @@
-import { Close, OpenInFullOutlined } from '@mui/icons-material';
-import { Dialog, DialogContent, DialogTitle, Fab, IconButton } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { type FunctionComponent, useState } from 'react';
+import { Close } from '@mui/icons-material';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import Transition from '../../../../../../components/common/Transition';
@@ -21,25 +20,20 @@ const useStyles = makeStyles()(theme => ({
 interface Props {
   widgetTitle: string;
   data: EsSeries[];
+  fullscreen: boolean;
+  setFullscreen: (fullscreen: boolean) => void;
 }
 
-const SecurityCoverage: FunctionComponent<Props> = ({ widgetTitle, data }) => {
+const SecurityCoverage: FunctionComponent<Props> = ({ widgetTitle, data, fullscreen, setFullscreen }) => {
   // Standard hooks
-  const theme = useTheme();
   const { classes } = useStyles();
 
-  const [openDialog, setOpenDialog] = useState(false);
-  const handleOpen = () => {
-    if (!openDialog) setOpenDialog(true);
-  };
-  const handleClose = () => setOpenDialog(false);
+  const handleClose = () => setFullscreen(false);
 
-  console.log(widgetTitle);
-
-  if (openDialog) {
+  if (fullscreen) {
     return (
       <Dialog
-        open={openDialog}
+        open={fullscreen}
         onClose={handleClose}
         fullScreen
         PaperProps={{ elevation: 1 }}
@@ -57,31 +51,15 @@ const SecurityCoverage: FunctionComponent<Props> = ({ widgetTitle, data }) => {
           {widgetTitle}
         </DialogTitle>
         <DialogContent>
-          <SecurityCoverageContent data={data} />
+          <Box display="flex">
+            <SecurityCoverageContent data={data} />
+          </Box>
         </DialogContent>
       </Dialog>
     );
   }
 
-  return (
-    <>
-      <SecurityCoverageContent data={data} />
-      <Fab
-        size="small"
-        color="secondary"
-        onClick={handleOpen}
-        className="noDrag"
-        sx={{
-          position: 'absolute',
-          bottom: theme.spacing(3),
-          right: theme.spacing(3),
-          zIndex: 10,
-        }}
-      >
-        <OpenInFullOutlined />
-      </Fab>
-    </>
-  );
+  return <SecurityCoverageContent data={data} />;
 };
 
 export default SecurityCoverage;

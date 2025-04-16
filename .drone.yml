@@ -83,6 +83,25 @@ steps:
     depends_on:
       - app-e2e
 
+  - name: frontend-api-types
+    image: node:22.14.0
+    volumes:
+      - name: cache-node-frontend-e2e
+        path: /drone/src/openbas-front/node_modules
+    commands:
+      - apt update
+      - apt -y install netcat-traditional
+      - while ! nc -z app-e2e 8080 ; do sleep 1 ; done
+      - cd openbas-front
+      - yarn install
+      - yarn generate-types-from-api
+      - |
+        if ! yarn check-ts; then
+           echo "⚠️ Forgot to generate types! Please run `yarn run generate-types-from-api` before committing."; && exit 1
+        fi
+    depends_on:
+      - app-e2e
+
   - name: codecov
     image: robertstettner/drone-codecov
     settings:
