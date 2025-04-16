@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Indexable(index = "expectation-inject", label = "Inject expectation")
+@Indexable(index = "expectation-inject", label = "Inject expectation", ref = "InjectExpectation")
 public class EsInjectExpectation extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
   /* Except relationships, they should have same name on every model! */

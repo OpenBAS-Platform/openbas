@@ -44,7 +44,7 @@ public class Finding implements Base {
   @NotBlank
   private String field;
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(filterable = true, sortable = true, label = "finding type")
   @Column(name = "finding_type", updatable = false, nullable = false)
   @Enumerated(EnumType.STRING)
   @JsonProperty("finding_type")
@@ -81,6 +81,7 @@ public class Finding implements Base {
 
   // -- RELATION --
 
+  @Queryable(filterable = true, sortable = true, label = "inject")
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "finding_inject_id")
   @JsonProperty("finding_inject_id")
@@ -91,14 +92,14 @@ public class Finding implements Base {
 
   // -- AUDIT --
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(filterable = true, sortable = true, label = "finding created at")
   @CreationTimestamp
   @Column(name = "finding_created_at", updatable = false, nullable = false)
   @JsonProperty("finding_created_at")
   @NotNull
   private Instant creationDate = now();
 
-  @Queryable(filterable = true, sortable = true)
+  @Queryable(filterable = true, sortable = true, label = "finding updated at")
   @UpdateTimestamp
   @Column(name = "finding_updated_at", nullable = false)
   @JsonProperty("finding_updated_at")

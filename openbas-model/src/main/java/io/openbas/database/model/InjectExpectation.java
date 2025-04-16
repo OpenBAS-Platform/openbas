@@ -6,6 +6,7 @@ import static java.time.Instant.now;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,6 +46,7 @@ public class InjectExpectation implements Base {
     SUCCESS
   }
 
+  @Queryable(filterable = true, label = "inject expectation type")
   @Setter
   @Column(name = "inject_expectation_type")
   @JsonProperty("inject_expectation_type")
@@ -107,11 +109,13 @@ public class InjectExpectation implements Base {
   @NotNull
   private Long expirationTime;
 
+  @Queryable(filterable = true, label = "inject expectation created at")
   @Setter
   @Column(name = "inject_expectation_created_at")
   @JsonProperty("inject_expectation_created_at")
   private Instant createdAt = now();
 
+  @Queryable(filterable = true, label = "inject expectation updated at")
   @Setter
   @Column(name = "inject_expectation_updated_at")
   @JsonProperty("inject_expectation_updated_at")

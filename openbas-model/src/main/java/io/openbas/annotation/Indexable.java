@@ -11,4 +11,6 @@ public @interface Indexable {
   String index();
 
   String label();
+
+  String ref() default "";
 }
