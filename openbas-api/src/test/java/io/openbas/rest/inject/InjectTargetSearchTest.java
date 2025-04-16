@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -200,10 +199,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
                                 .collect(Collectors.toSet())))
                 .toList();
 
-        assertThatJson(response)
-            .when(Option.IGNORING_ARRAY_ORDER)
-            .node("content")
-            .isEqualTo(mapper.writeValueAsString(expected));
+        assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
       }
 
       @Test
@@ -252,10 +248,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
                                 .collect(Collectors.toSet())))
                 .toList();
 
-        assertThatJson(response)
-            .when(Option.IGNORING_ARRAY_ORDER)
-            .node("content")
-            .isEqualTo(mapper.writeValueAsString(expected));
+        assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
       }
     }
   }

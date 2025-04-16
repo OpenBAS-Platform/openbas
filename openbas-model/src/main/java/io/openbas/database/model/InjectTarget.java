@@ -16,7 +16,7 @@ import lombok.Data;
     discriminatorMapping = {
       @DiscriminatorMapping(value = "ASSETS_GROUPS", schema = AssetGroupTarget.class),
     })
-public class InjectTarget {
+public abstract class InjectTarget {
   @JsonProperty("target_id")
   private String id;
 
@@ -31,23 +31,23 @@ public class InjectTarget {
   @JsonProperty("target_type")
   private String targetType;
 
+  // use this property to convey the correct icon client-side
+  @JsonProperty("target_subtype")
+  protected abstract String getTargetSubtype();
+
   @JsonProperty("target_detection_status")
-  private InjectExpectation.EXPECTATION_STATUS getTargetDetectionStatus() {
-    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
-  }
+  private InjectExpectation.EXPECTATION_STATUS targetDetectionStatus =
+      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
 
   @JsonProperty("target_prevention_status")
-  private InjectExpectation.EXPECTATION_STATUS getTargetPreventionStatus() {
-    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
-  }
+  private InjectExpectation.EXPECTATION_STATUS targetPreventionStatus =
+      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
 
   @JsonProperty("target_human_response_status")
-  private InjectExpectation.EXPECTATION_STATUS getTargetHumanResponseStatus() {
-    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
-  }
+  private InjectExpectation.EXPECTATION_STATUS targetHumanResponseStatus =
+      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
 
   @JsonProperty("target_execution_status")
-  private InjectExpectation.EXPECTATION_STATUS getTargetExecutionStatus() {
-    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
-  }
+  private InjectExpectation.EXPECTATION_STATUS targetExecutionStatus =
+      InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
 }
