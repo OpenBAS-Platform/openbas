@@ -4,10 +4,10 @@ import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Collector;
 import io.openbas.database.model.InjectExpectationTrace;
 import io.openbas.database.repository.CollectorRepository;
-import io.openbas.database.repository.InjectExpectationRepository;
+import io.openbas.database.repository.InjectExpectationTraceRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.helper.RestBehavior;
-import io.openbas.rest.inject_expectation_trace.form.BulkInjectExpectationTraceInput;
+import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceBulkInsertInput;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
 import io.openbas.service.InjectExpectationTraceService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,8 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -33,12 +31,12 @@ public class InjectExpectationTraceApi extends RestBehavior {
   public static final String INJECT_EXPECTATION_TRACES_URI = "/api/inject-expectations-traces";
 
   private final InjectExpectationTraceService injectExpectationTraceService;
-  private final InjectExpectationRepository injectExpectationRepository;
+  private final InjectExpectationTraceRepository injectExpectationTraceRepository;
   private final CollectorRepository collectorRepository;
 
   /**
    * @deprecated since 1.16.0, forRemoval = true
-   * @see #bulkInsertInjectExpectationTraceForCollector(List)
+   * @see #bulkInsertInjectExpectationTraceForCollector(InjectExpectationTraceBulkInsertInput)
    */
   @Deprecated(since = "1.16.0", forRemoval = true)
   @Operation(
@@ -49,18 +47,15 @@ public class InjectExpectationTraceApi extends RestBehavior {
   @PostMapping()
   public InjectExpectationTrace createInjectExpectationTraceForCollector(
       @Valid @RequestBody InjectExpectationTraceInput input) {
-    InjectExpectationTrace injectExpectationTrace = new InjectExpectationTrace();
-    injectExpectationTrace.setUpdateAttributes(input);
-    injectExpectationTrace.setInjectExpectation(
-        injectExpectationRepository
-            .findById(input.getInjectExpectationId())
-            .orElseThrow(() -> new ElementNotFoundException("Inject expectation not found")));
-    Collector collector =
-        collectorRepository
-            .findById(input.getSourceId())
-            .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
-    injectExpectationTrace.setSecurityPlatform(collector.getSecurityPlatform());
-    return this.injectExpectationTraceService.createInjectExpectationTrace(injectExpectationTrace);
+
+    InjectExpectationTraceBulkInsertInput bulkInput = new InjectExpectationTraceBulkInsertInput();
+    bulkInput.setExpectationTraces(List.of(input));
+
+    this.bulkInsertInjectExpectationTraceForCollector(bulkInput);
+    // fetch the inserted data from the DB
+    return this.injectExpectationTraceRepository
+        .findByAlertLink(input.getAlertLink())
+        .orElseThrow(ElementNotFoundException::new);
   }
 
   /**
@@ -78,20 +73,12 @@ public class InjectExpectationTraceApi extends RestBehavior {
   @LogExecutionTime
   @PostMapping("/bulk")
   public void bulkInsertInjectExpectationTraceForCollector(
-      @Valid @RequestBody @NotNull BulkInjectExpectationTraceInput inputs) {
-    Instant start = Instant.now();
+      @Valid @RequestBody @NotNull InjectExpectationTraceBulkInsertInput inputs) {
     if (inputs.getExpectationTraces().isEmpty()) {
       return;
     }
     this.injectExpectationTraceService.bulkInsertInjectExpectationTraces(
         inputs.getExpectationTraces());
-    Instant afterSelect = Instant.now();
-    log.warning(
-        "It took "
-            + Duration.between(start, afterSelect).toMillis()
-            + " ms to handle "
-            + inputs.getExpectationTraces().size()
-            + " traces");
   }
 
   @Operation(summary = "Get inject expectation traces from collector")

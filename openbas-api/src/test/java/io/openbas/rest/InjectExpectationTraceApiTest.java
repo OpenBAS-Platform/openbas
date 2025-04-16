@@ -13,7 +13,7 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.SecurityPlatform.SECURITY_PLATFORM_TYPE;
 import io.openbas.database.repository.*;
 import io.openbas.helper.StreamHelper;
-import io.openbas.rest.inject_expectation_trace.form.BulkInjectExpectationTraceInput;
+import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceBulkInsertInput;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
 import io.openbas.utils.fixtures.AssetFixture;
 import io.openbas.utils.fixtures.InjectExpectationFixture;
@@ -81,7 +81,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     iet1.setInjectExpectation(savedInjectExpectation);
     iet1.setSecurityPlatform(savedSecurityPlatform);
     iet1.setAlertDate(Instant.now().minus(1, ChronoUnit.SECONDS));
-    iet1.setAlertLink("http://test-link.com");
+    iet1.setAlertLink("http://test-link.com/1");
     iet1.setAlertName("Test Alert 1");
     savedInjectExpectationTrace1 = injectExpectationTraceRepository.save(iet1);
 
@@ -89,7 +89,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     iet2.setInjectExpectation(savedInjectExpectation);
     iet2.setSecurityPlatform(savedSecurityPlatform);
     iet2.setAlertDate(Instant.now().minus(1, ChronoUnit.SECONDS));
-    iet2.setAlertLink("http://test-link.com");
+    iet2.setAlertLink("http://test-link.com/2");
     iet2.setAlertName("Test Alert 2");
     savedInjectExpectationTrace2 = injectExpectationTraceRepository.save(iet2);
 
@@ -97,7 +97,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     savedInjectExpectationTrace3Dupe = new InjectExpectationTrace();
     savedInjectExpectationTrace3Dupe.setInjectExpectation(savedInjectExpectation);
     savedInjectExpectationTrace3Dupe.setAlertDate(Instant.now());
-    savedInjectExpectationTrace3Dupe.setAlertLink("http://fake-link.com");
+    savedInjectExpectationTrace3Dupe.setAlertLink("http://fake-link.com/bulk3");
     savedInjectExpectationTrace3Dupe.setSecurityPlatform(savedSecurityPlatform);
     savedInjectExpectationTrace3Dupe.setAlertName("Test Alert Bulk 3 for duplicate test");
     injectExpectationTraceRepository.save(savedInjectExpectationTrace3Dupe);
@@ -252,7 +252,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     input.setSourceId(savedCollector.getId());
     input.setAlertName("Test Alert Bulk");
 
-    BulkInjectExpectationTraceInput inputBulk = new BulkInjectExpectationTraceInput();
+    InjectExpectationTraceBulkInsertInput inputBulk = new InjectExpectationTraceBulkInsertInput();
     inputBulk.setExpectationTraces(List.of(input));
 
     // --EXECUTE--
@@ -294,18 +294,18 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     InjectExpectationTraceInput input = new InjectExpectationTraceInput();
     input.setInjectExpectationId(savedInjectExpectation.getId());
     input.setAlertDate(Instant.now());
-    input.setAlertLink("http://fake-link.com");
+    input.setAlertLink("http://fake-link.com/bulk");
     input.setSourceId(savedCollector.getId());
     input.setAlertName("Test Alert Bulk");
 
     InjectExpectationTraceInput input2 = new InjectExpectationTraceInput();
     input2.setInjectExpectationId(savedInjectExpectation.getId());
     input2.setAlertDate(Instant.now());
-    input2.setAlertLink("http://fake-link.com");
+    input2.setAlertLink("http://fake-link.com/bulk2");
     input2.setSourceId(savedCollector.getId());
     input2.setAlertName("Test Alert Bulk 2");
 
-    BulkInjectExpectationTraceInput inputBulk = new BulkInjectExpectationTraceInput();
+    InjectExpectationTraceBulkInsertInput inputBulk = new InjectExpectationTraceBulkInsertInput();
     inputBulk.setExpectationTraces(List.of(input, input2));
 
     // --EXECUTE--
@@ -335,14 +335,14 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     InjectExpectationTraceInput input = new InjectExpectationTraceInput();
     input.setInjectExpectationId(savedInjectExpectation.getId());
     input.setAlertDate(Instant.now());
-    input.setAlertLink("http://fake-link.com");
+    input.setAlertLink("http://fake-link.com/bulk");
     input.setSourceId(savedCollector.getId());
     input.setAlertName("Test Alert Bulk");
 
     InjectExpectationTraceInput input2 = new InjectExpectationTraceInput();
     input2.setInjectExpectationId(savedInjectExpectation.getId());
     input2.setAlertDate(Instant.now());
-    input2.setAlertLink("http://fake-link.com");
+    input2.setAlertLink("http://fake-link.com/bulk2");
     input2.setSourceId(savedCollector.getId());
     input2.setAlertName("Test Alert Bulk 2");
 
@@ -353,7 +353,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
     input3.setSourceId(savedInjectExpectationTrace3Dupe.getSecurityPlatform().getId());
     input3.setAlertName(savedInjectExpectationTrace3Dupe.getAlertName());
 
-    BulkInjectExpectationTraceInput inputBulk = new BulkInjectExpectationTraceInput();
+    InjectExpectationTraceBulkInsertInput inputBulk = new InjectExpectationTraceBulkInsertInput();
     inputBulk.setExpectationTraces(List.of(input, input2, input3));
 
     // --EXECUTE--
