@@ -969,8 +969,10 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
-      <div style={{ paddingTop: 20 }}>{activeTab === Object.keys(sortedGroupedResults).length &&
-        <ExecutionDetail targetId={target.id} targetType={target.targetType} injectResultOverviewOutput={inject}/>}</div>
+      <div style={{ paddingTop: 20 }}>
+        {activeTab === Object.keys(sortedGroupedResults).length
+          && <ExecutionDetail targetId={target.id} targetType={target.targetType} injectResultOverviewOutput={inject} />}
+      </div>
     </>
   );
 };
