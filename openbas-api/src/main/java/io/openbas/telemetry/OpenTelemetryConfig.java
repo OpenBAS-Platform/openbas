@@ -23,6 +23,10 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +52,9 @@ public class OpenTelemetryConfig {
   @Getter private final Duration collectInterval = Duration.ofMinutes(60);
   @Getter private final Duration exportInterval = Duration.ofMinutes(6 * 60);
   @Autowired private Environment environment;
+
+  private static final DateTimeFormatter CREATION_DATE_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
 
   @Bean
   public OpenTelemetry openTelemetry() {
@@ -133,12 +140,18 @@ public class OpenTelemetryConfig {
         this.settingRepository.findByKey(PLATFORM_INSTANCE.key()).orElse(new Setting());
     Setting instanceCreationDate =
         this.settingRepository.findByKey(PLATFORM_INSTANCE_CREATION.key()).orElse(new Setting());
+    LocalDateTime creationDate = LocalDateTime.now();
+    if (instanceCreationDate.getValue() != null) {
+      creationDate = LocalDateTime.parse(instanceCreationDate.getValue(), CREATION_DATE_FORMATTER);
+    }
     ResourceBuilder resourceBuilder =
         Resource.getDefault().toBuilder()
             .put(ServiceAttributes.SERVICE_NAME, "openbas-telemetry")
             .put(ServiceAttributes.SERVICE_VERSION, getRequiredProperty("info.app.version"))
             .put(stringKey("service.instance.id"), instanceId.getValue())
-            .put(stringKey("service.instance.creation"), instanceCreationDate.getValue());
+            .put(
+                stringKey("service.instance.creation"),
+                ZonedDateTime.of(creationDate, ZoneId.systemDefault()).toInstant().toString());
 
     try {
       String hostAddress = InetAddress.getLocalHost().getHostAddress();
