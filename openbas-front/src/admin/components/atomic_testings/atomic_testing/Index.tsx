@@ -144,13 +144,6 @@ const Index = () => {
                 className={classes.item}
               />
             )}
-            <Tab
-              component={Link}
-              to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
-              value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
-              label={t('Execution details')}
-              className={classes.item}
-            />
             {
               injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
                 <Tab
