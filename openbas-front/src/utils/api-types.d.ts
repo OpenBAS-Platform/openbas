@@ -2640,6 +2640,15 @@ export interface NetworkTraffic {
     | "NETWORK_TRAFFIC";
 }
 
+export interface NotificationRuleOutput {
+  id?: string;
+  owner?: string;
+  resource_id?: string;
+  resource_type?: string;
+  subject?: string;
+  trigger?: string;
+}
+
 /** List of Saml2 providers */
 export interface OAuthProvider {
   provider_login?: string;
@@ -2976,6 +2985,25 @@ export interface PageLessonsTemplate {
 
 export interface PageMitigation {
   content?: Mitigation[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageNotificationRuleOutput {
+  content?: NotificationRuleOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -4305,6 +4333,10 @@ export interface UpdateExerciseInput {
 export interface UpdateMePasswordInput {
   user_current_password: string;
   user_plain_password: string;
+}
+
+export interface UpdateNotificationRuleInput {
+  subject?: string;
 }
 
 export interface UpdateProfileInput {
