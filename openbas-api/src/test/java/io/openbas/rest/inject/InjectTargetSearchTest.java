@@ -81,6 +81,27 @@ public class InjectTargetSearchTest extends IntegrationTest {
     }
 
     @Nested
+    @WithMockAdminUser
+    @DisplayName("When target type does not exist")
+    public class WhenTargetTypeDoesNotExist {
+      @Test
+      @DisplayName("Returns bad request")
+      public void returnBadRequest() throws Exception {
+        String id = UUID.randomUUID().toString();
+        mvc.perform(
+                post(INJECT_URI
+                        + "/"
+                        + id
+                        + "/targets/"
+                        + "THIS_TARGET_TYPE_DOES_NOT_EXIST"
+                        + "/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(new SearchPaginationInput())))
+            .andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
     @WithMockUnprivilegedUser
     @DisplayName("Without authorisation")
     public class WhenInjectWithoutAuthorisation {
