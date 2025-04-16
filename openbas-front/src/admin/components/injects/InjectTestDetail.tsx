@@ -58,7 +58,7 @@ const InjectTestDetail: FunctionComponent<Props> = ({
             {truncate(test?.inject_title, 80)}
           </CardContent>
         </Card>
-        <InjectStatus injectStatus={test} />
+        <InjectStatus injectStatus={test} showGlobalExecutionStatus />
       </div>
     </Drawer>
 

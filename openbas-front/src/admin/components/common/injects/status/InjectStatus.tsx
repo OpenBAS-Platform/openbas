@@ -13,9 +13,10 @@ import TraceMessage from './traces/TraceMessage';
 interface Props {
   injectStatus?: InjectStatusOutput | null;
   endpointsMap?: Map<string, EndpointOutput>;
+  showGlobalExecutionStatus?: boolean;
 }
 
-const InjectStatus = ({ injectStatus = null, endpointsMap = new Map() }: Props) => {
+const InjectStatus = ({ injectStatus = null, endpointsMap = new Map(), showGlobalExecutionStatus = false }: Props) => {
   const { t } = useFormatter();
   const orderedTracesByAsset = new Map<string, AgentStatusOutput[]>();
 
@@ -30,19 +31,30 @@ const InjectStatus = ({ injectStatus = null, endpointsMap = new Map() }: Props) 
     <>
       <Typography variant="h4">{t('Execution logs')}</Typography>
       {injectStatus ? (
-        <Paper variant="outlined" style={{ padding: '20px' }}>
-          <Typography variant="subtitle1" style={{ fontWeight: 'bold' }} gutterBottom>
-            {t('Execution status')}
-          </Typography>
-          {injectStatus.status_name
-            && (
-              <ItemStatus
-                isInject
-                status={injectStatus.status_name}
-                label={t(injectStatus.status_name)}
-              />
-            )}
-          <ExecutionTime style={{ marginTop: '16px' }} startDate={injectStatus.tracking_sent_date ?? null} endDate={injectStatus.tracking_end_date ?? null} />
+        <Paper variant="outlined" style={{ padding: '0 20px 20px 20px' }}>
+          {showGlobalExecutionStatus && (
+            <>
+              <Typography
+                variant="subtitle1"
+                style={{
+                  paddingTop: '20px',
+                  fontWeight: 'bold',
+                }}
+                gutterBottom
+              >
+                {t('Execution status')}
+              </Typography>
+              {injectStatus.status_name
+                && (
+                  <ItemStatus
+                    isInject
+                    status={injectStatus.status_name}
+                    label={t(injectStatus.status_name)}
+                  />
+                )}
+              <ExecutionTime style={{ marginTop: '16px' }} startDate={injectStatus.tracking_sent_date ?? null} endDate={injectStatus.tracking_end_date ?? null} />
+            </>
+          )}
           <Typography
             variant="subtitle1"
             style={{
