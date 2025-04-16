@@ -590,26 +590,26 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           proOptions={proOptions}
         />
       </div>
-      {Object.keys(sortedGroupedResults).length > 0 && (
-        <Box sx={{
+      <Box
+        sx={{
           borderBottom: 1,
           borderColor: 'divider',
         }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          className={classes.tabs}
         >
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
-            className={classes.tabs}
-          >
-            {Object.keys(sortedGroupedResults).map((type, index) => (
+          {Object.keys(sortedGroupedResults).length > 0 &&
+            Object.keys(sortedGroupedResults).map((type, index) => (
               <Tab key={index} label={t(`TYPE_${type}`)} />
             ))}
-            <Tab label={t("Execution")}></Tab>
-          </Tabs>
-        </Box>
-      )}
+          <Tab label={t("Execution")} />
+        </Tabs>
+      </Box>
       {Object.keys(sortedGroupedResults).map((targetResult, targetResultIndex) => (
         <div key={targetResultIndex} hidden={activeTab !== targetResultIndex}>
           {sortedGroupedResults[targetResult]
@@ -674,7 +674,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                                 )
                               }
                             </GridLegacy>
-
                           )}
                       {
                         injectExpectation.inject_expectation_type === 'MANUAL' && injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.map((expectationResult) => {
@@ -716,7 +715,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                           );
                         })
                       }
-
                       {(['DETECTION', 'PREVENTION'].includes(injectExpectation.inject_expectation_type)
                         || (injectExpectation.inject_expectation_type === 'MANUAL'
                           && injectExpectation.inject_expectation_results
@@ -747,7 +745,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
 
                           </GridLegacy>
                         )}
-
                     </GridLegacy>
                     <div className={classes.flexContainer}>
                       <div>
@@ -971,6 +968,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
+
     </>
   );
 };
