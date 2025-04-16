@@ -45,7 +45,7 @@ public abstract class SearchAdaptorBase {
 
     // mind the sorts
     List<SortField> newSorts = new ArrayList<>();
-    SortField defaultSort = new SortField("target_name", "ASC");
+    SortField defaultSort = new SortField(fieldTranslations.get("target_name"), "ASC");
     List<SortField> currentSorts =
         input.getSorts() == null ? List.of(defaultSort) : input.getSorts();
     for (SortField sortField : currentSorts) {

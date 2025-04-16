@@ -30,4 +30,24 @@ public class InjectTarget {
 
   @JsonProperty("target_type")
   private String targetType;
+
+  @JsonProperty("target_detection_status")
+  private InjectExpectation.EXPECTATION_STATUS getTargetDetectionStatus() {
+    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  }
+
+  @JsonProperty("target_prevention_status")
+  private InjectExpectation.EXPECTATION_STATUS getTargetPreventionStatus() {
+    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  }
+
+  @JsonProperty("target_human_response_status")
+  private InjectExpectation.EXPECTATION_STATUS getTargetHumanResponseStatus() {
+    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  }
+
+  @JsonProperty("target_execution_status")
+  private InjectExpectation.EXPECTATION_STATUS getTargetExecutionStatus() {
+    return InjectExpectation.EXPECTATION_STATUS.UNKNOWN;
+  }
 }
