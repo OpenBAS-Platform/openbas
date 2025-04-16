@@ -139,7 +139,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
   parentTargetId,
   upperParentTargetId,
 }) => {
-  console.log(inject);
   const { classes } = useStyles();
   const dispatch = useAppDispatch();
   const theme = useTheme();
@@ -540,8 +539,6 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     setSelectedExpectationForResults(null);
   };
 
-  console.log(injectResultOverviewOutput);
-
   return (
     <>
       <div className={classes.target}>
@@ -609,9 +606,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         >
           {Object.keys(sortedGroupedResults).length > 0
             && Object.keys(sortedGroupedResults).map((type, index) => (
-              <Tab key={index} label={t(`TYPE_${type}`)}/>
+              <Tab key={index} label={t(`TYPE_${type}`)} />
             ))}
-          <Tab label={t('Execution')}/>
+          <Tab label={t('Execution')} />
         </Tabs>
       </Box>
       {Object.keys(sortedGroupedResults).map((targetResult, targetResultIndex) => (
@@ -972,7 +969,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
-      <div style={{ paddingTop: 20 }}>{activeTab === Object.keys(sortedGroupedResults).length && <ExecutionDetail />}</div>
+      <div style={{ paddingTop: 20 }}>{activeTab === Object.keys(sortedGroupedResults).length &&
+        <ExecutionDetail targetId={target.id} targetType={target.targetType} injectResultOverviewOutput={inject}/>}</div>
     </>
   );
 };

@@ -4,15 +4,18 @@ import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import Loader from '../../../../components/Loader';
-import { type EndpointOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
+import { type EndpointOutput, type InjectResultOverviewOutput, type InjectStatusOutput } from '../../../../utils/api-types';
 import InjectStatus from '../../common/injects/status/InjectStatus';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
-const ExecutionDetail: FunctionComponent = () => {
-  // Fetching data
-  const [loading, setLoading] = useState(true);
-  const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
+interface Props {
+  targetId: string;
+  targetType: string;
+  injectResultOverviewOutput: InjectResultOverviewOutput;
+}
 
+const ExecutionDetail = ({ targetId, targetType, injectResultOverviewOutput }: Props) => {
+  // Fetching data
   const [endpointsMap, setEndpointsMap] = useState<Map<string, EndpointOutput>>(new Map());
 
   const extractEndpointsFromInjectResult = (injectResult: InjectResultOverviewOutput): Map<string, EndpointOutput> => {
@@ -59,17 +62,12 @@ const ExecutionDetail: FunctionComponent = () => {
       })).then(({ data }) => {
         data?.content.forEach((endpoint: EndpointOutput) => newEndpointsMap.set(endpoint.asset_id, endpoint));
         setEndpointsMap(newEndpointsMap);
-        setLoading(false);
       });
     } else {
       setEndpointsMap(newEndpointsMap);
-      setLoading(false);
     }
   }, [injectResultOverviewOutput]);
 
-  if (loading) {
-    return <Loader />;
-  }
   return (
     <InjectStatus
       injectStatus={injectResultOverviewOutput?.inject_status ?? null}
