@@ -239,6 +239,29 @@ public class NotificationRuleApiTest extends IntegrationTest {
   @Test
   @WithMockAdminUser
   @Transactional
+  void findNotificationRuleByResource() throws Exception {
+
+    NotificationRule notificationRule = createNotificationRuleInDb("resourceid");
+
+    String response =
+        mvc.perform(
+                get(NOTIFICATION_RULE_URI + "/resource/" + notificationRule.getResourceId())
+                    .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().is2xxSuccessful())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    assertEquals(notificationRule.getSubject(), JsonPath.read(response, "$[0].subject"));
+    assertEquals(notificationRule.getTrigger().name(), JsonPath.read(response, "$[0].trigger"));
+    assertEquals(notificationRule.getResourceId(), JsonPath.read(response, "$[0].resource_id"));
+    assertEquals(
+        notificationRule.getResourceType().name(), JsonPath.read(response, "$[0].resource_type"));
+    assertEquals(notificationRule.getOwner().getId(), JsonPath.read(response, "$[0].owner"));
+  }
+
+  @Test
+  @WithMockAdminUser
+  @Transactional
   void searchTagRule() throws Exception {
     createNotificationRuleInDb("notificationRule1");
     createNotificationRuleInDb("notificationRule2");
