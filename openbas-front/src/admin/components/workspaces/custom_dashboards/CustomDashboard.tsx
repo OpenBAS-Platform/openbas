@@ -1,4 +1,5 @@
-import { Box, Paper, Typography } from '@mui/material';
+import { OpenInFullOutlined } from '@mui/icons-material';
+import { Box, IconButton, Paper, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useEffect, useMemo, useState } from 'react';
 import RGL, { type Layout, WidthProvider } from 'react-grid-layout';
@@ -10,15 +11,15 @@ import { useFormatter } from '../../../../components/i18n';
 import { type CustomDashboard, type Widget } from '../../../../utils/api-types';
 import WidgetCreation from './widgets/WidgetCreation';
 import WidgetPopover from './widgets/WidgetPopover';
-import WidgetStructuralViz from './widgets/WidgetStructuralViz';
-import WidgetTemporalViz from './widgets/WidgetTemporalViz';
 import { getWidgetTitle } from './widgets/WidgetUtils';
+import WidgetViz from './widgets/WidgetViz';
 
 const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashboard }> = ({ customDashboard }) => {
   // Standard hooks
   const theme = useTheme();
   const { t } = useFormatter();
   const ReactGridLayout = useMemo(() => WidthProvider(RGL), []);
+  const [fullscreenWidgets, setFullscreenWidgets] = useState<Record<Widget['widget_id'], boolean | never>>({});
 
   const { customDashboardId } = useParams() as { customDashboardId: CustomDashboard['custom_dashboard_id'] };
   const [customDashboardValue, setCustomDashboardValue] = useState<CustomDashboard>(customDashboard);
@@ -99,6 +100,10 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
             w: widget.widget_layout?.widget_layout_w,
             h: widget.widget_layout?.widget_layout_h,
           };
+          const setFullscreen = (fullscreen: boolean) => setFullscreenWidgets({
+            ...fullscreenWidgets,
+            [widget.widget_id]: fullscreen,
+          });
           return (
             <Paper
               key={widget.widget_id}
@@ -117,16 +122,39 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography variant="h3" style={{ paddingLeft: theme.spacing(2) }}>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    margin: 0,
+                    paddingLeft: theme.spacing(2),
+                    textTransform: 'uppercase',
+                  }}
+                >
                   {getWidgetTitle(widget.widget_config.title, widget.widget_type, t)}
                 </Typography>
-                <WidgetPopover
-                  className="noDrag"
-                  customDashboardId={customDashboardId}
-                  widget={widget}
-                  onUpdate={widget => handleWidgetUpdate(widget)}
-                  onDelete={widgetId => handleWidgetDelete(widgetId)}
-                />
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                >
+                  {widget.widget_type === 'security-coverage' && (
+                    <IconButton
+                      color="primary"
+                      className="noDrag"
+                      onClick={() => setFullscreen(true)}
+                      size="small"
+                    >
+                      <OpenInFullOutlined fontSize="small" />
+                    </IconButton>
+                  )}
+                  <WidgetPopover
+                    className="noDrag"
+                    size="small"
+                    customDashboardId={customDashboardId}
+                    widget={widget}
+                    onUpdate={widget => handleWidgetUpdate(widget)}
+                    onDelete={widgetId => handleWidgetDelete(widgetId)}
+                  />
+                </Box>
               </Box>
               <ErrorBoundary>
                 {widget.widget_id === idToResize ? (<div />) : (
@@ -135,14 +163,13 @@ const CustomDashboardComponent: FunctionComponent<{ customDashboard: CustomDashb
                     display="flex"
                     flexDirection="column"
                     minHeight={0}
-                    padding={`0 ${theme.spacing(2)} ${theme.spacing(2)} ${theme.spacing(2)}`}
+                    padding={theme.spacing(0, 2)}
                   >
-                    {widget.widget_config.mode === 'structural' && (
-                      <WidgetStructuralViz widget={widget} />
-                    )}
-                    {widget.widget_config.mode === 'temporal' && (
-                      <WidgetTemporalViz widget={widget} />
-                    )}
+                    <WidgetViz
+                      widget={widget}
+                      fullscreen={fullscreenWidgets[widget.widget_id]}
+                      setFullscreen={setFullscreen}
+                    />
                   </Box>
                 )}
               </ErrorBoundary>

@@ -1,5 +1,5 @@
 import { CancelOutlined } from '@mui/icons-material';
-import { IconButton, TextField } from '@mui/material';
+import { Box, IconButton, TextField } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -12,13 +12,9 @@ import { BASE_ENTITY_FILTER_KEY } from './WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
   step_entity: {
-    position: 'relative',
-    width: '100%',
-    margin: '0 0 20px 0',
-    padding: 15,
-    verticalAlign: 'middle',
     border: `1px solid ${theme.palette.secondary.main}`,
     borderRadius: 4,
+    position: 'relative',
   },
   icon: {
     paddingTop: 4,
@@ -73,29 +69,38 @@ const WidgetCreationSeries: FunctionComponent<{
 
   return (
     <div className={classes.step_entity}>
-      <IconButton
-        disabled={index === 0}
-        aria-label="Delete"
-        style={{
-          position: 'absolute',
-          top: -20,
-          right: -20,
-        }}
-        onClick={handleRemoveSeries}
-        size="large"
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        zIndex: 10,
+      }}
       >
-        <CancelOutlined fontSize="small" />
-      </IconButton>
-      <TextField
-        variant="standard"
-        fullWidth
-        label={t('Label (entities)')}
-        value={label}
-        onChange={e => onChangeLabel(e.target.value)}
-      />
-      <div style={{ marginTop: theme.spacing(2) }}>
-        <FilterFieldBaseEntity value={entity} onChange={onChangeEntity} />
+        <IconButton
+          disabled={index === 0}
+          aria-label="Delete"
+          onClick={handleRemoveSeries}
+          size="small"
+        >
+          <CancelOutlined fontSize="small" />
+        </IconButton>
       </div>
+      <Box
+        padding={theme.spacing(0, 2, 2, 2)}
+      >
+        <TextField
+          variant="standard"
+          fullWidth
+          label={t('Label (entities)')}
+          value={label}
+          onChange={e => onChangeLabel(e.target.value)}
+        />
+        <div style={{ marginTop: theme.spacing(2) }}>
+          <FilterFieldBaseEntity value={entity} onChange={onChangeEntity} />
+        </div>
+      </Box>
     </div>
   );
 };

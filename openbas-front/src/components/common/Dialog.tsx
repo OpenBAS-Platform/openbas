@@ -6,11 +6,12 @@ import Transition from './Transition';
 interface DialogProps {
   open: boolean;
   handleClose: () => void;
-  title: string;
+  title: ReactNode;
   children: (() => ReactElement) | ReactElement | null;
   maxWidth?: Breakpoint;
   className?: string;
   actions?: ReactElement | null;
+  action?: ReactElement | null;
 }
 
 const Dialog: FunctionComponent<DialogProps> = ({
@@ -19,7 +20,7 @@ const Dialog: FunctionComponent<DialogProps> = ({
   title,
   children,
   maxWidth = 'md',
-                                                  actions,
+  actions,
   className,
 }) => {
   let component;

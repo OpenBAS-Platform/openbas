@@ -31,7 +31,7 @@ export const widgetVisualizationTypes: {
   {
     category: 'line',
     modes: ['temporal'],
-    seriesLimit: 1,
+    seriesLimit: 5,
   },
   {
     category: 'donut',
