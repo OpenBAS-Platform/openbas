@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.expectation.ExpectationType;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.inject.service.InjectDuplicateService;
@@ -32,6 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
 
+  @Mock private Ee eeService;
   @Mock private GrantService grantService;
   @Mock private InjectDuplicateService injectDuplicateService;
   @Mock private TeamService teamService;
@@ -59,6 +61,7 @@ class ExerciseServiceTest {
   void setUp() {
     exerciseService =
         new ExerciseService(
+            eeService,
             grantService,
             injectDuplicateService,
             teamService,

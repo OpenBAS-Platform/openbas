@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.rest.exercise.service.ExerciseService;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExerciseServiceIntegrationTest {
 
+  @Mock Ee eeService;
   @Mock GrantService grantService;
   @Mock InjectDuplicateService injectDuplicateService;
   @Mock VariableService variableService;
@@ -67,6 +69,7 @@ class ExerciseServiceIntegrationTest {
   void setUp() {
     exerciseService =
         new ExerciseService(
+            eeService,
             grantService,
             injectDuplicateService,
             teamService,
