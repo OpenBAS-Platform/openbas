@@ -32,7 +32,7 @@ public class ExerciseSimple {
   @NotBlank
   private String id;
 
-  @Schema(description = "Exercise Id")
+  @Schema(description = "Exercise Name")
   @JsonProperty("exercise_name")
   @NotBlank
   private String name;
@@ -50,9 +50,11 @@ public class ExerciseSimple {
   @JsonProperty("exercise_category")
   private String category;
 
+  @Schema(description = "Exercise Start Date")
   @JsonProperty("exercise_start_date")
   private Instant start;
 
+  @Schema(description = "Exercise Update Date")
   @JsonProperty("exercise_updated_at")
   private Instant updatedAt = now();
 
