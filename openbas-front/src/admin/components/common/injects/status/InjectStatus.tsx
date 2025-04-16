@@ -2,10 +2,8 @@ import { Paper, Typography } from '@mui/material';
 
 import { useFormatter } from '../../../../../components/i18n';
 import ItemStatus from '../../../../../components/ItemStatus';
-import {
-  type AgentStatusOutput,
-  type EndpointOutput, type InjectStatusOutput,
-} from '../../../../../utils/api-types';
+import { type EndpointOutput, type InjectStatusOutput } from '../../../../../utils/api-types';
+import AgentTraces from './traces/AgentTraces';
 import EndpointTraces from './traces/EndpointTraces';
 import ExecutionTime from './traces/ExecutionTime';
 import TraceMessage from './traces/TraceMessage';
@@ -13,23 +11,30 @@ import TraceMessage from './traces/TraceMessage';
 interface Props {
   injectStatus?: InjectStatusOutput | null;
   endpointsMap?: Map<string, EndpointOutput>;
+  targetId?: string;
+  targetType?: string;
   showGlobalExecutionStatus?: boolean;
 }
 
-const InjectStatus = ({ injectStatus = null, endpointsMap = new Map(), showGlobalExecutionStatus = false }: Props) => {
+const InjectStatus = ({
+  injectStatus = null,
+  endpointsMap = new Map(),
+  targetId,
+  targetType,
+  showGlobalExecutionStatus = false,
+}: Props) => {
   const { t } = useFormatter();
-  const orderedTracesByAsset = new Map<string, AgentStatusOutput[]>();
 
-  (injectStatus?.status_traces_by_agent || []).forEach((t) => {
-    if (!orderedTracesByAsset.has(t.asset_id)) {
-      orderedTracesByAsset.set(t.asset_id, []);
-    }
-    orderedTracesByAsset.get(t.asset_id)!.push(t);
-  });
+  // Get traces for asset or agent based on type
+  const tracesByAgent = injectStatus?.status_traces_by_agent || [];
+
+  const assetTraces = tracesByAgent.filter(t => t.asset_id === targetId);
+  const agentTrace = tracesByAgent.find(t => t.agent_id === targetId);
 
   return (
     <>
       <Typography variant="h4">{t('Execution logs')}</Typography>
+
       {injectStatus ? (
         <Paper variant="outlined" style={{ padding: '0 20px 20px 20px' }}>
           {showGlobalExecutionStatus && (
@@ -44,37 +49,50 @@ const InjectStatus = ({ injectStatus = null, endpointsMap = new Map(), showGloba
               >
                 {t('Execution status')}
               </Typography>
-              {injectStatus.status_name
-                && (
-                  <ItemStatus
-                    isInject
-                    status={injectStatus.status_name}
-                    label={t(injectStatus.status_name)}
-                  />
-                )}
-              <ExecutionTime style={{ marginTop: '16px' }} startDate={injectStatus.tracking_sent_date ?? null} endDate={injectStatus.tracking_end_date ?? null} />
+
+              {injectStatus.status_name && (
+                <ItemStatus
+                  isInject
+                  status={injectStatus.status_name}
+                  label={t(injectStatus.status_name)}
+                />
+              )}
+
+              <ExecutionTime
+                style={{ marginTop: '16px' }}
+                startDate={injectStatus.tracking_sent_date ?? null}
+                endDate={injectStatus.tracking_end_date ?? null}
+              />
             </>
           )}
-          <Typography
-            variant="subtitle1"
-            style={{
-              fontWeight: 'bold',
-              marginTop: 20,
-            }}
-            gutterBottom
-          >
-            {t('Traces')}
-          </Typography>
-          {(injectStatus.status_main_traces || []).length > 0 && <TraceMessage traces={injectStatus.status_main_traces || []} />}
-          {Array.from(orderedTracesByAsset.entries())
-            .sort(([assetIdA], [assetIdB]) => assetIdA.localeCompare(assetIdB))
-            .map(([assetId, tracesByAgent]) => (
-              <EndpointTraces
-                key={assetId}
-                endpoint={endpointsMap.get(assetId) as EndpointOutput}
-                tracesByAgent={tracesByAgent || []}
-              />
-            ))}
+
+          {(injectStatus.status_main_traces || []).length > 0 && (
+            <>
+              <Typography
+                variant="subtitle1"
+                style={{
+                  fontWeight: 'bold',
+                  marginTop: 20,
+                }}
+                gutterBottom
+              >
+                {t('Traces')}
+              </Typography>
+              <TraceMessage traces={injectStatus.status_main_traces!} />
+            </>
+          )}
+
+          {targetType === 'ASSETS' && targetId && (
+            <EndpointTraces
+              key={targetId}
+              endpoint={endpointsMap.get(targetId) as EndpointOutput}
+              tracesByAgent={assetTraces}
+            />
+          )}
+
+          {targetType === 'AGENT' && agentTrace && (
+            <AgentTraces agentStatus={agentTrace} />
+          )}
         </Paper>
       ) : (
         <Paper variant="outlined" style={{ padding: '20px' }}>
@@ -84,4 +102,5 @@ const InjectStatus = ({ injectStatus = null, endpointsMap = new Map(), showGloba
     </>
   );
 };
+
 export default InjectStatus;
