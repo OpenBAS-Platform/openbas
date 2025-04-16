@@ -31,23 +31,6 @@ public class InjectExpectationTraceService {
 
   private static final String COLLECTOR_TYPE = "collector";
 
-  public InjectExpectationTrace createInjectExpectationTrace(
-      @NotNull InjectExpectationTrace injectExpectationTrace) {
-    Optional<InjectExpectationTrace> existingTrace =
-        this.injectExpectationTraceRepository
-            .findByAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
-                injectExpectationTrace.getAlertLink(),
-                injectExpectationTrace.getAlertName(),
-                injectExpectationTrace.getSecurityPlatform(),
-                injectExpectationTrace.getInjectExpectation());
-    if (existingTrace.isPresent()) {
-      log.info("Existing trace present, no creation");
-      return existingTrace.get();
-    } else {
-      return this.injectExpectationTraceRepository.save(injectExpectationTrace);
-    }
-  }
-
   public List<InjectExpectationTrace> getInjectExpectationTracesFromCollector(
       @NotNull String injectExpectationId, @NotNull String sourceId) {
     return this.injectExpectationTraceRepository.findByExpectationAndSecurityPlatform(
@@ -73,6 +56,9 @@ public class InjectExpectationTraceService {
   @Transactional(rollbackFor = Exception.class)
   public void bulkInsertInjectExpectationTraces(
       @NotNull List<InjectExpectationTraceInput> injectExpectationTraces) {
+    if (injectExpectationTraces.isEmpty()) {
+      return;
+    }
     // We start by deduplicating the data, to avoid duplicates in the database
     // Convert the input list to InjectExpectationTrace objects and extract oldest trace's date
     // Start by getting the collector. We can take the first one since they are all the same

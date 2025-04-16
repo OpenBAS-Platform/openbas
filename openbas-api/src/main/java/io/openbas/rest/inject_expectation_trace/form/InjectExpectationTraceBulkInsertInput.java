@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class BulkInjectExpectationTraceInput {
+public class InjectExpectationTraceBulkInsertInput {
 
   @JsonProperty("expectation_traces")
   @NotNull(message = AppConfig.MANDATORY_MESSAGE)

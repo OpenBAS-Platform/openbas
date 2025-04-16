@@ -1,8 +1,6 @@
 package io.openbas.database.repository;
 
-import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectationTrace;
-import io.openbas.database.model.SecurityPlatform;
 import io.openbas.database.raw.impl.SimpleRawExpectationTrace;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -20,12 +18,7 @@ public interface InjectExpectationTraceRepository
         JpaSpecificationExecutor<InjectExpectationTrace> {
 
   @NotNull
-  Optional<InjectExpectationTrace>
-      findByAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
-          String alertLink,
-          String alertName,
-          SecurityPlatform securityPlatform,
-          InjectExpectation injectExpectation);
+  Optional<InjectExpectationTrace> findByAlertLink(String alertLink);
 
   @Query(
       "select t from InjectExpectationTrace t where t.injectExpectation.id = :expectationId and t.securityPlatform.id = :sourceId")
