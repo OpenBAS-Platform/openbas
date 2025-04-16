@@ -1,6 +1,7 @@
 package io.openbas.rest.notification_rule.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
@@ -9,6 +10,7 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Builder(toBuilder = true)
 public class CreateNotificationRuleInput {
+
   @JsonProperty("resource_type")
   private String resourceType;
 
@@ -22,5 +24,6 @@ public class CreateNotificationRuleInput {
   private String type;
 
   @JsonProperty("subject")
+  @NotNull
   private String subject;
 }

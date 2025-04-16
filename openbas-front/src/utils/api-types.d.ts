@@ -2567,6 +2567,15 @@ export interface NotificationRuleOutput {
   notification_rule_trigger?: string;
 }
 
+export interface NotificationRuleOutput {
+  id?: string;
+  owner?: string;
+  resource_id?: string;
+  resource_type?: string;
+  subject?: string;
+  trigger?: string;
+}
+
 /** List of Saml2 providers */
 export interface OAuthProvider {
   provider_login?: string;

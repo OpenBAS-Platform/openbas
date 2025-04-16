@@ -2,19 +2,20 @@ import { NotificationsOutlined, UpdateOutlined } from '@mui/icons-material';
 import { Alert, AlertTitle, Box, IconButton, Tab, Tabs, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import cronstrue from 'cronstrue';
-import { type FunctionComponent, lazy, Suspense, useState } from 'react';
+import { type FunctionComponent, lazy, Suspense, useEffect, useState } from 'react';
 import { Link, Route, Routes, useLocation, useParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
 import { fetchScenario } from '../../../../actions/scenarios/scenario-actions';
 import { type ScenariosHelper } from '../../../../actions/scenarios/scenario-helper';
+import { findNotificationRuleByResource } from '../../../../actions/scenarios/scenario-notification-rules';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import { errorWrapper } from '../../../../components/Error';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import NotFound from '../../../../components/NotFound';
 import { useHelper } from '../../../../store';
-import { type Scenario } from '../../../../utils/api-types';
+import { type NotificationRuleOutput, type Scenario } from '../../../../utils/api-types';
 import { parseCron, type ParsedCron } from '../../../../utils/Cron';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
@@ -103,6 +104,14 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
     return sentence;
   };
   const [openScenarioNotificationRuleDrawer, setOpenScenarioNotificationRuleDrawer] = useState(false);
+  const [editNotification, setEditNotification] = useState(false);
+  useEffect(() => {
+    findNotificationRuleByResource(scenario.scenario_id).then((result: { data: NotificationRuleOutput[] }) => {
+      if (result.data) {
+        setEditNotification(true);
+      }
+    });
+  }, []);
 
   return (
     <PermissionsContext.Provider value={permissionsContext}>
@@ -185,8 +194,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
               >
                 <IconButton
                   size="small"
-                  color="primary"
                   style={{ marginRight: 5 }}
+                  sx={{ color: editNotification ? 'success' : 'primary' }}
                   onClick={() => setOpenScenarioNotificationRuleDrawer(true)}
                 >
                   <NotificationsOutlined />
@@ -201,6 +210,8 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                   <ScenarioNotificationRulesDrawer
                     open={openScenarioNotificationRuleDrawer}
                     setOpen={setOpenScenarioNotificationRuleDrawer}
+                    editing={editNotification}
+                    scenarioId={scenario.scenario_id}
                     scenarioName={scenario.scenario_name}
                   />
                 )}

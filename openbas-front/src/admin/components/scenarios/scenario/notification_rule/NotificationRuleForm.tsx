@@ -7,21 +7,13 @@ import { z } from 'zod';
 
 import TextField from '../../../../../components/fields/TextField';
 import { useFormatter } from '../../../../../components/i18n';
-import type { ThemeInput } from '../../../../../utils/api-types';
+import type { CreateNotificationRuleInput } from '../../../../../utils/api-types';
 import { zodImplement } from '../../../../../utils/Zod';
 
 interface Props {
-  onSubmit: SubmitHandler<{
-    trigger: string;
-    notification_type: string;
-    subject: string;
-  }>;
+  onSubmit: SubmitHandler<CreateNotificationRuleInput>;
   editing?: boolean;
-  initialValues?: {
-    trigger: string;
-    notification_type: string;
-    subject: string;
-  };
+  initialValues?: CreateNotificationRuleInput;
   handleClose: () => void;
   scenarioName: string;
 }
@@ -31,8 +23,10 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
   editing,
   scenarioName,
   initialValues = {
-    trigger: 'difference',
-    notification_type: 'mail',
+    resource_id: '',
+    resource_type: 'SCENARIO',
+    trigger: 'DIFFERENCE',
+    type: 'EMAIL',
     subject: { scenarioName }.scenarioName + ' - alert',
   },
   handleClose,
@@ -45,17 +39,15 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
     register,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
-  } = useForm<{
-    trigger: string;
-    notification_type: string;
-    subject: string;
-  }>({
+  } = useForm<CreateNotificationRuleInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<ThemeInput>().with({
-        trigger: z.string(),
-        notification_type: z.string(),
-        subject: z.string(),
+      zodImplement<CreateNotificationRuleInput>().with({
+        resource_id: z.string().optional(),
+        resource_type: z.string().optional(),
+        trigger: z.string().optional(),
+        type: z.string().optional(),
+        subject: z.string().min(1, { message: t('Should not be empty') }),
       }),
     ),
     defaultValues: initialValues,
@@ -77,6 +69,7 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
         fullWidth
         label={t('Email subject')}
         error={!!errors.subject}
+        helperText={errors.subject?.message}
         inputProps={register('subject')}
         InputLabelProps={{ required: true }}
       />
@@ -95,8 +88,8 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
         disabled
         fullWidth
         label={t('Notifier')}
-        error={!!errors.notification_type}
-        inputProps={register('notification_type')}
+        error={!!errors.type}
+        inputProps={register('type')}
       />
 
       <div style={{ alignSelf: 'flex-end' }}>
@@ -112,7 +105,7 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
           variant="contained"
           color="secondary"
           type="submit"
-          disabled={!isDirty || isSubmitting}
+          disabled={isSubmitting}
         >
           {editing ? t('Update') : t('Create')}
         </Button>
