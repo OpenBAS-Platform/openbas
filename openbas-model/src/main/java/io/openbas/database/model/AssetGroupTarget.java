@@ -1,6 +1,5 @@
 package io.openbas.database.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Set;
 
 public class AssetGroupTarget extends InjectTarget {
@@ -11,8 +10,8 @@ public class AssetGroupTarget extends InjectTarget {
     this.setTargetType("ASSETS_GROUPS");
   }
 
-  @JsonProperty("target_subtype")
+  @Override
   protected String getTargetSubtype() {
-    return "ASSETS_GROUPS";
+    return this.getTargetType();
   }
 }
