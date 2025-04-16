@@ -17,7 +17,6 @@ import { usePermissions } from '../../../../../utils/Exercise';
 import { useAppDispatch } from '../../../../../utils/hooks';
 import useDataLoader from '../../../../../utils/hooks/useDataLoader';
 import AtomicTesting from '../../../atomic_testings/atomic_testing/AtomicTesting';
-import AtomicTestingDetail from '../../../atomic_testings/atomic_testing/AtomicTestingDetail';
 import AtomicTestingFindings from '../../../atomic_testings/atomic_testing/AtomicTestingFindings';
 import AtomicTestingPayloadInfo from '../../../atomic_testings/atomic_testing/payload_info/AtomicTestingPayloadInfo';
 import { InjectResultOverviewOutputContext } from '../../../atomic_testings/InjectResultOverviewOutputContext';
@@ -151,7 +150,6 @@ const InjectIndexComponent: FunctionComponent<{
             { (injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
               || injectResultOverviewOutput.inject_type === 'openbas_nmap')
             && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
-            <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
             { injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
               && <Route path="payload_info" element={errorWrapper(AtomicTestingPayloadInfo)()} />}
             {/* Not found */}

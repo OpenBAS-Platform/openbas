@@ -44,6 +44,7 @@ import TargetResultAlertNumber from './TargetResultAlertNumber';
 import TargetResultsSecurityPlatform from './TargetResultsSecurityPlatform';
 import nodeTypes from './types/nodes';
 import { type NodeResultStep } from './types/nodes/NodeResultStep';
+import ExecutionDetail from './ExecutionDetail';
 
 interface Steptarget {
   label: string;
@@ -538,6 +539,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     setSelectedExpectationForResults(null);
   };
 
+  console.log(injectResultOverviewOutput);
+
   return (
     <>
       <div className={classes.target}>
@@ -968,7 +971,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
-
+      <ExecutionDetail></ExecutionDetail>
     </>
   );
 };

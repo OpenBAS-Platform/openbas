@@ -8,7 +8,7 @@ import { type EndpointOutput, type InjectResultOverviewOutput } from '../../../.
 import InjectStatus from '../../common/injects/status/InjectStatus';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
 
-const AtomicTestingDetail: FunctionComponent = () => {
+const ExecutionDetail: FunctionComponent = () => {
   // Fetching data
   const [loading, setLoading] = useState(true);
   const { injectResultOverviewOutput } = useContext<InjectResultOverviewOutputContextType>(InjectResultOverviewOutputContext);
@@ -78,4 +78,4 @@ const AtomicTestingDetail: FunctionComponent = () => {
   );
 };
 
-export default AtomicTestingDetail;
+export default ExecutionDetail;
