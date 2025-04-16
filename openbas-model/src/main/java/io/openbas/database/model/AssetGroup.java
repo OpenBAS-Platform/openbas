@@ -105,9 +105,9 @@ public class AssetGroup implements Base {
   @Getter
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
-          name = "injects_asset_groups",
-          joinColumns = @JoinColumn(name = "asset_group_id"),
-          inverseJoinColumns = @JoinColumn(name = "inject_id"))
+      name = "injects_asset_groups",
+      joinColumns = @JoinColumn(name = "asset_group_id"),
+      inverseJoinColumns = @JoinColumn(name = "inject_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("asset_group_injects")
   @Queryable(filterable = true, dynamicValues = true, path = "injects.id")

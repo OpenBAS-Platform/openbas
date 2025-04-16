@@ -167,8 +167,7 @@ public class InjectApi extends RestBehavior {
   public Page<InjectTarget> injectTargetSearch(
       @PathVariable String injectId,
       @PathVariable String targetType,
-      @Valid @RequestBody SearchPaginationInput input
-      ) {
+      @Valid @RequestBody SearchPaginationInput input) {
     TargetType injectTargetTypeEnum;
 
     try {

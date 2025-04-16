@@ -91,7 +91,6 @@ public class InjectComposer extends ComposerBase<Inject> {
       return this;
     }
 
-
     @Override
     public Composer persist() {
       this.injectorContractComposer.ifPresent(

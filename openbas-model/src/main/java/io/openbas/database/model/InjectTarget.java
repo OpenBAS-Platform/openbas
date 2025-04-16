@@ -5,9 +5,7 @@ import io.openbas.annotation.Queryable;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Set;
-
 import lombok.Data;
-import org.hibernate.tool.schema.TargetType;
 
 @Data
 @Schema(
