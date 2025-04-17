@@ -5,12 +5,11 @@ import io.openbas.database.model.Inject;
 import io.openbas.database.model.InjectTarget;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
-import org.springframework.data.domain.Page;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Page;
 
 public abstract class SearchAdaptorBase {
   protected final Map<String, String> fieldTranslations = new HashMap<>();

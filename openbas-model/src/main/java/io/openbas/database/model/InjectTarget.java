@@ -25,7 +25,7 @@ public abstract class InjectTarget {
   private String name;
 
   @JsonProperty("target_tags")
-  @Queryable(filterable = true, searchable = true, sortable = true)
+  @Queryable(filterable = true, searchable = true, sortable = true, dynamicValues = true)
   private Set<String> tags;
 
   @JsonProperty("target_type")
