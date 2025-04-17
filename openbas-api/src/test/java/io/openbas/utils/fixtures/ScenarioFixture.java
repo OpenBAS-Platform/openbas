@@ -5,9 +5,9 @@ import static io.openbas.database.model.Scenario.SEVERITY.critical;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.model.Team;
-import java.util.ArrayList;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
