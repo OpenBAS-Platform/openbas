@@ -108,6 +108,9 @@ public class InjectMapper {
     output.setTracesByAgent(
         groupTracesByAgent(
             executionTraces.stream().filter(trace -> trace.getAgent() != null).toList()));
+    output.setTracesByPlayer(
+        groupTracesByPlayer(
+            executionTraces.stream().filter(trace -> trace.getIdentifiers() != null).toList()));
     output.setTrackingSentDate(status.getTrackingSentDate());
     output.setTrackingEndDate(status.getTrackingEndDate());
     return output;
