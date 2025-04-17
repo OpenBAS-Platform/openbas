@@ -2,7 +2,7 @@ import { type PlatformSettings } from '../../../utils/api-types';
 import { isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 import { SYSTEM_BANNER_HEIGHT_PER_MESSAGE } from './SystemBanners';
 
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line import-x/prefer-default-export
 export const computeBannerSettings = (settings: PlatformSettings) => {
   const bannerByLevel = settings.platform_banner_by_level;
   const isBannerActivated = bannerByLevel !== undefined && isNotEmptyField(recordKeys(bannerByLevel));

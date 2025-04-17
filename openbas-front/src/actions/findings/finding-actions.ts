@@ -3,7 +3,7 @@ import { type SearchPaginationInput } from '../../utils/api-types';
 
 const FINDING_URI = '/api/findings';
 
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line import-x/prefer-default-export
 export const searchFindings = (searchPaginationInput: SearchPaginationInput) => {
   const data = searchPaginationInput;
   const uri = `${FINDING_URI}/search`;
