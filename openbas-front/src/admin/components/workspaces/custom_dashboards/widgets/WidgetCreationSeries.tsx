@@ -13,7 +13,7 @@ import { useQueryable } from '../../../../../components/common/queryable/useQuer
 import { useFormatter } from '../../../../../components/i18n';
 import { type DateHistogramSeries, type PropertySchemaDTO, type StructuralHistogramSeries } from '../../../../../utils/api-types';
 import { MITRE_FILTER_KEY } from '../../../common/filters/MitreFilter';
-import FilterFieldBaseEntity, { availableFilters } from './FilterFieldBaseEntity';
+import FilterFieldBaseEntity from './FilterFieldBaseEntity';
 import { BASE_ENTITY_FILTER_KEY, excludeBaseEntities } from './WidgetUtils';
 
 const useStyles = makeStyles()(theme => ({
@@ -32,6 +32,11 @@ const useStyles = makeStyles()(theme => ({
     marginLeft: 10,
   },
 }));
+
+const availableFilters = new Map([
+  ['expectation-inject', ['base_created_at', 'inject_expectation_status', 'inject_expectation_type', 'base_updated_at']],
+  ['finding', ['base_created_at', 'finding_type', 'base_updated_at']],
+]);
 
 const WidgetCreationSeries: FunctionComponent<{
   index: number;
