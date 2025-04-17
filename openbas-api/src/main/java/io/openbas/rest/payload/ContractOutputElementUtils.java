@@ -61,8 +61,7 @@ public class ContractOutputElementUtils {
       boolean copyId) {
 
     if (!isValidRegex(input.getRule())) {
-      throw new BadRequestException(
-          "Invalid rule: " + input.getName() + " with regex: " + input.getRule());
+      throw new BadRequestException(String.format("Invalid rule: %s with regex: %s", input.getName(), input.getRule()));
     }
 
     BeanUtils.copyProperties(input, contractOutputElement, "id", "tags", "regexGroups");
@@ -77,8 +76,7 @@ public class ContractOutputElementUtils {
       ContractOutputElement existing, ContractOutputElement contractOutputElement, boolean copyId) {
 
     if (!isValidRegex(existing.getRule())) {
-      throw new BadRequestException(
-          "Invalid rule: " + existing.getName() + " with regex: " + existing.getRule());
+      throw new BadRequestException(String.format("Invalid rule: %s with regex: %s", existing.getName(), existing.getRule()));
     }
 
     BeanUtils.copyProperties(existing, contractOutputElement, "id", "tags", "regexGroups");
