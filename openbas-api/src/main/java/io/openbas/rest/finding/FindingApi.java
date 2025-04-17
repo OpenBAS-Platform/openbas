@@ -2,6 +2,7 @@ package io.openbas.rest.finding;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
+import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Finding;
 import io.openbas.database.repository.FindingRepository;
 import io.openbas.database.specification.FindingSpecification;
@@ -32,6 +33,7 @@ public class FindingApi extends RestBehavior {
 
   // -- CRUD --
 
+  @LogExecutionTime
   @PostMapping("/search")
   public Page<FindingOutput> findings(
       @RequestBody @Valid final SearchPaginationInput searchPaginationInput) {
@@ -39,6 +41,7 @@ public class FindingApi extends RestBehavior {
         .map(findingMapper::toFindingOutput);
   }
 
+  @LogExecutionTime
   @PostMapping("/injects/{injectId}/search")
   @PreAuthorize("isObserver()")
   public Page<FindingOutput> findingsByInject(
@@ -54,6 +57,7 @@ public class FindingApi extends RestBehavior {
         .map(findingMapper::toFindingOutput);
   }
 
+  @LogExecutionTime
   @PostMapping("/exercises/{simulationId}/search")
   @PreAuthorize("isExerciseObserver(#exerciseId)")
   public Page<FindingOutput> findingsBySimulation(
@@ -69,6 +73,7 @@ public class FindingApi extends RestBehavior {
         .map(findingMapper::toFindingOutput);
   }
 
+  @LogExecutionTime
   @PostMapping("/scenarios/{scenarioId}/search")
   @PreAuthorize("isScenarioObserver(#scenarioId)")
   public Page<FindingOutput> findingsByScenario(
@@ -84,6 +89,7 @@ public class FindingApi extends RestBehavior {
         .map(findingMapper::toFindingOutput);
   }
 
+  @LogExecutionTime
   @PostMapping("/endpoints/{endpointId}/search")
   @PreAuthorize("isObserver()")
   public Page<FindingOutput> findingsByEndpoint(
