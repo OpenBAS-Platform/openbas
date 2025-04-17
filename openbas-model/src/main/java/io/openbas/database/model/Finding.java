@@ -92,14 +92,14 @@ public class Finding implements Base {
 
   // -- AUDIT --
 
-  @Queryable(filterable = true, sortable = true, label = "finding created at")
+  @Queryable(filterable = true, sortable = true, label = "created at")
   @CreationTimestamp
   @Column(name = "finding_created_at", updatable = false, nullable = false)
   @JsonProperty("finding_created_at")
   @NotNull
   private Instant creationDate = now();
 
-  @Queryable(filterable = true, sortable = true, label = "finding updated at")
+  @Queryable(filterable = true, sortable = true, label = "updated at")
   @UpdateTimestamp
   @Column(name = "finding_updated_at", nullable = false)
   @JsonProperty("finding_updated_at")

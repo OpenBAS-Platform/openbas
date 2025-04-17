@@ -33,6 +33,7 @@ const useRetrieveOptions = () => {
         });
         break;
       case 'payload_attack_patterns':
+      case 'base_attack_patterns_side':
         searchAttackPatternsByIdAsOption(ids).then((response) => {
           setOptions(response.data);
         });
