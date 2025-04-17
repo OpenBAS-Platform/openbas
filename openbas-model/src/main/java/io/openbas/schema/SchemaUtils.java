@@ -172,13 +172,10 @@ public class SchemaUtils {
               ? ((Field) member).getAnnotation(Queryable.class)
               : ((Method) member).getAnnotation(Queryable.class);
       if (queryable != null) {
-        String entity;
-        if (clazz.isAnnotationPresent(Indexable.class)) {
-          Indexable indexable = clazz.getAnnotation(Indexable.class);
-          entity = hasText(indexable.ref()) ? indexable.ref() : indexable.index();
-        } else {
-          entity = clazz.getSimpleName();
-        }
+        String entity =
+            clazz.isAnnotationPresent(Indexable.class)
+                ? clazz.getAnnotation(Indexable.class).index()
+                : clazz.getSimpleName().toLowerCase();
         builder
             .searchable(queryable.searchable())
             .filterable(queryable.filterable())
@@ -192,6 +189,12 @@ public class SchemaUtils {
           builder.type(queryable.clazz()); // Override
         } else if (hasText(queryable.path()) || queryable.paths().length > 0) {
           builder.type(queryable.clazz()); // Override
+        } else if (!queryable.clazz().equals(Void.class)) {
+          builder.type(String.class);
+        }
+        // Enum values from redefinition
+        if (!queryable.refEnumClazz().equals(Void.class)) {
+          builder.availableValues(getEnumNames(queryable.refEnumClazz()));
         }
       }
     } else if (annotation.annotationType().equals(EsQueryable.class)) {

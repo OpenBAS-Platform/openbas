@@ -1,6 +1,6 @@
 import { Chip, Tooltip } from '@mui/material';
 import * as R from 'ramda';
-import { type FunctionComponent, useRef, useState } from 'react';
+import { type FunctionComponent, useEffect, useRef, useState } from 'react';
 
 import { type Filter, type PropertySchemaDTO } from '../../../../utils/api-types';
 import FilterChipPopover from './FilterChipPopover';
@@ -41,6 +41,14 @@ const FilterChip: FunctionComponent<Props> = ({
     ? 'outlined'
     : 'filled';
 
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (chipRef.current) {
+      setAnchorEl(chipRef.current);
+    }
+  }, [chipRef.current]);
+
   return (
     <>
       <Tooltip
@@ -67,14 +75,14 @@ const FilterChip: FunctionComponent<Props> = ({
           ref={chipRef}
         />
       </Tooltip>
-      {chipRef?.current
+      {anchorEl
         && (
           <FilterChipPopover
             filter={filter}
             helpers={helpers}
             open={open}
             onClose={handleClose}
-            anchorEl={chipRef.current}
+            anchorEl={chipRef.current!}
             propertySchema={propertySchema}
             contextId={contextId}
           />

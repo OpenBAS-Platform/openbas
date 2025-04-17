@@ -109,13 +109,13 @@ public class InjectExpectation implements Base {
   @NotNull
   private Long expirationTime;
 
-  @Queryable(filterable = true, label = "inject expectation created at")
+  @Queryable(filterable = true, label = "created at")
   @Setter
   @Column(name = "inject_expectation_created_at")
   @JsonProperty("inject_expectation_created_at")
   private Instant createdAt = now();
 
-  @Queryable(filterable = true, label = "inject expectation updated at")
+  @Queryable(filterable = true, label = "updated at")
   @Setter
   @Column(name = "inject_expectation_updated_at")
   @JsonProperty("inject_expectation_updated_at")

@@ -3,6 +3,7 @@ package io.openbas.engine.model.finding;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.ContractOutputType;
 import io.openbas.engine.model.EsBase;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ public class EsFinding extends EsBase {
   @Queryable(label = "finding value", filterable = true)
   private String finding_value;
 
-  @Queryable(label = "finding type", filterable = true)
+  @Queryable(label = "finding type", filterable = true, refEnumClazz = ContractOutputType.class)
   private String finding_type;
 
   @Queryable(label = "field")

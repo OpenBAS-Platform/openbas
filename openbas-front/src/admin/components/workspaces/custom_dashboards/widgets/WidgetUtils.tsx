@@ -1,15 +1,7 @@
 import { TableChart } from '@mui/icons-material';
 import { ChartBar, ChartDonut, ChartLine } from 'mdi-material-ui';
 
-import {
-  type Filter,
-  type FilterGroup,
-  type HistogramWidget,
-  type InjectExpectation,
-  type StructuralHistogramSeries,
-  type Widget,
-  type WidgetInput,
-} from '../../../../../utils/api-types';
+import { type Filter, type FilterGroup, type HistogramWidget, type InjectExpectation, type StructuralHistogramSeries, type Widget, type WidgetInput } from '../../../../../utils/api-types';
 
 export type WidgetInputWithoutLayout = Omit<WidgetInput, 'widget_layout'>;
 export type StepType = ('type' | 'series' | 'parameters');
@@ -89,6 +81,15 @@ export const getWidgetTitle = (widgetTitle: Widget['widget_config']['title'], ty
 export const BASE_ENTITY_FILTER_KEY = 'base_entity';
 export const getBaseEntities = (filterGroup: FilterGroup | undefined) => {
   return filterGroup?.filters?.filter(f => f.key === BASE_ENTITY_FILTER_KEY).map(f => f.values ?? []).flat();
+};
+export const excludeBaseEntities = (filterGroup: FilterGroup | undefined) => {
+  if (!filterGroup) {
+    return undefined;
+  }
+  return {
+    mode: filterGroup.mode,
+    filters: filterGroup.filters?.filter(f => f.key !== BASE_ENTITY_FILTER_KEY) ?? [],
+  };
 };
 
 // -- MATRIX MITRE --

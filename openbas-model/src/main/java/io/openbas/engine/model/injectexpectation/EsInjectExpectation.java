@@ -3,6 +3,8 @@ package io.openbas.engine.model.injectexpectation;
 import io.openbas.annotation.EsQueryable;
 import io.openbas.annotation.Indexable;
 import io.openbas.annotation.Queryable;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_STATUS;
+import io.openbas.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openbas.engine.model.EsBase;
 import java.util.Set;
 import lombok.Getter;
@@ -15,7 +17,10 @@ public class EsInjectExpectation extends EsBase {
   /* Every attribute must be uniq, so prefixed with the entity type! */
   /* Except relationships, they should have same name on every model! */
 
-  @Queryable(label = "inject expectation type")
+  @Queryable(
+      label = "inject expectation type",
+      filterable = true,
+      refEnumClazz = EXPECTATION_TYPE.class)
   @EsQueryable(keyword = true)
   private String inject_expectation_type;
 
@@ -40,7 +45,10 @@ public class EsInjectExpectation extends EsBase {
   @Queryable(label = "inject expectation is group")
   private Boolean inject_expectation_group;
 
-  @Queryable(label = "inject expectation status", filterable = true)
+  @Queryable(
+      label = "inject expectation status",
+      filterable = true,
+      refEnumClazz = EXPECTATION_STATUS.class)
   @EsQueryable(keyword = true)
   private String inject_expectation_status;
 
@@ -74,7 +82,11 @@ public class EsInjectExpectation extends EsBase {
   @EsQueryable(keyword = true)
   private String base_asset_group_side; // Must finish by _side
 
-  @Queryable(label = "attack patterns", filterable = true)
+  @Queryable(
+      label = "attack patterns",
+      filterable = true,
+      dynamicValues = true,
+      clazz = String.class)
   @EsQueryable(keyword = true)
   private Set<String> base_attack_patterns_side; // Must finish by _side
 }
