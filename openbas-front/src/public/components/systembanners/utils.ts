@@ -1,8 +1,9 @@
-import { type BannerMessage, type PlatformSettings } from '../../../utils/api-types';
+import { type PlatformSettings } from '../../../utils/api-types';
 import { utcDate } from '../../../utils/Time';
 import { isNotEmptyField, recordEntries, recordKeys } from '../../../utils/utils';
 
 const SYSTEM_BANNER_HEIGHT_PER_MESSAGE = 18;
+type BannerMessage = Record<'debug' | 'info' | 'warn' | 'error' | 'fatal', string[]>;
 
 export const computeBanners = (settings: PlatformSettings): BannerMessage => {
   let bannerLevel = settings.platform_banner_by_level as BannerMessage;
