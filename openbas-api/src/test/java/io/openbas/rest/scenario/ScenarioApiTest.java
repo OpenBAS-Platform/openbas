@@ -50,8 +50,6 @@ public class ScenarioApiTest extends IntegrationTest {
   @Autowired private AssetGroupRepository assetGroupRepository;
   @Autowired private EndpointRepository endpointRepository;
 
-  List<ScenarioComposer.Composer> scenarioWrapperComposers = new ArrayList<>();
-
   static String SCENARIO_ID;
 
   @AfterAll
@@ -60,7 +58,6 @@ public class ScenarioApiTest extends IntegrationTest {
     this.tagRuleRepository.deleteAll();
     this.tagRepository.deleteAll();
     this.assetGroupRepository.deleteAll();
-    scenarioWrapperComposers.forEach(ScenarioComposer.Composer::delete);
   }
 
   @DisplayName("Create scenario succeed")
@@ -283,7 +280,6 @@ public class ScenarioApiTest extends IntegrationTest {
                           injectStatusComposer.forInjectStatus(
                               InjectStatusFixture.createDraftInjectStatus())))
               .persist();
-      scenarioWrapperComposers.add(newScenarioComposer);
       return newScenarioComposer.get();
     }
 
