@@ -104,14 +104,39 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
     return sentence;
   };
   const [openScenarioNotificationRuleDrawer, setOpenScenarioNotificationRuleDrawer] = useState(false);
-  const [editNotification, setEditNotification] = useState(false);
+  const [editNotification, setEditNotification] = useState<boolean>(false);
+  const [notificationRule, setNotificationRule] = useState<NotificationRuleOutput>({
+    id: '',
+    resource_id: '',
+    resource_type: '',
+    subject: '',
+    trigger: '',
+  });
+
   useEffect(() => {
     findNotificationRuleByResource(scenario.scenario_id).then((result: { data: NotificationRuleOutput[] }) => {
-      if (result.data) {
+      if (result.data.length > 0) {
         setEditNotification(true);
+        setNotificationRule(result.data[0]);
       }
     });
   }, []);
+
+  const onCreateNotification = (result: NotificationRuleOutput) => {
+    setEditNotification(true);
+    setNotificationRule(result);
+  };
+
+  const onDeleteNotification = () => {
+    setEditNotification(false);
+    setNotificationRule({
+      id: '',
+      resource_id: '',
+      resource_type: '',
+      subject: '',
+      trigger: '',
+    });
+  };
 
   return (
     <PermissionsContext.Provider value={permissionsContext}>
@@ -195,10 +220,9 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                 <IconButton
                   size="small"
                   style={{ marginRight: 5 }}
-                  sx={{ color: editNotification ? 'success' : 'primary' }}
                   onClick={() => setOpenScenarioNotificationRuleDrawer(true)}
                 >
-                  <NotificationsOutlined />
+                  <NotificationsOutlined color={editNotification ? 'success' : 'primary'} />
                 </IconButton>
                 <Typography
                   variant="body1"
@@ -211,6 +235,10 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
                     open={openScenarioNotificationRuleDrawer}
                     setOpen={setOpenScenarioNotificationRuleDrawer}
                     editing={editNotification}
+                    onCreate={onCreateNotification}
+                    onUpdate={result => setNotificationRule(result)}
+                    onDelete={onDeleteNotification}
+                    notificationRule={notificationRule}
                     scenarioId={scenario.scenario_id}
                     scenarioName={scenario.scenario_name}
                   />

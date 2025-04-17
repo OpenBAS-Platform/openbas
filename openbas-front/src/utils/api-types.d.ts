@@ -2641,7 +2641,7 @@ export interface NetworkTraffic {
 }
 
 export interface NotificationRuleOutput {
-  id?: string;
+  id: string;
   owner?: string;
   resource_id?: string;
   resource_type?: string;
@@ -4336,7 +4336,7 @@ export interface UpdateMePasswordInput {
 }
 
 export interface UpdateNotificationRuleInput {
-  subject?: string;
+  subject: string;
 }
 
 export interface UpdateProfileInput {
