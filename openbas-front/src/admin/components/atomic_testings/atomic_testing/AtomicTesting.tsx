@@ -107,10 +107,6 @@ const AtomicTesting = () => {
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
-    searchTargets(injectResultOverviewOutput?.inject_id ? injectResultOverviewOutput?.inject_id : '', tabConfig[newValue].type, searchPaginationInput)
-      .then((response) => {
-        setTargets(response.data);
-      });
   };
 
   const renderTargetItem = (target: InjectTargetWithResult, parent: InjectTargetWithResult | undefined, upperParent: InjectTargetWithResult | undefined) => {
@@ -206,7 +202,6 @@ const AtomicTesting = () => {
                       searchPaginationInput={searchPaginationInput}
                       setContent={setTargets}
                       entityPrefix={tab.entityPrefix}
-                      availableFilterNames={['target_name', 'target_tags']}
                       queryableHelpers={queryableHelpers}
                     />
                     {targets && targets.length > 0 ? (

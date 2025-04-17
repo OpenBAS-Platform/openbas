@@ -2,8 +2,11 @@ package io.openbas.service.targets.search;
 
 import io.openbas.database.model.Filters;
 import io.openbas.database.model.Inject;
+import io.openbas.database.model.InjectTarget;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.openbas.utils.pagination.SortField;
+import org.springframework.data.domain.Page;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +15,9 @@ import java.util.Map;
 public abstract class SearchAdaptorBase {
   protected final Map<String, String> fieldTranslations = new HashMap<>();
 
-  public SearchPaginationInput translate(SearchPaginationInput input, Inject scopedInject) {
+  public abstract Page<InjectTarget> search(SearchPaginationInput input, Inject scopedInject);
+
+  protected SearchPaginationInput translate(SearchPaginationInput input, Inject scopedInject) {
     SearchPaginationInput newInput = new SearchPaginationInput();
 
     // swap the filters
@@ -29,7 +34,8 @@ public abstract class SearchAdaptorBase {
     }
 
     // avoid double adding this filter if it's already in the collection
-    if (newFilters.stream().noneMatch(filter -> filter.getKey().equals("target_inject"))) {
+    if (newFilters.stream()
+        .noneMatch(filter -> filter.getKey().equals(fieldTranslations.get("target_injects")))) {
       // add search term on inject scope
       Filters.Filter injectScopeFilter = new Filters.Filter();
       injectScopeFilter.setMode(Filters.FilterMode.and);
