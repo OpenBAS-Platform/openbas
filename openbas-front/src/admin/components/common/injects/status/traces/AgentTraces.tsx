@@ -9,12 +9,15 @@ import { type AgentStatusOutput, type ExecutionTracesOutput } from '../../../../
 import ExecutionTime from './ExecutionTime';
 import TraceMessage from './TraceMessage';
 
-interface Props { agentStatus: AgentStatusOutput }
+interface Props {
+  agentStatus: AgentStatusOutput;
+  isInitialExpanded?: boolean;
+}
 
-const AgentTraces = ({ agentStatus }: Props) => {
+const AgentTraces = ({ agentStatus, isInitialExpanded = false }: Props) => {
   // Standard hooks
   const theme = useTheme();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(isInitialExpanded);
   const { t } = useFormatter();
 
   const toggleExpand = () => {
@@ -43,7 +46,7 @@ const AgentTraces = ({ agentStatus }: Props) => {
       <div
         onClick={toggleExpand}
         style={{
-          marginTop: theme.spacing(1),
+          marginTop: theme.spacing(3),
           cursor: 'pointer',
           display: 'flex',
         }}
@@ -56,8 +59,8 @@ const AgentTraces = ({ agentStatus }: Props) => {
       </div>
       {isExpanded && (
         <div style={{
-          marginLeft: '24px',
-          marginTop: '5px',
+          marginLeft: theme.spacing(3),
+          marginTop: theme.spacing(1),
         }}
         >
           <ExecutionTime

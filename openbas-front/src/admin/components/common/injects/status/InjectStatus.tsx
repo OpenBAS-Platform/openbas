@@ -13,7 +13,7 @@ interface Props {
   endpointsMap?: Map<string, EndpointOutput>;
   targetId?: string;
   targetType?: string;
-  showGlobalExecutionStatus?: boolean;
+  canShowGlobalExecutionStatus?: boolean;
 }
 
 const InjectStatus = ({
@@ -21,7 +21,7 @@ const InjectStatus = ({
   endpointsMap = new Map(),
   targetId,
   targetType,
-  showGlobalExecutionStatus = false,
+  canShowGlobalExecutionStatus = false,
 }: Props) => {
   const { t } = useFormatter();
 
@@ -37,7 +37,7 @@ const InjectStatus = ({
 
       {injectStatus ? (
         <Paper variant="outlined" style={{ padding: '0 20px 20px 20px' }}>
-          {showGlobalExecutionStatus && (
+          {canShowGlobalExecutionStatus && (
             <>
               <Typography
                 variant="subtitle1"
@@ -91,7 +91,7 @@ const InjectStatus = ({
           )}
 
           {targetType === 'AGENT' && agentTrace && (
-            <AgentTraces agentStatus={agentTrace} />
+            <AgentTraces agentStatus={agentTrace} isInitialExpanded />
           )}
         </Paper>
       ) : (
