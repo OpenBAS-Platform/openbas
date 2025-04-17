@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { withStyles } from 'tss-react/mui';
 
 import { addGroup } from '../../../../actions/Group';
+import { storeHelper } from '../../../../actions/Schema.js';
 import Drawer from '../../../../components/common/Drawer';
 import inject18n from '../../../../components/i18n';
 import GroupForm from './GroupForm';
@@ -78,7 +79,10 @@ CreateGroup.propTypes = {
   addGroup: PropTypes.func,
 };
 
-const select = state => ({ organizations: state.referential.entities.organizations });
+const select = (state) => {
+  const helper = storeHelper(state);
+  return { organizations: helper.getOrganizations() };
+};
 
 export default R.compose(
   connect(select, { addGroup }),
