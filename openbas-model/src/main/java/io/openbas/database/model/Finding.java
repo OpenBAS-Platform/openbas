@@ -81,7 +81,6 @@ public class Finding implements Base {
 
   // -- RELATION --
 
-  @Queryable(filterable = true, sortable = true, label = "inject")
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "finding_inject_id")
   @JsonProperty("finding_inject_id")
