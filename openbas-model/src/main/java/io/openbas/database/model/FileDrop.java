@@ -7,6 +7,7 @@ import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +29,7 @@ public class FileDrop extends Payload {
   @JsonSerialize(using = MonoIdDeserializer.class)
   @JsonProperty("file_drop_file")
   @Schema(type = "string")
+  @NotNull
   private Document fileDropFile;
 
   @Override

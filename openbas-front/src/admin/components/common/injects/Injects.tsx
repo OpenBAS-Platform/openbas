@@ -712,14 +712,6 @@ const Injects: FunctionComponent<Props> = ({
                 handleClose={() => setOpenCreateDrawer(false)}
                 onCreateInject={onCreateInject}
                 presetInjectDuration={presetInjectDuration}
-                // @ts-expect-error typing
-                teamsFromExerciseOrScenario={teams}
-                articlesFromExerciseOrScenario={articles}
-                variablesFromExerciseOrScenario={variables}
-                uriVariable={uriVariable}
-                allUsersNumber={allUsersNumber}
-                usersNumber={usersNumber}
-                teamsUsers={teamsUsers}
               />
             )}
         </>

@@ -101,6 +101,7 @@ public class Payload implements Base {
   @Type(StringArrayType.class)
   @Column(name = "payload_platforms", columnDefinition = "text[]")
   @JsonProperty("payload_platforms")
+  @NotNull
   private PLATFORM_TYPE[] platforms = new PLATFORM_TYPE[0];
 
   @ArraySchema(schema = @Schema(type = "string"))

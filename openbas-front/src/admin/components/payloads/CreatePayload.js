@@ -9,7 +9,7 @@ import { withStyles } from 'tss-react/mui';
 import { addPayload } from '../../../actions/payloads/payload-actions';
 import Drawer from '../../../components/common/Drawer';
 import inject18n from '../../../components/i18n';
-import PayloadForm from './PayloadForm.tsx';
+import PayloadForm from './PayloadForm';
 
 const styles = () => ({
   createButton: {
