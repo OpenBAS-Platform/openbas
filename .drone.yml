@@ -86,7 +86,7 @@ steps:
   - name: frontend-api-types
     image: node:22.14.0
     volumes:
-      - name: cache-node-frontend-e2e
+      - name: cache-node-frontend-api-types
         path: /drone/src/openbas-front/node_modules
     commands:
       - apt update
