@@ -74,6 +74,7 @@ const ExecutionDetail = ({ targetId, targetType, injectResultOverviewOutput }: P
   if (loading) {
     return <Loader />;
   }
+
   return (
     <InjectStatus
       injectStatus={injectResultOverviewOutput?.inject_status ?? null}

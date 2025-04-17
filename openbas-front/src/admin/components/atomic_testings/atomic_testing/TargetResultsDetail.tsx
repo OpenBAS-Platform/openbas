@@ -539,6 +539,8 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
     setSelectedExpectationForResults(null);
   };
 
+  const canShowExecutionTab = target.targetType !== 'ASSETS_GROUPS';
+
   return (
     <>
       <div className={classes.target}>
@@ -608,7 +610,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
             && Object.keys(sortedGroupedResults).map((type, index) => (
               <Tab key={index} label={t(`TYPE_${type}`)} />
             ))}
-          <Tab label={t('Execution')} />
+          {canShowExecutionTab && <Tab label={t('Execution')} />}
         </Tabs>
       </Box>
       {Object.keys(sortedGroupedResults).map((targetResult, targetResultIndex) => (
@@ -970,7 +972,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
         </div>
       ))}
       <div style={{ paddingTop: 20 }}>
-        {activeTab === Object.keys(sortedGroupedResults).length
+        {(activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab)
           && <ExecutionDetail targetId={target.id} targetType={target.targetType} injectResultOverviewOutput={inject} />}
       </div>
     </>
