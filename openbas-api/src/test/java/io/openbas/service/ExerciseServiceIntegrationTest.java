@@ -9,6 +9,7 @@ import static io.openbas.utils.fixtures.UserFixture.getUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.repository.*;
 import io.openbas.ee.Ee;
@@ -58,6 +59,7 @@ class ExerciseServiceIntegrationTest {
   @Autowired private ExerciseTeamUserRepository exerciseTeamUserRepository;
   @Autowired private InjectorContractRepository injectorContractRepository;
   @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+  @Autowired private LicenseCacheManager licenseCacheManager;
 
   private static String USER_ID;
   private static String TEAM_ID;
@@ -80,6 +82,7 @@ class ExerciseServiceIntegrationTest {
             injectMapper,
             resultUtils,
             actionMetricCollector,
+            licenseCacheManager,
             assetRepository,
             assetGroupRepository,
             injectExpectationRepository,
