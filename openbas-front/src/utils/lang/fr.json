@@ -1227,6 +1227,8 @@
   "tag_rule_tag": "Étiquette",
   "Tags": "Tags",
   "Target": "Cible",
+  "target_name": "Nom",
+  "target_tags": "Tags",
   "Targeted asset groups": "Groupes d'assets ciblés",
   "Targeted assets": "Assets ciblés",
   "Targeted players": "Joueurs ciblés",

@@ -1227,6 +1227,8 @@
   "tag_rule_tag": "标签",
   "Tags": "标签",
   "Target": "目标",
+  "target_name": "名称",
+  "target_tags": "标签",
   "Targeted asset groups": "目标资产组",
   "Targeted assets": "目标资产",
   "Targeted players": "目标选手",

@@ -1227,6 +1227,8 @@
   "tag_rule_tag": "Tag",
   "Tags": "Tags",
   "Target": "Target",
+  "target_name": "Name",
+  "target_tags": "Tags",
   "Targeted asset groups": "Targeted asset groups",
   "Targeted assets": "Targeted assets",
   "Targeted players": "Targeted players",
