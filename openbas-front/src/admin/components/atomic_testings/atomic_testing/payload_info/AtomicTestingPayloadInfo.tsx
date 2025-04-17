@@ -29,11 +29,11 @@ const AtomicTestingPayloadInfo: FunctionComponent = () => {
 
   return (
     <div className={classes.payloadInfoTabContainer} id="atomic-testing-info">
-      <Typography gutterBottom variant="h4">{t('Payload')}</Typography>
+      <Typography variant="h4">{t('Payload')}</Typography>
       <PayloadInfoPaper payloadOutput={payloadOutput} />
-      <Typography gutterBottom variant="h4">{t('Commands')}</Typography>
+      <Typography variant="h4">{t('Commands')}</Typography>
       <CommandsInfoCard payloadOutput={payloadOutput} />
-      <Typography gutterBottom variant="h4">{t('Output parser')}</Typography>
+      <Typography variant="h4">{t('Output parser')}</Typography>
       <OutputParserInfoCard outputParsers={payloadOutput?.payload_output_parsers || []} />
     </div>
   );

@@ -316,4 +316,20 @@ public interface ExerciseRepository
       nativeQuery = true)
   List<RawFinishedExerciseWithInjects> rawLatestFinishedExercisesWithInjectsByScenarioId(
       @Param("scenarioId") String scenarioId);
+
+  @Query(
+      "SELECT ex FROM Inject i"
+          + " INNER JOIN i.findings f"
+          + " JOIN i.exercise ex"
+          + " WHERE (:name IS NULL OR lower(ex.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
+  Set<Exercise> findAllByNameLinkedToFindings(String name);
+
+  @Query(
+      "SELECT ex FROM Inject i"
+          + " INNER JOIN i.findings f"
+          + " JOIN i.exercise ex"
+          + " WHERE (i.exercise.id = :simulationOrScenarioId OR i.exercise.scenario.id = :simulationOrScenarioId)"
+          + " AND (:name IS NULL OR lower(ex.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
+  Set<Exercise> findAllByNameLinkedToFindingsWithContext(
+      String simulationOrScenarioId, String name);
 }

@@ -1,6 +1,7 @@
 package io.openbas.utils.fixtures.composers;
 
 import io.openbas.database.model.Article;
+import io.openbas.database.model.Exercise;
 import io.openbas.database.model.Inject;
 import io.openbas.database.model.Scenario;
 import io.openbas.database.repository.ScenarioRepository;
@@ -20,6 +21,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
   public class Composer extends InnerComposerBase<Scenario> {
     private final Scenario scenario;
     private final List<InjectComposer.Composer> injectComposers = new ArrayList<>();
+    private final List<ExerciseComposer.Composer> simulationComposers = new ArrayList<>();
     private final List<ArticleComposer.Composer> articleComposers = new ArrayList<>();
 
     public Composer(Scenario scenario) {
@@ -40,6 +42,14 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
       return this;
     }
 
+    public Composer withSimulation(ExerciseComposer.Composer simulationComposer) {
+      simulationComposers.add(simulationComposer);
+      List<Exercise> simulations = this.scenario.getExercises();
+      simulations.add(simulationComposer.get());
+      this.scenario.setExercises(simulations);
+      return this;
+    }
+
     public Composer withArticle(ArticleComposer.Composer articleComposer) {
       articleComposers.add(articleComposer);
       List<Article> tempArticles = new ArrayList<>(this.scenario.getArticles());
@@ -53,6 +63,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
     public Composer persist() {
       articleComposers.forEach(ArticleComposer.Composer::persist);
       injectComposers.forEach(InjectComposer.Composer::persist);
+      simulationComposers.forEach(ExerciseComposer.Composer::persist);
       scenarioRepository.save(scenario);
       scenarioService.createScenario(scenario);
       return this;
@@ -62,6 +73,7 @@ public class ScenarioComposer extends ComposerBase<Scenario> {
     public Composer delete() {
       articleComposers.forEach(ArticleComposer.Composer::delete);
       injectComposers.forEach(InjectComposer.Composer::delete);
+      simulationComposers.forEach(ExerciseComposer.Composer::delete);
       scenarioRepository.delete(scenario);
       return this;
     }

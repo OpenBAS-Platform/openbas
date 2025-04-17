@@ -2,13 +2,13 @@ package io.openbas.rest.payload;
 
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.arm64;
 import static io.openbas.database.model.Payload.PAYLOAD_EXECUTION_ARCH.x86_64;
+import static io.openbas.utils.StringUtils.duplicateString;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.openbas.database.model.*;
 import io.openbas.rest.exception.BadRequestException;
 import io.openbas.rest.payload.form.*;
-import io.openbas.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -120,7 +120,7 @@ public class PayloadUtils {
     BeanUtils.copyProperties(
         origin, duplicate, "outputParsers", "tags", "attackPatterns", "arguments", "prerequisites");
     duplicate.setId(null);
-    duplicate.setName(StringUtils.duplicateString(origin.getName()));
+    duplicate.setName(duplicateString(origin.getName()));
     duplicate.setAttackPatterns(new ArrayList<>(origin.getAttackPatterns()));
     duplicate.setExternalId(null);
     duplicate.setArguments(

@@ -9,7 +9,6 @@ import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { fetchExecutors } from '../../../../actions/Executor';
 import { type ExecutorHelper } from '../../../../actions/executors/executor-helper';
 import { type UserHelper } from '../../../../actions/helper';
-import { fetchTags } from '../../../../actions/Tag';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import ExportButton from '../../../../components/common/ExportButton';
 import { initSorting } from '../../../../components/common/queryable/Page';
@@ -74,7 +73,6 @@ const Endpoints = () => {
   }));
   useDataLoader(() => {
     dispatch(fetchExecutors());
-    dispatch(fetchTags());
   });
 
   const availableFilterNames = [

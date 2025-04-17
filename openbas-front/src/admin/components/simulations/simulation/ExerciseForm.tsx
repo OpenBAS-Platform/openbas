@@ -9,14 +9,14 @@ import SelectField from '../../../../components/fields/SelectField';
 import TagField from '../../../../components/fields/TagField';
 import TextField from '../../../../components/fields/TextField';
 import { useFormatter } from '../../../../components/i18n';
-import { type ExerciseInput } from '../../../../utils/api-types';
+import { type CreateExerciseInput } from '../../../../utils/api-types';
 import { zodImplement } from '../../../../utils/Zod';
 import { scenarioCategories } from '../../scenarios/constants';
 
 interface Props {
-  onSubmit: SubmitHandler<ExerciseInput>;
+  onSubmit: SubmitHandler<CreateExerciseInput>;
   handleClose: () => void;
-  initialValues?: ExerciseInput;
+  initialValues?: CreateExerciseInput;
   disabled?: boolean;
   edit: boolean;
 }
@@ -50,10 +50,10 @@ const ExerciseForm: FunctionComponent<Props> = ({
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
     setValue,
-  } = useForm<ExerciseInput>({
+  } = useForm<CreateExerciseInput>({
     mode: 'onTouched',
     resolver: zodResolver(
-      zodImplement<ExerciseInput>().with({
+      zodImplement<CreateExerciseInput>().with({
         exercise_name: z.string().min(1, { message: t('Should not be empty') }),
         exercise_subtitle: z.string().optional(),
         exercise_category: z.string().optional(),

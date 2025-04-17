@@ -191,7 +191,6 @@ public class FindingService {
   }
 
   private void extractFindings(Inject inject, Asset asset, String trace) {
-    List<Finding> findings = new ArrayList<>();
     inject
         .getPayload()
         .map(Payload::getOutputParsers)
@@ -207,16 +206,13 @@ public class FindingService {
                       switch (outputParser.getType()) {
                         case REGEX:
                         default:
-                          findings.addAll(
-                              findingUtils.computeFindingUsingRegexRules(
-                                  inject,
-                                  asset,
-                                  rawOutputByMode,
-                                  outputParser.getContractOutputElements()));
+                          findingUtils.computeFindingUsingRegexRules(
+                              inject,
+                              asset,
+                              rawOutputByMode,
+                              outputParser.getContractOutputElements());
                           break;
                       }
                     }));
-
-    findingRepository.saveAll(findings);
   }
 }
