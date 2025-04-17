@@ -16,10 +16,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -40,7 +38,7 @@ public class Finding implements Base {
   @NotBlank
   private String id;
 
-  @Queryable(sortable = true)
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "finding_field", nullable = false)
   @JsonProperty("finding_field")
   @NotBlank
@@ -53,7 +51,7 @@ public class Finding implements Base {
   @NotNull
   protected ContractOutputType type;
 
-  @Queryable(sortable = true)
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "finding_value", nullable = false)
   @JsonProperty("finding_value")
   @NotBlank
@@ -65,6 +63,7 @@ public class Finding implements Base {
   @JsonProperty("finding_labels")
   private String[] labels;
 
+  @Queryable(searchable = true, filterable = true, sortable = true)
   @Column(name = "finding_name")
   @JsonProperty("finding_name")
   protected String name;
@@ -77,16 +76,17 @@ public class Finding implements Base {
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   @JsonSerialize(using = MultiIdSetDeserializer.class)
   @JsonProperty("finding_tags")
+  @Queryable(filterable = true, dynamicValues = true, path = "tags.id")
   private Set<Tag> tags = new HashSet<>();
 
   // -- RELATION --
 
-  @Queryable(filterable = true, sortable = true)
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "finding_inject_id")
   @JsonProperty("finding_inject_id")
   @JsonSerialize(using = MonoIdDeserializer.class)
   @Schema(type = "string")
+  @Queryable(filterable = true, dynamicValues = true, sortable = true, path = "inject.id")
   private Inject inject;
 
   // -- AUDIT --
@@ -114,6 +114,7 @@ public class Finding implements Base {
       inverseJoinColumns = @JoinColumn(name = "asset_id"))
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("finding_assets")
+  @Queryable(filterable = true, dynamicValues = true, path = "assets.id")
   private List<Asset> assets = new ArrayList<>();
 
   @ArraySchema(schema = @Schema(type = "string"))
@@ -135,4 +136,26 @@ public class Finding implements Base {
   @JsonSerialize(using = MultiIdListDeserializer.class)
   @JsonProperty("finding_users")
   private List<User> users = new ArrayList<>();
+
+  @JsonProperty("finding_simulation")
+  @Queryable(filterable = true, dynamicValues = true, path = "inject.exercise.id")
+  public Exercise getSimulation() {
+    return getInject().getExercise();
+  }
+
+  @JsonProperty("finding_scenario")
+  @Queryable(filterable = true, dynamicValues = true, path = "inject.exercise.scenario.id")
+  public Scenario getScenario() {
+    return Optional.ofNullable(getInject().getExercise())
+        .map(exercise -> exercise.getScenario())
+        .orElse(null);
+  }
+
+  @JsonProperty("finding_asset_groups")
+  @Queryable(filterable = true, dynamicValues = true, path = "assets.assetGroups.id")
+  public Set<AssetGroup> getAssetGroups() {
+    return getAssets().stream()
+        .flatMap(asset -> asset.getAssetGroups().stream())
+        .collect(Collectors.toSet());
+  }
 }

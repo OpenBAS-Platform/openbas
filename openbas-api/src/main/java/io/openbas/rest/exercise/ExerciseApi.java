@@ -32,6 +32,7 @@ import io.openbas.rest.team.output.TeamOutput;
 import io.openbas.service.*;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
 import io.openbas.utils.AtomicTestingUtils.ExpectationResultsByType;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.ResultUtils;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
@@ -361,6 +362,22 @@ public class ExerciseApi extends RestBehavior {
     exercise.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
     exercise.setLogoLight(documentRepository.findById(input.getLogoLight()).orElse(null));
     return exerciseRepository.save(exercise);
+  }
+
+  // -- OPTION --
+
+  @GetMapping(EXERCISE_URI + "/findings/options")
+  public List<FilterUtilsJpa.Option> optionsByNameLinkedToFindings(
+      @RequestParam(required = false) final String searchText,
+      @RequestParam(required = false) final String scenarioId) {
+    return exerciseService.getOptionsByNameLinkedToFindings(searchText, scenarioId);
+  }
+
+  @PostMapping(EXERCISE_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.exerciseRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
+        .toList();
   }
 
   @PutMapping(EXERCISE_URI + "/{exerciseId}/lessons")

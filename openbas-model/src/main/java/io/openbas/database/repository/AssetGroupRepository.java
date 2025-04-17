@@ -104,4 +104,20 @@ public interface AssetGroupRepository
           + " ) AND (:name IS NULL OR lower(ag.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
   List<AssetGroup> findAllBySimulationOrScenarioIdAndName(
       String simulationOrScenarioId, String name);
+
+  @Query(
+      "SELECT ag FROM Inject i"
+          + " INNER JOIN i.findings f"
+          + " JOIN i.assetGroups ag"
+          + " WHERE (:name IS NULL OR lower(ag.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
+  Set<AssetGroup> findAllByNameLinkedToFindings(String name);
+
+  @Query(
+      "SELECT ag FROM Inject i"
+          + " INNER JOIN i.findings f"
+          + " JOIN i.assetGroups ag"
+          + " WHERE (i.exercise.id = :simulationOrScenarioId OR i.exercise.scenario.id = :simulationOrScenarioId)"
+          + " AND (:name IS NULL OR lower(ag.name) LIKE lower(concat('%', cast(coalesce(:name, '') as string), '%')))")
+  Set<AssetGroup> findAllByNameLinkedToFindingsWithContext(
+      String simulationOrScenarioId, String name);
 }

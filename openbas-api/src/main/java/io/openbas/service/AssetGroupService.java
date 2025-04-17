@@ -12,6 +12,7 @@ import io.openbas.database.model.Endpoint;
 import io.openbas.database.raw.RawAssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
 import io.openbas.database.specification.EndpointSpecification;
+import io.openbas.utils.FilterUtilsJpa;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
@@ -19,6 +20,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,5 +175,23 @@ public class AssetGroupService {
                                   .toList();
                             })
                         .orElse(Collections.emptyList())));
+  }
+
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
+      String searchText, String simulationOrScenarioId) {
+    String trimmedSearchText = StringUtils.trimToNull(searchText);
+    String trimmedSimulationOrScenarioId = StringUtils.trimToNull(simulationOrScenarioId);
+
+    Set<AssetGroup> results;
+
+    if (trimmedSimulationOrScenarioId == null) {
+      results = assetGroupRepository.findAllByNameLinkedToFindings(trimmedSearchText);
+    } else {
+      results =
+          assetGroupRepository.findAllByNameLinkedToFindingsWithContext(
+              trimmedSimulationOrScenarioId, trimmedSearchText);
+    }
+
+    return results.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName())).toList();
   }
 }

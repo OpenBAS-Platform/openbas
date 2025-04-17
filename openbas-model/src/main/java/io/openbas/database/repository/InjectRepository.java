@@ -247,4 +247,18 @@ public interface InjectRepository
   @Transactional
   void removeTeamsForScenario(
       @Param("scenarioId") final String scenarioId, @Param("teamIds") final List<String> teamIds);
+
+  @Query(
+      "SELECT i FROM Inject i"
+          + " INNER JOIN i.findings f"
+          + " WHERE (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
+  Set<Inject> findAllByTitleLinkedToFindings(String title);
+
+  @Query(
+      "SELECT i FROM Inject i"
+          + " INNER JOIN i.findings f"
+          + " WHERE (i.exercise.id = :simulationOrScenarioId OR i.exercise.scenario.id = :simulationOrScenarioId)"
+          + " AND (:title IS NULL OR lower(i.title) LIKE lower(concat('%', cast(coalesce(:title, '') as string), '%')))")
+  Set<Inject> findAllByTitleLinkedToFindingsWithContext(
+      String simulationOrScenarioId, String title);
 }

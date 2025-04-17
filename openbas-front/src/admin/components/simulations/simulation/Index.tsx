@@ -24,6 +24,7 @@ import ExerciseHeader from './ExerciseHeader';
 const Simulation = lazy(() => import('./overview/SimulationComponent'));
 const Comcheck = lazy(() => import('./controls/Comcheck'));
 const Lessons = lazy(() => import('./lessons/SimulationLessons'));
+const SimulationFindings = lazy(() => import('./findings/SimulationFindings'));
 const SimulationDefinition = lazy(() => import('./SimulationDefinition'));
 const Injects = lazy(() => import('./injects/ExerciseInjects'));
 const Tests = lazy(() => import('./tests/ExerciseTests'));
@@ -132,6 +133,12 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
                 value={`/admin/simulations/${exercise.exercise_id}/lessons`}
                 label={t('Lessons learned')}
               />
+              <Tab
+                component={Link}
+                to={`/admin/simulations/${exercise.exercise_id}/findings`}
+                value={`/admin/simulations/${exercise.exercise_id}/findings`}
+                label={t('Findings')}
+              />
             </Tabs>
             <div className={classes.scheduling}>
               <ExerciseDatePopover exercise={exercise} />
@@ -153,6 +160,7 @@ const IndexComponent: FunctionComponent<{ exercise: ExerciseType }> = ({ exercis
               <Route path="animation/chat" element={errorWrapper(Chat)()} />
               <Route path="animation/validations" element={errorWrapper(Validations)()} />
               <Route path="lessons" element={errorWrapper(Lessons)()} />
+              <Route path="findings" element={errorWrapper(SimulationFindings)()} />
               {/* Not found */}
               <Route path="*" element={<NotFound />} />
             </Routes>

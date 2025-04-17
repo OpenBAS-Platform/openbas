@@ -68,7 +68,7 @@
     "tss-react": "4.9.16",
     "usehooks-ts": "3.1.1",
     "uuid": "11.1.0",
-    "zod": "3.24.2",
+    "zod": "3.24.3",
     "zustand": "5.0.3"
   },
   "devDependencies": {
@@ -87,7 +87,7 @@
     "@types/react-dom": "19.1.2",
     "@types/react-syntax-highlighter": "15",
     "@typescript-eslint/utils": "8.29.1",
-    "@vitejs/plugin-react": "4.3.4",
+    "@vitejs/plugin-react": "4.4.0",
     "@vitest/eslint-plugin": "1.1.42",
     "chokidar": "4.0.3",
     "cross-env": "7.0.3",
@@ -110,7 +110,7 @@
     "swagger-typescript-api": "13.1.1",
     "typescript": "5.8.3",
     "typescript-eslint": "8.29.1",
-    "vite": "6.2.6",
+    "vite": "6.3.1",
     "vitest": "3.1.1"
   },
   "resolutions": {
