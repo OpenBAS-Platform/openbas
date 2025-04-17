@@ -75,7 +75,8 @@ public class NotificationRuleApiTest extends IntegrationTest {
     assertEquals(input.getSubject(), JsonPath.read(response, "$.notification_rule_subject"));
     assertEquals(input.getTrigger(), JsonPath.read(response, "$.notification_rule_trigger"));
     assertEquals(input.getResourceId(), JsonPath.read(response, "$.notification_rule_resource_id"));
-    assertEquals(input.getResourceType(), JsonPath.read(response, "$.notification_rule_resource_type"));
+    assertEquals(
+        input.getResourceType(), JsonPath.read(response, "$.notification_rule_resource_type"));
     assertEquals(ADMIN_UUID, JsonPath.read(response, "$.notification_rule_owner"));
   }
 
@@ -189,12 +190,19 @@ public class NotificationRuleApiTest extends IntegrationTest {
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertEquals(notificationRule.getSubject(), JsonPath.read(response, "$.notification_rule_subject"));
-    assertEquals(notificationRule.getTrigger().name(), JsonPath.read(response, "$.notification_rule_trigger"));
-    assertEquals(notificationRule.getResourceId(), JsonPath.read(response, "$.notification_rule_resource_id"));
     assertEquals(
-        notificationRule.getResourceType().name(), JsonPath.read(response, "$.notification_rule_resource_type"));
-    assertEquals(notificationRule.getOwner().getId(), JsonPath.read(response, "$.notification_rule_owner"));
+        notificationRule.getSubject(), JsonPath.read(response, "$.notification_rule_subject"));
+    assertEquals(
+        notificationRule.getTrigger().name(),
+        JsonPath.read(response, "$.notification_rule_trigger"));
+    assertEquals(
+        notificationRule.getResourceId(),
+        JsonPath.read(response, "$.notification_rule_resource_id"));
+    assertEquals(
+        notificationRule.getResourceType().name(),
+        JsonPath.read(response, "$.notification_rule_resource_type"));
+    assertEquals(
+        notificationRule.getOwner().getId(), JsonPath.read(response, "$.notification_rule_owner"));
   }
 
   @Test
@@ -212,12 +220,20 @@ public class NotificationRuleApiTest extends IntegrationTest {
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertEquals(notificationRule.getSubject(), JsonPath.read(response, "$[0].notification_rule_subject"));
-    assertEquals(notificationRule.getTrigger().name(), JsonPath.read(response, "$[0].notification_rule_trigger"));
-    assertEquals(notificationRule.getResourceId(), JsonPath.read(response, "$[0].notification_rule_resource_id"));
     assertEquals(
-        notificationRule.getResourceType().name(), JsonPath.read(response, "$[0].notification_rule_resource_type"));
-    assertEquals(notificationRule.getOwner().getId(), JsonPath.read(response, "$[0].notification_rule_owner"));
+        notificationRule.getSubject(), JsonPath.read(response, "$[0].notification_rule_subject"));
+    assertEquals(
+        notificationRule.getTrigger().name(),
+        JsonPath.read(response, "$[0].notification_rule_trigger"));
+    assertEquals(
+        notificationRule.getResourceId(),
+        JsonPath.read(response, "$[0].notification_rule_resource_id"));
+    assertEquals(
+        notificationRule.getResourceType().name(),
+        JsonPath.read(response, "$[0].notification_rule_resource_type"));
+    assertEquals(
+        notificationRule.getOwner().getId(),
+        JsonPath.read(response, "$[0].notification_rule_owner"));
   }
 
   @Test
