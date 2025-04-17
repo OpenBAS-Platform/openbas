@@ -1284,9 +1284,12 @@ export interface ExerciseSimple {
   exercise_global_score: ExpectationResultsByType[];
   /** Exercise Id */
   exercise_id: string;
-  /** Exercise Id */
+  /** Exercise Name */
   exercise_name: string;
-  /** @format date-time */
+  /**
+   * Exercise Start Date
+   * @format date-time
+   */
   exercise_start_date?: string;
   /** Exercise status */
   exercise_status?:
@@ -1303,7 +1306,10 @@ export interface ExerciseSimple {
    */
   exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
-  /** @format date-time */
+  /**
+   * Exercise Update Date
+   * @format date-time
+   */
   exercise_updated_at?: string;
 }
 
@@ -3624,16 +3630,19 @@ export interface PublicExercise {
 }
 
 export interface RawAttackPattern {
+  /** @format date-time */
   attack_pattern_created_at?: string;
   attack_pattern_description?: string;
   attack_pattern_external_id?: string;
   attack_pattern_id?: string;
+  /** @uniqueItems true */
   attack_pattern_kill_chain_phases?: string[];
   attack_pattern_name?: string;
   attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
   attack_pattern_stix_id?: string;
+  /** @format date-time */
   attack_pattern_updated_at?: string;
 }
 
