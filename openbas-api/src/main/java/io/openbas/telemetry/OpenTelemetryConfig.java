@@ -54,7 +54,7 @@ public class OpenTelemetryConfig {
   @Autowired private Environment environment;
 
   private static final DateTimeFormatter CREATION_DATE_FORMATTER =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn");
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss[.n]");
 
   @Bean
   public OpenTelemetry openTelemetry() {
