@@ -13,6 +13,14 @@ public class V3_80__Add_Unique_constraint_findings extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     Connection connection = context.getConnection();
     Statement select = connection.createStatement();
+
+    select.execute(
+        " DELETE FROM findings WHERE ctid NOT IN ("
+            + "  SELECT min(ctid)"
+            + "  FROM findings"
+            + "  GROUP BY finding_inject_id, finding_value, finding_type, finding_field"
+            + ");");
+
     select.execute(
         "ALTER TABLE findings ADD CONSTRAINT unique_finding_constraint UNIQUE (finding_inject_id, finding_value, finding_type, finding_field);");
   }
