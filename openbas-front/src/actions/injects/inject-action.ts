@@ -1,15 +1,11 @@
 import { type Dispatch } from 'redux';
 
 import { getReferential, simpleCall, simplePostCall } from '../../utils/Action';
-import {
-  type Exercise,
-  type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput,
-  type InjectExportRequestInput, type InjectImportInput,
-  type Scenario,
-  type SearchPaginationInput,
-} from '../../utils/api-types';
+import { type Exercise, type InjectBulkProcessingInput, type InjectExportFromSearchRequestInput, type InjectExportRequestInput, type InjectImportInput, type Scenario, type SearchPaginationInput } from '../../utils/api-types';
 import { MESSAGING$ } from '../../utils/Environment';
 import * as schema from '../Schema';
+
+const INJECT_URI = '/api/injects';
 
 export const testInject = (injectId: string) => {
   const uri = `/api/injects/${injectId}/test`;
@@ -73,4 +69,18 @@ export const fetchScenarioInjectsSimple = (scenarioId: Scenario['scenario_id']) 
 export const searchScenarioInjectsSimple = (scenarioId: Scenario['scenario_id'], input: SearchPaginationInput) => {
   const uri = `/api/scenarios/${scenarioId}/injects/simple`;
   return simplePostCall(uri, input);
+};
+
+// -- OPTION --
+
+export const searchInjectLinkedToFindingsAsOption = (searchText: string = '', simulationOrScenarioId: string = '') => {
+  const params = {
+    searchText,
+    simulationOrScenarioId,
+  };
+  return simpleCall(`${INJECT_URI}/findings/options`, { params });
+};
+
+export const searchInjectByIdAsOption = (ids: string[]) => {
+  return simplePostCall(`${INJECT_URI}/options`, ids);
 };

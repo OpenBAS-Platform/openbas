@@ -31,6 +31,7 @@ import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.*;
 import io.openbas.service.targets.TargetService;
 import io.openbas.utils.TargetType;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.ServletOutputStream;
@@ -617,6 +618,22 @@ public class InjectApi extends RestBehavior {
     // Bulk delete
     this.injectService.deleteAll(injectsToDelete);
     return injectsToDelete;
+  }
+
+  // -- OPTION --
+
+  @GetMapping(INJECT_URI + "/findings/options")
+  public List<FilterUtilsJpa.Option> optionsByTitleLinkedToFindings(
+      @RequestParam(required = false) final String searchText,
+      @RequestParam(required = false) final String simulationOrScenarioId) {
+    return injectService.getOptionsByNameLinkedToFindings(searchText, simulationOrScenarioId);
+  }
+
+  @PostMapping(INJECT_URI + "/options")
+  public List<FilterUtilsJpa.Option> optionsById(@RequestBody final List<String> ids) {
+    return fromIterable(this.injectRepository.findAllById(ids)).stream()
+        .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle()))
+        .toList();
   }
 
   /**

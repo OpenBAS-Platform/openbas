@@ -7,7 +7,7 @@ import ButtonCreate from '../../../../components/common/ButtonCreate';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { useHelper } from '../../../../store';
-import { type Exercise, type ExerciseInput, type PlatformSettings } from '../../../../utils/api-types';
+import { type CreateExerciseInput, type Exercise, type PlatformSettings } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import ExerciseForm from './ExerciseForm';
 
@@ -17,7 +17,7 @@ const ExerciseCreation = () => {
   const { t } = useFormatter();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const onSubmit = (data: ExerciseInput) => {
+  const onSubmit = (data: CreateExerciseInput) => {
     dispatch(addExercise(data)).then((result: {
       result: string;
       entities: { scenarios: Record<string, Exercise> };
@@ -30,7 +30,7 @@ const ExerciseCreation = () => {
   const { settings }: { settings: PlatformSettings } = useHelper((helper: LoggedHelper) => ({ settings: helper.getPlatformSettings() }));
 
   // Form
-  const initialValues: ExerciseInput = {
+  const initialValues: CreateExerciseInput = {
     exercise_name: '',
     exercise_subtitle: '',
     exercise_description: '',

@@ -31,6 +31,7 @@ import io.openbas.rest.security.SecurityExpression;
 import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
 import io.openbas.service.*;
+import io.openbas.utils.FilterUtilsJpa;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
@@ -46,6 +47,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.domain.Specification;
@@ -622,5 +624,23 @@ public class InjectService {
             });
 
     return agents;
+  }
+
+  public List<FilterUtilsJpa.Option> getOptionsByNameLinkedToFindings(
+      String searchText, String simulationOrScenarioId) {
+    String trimmedSearchText = StringUtils.trimToNull(searchText);
+    String trimmedSimulationOrScenarioId = StringUtils.trimToNull(simulationOrScenarioId);
+
+    Set<Inject> results;
+
+    if (trimmedSimulationOrScenarioId == null) {
+      results = injectRepository.findAllByTitleLinkedToFindings(trimmedSearchText);
+    } else {
+      results =
+          injectRepository.findAllByTitleLinkedToFindingsWithContext(
+              trimmedSimulationOrScenarioId, trimmedSearchText);
+    }
+
+    return results.stream().map(i -> new FilterUtilsJpa.Option(i.getId(), i.getTitle())).toList();
   }
 }

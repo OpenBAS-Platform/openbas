@@ -1,7 +1,10 @@
 package io.openbas.utils.fixtures.composers;
 
+import io.openbas.database.model.Asset;
 import io.openbas.database.model.AssetGroup;
 import io.openbas.database.repository.AssetGroupRepository;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +14,18 @@ public class AssetGroupComposer extends ComposerBase<AssetGroup> {
 
   public class Composer extends InnerComposerBase<AssetGroup> {
     private final AssetGroup assetGroup;
+    private final List<EndpointComposer.Composer> endpointComposers = new ArrayList<>();
 
     public Composer(AssetGroup assetGroup) {
       this.assetGroup = assetGroup;
+    }
+
+    public Composer withAsset(EndpointComposer.Composer endpointComposer) {
+      endpointComposers.add(endpointComposer);
+      List<Asset> assets = assetGroup.getAssets();
+      assets.add(endpointComposer.get());
+      this.assetGroup.setAssets(assets);
+      return this;
     }
 
     @Override

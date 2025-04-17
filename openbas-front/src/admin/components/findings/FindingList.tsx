@@ -1,121 +1,171 @@
 import { HubOutlined } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import type { CSSProperties } from 'react';
+import { List, ListItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { type CSSProperties, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { makeStyles } from 'tss-react/mui';
 
+import { initSorting, type Page } from '../../../components/common/queryable/Page';
+import PaginationComponentV2 from '../../../components/common/queryable/pagination/PaginationComponentV2';
+import { buildSearchPagination } from '../../../components/common/queryable/QueryableUtils';
 import SortHeadersComponentV2 from '../../../components/common/queryable/sort/SortHeadersComponentV2';
-import type { SortHelpers } from '../../../components/common/queryable/sort/SortHelpers';
 import useBodyItemsStyles from '../../../components/common/queryable/style/style';
+import { useQueryableWithLocalStorage } from '../../../components/common/queryable/useQueryableWithLocalStorage';
 import { type Header } from '../../../components/common/SortHeadersList';
 import FindingIcon from '../../../components/FindingIcon';
 import ItemTags from '../../../components/ItemTags';
 import ItemTargets from '../../../components/ItemTargets';
 import PaginatedListLoader from '../../../components/PaginatedListLoader';
-import { type Finding, type TargetSimple } from '../../../utils/api-types';
+import { type FindingOutput, type SearchPaginationInput, type TargetSimple } from '../../../utils/api-types';
 
 const useStyles = makeStyles()(() => ({
   itemHead: { textTransform: 'uppercase' },
   item: { height: 50 },
 }));
 
-const inlineStyles: Record<string, CSSProperties> = {
-  finding_type: { width: '20%' },
-  finding_field: { width: '20%' },
-  finding_value: {
-    width: '30%',
-    cursor: 'default',
-  },
-  finding_assets: { width: '10%' },
-  finding_tags: { width: '20%' },
-};
-
 interface Props {
-  findings: Finding[];
-  sortHelpers: SortHelpers;
-  assetsMap: Map<string, TargetSimple>;
+  searchFindings: (input: SearchPaginationInput) => Promise<{ data: Page<FindingOutput> }>;
   additionalHeaders?: Header[];
-  loading?: boolean;
+  additionalFilterNames?: string[];
+  filterLocalStorageKey: string;
+  contextId?: string;
 }
 
-const FindingList = ({ findings, sortHelpers, assetsMap, additionalHeaders = [], loading = false }: Props) => {
+const FindingList = ({ searchFindings, filterLocalStorageKey, contextId, additionalHeaders = [], additionalFilterNames = [] }: Props) => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const availableFilterNames = [
+    'finding_name',
+    'finding_type',
+    'finding_tags',
+    'finding_created_at',
+    'finding_asset_groups',
+    'finding_assets',
+    ...additionalFilterNames,
+  ];
+
+  const [searchParams] = useSearchParams();
+  const [search] = searchParams.getAll('search');
+
+  const [findings, setFindings] = useState<FindingOutput[]>([]);
+  const { queryableHelpers, searchPaginationInput } = useQueryableWithLocalStorage(filterLocalStorageKey, buildSearchPagination({
+    sorts: initSorting('finding_created_at', 'DESC'),
+    textSearch: search,
+  }));
+
+  const searchFindingsToload = (input: SearchPaginationInput) => {
+    setLoading(true);
+    return searchFindings(input).finally(() => {
+      setLoading(false);
+    });
+  };
 
   const headers = [
     {
       field: 'finding_type',
       label: 'Type',
       isSortable: true,
-      value: (finding: Finding) => finding.finding_type,
+      value: (finding: FindingOutput) => finding.finding_type,
     },
     {
       field: 'finding_value',
       label: 'Value',
       isSortable: true,
-      value: (finding: Finding) => finding.finding_value,
+      value: (finding: FindingOutput) => <Tooltip title={finding.finding_value}><span>{finding.finding_value}</span></Tooltip>,
     },
     {
       field: 'finding_tags',
       label: 'Tags',
       isSortable: false,
-      value: (finding: Finding) => <ItemTags variant="list" tags={finding.finding_tags} />,
+      value: (finding: FindingOutput) => <ItemTags variant="list" tags={finding.finding_tags} />,
     },
     {
       field: 'finding_assets',
-      label: 'Asset',
+      label: 'Endpoints',
       isSortable: false,
-      value: (finding: Finding) => <ItemTargets targets={(finding.finding_assets || []).map(assetId => assetsMap.get(assetId) || '') as TargetSimple[]} />,
+      value: (finding: FindingOutput) => (
+        <ItemTargets targets={(finding.finding_assets || []).map(asset => ({
+          target_id: asset.asset_id,
+          target_name: asset.asset_name,
+          target_type: 'ASSETS',
+        })) as TargetSimple[]}
+        />
+      ),
     },
     ...additionalHeaders,
   ];
 
+  const basis = `${100 / headers.length}%`;
+  const inlineStyles: Record<string, CSSProperties> = ({
+    finding_type: { width: basis },
+    finding_value: { width: basis },
+    finding_assets: { width: basis },
+    finding_tags: { width: basis },
+    ...additionalHeaders.reduce((acc, header) => {
+      acc[header.field] = { width: basis };
+      return acc;
+    }, {} as Record<string, CSSProperties>),
+  });
+
   return (
-    <List>
-      <ListItem
-        classes={{ root: classes.itemHead }}
-        style={{ padding: 0 }}
-      >
-        <ListItemIcon />
-        <ListItemText
-          primary={(
-            <SortHeadersComponentV2
-              headers={headers}
-              inlineStylesHeaders={inlineStyles}
-              sortHelpers={sortHelpers}
-            />
-          )}
-        />
-      </ListItem>
-      {loading ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} /> : findings.map((finding: Finding) => (
+    <>
+      <PaginationComponentV2
+        fetch={searchFindingsToload}
+        searchPaginationInput={searchPaginationInput}
+        setContent={setFindings}
+        entityPrefix="finding"
+        availableFilterNames={availableFilterNames}
+        queryableHelpers={queryableHelpers}
+        contextId={contextId}
+      />
+      <List>
         <ListItem
-          key={finding.finding_id}
-          classes={{ root: classes.item }}
-          divider={true}
-          disablePadding={true}
+          classes={{ root: classes.itemHead }}
+          style={{ padding: 0 }}
         >
-          <ListItemIcon>
-            <FindingIcon findingType={finding.finding_type} tooltip={true} />
-          </ListItemIcon>
+          <ListItemIcon />
           <ListItemText
             primary={(
-              <div style={bodyItemsStyles.bodyItems}>
-                {headers.map(header => (
-                  <div
-                    key={header.field}
-                    style={{
-                      ...bodyItemsStyles.bodyItem,
-                      ...inlineStyles[header.field],
-                    }}
-                  >
-                    {header.value && header.value(finding)}
-                  </div>
-                ))}
-              </div>
+              <SortHeadersComponentV2
+                headers={headers}
+                inlineStylesHeaders={inlineStyles}
+                sortHelpers={queryableHelpers.sortHelpers}
+              />
             )}
           />
         </ListItem>
-      ))}
-    </List>
+        {loading ? <PaginatedListLoader Icon={HubOutlined} headers={headers} headerStyles={inlineStyles} /> : findings.map(finding => (
+          <ListItem
+            key={finding.finding_id}
+            classes={{ root: classes.item }}
+            divider={true}
+            disablePadding={true}
+          >
+            <ListItemIcon>
+              <FindingIcon findingType={finding.finding_type} tooltip={true} />
+            </ListItemIcon>
+            <ListItemText
+              primary={(
+                <div style={bodyItemsStyles.bodyItems}>
+                  {headers.map(header => (
+                    <div
+                      key={header.field}
+                      style={{
+                        ...bodyItemsStyles.bodyItem,
+                        ...inlineStyles[header.field],
+                      }}
+                    >
+                      {header.value && header.value(finding)}
+                    </div>
+                  ))}
+                </div>
+              )}
+            />
+          </ListItem>
+        ))}
+      </List>
+    </>
   );
 };
 

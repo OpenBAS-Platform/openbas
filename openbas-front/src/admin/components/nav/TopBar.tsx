@@ -201,7 +201,7 @@ const TopBar: FunctionComponent = () => {
         </div>
         <div className={classes.barRight}>
           <div className={classes.barRightContainer}>
-            { settings.platform_license.license_type === 'nfr' && <ItemBoolean variant="large" label="EE DEV LICENSE" status={false} /> }
+            { settings.platform_license?.license_type === 'nfr' && <ItemBoolean variant="large" label="EE DEV LICENSE" status={false} /> }
             <Tooltip title={t('Install simulation agents')}>
               <IconButton
                 size="medium"
