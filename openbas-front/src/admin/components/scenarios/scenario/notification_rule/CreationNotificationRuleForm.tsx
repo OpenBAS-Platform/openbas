@@ -12,23 +12,13 @@ import { zodImplement } from '../../../../../utils/Zod';
 
 interface Props {
   onSubmit: SubmitHandler<CreateNotificationRuleInput>;
-  editing?: boolean;
-  initialValues?: CreateNotificationRuleInput;
+  creationInitialValues: CreateNotificationRuleInput;
   handleClose: () => void;
-  scenarioName: string;
 }
 
-const NotificationRuleForm: FunctionComponent<Props> = ({
+const CreationNotificationRuleForm: FunctionComponent<Props> = ({
   onSubmit,
-  editing,
-  scenarioName,
-  initialValues = {
-    resource_id: '',
-    resource_type: 'SCENARIO',
-    trigger: 'DIFFERENCE',
-    type: 'EMAIL',
-    subject: { scenarioName }.scenarioName + ' - alert',
-  },
+  creationInitialValues,
   handleClose,
 }) => {
   // Standard hooks
@@ -38,7 +28,7 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm<CreateNotificationRuleInput>({
     mode: 'onTouched',
     resolver: zodResolver(
@@ -50,7 +40,7 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
         subject: z.string().min(1, { message: t('Should not be empty') }),
       }),
     ),
-    defaultValues: initialValues,
+    defaultValues: creationInitialValues,
   });
 
   return (
@@ -79,7 +69,6 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
         disabled
         fullWidth
         label={t('Trigger on')}
-        error={!!errors.trigger}
         inputProps={register('trigger')}
       />
 
@@ -88,7 +77,6 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
         disabled
         fullWidth
         label={t('Notifier')}
-        error={!!errors.type}
         inputProps={register('type')}
       />
 
@@ -96,10 +84,10 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
         <Button
           variant="contained"
           onClick={handleClose}
-          style={{ marginRight: 10 }}
+          style={{ marginRight: theme.spacing(1) }}
           disabled={isSubmitting}
         >
-          {editing ? t('Delete') : t('Cancel')}
+          {t('Cancel')}
         </Button>
         <Button
           variant="contained"
@@ -107,11 +95,11 @@ const NotificationRuleForm: FunctionComponent<Props> = ({
           type="submit"
           disabled={isSubmitting}
         >
-          {editing ? t('Update') : t('Create')}
+          {t('Create')}
         </Button>
       </div>
     </form>
   );
 };
 
-export default NotificationRuleForm;
+export default CreationNotificationRuleForm;

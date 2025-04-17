@@ -2568,7 +2568,7 @@ export interface NotificationRuleOutput {
 }
 
 export interface NotificationRuleOutput {
-  id?: string;
+  id: string;
   owner?: string;
   resource_id?: string;
   resource_type?: string;
