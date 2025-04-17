@@ -11,21 +11,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
-import io.openbas.database.model.AssetGroup;
-import io.openbas.database.model.Scenario;
+import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
-import io.openbas.database.model.TagRule;
-import io.openbas.database.repository.AssetGroupRepository;
-import io.openbas.database.repository.ScenarioRepository;
-import io.openbas.database.repository.TagRepository;
-import io.openbas.database.repository.TagRuleRepository;
+import io.openbas.database.repository.*;
+import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.rest.scenario.form.CheckScenarioRulesInput;
 import io.openbas.rest.scenario.form.ScenarioInput;
-import io.openbas.utils.fixtures.AssetGroupFixture;
-import io.openbas.utils.fixtures.ScenarioFixture;
-import io.openbas.utils.fixtures.TagFixture;
+import io.openbas.rest.scenario.form.ScenarioRecurrenceInput;
+import io.openbas.utils.fixtures.*;
+import io.openbas.utils.fixtures.composers.*;
+import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockObserverUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import jakarta.annotation.Nullable;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +36,21 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestInstance(PER_CLASS)
 public class ScenarioApiTest extends IntegrationTest {
 
+  @Autowired private AgentComposer agentComposer;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private InjectStatusComposer injectStatusComposer;
+  @Autowired private ScenarioComposer scenarioComposer;
+  @Autowired private ExecutorFixture executorFixture;
+
   @Autowired private MockMvc mvc;
-
   @Autowired private ScenarioRepository scenarioRepository;
-
   @Autowired private TagRepository tagRepository;
-
   @Autowired private TagRuleRepository tagRuleRepository;
-
   @Autowired private AssetGroupRepository assetGroupRepository;
+  @Autowired private EndpointRepository endpointRepository;
+
+  List<ScenarioComposer.Composer> scenarioWrapperComposers = new ArrayList<>();
 
   static String SCENARIO_ID;
 
@@ -54,6 +60,7 @@ public class ScenarioApiTest extends IntegrationTest {
     this.tagRuleRepository.deleteAll();
     this.tagRepository.deleteAll();
     this.assetGroupRepository.deleteAll();
+    scenarioWrapperComposers.forEach(ScenarioComposer.Composer::delete);
   }
 
   @DisplayName("Create scenario succeed")
@@ -250,5 +257,103 @@ public class ScenarioApiTest extends IntegrationTest {
 
     assertNotNull(response);
     assertEquals(false, JsonPath.read(response, "$.rules_found"));
+  }
+
+  @Nested
+  @DisplayName("Lock Scenario EE feature")
+  @WithMockAdminUser
+  class LockScenarioEEFeature {
+
+    private Scenario getScenario(@Nullable Scenario scenario, @Nullable Executor executor) {
+      Executor executorToRun = (executor == null) ? executorFixture.getDefaultExecutor() : executor;
+      Scenario scenarioToSet = (scenario == null) ? ScenarioFixture.getScenario() : scenario;
+      ScenarioComposer.Composer newScenarioComposer =
+          scenarioComposer
+              .forScenario(scenarioToSet)
+              .withInject(
+                  injectComposer
+                      .forInject(InjectFixture.getDefaultInject())
+                      .withEndpoint(
+                          endpointComposer
+                              .forEndpoint(EndpointFixture.createEndpoint())
+                              .withAgent(
+                                  agentComposer.forAgent(
+                                      AgentFixture.createDefaultAgentSession(executorToRun))))
+                      .withInjectStatus(
+                          injectStatusComposer.forInjectStatus(
+                              InjectStatusFixture.createDraftInjectStatus())))
+              .persist();
+      scenarioWrapperComposers.add(newScenarioComposer);
+      return newScenarioComposer.get();
+    }
+
+    @Test
+    @DisplayName("Throw license restricted error when launch scenario with crowdstrike")
+    void lockLaunchScenario() throws Exception {
+      Scenario scenario = getScenario(null, executorFixture.getCrowdstrikeExecutor());
+
+      mvc.perform(post(SCENARIO_URI + "/" + scenario.getId() + "/exercise/running"))
+          .andExpect(status().is4xxClientError())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
+
+    @Test
+    @DisplayName("Throw license restricted error when scheduled scenario with Tanium")
+    void lockSchedulingScenario() throws Exception {
+      Scenario scenario = getScenario(null, executorFixture.getTaniumExecutor());
+      ScenarioRecurrenceInput input = new ScenarioRecurrenceInput();
+      input.setRecurrenceStart(Instant.now());
+
+      mvc.perform(
+              put(SCENARIO_URI + "/" + scenario.getId() + "/recurrence")
+                  .content(asJsonString(input))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().is4xxClientError())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
+
+    @Test
+    @DisplayName("Throw license restricted error when add Crowdstrike on scheduled scenario")
+    void lockAddCrowdstrikeOnScheduledScenario() throws Exception {
+      Scenario scenario = getScenario(ScenarioFixture.getScheduledScenario(), null);
+
+      // Create dynamic windows asset group
+      AssetGroup dynamicAssetGroup = AssetGroupFixture.createDefaultAssetGroup("windows group");
+      Filters.Filter windowsFilter = new Filters.Filter();
+      windowsFilter.setKey("endpoint_platform");
+      windowsFilter.setMode(Filters.FilterMode.and);
+      windowsFilter.setValues(List.of("Windows"));
+      windowsFilter.setOperator(Filters.FilterOperator.eq);
+      Filters.FilterGroup filterGroup = new Filters.FilterGroup();
+      filterGroup.setFilters(List.of(windowsFilter));
+      filterGroup.setMode(Filters.FilterMode.and);
+      dynamicAssetGroup.setDynamicFilter(filterGroup);
+      AssetGroup dynamicAssetGroupSaved = assetGroupRepository.save(dynamicAssetGroup);
+
+      // Create windows endpoint with crowdstrike agent
+      endpointRepository.deleteAll();
+      endpointComposer
+          .forEndpoint(EndpointFixture.createEndpoint())
+          .withAgent(
+              agentComposer.forAgent(
+                  AgentFixture.createDefaultAgentSession(executorFixture.getCrowdstrikeExecutor())))
+          .persist();
+
+      InjectInput input = new InjectInput();
+      input.setAssetGroups(List.of(dynamicAssetGroupSaved.getId()));
+
+      mvc.perform(
+              put(SCENARIO_URI
+                      + "/"
+                      + scenario.getId()
+                      + "/injects/"
+                      + scenario.getInjects().getFirst().getId())
+                  .content(asJsonString(input))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().is4xxClientError())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
   }
 }

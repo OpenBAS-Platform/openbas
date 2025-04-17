@@ -90,11 +90,11 @@ public class InjectComposer extends ComposerBase<Inject> {
             this.inject.setContent(composer.getInjectContent());
           });
       endpointComposers.forEach(EndpointComposer.Composer::persist);
-      injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       tagComposers.forEach(TagComposer.Composer::persist);
       teamComposers.forEach(TeamComposer.Composer::persist);
       documentComposers.forEach(DocumentComposer.Composer::persist);
       injectRepository.save(inject);
+      injectStatusComposers.ifPresent(InjectStatusComposer.Composer::persist);
       injectDocumentRepository.saveAll(inject.getDocuments());
       return this;
     }

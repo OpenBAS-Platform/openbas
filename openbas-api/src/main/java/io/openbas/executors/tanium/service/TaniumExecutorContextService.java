@@ -17,7 +17,6 @@ import java.util.Base64;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
@@ -28,8 +27,7 @@ public class TaniumExecutorContextService extends ExecutorContextService {
   private final Ee eeService;
   private final TaniumExecutorConfig taniumExecutorConfig;
   private final TaniumExecutorClient taniumExecutorClient;
-
-  @Autowired private LicenseCacheManager licenseCacheManager;
+  private final LicenseCacheManager licenseCacheManager;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,

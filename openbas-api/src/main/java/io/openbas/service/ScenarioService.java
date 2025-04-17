@@ -67,7 +67,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -103,6 +102,7 @@ public class ScenarioService {
 
   private final ExerciseMapper exerciseMapper;
   private final ActionMetricCollector actionMetricCollector;
+  private final LicenseCacheManager licenseCacheManager;
 
   private final Ee eeService;
   private final GrantService grantService;
@@ -116,8 +116,6 @@ public class ScenarioService {
 
   private final InjectRepository injectRepository;
   private final LessonsCategoryRepository lessonsCategoryRepository;
-
-  @Autowired private LicenseCacheManager licenseCacheManager;
 
   @Transactional
   public Scenario createScenario(@NotNull final Scenario scenario) {

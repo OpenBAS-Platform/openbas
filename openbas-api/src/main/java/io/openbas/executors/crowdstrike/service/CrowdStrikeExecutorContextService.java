@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
@@ -45,8 +44,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
   private final Ee eeService;
-
-  @Autowired private LicenseCacheManager licenseCacheManager;
+  private final LicenseCacheManager licenseCacheManager;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,

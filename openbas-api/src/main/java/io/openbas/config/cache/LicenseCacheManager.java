@@ -23,5 +23,4 @@ public class LicenseCacheManager {
   public void refreshLicense() {
     eeService.getEnterpriseEditionInfo();
   }
-
 }
