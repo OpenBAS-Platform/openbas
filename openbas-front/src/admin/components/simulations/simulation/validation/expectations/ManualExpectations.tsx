@@ -1,19 +1,5 @@
 import { AssignmentTurnedIn, ExpandMore, PersonOutlined } from '@mui/icons-material';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Alert,
-  AlertTitle,
-  Chip,
-  Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Alert, AlertTitle, Chip, Divider, List, ListItemButton, ListItemIcon, ListItemText, Tooltip, Typography } from '@mui/material';
 import * as R from 'ramda';
 import { type FunctionComponent, type SyntheticEvent, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
@@ -113,11 +99,23 @@ const ManualExpectations: FunctionComponent<Props> = ({
   const validatedCount = expectations.filter(v => !R.isEmpty(v.inject_expectation_results)).length;
   const isAllValidated = validatedCount === expectations.length;
 
-  const label = isAllValidated
-    ? `${t('Validated')} (${parentExpectation.inject_expectation_score})`
-    : t('Pending validation');
+  let label;
+  let style;
+  if (!isAllValidated || !parentExpectation) {
+    label = t('Pending validation');
+    style = colorStyles.orange;
+  } else {
+    const results = parentExpectation.inject_expectation_results ?? [];
+    const hasFailed = results.some(result => result?.result === 'Failed');
 
-  const style = isAllValidated ? colorStyles.green : colorStyles.orange;
+    if (hasFailed) {
+      label = `${t('Failed')} (${parentExpectation.inject_expectation_score})`;
+      style = colorStyles.red;
+    } else {
+      label = `${t('Success')} (${parentExpectation.inject_expectation_score})`;
+      style = colorStyles.green;
+    }
+  }
 
   const targetLabel = (expectationToProcess: InjectExpectationsStore) => {
     if (expectationToProcess.inject_expectation_user && usersMap[expectationToProcess.inject_expectation_user]) {
@@ -153,10 +151,6 @@ const ManualExpectations: FunctionComponent<Props> = ({
                     <Chip
                       classes={{ root: classes.validationType }}
                       label={expectations[0].inject_expectation_group ? 'At least one player' : 'All players'}
-                    />
-                    <Chip
-                      classes={{ root: classes.points }}
-                      label={expectations[0].inject_expectation_expected_score}
                     />
                     <Chip
                       classes={{ root: classes.chipInList }}
