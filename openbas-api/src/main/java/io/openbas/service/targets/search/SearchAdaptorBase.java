@@ -46,6 +46,7 @@ public abstract class SearchAdaptorBase {
 
     Filters.FilterGroup newFilterGroup = new Filters.FilterGroup();
     newFilterGroup.setFilters(newFilters);
+    newFilterGroup.setMode(input.getFilterGroup().getMode());
     newInput.setFilterGroup(newFilterGroup);
 
     // mind the sorts
