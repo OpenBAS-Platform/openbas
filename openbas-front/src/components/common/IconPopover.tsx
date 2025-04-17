@@ -6,7 +6,7 @@ import { useFormatter } from '../i18n';
 import { type PopoverEntry } from './ButtonPopover';
 
 interface Props {
-  size: IconButtonProps['size'];
+  size?: IconButtonProps['size'];
   entries: PopoverEntry[];
 }
 
