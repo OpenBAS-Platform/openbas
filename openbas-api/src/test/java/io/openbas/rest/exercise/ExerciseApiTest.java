@@ -5,8 +5,7 @@ import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,10 +14,16 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
 import io.openbas.rest.exercise.form.CheckExerciseRulesInput;
+import io.openbas.rest.exercise.form.ExerciseUpdateStartDateInput;
+import io.openbas.rest.exercise.form.ExerciseUpdateStatusInput;
 import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
+import io.openbas.rest.inject.form.InjectInput;
 import io.openbas.utils.fixtures.*;
+import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockPlannerUser;
+import jakarta.annotation.Nullable;
+import java.time.Instant;
 import java.util.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +38,29 @@ import org.springframework.test.web.servlet.MockMvc;
 public class ExerciseApiTest {
   @Autowired private MockMvc mvc;
 
+  @Autowired private AgentComposer agentComposer;
+  @Autowired private EndpointComposer endpointComposer;
+  @Autowired private ExerciseComposer exerciseComposer;
+  @Autowired private InjectComposer injectComposer;
+  @Autowired private InjectStatusComposer injectStatusComposer;
+  @Autowired private ExecutorFixture executorFixture;
+
   @Autowired private ExerciseRepository exerciseRepository;
-
   @Autowired private UserRepository userRepository;
-
   @Autowired private TeamRepository teamRepository;
-
   @Autowired private ExerciseTeamUserRepository exerciseTeamUserRepository;
-
   @Autowired private TagRepository tagRepository;
-
   @Autowired private TagRuleRepository tagRuleRepository;
-
   @Autowired private AssetGroupRepository assetGroupRepository;
 
+  List<ExerciseComposer.Composer> exerciseWrapperComposers = new ArrayList<>();
   private static final List<String> EXERCISE_IDS = new ArrayList<>();
   private static final List<String> USER_IDS = new ArrayList<>();
   private static final List<String> TEAM_IDS = new ArrayList<>();
 
   @AfterAll
   void afterAll() {
+    exerciseWrapperComposers.forEach(ExerciseComposer.Composer::delete);
     this.exerciseRepository.deleteAllById(EXERCISE_IDS);
     this.userRepository.deleteAllById(USER_IDS);
     this.teamRepository.deleteAllById(TEAM_IDS);
@@ -203,5 +211,95 @@ public class ExerciseApiTest {
 
     assertNotNull(response);
     assertEquals(false, JsonPath.read(response, "$.rules_found"));
+  }
+
+  @Nested
+  @DisplayName("Lock Exercise EE feature")
+  @WithMockPlannerUser
+  class LockExerciseEEFeature {
+
+    private Exercise getExercise(@Nullable Executor executor) {
+      Executor executorToRun = (executor == null) ? executorFixture.getDefaultExecutor() : executor;
+      ExerciseComposer.Composer newExerciseComposer =
+          exerciseComposer
+              .forExercise(ExerciseFixture.createDefaultAttackExercise(Instant.now()))
+              .withInject(
+                  injectComposer
+                      .forInject(InjectFixture.getDefaultInject())
+                      .withEndpoint(
+                          endpointComposer
+                              .forEndpoint(EndpointFixture.createEndpoint())
+                              .withAgent(
+                                  agentComposer.forAgent(
+                                      AgentFixture.createDefaultAgentSession(executorToRun))))
+                      .withInjectStatus(
+                          injectStatusComposer.forInjectStatus(
+                              InjectStatusFixture.createDraftInjectStatus())))
+              .persist();
+      exerciseWrapperComposers.add(newExerciseComposer);
+      return newExerciseComposer.get();
+    }
+
+    @Test
+    @DisplayName("Throw license restricted error when launch exercise with Crowdstrike")
+    void lockLaunchExercise() throws Exception {
+      Exercise exercise = getExercise(executorFixture.getTaniumExecutor());
+      ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
+      input.setStatus(ExerciseStatus.RUNNING);
+
+      mvc.perform(
+              put(EXERCISE_URI + "/" + exercise.getId() + "/status")
+                  .content(asJsonString(input))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().is4xxClientError())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
+
+    @Test
+    @DisplayName("Throw license restricted error when schedule exercise with Tanium")
+    void lockSchedulingExercise() throws Exception {
+      Exercise exercise = getExercise(executorFixture.getTaniumExecutor());
+      ExerciseUpdateStartDateInput input = new ExerciseUpdateStartDateInput();
+
+      mvc.perform(
+              put(EXERCISE_URI + "/" + exercise.getId() + "/start-date")
+                  .content(asJsonString(input))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().is4xxClientError())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
+
+    @Test
+    @DisplayName("Throw license restricted error when add Tanium on scheduled scenario")
+    void lockAddCrowdstrikeOnScheduledExercise() throws Exception {
+      Exercise exercise = getExercise(null);
+
+      // Create endpoint with tanium agent
+      Asset assetToAdd =
+          endpointComposer
+              .forEndpoint(EndpointFixture.createEndpoint())
+              .withAgent(
+                  agentComposer.forAgent(
+                      AgentFixture.createDefaultAgentSession(
+                          executorFixture.getCrowdstrikeExecutor())))
+              .persist()
+              .get();
+
+      InjectInput input = new InjectInput();
+      input.setAssets(List.of(assetToAdd.getId()));
+
+      mvc.perform(
+              put("/api/injects/"
+                      + exercise.getId()
+                      + "/"
+                      + exercise.getInjects().getFirst().getId())
+                  .content(asJsonString(input))
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .accept(MediaType.APPLICATION_JSON))
+          .andExpect(status().is4xxClientError())
+          .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
+    }
   }
 }

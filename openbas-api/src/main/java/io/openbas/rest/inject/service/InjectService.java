@@ -37,6 +37,10 @@ import io.openbas.rest.security.SecurityExpressionHandler;
 import io.openbas.rest.tag.TagService;
 import io.openbas.service.*;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.service.AssetGroupService;
+import io.openbas.service.AssetService;
+import io.openbas.service.TagRuleService;
+import io.openbas.service.UserService;
 import io.openbas.utils.InjectMapper;
 import io.openbas.utils.InjectUtils;
 import io.openbas.utils.JpaUtils;
@@ -56,7 +60,6 @@ import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -69,7 +72,6 @@ import org.springframework.util.CollectionUtils;
 public class InjectService {
 
   private final TeamRepository teamRepository;
-  private final AgentService agentService;
   private final AssetService assetService;
   private final AssetGroupService assetGroupService;
   private final Ee eeService;
@@ -84,8 +86,8 @@ public class InjectService {
   private final TagService tagService;
   private final DocumentService documentService;
 
+  private final LicenseCacheManager licenseCacheManager;
   @Resource protected ObjectMapper mapper;
-  @Autowired private LicenseCacheManager licenseCacheManager;
 
   private SecurityExpression getAmbientSecurityExpression() {
     return ((SecurityExpressionHandler) methodSecurityExpressionHandler).getSecurityExpression();
@@ -649,7 +651,7 @@ public class InjectService {
         });
   }
 
-  public final List<Agent> getAgentsByInject(Inject inject) {
+  public List<Agent> getAgentsByInject(Inject inject) {
     List<Agent> agents = new ArrayList<>();
     Set<String> agentIds = new HashSet<>();
 
@@ -668,8 +670,7 @@ public class InjectService {
 
     new ArrayList<>(inject.getAssets()).forEach(extractAgents);
     inject.getAssetGroups().stream()
-        .flatMap(
-            assetGroup -> this.assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
+        .flatMap(assetGroup -> assetGroupService.assetsFromAssetGroup(assetGroup.getId()).stream())
         .forEach(extractAgents);
 
     return agents;

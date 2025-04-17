@@ -324,7 +324,7 @@ public class ExerciseApi extends RestBehavior {
     return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
-  @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
+  @PutMapping(EXERCISE_URI + "/{exerciseId}/start-date")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackFor = Exception.class)
   public Exercise updateExerciseStart(

@@ -51,7 +51,6 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -81,6 +80,7 @@ public class ExerciseService {
   private final InjectMapper injectMapper;
   private final ResultUtils resultUtils;
   private final ActionMetricCollector actionMetricCollector;
+  private final LicenseCacheManager licenseCacheManager;
 
   private final AssetRepository assetRepository;
   private final AssetGroupRepository assetGroupRepository;
@@ -100,7 +100,6 @@ public class ExerciseService {
   private String imapUsername;
 
   @Resource private OpenBASConfig openBASConfig;
-  @Autowired private LicenseCacheManager licenseCacheManager;
 
   // endregion
 

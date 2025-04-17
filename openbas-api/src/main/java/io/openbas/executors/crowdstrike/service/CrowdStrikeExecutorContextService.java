@@ -51,8 +51,7 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
   private final Ee eeService;
-
-  @Autowired private LicenseCacheManager licenseCacheManager;
+  private final LicenseCacheManager licenseCacheManager;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
