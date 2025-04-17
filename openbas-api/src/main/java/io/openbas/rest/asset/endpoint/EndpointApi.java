@@ -9,6 +9,7 @@ import io.openbas.aop.LogExecutionTime;
 import io.openbas.database.model.Agent;
 import io.openbas.database.model.AssetAgentJob;
 import io.openbas.database.model.Endpoint;
+import io.openbas.database.model.ExecutionStatus;
 import io.openbas.database.repository.AssetAgentJobRepository;
 import io.openbas.database.repository.EndpointRepository;
 import io.openbas.database.specification.AssetAgentJobSpecification;
@@ -18,6 +19,8 @@ import io.openbas.rest.asset.endpoint.form.EndpointOverviewOutput;
 import io.openbas.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openbas.rest.asset.endpoint.form.EndpointUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.inject.form.InjectUpdateStatusInput;
+import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.service.EndpointService;
 import io.openbas.utils.EndpointMapper;
 import io.openbas.utils.FilterUtilsJpa;
@@ -47,6 +50,7 @@ public class EndpointApi extends RestBehavior {
   private final EndpointService endpointService;
   private final EndpointRepository endpointRepository;
   private final AssetAgentJobRepository assetAgentJobRepository;
+  private final InjectStatusService injectStatusService;
 
   private final EndpointMapper endpointMapper;
 
@@ -89,6 +93,10 @@ public class EndpointApi extends RestBehavior {
   @PreAuthorize("isPlanner()")
   @Transactional(rollbackFor = Exception.class)
   public void cleanupAssetAgentJob(@PathVariable @NotBlank final String assetAgentJobId) {
+    AssetAgentJob assetAgentJob = this.assetAgentJobRepository.findById(assetAgentJobId).orElseThrow();
+    InjectUpdateStatusInput injectUpdateStatusInput =  new InjectUpdateStatusInput();
+    injectUpdateStatusInput.setStatus(ExecutionStatus.MAYBE_PREVENTED.name());
+    this.injectStatusService.updateInjectStatus(assetAgentJob.getInject().getId(), injectUpdateStatusInput);
     this.assetAgentJobRepository.deleteById(assetAgentJobId);
   }
 
