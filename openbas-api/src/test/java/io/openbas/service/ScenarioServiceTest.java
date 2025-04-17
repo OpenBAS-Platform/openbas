@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
@@ -41,10 +42,11 @@ class ScenarioServiceTest {
   @Autowired private DocumentRepository documentRepository;
   @Autowired private ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Autowired private ArticleRepository articleRepository;
-
-  @Autowired InjectRepository injectRepository;
-
   @Mock ScenarioRepository mockScenarioRepository;
+  @Autowired InjectRepository injectRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+
   @Mock Ee eeService;
   @Mock GrantService grantService;
   @Mock VariableService variableService;
@@ -52,13 +54,13 @@ class ScenarioServiceTest {
   @Autowired private TeamService teamService;
   @Mock FileService fileService;
   @Autowired private InjectDuplicateService injectDuplicateService;
-  @Autowired private ExerciseMapper exerciseMapper;
-  @Mock private ActionMetricCollector actionMetricCollector;
-  @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
   @Mock private InjectService injectService;
   @Mock private TagRuleService tagRuleService;
   @InjectMocks private ScenarioService scenarioService;
+
+  @Mock private LicenseCacheManager licenseCacheManager;
+  @Autowired private ExerciseMapper exerciseMapper;
+  @Mock private ActionMetricCollector actionMetricCollector;
 
   private static String USER_ID;
   private static String TEAM_ID;
@@ -76,6 +78,7 @@ class ScenarioServiceTest {
             articleRepository,
             exerciseMapper,
             actionMetricCollector,
+            licenseCacheManager,
             eeService,
             grantService,
             variableService,
@@ -100,6 +103,7 @@ class ScenarioServiceTest {
             articleRepository,
             exerciseMapper,
             actionMetricCollector,
+            licenseCacheManager,
             eeService,
             grantService,
             variableService,
