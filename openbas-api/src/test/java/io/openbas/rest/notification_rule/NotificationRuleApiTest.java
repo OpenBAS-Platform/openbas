@@ -123,7 +123,7 @@ public class NotificationRuleApiTest extends IntegrationTest {
             .andReturn()
             .getResponse()
             .getContentAsString();
-    assertEquals(updatedSubject, JsonPath.read(response, "$.subject"));
+    assertEquals(updatedSubject, JsonPath.read(response, "$.notification_rule_subject"));
   }
 
   @Test
