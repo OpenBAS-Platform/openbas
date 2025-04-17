@@ -14,10 +14,6 @@ interface Props {
 }
 
 const ENTITIES = ['expectation-inject', 'finding'];
-export const availableFilters = new Map([
-  ['expectation-inject', ['base_created_at', 'inject_expectation_status', 'inject_expectation_type', 'base_updated_at']],
-  ['finding', ['base_created_at', 'finding_type', 'base_updated_at']],
-]);
 
 const FilterFieldBaseEntity: FunctionComponent<Props> = ({
   value,
