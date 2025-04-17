@@ -626,9 +626,7 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
                     <Grid container={true} spacing={2} style={{ alignItems: 'baseline' }}>
                       <Grid item={true} xs={6}>
                         <Typography variant="h5">
-                          {injectExpectation.inject_expectation_type}
-                          {' '}
-                          {injectExpectation.inject_expectation_type === 'MANUAL' && (t('Expectation'))}
+                          {injectExpectation.inject_expectation_name}
                         </Typography>
                       </Grid>
                       {injectExpectation.inject_expectation_results && injectExpectation.inject_expectation_results.length > 0 ? (
