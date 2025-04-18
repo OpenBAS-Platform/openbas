@@ -2,7 +2,7 @@ import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/ma
 import { Fragment, type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { searchTargets } from '../../../../actions/targets/targets-action';
+import searchTargets from '../../../../actions/targets/targets-action';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
@@ -10,7 +10,7 @@ import Empty from '../../../../components/Empty';
 import { useFormatter } from '../../../../components/i18n';
 import Loader from '../../../../components/Loader';
 import SearchFilter from '../../../../components/SearchFilter';
-import { type InjectResultOutput, type InjectTarget, type InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectTarget, type InjectTargetWithResult } from '../../../../utils/api-types';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import ResponsePie from '../../common/injects/ResponsePie';
 import { InjectResultOverviewOutputContext, type InjectResultOverviewOutputContextType } from '../InjectResultOverviewOutputContext';
@@ -102,7 +102,13 @@ const AtomicTesting = () => {
   };
 
   const handleNewTargetClick = (target: InjectTarget) => {
-    setNewSelectedTarget(target);
+    // TODO: handle the platform type for Endpoint targets
+    setSelectedTarget({
+      id: target.target_id,
+      name: target.target_name,
+      targetType: target.target_type,
+      platformType: undefined,
+    });
   };
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
