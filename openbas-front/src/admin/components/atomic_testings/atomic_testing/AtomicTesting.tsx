@@ -2,7 +2,7 @@ import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/ma
 import { Fragment, type SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import searchTargets from '../../../../actions/targets/targets-action';
+import { searchTargets } from '../../../../actions/injects/inject-action';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import { useQueryable } from '../../../../components/common/queryable/useQueryableWithLocalStorage';
@@ -50,8 +50,8 @@ const AtomicTesting = () => {
   // Standard hooks
   const { classes } = useStyles();
   const { t } = useFormatter();
-  const [selectedTarget, setSelectedTarget] = useState<InjectTargetWithResult>();
-  const [newSelectedTarget, setNewSelectedTarget] = useState<InjectTarget>();
+  const [selectedTargetLegacy, setSelectedTargetLegacy] = useState<InjectTargetWithResult>();
+  const [selectedTarget, setSelectedTarget] = useState<InjectTarget>();
   const [targets, setTargets] = useState<InjectTarget[]>();
   const [currentParentTarget, setCurrentParentTarget] = useState<InjectTargetWithResult>();
   const [upperParentTarget, setUpperParentTarget] = useState<InjectTargetWithResult>();
@@ -85,25 +85,25 @@ const AtomicTesting = () => {
   }));
 
   useEffect(() => {
-    setSelectedTarget(selectedTarget || currentParentTarget || injectResultOverviewOutput?.inject_targets ? injectResultOverviewOutput?.inject_targets[0] : undefined);
+    setSelectedTargetLegacy(selectedTargetLegacy || currentParentTarget || injectResultOverviewOutput?.inject_targets ? injectResultOverviewOutput?.inject_targets[0] : undefined);
     searchTargets(injectResultOverviewOutput?.inject_id ? injectResultOverviewOutput?.inject_id : '', tabConfig[0].type, searchPaginationInput)
       .then((response) => {
         setTargets(response.data);
-        setNewSelectedTarget(response.data);
+        setSelectedTarget(response.data);
       });
   }, [injectResultOverviewOutput]);
 
   // Handles
 
   const handleTargetClick = (target: InjectTargetWithResult, currentParent?: InjectTargetWithResult, upperParentTarget?: InjectTargetWithResult) => {
-    setSelectedTarget(target);
+    setSelectedTargetLegacy(target);
     setCurrentParentTarget(currentParent);
     setUpperParentTarget(upperParentTarget);
   };
 
   const handleNewTargetClick = (target: InjectTarget) => {
     // TODO: handle the platform type for Endpoint targets
-    setSelectedTarget({
+    setSelectedTargetLegacy({
       id: target.target_id,
       name: target.target_name,
       targetType: target.target_type,
@@ -121,7 +121,7 @@ const AtomicTesting = () => {
         <TargetListItem
           onClick={() => handleTargetClick(target, parent, upperParent)}
           target={target}
-          selected={selectedTarget?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
+          selected={selectedTargetLegacy?.id === target.id && currentParentTarget?.id === parent?.id && upperParentTarget?.id === upperParent?.id}
         />
         {target?.children && target.children.length > 0 && (
           <List disablePadding style={{ marginLeft: 15 }}>
@@ -214,13 +214,12 @@ const AtomicTesting = () => {
                     {targets && targets.length > 0 ? (
                       <List>
                         {targets.map(target => (
-                          <div key={target?.target_id}>
-                            <NewTargetListItem
-                              onClick={() => handleNewTargetClick(target)}
-                              target={target}
-                              selected={newSelectedTarget?.target_id === target.target_id}
-                            />
-                          </div>
+                          <NewTargetListItem
+                            onClick={() => handleNewTargetClick(target)}
+                            target={target}
+                            selected={selectedTarget?.target_id === target.target_id}
+                            key={target?.target_id}
+                          />
                         ))}
                       </List>
                     ) : (
@@ -254,17 +253,17 @@ const AtomicTesting = () => {
           {t('Results by target')}
         </Typography>
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          {selectedTarget && !!injectResultOverviewOutput.inject_type && (
+          {selectedTargetLegacy && !!injectResultOverviewOutput.inject_type && (
             <TargetResultsDetail
               inject={injectResultOverviewOutput}
               upperParentTargetId={upperParentTarget?.id}
               parentTargetId={currentParentTarget?.id}
-              target={selectedTarget}
+              target={selectedTargetLegacy}
               lastExecutionStartDate={injectResultOverviewOutput.inject_status?.tracking_sent_date || ''}
               lastExecutionEndDate={injectResultOverviewOutput.inject_status?.tracking_end_date || ''}
             />
           )}
-          {!selectedTarget && (
+          {!selectedTargetLegacy && (
             <Empty message={t('No target data available.')} />
           )}
         </Paper>

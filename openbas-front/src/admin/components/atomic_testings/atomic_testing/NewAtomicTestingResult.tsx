@@ -1,5 +1,6 @@
 import { SensorOccupiedOutlined, ShieldOutlined, TrackChangesOutlined } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -18,6 +19,7 @@ interface Props { target: InjectTarget }
 
 const NewAtomicTestingResult: FunctionComponent<Props> = ({ target }) => {
   const { t } = useFormatter();
+  const theme = useTheme();
   const { classes } = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
@@ -34,7 +36,7 @@ const NewAtomicTestingResult: FunctionComponent<Props> = ({ target }) => {
       <Tooltip key={0} title={t('Prevention')}>
         <ShieldOutlined style={{
           color: getColor(target.target_prevention_status),
-          marginRight: 10,
+          marginRight: theme.spacing(2),
           fontSize: 22,
         }}
         />
@@ -42,7 +44,7 @@ const NewAtomicTestingResult: FunctionComponent<Props> = ({ target }) => {
       <Tooltip key={1} title={t('Detection')}>
         <TrackChangesOutlined style={{
           color: getColor(target.target_detection_status),
-          marginRight: 10,
+          marginRight: theme.spacing(2),
           fontSize: 22,
         }}
         />
@@ -50,7 +52,7 @@ const NewAtomicTestingResult: FunctionComponent<Props> = ({ target }) => {
       <Tooltip key={2} title={t('Human Response')}>
         <SensorOccupiedOutlined style={{
           color: getColor(target.target_human_response_status),
-          marginRight: 10,
+          marginRight: theme.spacing(2),
           fontSize: 22,
         }}
         />

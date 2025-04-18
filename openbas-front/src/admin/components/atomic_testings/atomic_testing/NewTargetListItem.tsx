@@ -1,5 +1,6 @@
 import { Groups3Outlined, PersonOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from 'tss-react/mui';
 
@@ -24,6 +25,7 @@ interface Props {
 
 const NewTargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
   const { classes } = useStyles();
+  const theme = useTheme();
   const handleItemClick = () => {
     onClick(target);
   };
@@ -40,7 +42,7 @@ const NewTargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
   return (
     <>
       <Paper elevation={1} key={target?.target_id}>
-        <ListItemButton onClick={handleItemClick} style={{ marginBottom: 10 }} selected={selected}>
+        <ListItemButton onClick={handleItemClick} style={{ marginBottom: theme.spacing() }} selected={selected}>
           <ListItemIcon>
             {getIcon(target)}
           </ListItemIcon>

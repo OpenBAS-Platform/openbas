@@ -164,6 +164,7 @@ public class InjectApi extends RestBehavior {
     outputStream.close();
   }
 
+  @LogExecutionTime
   @PostMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/search")
   @PreAuthorize("isInjectObserver(#injectId)")
   public Page<InjectTarget> injectTargetSearch(
@@ -178,7 +179,7 @@ public class InjectApi extends RestBehavior {
       throw new BadRequestException(String.format("Invalid target type %s", targetType));
     }
 
-    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
+    Inject inject = injectService.inject(injectId);
 
     return targetService.injectTargets(injectTargetTypeEnum, inject, input);
   }

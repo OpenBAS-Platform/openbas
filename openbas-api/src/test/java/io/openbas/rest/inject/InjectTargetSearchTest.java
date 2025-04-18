@@ -69,7 +69,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public class WhenInjectDoesNotExist {
       @Test
       @DisplayName("Returns not found")
-      public void returnNotFound() throws Exception {
+      public void whenInjectDoesNotExist_returnNotFound() throws Exception {
         String id = UUID.randomUUID().toString();
         mvc.perform(
                 post(INJECT_URI + "/" + id + "/targets/" + targetType + "/search")
@@ -85,7 +85,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public class WhenTargetTypeDoesNotExist {
       @Test
       @DisplayName("Returns bad request")
-      public void returnBadRequest() throws Exception {
+      public void whenTargetTypeDoesNotExist_returnBadRequest() throws Exception {
         String id = UUID.randomUUID().toString();
         mvc.perform(
                 post(INJECT_URI
@@ -106,7 +106,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public class WhenInjectWithoutAuthorisation {
       @Test
       @DisplayName("Returns not found") // obfuscate lacking privs with NOT_FOUND
-      public void returnNotFound() throws Exception {
+      public void withoutAuthorisation_returnNotFound() throws Exception {
         String id = UUID.randomUUID().toString();
         mvc.perform(
                 post(INJECT_URI + "/" + id + "/targets/" + targetType + "/search")
@@ -127,7 +127,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("With no asset group targets, return no items in page")
-      public void withNoAssetGroupTargets() throws Exception {
+      public void withNoAssetGroupTargets_returnNoItemsInPage() throws Exception {
         Inject inject = getInjectWrapper().persist().get();
         entityManager.flush();
         entityManager.clear();
@@ -155,7 +155,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("With some asset group targets, return matching items in page 1")
-      public void withSomeAssetGroupTargetsPageOne() throws Exception {
+      public void withSomeAssetGroupTargets_returnMatchingItemsInPage1() throws Exception {
         String searchTerm = "asset group target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         for (int i = 0; i < 20; i++) {
@@ -202,7 +202,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
       @Test
       @DisplayName("With some asset group targets, return matching items in page 2")
-      public void withSomeAssetGroupTargetsPageTwo() throws Exception {
+      public void withSomeAssetGroupTargets_returnMatchingItemsInPage2() throws Exception {
         String searchTerm = "asset group target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         for (int i = 0; i < 20; i++) {
@@ -260,7 +260,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
 
         @Test
         @DisplayName("Given specific scores, expectation type results are of correct status")
-        public void withActualResultsWithCorrectStatus() throws Exception {
+        public void givenSpecificScores_expectationTypeResultsAreOfCorrectStatus()
+            throws Exception {
           String searchTerm = "asset group target";
           InjectComposer.Composer injectWrapper = getInjectWrapper();
           AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupComposerWithName(searchTerm);
