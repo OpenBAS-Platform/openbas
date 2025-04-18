@@ -17,6 +17,12 @@ export const widgetVisualizationTypes: {
   steps?: StepType[];
 }[] = [
   {
+    category: 'security-coverage',
+    seriesLimit: 2,
+    modes: ['structural'],
+    fields: ['base_attack_patterns_side'],
+  },
+  {
     category: 'vertical-barchart',
     seriesLimit: 5,
   },
@@ -29,12 +35,6 @@ export const widgetVisualizationTypes: {
     category: 'donut',
     modes: ['structural'],
     seriesLimit: 1,
-  },
-  {
-    category: 'security-coverage',
-    seriesLimit: 2,
-    modes: ['structural'],
-    fields: ['base_attack_patterns_side'],
   },
 ];
 
