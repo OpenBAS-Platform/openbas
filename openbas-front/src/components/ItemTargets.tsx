@@ -1,4 +1,4 @@
-import { DevicesOtherOutlined, Groups3Outlined, HorizontalRule } from '@mui/icons-material';
+import { DevicesOtherOutlined, Groups3Outlined } from '@mui/icons-material';
 import { Chip, Tooltip } from '@mui/material';
 import { SelectGroup } from 'mdi-material-ui';
 import { type FunctionComponent } from 'react';
@@ -40,7 +40,7 @@ const ItemTargets: FunctionComponent<Props> = ({
   const remainingTargetsCount = getRemainingItemsCount(targets, visibleTargets);
 
   if (!targets || targets.length === 0) {
-    return <HorizontalRule />;
+    return '-';
   }
 
   const getIcon = (type: string) => {
