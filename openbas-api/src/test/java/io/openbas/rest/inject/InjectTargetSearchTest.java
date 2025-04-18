@@ -12,16 +12,14 @@ import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.utils.TargetType;
 import io.openbas.utils.fixtures.*;
-import io.openbas.utils.fixtures.composers.AssetGroupComposer;
-import io.openbas.utils.fixtures.composers.InjectComposer;
-import io.openbas.utils.fixtures.composers.InjectorContractComposer;
-import io.openbas.utils.fixtures.composers.PayloadComposer;
+import io.openbas.utils.fixtures.composers.*;
 import io.openbas.utils.mockUser.WithMockAdminUser;
 import io.openbas.utils.mockUser.WithMockUnprivilegedUser;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.*;
@@ -38,6 +36,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
   @Autowired private InjectorContractComposer injectContractComposer;
   @Autowired private PayloadComposer payloadComposer;
   @Autowired private AssetGroupComposer assetGroupComposer;
+  @Autowired private ExpectationComposer expectationComposer;
   @Autowired private MockMvc mvc;
   @Autowired private ObjectMapper mapper;
   @Autowired private EntityManager entityManager;
@@ -47,6 +46,8 @@ public class InjectTargetSearchTest extends IntegrationTest {
     injectComposer.reset();
     injectContractComposer.reset();
     payloadComposer.reset();
+    assetGroupComposer.reset();
+    expectationComposer.reset();
   }
 
   private InjectComposer.Composer getInjectWrapper() {
@@ -120,11 +121,9 @@ public class InjectTargetSearchTest extends IntegrationTest {
     @WithMockAdminUser
     @DisplayName("With existing inject")
     public class WithExistingInject {
-      private void addAssetGroupWithName(
-          InjectComposer.Composer injectWrapper, String assetGroupName) {
-        injectWrapper.withAssetGroup(
-            assetGroupComposer.forAssetGroup(
-                AssetGroupFixture.createDefaultAssetGroup(assetGroupName)));
+      private AssetGroupComposer.Composer getAssetGroupComposerWithName(String assetGroupName) {
+        return assetGroupComposer.forAssetGroup(
+                AssetGroupFixture.createDefaultAssetGroup(assetGroupName));
       }
 
       @Test
@@ -161,7 +160,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         String searchTerm = "asset group target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         for (int i = 0; i < 20; i++) {
-          addAssetGroupWithName(injectWrapper, searchTerm + " " + i);
+          injectWrapper.withAssetGroup(getAssetGroupComposerWithName(searchTerm + " " + i));
         }
         Inject inject = injectWrapper.persist().get();
         entityManager.flush();
@@ -208,7 +207,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
         String searchTerm = "asset group target";
         InjectComposer.Composer injectWrapper = getInjectWrapper();
         for (int i = 0; i < 20; i++) {
-          addAssetGroupWithName(injectWrapper, searchTerm + " " + i);
+          injectWrapper.withAssetGroup(getAssetGroupComposerWithName(searchTerm + " " + i));
         }
         Inject inject = injectWrapper.persist().get();
         entityManager.flush();
@@ -249,6 +248,58 @@ public class InjectTargetSearchTest extends IntegrationTest {
                 .toList();
 
         assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+      }
+
+      @Nested
+      @DisplayName("With actual results")
+      public class WithActualResults {
+        private ExpectationComposer.Composer getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
+          return expectationComposer.forExpectation(InjectExpectationFixture.createExpectationWithTypeAndStatus(type, status));
+        }
+
+        @Test
+        @DisplayName("Given specific scores, expectation type results are of correct status")
+        public void withActualResultsWithCorrectStatus() throws Exception {
+          String searchTerm = "asset group target";
+          InjectComposer.Composer injectWrapper = getInjectWrapper();
+          AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupComposerWithName(searchTerm);
+          ExpectationComposer.Composer expectationDetectionWrapper = getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE.DETECTION, InjectExpectation.EXPECTATION_STATUS.SUCCESS).withAssetGroup(assetGroupWrapper);
+          ExpectationComposer.Composer expectationPreventionWrapper = getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE.PREVENTION, InjectExpectation.EXPECTATION_STATUS.FAILED).withAssetGroup(assetGroupWrapper);
+          ExpectationComposer.Composer expectationHumanResponseWrapper = getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE.CHALLENGE, InjectExpectation.EXPECTATION_STATUS.PENDING).withAssetGroup(assetGroupWrapper);
+          injectWrapper.withAssetGroup(assetGroupWrapper);
+          injectWrapper.withExpectation(expectationDetectionWrapper);
+          injectWrapper.withExpectation(expectationPreventionWrapper);
+          injectWrapper.withExpectation(expectationHumanResponseWrapper);
+          Inject inject = injectWrapper.persist().get();
+          entityManager.flush();
+          entityManager.clear();
+
+          SearchPaginationInput search =
+                  PaginationFixture.simpleFilter(
+                          "target_name", searchTerm, Filters.FilterOperator.contains);
+          String response =
+                  mvc.perform(
+                                  post(INJECT_URI
+                                          + "/"
+                                          + inject.getId()
+                                          + "/targets/"
+                                          + targetType.name()
+                                          + "/search")
+                                          .contentType(MediaType.APPLICATION_JSON)
+                                          .content(mapper.writeValueAsString(search)))
+                          .andExpect(status().isOk())
+                          .andReturn()
+                          .getResponse()
+                          .getContentAsString();
+
+          AssetGroupTarget expectedAssetGroup = new AssetGroupTarget(assetGroupWrapper.get().getId(), assetGroupWrapper.get().getName(), assetGroupWrapper.get().getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
+          expectedAssetGroup.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
+          expectedAssetGroup.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.FAILED);
+          expectedAssetGroup.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.PENDING);
+          List<AssetGroupTarget> expected = List.of(expectedAssetGroup);
+
+          assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
+        }
       }
     }
   }

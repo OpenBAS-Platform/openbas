@@ -14,6 +14,20 @@ public class InjectExpectationFixture {
 
   static Double EXPECTED_SCORE = 100.0;
 
+  public static InjectExpectation createExpectationWithTypeAndStatus(InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
+    InjectExpectation expectation = new InjectExpectation();
+    expectation.setExpirationTime(EXPIRATION_TIME_SIX_HOURS);
+    expectation.setType(type);
+    expectation.setExpectedScore(EXPECTED_SCORE);
+    switch (status) {
+      case SUCCESS -> expectation.setScore(EXPECTED_SCORE);
+      case FAILED -> expectation.setScore(0.0);
+      case PENDING -> expectation.setScore(null);
+      case PARTIAL -> expectation.setScore(EXPECTED_SCORE / 2);
+    }
+    return expectation;
+  }
+
   public static InjectExpectation createPreventionInjectExpectation(Team team, Inject inject) {
     InjectExpectation injectExpectation = new InjectExpectation();
     injectExpectation.setInject(inject);
