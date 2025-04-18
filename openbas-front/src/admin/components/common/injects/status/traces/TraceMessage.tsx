@@ -20,11 +20,15 @@ const TraceMessage = ({ traces }: Props) => {
     </span>
   );
 
+  const sorted = traces.sort(
+    (a, b) => new Date(a.execution_time).getTime() - new Date(b.execution_time).getTime(),
+  );
+
   return (
     <pre style={{ marginTop: theme.spacing(1) }}>
       {traces.length > 1 ? (
         <ul>
-          {traces.sort((a, b) => new Date(a.execution_time).getTime() - new Date(b.execution_time).getTime()).map((tr, index) => (
+          {sorted.map((tr, index) => (
             <li key={index}>
               {displayMsg(tr)}
             </li>

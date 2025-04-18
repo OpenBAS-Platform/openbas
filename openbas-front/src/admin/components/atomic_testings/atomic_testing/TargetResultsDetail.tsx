@@ -971,9 +971,9 @@ const TargetResultsDetailFlow: FunctionComponent<Props> = ({
           </Dialog>
         </div>
       ))}
-      <div style={{ paddingTop: 20 }}>
+      <div style={{ paddingTop: theme.spacing(3) }}>
         {(activeTab === Object.keys(sortedGroupedResults).length && canShowExecutionTab)
-          && <ExecutionDetail targetId={target.id} targetType={target.targetType} injectResultOverviewOutput={inject} />}
+          && <ExecutionDetail target={target} injectResultOverviewOutput={inject} />}
       </div>
     </>
   );

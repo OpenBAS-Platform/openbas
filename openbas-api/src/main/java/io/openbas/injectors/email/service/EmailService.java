@@ -75,7 +75,7 @@ public class EmailService {
     execution.addTrace(
         getNewSuccessTrace("Mail sent to " + emails, ExecutionTraceAction.EXECUTION, userIds));
     // Store message in Imap after sending
-    storeMessageImap(execution, mimeMessage);
+    storeMessageImap(execution, mimeMessage, userIds);
   }
 
   public void sendEmail(
@@ -108,7 +108,7 @@ public class EmailService {
     execution.addTrace(
         getNewSuccessTrace("Mail sent to " + email, ExecutionTraceAction.EXECUTION, userIds));
     // Store message in Imap after sending
-    storeMessageImap(execution, mimeMessage);
+    storeMessageImap(execution, mimeMessage, userIds);
   }
 
   private InternetAddress getInternetAddress(String email) {
@@ -119,12 +119,12 @@ public class EmailService {
     }
   }
 
-  private void storeMessageImap(Execution execution, MimeMessage mimeMessage)
+  private void storeMessageImap(Execution execution, MimeMessage mimeMessage, List<String> userIds)
       throws InterruptedException {
     if (!imapEnabled) {
       execution.addTrace(
           getNewSuccessTrace(
-              "Mail successfully send (imap disabled)", ExecutionTraceAction.COMPLETE));
+              "Mail successfully send (imap disabled)", ExecutionTraceAction.COMPLETE, userIds));
       return;
     }
     if (execution.isRuntime() && imapEnabled) {
@@ -133,18 +133,22 @@ public class EmailService {
           imapService.storeSentMessage(mimeMessage);
           execution.addTrace(
               getNewSuccessTrace(
-                  "Mail successfully stored in IMAP", ExecutionTraceAction.COMPLETE));
+                  "Mail successfully stored in IMAP", ExecutionTraceAction.COMPLETE, userIds));
           return;
         } catch (Exception e) {
           execution.addTrace(
               getNewInfoTrace(
-                  "Fail to store mail in IMAP " + e.getMessage(), ExecutionTraceAction.EXECUTION));
+                  "Fail to store mail in IMAP " + e.getMessage(),
+                  ExecutionTraceAction.EXECUTION,
+                  userIds));
           Thread.sleep(2000);
         }
       }
       execution.addTrace(
           getNewErrorTrace(
-              "Fail to store mail in IMAP after 3 attempts", ExecutionTraceAction.COMPLETE));
+              "Fail to store mail in IMAP after 3 attempts",
+              ExecutionTraceAction.COMPLETE,
+              userIds));
     }
   }
 
