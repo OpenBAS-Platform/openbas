@@ -1,4 +1,4 @@
-import {Box, Button, Chip} from '@mui/material';
+import { Box, Button, Chip } from '@mui/material';
 import { cloneElement, type ReactElement, useEffect, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
@@ -23,9 +23,7 @@ const useStyles = makeStyles<{ topPagination?: boolean }>()((theme, props) => ({
     display: 'flex',
     alignItems: 'center',
   },
-  topPagination: {
-    display: 'block',
-  },
+  topPagination: { display: 'block' },
   parameters: {
     marginTop: -10,
     display: props.topPagination ? 'block' : 'flex',
@@ -68,7 +66,7 @@ const PaginationComponentV2 = <T extends object>({
   topBarButtons,
   reloadContentCount = 0,
   contextId,
-  topPagination = false
+  topPagination = false,
 }: Props<T>) => {
   // Standard hooks
   const { classes } = useStyles({ topPagination });
@@ -132,18 +130,19 @@ const PaginationComponentV2 = <T extends object>({
   return (
     <>
       <div className={disablePagination ? classes.parametersWithoutPagination : classes.parameters}>
-        {topPagination &&
-          <div className={classes.topPagination}>
-            {!disablePagination && (
-              <TablePaginationComponentV2
-                page={searchPaginationInput.page}
-                size={searchPaginationInput.size}
-                paginationHelpers={queryableHelpers.paginationHelpers}
-              />
-            )}
-            {!!topBarButtonComponent && topBarButtonComponent}
-          </div>
-        }
+        {topPagination
+          && (
+            <div className={classes.topPagination}>
+              {!disablePagination && (
+                <TablePaginationComponentV2
+                  page={searchPaginationInput.page}
+                  size={searchPaginationInput.size}
+                  paginationHelpers={queryableHelpers.paginationHelpers}
+                />
+              )}
+              {!!topBarButtonComponent && topBarButtonComponent}
+            </div>
+          )}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -191,18 +190,19 @@ const PaginationComponentV2 = <T extends object>({
             </div>
           )}
         </div>
-        {!topPagination &&
-          <div className={classes.topbar}>
-            {!disablePagination && (
-              <TablePaginationComponentV2
-                page={searchPaginationInput.page}
-                size={searchPaginationInput.size}
-                paginationHelpers={queryableHelpers.paginationHelpers}
-              />
-            )}
-            {!!topBarButtonComponent && topBarButtonComponent}
-          </div>
-        }
+        {!topPagination
+          && (
+            <div className={classes.topbar}>
+              {!disablePagination && (
+                <TablePaginationComponentV2
+                  page={searchPaginationInput.page}
+                  size={searchPaginationInput.size}
+                  paginationHelpers={queryableHelpers.paginationHelpers}
+                />
+              )}
+              {!!topBarButtonComponent && topBarButtonComponent}
+            </div>
+          )}
       </div>
       {/* Handle Mitre Filter */}
       {queryableHelpers.filterHelpers && searchPaginationInput.filterGroup && (
