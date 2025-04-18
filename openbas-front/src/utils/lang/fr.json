@@ -488,6 +488,7 @@
   "Execution Time": "Temps d'exécution",
   "Executor": "Exécuteur",
   "Executor Caldera is not responding, your exercises may be impacted.": "L'exécuteur Caldera ne réponds pas, vos exercises peuvent être impactés.",
+  "executor is an enterprise edition feature. You can start the set up but you will need a license key to execute your injects. We provide a 3 month trial to let you test the platform at full capacity.": "exécuteur est une fonctionnalité de l'édition Entreprise. Vous pouvez commencer l'installation, mais vous aurez besoin d'une clé de licence pour exécuter vos injections. Nous proposons une période d'essai de 3 mois pour vous permettre de tester la plateforme à pleine capacité.",
   "Executors": "Exécuteurs",
   "Exercise": "Simulation",
   "Exercise details": "Détails de l'exercise",
@@ -543,6 +544,7 @@
   "finding_asset_groups": "Groupes d'actifs",
   "finding_assets": "Points finaux",
   "finding_created_at": "Créé à",
+  "finding_inject_id": "Stimuli",
   "finding_name": "Nom",
   "finding_scenario": "Scénario",
   "finding_simulation": "Simulation",
@@ -1484,6 +1486,5 @@
   "Your file should be a XLS": "Votre fichier doit être un XLS",
   "Your overall evaluation about this question.": "Votre évaluation globale de cette question.",
   "your trial license online": "votre licence d'essai en ligne",
-  "YYYY": "AAAA",
-  "finding_inject_id": "Stimuli"
+  "YYYY": "AAAA"
 }
