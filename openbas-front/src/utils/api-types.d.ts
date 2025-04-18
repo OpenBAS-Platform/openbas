@@ -1226,9 +1226,12 @@ export interface ExerciseSimple {
   exercise_global_score: ExpectationResultsByType[];
   /** Exercise Id */
   exercise_id: string;
-  /** Exercise Id */
+  /** Exercise Name */
   exercise_name: string;
-  /** @format date-time */
+  /**
+   * Exercise Start Date
+   * @format date-time
+   */
   exercise_start_date?: string;
   /** Exercise status */
   exercise_status?:
@@ -1245,7 +1248,10 @@ export interface ExerciseSimple {
    */
   exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
-  /** @format date-time */
+  /**
+   * Exercise Update Date
+   * @format date-time
+   */
   exercise_updated_at?: string;
 }
 
@@ -2034,6 +2040,7 @@ export interface InjectStatusOutput {
   status_main_traces?: ExecutionTracesOutput[];
   status_name?: string;
   status_traces_by_agent?: AgentStatusOutput[];
+  status_traces_by_player?: PlayerStatusOutput[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
@@ -2079,6 +2086,7 @@ export interface InjectTestStatusOutput {
   status_main_traces?: ExecutionTracesOutput[];
   status_name?: string;
   status_traces_by_agent?: AgentStatusOutput[];
+  status_traces_by_player?: PlayerStatusOutput[];
   /** @format date-time */
   tracking_end_date?: string;
   /** @format date-time */
@@ -3488,6 +3496,25 @@ export interface PlayerOutput {
   user_phone?: string;
   /** @uniqueItems true */
   user_tags?: string[];
+}
+
+/** Represents the output result details of an player */
+export interface PlayerStatusOutput {
+  player_id: string;
+  player_name?: string;
+  /**
+   * Execution status of the player
+   * @example "SUCCESS, ERROR, MAYBE_PREVENTED..."
+   */
+  player_status_name?: string;
+  /** List of player execution traces */
+  player_traces?: ExecutionTracesOutput[];
+  /** Team ID */
+  team_id: string;
+  /** @format date-time */
+  tracking_end_date?: string;
+  /** @format date-time */
+  tracking_sent_date?: string;
 }
 
 /** Policies of the platform */

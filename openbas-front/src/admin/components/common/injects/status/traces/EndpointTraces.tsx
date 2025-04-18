@@ -1,4 +1,5 @@
 import { Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 import { useFormatter } from '../../../../../../components/i18n';
 import PlatformIcon from '../../../../../../components/PlatformIcon';
@@ -12,6 +13,7 @@ interface Props {
 
 const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
   const { t } = useFormatter();
+  const theme = useTheme();
 
   const sortedTraces = [...tracesByAgent].sort((a, b) => {
     const nameA = a.agent_name ?? '';
@@ -22,7 +24,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
   return (
     <div style={{
       display: 'grid',
-      marginTop: '24px',
+      marginTop: theme.spacing(3),
       gap: '5px',
     }}
     >
@@ -54,7 +56,7 @@ const EndpointTraces = ({ endpoint, tracesByAgent }: Props) => {
         <PlatformIcon key={endpoint.endpoint_platform} platform={endpoint.endpoint_platform} tooltip width={16} />
         <Typography variant="body2">{t(endpoint.endpoint_platform)}</Typography>
       </div>
-      <div style={{ marginTop: '8px' }}>
+      <div>
         {sortedTraces.map(t => <AgentTraces key={t.agent_id} agentStatus={t} />)}
       </div>
     </div>

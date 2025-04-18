@@ -103,6 +103,12 @@ public class ExecutionTraces implements Base {
         null, ExecutionTraceStatus.ERROR, null, message, action, agent, null);
   }
 
+  public static ExecutionTraces getNewErrorTrace(
+      String message, ExecutionTraceAction action, List<String> identifiers) {
+    return new ExecutionTraces(
+        null, ExecutionTraceStatus.ERROR, identifiers, message, action, null, null);
+  }
+
   public static ExecutionTraces getNewSuccessTrace(String message, ExecutionTraceAction action) {
     return new ExecutionTraces(
         null, ExecutionTraceStatus.SUCCESS, null, message, action, null, null);

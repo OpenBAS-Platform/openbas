@@ -3,11 +3,15 @@ import { type ExecutionTracesOutput } from '../../../../../../utils/api-types';
 interface Props { traces: ExecutionTracesOutput[] }
 
 const TraceMessage = ({ traces }: Props) => {
+  const sorted = traces.sort(
+    (a, b) => new Date(a.execution_time).getTime() - new Date(b.execution_time).getTime(),
+  );
+
   return (
     <pre style={{ marginTop: '5px' }}>
       {traces.length > 1 ? (
         <ul>
-          {traces.sort((a, b) => new Date(a.execution_time).getTime() - new Date(b.execution_time).getTime()).map((tr, index) => (
+          {sorted.map((tr, index) => (
             <li key={index}>
               {tr.execution_status}
               {' '}

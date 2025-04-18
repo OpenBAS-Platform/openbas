@@ -34,6 +34,10 @@ public class InjectStatusOutput {
   private List<ExecutionTracesOutput> traces = new ArrayList<>();
 
   @Builder.Default
+  @JsonProperty("status_traces_by_player")
+  private List<PlayerStatusOutput> tracesByPlayer = new ArrayList<>();
+
+  @Builder.Default
   @JsonProperty("status_traces_by_agent")
   private List<AgentStatusOutput> tracesByAgent = new ArrayList<>();
 
