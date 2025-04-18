@@ -247,7 +247,7 @@ const ChallengesPreview = () => {
             color="primary"
             variant="outlined"
             component={Link}
-            to={`/admin/exercises/${exerciseId}/definition/challenges`}
+            to={`/admin/simulations/${exerciseId}/definition/challenges`}
             style={{
               position: 'absolute',
               top: 20,
