@@ -209,6 +209,7 @@ const AtomicTesting = () => {
                       setContent={setTargets}
                       entityPrefix={tab.entityPrefix}
                       queryableHelpers={queryableHelpers}
+                      topPagination={true}
                     />
                     {targets && targets.length > 0 ? (
                       <List>
