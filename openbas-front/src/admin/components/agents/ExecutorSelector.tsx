@@ -58,6 +58,7 @@ const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelect
               padding: theme.spacing(2, 0, 1),
               display: 'flex',
               justifyContent: 'center',
+              alignItems: 'center',
               color: platforms.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
             }}
           >
