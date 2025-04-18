@@ -543,6 +543,7 @@
   "finding_asset_groups": "Asset groups",
   "finding_assets": "Endpoints",
   "finding_created_at": "Created at",
+  "finding_inject_id": "Inject",
   "finding_name": "Name",
   "finding_scenario": "Scenario",
   "finding_simulation": "Simulation",
@@ -1227,6 +1228,8 @@
   "tag_rule_tag": "Tag",
   "Tags": "Tags",
   "Target": "Target",
+  "target_name": "Name",
+  "target_tags": "Tag",
   "Targeted asset groups": "Targeted asset groups",
   "Targeted assets": "Targeted assets",
   "Targeted players": "Targeted players",
@@ -1484,6 +1487,5 @@
   "Your file should be a XLS": "Your file should be a XLS",
   "Your overall evaluation about this question.": "Your overall evaluation about this question.",
   "your trial license online": "your trial license online",
-  "YYYY": "YYYY",
-  "finding_inject_id": "Inject"
+  "YYYY": "YYYY"
 }
