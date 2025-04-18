@@ -30,15 +30,11 @@ public class NotificationRuleApiTest extends IntegrationTest {
 
   public static final String NOTIFICATION_RULE_URI = "/api/notification-rules";
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private NotificationRuleRepository notificationRuleRepository;
-  @Autowired
-  private UserRepository userRepository;
-  @Autowired
-  private ScenarioRepository scenarioRepository;
+  @Autowired private NotificationRuleRepository notificationRuleRepository;
+  @Autowired private UserRepository userRepository;
+  @Autowired private ScenarioRepository scenarioRepository;
 
   @AfterEach
   void afterEach() {
