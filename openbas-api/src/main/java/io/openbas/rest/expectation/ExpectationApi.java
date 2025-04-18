@@ -3,6 +3,7 @@ package io.openbas.rest.expectation;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import io.openbas.rest.helper.RestBehavior;
+import io.openbas.rest.inject.form.InjectExpectationBulkUpdateInput;
 import io.openbas.rest.inject.form.InjectExpectationUpdateInput;
 import io.openbas.service.InjectExpectationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -138,5 +139,15 @@ public class ExpectationApi extends RestBehavior {
       @PathVariable @NotBlank final String expectationId,
       @Valid @RequestBody @NotNull InjectExpectationUpdateInput input) {
     return injectExpectationService.updateInjectExpectation(expectationId, input);
+  }
+
+  @Operation(
+      summary = "Bulk Update Inject Expectation",
+      description = "Bulk Update Inject expectation from an external source, e.g., EDR collector.")
+  @PutMapping(INJECTS_EXPECTATIONS_URI + "/bulk")
+  @Transactional(rollbackOn = Exception.class)
+  public void updateInjectExpectation(
+      @Valid @RequestBody @NotNull InjectExpectationBulkUpdateInput inputs) {
+    injectExpectationService.bulkUpdateInjectExpectation(inputs.getInputs());
   }
 }

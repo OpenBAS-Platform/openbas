@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectationTrace;
 import io.openbas.database.model.SecurityPlatform;
+import io.openbas.database.repository.CollectorRepository;
 import io.openbas.database.repository.InjectExpectationTraceRepository;
 import java.time.Instant;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class InjectExpectationTraceServiceTest {
 
   @Mock private InjectExpectationTraceRepository injectExpectationTraceRepository;
+  @Mock private CollectorRepository collectorRepository;
 
   @InjectMocks private InjectExpectationTraceService injectExpectationTraceService;
 
@@ -52,25 +54,6 @@ class InjectExpectationTraceServiceTest {
     injectExpectationTrace.setAlertDate(Instant.now());
     injectExpectationTrace.setAlertLink("http://test-link.com");
     injectExpectationTrace.setAlertName("Test Alert");
-  }
-
-  @Test
-  void createInjectExpectationTrace_Success() {
-    // Arrange
-    when(injectExpectationTraceRepository.save(any(InjectExpectationTrace.class)))
-        .thenReturn(injectExpectationTrace);
-
-    // Act
-    InjectExpectationTrace result =
-        injectExpectationTraceService.createInjectExpectationTrace(injectExpectationTrace);
-
-    // Assert
-    assertNotNull(result);
-    assertEquals(injectExpectationTrace.getId(), result.getId());
-    assertEquals(injectExpectationTrace.getInjectExpectation(), result.getInjectExpectation());
-    assertEquals(injectExpectationTrace.getSecurityPlatform(), result.getSecurityPlatform());
-    assertEquals(injectExpectationTrace.getAlertLink(), result.getAlertLink());
-    verify(injectExpectationTraceRepository).save(injectExpectationTrace);
   }
 
   @Test
@@ -148,9 +131,8 @@ class InjectExpectationTraceServiceTest {
   @Test
   void createInjectExpectationTrace_WithNullTrace() {
     // Act & Assert
-    assertThrows(
-        NullPointerException.class,
-        () -> injectExpectationTraceService.createInjectExpectationTrace(null));
+    injectExpectationTraceService.bulkInsertInjectExpectationTraces(List.of());
+    verify(collectorRepository, never()).save(any());
     verify(injectExpectationTraceRepository, never()).save(any());
   }
 }

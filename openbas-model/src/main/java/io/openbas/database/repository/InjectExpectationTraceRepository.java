@@ -1,9 +1,9 @@
 package io.openbas.database.repository;
 
-import io.openbas.database.model.InjectExpectation;
 import io.openbas.database.model.InjectExpectationTrace;
-import io.openbas.database.model.SecurityPlatform;
+import io.openbas.database.raw.impl.SimpleRawExpectationTrace;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -18,12 +18,7 @@ public interface InjectExpectationTraceRepository
         JpaSpecificationExecutor<InjectExpectationTrace> {
 
   @NotNull
-  Optional<InjectExpectationTrace>
-      findByAlertLinkAndAlertNameAndSecurityPlatformAndInjectExpectation(
-          String alertLink,
-          String alertName,
-          SecurityPlatform securityPlatform,
-          InjectExpectation injectExpectation);
+  Optional<InjectExpectationTrace> findByAlertLink(String alertLink);
 
   @Query(
       "select t from InjectExpectationTrace t where t.injectExpectation.id = :expectationId and t.securityPlatform.id = :sourceId")
@@ -34,4 +29,8 @@ public interface InjectExpectationTraceRepository
       "select count(distinct t) from InjectExpectationTrace t where t.injectExpectation.id = :expectationId and t.securityPlatform.id = :sourceId")
   long countAlerts(
       @Param("expectationId") final String expectationId, @Param("sourceId") final String sourceId);
+
+  @Query(nativeQuery = true)
+  List<SimpleRawExpectationTrace> findAllTracesNewerThan(
+      @Param("alert_date_limit") Instant alertDateLimit);
 }
