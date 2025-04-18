@@ -28,7 +28,7 @@ import { deleteInjectExpectationResult } from '../../../../actions/Exercise';
 import Transition from '../../../../components/common/Transition';
 import { useFormatter } from '../../../../components/i18n';
 import ItemResult from '../../../../components/ItemResult';
-import { type InjectExpectation, type InjectExpectationResult, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
+import { type InjectExpectation, type InjectExpectationResult, type InjectResultOverviewOutput } from '../../../../utils/api-types';
 import useAutoLayout, { type LayoutOptions } from '../../../../utils/flows/useAutoLayout';
 import { useAppDispatch } from '../../../../utils/hooks';
 import { emptyFilled, truncate } from '../../../../utils/String';
@@ -120,7 +120,12 @@ interface Props {
   inject: InjectResultOverviewOutput;
   lastExecutionStartDate: string;
   lastExecutionEndDate: string;
-  target: InjectTargetWithResult;
+  target: {
+    id: string;
+    name?: string;
+    targetType: string;
+    platformType?: string;
+  };
   parentTargetId?: string;
   upperParentTargetId?: string;
 }

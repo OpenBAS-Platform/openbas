@@ -11,6 +11,7 @@ import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectRepository;
 import io.openbas.database.repository.ScenarioRepository;
 import io.openbas.database.repository.UserRepository;
+import io.openbas.rest.exception.ElementNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
@@ -132,7 +133,7 @@ public class SecurityExpression extends SecurityExpressionRoot
       return true;
     }
 
-    Inject inject = injectRepository.findById(injectId).orElseThrow();
+    Inject inject = injectRepository.findById(injectId).orElseThrow(ElementNotFoundException::new);
     if (inject.isAtomicTesting()) {
       return isUserHasBypass();
     }

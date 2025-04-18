@@ -29,7 +29,9 @@ import io.openbas.rest.inject.form.*;
 import io.openbas.rest.inject.service.*;
 import io.openbas.rest.security.SecurityExpression;
 import io.openbas.service.*;
+import io.openbas.service.targets.TargetService;
 import io.openbas.utils.FilterUtilsJpa;
+import io.openbas.utils.TargetType;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.ServletOutputStream;
@@ -90,6 +92,7 @@ public class InjectApi extends RestBehavior {
   private final InjectExportService injectExportService;
   private final ScenarioRepository scenarioRepository;
   private final AuthorisationService authorisationService;
+  private final TargetService targetService;
 
   // -- INJECTS --
 
@@ -159,6 +162,26 @@ public class InjectApi extends RestBehavior {
     ServletOutputStream outputStream = response.getOutputStream();
     outputStream.write(zippedExport);
     outputStream.close();
+  }
+
+  @LogExecutionTime
+  @PostMapping(path = INJECT_URI + "/{injectId}/targets/{targetType}/search")
+  @PreAuthorize("isInjectObserver(#injectId)")
+  public Page<InjectTarget> injectTargetSearch(
+      @PathVariable String injectId,
+      @PathVariable String targetType,
+      @Valid @RequestBody SearchPaginationInput input) {
+    TargetType injectTargetTypeEnum;
+
+    try {
+      injectTargetTypeEnum = TargetType.valueOf(targetType);
+    } catch (IllegalArgumentException e) {
+      throw new BadRequestException(String.format("Invalid target type %s", targetType));
+    }
+
+    Inject inject = injectService.inject(injectId);
+
+    return targetService.injectTargets(injectTargetTypeEnum, inject, input);
   }
 
   @PostMapping(

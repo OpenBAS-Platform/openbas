@@ -46,8 +46,8 @@ public class AssetGroupComposer extends ComposerBase<AssetGroup> {
     }
   }
 
-  public AssetGroupComposer.Composer forAssetGroup(AssetGroup assetGroup) {
+  public Composer forAssetGroup(AssetGroup assetGroup) {
     generatedItems.add(assetGroup);
-    return new AssetGroupComposer.Composer(assetGroup);
+    return new Composer(assetGroup);
   }
 }
