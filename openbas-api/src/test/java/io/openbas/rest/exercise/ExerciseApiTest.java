@@ -242,7 +242,7 @@ public class ExerciseApiTest {
 
     @Test
     @DisplayName("Throw license restricted error when launch exercise with Crowdstrike")
-    void lockLaunchExercise() throws Exception {
+    void given_crowdstrike_should_not_launchExercise() throws Exception {
       Exercise exercise = getExercise(executorFixture.getTaniumExecutor());
       ExerciseUpdateStatusInput input = new ExerciseUpdateStatusInput();
       input.setStatus(ExerciseStatus.RUNNING);
@@ -258,7 +258,7 @@ public class ExerciseApiTest {
 
     @Test
     @DisplayName("Throw license restricted error when schedule exercise with Tanium")
-    void lockSchedulingExercise() throws Exception {
+    void given_tanium_should_not_scheduleExercise() throws Exception {
       Exercise exercise = getExercise(executorFixture.getTaniumExecutor());
       ExerciseUpdateStartDateInput input = new ExerciseUpdateStartDateInput();
 
@@ -273,7 +273,7 @@ public class ExerciseApiTest {
 
     @Test
     @DisplayName("Throw license restricted error when add Tanium on scheduled scenario")
-    void lockAddCrowdstrikeOnScheduledExercise() throws Exception {
+    void given_taniumAsset_should_not_beAddedToScheduledExercise() throws Exception {
       Exercise exercise = getExercise(null);
 
       // Create endpoint with tanium agent
