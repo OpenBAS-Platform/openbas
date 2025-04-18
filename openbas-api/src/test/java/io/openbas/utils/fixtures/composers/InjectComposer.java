@@ -24,6 +24,7 @@ public class InjectComposer extends ComposerBase<Inject> {
     private final List<DocumentComposer.Composer> documentComposers = new ArrayList<>();
     private final List<TeamComposer.Composer> teamComposers = new ArrayList<>();
     private final List<AssetGroupComposer.Composer> assetGroupComposers = new ArrayList<>();
+    private final List<ExpectationComposer.Composer> expectationComposers = new ArrayList<>();
 
     public Composer(Inject inject) {
       this.inject = inject;
@@ -88,6 +89,15 @@ public class InjectComposer extends ComposerBase<Inject> {
       List<AssetGroup> tempAssetGroups = this.inject.getAssetGroups();
       tempAssetGroups.add(assetGroupComposer.get());
       this.inject.setAssetGroups(tempAssetGroups);
+      return this;
+    }
+
+    public Composer withExpectation(ExpectationComposer.Composer expectationComposer) {
+      expectationComposers.add(expectationComposer);
+      List<InjectExpectation> tempExpectations = this.inject.getExpectations();
+      tempExpectations.add(expectationComposer.get());
+      expectationComposer.get().setInject(this.inject);
+      this.inject.setExpectations(tempExpectations);
       return this;
     }
 

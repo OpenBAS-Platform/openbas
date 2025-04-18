@@ -5,6 +5,9 @@ import io.openbas.annotation.Queryable;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Set;
+
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -17,6 +20,8 @@ import lombok.Data;
       @DiscriminatorMapping(value = "ASSETS_GROUPS", schema = AssetGroupTarget.class),
     })
 public abstract class InjectTarget {
+  @Id
+  @NotBlank
   @JsonProperty("target_id")
   private String id;
 

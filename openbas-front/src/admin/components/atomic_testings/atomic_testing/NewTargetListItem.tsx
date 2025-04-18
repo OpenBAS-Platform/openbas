@@ -1,12 +1,9 @@
 import { Groups3Outlined, PersonOutlined } from '@mui/icons-material';
 import { ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import { SelectGroup } from 'mdi-material-ui';
 import { makeStyles } from 'tss-react/mui';
 
-import PlatformIcon from '../../../../components/PlatformIcon';
-import type { InjectTarget, InjectTargetWithResult } from '../../../../utils/api-types';
-import AtomicTestingResult from './AtomicTestingResult';
+import type { InjectTarget } from '../../../../utils/api-types';
 import NewAtomicTestingResult from './NewAtomicTestingResult';
 
 const useStyles = makeStyles()(() => ({
@@ -27,12 +24,12 @@ interface Props {
 
 const NewTargetListItem: React.FC<Props> = ({ onClick, target, selected }) => {
   const { classes } = useStyles();
-  const theme = useTheme();
   const handleItemClick = () => {
     onClick(target);
   };
   const getIcon = (target: InjectTarget) => {
     const iconMap = {
+      // TODO: for Endpoints and Agents, check the targetSubType attribute
       ASSETS_GROUPS: <SelectGroup />,
       TEAMS: <Groups3Outlined />,
       PLAYER: <PersonOutlined fontSize="small" />,

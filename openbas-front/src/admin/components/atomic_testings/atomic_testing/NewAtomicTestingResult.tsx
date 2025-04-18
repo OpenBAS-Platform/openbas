@@ -4,7 +4,7 @@ import { type FunctionComponent } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { useFormatter } from '../../../../components/i18n';
-import { type ExpectationResultsByType, type InjectResultOutput, type InjectTarget } from '../../../../utils/api-types';
+import { type InjectTarget } from '../../../../utils/api-types';
 
 const useStyles = makeStyles()(() => ({
   inline: {
@@ -18,7 +18,6 @@ interface Props { target: InjectTarget }
 
 const NewAtomicTestingResult: FunctionComponent<Props> = ({ target }) => {
   const { t } = useFormatter();
-  const tooltipLabel: string = '';
   const { classes } = useStyles();
   const getColor = (result: string | undefined): string => {
     const colorMap: Record<string, string> = {
