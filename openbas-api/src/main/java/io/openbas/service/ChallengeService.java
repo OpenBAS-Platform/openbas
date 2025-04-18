@@ -16,14 +16,12 @@ import io.openbas.rest.challenge.response.ChallengeInformation;
 import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
-import io.openbas.utils.ExpectationUtils;
+import io.openbas.rest.exercise.form.ExpectationUpdateInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +34,7 @@ public class ChallengeService {
   private final ExerciseRepository exerciseRepository;
   private final ChallengeRepository challengeRepository;
   private final InjectRepository injectRepository;
+  private final InjectExpectationService injectExpectationService;
   private final InjectExpectationRepository injectExpectationRepository;
   @Resource protected ObjectMapper mapper;
 
@@ -131,48 +130,16 @@ public class ChallengeService {
               user.getId(), exerciseId, challengeId);
       playerExpectations.forEach(
           playerExpectation -> {
-            playerExpectation.setScore(playerExpectation.getExpectedScore());
-            InjectExpectationResult expectationResult =
-                InjectExpectationResult.builder()
-                    .sourceId("challenge")
-                    .sourceType("challenge")
-                    .sourceName("Challenge validation")
-                    .result(Instant.now().toString())
-                    .date(Instant.now().toString())
-                    .score(playerExpectation.getExpectedScore())
-                    .build();
-            playerExpectation.getResults().add(expectationResult);
-            playerExpectation.setUpdatedAt(Instant.now());
-            injectExpectationRepository.save(playerExpectation);
+            ExpectationUpdateInput expectationUpdateInput = new ExpectationUpdateInput();
+            expectationUpdateInput.setSourceId("challenge");
+            expectationUpdateInput.setSourceType("challenge");
+            expectationUpdateInput.setSourceName("Challenge validation");
+            expectationUpdateInput.setScore(playerExpectation.getExpectedScore());
+            this.injectExpectationService.updateInjectExpectation(
+                playerExpectation.getId(), expectationUpdateInput);
           });
-
-      // -- VALIDATION TYPE --
-      processByValidationType(exerciseId, challengeId, user, true);
     }
     return playerChallenges(exerciseId, user);
-  }
-
-  private void processByValidationType(
-      String exerciseId, String challengeId, User user, boolean isaNewExpectationResult) {
-    // Process expectations linked to teams where the user is a member
-    List<String> teamIds = user.getTeams().stream().map(Team::getId).toList();
-    // Find all expectations for this exercise, challenge and teams
-    List<InjectExpectation> challengeExpectations =
-        injectExpectationRepository.findChallengeExpectations(exerciseId, teamIds, challengeId);
-    // If user is null then expectation is from a team
-    List<InjectExpectation> parentExpectations =
-        challengeExpectations.stream().filter(exp -> exp.getUser() == null).toList();
-    // If user is not null then expectation is from a player
-    Map<Team, List<InjectExpectation>> playerByTeam =
-        challengeExpectations.stream()
-            .filter(exp -> exp.getUser() != null)
-            .collect(Collectors.groupingBy(InjectExpectation::getTeam));
-
-    // Depending on type of validation, We process the parent expectations:
-    List<InjectExpectation> toUpdate =
-        ExpectationUtils.processByValidationType(
-            isaNewExpectationResult, challengeExpectations, parentExpectations, playerByTeam);
-    injectExpectationRepository.saveAll(toUpdate);
   }
 
   // -- PRIVATE --

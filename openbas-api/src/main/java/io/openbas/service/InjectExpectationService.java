@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +69,7 @@ public class InjectExpectationService {
             .findAny();
 
     String result;
-    if (MANUAL.equals(injectExpectation.getType())) {
+    if (List.of(MANUAL, CHALLENGE, ARTICLE).contains(injectExpectation.getType())) {
       result = input.getScore() >= injectExpectation.getExpectedScore() ? SUCCESS : FAILED;
       injectExpectation.getResults().clear();
       exists = Optional.empty();
@@ -110,7 +111,7 @@ public class InjectExpectationService {
       injectExpectation.setScore(input.getScore());
     } else {
       if (input.getScore() > injectExpectation.getScore()
-          || MANUAL.equals(injectExpectation.getType())) {
+          || List.of(MANUAL, CHALLENGE, ARTICLE).contains(injectExpectation.getType())) {
         injectExpectation.setScore(input.getScore());
       } else {
         injectExpectation.setScore(
@@ -136,7 +137,8 @@ public class InjectExpectationService {
     }
 
     // If the expectation is type manual, We should update expectations for teams and players
-    if (MANUAL.equals(updated.getType()) && updated.getTeam() != null) {
+    if (List.of(MANUAL, CHALLENGE, ARTICLE).contains(injectExpectation.getType())
+        && updated.getTeam() != null) {
       computeExpectationsForTeamsAndPlayer(updated, result);
     }
     return updated;
