@@ -7436,9 +7436,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18n-auto-translation@npm:2.1.3":
-  version: 2.1.3
-  resolution: "i18n-auto-translation@npm:2.1.3"
+"i18n-auto-translation@npm:2.2.0":
+  version: 2.2.0
+  resolution: "i18n-auto-translation@npm:2.2.0"
   dependencies:
     "@google-cloud/translate": "npm:8.5.1"
     axios: "npm:1.8.4"
@@ -7450,7 +7450,7 @@ __metadata:
     yocto-spinner: "npm:0.2.1"
   bin:
     i18n-auto-translation: dist/src/index.js
-  checksum: 10c0/ecb54ac70ccec5313dec298cce895f6c1b40d9efbe06202c785b2e372b9fe71a472d5cd7fa242c3fb0bbd42105350ab467ad0ed18431340139abeeacc9ce9569
+  checksum: 10c0/4806bf7cb2be8c3336197f3391dae29a224228ba684179094aa8d45ad9e452e22cbffd68f290180ab6f90285e7b2448d8a0b99b55503cdf1242d29729a3662cc
   languageName: node
   linkType: hard
 
@@ -9723,7 +9723,7 @@ __metadata:
     html-react-parser: "npm:5.2.3"
     html-to-image: "npm:1.11.13"
     http-proxy-middleware: "npm:3.0.5"
-    i18n-auto-translation: "npm:2.1.3"
+    i18n-auto-translation: "npm:2.2.0"
     immutable: "npm:5.1.1"
     js-file-download: "npm:0.4.12"
     jsdom: "npm:26.1.0"
