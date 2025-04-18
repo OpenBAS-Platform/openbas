@@ -14,7 +14,8 @@ public class InjectExpectationFixture {
 
   static Double EXPECTED_SCORE = 100.0;
 
-  public static InjectExpectation createExpectationWithTypeAndStatus(InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
+  public static InjectExpectation createExpectationWithTypeAndStatus(
+      InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
     InjectExpectation expectation = new InjectExpectation();
     expectation.setExpirationTime(EXPIRATION_TIME_SIX_HOURS);
     expectation.setType(type);
