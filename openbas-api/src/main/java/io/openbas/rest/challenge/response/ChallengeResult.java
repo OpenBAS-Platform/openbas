@@ -8,9 +8,9 @@ import lombok.Setter;
 @Getter
 public class ChallengeResult {
   @JsonProperty("result")
-  private Boolean result;
+  private boolean result;
 
-  public ChallengeResult(Boolean result) {
+  public ChallengeResult(boolean result) {
     this.result = result;
   }
 }

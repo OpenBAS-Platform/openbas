@@ -2,6 +2,9 @@ package io.openbas.service;
 
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.injectors.challenge.ChallengeContract.CHALLENGE_PUBLISH;
+import static io.openbas.utils.challenge.ChallengeAttemptUtils.challengeAttempt;
+import static io.openbas.utils.challenge.ChallengeAttemptUtils.challengeAttemptId;
+import static io.openbas.utils.challenge.ChallengeExpectationUtils.buildChallengeUpdateInput;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +20,7 @@ import io.openbas.rest.challenge.response.ChallengeResult;
 import io.openbas.rest.challenge.response.ChallengesReader;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.exercise.form.ExpectationUpdateInput;
+import io.openbas.service.challenge.ChallengeAttemptService;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +40,7 @@ public class ChallengeService {
   private final InjectRepository injectRepository;
   private final InjectExpectationService injectExpectationService;
   private final InjectExpectationRepository injectExpectationRepository;
+  private final ChallengeAttemptService challengeAttemptService;
   @Resource protected ObjectMapper mapper;
 
   public Challenge enrichChallengeWithExercisesOrScenarios(@NotNull Challenge challenge) {
@@ -77,7 +82,9 @@ public class ChallengeService {
 
   public ChallengeResult tryChallenge(String challengeId, ChallengeTryInput input) {
     Challenge challenge =
-        challengeRepository.findById(challengeId).orElseThrow(ElementNotFoundException::new);
+        challengeRepository
+            .findById(challengeId)
+            .orElseThrow(() -> new ElementNotFoundException("Challenge not found"));
     for (ChallengeFlag flag : challenge.getFlags()) {
       if (checkFlag(flag, input.getValue())) {
         return new ChallengeResult(true);
@@ -112,7 +119,16 @@ public class ChallengeService {
                 injectExpectation -> {
                   Challenge challenge = injectExpectation.getChallenge();
                   challenge.setVirtualPublication(injectExpectation.getCreatedAt());
-                  return new ChallengeInformation(challenge, injectExpectation);
+                  InjectStatus injectStatus =
+                      injectExpectation.getInject().getStatus().orElseThrow();
+                  ChallengeAttemptId challengeAttemptId =
+                      challengeAttemptId(challenge.getId(), injectStatus.getId(), user.getId());
+                  ChallengeAttempt challengeAttempt =
+                      this.challengeAttemptService
+                          .challengeAttempt(challengeAttemptId)
+                          .orElse(challengeAttempt(challengeAttemptId));
+                  return new ChallengeInformation(
+                      challenge, injectExpectation, challengeAttempt.getAttempt());
                 })
             .sorted(Comparator.comparing(o -> o.getChallenge().getVirtualPublication()))
             .toList();
@@ -123,20 +139,53 @@ public class ChallengeService {
   public ChallengesReader validateChallenge(
       String exerciseId, String challengeId, ChallengeTryInput input, User user) {
     ChallengeResult challengeResult = tryChallenge(challengeId, input);
-    if (challengeResult.getResult()) {
+    if (challengeResult.isResult()) {
       // Find and update the expectations linked to the user
       List<InjectExpectation> playerExpectations =
           injectExpectationRepository.findByUserAndExerciseAndChallenge(
               user.getId(), exerciseId, challengeId);
       playerExpectations.forEach(
           playerExpectation -> {
-            ExpectationUpdateInput expectationUpdateInput = new ExpectationUpdateInput();
-            expectationUpdateInput.setSourceId("challenge");
-            expectationUpdateInput.setSourceType("challenge");
-            expectationUpdateInput.setSourceName("Challenge validation");
-            expectationUpdateInput.setScore(playerExpectation.getExpectedScore());
+            InjectStatus injectStatus = playerExpectation.getInject().getStatus().orElseThrow();
+            ChallengeAttemptId challengeAttemptId =
+                challengeAttemptId(challengeId, injectStatus.getId(), user.getId());
+            ChallengeAttempt challengeAttempt =
+                this.challengeAttemptService
+                    .challengeAttempt(challengeAttemptId)
+                    .orElse(challengeAttempt(challengeAttemptId));
+            double score =
+                challengeAttempt.getAttempt() < playerExpectation.getChallenge().getMaxAttempts()
+                    ? playerExpectation.getExpectedScore()
+                    : 0;
+
+            ExpectationUpdateInput expectationUpdateInput = buildChallengeUpdateInput(score);
             this.injectExpectationService.updateInjectExpectation(
                 playerExpectation.getId(), expectationUpdateInput);
+
+            // Clean attempt
+            this.challengeAttemptService.deleteChallengeAttempt(challengeAttemptId);
+          });
+    } else {
+      List<InjectExpectation> playerExpectations =
+          injectExpectationRepository.findByUserAndExerciseAndChallenge(
+              user.getId(), exerciseId, challengeId);
+      playerExpectations.forEach(
+          playerExpectation -> {
+            InjectStatus injectStatus = playerExpectation.getInject().getStatus().orElseThrow();
+            ChallengeAttemptId challengeAttemptId =
+                challengeAttemptId(challengeId, injectStatus.getId(), user.getId());
+            ChallengeAttempt challengeAttempt =
+                this.challengeAttemptService
+                    .challengeAttempt(challengeAttemptId)
+                    .orElse(challengeAttempt(challengeAttemptId));
+            challengeAttempt.setAttempt(challengeAttempt.getAttempt() + 1);
+            challengeAttemptService.saveChallengeAttempt(challengeAttempt);
+            if (challengeAttempt.getAttempt()
+                >= playerExpectation.getChallenge().getMaxAttempts()) {
+              ExpectationUpdateInput expectationUpdateInput = buildChallengeUpdateInput(0D);
+              this.injectExpectationService.updateInjectExpectation(
+                  playerExpectation.getId(), expectationUpdateInput);
+            }
           });
     }
     return playerChallenges(exerciseId, user);

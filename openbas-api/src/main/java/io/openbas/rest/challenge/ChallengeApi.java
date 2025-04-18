@@ -120,7 +120,7 @@ public class ChallengeApi extends RestBehavior {
     Iterable<Challenge> challenges = challengeService.getExerciseChallenges(exerciseId);
     challengesReader.setExerciseChallenges(
         fromIterable(challenges).stream()
-            .map(challenge -> new ChallengeInformation(challenge, null))
+            .map(challenge -> new ChallengeInformation(challenge, null, 0))
             .toList());
     return challengesReader;
   }

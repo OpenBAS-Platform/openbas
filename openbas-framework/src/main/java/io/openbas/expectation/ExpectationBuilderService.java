@@ -17,7 +17,7 @@ public class ExpectationBuilderService {
   public Expectation buildPreventionExpectation() {
     Expectation preventionExpectation = new Expectation();
     preventionExpectation.setType(PREVENTION);
-    preventionExpectation.setName("Expect inject to be prevented");
+    preventionExpectation.setName("Prevention");
     preventionExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
     preventionExpectation.setExpirationTime(
         this.expectationPropertiesConfig.getPreventionExpirationTime());
@@ -27,7 +27,7 @@ public class ExpectationBuilderService {
   public Expectation buildDetectionExpectation() {
     Expectation detectionExpectation = new Expectation();
     detectionExpectation.setType(DETECTION);
-    detectionExpectation.setName("Expect inject to be detected");
+    detectionExpectation.setName("Detection");
     detectionExpectation.setScore(DEFAULT_EXPECTATION_SCORE);
     detectionExpectation.setExpirationTime(
         this.expectationPropertiesConfig.getDetectionExpirationTime());
