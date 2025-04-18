@@ -284,7 +284,7 @@ public class ScenarioApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Throw license restricted error when launch scenario with crowdstrike")
-    void lockLaunchScenario() throws Exception {
+    void given_crowdstrikeAsset_should_not_startScenario() throws Exception {
       Scenario scenario = getScenario(null, executorFixture.getCrowdstrikeExecutor());
 
       mvc.perform(post(SCENARIO_URI + "/" + scenario.getId() + "/exercise/running"))
@@ -294,7 +294,7 @@ public class ScenarioApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Throw license restricted error when scheduled scenario with Tanium")
-    void lockSchedulingScenario() throws Exception {
+    void given_taniumAsset_should_not_scheduleScenario() throws Exception {
       Scenario scenario = getScenario(null, executorFixture.getTaniumExecutor());
       ScenarioRecurrenceInput input = new ScenarioRecurrenceInput();
       input.setRecurrenceStart(Instant.now());
@@ -310,7 +310,8 @@ public class ScenarioApiTest extends IntegrationTest {
 
     @Test
     @DisplayName("Throw license restricted error when add Crowdstrike on scheduled scenario")
-    void lockAddCrowdstrikeOnScheduledScenario() throws Exception {
+    void given_crowdstrikeInsdeDynamicGroup_should_not_beAddedToScheduledExercise()
+        throws Exception {
       Scenario scenario = getScenario(ScenarioFixture.getScheduledScenario(), null);
 
       // Create dynamic windows asset group

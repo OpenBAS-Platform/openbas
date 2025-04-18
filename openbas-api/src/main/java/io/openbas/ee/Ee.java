@@ -150,15 +150,8 @@ public class Ee {
   }
 
   public boolean isLicenseActive(License license) {
-    boolean isActivated =
-        license.isLicenseValidated()
-            && Instant.now().isBefore(license.getExpirationDate())
-            && Instant.now()
-                .isBefore(
-                    license
-                        .getExpirationDate()
-                        .plus(license.getExtraExpirationDays(), ChronoUnit.DAYS));
-    return isActivated;
+    return license.isLicenseValidated()
+        && (Instant.now().isBefore(license.getExpirationDate()) || license.isExtraExpiration());
   }
 
   /**

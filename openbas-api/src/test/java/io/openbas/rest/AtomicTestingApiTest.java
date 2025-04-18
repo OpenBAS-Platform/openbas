@@ -185,7 +185,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
   class LockAtomicTestingEEFeature {
     @Test
     @DisplayName("Throw license restricted error when launch with crowdstrike")
-    void lockLaunchAtomicTesting() throws Exception {
+    void given_crowdstrike_should_not_LaunchAtomicTesting() throws Exception {
       Inject atomicTesting = getAtomicTesting(null, executorFixture.getCrowdstrikeExecutor());
 
       mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/launch"))
@@ -194,8 +194,8 @@ public class AtomicTestingApiTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("Throw license restricted error when relaunch with crowdstrike")
-    void lockReLaunchAtomicTesting() throws Exception {
+    @DisplayName("Throw license restricted error when relaunch with Tanium")
+    void given_tanium_should_not_relaunchAtomicTesting() throws Exception {
       Inject atomicTesting =
           getAtomicTesting(
               InjectStatusFixture.createQueuingInjectStatus(), executorFixture.getTaniumExecutor());

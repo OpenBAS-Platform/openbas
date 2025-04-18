@@ -288,10 +288,10 @@ public class InjectService {
     boolean hasCrowdstrike = false;
     boolean hasTanium = false;
     for (Agent agent : agents) {
-      String type = agent.getExecutor().getType();
-      if (type.equals(CROWDSTRIKE_EXECUTOR_TYPE)) {
+      String type = agent.getExecutor() != null ? agent.getExecutor().getType() : null;
+      if (CROWDSTRIKE_EXECUTOR_TYPE.equals(type)) {
         hasCrowdstrike = true;
-      } else if (type.equals(TANIUM_EXECUTOR_TYPE)) {
+      } else if (TANIUM_EXECUTOR_TYPE.equals(type)) {
         hasTanium = true;
       }
       if (hasCrowdstrike && hasTanium) {
