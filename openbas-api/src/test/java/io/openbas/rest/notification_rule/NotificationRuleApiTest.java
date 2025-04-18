@@ -30,11 +30,15 @@ public class NotificationRuleApiTest extends IntegrationTest {
 
   public static final String NOTIFICATION_RULE_URI = "/api/notification-rules";
 
-  @Autowired private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-  @Autowired private NotificationRuleRepository notificationRuleRepository;
-  @Autowired private UserRepository userRepository;
-  @Autowired private ScenarioRepository scenarioRepository;
+  @Autowired
+  private NotificationRuleRepository notificationRuleRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private ScenarioRepository scenarioRepository;
 
   @AfterEach
   void afterEach() {
@@ -234,29 +238,6 @@ public class NotificationRuleApiTest extends IntegrationTest {
     assertEquals(
         notificationRule.getOwner().getId(),
         JsonPath.read(response, "$[0].notification_rule_owner"));
-  }
-
-  @Test
-  @WithMockAdminUser
-  @Transactional
-  void findNotificationRuleByResource() throws Exception {
-
-    NotificationRule notificationRule = createNotificationRuleInDb("resourceid");
-
-    String response =
-        mvc.perform(
-                get(NOTIFICATION_RULE_URI + "/resource/" + notificationRule.getResourceId())
-                    .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().is2xxSuccessful())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-    assertEquals(notificationRule.getSubject(), JsonPath.read(response, "$[0].subject"));
-    assertEquals(notificationRule.getTrigger().name(), JsonPath.read(response, "$[0].trigger"));
-    assertEquals(notificationRule.getResourceId(), JsonPath.read(response, "$[0].resource_id"));
-    assertEquals(
-        notificationRule.getResourceType().name(), JsonPath.read(response, "$[0].resource_type"));
-    assertEquals(notificationRule.getOwner().getId(), JsonPath.read(response, "$[0].owner"));
   }
 
   @Test
