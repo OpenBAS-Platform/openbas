@@ -57,10 +57,10 @@ const ScenarioNotificationRulesDrawer: FunctionComponent<Props> = ({
     });
   };
 
-  const editionInitialValues = (({ subject }) => ({ subject: subject ?? '' }))(notificationRule);
+  const editionInitialValues = (({ notification_rule_subject }) => ({ notification_rule_subject: notification_rule_subject ?? '' }))(notificationRule);
 
   const onSubmitEdition = async (data: UpdateNotificationRuleInput) => {
-    await updateNotificationRule(notificationRule.id, data).then((result: { data: NotificationRuleOutput }) => {
+    await updateNotificationRule(notificationRule.notification_rule_id, data).then((result: { data: NotificationRuleOutput }) => {
       if (result) {
         if (onUpdate) {
           onUpdate(result.data);
@@ -72,7 +72,7 @@ const ScenarioNotificationRulesDrawer: FunctionComponent<Props> = ({
   };
 
   const onDeleteNotificationRule = () => {
-    deleteNotificationRule(notificationRule.id).then(() => {
+    deleteNotificationRule(notificationRule.notification_rule_id).then(() => {
       setOpen(false);
       if (onDelete) {
         onDelete();

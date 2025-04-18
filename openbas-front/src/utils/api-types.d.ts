@@ -718,7 +718,7 @@ export interface CreateExerciseInput {
 export interface CreateNotificationRuleInput {
   resource_id?: string;
   resource_type?: string;
-  subject?: string;
+  subject: string;
   trigger?: string;
   type?: string;
 }
@@ -2568,12 +2568,18 @@ export interface NotificationRuleOutput {
 }
 
 export interface NotificationRuleOutput {
-  id: string;
-  owner?: string;
-  resource_id?: string;
-  resource_type?: string;
-  subject?: string;
-  trigger?: string;
+  /** ID of the notification rule */
+  notification_rule_id: string;
+  /** Owner of the notification rule */
+  notification_rule_owner?: string;
+  /** Resource id of the resource associated with the rule */
+  notification_rule_resource_id?: string;
+  /** Resource type of the resource associated with the rule */
+  notification_rule_resource_type?: string;
+  /** Subject of the notification rule */
+  notification_rule_subject?: string;
+  /** Event that will trigger the notification */
+  notification_rule_trigger?: string;
 }
 
 /** List of Saml2 providers */
@@ -4279,7 +4285,7 @@ export interface UpdateMePasswordInput {
 }
 
 export interface UpdateNotificationRuleInput {
-  notification_rule_subject?: string;
+  notification_rule_subject: string;
 }
 
 export interface UpdateProfileInput {
