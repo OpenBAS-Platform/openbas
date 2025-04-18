@@ -74,10 +74,14 @@ const referential = (state: any = Map({}), action: any = {}) => {
       return mergeDeepOverwriteLists(state, R.dissoc('result', action.payload));
     }
     case Constants.DATA_DELETE_SUCCESS: {
-      return state.setIn(
-        ['entities', action.payload.type],
-        state.getIn(['entities', action.payload.type]).delete(action.payload.id),
-      );
+      const toDeleteIn = state.getIn(['entities', action.payload.type]);
+      if (toDeleteIn) {
+        return state.setIn(
+          ['entities', action.payload.type],
+          state.getIn(['entities', action.payload.type]).delete(action.payload.id),
+        );
+      }
+      return state;
     }
     default: {
       return state;

@@ -1,13 +1,16 @@
 import { MoreVert } from '@mui/icons-material';
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import { IconButton, type IconButtonProps, Menu, MenuItem } from '@mui/material';
 import { type FunctionComponent, useState } from 'react';
 
 import { useFormatter } from '../i18n';
 import { type PopoverEntry } from './ButtonPopover';
 
-interface Props { entries: PopoverEntry[] }
+interface Props {
+  size?: IconButtonProps['size'];
+  entries: PopoverEntry[];
+}
 
-const IconPopover: FunctionComponent<Props> = ({ entries }) => {
+const IconPopover: FunctionComponent<Props> = ({ size = 'large', entries }) => {
   // Standard hooks
   const { t } = useFormatter();
 
@@ -23,9 +26,9 @@ const IconPopover: FunctionComponent<Props> = ({ entries }) => {
         }}
         aria-label="Xls mapper menu"
         aria-haspopup="true"
-        size="large"
+        size={size}
       >
-        <MoreVert />
+        <MoreVert fontSize={size} />
       </IconButton>
       <Menu
         anchorEl={anchorEl}

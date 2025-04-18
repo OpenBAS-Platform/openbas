@@ -1,11 +1,12 @@
 package io.openbas.database.model;
 
+import static io.openbas.helper.InjectExpectationHelper.computeStatus;
 import static java.time.Instant.now;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import io.openbas.annotation.Queryable;
 import io.openbas.database.audit.ModelBaseListener;
 import io.openbas.helper.MonoIdDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,6 +46,7 @@ public class InjectExpectation implements Base {
     SUCCESS
   }
 
+  @Queryable(filterable = true, label = "inject expectation type")
   @Setter
   @Column(name = "inject_expectation_type")
   @JsonProperty("inject_expectation_type")
@@ -91,33 +93,7 @@ public class InjectExpectation implements Base {
 
   @JsonProperty("inject_expectation_status")
   public EXPECTATION_STATUS getResponse() {
-
-    if (this.getScore() == null) {
-      return EXPECTATION_STATUS.PENDING;
-    }
-    if (team != null) {
-      return getExpectationStatus();
-    }
-
-    if (this.getScore() >= this.getExpectedScore()) {
-      return EXPECTATION_STATUS.SUCCESS;
-    }
-    if (0.0 == this.getScore()) {
-      return EXPECTATION_STATUS.FAILED;
-    }
-    return EXPECTATION_STATUS.PARTIAL;
-  }
-
-  @JsonIgnore
-  public EXPECTATION_STATUS getExpectationStatus() {
-    String result = getResults().getFirst().getResult().toUpperCase();
-    return switch (result) {
-      case "FAILED" -> EXPECTATION_STATUS.FAILED;
-      case "SUCCESS" -> EXPECTATION_STATUS.SUCCESS;
-      case "PARTIAL" -> EXPECTATION_STATUS.PARTIAL;
-      case "UNKNOWN" -> EXPECTATION_STATUS.UNKNOWN;
-      default -> EXPECTATION_STATUS.PENDING;
-    };
+    return computeStatus(this);
   }
 
   @Setter
@@ -133,11 +109,13 @@ public class InjectExpectation implements Base {
   @NotNull
   private Long expirationTime;
 
+  @Queryable(filterable = true, label = "created at")
   @Setter
   @Column(name = "inject_expectation_created_at")
   @JsonProperty("inject_expectation_created_at")
   private Instant createdAt = now();
 
+  @Queryable(filterable = true, label = "updated at")
   @Setter
   @Column(name = "inject_expectation_updated_at")
   @JsonProperty("inject_expectation_updated_at")

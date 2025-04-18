@@ -51,7 +51,7 @@ const EnterpriseEditionAgreementDialog = ({ open, onClose, featureDetectedInfo }
       open={open}
       handleClose={onClose}
       title={t('OpenBAS Enterprise Edition (EE) license agreement')}
-      action={(
+      actions={(
         <>
           <Button onClick={onClose}>{t('Cancel')}</Button>
           <Button

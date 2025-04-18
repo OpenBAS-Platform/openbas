@@ -9,6 +9,8 @@ import { useFormatter } from './i18n';
 import themeDark from './ThemeDark';
 import themeLight from './ThemeLight';
 
+export const scaleFactor = 8;
+
 interface Props { children: ReactNode }
 
 const localeMap = {
@@ -45,30 +47,36 @@ const AppThemeProvider: FunctionComponent<Props> = ({ children }) => {
   }, [locale]);
 
   let muiTheme = createTheme(
-    themeDark(
-      dark?.logo_url,
-      dark?.logo_url_collapsed,
-      dark?.background_color,
-      dark?.paper_color,
-      dark?.navigation_color,
-      dark?.primary_color,
-      dark?.secondary_color,
-      dark?.accent_color,
-    ),
+    {
+      spacing: scaleFactor,
+      ...themeDark(
+        dark?.logo_url,
+        dark?.logo_url_collapsed,
+        dark?.background_color,
+        dark?.paper_color,
+        dark?.navigation_color,
+        dark?.primary_color,
+        dark?.secondary_color,
+        dark?.accent_color,
+      ),
+    },
     muiLocale,
   );
   if (theme === 'light') {
     muiTheme = createTheme(
-      themeLight(
-        light?.logo_url,
-        light?.logo_url_collapsed,
-        light?.background_color,
-        light?.paper_color,
-        light?.navigation_color,
-        light?.primary_color,
-        light?.secondary_color,
-        light?.accent_color,
-      ),
+      {
+        spacing: scaleFactor,
+        ...themeLight(
+          light?.logo_url,
+          light?.logo_url_collapsed,
+          light?.background_color,
+          light?.paper_color,
+          light?.navigation_color,
+          light?.primary_color,
+          light?.secondary_color,
+          light?.accent_color,
+        ),
+      },
       muiLocale,
     );
   }

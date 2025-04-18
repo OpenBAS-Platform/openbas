@@ -1,13 +1,15 @@
 package io.openbas.schema;
 
-import static io.openbas.utils.schema.SchemaUtils.isValidClassName;
+import static io.openbas.schema.SchemaUtils.isValidClassName;
 
+import io.openbas.engine.EsEngine;
 import io.openbas.rest.helper.RestBehavior;
 import io.openbas.schema.model.PropertySchemaDTO;
-import io.openbas.utils.schema.SchemaUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping
 public class SchemaApi extends RestBehavior {
+
+  private final EsEngine esEngine;
 
   @PostMapping("/api/schemas/{className}")
   public List<PropertySchemaDTO> schemas(
@@ -37,5 +41,25 @@ public class SchemaApi extends RestBehavior {
         .filter(p -> filterNames.isEmpty() || filterNames.contains(p.getJsonName()))
         .map(PropertySchemaDTO::new)
         .toList();
+  }
+
+  @GetMapping("/api/engine/schemas")
+  public Set<PropertySchemaDTO> engineSchemas(
+      @RequestParam(name = "classNames", required = false) List<String> classNames) {
+    return esEngine.getModels().stream()
+        .filter(
+            model ->
+                classNames == null || classNames.isEmpty() || classNames.contains(model.getName()))
+        .flatMap(
+            model -> {
+              try {
+                return SchemaUtils.schemaWithSubtypes(model.getModel()).stream();
+              } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .filter(PropertySchema::isFilterable)
+        .map(PropertySchemaDTO::new)
+        .collect(Collectors.toSet());
   }
 }

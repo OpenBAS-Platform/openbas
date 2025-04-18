@@ -10,6 +10,8 @@
  * ---------------------------------------------------------------
  */
 
+type UtilRequiredKeys<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
 export interface Agent {
   agent_active?: boolean;
   agent_asset: string;
@@ -746,6 +748,39 @@ export interface CreateUserInput {
   user_tags?: string[];
 }
 
+export interface CustomDashboard {
+  /** @format date-time */
+  custom_dashboard_created_at: string;
+  custom_dashboard_description?: string;
+  custom_dashboard_id: string;
+  custom_dashboard_name: string;
+  /** @format date-time */
+  custom_dashboard_updated_at: string;
+  custom_dashboard_widgets?: Widget[];
+  listened?: boolean;
+}
+
+export interface CustomDashboardInput {
+  custom_dashboard_description?: string;
+  custom_dashboard_name: string;
+}
+
+export interface DateHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type DateHistogramWidget = UtilRequiredKeys<
+  HistogramWidget,
+  "mode" | "field"
+> & {
+  end: string;
+  interval?: "year" | "month" | "week" | "day" | "hour" | "quarter";
+  series: DateHistogramSeries[];
+  start: string;
+};
+
 export interface DirectInjectInput {
   inject_content?: object;
   inject_description?: string;
@@ -979,6 +1014,29 @@ export interface EndpointUpdateInput {
   asset_description?: string;
   asset_name: string;
   asset_tags?: string[];
+}
+
+export interface EsSearch {
+  base_created_at?: string;
+  base_entity?: string;
+  base_id: string;
+  base_representative?: string;
+  /** @format double */
+  base_score?: number;
+  base_updated_at?: string;
+}
+
+export interface EsSeries {
+  color?: string;
+  data?: EsSeriesData[];
+  label?: string;
+}
+
+export interface EsSeriesData {
+  key?: string;
+  label?: string;
+  /** @format int64 */
+  value?: number;
 }
 
 export interface Evaluation {
@@ -1226,9 +1284,12 @@ export interface ExerciseSimple {
   exercise_global_score: ExpectationResultsByType[];
   /** Exercise Id */
   exercise_id: string;
-  /** Exercise Id */
+  /** Exercise Name */
   exercise_name: string;
-  /** @format date-time */
+  /**
+   * Exercise Start Date
+   * @format date-time
+   */
   exercise_start_date?: string;
   /** Exercise status */
   exercise_status?:
@@ -1245,7 +1306,10 @@ export interface ExerciseSimple {
    */
   exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
-  /** @format date-time */
+  /**
+   * Exercise Update Date
+   * @format date-time
+   */
   exercise_updated_at?: string;
 }
 
@@ -1551,6 +1615,14 @@ export interface GroupGrantInput {
 
 export interface GroupUpdateUsersInput {
   group_users?: string[];
+}
+
+export interface HistogramWidget {
+  display_legend?: boolean;
+  field: string;
+  mode: "structural" | "temporal";
+  stacked?: boolean;
+  title?: string;
 }
 
 export interface ImportMapper {
@@ -2784,6 +2856,25 @@ export interface PageAttackPattern {
   totalPages?: number;
 }
 
+export interface PageCustomDashboard {
+  content?: CustomDashboard[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
 export interface PageEndpointOutput {
   content?: EndpointOutput[];
   empty?: boolean;
@@ -3501,7 +3592,9 @@ export interface PolicyInput {
 }
 
 export interface PropertySchemaDTO {
+  schema_property_entity: string;
   schema_property_has_dynamic_value?: boolean;
+  schema_property_label: string;
   schema_property_name: string;
   schema_property_type: string;
   schema_property_type_array?: boolean;
@@ -3537,16 +3630,19 @@ export interface PublicExercise {
 }
 
 export interface RawAttackPattern {
+  /** @format date-time */
   attack_pattern_created_at?: string;
   attack_pattern_description?: string;
   attack_pattern_external_id?: string;
   attack_pattern_id?: string;
+  /** @uniqueItems true */
   attack_pattern_kill_chain_phases?: string[];
   attack_pattern_name?: string;
   attack_pattern_parent?: string;
   attack_pattern_permissions_required?: string[];
   attack_pattern_platforms?: string[];
   attack_pattern_stix_id?: string;
+  /** @format date-time */
   attack_pattern_updated_at?: string;
 }
 
@@ -4064,6 +4160,19 @@ export interface StatusPayloadOutput {
   payload_type?: string;
 }
 
+export interface StructuralHistogramSeries {
+  /** Filter object to search within filterable attributes */
+  filter?: FilterGroup;
+  name?: string;
+}
+
+export type StructuralHistogramWidget = UtilRequiredKeys<
+  HistogramWidget,
+  "mode" | "field"
+> & {
+  series: StructuralHistogramSeries[];
+};
+
 export interface Tag {
   listened?: boolean;
   /** Color of the tag */
@@ -4514,4 +4623,34 @@ export interface ViolationErrorBag {
   message?: string;
   /** The type of error */
   type?: string;
+}
+
+export interface Widget {
+  listened?: boolean;
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  /** @format date-time */
+  widget_created_at: string;
+  widget_custom_dashboard?: string;
+  widget_id: string;
+  widget_layout: WidgetLayout;
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+  /** @format date-time */
+  widget_updated_at: string;
+}
+
+export interface WidgetInput {
+  widget_config: DateHistogramWidget | StructuralHistogramWidget;
+  widget_layout: WidgetLayout;
+  widget_type: "vertical-barchart" | "security-coverage" | "line" | "donut";
+}
+
+export interface WidgetLayout {
+  /** @format int32 */
+  widget_layout_h: number;
+  /** @format int32 */
+  widget_layout_w: number;
+  /** @format int32 */
+  widget_layout_x: number;
+  /** @format int32 */
+  widget_layout_y: number;
 }
