@@ -33,7 +33,7 @@ services:
     restart: unless-stopped
   openbas-dev-rabbitmq:
     container_name: openbas-dev-rabbitmq
-    image: rabbitmq:4.0-management
+    image: rabbitmq:4.1-management
     restart: unless-stopped
     volumes:
       - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
