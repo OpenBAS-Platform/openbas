@@ -508,6 +508,11 @@
   "Execution Time": "执行时间",
   "Executor": "执行者",
   "Executor Caldera is not responding, your exercises may be impacted.": "Executor Caldera is not responding, your exercises may be impacted.",
+  "executor is an enterprise edition feature": {
+    " You can start the set up but you will need a license key to execute your injects": {
+      " We provide a 3 month trial to let you test the platform at full capacity": "执行器是企业版功能。您可以开始设置，但需要许可证密钥才能执行注入。我们提供 3 个月的试用期，让您可以充分测试平台的功能。"
+    }
+  },
   "Executors": "执行者",
   "Exercise": "练习",
   "Exercise details": "锻炼详情",

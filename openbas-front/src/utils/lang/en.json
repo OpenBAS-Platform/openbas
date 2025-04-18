@@ -508,6 +508,11 @@
   "Execution Time": "Execution Time",
   "Executor": "Executor",
   "Executor Caldera is not responding, your exercises may be impacted.": "Executor Caldera is not responding, your exercises may be impacted.",
+  "executor is an enterprise edition feature": {
+    " You can start the set up but you will need a license key to execute your injects": {
+      " We provide a 3 month trial to let you test the platform at full capacity": "executor is an enterprise edition feature. You can start the set up but you will need a license key to execute your injects. We provide a 3 month trial to let you test the platform at full capacity."
+    }
+  },
   "Executors": "Executors",
   "Exercise": "Simulation",
   "Exercise details": "Exercise details",

@@ -5,6 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 import { useFormatter } from '../../../components/i18n';
 import PlatformIcon from '../../../components/PlatformIcon';
 import { type Executor } from '../../../utils/api-types';
+import EEChip from '../common/entreprise_edition/EEChip';
 import ExecutorBanner from './ExecutorBanner';
 
 const useStyles = makeStyles()(theme => ({
@@ -27,9 +28,10 @@ const useStyles = makeStyles()(theme => ({
 interface ExecutorSelectorProps {
   executor: Executor;
   setSelectedExecutor: (executor: Executor) => void;
+  isEEExecutor?: boolean;
 }
 
-const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelectedExecutor }) => {
+const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelectedExecutor, isEEExecutor = false }) => {
   const theme = useTheme();
   const { classes } = useStyles();
   const { t } = useFormatter();
@@ -55,12 +57,12 @@ const ExecutorSelector: React.FC<ExecutorSelectorProps> = ({ executor, setSelect
               fontSize: 15,
               padding: theme.spacing(2, 0, 1),
               display: 'flex',
-              alignItems: 'center',
               justifyContent: 'center',
               color: platforms.length === 0 ? theme.palette.text?.disabled : theme.palette.text?.primary,
             }}
           >
             {`${t('Install')} ${executor.executor_name}`}
+            {isEEExecutor && <EEChip style={{ marginLeft: theme.spacing(1) }} />}
           </Typography>
           <Box
             sx={{
