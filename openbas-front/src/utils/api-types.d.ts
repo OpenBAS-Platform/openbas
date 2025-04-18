@@ -247,7 +247,7 @@ export interface AtomicTestingInput {
   inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
-  inject_title?: string;
+  inject_title: string;
 }
 
 export interface AtomicTestingUpdateTagsInput {
@@ -317,7 +317,7 @@ interface BasePayload {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
+  payload_platforms: (
     | "Linux"
     | "Windows"
     | "MacOS"
@@ -341,6 +341,45 @@ interface BasePayload {
     | "DNS_RESOLUTION"
     | "NETWORK_TRAFFIC";
 }
+
+interface BasePayloadCreateInput {
+  command_content?: string | null;
+  command_executor?: string | null;
+  dns_resolution_hostname?: string;
+  executable_file?: string;
+  file_drop_file?: string;
+  payload_arguments?: PayloadArgument[];
+  payload_attack_patterns?: string[];
+  payload_cleanup_command?: string | null;
+  payload_cleanup_executor?: string | null;
+  payload_description?: string;
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_name: string;
+  /**
+   * Set of output parsers
+   * @uniqueItems true
+   */
+  payload_output_parsers?: OutputParserInput[];
+  payload_platforms: (
+    | "Linux"
+    | "Windows"
+    | "MacOS"
+    | "Container"
+    | "Service"
+    | "Generic"
+    | "Internal"
+    | "Unknown"
+  )[];
+  payload_prerequisites?: PayloadPrerequisite[];
+  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
+  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
+  payload_tags?: string[];
+  payload_type: string;
+}
+
+type BasePayloadCreateInputPayloadTypeMapping<Key, Type> = {
+  payload_type: Key;
+} & Type;
 
 type BasePayloadPayloadTypeMapping<Key, Type> = {
   payload_type: Key;
@@ -581,7 +620,7 @@ export interface Command {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
+  payload_platforms: (
     | "Linux"
     | "Windows"
     | "MacOS"
@@ -774,7 +813,7 @@ export interface DnsResolution {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
+  payload_platforms: (
     | "Linux"
     | "Windows"
     | "MacOS"
@@ -1018,7 +1057,7 @@ export interface Executable {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
+  payload_platforms: (
     | "Linux"
     | "Windows"
     | "MacOS"
@@ -1226,9 +1265,12 @@ export interface ExerciseSimple {
   exercise_global_score: ExpectationResultsByType[];
   /** Exercise Id */
   exercise_id: string;
-  /** Exercise Id */
+  /** Exercise Name */
   exercise_name: string;
-  /** @format date-time */
+  /**
+   * Exercise Start Date
+   * @format date-time
+   */
   exercise_start_date?: string;
   /** Exercise status */
   exercise_status?:
@@ -1245,7 +1287,10 @@ export interface ExerciseSimple {
    */
   exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
-  /** @format date-time */
+  /**
+   * Exercise Update Date
+   * @format date-time
+   */
   exercise_updated_at?: string;
 }
 
@@ -1321,7 +1366,7 @@ export interface ExportOptionsInput {
 }
 
 export interface FileDrop {
-  file_drop_file?: string;
+  file_drop_file: string;
   listened?: boolean;
   payload_arguments?: PayloadArgument[];
   payload_attack_patterns?: string[];
@@ -1339,7 +1384,7 @@ export interface FileDrop {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
+  payload_platforms: (
     | "Linux"
     | "Windows"
     | "MacOS"
@@ -1906,7 +1951,7 @@ export interface InjectInput {
   inject_injector_contract?: string;
   inject_tags?: string[];
   inject_teams?: string[];
-  inject_title?: string;
+  inject_title: string;
 }
 
 export interface InjectOutput {
@@ -2615,7 +2660,7 @@ export interface NetworkTraffic {
   payload_name: string;
   /** @uniqueItems true */
   payload_output_parsers?: OutputParser[];
-  payload_platforms?: (
+  payload_platforms: (
     | "Linux"
     | "Windows"
     | "MacOS"
@@ -3217,40 +3262,14 @@ export interface PayloadCommandBlock {
   payload_cleanup_command?: string[];
 }
 
-export interface PayloadCreateInput {
-  command_content?: string | null;
-  command_executor?: string | null;
-  dns_resolution_hostname?: string;
-  executable_file?: string;
-  file_drop_file?: string;
-  payload_arguments?: PayloadArgument[];
-  payload_attack_patterns?: string[];
-  payload_cleanup_command?: string | null;
-  payload_cleanup_executor?: string | null;
-  payload_description?: string;
-  payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
-  payload_name: string;
-  /**
-   * Set of output parsers
-   * @uniqueItems true
-   */
-  payload_output_parsers?: OutputParserInput[];
-  payload_platforms: (
-    | "Linux"
-    | "Windows"
-    | "MacOS"
-    | "Container"
-    | "Service"
-    | "Generic"
-    | "Internal"
-    | "Unknown"
-  )[];
-  payload_prerequisites?: PayloadPrerequisite[];
-  payload_source: "COMMUNITY" | "FILIGRAN" | "MANUAL";
-  payload_status: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
-  payload_tags?: string[];
-  payload_type: string;
-}
+export type PayloadCreateInput = BasePayloadCreateInput &
+  (
+    | BasePayloadCreateInputPayloadTypeMapping<"Command", Command>
+    | BasePayloadCreateInputPayloadTypeMapping<"Executable", Executable>
+    | BasePayloadCreateInputPayloadTypeMapping<"File", FileDrop>
+    | BasePayloadCreateInputPayloadTypeMapping<"Dns", DnsResolution>
+    | BasePayloadCreateInputPayloadTypeMapping<"Network", NetworkTraffic>
+  );
 
 export interface PayloadPrerequisite {
   check_command?: string;
@@ -3276,7 +3295,7 @@ export interface PayloadUpdateInput {
   payload_cleanup_command?: string | null;
   payload_cleanup_executor?: string | null;
   payload_description?: string;
-  payload_execution_arch?: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
+  payload_execution_arch: "x86_64" | "arm64" | "ALL_ARCHITECTURES";
   payload_name: string;
   /**
    * Set of output parsers

@@ -14,6 +14,7 @@ import lombok.Setter;
 @Getter
 public class InjectInput {
 
+  @NotNull
   @JsonProperty("inject_title")
   private String title;
 

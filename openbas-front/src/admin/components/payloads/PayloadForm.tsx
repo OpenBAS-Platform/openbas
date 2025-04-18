@@ -6,16 +6,37 @@ import { FormProvider, type SubmitHandler, useForm } from 'react-hook-form';
 import { z, type ZodTypeAny } from 'zod';
 
 import { useFormatter } from '../../../components/i18n';
-import type { PayloadCreateInput } from '../../../utils/api-types';
-import type { Option } from '../../../utils/Option';
+import {
+  type BasePayload,
+  type Command,
+  type ContractOutputElement,
+  type DnsResolution,
+  type Executable,
+  type FileDrop,
+  type OutputParser,
+  type RegexGroup,
+} from '../../../utils/api-types';
 import CommandsFormTab from './form/CommandsFormTab';
 import GeneralFormTab from './form/GeneralFormTab';
 import OutputFormTab from './form/OutputFormTab';
 
-type PayloadCreateInputForm = Omit<PayloadCreateInput, 'payload_source' | 'payload_status' | 'payload_platforms' | 'executable_file'> & {
-  payload_platforms: Option[];
-  executable_file: Option | undefined;
+type omit = 'payload_type' | 'payload_source' | 'payload_status' | 'payload_created_at' | 'payload_id' | 'payload_updated_at' | 'payload_output_parsers';
+type more = {
+  payload_output_parsers?: (
+  Omit<OutputParser, 'output_parser_created_at' | 'output_parser_updated_at' | 'output_parser_id' | 'output_parser_contract_output_elements'>
+  & {
+    output_parser_contract_output_elements: (Omit<ContractOutputElement, 'contract_output_element_created_at' | 'contract_output_element_updated_at' | 'contract_output_element_id' | 'contract_output_element_regex_groups'>
+      & { contract_output_element_regex_groups: Omit<RegexGroup, 'regex_group_created_at' | 'regex_group_updated_at' | 'regex_group_id'>[] })[];
+  }
+  )[];
 };
+type PayloadCreateInputForm = Omit<BasePayload, omit> & more &
+  (
+    | Omit<Command, omit> & more & { payload_type: 'Command' }
+    | Omit<Executable, omit> & more & { payload_type: 'Executable' }
+    | Omit<FileDrop, omit> & more & { payload_type: 'FileDrop' }
+    | Omit<DnsResolution, omit> & more & { payload_type: 'DnsResolution' }
+    );
 
 interface Props {
   onSubmit: SubmitHandler<PayloadCreateInputForm>;
@@ -29,7 +50,8 @@ const PayloadForm = ({
   handleClose,
   editing,
   initialValues = {
-    payload_type: '',
+    // @ts-expect-error because of the discriminated union we need to ignore this ts error
+    payload_type: undefined,
     payload_name: '',
     payload_platforms: [],
     payload_description: '',
@@ -45,6 +67,7 @@ const PayloadForm = ({
     payload_arguments: [],
     payload_prerequisites: [],
     payload_output_parsers: [],
+    payload_execution_arch: 'ALL_ARCHITECTURES',
   },
 }: Props) => {
   const { t } = useFormatter();
@@ -64,7 +87,7 @@ const PayloadForm = ({
 
   const contractOutputElementObject = z.object({
     ...editing && { contract_output_element_id: z.string().optional() },
-    contract_output_element_is_finding: z.boolean().optional(),
+    contract_output_element_is_finding: z.boolean(),
     contract_output_element_name: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_key: z.string().min(1, { message: t('Should not be empty') }),
     contract_output_element_type: z.enum(['text', 'number', 'port', 'portscan', 'ipv4', 'ipv6', 'credentials'], { message: t('Should not be empty') }),
@@ -74,7 +97,7 @@ const PayloadForm = ({
   });
   const outputParserObject = z.object({
     ...editing && { output_parser_id: z.string().optional() },
-    output_parser_mode: z.enum(['STDOUT'], { message: t('Should not be empty') }),
+    output_parser_mode: z.enum(['STDOUT', 'STDERR', 'READ_FILE'], { message: t('Should not be empty') }),
     output_parser_type: z.enum(['REGEX'], { message: t('Should not be empty') }),
     output_parser_contract_output_elements: z.array(contractOutputElementObject),
   });
@@ -82,7 +105,7 @@ const PayloadForm = ({
   const payloadPrerequisiteZodObject = z.object({
     executor: z.string().min(1, { message: t('Should not be empty') }),
     get_command: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().nullish(),
+    description: z.string().optional(),
     check_command: z.string().optional(),
   });
 
@@ -90,7 +113,7 @@ const PayloadForm = ({
     default_value: z.string().nonempty(t('Should not be empty')),
     key: z.string().min(1, { message: t('Should not be empty') }),
     type: z.string().min(1, { message: t('Should not be empty') }),
-    description: z.string().nullish(),
+    description: z.string().optional(),
   });
 
   const baseSchema = {
@@ -98,10 +121,7 @@ const PayloadForm = ({
     payload_description: z.string().optional().describe('General-tab'),
     payload_attack_patterns: z.string().array().optional(),
     payload_tags: z.string().array().optional(),
-    payload_platforms: z.object({
-      id: z.string(),
-      label: z.string(),
-    }).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
+    payload_platforms: z.enum(['Linux', 'Windows', 'MacOS', 'Container', 'Service', 'Generic', 'Internal', 'Unknown']).array().min(1, { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_execution_arch: z.enum(['x86_64', 'arm64', 'ALL_ARCHITECTURES'], { message: t('Should not be empty') }).describe('Commands-tab'),
     payload_cleanup_command: z.string().optional().describe('Commands-tab'),
     payload_cleanup_executor: z.string().optional(),
@@ -119,10 +139,7 @@ const PayloadForm = ({
   const executableSchema = z.object({
     ...baseSchema,
     payload_type: z.literal('Executable').describe('Commands-tab'),
-    executable_file: z.object({
-      id: z.string().min(1, { message: t('Should not be empty') }),
-      label: z.string().min(1, { message: t('Should not be empty') }),
-    }).describe('Commands-tab'),
+    executable_file: z.string().optional().describe('Commands-tab'),
   });
   const fileDropSchema = z.object({
     ...baseSchema,
