@@ -24,7 +24,7 @@ public class V3_76__Add_challenge_attempt extends BaseJavaMigration {
             attempt_updated_at TIMESTAMP(0) WITH TIME ZONE NOT NULL DEFAULT now(),
             CONSTRAINT pk_challenge_attempts PRIMARY KEY (challenge_id, inject_status_id, user_id),
             CONSTRAINT fk_challenge_attempt_challenge FOREIGN KEY (challenge_id) REFERENCES challenges (challenge_id) ON DELETE CASCADE,
-            CONSTRAINT fk_challenge_attempt_challenge FOREIGN KEY (inject_status_id) REFERENCES injects_statuses (status_id) ON DELETE CASCADE,
+            CONSTRAINT fk_challenge_attempt_inject_status FOREIGN KEY (inject_status_id) REFERENCES injects_statuses (status_id) ON DELETE CASCADE,
             CONSTRAINT fk_challenge_attempt_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
         );
         CREATE INDEX idx_challenge_attempt_challenge_id ON challenge_attempts(challenge_id);
