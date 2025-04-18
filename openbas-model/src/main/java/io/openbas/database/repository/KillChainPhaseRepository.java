@@ -21,4 +21,6 @@ public interface KillChainPhaseRepository
 
   Optional<KillChainPhase> findByKillChainNameAndShortName(
       @NotNull String killChainName, @NotNull String shortName);
+
+  Optional<KillChainPhase> findByExternalId(@NotNull String externalId);
 }

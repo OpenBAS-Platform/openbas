@@ -205,11 +205,17 @@ public class Payload implements Base {
   @NotNull
   private Instant updatedAt = now();
 
+  @JsonProperty("payload_attack_patterns_details")
+  public List<AttackPattern> getAttackPatternsDetails() {
+    return this.attackPatterns;
+  }
+  
   @OneToMany(
       mappedBy = "payload",
       fetch = FetchType.EAGER,
       cascade = CascadeType.ALL,
       orphanRemoval = true)
+  
   @JsonProperty("payload_output_parsers")
   private Set<OutputParser> outputParsers = new HashSet<>();
 
