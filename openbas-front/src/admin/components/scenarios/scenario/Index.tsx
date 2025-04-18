@@ -106,11 +106,11 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
   const [openScenarioNotificationRuleDrawer, setOpenScenarioNotificationRuleDrawer] = useState(false);
   const [editNotification, setEditNotification] = useState<boolean>(false);
   const [notificationRule, setNotificationRule] = useState<NotificationRuleOutput>({
-    id: '',
-    resource_id: '',
-    resource_type: '',
-    subject: '',
-    trigger: '',
+    notification_rule_id: '',
+    notification_rule_resource_id: '',
+    notification_rule_resource_type: '',
+    notification_rule_subject: '',
+    notification_rule_trigger: '',
   });
 
   useEffect(() => {
@@ -130,11 +130,11 @@ const IndexScenarioComponent: FunctionComponent<{ scenario: Scenario }> = ({ sce
   const onDeleteNotification = () => {
     setEditNotification(false);
     setNotificationRule({
-      id: '',
-      resource_id: '',
-      resource_type: '',
-      subject: '',
-      trigger: '',
+      notification_rule_id: '',
+      notification_rule_resource_id: '',
+      notification_rule_resource_type: '',
+      notification_rule_subject: '',
+      notification_rule_trigger: '',
     });
   };
 
