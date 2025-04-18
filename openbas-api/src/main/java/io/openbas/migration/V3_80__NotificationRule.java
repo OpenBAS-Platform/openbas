@@ -34,8 +34,7 @@ public class V3_80__NotificationRule extends BaseJavaMigration {
                CREATE INDEX idx_resource_id ON notification_rules (notification_resource_id);
                 """);
 
-
-    //add a trigger to delete the rule when a scenario is deleted
+    // add a trigger to delete the rule when a scenario is deleted
     select.execute(
         """
                   -- Delete function
