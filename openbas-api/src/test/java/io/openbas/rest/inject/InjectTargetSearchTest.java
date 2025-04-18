@@ -19,7 +19,6 @@ import io.openbas.utils.pagination.SearchPaginationInput;
 import jakarta.persistence.EntityManager;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.*;
@@ -123,7 +122,7 @@ public class InjectTargetSearchTest extends IntegrationTest {
     public class WithExistingInject {
       private AssetGroupComposer.Composer getAssetGroupComposerWithName(String assetGroupName) {
         return assetGroupComposer.forAssetGroup(
-                AssetGroupFixture.createDefaultAssetGroup(assetGroupName));
+            AssetGroupFixture.createDefaultAssetGroup(assetGroupName));
       }
 
       @Test
@@ -253,8 +252,10 @@ public class InjectTargetSearchTest extends IntegrationTest {
       @Nested
       @DisplayName("With actual results")
       public class WithActualResults {
-        private ExpectationComposer.Composer getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
-          return expectationComposer.forExpectation(InjectExpectationFixture.createExpectationWithTypeAndStatus(type, status));
+        private ExpectationComposer.Composer getExpectationWrapperWithResult(
+            InjectExpectation.EXPECTATION_TYPE type, InjectExpectation.EXPECTATION_STATUS status) {
+          return expectationComposer.forExpectation(
+              InjectExpectationFixture.createExpectationWithTypeAndStatus(type, status));
         }
 
         @Test
@@ -263,9 +264,21 @@ public class InjectTargetSearchTest extends IntegrationTest {
           String searchTerm = "asset group target";
           InjectComposer.Composer injectWrapper = getInjectWrapper();
           AssetGroupComposer.Composer assetGroupWrapper = getAssetGroupComposerWithName(searchTerm);
-          ExpectationComposer.Composer expectationDetectionWrapper = getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE.DETECTION, InjectExpectation.EXPECTATION_STATUS.SUCCESS).withAssetGroup(assetGroupWrapper);
-          ExpectationComposer.Composer expectationPreventionWrapper = getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE.PREVENTION, InjectExpectation.EXPECTATION_STATUS.FAILED).withAssetGroup(assetGroupWrapper);
-          ExpectationComposer.Composer expectationHumanResponseWrapper = getExpectationWrapperWithResult(InjectExpectation.EXPECTATION_TYPE.CHALLENGE, InjectExpectation.EXPECTATION_STATUS.PENDING).withAssetGroup(assetGroupWrapper);
+          ExpectationComposer.Composer expectationDetectionWrapper =
+              getExpectationWrapperWithResult(
+                      InjectExpectation.EXPECTATION_TYPE.DETECTION,
+                      InjectExpectation.EXPECTATION_STATUS.SUCCESS)
+                  .withAssetGroup(assetGroupWrapper);
+          ExpectationComposer.Composer expectationPreventionWrapper =
+              getExpectationWrapperWithResult(
+                      InjectExpectation.EXPECTATION_TYPE.PREVENTION,
+                      InjectExpectation.EXPECTATION_STATUS.FAILED)
+                  .withAssetGroup(assetGroupWrapper);
+          ExpectationComposer.Composer expectationHumanResponseWrapper =
+              getExpectationWrapperWithResult(
+                      InjectExpectation.EXPECTATION_TYPE.CHALLENGE,
+                      InjectExpectation.EXPECTATION_STATUS.PENDING)
+                  .withAssetGroup(assetGroupWrapper);
           injectWrapper.withAssetGroup(assetGroupWrapper);
           injectWrapper.withExpectation(expectationDetectionWrapper);
           injectWrapper.withExpectation(expectationPreventionWrapper);
@@ -275,27 +288,34 @@ public class InjectTargetSearchTest extends IntegrationTest {
           entityManager.clear();
 
           SearchPaginationInput search =
-                  PaginationFixture.simpleFilter(
-                          "target_name", searchTerm, Filters.FilterOperator.contains);
+              PaginationFixture.simpleFilter(
+                  "target_name", searchTerm, Filters.FilterOperator.contains);
           String response =
-                  mvc.perform(
-                                  post(INJECT_URI
-                                          + "/"
-                                          + inject.getId()
-                                          + "/targets/"
-                                          + targetType.name()
-                                          + "/search")
-                                          .contentType(MediaType.APPLICATION_JSON)
-                                          .content(mapper.writeValueAsString(search)))
-                          .andExpect(status().isOk())
-                          .andReturn()
-                          .getResponse()
-                          .getContentAsString();
+              mvc.perform(
+                      post(INJECT_URI
+                              + "/"
+                              + inject.getId()
+                              + "/targets/"
+                              + targetType.name()
+                              + "/search")
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .content(mapper.writeValueAsString(search)))
+                  .andExpect(status().isOk())
+                  .andReturn()
+                  .getResponse()
+                  .getContentAsString();
 
-          AssetGroupTarget expectedAssetGroup = new AssetGroupTarget(assetGroupWrapper.get().getId(), assetGroupWrapper.get().getName(), assetGroupWrapper.get().getTags().stream().map(Tag::getId).collect(Collectors.toSet()));
+          AssetGroupTarget expectedAssetGroup =
+              new AssetGroupTarget(
+                  assetGroupWrapper.get().getId(),
+                  assetGroupWrapper.get().getName(),
+                  assetGroupWrapper.get().getTags().stream()
+                      .map(Tag::getId)
+                      .collect(Collectors.toSet()));
           expectedAssetGroup.setTargetDetectionStatus(InjectExpectation.EXPECTATION_STATUS.SUCCESS);
           expectedAssetGroup.setTargetPreventionStatus(InjectExpectation.EXPECTATION_STATUS.FAILED);
-          expectedAssetGroup.setTargetHumanResponseStatus(InjectExpectation.EXPECTATION_STATUS.PENDING);
+          expectedAssetGroup.setTargetHumanResponseStatus(
+              InjectExpectation.EXPECTATION_STATUS.PENDING);
           List<AssetGroupTarget> expected = List.of(expectedAssetGroup);
 
           assertThatJson(response).node("content").isEqualTo(mapper.writeValueAsString(expected));
