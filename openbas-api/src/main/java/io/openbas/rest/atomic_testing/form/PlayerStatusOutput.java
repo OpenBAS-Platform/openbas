@@ -14,23 +14,9 @@ import lombok.Data;
 @Schema(description = "Represents the output result details of an player")
 public class PlayerStatusOutput {
 
-  @JsonProperty("team_id")
-  @Schema(description = "Team ID")
-  @NotNull
-  private String teamId;
-
   @JsonProperty("player_id")
   @NotNull
   private String playerId;
-
-  @JsonProperty("player_name")
-  private String playerName;
-
-  @JsonProperty("tracking_sent_date")
-  private Instant trackingSentDate;
-
-  @JsonProperty("tracking_end_date")
-  private Instant trackingEndDate;
 
   @JsonProperty("player_status_name")
   @Schema(
@@ -42,4 +28,10 @@ public class PlayerStatusOutput {
   @JsonProperty("player_traces")
   @Schema(description = "List of player execution traces")
   private List<ExecutionTracesOutput> playerTraces = new ArrayList<>();
+
+  @JsonProperty("tracking_sent_date")
+  private Instant trackingSentDate;
+
+  @JsonProperty("tracking_end_date")
+  private Instant trackingEndDate;
 }

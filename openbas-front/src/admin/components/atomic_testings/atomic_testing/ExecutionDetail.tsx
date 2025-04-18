@@ -4,16 +4,15 @@ import { searchEndpoints } from '../../../../actions/assets/endpoint-actions';
 import { buildFilter } from '../../../../components/common/queryable/filter/FilterUtils';
 import { buildSearchPagination } from '../../../../components/common/queryable/QueryableUtils';
 import Loader from '../../../../components/Loader';
-import { type EndpointOutput, type InjectResultOverviewOutput } from '../../../../utils/api-types';
+import { type EndpointOutput, type InjectResultOverviewOutput, type InjectTargetWithResult } from '../../../../utils/api-types';
 import InjectStatus from '../../common/injects/status/InjectStatus';
 
 interface Props {
-  targetId: string;
-  targetType: string;
+  target: InjectTargetWithResult;
   injectResultOverviewOutput: InjectResultOverviewOutput;
 }
 
-const ExecutionDetail = ({ targetId, targetType, injectResultOverviewOutput }: Props) => {
+const ExecutionDetail = ({ target, injectResultOverviewOutput }: Props) => {
   // Fetching data
   const [loading, setLoading] = useState(true);
 
@@ -79,8 +78,7 @@ const ExecutionDetail = ({ targetId, targetType, injectResultOverviewOutput }: P
     <InjectStatus
       injectStatus={injectResultOverviewOutput?.inject_status ?? null}
       endpointsMap={endpointsMap}
-      targetId={targetId}
-      targetType={targetType}
+      target={target}
     />
   );
 };

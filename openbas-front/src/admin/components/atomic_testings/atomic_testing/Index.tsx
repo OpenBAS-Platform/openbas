@@ -33,6 +33,7 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const AtomicTesting = lazy(() => import('./AtomicTesting'));
+const AtomicTestingDetail = lazy(() => import('./AtomicTestingDetail'));
 const AtomicTestingFindings = lazy(() => import('./AtomicTestingFindings'));
 
 const Index = () => {
@@ -144,6 +145,13 @@ const Index = () => {
                 className={classes.item}
               />
             )}
+            <Tab
+              component={Link}
+              to={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
+              value={`/admin/atomic_testings/${injectResultOverviewOutput.inject_id}/detail`}
+              label={t('Execution details')}
+              className={classes.item}
+            />
             {
               injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
                 <Tab
@@ -163,6 +171,7 @@ const Index = () => {
             {(injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload
               || injectResultOverviewOutput.inject_type === 'openbas_nmap')
             && <Route path="findings" element={errorWrapper(AtomicTestingFindings)()} />}
+            <Route path="detail" element={errorWrapper(AtomicTestingDetail)()} />
             {injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
               <Route
                 path="payload_info"

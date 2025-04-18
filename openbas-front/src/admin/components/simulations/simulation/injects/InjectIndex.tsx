@@ -124,6 +124,13 @@ const InjectIndexComponent: FunctionComponent<{
                 className={classes.item}
               />
             )}
+            <Tab
+              component={Link}
+              to={computePath(`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`)}
+              value={`/admin/simulations/${exercise.exercise_id}/injects/${injectResultOverviewOutput.inject_id}/detail`}
+              label={t('Execution details')}
+              className={classes.item}
+            />
             {
               injectResultOverviewOutput.inject_injector_contract?.injector_contract_payload && (
                 <Tab
