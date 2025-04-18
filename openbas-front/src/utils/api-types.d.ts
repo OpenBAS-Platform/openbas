@@ -729,6 +729,14 @@ export interface CreateExerciseInput {
   exercise_tags?: string[];
 }
 
+export interface CreateNotificationRuleInput {
+  resource_id?: string;
+  resource_type?: string;
+  subject: string;
+  trigger?: string;
+  type?: string;
+}
+
 export interface CreateUserInput {
   /** True if the user is admin */
   user_admin?: boolean;
@@ -1226,9 +1234,12 @@ export interface ExerciseSimple {
   exercise_global_score: ExpectationResultsByType[];
   /** Exercise Id */
   exercise_id: string;
-  /** Exercise Id */
+  /** Exercise Name */
   exercise_name: string;
-  /** @format date-time */
+  /**
+   * Exercise Start Date
+   * @format date-time
+   */
   exercise_start_date?: string;
   /** Exercise status */
   exercise_status?:
@@ -1245,7 +1256,10 @@ export interface ExerciseSimple {
    */
   exercise_tags?: string[];
   exercise_targets?: TargetSimple[];
-  /** @format date-time */
+  /**
+   * Exercise Update Date
+   * @format date-time
+   */
   exercise_updated_at?: string;
 }
 
@@ -2640,6 +2654,21 @@ export interface NetworkTraffic {
     | "NETWORK_TRAFFIC";
 }
 
+export interface NotificationRuleOutput {
+  /** ID of the notification rule */
+  notification_rule_id: string;
+  /** Owner of the notification rule */
+  notification_rule_owner?: string;
+  /** Resource id of the resource associated with the rule */
+  notification_rule_resource_id?: string;
+  /** Resource type of the resource associated with the rule */
+  notification_rule_resource_type?: string;
+  /** Subject of the notification rule */
+  notification_rule_subject?: string;
+  /** Event that will trigger the notification */
+  notification_rule_trigger?: string;
+}
+
 /** List of Saml2 providers */
 export interface OAuthProvider {
   provider_login?: string;
@@ -2976,6 +3005,25 @@ export interface PageLessonsTemplate {
 
 export interface PageMitigation {
   content?: Mitigation[];
+  empty?: boolean;
+  first?: boolean;
+  last?: boolean;
+  /** @format int32 */
+  number?: number;
+  /** @format int32 */
+  numberOfElements?: number;
+  pageable?: PageableObject;
+  /** @format int32 */
+  size?: number;
+  sort?: SortObject[];
+  /** @format int64 */
+  totalElements?: number;
+  /** @format int32 */
+  totalPages?: number;
+}
+
+export interface PageNotificationRuleOutput {
+  content?: NotificationRuleOutput[];
   empty?: boolean;
   first?: boolean;
   last?: boolean;
@@ -4305,6 +4353,10 @@ export interface UpdateExerciseInput {
 export interface UpdateMePasswordInput {
   user_current_password: string;
   user_plain_password: string;
+}
+
+export interface UpdateNotificationRuleInput {
+  notification_rule_subject: string;
 }
 
 export interface UpdateProfileInput {

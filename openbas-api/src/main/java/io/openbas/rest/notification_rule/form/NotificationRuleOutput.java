@@ -2,6 +2,7 @@ package io.openbas.rest.notification_rule.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,6 +11,7 @@ import lombok.Getter;
 public class NotificationRuleOutput {
   @JsonProperty("notification_rule_id")
   @Schema(description = "ID of the notification rule")
+  @NotNull
   private String id;
 
   @JsonProperty("notification_rule_resource_type")
