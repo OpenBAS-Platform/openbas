@@ -11,10 +11,10 @@ import java.util.List;
 
 public class InjectStatusFixture {
 
-  public static InjectStatus createDefaultInjectStatus() {
+  private static InjectStatus createInjectStatus(ExecutionStatus status) {
     InjectStatus injectStatus = new InjectStatus();
     injectStatus.setTrackingSentDate(Instant.now());
-    injectStatus.setName(ExecutionStatus.PENDING);
+    injectStatus.setName(status);
     injectStatus.setPayloadOutput(
         new StatusPayload(
             null,
@@ -34,5 +34,17 @@ public class InjectStatusFixture {
             List.of(new PayloadCommandBlock("cmd", "content", List.of("clean cmd"))),
             "cmd"));
     return injectStatus;
+  }
+
+  public static InjectStatus createPendingInjectStatus() {
+    return createInjectStatus(ExecutionStatus.PENDING);
+  }
+
+  public static InjectStatus createDraftInjectStatus() {
+    return createInjectStatus(ExecutionStatus.DRAFT);
+  }
+
+  public static InjectStatus createQueuingInjectStatus() {
+    return createInjectStatus(ExecutionStatus.QUEUING);
   }
 }

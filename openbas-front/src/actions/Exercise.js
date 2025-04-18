@@ -24,7 +24,7 @@ export const updateExercise = (exerciseId, data) => dispatch => putReferential(
 
 export const updateExerciseStartDate = (exerciseId, data) => dispatch => putReferential(
   schema.exercise,
-  `/api/exercises/${exerciseId}/start_date`,
+  `/api/exercises/${exerciseId}/start-date`,
   data,
 )(dispatch);
 

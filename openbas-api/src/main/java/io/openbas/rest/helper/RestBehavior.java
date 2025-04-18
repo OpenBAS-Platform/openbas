@@ -71,6 +71,19 @@ public class RestBehavior {
     return bag;
   }
 
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  @ExceptionHandler(LicenseRestrictionException.class)
+  public ValidationErrorBag handleLicenseError(LicenseRestrictionException ex) {
+    ValidationErrorBag bag =
+        new ValidationErrorBag(HttpStatus.FORBIDDEN.value(), "LICENSE_RESTRICTION");
+    ValidationError errors = new ValidationError();
+    Map<String, ValidationContent> errorsBag = new HashMap<>();
+    errorsBag.put("message", new ValidationContent(ex.getMessage()));
+    errors.setChildren(errorsBag);
+    bag.setErrors(errors);
+    return bag;
+  }
+
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(InputValidationException.class)
   public ValidationErrorBag handleInputValidationExceptions(InputValidationException ex) {

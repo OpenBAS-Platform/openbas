@@ -3,12 +3,15 @@ package io.openbas.executors.crowdstrike.service;
 import static io.openbas.executors.ExecutorHelper.replaceArgs;
 import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_NAME;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
+import io.openbas.ee.Ee;
 import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.ExecutorHelper;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeAction;
+import io.openbas.rest.exception.LicenseRestrictionException;
 import jakarta.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -40,6 +43,8 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
   private final CrowdStrikeExecutorConfig crowdStrikeExecutorConfig;
   private final CrowdStrikeExecutorClient crowdStrikeExecutorClient;
+  private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
@@ -48,10 +53,17 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
   public List<Agent> launchBatchExecutorSubprocess(
       Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
-    List<Agent> csAgents = new ArrayList<>(agents);
+    if (!eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
+      injectStatus.addInfoTrace(
+          "LICENSE RESTRICTION - Some asset will be executed through the Crowdstrike executor",
+          ExecutionTraceAction.EXECUTION);
+      throw new LicenseRestrictionException(
+          "LICENSE RESTRICTION - Asset will be executed through the Crowdstrike executor");
+    }
     if (!this.crowdStrikeExecutorConfig.isEnable()) {
       throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
     }
+    List<Agent> csAgents = new ArrayList<>(agents);
 
     Injector injector =
         inject

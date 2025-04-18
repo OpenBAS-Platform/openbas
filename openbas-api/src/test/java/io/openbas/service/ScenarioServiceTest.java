@@ -9,9 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 
+import io.openbas.config.cache.LicenseCacheManager;
 import io.openbas.database.model.*;
 import io.openbas.database.model.Tag;
 import io.openbas.database.repository.*;
+import io.openbas.ee.Ee;
 import io.openbas.rest.inject.service.InjectDuplicateService;
 import io.openbas.rest.inject.service.InjectService;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
@@ -40,23 +42,25 @@ class ScenarioServiceTest {
   @Autowired private DocumentRepository documentRepository;
   @Autowired private ScenarioTeamUserRepository scenarioTeamUserRepository;
   @Autowired private ArticleRepository articleRepository;
-
-  @Autowired InjectRepository injectRepository;
-
   @Mock ScenarioRepository mockScenarioRepository;
+  @Autowired InjectRepository injectRepository;
+  @Autowired private InjectorContractRepository injectorContractRepository;
+  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
+
+  @Mock Ee eeService;
   @Mock GrantService grantService;
   @Mock VariableService variableService;
   @Mock ChallengeService challengeService;
   @Autowired private TeamService teamService;
   @Mock FileService fileService;
   @Autowired private InjectDuplicateService injectDuplicateService;
-  @Autowired private ExerciseMapper exerciseMapper;
-  @Mock private ActionMetricCollector actionMetricCollector;
-  @Autowired private InjectorContractRepository injectorContractRepository;
-  @Autowired private LessonsCategoryRepository lessonsCategoryRepository;
   @Mock private InjectService injectService;
   @Mock private TagRuleService tagRuleService;
   @InjectMocks private ScenarioService scenarioService;
+
+  @Mock private LicenseCacheManager licenseCacheManager;
+  @Autowired private ExerciseMapper exerciseMapper;
+  @Mock private ActionMetricCollector actionMetricCollector;
 
   private static String USER_ID;
   private static String TEAM_ID;
@@ -65,26 +69,27 @@ class ScenarioServiceTest {
   @BeforeEach
   void setUp() {
     scenarioService =
-        scenarioService =
-            new ScenarioService(
-                scenarioRepository,
-                teamRepository,
-                userRepository,
-                documentRepository,
-                scenarioTeamUserRepository,
-                articleRepository,
-                exerciseMapper,
-                actionMetricCollector,
-                grantService,
-                variableService,
-                challengeService,
-                teamService,
-                fileService,
-                injectDuplicateService,
-                tagRuleService,
-                injectService,
-                injectRepository,
-                lessonsCategoryRepository);
+        new ScenarioService(
+            scenarioRepository,
+            teamRepository,
+            userRepository,
+            documentRepository,
+            scenarioTeamUserRepository,
+            articleRepository,
+            exerciseMapper,
+            actionMetricCollector,
+            licenseCacheManager,
+            eeService,
+            grantService,
+            variableService,
+            challengeService,
+            teamService,
+            fileService,
+            injectDuplicateService,
+            tagRuleService,
+            injectService,
+            injectRepository,
+            lessonsCategoryRepository);
   }
 
   void setUpWithMockRepository() {
@@ -98,6 +103,8 @@ class ScenarioServiceTest {
             articleRepository,
             exerciseMapper,
             actionMetricCollector,
+            licenseCacheManager,
+            eeService,
             grantService,
             variableService,
             challengeService,
