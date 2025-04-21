@@ -8,20 +8,27 @@ import io.openbas.notification.handler.ScenarioNotificationEventHandler;
 import io.openbas.notification.model.NotificationEvent;
 import io.openbas.notification.model.NotificationEventType;
 import java.time.Instant;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @SpringBootTest
 public class NotificationEvenServiceTest {
 
   @Mock private ApplicationEventPublisher appPublisher;
-
   @Mock private ScenarioNotificationEventHandler scenarioNotificationEventHandler;
+  @Mock private ThreadPoolTaskScheduler taskScheduler;
 
-  @InjectMocks private NotificationEventService notificationEventService;
+  private NotificationEventService notificationEventService;
+
+  @BeforeEach
+  public void setUp() {
+    notificationEventService =
+        new NotificationEventService(appPublisher, scenarioNotificationEventHandler, taskScheduler);
+  }
 
   @Test
   public void test_handleEvent() {
@@ -36,6 +43,7 @@ public class NotificationEvenServiceTest {
     verify(scenarioNotificationEventHandler).handle(notificationEvent);
   }
 
+  @Test
   public void test_send_event() {
     NotificationEvent notificationEvent =
         NotificationEvent.builder()
