@@ -113,7 +113,8 @@ public class InjectsExecutionJob implements Job {
                         .resourceType(NotificationRuleResourceType.SCENARIO)
                         .resourceId(ex.getScenario().getId())
                         .timestamp(Instant.now())
-                        .build(), 3600L)); // add a 1 hour delay
+                        .build(),
+                    3600L)); // add a 1 hour delay
   }
 
   private void executeInject(ExecutableInject executableInject)
