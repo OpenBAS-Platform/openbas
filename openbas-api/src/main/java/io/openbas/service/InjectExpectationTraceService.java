@@ -11,10 +11,7 @@ import io.openbas.database.repository.SecurityPlatformRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject_expectation_trace.form.InjectExpectationTraceInput;
 import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -66,14 +63,9 @@ public class InjectExpectationTraceService {
         collectorRepository
             .findById(injectExpectationTraces.getFirst().getSourceId())
             .orElseThrow(() -> new ElementNotFoundException("Collector not found"));
-    final AtomicReference<Instant> oldestAlertDate = new AtomicReference<>(Instant.now());
     Map<SimpleRawExpectationTrace, InjectExpectationTrace> traces = new HashMap<>();
     injectExpectationTraces.forEach(
         input -> {
-          // Compute oldest date
-          if (input.getAlertDate().isBefore(oldestAlertDate.get())) {
-            oldestAlertDate.set(input.getAlertDate());
-          }
           // Convert input to InjectExpectationTrace
           InjectExpectationTrace trace = new InjectExpectationTrace();
           trace.setUpdateAttributes(input);
@@ -88,16 +80,17 @@ public class InjectExpectationTraceService {
           traces.computeIfAbsent(simpleTrace, k -> trace);
         });
 
-    // Dedupe from DB
-    List<SimpleRawExpectationTrace> rawsfromDB1 =
-        this.injectExpectationTraceRepository.findAllTracesNewerThan(
-            oldestAlertDate.get().truncatedTo(ChronoUnit.SECONDS));
-    Set<SimpleRawExpectationTrace> fromDB = new HashSet<>(rawsfromDB1);
-
-    // Removing duplicate traces
-    traces.keySet().removeAll(fromDB);
-
     // Save the remaining traces
-    this.injectExpectationTraceRepository.saveAll(traces.values());
+    for (InjectExpectationTrace trace : traces.values()) {
+      this.injectExpectationTraceRepository.insertIfNotExists(
+          UUID.randomUUID().toString(),
+          trace.getInjectExpectation().getId(),
+          trace.getSecurityPlatform().getId(),
+          trace.getAlertLink(),
+          trace.getAlertName(),
+          trace.getAlertDate(),
+          trace.getCreatedAt(),
+          trace.getUpdatedAt());
+    }
   }
 }

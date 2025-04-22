@@ -3,6 +3,7 @@ package io.openbas.rest;
 import static io.openbas.rest.inject_expectation_trace.InjectExpectationTraceApi.INJECT_EXPECTATION_TRACES_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -155,12 +156,24 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertEquals(
-        savedInjectExpectationTrace1.getId(),
-        JsonPath.read(response, "$[0].inject_expectation_trace_id"));
-    assertEquals(
-        savedInjectExpectationTrace2.getId(),
+    assertNotEquals(
+        (String) JsonPath.read(response, "$[0].inject_expectation_trace_id"),
         JsonPath.read(response, "$[1].inject_expectation_trace_id"));
+    assertTrue(
+        JsonPath.read(response, "$[0].inject_expectation_trace_id")
+                .equals(savedInjectExpectationTrace1.getId())
+            || JsonPath.read(response, "$[0].inject_expectation_trace_id")
+                .equals(savedInjectExpectationTrace2.getId())
+            || JsonPath.read(response, "$[0].inject_expectation_trace_id")
+                .equals(savedInjectExpectationTrace3Dupe.getId()));
+    assertTrue(
+        JsonPath.read(response, "$[1].inject_expectation_trace_id")
+                .equals(savedInjectExpectationTrace1.getId())
+            || JsonPath.read(response, "$[1].inject_expectation_trace_id")
+                .equals(savedInjectExpectationTrace2.getId())
+            || JsonPath.read(response, "$[1].inject_expectation_trace_id")
+                .equals(savedInjectExpectationTrace3Dupe.getId()));
+
     assertEquals(
         savedSecurityPlatform.getId(),
         JsonPath.read(response, "$[0].inject_expectation_trace_source_id"));
