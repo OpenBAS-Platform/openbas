@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InjectStatusMapper {
 
-  private final EndpointMapper endpointMapper;
+  private final AgentMapper agentMapper;
 
   public InjectStatusOutput toInjectStatusOutput(Optional<InjectStatus> injectStatus) {
     return injectStatus
@@ -75,7 +75,7 @@ public class InjectStatusMapper {
                     .action(trace.getAction())
                     .agent(
                         trace.getAgent() != null
-                            ? endpointMapper.toAgentOutput(trace.getAgent())
+                            ? agentMapper.toAgentOutput(trace.getAgent())
                             : null)
                     .build())
         .toList();
