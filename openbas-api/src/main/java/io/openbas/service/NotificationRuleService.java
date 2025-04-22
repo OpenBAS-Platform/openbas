@@ -2,15 +2,15 @@ package io.openbas.service;
 
 import static io.openbas.utils.pagination.PaginationUtils.buildPaginationJPA;
 
-import io.openbas.database.model.NotificationRule;
-import io.openbas.database.model.NotificationRuleResourceType;
-import io.openbas.database.model.User;
+import io.openbas.database.model.*;
 import io.openbas.database.repository.NotificationRuleRepository;
 import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.utils.pagination.SearchPaginationInput;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -25,6 +25,8 @@ public class NotificationRuleService {
 
   private final UserService userService;
   private final ScenarioService scenarioService;
+  private final EmailNotificationService emailNotificationService;
+
 
   public Optional<NotificationRule> findById(final String id) {
     return notificationRuleRepository.findById(id);
@@ -90,5 +92,19 @@ public class NotificationRuleService {
       @NotNull final SearchPaginationInput searchPaginationInput) {
     return buildPaginationJPA(
         notificationRuleRepository::findAll, searchPaginationInput, NotificationRule.class);
+  }
+
+  @Transactional
+  public void activateNotificationRules(@NotNull final String resourceId,
+                                        @NotNull final NotificationRuleTrigger trigger,
+                                        @NotNull final Map<String,String> data) {
+    List<NotificationRule> rules = notificationRuleRepository
+            .findNotificationRuleByResourceAndTrigger(resourceId, trigger);
+
+    for(NotificationRule rule : rules) {
+      if(NotificationRuleType.EMAIL.equals(rule.getType())){
+          emailNotificationService.sendNotification(rule, data);
+      }
+    }
   }
 }

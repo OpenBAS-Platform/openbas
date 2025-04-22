@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+    <meta charset="utf-8">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings xmlns:o="urn:schemas-microsoft-com:office:office">
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <style>
+        td,th,div,p,a,h1,h2,h3,h4,h5,h6 {font-family: "Segoe UI", sans-serif; mso-line-height-rule: exactly;}
+    </style>
+    <![endif]-->
+
+    <title>OBAS - Drop in your scenario results</title>
+    <style>
+        /* Your custom CSS resets for email */
+        /*
+        * Here is where you can add your global email CSS resets.
+        *
+        * We use a custom, email-specific CSS reset, instead
+        * of Tailwind's web-optimized `base` layer.
+        *
+        * Styles defined here will be inlined.
+        */
+        img {
+            max-width: 100%;
+            vertical-align: middle
+        }
+        /* Tailwind CSS components */
+        /**
+        * @import here any custom CSS components - that is, CSS that
+        * you'd want loaded before the Tailwind utilities, so the
+        * utilities can still override them.
+        */
+        /* Tailwind CSS utility classes */
+        .absolute {
+            position: absolute
+        }
+        .m-0 {
+            margin: 0
+        }
+        .mb-10 {
+            margin-bottom: 40px
+        }
+        .mb-2 {
+            margin-bottom: 8px
+        }
+        .mb-5 {
+            margin-bottom: 20px
+        }
+        .mb-6 {
+            margin-bottom: 24px
+        }
+        .mt-10 {
+            margin-top: 40px
+        }
+        .inline-block {
+            display: inline-block
+        }
+        .table {
+            display: table
+        }
+        .hidden {
+            display: none
+        }
+        .w-\[552px\] {
+            width: 552px
+        }
+        .w-full {
+            width: 100%
+        }
+        .max-w-full {
+            max-width: 100%
+        }
+        .border-collapse {
+            border-collapse: collapse
+        }
+        .rounded {
+            border-radius: 4px
+        }
+        .border {
+            border-width: 1px
+        }
+        .bg-background {
+            background-color: #F1F5F9
+        }
+        .bg-red-200 {
+            background-color: #fecaca
+        }
+        .bg-slate-300 {
+            background-color: #cbd5e1
+        }
+        .bg-white {
+            background-color: #fff
+        }
+        .p-0 {
+            padding: 0
+        }
+        .p-1 {
+            padding: 4px
+        }
+        .p-12 {
+            padding: 48px
+        }
+        .px-6 {
+            padding-left: 24px;
+            padding-right: 24px
+        }
+        .py-4 {
+            padding-top: 16px;
+            padding-bottom: 16px
+        }
+        .pt-4 {
+            padding-top: 16px
+        }
+        .text-left {
+            text-align: left
+        }
+        .text-center {
+            text-align: center
+        }
+        .text-right {
+            text-align: right
+        }
+        .font-sans {
+            font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif
+        }
+        .text-2xl {
+            font-size: 24px
+        }
+        .text-base {
+            font-size: 16px
+        }
+        .text-base\/none {
+            font-size: 16px;
+            line-height: 1
+        }
+        .text-sm {
+            font-size: 14px
+        }
+        .text-xs {
+            font-size: 12px
+        }
+        .font-bold {
+            font-weight: 700
+        }
+        .font-normal {
+            font-weight: 400
+        }
+        .font-semibold {
+            font-weight: 600
+        }
+        .leading-4 {
+            line-height: 16px
+        }
+        .leading-6 {
+            line-height: 24px
+        }
+        .text-foreground {
+            color: #00020c
+        }
+        .mso-font-width-\[150\%\] {
+            mso-font-width: 150%
+        }
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05)
+        }
+        .no-underline {
+            text-decoration: none
+        }
+        .\[-webkit-font-smoothing\:antialiased\] {
+            -webkit-font-smoothing: antialiased
+        }
+        .\[word-break\:break-word\] {
+            word-break: break-word
+        }
+        /* Your custom utility classes */
+        /*
+        * Here is where you can define your custom utility classes.
+        *
+        * We wrap them in the `utilities` @layer directive, so
+        * that Tailwind moves them to the correct location.
+        *
+        * More info:
+        * https://tailwindcss.com/docs/functions-and-directives#layer
+        */
+        @media (max-width: 600px) {
+            .sm\:my-8 {
+                margin-top: 32px !important;
+                margin-bottom: 32px !important
+            }
+            .sm\:px-4 {
+                padding-left: 16px !important;
+                padding-right: 16px !important
+            }
+            .sm\:px-6 {
+                padding-left: 24px !important;
+                padding-right: 24px !important
+            }
+            .sm\:leading-8 {
+                line-height: 32px !important
+            }
+        }
+
+    </style>
+
+</head>
+<body class="m-0 p-0 w-full [word-break:break-word] [-webkit-font-smoothing:antialiased] bg-background">
+<div role="article" aria-roledescription="email" aria-label="OBAS - Drop in your scenario results" lang="en">
+
+    <div class="bg-background sm:px-4 font-sans">
+        <table align="center" cellpadding="0" cellspacing="0" role="none">
+            <tr>
+                <td class="w-[552px] max-w-full">
+                    <div class="mt-10 mb-10 sm:my-8 text-center">
+                        <img src="../images/logo_text_obas_light.png" width="320" alt="OpenBAS logo">
+                    </div>
+
+
+                    <table class="w-full" cellpadding="0" cellspacing="0" role="none">
+                        <tr>
+                            <td class="p-12 sm:px-6 text-base text-foreground bg-white rounded shadow-sm">
+                                <h2 class="m-0 mb-6 text-2xl sm:leading-8 font-bold text-center">
+                                    ALERT: Drop in risk detection score
+                                </h2>
+                                <h4 class="text-center">Scenario ${scenario_name}</h4>
+
+                                <div class="bg-red-200">
+                                    <table align="center" cellpadding="0" cellspacing="0" role="none">
+                                        <tr>
+                                            <td>
+                                                <h4 class="font-bold"><span style="color: #ec1d0b">-${decrease_prev}%</span> on Prevention & <span style="color: #ec1d0b">-${decrease_detect}%</span> on Detection</h4>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <table cellpadding="0" cellspacing="0" role="none">
+                                    <tr>
+                                        <td>
+                                            <table cellpadding="0" cellspacing="0" role="none">
+                                                <tr><h5 class="font-bold">Previous simulation</h5></tr>
+                                                <tr><p>Date: ${prev_simulation_date}</p></tr>
+                                                <tr><p>Detection: ${prev_percentage_detection}%</p></tr>
+                                                <tr><p>Prevention: ${prev_percentage_prevention}%</p></tr>
+                                            </table>
+                                        </td>
+                                        <td align="end">
+                                            <table cellpadding="0" cellspacing="0" role="none">
+                                                <tr><h5 class="font-bold">New simulation</h5></tr>
+                                                <tr><p>Date: ${new_simulation_date}</p></tr>
+                                                <tr><p>Detection: ${new_percentage_detection}% <span style="color: #ec1d0b">(<svg width="10" height="10" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <mask id="mask0_1754_7" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-4" y="-4" width="24" height="24">
+    <rect x="-4" y="-4" width="24" height="24" fill="currentColor"></rect>
+  </mask>
+  <g mask="url(#mask0_1754_7)">
+    <path d="M7 0V12.175L1.4 6.575L0 8L8 16L16 8L14.6 6.575L9 12.175V0H7Z" fill="#ec1d0b"></path>
+  </g>
+</svg>
+-${decrease_detect}%)</span></p></tr>
+                                                <tr><p>Prevention: ${new_percentage_prevention}%<span style="color: #ec1d0b">(<svg width="10" height="10" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <mask id="mask0_1754_7" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-4" y="-4" width="24" height="24">
+    <rect x="-4" y="-4" width="24" height="24" fill="currentColor"></rect>
+  </mask>
+  <g mask="url(#mask0_1754_7)">
+    <path d="M7 0V12.175L1.4 6.575L0 8L8 16L16 8L14.6 6.575L9 12.175V0H7Z" fill="#ec1d0b"></path>
+  </g>
+</svg>
+-${decrease_prev}%)</span></p></tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+
+
+                                <div class="text-center">
+                                    <a href="${scenarioLink}" class="inline-block px-6 py-4 font-semibold no-underline rounded text-base/none mb-5" style="color: #F4F4F6; background-color: #001BDB">
+                                        <!--[if mso]>
+                                          <i class="mso-font-width-[150%]" style="mso-text-raise: 30px;" hidden="">&emsp;</i>
+                                        <![endif]-->
+                                        <span style="mso-text-raise: 16px">
+                  Access scenario
+                </span>
+                                        <!--[if mso]>
+                                          <i class="mso-font-width-[150%]" hidden="">&emsp;&#8203;</i>
+                                        <![endif]-->
+                                    </a>
+                                </div>
+
+                                <div align="center">
+                                    <a href="${instanceLink}">
+                                        ${instanceLink}
+                                    </a>
+                                </div>
+
+                            </td>
+                        </tr>
+                        <tr>
+                        </tr><tr role="separator">
+                        <td class="leading-4">&zwj;</td>
+                    </tr>
+                        <td class="text-center text-foreground text-xs px-6">
+                            <p>OpenBAS - Breach & Attack Simulation Platform</p>
+                            <div class="mb-2">
+                                <img src="../images/logo-filigran.png" width="100" alt="Filigran logo">
+                            </div>
+                            <p class="m-0 mb-10">New York, Paris, London, Sydney</p>
+                        </td>
+
+                    </table></td></tr>
+        </table>
+
+
+
+    </div>
+
+</div>
+</body>
+</html>
+

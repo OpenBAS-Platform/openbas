@@ -708,34 +708,32 @@ public class ExerciseService {
   }
 
   public boolean isThereAScoreDegradation(
-      List<AtomicTestingUtils.ExpectationResultsByType> lastSimulationResults,
-      List<AtomicTestingUtils.ExpectationResultsByType> secondLastSimulationResults) {
+      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType> lastSimulationResultsMap,
+      Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
+          secondLastSimulationResultsMap) {
 
-    // Map the second last results by type for quick lookup
-    Map<ExpectationType, AtomicTestingUtils.ExpectationResultsByType>
-        secondLastSimulationResultsMap =
-            secondLastSimulationResults.stream()
-                .collect(
-                    Collectors.toMap(
-                        AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
-
-    for (AtomicTestingUtils.ExpectationResultsByType result : lastSimulationResults) {
+    for (ExpectationType type : lastSimulationResultsMap.keySet()) {
       // we ignore manual expectation
-      if (ExpectationType.HUMAN_RESPONSE.equals(result.type())) {
+      if (ExpectationType.HUMAN_RESPONSE.equals(type)) {
         break;
       }
+
+      ExpectationResultsByType lastSimulationResultsByType = lastSimulationResultsMap.get(type);
+      ExpectationResultsByType secondLastSimulationResultsByType =
+          secondLastSimulationResultsMap.get(type);
 
       // we ignore if one of the 2 expectation is still PENDING
-      if (InjectExpectation.EXPECTATION_STATUS.PENDING.equals(result.avgResult())
+      if (InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
+              lastSimulationResultsByType.avgResult())
           || InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
-              secondLastSimulationResultsMap.get(result.type()).avgResult())) {
+              secondLastSimulationResultsByType.avgResult())) {
         break;
       }
 
-      float lastSimulationScore = ScenarioStatisticService.getRoundedPercentage(result);
+      float lastSimulationScore =
+          ScenarioStatisticService.getRoundedPercentage(lastSimulationResultsByType);
       float secondLastSimulationScore =
-          ScenarioStatisticService.getRoundedPercentage(
-              secondLastSimulationResultsMap.get(result.type()));
+          ScenarioStatisticService.getRoundedPercentage(secondLastSimulationResultsByType);
       if (lastSimulationScore < secondLastSimulationScore) {
         return true;
       }
