@@ -7,13 +7,14 @@ import io.openbas.rest.exercise.form.ExercisesGlobalScoresInput;
 import io.openbas.rest.exercise.response.ExercisesGlobalScoresOutput;
 import io.openbas.rest.exercise.service.ExerciseService;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ScenarioNotificationEventHandler implements NotificationEventHandler {
 
-  @Autowired private ExerciseService exerciseService;
+  private final ExerciseService exerciseService;
 
   @Override
   public void handle(NotificationEvent event) {

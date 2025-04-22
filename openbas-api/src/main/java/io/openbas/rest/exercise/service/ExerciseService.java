@@ -720,9 +720,18 @@ public class ExerciseService {
                         AtomicTestingUtils.ExpectationResultsByType::type, Function.identity()));
 
     for (AtomicTestingUtils.ExpectationResultsByType result : lastSimulationResults) {
-      if (result.distribution().isEmpty()) {
+      // we ignore manual expectation
+      if (ExpectationType.HUMAN_RESPONSE.equals(result.type())) {
         break;
       }
+
+      // we ignore if one of the 2 expectation is still PENDING
+      if (InjectExpectation.EXPECTATION_STATUS.PENDING.equals(result.avgResult())
+          || InjectExpectation.EXPECTATION_STATUS.PENDING.equals(
+              secondLastSimulationResultsMap.get(result.type()).avgResult())) {
+        break;
+      }
+
       float lastSimulationScore = ScenarioStatisticService.getRoundedPercentage(result);
       float secondLastSimulationScore =
           ScenarioStatisticService.getRoundedPercentage(
