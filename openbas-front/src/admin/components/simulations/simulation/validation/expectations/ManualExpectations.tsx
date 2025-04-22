@@ -17,6 +17,7 @@ import { useAppDispatch } from '../../../../../../utils/hooks';
 import useDataLoader from '../../../../../../utils/hooks/useDataLoader';
 import { computeColorStyle, computeLabel, resolveUserName, truncate } from '../../../../../../utils/String';
 import { type InjectExpectationsStore } from '../../../../common/injects/expectations/Expectation';
+import { FAILED } from '../../../../common/injects/expectations/ExpectationUtils';
 import ManualExpectationsValidationForm from './ManualExpectationsValidationForm';
 
 const useStyles = makeStyles()(theme => ({
@@ -106,7 +107,7 @@ const ManualExpectations: FunctionComponent<Props> = ({
     style = colorStyles.orange;
   } else {
     const results = parentExpectation.inject_expectation_results ?? [];
-    const hasFailed = results.some(result => result?.result === 'Failed');
+    const hasFailed = results.some(result => result?.result === FAILED);
 
     if (hasFailed) {
       label = `${t('Failed')} (${parentExpectation.inject_expectation_score})`;

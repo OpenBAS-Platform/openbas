@@ -41,6 +41,7 @@ import { makeStyles } from 'tss-react/mui';
 import { fetchMe } from '../../../actions/Application';
 import { fetchPlayerChallenges, validateChallenge } from '../../../actions/Challenge';
 import { fetchPlayerDocuments } from '../../../actions/Document';
+import { FAILED } from '../../../admin/components/common/injects/expectations/ExpectationUtils.js';
 import DocumentType from '../../../admin/components/components/documents/DocumentType';
 import Transition from '../../../components/common/Transition';
 import Empty from '../../../components/Empty';
@@ -246,9 +247,9 @@ const ChallengesPlayer = () => {
 
   const noResult = () => resultList.length === 0 && !hasManualResult;
   const hasResult = () => resultList.length > 0 || hasManualResult;
-  const validResult = () => resultList.length > 0 && resultList.every(r => r.result !== 'Failed');
-  const invalidResult = () => (resultList.length === 0 && hasManualResult) || resultList.some(r => r.result === 'Failed');
-  const maxAttemptsExceeded = () => currentAttempt >= currentChallenge?.challenge_max_attempts;
+  const validResult = () => resultList.length > 0 && resultList.every(r => r.result !== FAILED);
+  const invalidResult = () => (resultList.length === 0 && hasManualResult) || resultList.some(r => r.result === FAILED);
+  const maxAttemptsExceeded = () => !!currentChallenge?.challenge_max_attempts && currentAttempt >= currentChallenge?.challenge_max_attempts;
 
   if (exercise) {
     const groupChallenges = R.groupBy(

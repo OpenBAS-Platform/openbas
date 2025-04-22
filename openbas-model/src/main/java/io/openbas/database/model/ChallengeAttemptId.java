@@ -14,8 +14,4 @@ public class ChallengeAttemptId implements Serializable {
   private String challengeId;
   private String injectStatusId;
   private String userId;
-
-  public ChallengeAttemptId() {
-    // Default constructor
-  }
 }

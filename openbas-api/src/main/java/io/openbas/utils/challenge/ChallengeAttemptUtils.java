@@ -9,7 +9,7 @@ public class ChallengeAttemptUtils {
 
   private ChallengeAttemptUtils() {}
 
-  public static ChallengeAttemptId challengeAttemptId(
+  public static ChallengeAttemptId buildChallengeAttemptID(
       @NotBlank final String challengeId,
       @NotBlank final String injectStatusId,
       @NotBlank final String userId) {
@@ -20,7 +20,7 @@ public class ChallengeAttemptUtils {
     return challengeAttemptId;
   }
 
-  public static ChallengeAttempt challengeAttempt(
+  public static ChallengeAttempt buildChallengeAttempt(
       @NotNull final ChallengeAttemptId challengeAttemptId) {
     ChallengeAttempt challengeAttempt = new ChallengeAttempt();
     challengeAttempt.setCompositeId(challengeAttemptId);
