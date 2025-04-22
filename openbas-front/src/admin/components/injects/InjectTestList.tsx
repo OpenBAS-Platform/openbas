@@ -199,7 +199,7 @@ const InjectTestList: FunctionComponent<Props> = ({
       </List>
       {
         selectedTest !== null
-        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} test={selectedTest} />
+        && <InjectTestDetail open handleClose={() => setSelectedTest(null)} injectTestStatus={selectedTest} />
       }
     </>
   );
