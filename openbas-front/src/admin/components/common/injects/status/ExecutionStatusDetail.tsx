@@ -7,7 +7,7 @@ import Loader from '../../../../../components/Loader';
 import { type ExecutionTraceOutput, type InjectTargetWithResult } from '../../../../../utils/api-types';
 import AgentTraces from './traces/AgentTraces';
 import EndpointTraces from './traces/EndpointTraces';
-import TraceMessage from './traces/TraceMessage';
+import MainTraces from './traces/MainTraces';
 
 interface Props {
   injectId: string;
@@ -47,31 +47,11 @@ const ExecutionStatusDetail = ({ injectId, target }: Props) => {
     <>
       <Typography variant="h4">{t('Execution logs')}</Typography>
       <Paper variant="outlined" style={{ padding: '0 20px 20px' }}>
-        {!loading && (
+        {!loading && traces && traces.length > 0 && (
           <>
-            {(isTeam || isPlayer) && (
-              <>
-                <Typography
-                  variant="subtitle1"
-                  style={{
-                    fontWeight: 'bold',
-                    marginTop: 20,
-                  }}
-                  gutterBottom
-                >
-                  {t('Traces')}
-                </Typography>
-                <TraceMessage traces={traces} />
-              </>
-            )}
-
-            {isAsset && target?.id && target.id && (
-              <EndpointTraces key={target.id} endpoint={target} tracesByAgent={traces} />
-            )}
-
-            {isAgent && traces.length > 0 && (
-              <AgentTraces traces={traces} isInitialExpanded />
-            )}
+            {(isTeam || isPlayer) && (<MainTraces traces={traces} />)}
+            {isAsset && (<EndpointTraces key={target.id} endpoint={target} tracesByAgent={traces} />)}
+            {isAgent && (<AgentTraces traces={traces} isInitialExpanded />)}
           </>
         )}
       </Paper>

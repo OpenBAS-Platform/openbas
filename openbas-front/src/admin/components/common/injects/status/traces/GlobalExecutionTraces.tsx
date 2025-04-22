@@ -5,7 +5,7 @@ import { useFormatter } from '../../../../../../components/i18n';
 import ItemStatus from '../../../../../../components/ItemStatus';
 import { type InjectStatusOutput } from '../../../../../../utils/api-types';
 import ExecutionTime from './ExecutionTime';
-import TraceMessage from './TraceMessage';
+import MainTraces from './MainTraces';
 
 type Props = { injectStatus: InjectStatusOutput };
 
@@ -38,21 +38,7 @@ const GlobalExecutionTraces: FunctionComponent<Props> = ({ injectStatus }) => {
           startDate={injectStatus.tracking_sent_date ?? null}
           endDate={injectStatus.tracking_end_date ?? null}
         />
-        {injectStatus.status_main_traces && (
-          <>
-            <Typography
-              variant="subtitle1"
-              style={{
-                fontWeight: 'bold',
-                marginTop: 20,
-              }}
-              gutterBottom
-            >
-              {t('Traces')}
-            </Typography>
-            <TraceMessage traces={injectStatus.status_main_traces} />
-          </>
-        )}
+        <MainTraces traces={injectStatus.status_main_traces} />
       </Paper>
     </>
   );

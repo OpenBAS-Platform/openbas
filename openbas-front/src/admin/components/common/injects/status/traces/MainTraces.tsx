@@ -5,10 +5,12 @@ import { useFormatter } from '../../../../../../components/i18n';
 import { type ExecutionTraceOutput } from '../../../../../../utils/api-types';
 import TraceMessage from './TraceMessage';
 
-interface Props { traces: ExecutionTraceOutput[] }
+interface Props { traces?: ExecutionTraceOutput[] }
 
 const MainTraces: React.FC<Props> = ({ traces }) => {
   const { t } = useFormatter();
+
+  if (!traces || traces.length === 0) return null;
 
   return (
     <>
@@ -22,7 +24,7 @@ const MainTraces: React.FC<Props> = ({ traces }) => {
       >
         {t('Traces')}
       </Typography>
-      <TraceMessage traces={traces} />
+      {traces && <TraceMessage traces={traces} />}
     </>
   );
 };
