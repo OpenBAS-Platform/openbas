@@ -36,5 +36,5 @@ public class EngineConfig {
 
   private String password;
 
-  private boolean rejectUnauthorized = false;
+  private boolean rejectUnauthorized = true;
 }
