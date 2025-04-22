@@ -2,12 +2,15 @@ package io.openbas.rest;
 
 import static io.openbas.rest.inject_expectation_trace.InjectExpectationTraceApi.INJECT_EXPECTATION_TRACES_URI;
 import static io.openbas.utils.JsonUtils.asJsonString;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.openbas.IntegrationTest;
 import io.openbas.database.model.*;
@@ -41,6 +44,7 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
   @Autowired private InjectExpectationRepository injectExpectationRepository;
   @Autowired private InjectExpectationTraceRepository injectExpectationTraceRepository;
   @Autowired private AssetRepository assetRepository;
+  @Autowired private ObjectMapper mapper;
 
   private Collector savedCollector;
   private Inject savedInject;
@@ -156,30 +160,21 @@ class InjectExpectationTraceApiTest extends IntegrationTest {
             .getContentAsString();
 
     // --ASSERT--
-    assertNotEquals(
-        (String) JsonPath.read(response, "$[0].inject_expectation_trace_id"),
-        JsonPath.read(response, "$[1].inject_expectation_trace_id"));
-    assertTrue(
-        JsonPath.read(response, "$[0].inject_expectation_trace_id")
-                .equals(savedInjectExpectationTrace1.getId())
-            || JsonPath.read(response, "$[0].inject_expectation_trace_id")
-                .equals(savedInjectExpectationTrace2.getId())
-            || JsonPath.read(response, "$[0].inject_expectation_trace_id")
-                .equals(savedInjectExpectationTrace3Dupe.getId()));
-    assertTrue(
-        JsonPath.read(response, "$[1].inject_expectation_trace_id")
-                .equals(savedInjectExpectationTrace1.getId())
-            || JsonPath.read(response, "$[1].inject_expectation_trace_id")
-                .equals(savedInjectExpectationTrace2.getId())
-            || JsonPath.read(response, "$[1].inject_expectation_trace_id")
-                .equals(savedInjectExpectationTrace3Dupe.getId()));
-
-    assertEquals(
-        savedSecurityPlatform.getId(),
-        JsonPath.read(response, "$[0].inject_expectation_trace_source_id"));
-    assertEquals(
-        savedSecurityPlatform.getId(),
-        JsonPath.read(response, "$[1].inject_expectation_trace_source_id"));
+    ObjectMapper objectMapper = mapper.copy();
+    String savedInjectExpectationTrace1Json =
+        mapper.writeValueAsString(savedInjectExpectationTrace1);
+    String savedInjectExpectationTrace2Json =
+        mapper.writeValueAsString(savedInjectExpectationTrace2);
+    String savedInjectExpectationTrace3DupeJson =
+        mapper.writeValueAsString(savedInjectExpectationTrace3Dupe);
+    assertThatJson(response)
+        .when(IGNORING_ARRAY_ORDER)
+        .isArray()
+        .containsAll(
+            List.of(
+                savedInjectExpectationTrace1Json,
+                savedInjectExpectationTrace2Json,
+                savedInjectExpectationTrace3DupeJson));
   }
 
   @DisplayName("Count expectation traces for a collector")
