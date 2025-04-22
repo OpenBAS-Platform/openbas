@@ -40,6 +40,5 @@ public class ExecutionTraceOutput {
   private ExecutionTraceAction action;
 
   @JsonProperty("execution_agent")
-  @NotNull
   private AgentOutput agent;
 }
