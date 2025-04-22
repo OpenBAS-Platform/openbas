@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -121,7 +122,7 @@ public class ExecutionExecutorService {
 
   private void launchExecutorContextForAgent(Inject inject, Agent agent) throws AgentException {
     try {
-      Endpoint assetEndpoint = (Endpoint) agent.getAsset();
+      Endpoint assetEndpoint = (Endpoint) Hibernate.unproxy(agent.getAsset());
       ExecutorContextService executorContextService =
           context.getBean(agent.getExecutor().getName(), ExecutorContextService.class);
       executorContextService.launchExecutorSubprocess(inject, assetEndpoint, agent);
