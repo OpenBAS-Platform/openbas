@@ -3770,9 +3770,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:4.4.0":
-  version: 4.4.0
-  resolution: "@vitejs/plugin-react@npm:4.4.0"
+"@vitejs/plugin-react@npm:4.4.1":
+  version: 4.4.1
+  resolution: "@vitejs/plugin-react@npm:4.4.1"
   dependencies:
     "@babel/core": "npm:^7.26.10"
     "@babel/plugin-transform-react-jsx-self": "npm:^7.25.9"
@@ -3781,7 +3781,7 @@ __metadata:
     react-refresh: "npm:^0.17.0"
   peerDependencies:
     vite: ^4.2.0 || ^5.0.0 || ^6.0.0
-  checksum: 10c0/a3e71dd6f67cca6a2a9ef3a8176bb30b58926fc93c01fa3f15c374aaca0a49fdd01d91fb22b84031ec47175563ad20659167800b1373ede8c4f0b94452ccfeba
+  checksum: 10c0/0eda45f2026cdfff4b172b1b2148824e5ac41ce65f1f1ce108f3ce4de2f0024caf79c811c1305a782168a269b0b1bc58d4cf8eaf164e4ef19954f05428ba7077
   languageName: node
   linkType: hard
 
@@ -9687,7 +9687,7 @@ __metadata:
     "@types/react-syntax-highlighter": "npm:15"
     "@typescript-eslint/utils": "npm:8.31.0"
     "@uiw/react-md-editor": "npm:4.0.5"
-    "@vitejs/plugin-react": "npm:4.4.0"
+    "@vitejs/plugin-react": "npm:4.4.1"
     "@vitest/eslint-plugin": "npm:1.1.43"
     "@xyflow/react": "npm:12.5.6"
     apexcharts: "npm:4.5.0"
