@@ -8,7 +8,9 @@ import io.openbas.rest.helper.RestBehavior;
 import io.openbas.rest.tag_rule.form.TagRuleInput;
 import io.openbas.rest.tag_rule.form.TagRuleMapper;
 import io.openbas.rest.tag_rule.form.TagRuleOutput;
+import io.openbas.service.MailingService;
 import io.openbas.service.TagRuleService;
+import io.openbas.service.UserService;
 import io.openbas.utils.pagination.SearchPaginationInput;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,7 +19,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,11 +43,16 @@ public class TagRuleApi extends RestBehavior {
 
   private final TagRuleService tagRuleService;
   private final TagRuleMapper tagRuleMapper;
+  private final MailingService mailingService;
+  private final UserService userService;
 
-  public TagRuleApi(TagRuleService tagRuleService, TagRuleMapper tagRuleMapper) {
+  public TagRuleApi(TagRuleService tagRuleService, TagRuleMapper tagRuleMapper,
+  MailingService mailingService, UserService userService) {
     super();
     this.tagRuleService = tagRuleService;
     this.tagRuleMapper = tagRuleMapper;
+    this.mailingService = mailingService;
+    this.userService = userService;
   }
 
   @LogExecutionTime
@@ -121,5 +134,15 @@ public class TagRuleApi extends RestBehavior {
   public Page<TagRuleOutput> searchTagRules(
       @RequestBody @Valid SearchPaginationInput searchPaginationInput) {
     return tagRuleService.searchTagRule(searchPaginationInput).map(tagRuleMapper::toTagRuleOutput);
+  }
+
+  @LogExecutionTime
+  @GetMapping(TagRuleApi.TAG_RULE_URI + "/test")
+  @Operation(description = "Get TagRule by Id", summary = "Get TagRule")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The TagRule")})
+  public void testEmail() throws IOException {
+    ClassPathResource resource = new ClassPathResource("email/degratation_score_email.html");
+    String body =  Files.readString(Path.of(resource.getURI()));
+    mailingService.sendEmail("test email Hedi", body, List.of(userService.currentUser(), userService.user("e68e3082-4f37-479a-9cd4-d6b4725bfa04")));
   }
 }
