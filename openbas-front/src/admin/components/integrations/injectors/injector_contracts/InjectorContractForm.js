@@ -28,7 +28,7 @@ const InjectorContractForm = (props) => {
             label={t('Attack patterns')}
             values={values}
             setFieldValue={form.mutators.setValue}
-            style={{ marginTop: theme.spacing(1) }}
+            style={{ marginTop: theme.spacing(2) }}
           />
           <div style={{
             float: 'right',
