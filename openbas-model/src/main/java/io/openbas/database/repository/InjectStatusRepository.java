@@ -26,7 +26,7 @@ public interface InjectStatusRepository
 
   @Query(
       value =
-          "SELECT ins FROM injects_statuses ins "
+          "SELECT ins.* FROM injects_statuses ins "
               + "INNER JOIN injects i ON ins.status_inject = i.inject_id "
               + "INNER JOIN execution_traces t ON t.execution_inject_status_id = ins.status_id "
               + "WHERE i.inject_id = :injectId AND t.execution_agent_id IS NULL",

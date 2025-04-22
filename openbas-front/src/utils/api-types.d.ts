@@ -1057,7 +1057,7 @@ export interface ExecutionTraceOutput {
     | "CLEANUP_EXECUTION"
     | "COMPLETE";
   /** List of primary agents */
-  execution_agent: AgentOutput;
+  execution_agent?: AgentOutput;
   /** A detailed message describing the execution */
   execution_message: string;
   /**

@@ -38,17 +38,21 @@ const GlobalExecutionTraces: FunctionComponent<Props> = ({ injectStatus }) => {
           startDate={injectStatus.tracking_sent_date ?? null}
           endDate={injectStatus.tracking_end_date ?? null}
         />
-        <Typography
-          variant="subtitle1"
-          style={{
-            fontWeight: 'bold',
-            marginTop: 20,
-          }}
-          gutterBottom
-        >
-          {t('Traces')}
-        </Typography>
-        <TraceMessage traces={injectStatus.status_main_traces ?? []} />
+        {injectStatus.status_main_traces && (
+          <>
+            <Typography
+              variant="subtitle1"
+              style={{
+                fontWeight: 'bold',
+                marginTop: 20,
+              }}
+              gutterBottom
+            >
+              {t('Traces')}
+            </Typography>
+            <TraceMessage traces={injectStatus.status_main_traces} />
+          </>
+        )}
       </Paper>
     </>
   );

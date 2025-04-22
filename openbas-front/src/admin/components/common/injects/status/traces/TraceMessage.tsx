@@ -1,9 +1,9 @@
 import { useTheme } from '@mui/material/styles';
 
-import { type ExecutionTracesOutput } from '../../../../../../utils/api-types';
+import { type ExecutionTraceOutput } from '../../../../../../utils/api-types';
 import EEChip from '../../../entreprise_edition/EEChip';
 
-interface Props { traces: ExecutionTracesOutput[] }
+interface Props { traces: ExecutionTraceOutput[] }
 
 const TraceMessage = ({ traces }: Props) => {
   const theme = useTheme();

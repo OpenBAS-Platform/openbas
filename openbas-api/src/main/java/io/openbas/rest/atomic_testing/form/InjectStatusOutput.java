@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openbas.database.model.ExecutionStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -29,9 +27,8 @@ public class InjectStatusOutput {
     return name != null ? name : ExecutionStatus.DRAFT.name();
   }
 
-  @Builder.Default
   @JsonProperty("status_main_traces")
-  private List<ExecutionTraceOutput> traces = new ArrayList<>();
+  private List<ExecutionTraceOutput> traces;
 
   @JsonProperty("tracking_sent_date")
   private Instant trackingSentDate;
