@@ -87,7 +87,7 @@
     "@types/react-dom": "19.1.2",
     "@types/react-syntax-highlighter": "15",
     "@typescript-eslint/utils": "8.31.0",
-    "@vitejs/plugin-react": "4.4.0",
+    "@vitejs/plugin-react": "4.4.1",
     "@vitest/eslint-plugin": "1.1.43",
     "chokidar": "4.0.3",
     "cross-env": "7.0.3",
