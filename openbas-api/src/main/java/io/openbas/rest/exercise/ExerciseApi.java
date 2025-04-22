@@ -324,6 +324,16 @@ public class ExerciseApi extends RestBehavior {
     return exerciseService.updateExercice(exercise, currentTagList, input.isApplyTagRule());
   }
 
+  @PutMapping(EXERCISE_URI + "/{exerciseId}/start_date")
+  @PreAuthorize("isExercisePlanner(#exerciseId)")
+  @Transactional(rollbackFor = Exception.class)
+  @Deprecated(since = "1.16.0")
+  public Exercise deprecatedUpdateExerciseStart(
+      @PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStartDateInput input)
+      throws InputValidationException {
+    return this.updateExerciseStart(exerciseId, input);
+  }
+
   @PutMapping(EXERCISE_URI + "/{exerciseId}/start-date")
   @PreAuthorize("isExercisePlanner(#exerciseId)")
   @Transactional(rollbackFor = Exception.class)
