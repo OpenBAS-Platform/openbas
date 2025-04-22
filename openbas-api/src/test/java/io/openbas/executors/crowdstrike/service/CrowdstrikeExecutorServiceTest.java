@@ -14,9 +14,7 @@ import io.openbas.executors.model.AgentRegisterInput;
 import io.openbas.service.AgentService;
 import io.openbas.service.AssetGroupService;
 import io.openbas.service.EndpointService;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import io.openbas.utils.fixtures.CrowdstrikeDeviceFixture;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +28,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class CrowdstrikeExecutorServiceTest {
 
   public static final String HOST_GROUP_CS = "hostGroupCs";
-  private String DATE;
 
   @Mock private CrowdStrikeExecutorClient client;
 
@@ -47,33 +44,12 @@ public class CrowdstrikeExecutorServiceTest {
   private CrowdStrikeDevice crowdstrikeAgent;
   private Executor crowdstrikeExecutor;
 
-  private void initCsAgent() {
-    crowdstrikeAgent = new CrowdStrikeDevice();
-    crowdstrikeAgent.setDevice_id("externalRefCS");
-    crowdstrikeAgent.setHostname("hostnameCS");
-    crowdstrikeAgent.setPlatform_name("Windows");
-    crowdstrikeAgent.setExternal_ip("1.1.1.1");
-    crowdstrikeAgent.setLocal_ip("1.1.1.2");
-    crowdstrikeAgent.setConnection_ip("1.1.1.3");
-    crowdstrikeAgent.setMac_address("AA:AA:AA:AA:AA:AA");
-    crowdstrikeAgent.setLast_seen(DATE);
-  }
-
-  private void initCsExecutor() {
+  @BeforeEach
+  void setUp() {
+    crowdstrikeAgent = CrowdstrikeDeviceFixture.createDefaultCrowdStrikeDevice();
     crowdstrikeExecutor = new Executor();
     crowdstrikeExecutor.setName(CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_NAME);
     crowdstrikeExecutor.setType(CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE);
-  }
-
-  @BeforeEach
-  void setUp() {
-    Instant now = Instant.now();
-    DateTimeFormatter formatter =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneId.systemDefault());
-    DATE = formatter.format(now);
-
-    initCsAgent();
-    initCsExecutor();
 
     ResourcesGroups resourcesGroups = new ResourcesGroups();
     CrowdStrikeHostGroup crowdstrikeHostGroup = new CrowdStrikeHostGroup();

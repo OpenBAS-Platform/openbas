@@ -161,6 +161,13 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
       // (we update this when the download implant script is launched on the endpoint)
       String executorCommandKey = platform.name() + "." + Endpoint.PLATFORM_ARCH.x86_64.name();
       String command = injector.getExecutorCommands().get(executorCommandKey);
+      // The default command to download the openbas implant and execute the attack is modified for
+      // CS
+      // - WINDOWS_ARCH: CS doesn't know the endpoint architecture so we include it to get the
+      // architecture before downloading the implant and we replace the default x86_64 put before
+      // - WINDOWS_EXTERNAL_REFERENCE: the agent id in the openBAS DB for CS is the CS agent id to
+      // make the batch attack works so we get it with a command line from the endpoint and give it
+      // to the implant
       command =
           WINDOWS_ARCH
               + WINDOWS_EXTERNAL_REFERENCE
@@ -225,6 +232,12 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
     // (we update this when the download implant script is launched on the endpoint)
     String executorCommandKey = platform.name() + "." + Endpoint.PLATFORM_ARCH.x86_64.name();
     String command = injector.getExecutorCommands().get(executorCommandKey);
+    // The default command to download the openbas implant and execute the attack is modified for CS
+    // - UNIX_ARCH: CS doesn't know the endpoint architecture so we include it to get the
+    // architecture before downloading the implant and we replace the default x86_64 put before
+    // - externalReferenceVariable: the agent id in the openBAS DB for CS is the CS agent id to make
+    // the batch attack works so we get it with a command line from the endpoint and give it to the
+    // implant
     command =
         UNIX_ARCH
             + externalReferenceVariable
