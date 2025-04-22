@@ -94,7 +94,8 @@ public class InjectHelper {
   }
 
   public List<Inject> getAllPendingInjectsWithThresholdMinutes(int thresholdMinutes) {
-    return this.injectRepository.findAll(InjectSpecification.pendingInjectWithThresholdMinutes(thresholdMinutes));
+    return this.injectRepository.findAll(
+        InjectSpecification.pendingInjectWithThresholdMinutes(thresholdMinutes));
   }
 
   // -- EXECUTABLE INJECT --

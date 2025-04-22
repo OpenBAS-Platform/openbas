@@ -31,6 +31,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.core.env.Environment;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -40,7 +41,7 @@ import org.springframework.stereotype.Component;
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
 public class InjectsExecutionJob implements Job {
-  private final int injectTimeoutThresholdMinutes = 10;
+  private final Environment env;
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
   private final InjectHelper injectHelper;
@@ -93,9 +94,13 @@ public class InjectsExecutionJob implements Job {
             .toList());
   }
 
+  private int getInjectExecutionThreshold() {
+    return Integer.parseInt(env.getProperty("inject.execution.threshold.minutes", "10"));
+  }
+
   public void handlePendingInject() {
     List<Inject> pendingInjects =
-        injectHelper.getAllPendingInjectsWithThresholdMinutes(injectTimeoutThresholdMinutes);
+        injectHelper.getAllPendingInjectsWithThresholdMinutes(getInjectExecutionThreshold());
 
     List<InjectStatus> updatedStatuses =
         pendingInjects.stream()
@@ -104,9 +109,9 @@ public class InjectsExecutionJob implements Job {
                   InjectStatus status =
                       inject.getStatus().orElseThrow(ElementNotFoundException::new);
                   status.setName(ExecutionStatus.MAYBE_PREVENTED);
-                  status.addInfoTrace(
+                  status.addWarningTrace(
                       "Execution delay detected: Inject exceeded the "
-                          + injectTimeoutThresholdMinutes
+                          + getInjectExecutionThreshold()
                           + " minutes threshold.",
                       ExecutionTraceAction.EXECUTION);
                   return status;

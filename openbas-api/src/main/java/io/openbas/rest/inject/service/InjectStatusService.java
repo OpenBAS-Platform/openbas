@@ -268,7 +268,7 @@ public class InjectStatusService {
     return injectStatusRepository.save(injectStatus);
   }
 
-  public Iterable<InjectStatus> saveAll(@NotNull List<InjectStatus> injectStatuses){
-      return this.injectStatusRepository.saveAll(injectStatuses);
+  public Iterable<InjectStatus> saveAll(@NotNull List<InjectStatus> injectStatuses) {
+    return this.injectStatusRepository.saveAll(injectStatuses);
   }
 }
