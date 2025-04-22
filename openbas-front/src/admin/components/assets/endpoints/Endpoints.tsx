@@ -30,7 +30,10 @@ import AssetStatus from '../AssetStatus';
 import AgentPrivilege from './AgentPrivilege';
 import EndpointPopover from './EndpointPopover';
 
-const useStyles = makeStyles()(() => ({ itemHead: { textTransform: 'uppercase' } }));
+const useStyles = makeStyles()(() => ({
+  itemHead: { textTransform: 'uppercase' },
+  item: { height: 50 },
+}));
 
 const inlineStyles: Record<string, CSSProperties> = {
   asset_name: { width: '25%' },
@@ -65,7 +68,7 @@ const Endpoints = () => {
 
   // Fetching data
   const { userAdmin, executorsMap } = useHelper((helper: ExecutorHelper & UserHelper) => ({
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
     executorsMap: helper.getExecutorsMap(),
   }));
   useDataLoader(() => {
@@ -338,6 +341,7 @@ const Endpoints = () => {
                     <ListItemButton
                       component={Link}
                       to={`/admin/assets/endpoints/${endpoint.asset_id}`}
+                      classes={{ root: classes.item }}
                     >
                       <ListItemIcon>
                         <DevicesOtherOutlined color="primary" />

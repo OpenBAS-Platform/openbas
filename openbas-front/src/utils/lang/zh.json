@@ -5,6 +5,8 @@
   ".": ".",
   "(last 180 days)": "(过去 180 天）",
   "[${exercise.name}] Lessons learned questionnaire": "[${exercise.name}] 经验教训调查问卷",
+  "{executor_name} documentation": "{executor_name}文件",
+  "{executor_name} documentation.": "{executor_name} 文档。",
   "&": "&；",
   "|": "|",
   "1 month": "一个月",

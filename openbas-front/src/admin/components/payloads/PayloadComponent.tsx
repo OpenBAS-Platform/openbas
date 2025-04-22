@@ -43,7 +43,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
   const { t } = useFormatter();
   const theme = useTheme();
 
-  const { attackPatternsMap } = useHelper((helper: AttackPatternHelper) => ({ attackPatternsMap: helper.getAttackPatternsMap() }));
+  const { attackPatternsMap }: { attackPatternsMap: ReturnType<AttackPatternHelper['getAttackPatternsMap']> } = useHelper((helper: AttackPatternHelper) => ({ attackPatternsMap: helper.getAttackPatternsMap() }));
 
   const getAttackCommand = (payload: PayloadType | null): string => {
     if (!payload) return '';
@@ -96,7 +96,7 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
               {t('Attack patterns')}
             </Typography>
 
-            {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap[attackPatternId]).map((attackPattern: AttackPattern) => (
+            {selectedPayload?.payload_attack_patterns && selectedPayload?.payload_attack_patterns.length === 0 ? '-' : selectedPayload?.payload_attack_patterns?.map((attackPatternId: string) => attackPatternsMap?.[attackPatternId]).map((attackPattern: AttackPattern) => (
               <Tooltip key={attackPattern.attack_pattern_id} title={`[${attackPattern.attack_pattern_external_id}] ${attackPattern.attack_pattern_name}`}>
                 <Chip
                   variant="outlined"
@@ -119,12 +119,11 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
               variant="body2"
               gutterBottom
             >
-              {t(selectedPayload?.payload_execution_arch)}
+              {selectedPayload && t(selectedPayload?.payload_execution_arch)}
             </Typography>
           </div>
 
           <div>
-
             <Typography
               variant="h3"
               gutterBottom
@@ -261,33 +260,28 @@ const PayloadComponent: FunctionComponent<Props> = ({ selectedPayload }) => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => {
-                          return (
-                            <>
-                              <TableRow
-                                key={prerequisite.executor}
-                              >
-                                <TableCell>
-                                  {prerequisite.executor}
-                                </TableCell>
-                                <TableCell>
-                                  <pre>
-                                    <ItemCopy content={prerequisite.get_command} />
-                                  </pre>
-                                </TableCell>
-                                <TableCell>
-                                  {prerequisite.check_command !== undefined
-                                    ? (
-                                        <pre>
-                                          <ItemCopy content={prerequisite.check_command} />
-                                        </pre>
-                                      ) : '-'}
-
-                                </TableCell>
-                              </TableRow>
-                            </>
-                          );
-                        })}
+                        {selectedPayload?.payload_prerequisites?.map((prerequisite: PayloadPrerequisite) => (
+                          <TableRow
+                            key={prerequisite.executor}
+                          >
+                            <TableCell>
+                              {prerequisite.executor}
+                            </TableCell>
+                            <TableCell>
+                              <pre>
+                                <ItemCopy content={prerequisite.get_command} />
+                              </pre>
+                            </TableCell>
+                            <TableCell>
+                              {prerequisite.check_command !== undefined
+                                ? (
+                                    <pre>
+                                      <ItemCopy content={prerequisite.check_command} />
+                                    </pre>
+                                  ) : '-'}
+                            </TableCell>
+                          </TableRow>
+                        ))}
                       </TableBody>
                     </Table>
                   </TableContainer>

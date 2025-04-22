@@ -149,8 +149,8 @@ const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const { exerciseId } = ownProps;
   return {
-    exercise: helper.getExercise(exerciseId),
-    tagsMap: helper.getTagsMap(),
+    exercise: helper.getExercise(exerciseId).toJS(),
+    tagsMap: helper.getTagsMap().toJS(),
   };
 };
 

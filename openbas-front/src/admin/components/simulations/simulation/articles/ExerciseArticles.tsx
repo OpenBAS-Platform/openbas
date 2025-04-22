@@ -15,7 +15,7 @@ const ExerciseArticles = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: Exercise['exercise_id'] };
-  const articles = useHelper((helper: ArticlesHelper) => helper.getExerciseArticles(exerciseId));
+  const { articles } = useHelper((helper: ArticlesHelper) => ({ articles: helper.getExerciseArticles(exerciseId) }));
   useDataLoader(() => {
     dispatch(fetchExerciseArticles(exerciseId));
   });

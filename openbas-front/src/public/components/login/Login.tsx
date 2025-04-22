@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { makeStyles } from 'tss-react/mui';
 
-import { askToken, checkKerberos, fetchPlatformParameters } from '../../../actions/Application';
+import { askToken, checkKerberos } from '../../../actions/Application';
 import { type LoggedHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import byFiligranDark from '../../../static/images/by_filigran_dark.png';
@@ -83,7 +83,6 @@ const Login = () => {
     return () => window.removeEventListener('resize', updateWindowDimensions);
   });
   useEffect(() => {
-    dispatch(fetchPlatformParameters());
     dispatch(checkKerberos());
   });
   const onSubmit = (data: {

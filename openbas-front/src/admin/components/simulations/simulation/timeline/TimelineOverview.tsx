@@ -82,10 +82,10 @@ const TimelineOverview = () => {
     searchColumns,
   );
 
-  const isEnable = (inject: InjectStore): boolean => inject.inject_injector_contract.injector_contract_content_parsed?.config.expose && inject.inject_enabled;
-  const filteredInjects = filtering.filterAndSort(injects.filter((inject: InjectStore) => isEnable(inject)));
-  const pendingInjects = filtering.filterAndSort(filteredInjects.filter((inject: InjectStore) => inject.inject_status === null));
-  const processedInjects = filtering.filterAndSort(filteredInjects.filter((i: InjectStore) => i.inject_status !== null));
+  const isEnable = (inject: InjectStore): boolean => inject.inject_injector_contract?.convertedContent?.config.expose && !!inject.inject_enabled;
+  const filteredInjects: InjectStore[] = filtering.filterAndSort(injects.filter((inject: InjectStore) => isEnable(inject)));
+  const pendingInjects: InjectStore[] = filtering.filterAndSort(filteredInjects.filter((inject: InjectStore) => inject.inject_status === null));
+  const processedInjects: InjectStore[] = filtering.filterAndSort(filteredInjects.filter((i: InjectStore) => i.inject_status !== null));
 
   const onUpdateInject = async (inject: Inject) => {
     if (selectedInjectId) {
@@ -149,9 +149,9 @@ const TimelineOverview = () => {
                     >
                       <ListItemIcon>
                         <InjectIcon
-                          isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                          isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
                           type={
-                            inject.inject_injector_contract.injector_contract_payload
+                            inject.inject_injector_contract?.injector_contract_payload
                               ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
                               || inject.inject_injector_contract.injector_contract_payload?.payload_type
                               : inject.inject_type
@@ -213,9 +213,9 @@ const TimelineOverview = () => {
                   >
                     <ListItemIcon>
                       <InjectIcon
-                        isPayload={isNotEmptyField(inject.inject_injector_contract.injector_contract_payload)}
+                        isPayload={isNotEmptyField(inject.inject_injector_contract?.injector_contract_payload)}
                         type={
-                          inject.inject_injector_contract.injector_contract_payload
+                          inject.inject_injector_contract?.injector_contract_payload
                             ? inject.inject_injector_contract.injector_contract_payload?.payload_collector_type
                             || inject.inject_injector_contract.injector_contract_payload?.payload_type
                             : inject.inject_type

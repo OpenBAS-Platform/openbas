@@ -3,7 +3,7 @@ import { SelectGroup } from 'mdi-material-ui';
 import { type CSSProperties, useMemo, useState } from 'react';
 import { makeStyles } from 'tss-react/mui';
 
-import { type TagHelper, type UserHelper } from '../../../../actions/helper';
+import { type UserHelper } from '../../../../actions/helper';
 import { searchTagRules } from '../../../../actions/tag_rules/tagrule-actions';
 import Breadcrumbs from '../../../../components/Breadcrumbs';
 import PaginationComponentV2 from '../../../../components/common/queryable/pagination/PaginationComponentV2';
@@ -31,7 +31,7 @@ const TagRules = () => {
   const { classes } = useStyles();
   const bodyItemsStyles = useBodyItemsStyles();
 
-  const { userAdmin } = useHelper((helper: TagHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const [tagRules, setTagRules] = useState<TagRuleOutput[]>([]);
 

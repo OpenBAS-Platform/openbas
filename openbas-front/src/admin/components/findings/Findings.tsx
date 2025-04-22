@@ -1,8 +1,12 @@
 import { searchFindings } from '../../../actions/findings/finding-actions';
+import Breadcrumbs from '../../../components/Breadcrumbs';
+import { useFormatter } from '../../../components/i18n';
 import type { FindingOutput } from '../../../utils/api-types';
 import FindingList from './FindingList';
 
 const Findings = () => {
+  const { t } = useFormatter();
+
   const additionalFilterNames = [
     'finding_inject_id',
     'finding_scenario',
@@ -30,12 +34,21 @@ const Findings = () => {
     },
   ];
   return (
-    <FindingList
-      searchFindings={searchFindings}
-      additionalHeaders={additionalHeaders}
-      additionalFilterNames={additionalFilterNames}
-      filterLocalStorageKey="findings"
-    />
+    <>
+      <Breadcrumbs
+        variant="list"
+        elements={[{
+          label: t('Findings'),
+          current: true,
+        }]}
+      />
+      <FindingList
+        searchFindings={searchFindings}
+        additionalHeaders={additionalHeaders}
+        additionalFilterNames={additionalFilterNames}
+        filterLocalStorageKey="findings"
+      />
+    </>
   );
 };
 

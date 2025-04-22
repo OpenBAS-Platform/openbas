@@ -23,7 +23,7 @@ const ScenarioVariables = () => {
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
   const { permissions } = useContext(PermissionsContext);
-  const variables = useHelper((helper: VariablesHelper) => helper.getScenarioVariables(scenarioId));
+  const { variables } = useHelper((helper: VariablesHelper) => ({ variables: helper.getScenarioVariables(scenarioId) }));
   useDataLoader(() => {
     dispatch(fetchVariablesForScenario(scenarioId));
   });

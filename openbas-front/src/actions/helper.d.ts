@@ -2,6 +2,7 @@ import { type Challenge, type Document, type Exercise, type Organization, type P
 
 export interface UserHelper {
   getMe: () => User;
+  getMeAdmin: () => boolean;
   getUsersMap: () => Record<string, User>;
 }
 

@@ -81,11 +81,16 @@ const Organizations = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { organizations, tagsMap, userAdmin } = useHelper((helper: UserHelper & TagHelper & OrganizationHelper) => ({
-    organizations: helper.getOrganizations(),
-    tagsMap: helper.getTagsMap(),
-    userAdmin: helper.getMe()?.user_admin,
-  }));
+  const { organizations, tagsMap, userAdmin }: {
+    organizations: ReturnType<OrganizationHelper['getOrganizations']>;
+    tagsMap: ReturnType<TagHelper['getTagsMap']>;
+    userAdmin: ReturnType<UserHelper['getMeAdmin']>;
+  }
+    = useHelper((helper: UserHelper & TagHelper & OrganizationHelper) => ({
+      organizations: helper.getOrganizations(),
+      tagsMap: helper.getTagsMap(),
+      userAdmin: helper.getMeAdmin(),
+    }));
 
   useDataLoader(() => {
     dispatch(fetchOrganizations());

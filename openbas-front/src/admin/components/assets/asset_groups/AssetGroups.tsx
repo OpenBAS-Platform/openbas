@@ -128,7 +128,7 @@ const AssetGroups = () => {
   const [searchId] = searchParams.getAll('id');
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: EndpointHelper & UserHelper & TagHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   // Headers
   const headers: Header[] = useMemo(() => [

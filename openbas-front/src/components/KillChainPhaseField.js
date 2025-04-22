@@ -125,8 +125,8 @@ class KillChainPhaseField extends Component {
 const select = (state) => {
   const helper = storeHelper(state);
   return {
-    killChainPhases: helper.getKillChainPhases(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    killChainPhases: helper.getKillChainPhases().toJS(),
+    userAdmin: helper.getMeAdmin(),
   };
 };
 

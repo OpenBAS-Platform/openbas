@@ -24,7 +24,7 @@ const Simulations = () => {
   const { t } = useFormatter();
 
   // Fetching data
-  const { userAdmin } = useHelper((helper: ExercisesHelper & UserHelper) => ({ userAdmin: helper.getMe()?.user_admin ?? false }));
+  const { userAdmin } = useHelper((helper: ExercisesHelper & UserHelper) => ({ userAdmin: helper.getMeAdmin() }));
 
   const [loading, setLoading] = useState<boolean>(true);
   const [exercises, setExercises] = useState<ExerciseSimple[]>([]);

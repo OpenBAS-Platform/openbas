@@ -5,6 +5,8 @@
   ".": ".",
   "(last 180 days)": "(180 derniers jours)",
   "[${exercise.name}] Lessons learned questionnaire": "[${exercise.name}] Questionnaire de retour d'expérience",
+  "{executor_name} documentation": "documentation {executor_name}",
+  "{executor_name} documentation.": "documentation {executor_name}.",
   "&": "& ;",
   "|": "|",
   "1 month": "1 mois",

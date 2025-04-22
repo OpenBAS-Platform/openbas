@@ -74,7 +74,7 @@ const Documents = () => {
   const { exercisesMap, scenariosMap, userAdmin } = useHelper(helper => ({
     exercisesMap: helper.getExercisesMap(),
     scenariosMap: helper.getScenariosMap(),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   useDataLoader(() => {
     dispatch(fetchExercises());

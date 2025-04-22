@@ -18,7 +18,7 @@ const ExecutorDocumentationLink: FunctionComponent<Props> = ({ executor }) => {
         <Typography variant="body1">
           {t('To install the agent please follow the ')}
           <a target="_blank" href={executor.executor_doc} rel="noreferrer">
-            {`${executor.executor_name} ${t('documentation')}`}
+            {t('{executor_name} documentation', { executor_name: executor.executor_name })}
           </a>
           .
         </Typography>

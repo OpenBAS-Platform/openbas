@@ -68,7 +68,7 @@ const AssetGroupManagement: FunctionComponent<Props> = ({
   // Fetching data
   const { assetGroup, userAdmin } = useHelper((helper: AssetGroupsHelper & UserHelper) => ({
     assetGroup: helper.getAssetGroup(assetGroupId),
-    userAdmin: helper.getMe()?.user_admin ?? false,
+    userAdmin: helper.getMeAdmin(),
   }));
   useDataLoader(() => {
     dispatch(fetchAssetGroup(assetGroupId));

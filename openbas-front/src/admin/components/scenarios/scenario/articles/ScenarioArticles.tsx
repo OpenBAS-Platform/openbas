@@ -15,7 +15,7 @@ const ScenarioArticles = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { scenarioId } = useParams() as { scenarioId: Scenario['scenario_id'] };
-  const articles = useHelper((helper: ArticlesHelper) => helper.getScenarioArticles(scenarioId));
+  const { articles } = useHelper((helper: ArticlesHelper) => ({ articles: helper.getScenarioArticles(scenarioId) }));
   useDataLoader(() => {
     dispatch(fetchScenarioArticles(scenarioId));
   });

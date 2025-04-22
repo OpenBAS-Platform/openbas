@@ -179,7 +179,7 @@ const Index = () => {
   const dispatch = useAppDispatch();
   // Fetching data
   const { exerciseId } = useParams() as { exerciseId: ExerciseType['exercise_id'] };
-  const exercise = useHelper((helper: ExercisesHelper) => helper.getExercise(exerciseId));
+  const { exercise } = useHelper((helper: ExercisesHelper) => ({ exercise: helper.getExercise(exerciseId) }));
   useDataLoader(() => {
     setLoading(true);
     dispatch(fetchExercise(exerciseId)).finally(() => {

@@ -45,7 +45,7 @@ const InjectDistributionByType: FunctionComponent<Props> = ({ exerciseId }) => {
       data: injectsByType.map((a: InjectStore & { number: number }) => ({
         x: tPick(a.inject_injector_contract?.injector_contract_labels),
         y: a.number,
-        fillColor: a.inject_injector_contract?.injector_contract_content_parsed?.config?.color,
+        fillColor: a.inject_injector_contract?.convertedContent?.config?.[`color_${theme.palette.mode}`],
       })),
     },
   ];

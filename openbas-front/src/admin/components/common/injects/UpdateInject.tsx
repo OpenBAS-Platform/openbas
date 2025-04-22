@@ -4,20 +4,19 @@ import { type SyntheticEvent, useEffect, useRef, useState } from 'react';
 
 import { fetchInject } from '../../../../actions/Inject';
 import { type InjectorContractConverted } from '../../../../actions/injector_contracts/InjectorContract';
-import { type InjectOutputType } from '../../../../actions/injects/Inject';
+import { type InjectOutputType, type InjectStore } from '../../../../actions/injects/Inject';
 import { type InjectHelper } from '../../../../actions/injects/inject-helper';
 import Drawer from '../../../../components/common/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import PlatformIcon from '../../../../components/PlatformIcon';
 import { useHelper } from '../../../../store';
-import { type AttackPattern, type Inject, type InjectInput, type InjectorContractOutput, type KillChainPhase } from '../../../../utils/api-types';
+import { type AttackPattern, type Inject, type InjectInput, type KillChainPhase } from '../../../../utils/api-types';
 import { useAppDispatch } from '../../../../utils/hooks';
 import useDataLoader from '../../../../utils/hooks/useDataLoader';
 import { isNotEmptyField } from '../../../../utils/utils';
 import InjectDetailsForm from './form/InjectDetailsForm';
 import InjectIcon from './InjectIcon';
 import UpdateInjectLogicalChains from './UpdateInjectLogicalChains';
-
 interface Props {
   open: boolean;
   handleClose: () => void;
@@ -37,7 +36,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
   const [activeTab, setActiveTab] = useState<null | string>(availableTabs[0]);
   const [isInjectLoading, setIsInjectLoading] = useState(true);
   // Fetching data
-  const { inject } = useHelper((helper: InjectHelper) => ({ inject: helper.getInject(injectId) }));
+  const { inject }: { inject: InjectStore } = useHelper((helper: InjectHelper) => ({ inject: helper.getInject(injectId) }));
 
   useDataLoader(() => {
     setIsInjectLoading(true);
@@ -103,7 +102,7 @@ const UpdateInject: React.FC<Props> = ({ open, handleClose, onUpdateInject, mass
               }}
               >
                 {inject?.inject_injector_contract?.injector_contract_platforms?.map(
-                  (platform: InjectorContractOutput['injector_contract_platforms']) => (
+                  platform => (
                     <PlatformIcon
                       key={String(platform)}
                       width={20}
