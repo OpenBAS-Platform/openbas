@@ -1,5 +1,5 @@
 import { Divider, GridLegacy, List, Paper, Tab, Tabs, Typography } from '@mui/material';
-import { Fragment, type SyntheticEvent, useContext, useEffect, useState } from 'react';
+import {Fragment, type SyntheticEvent, useContext, useEffect, useMemo, useState} from 'react';
 import { makeStyles } from 'tss-react/mui';
 
 import { searchTargets } from '../../../../actions/injects/inject-action';
@@ -63,19 +63,30 @@ const AtomicTesting = () => {
 
   const sortedTargets: InjectTargetWithResult[] = filtering.filterAndSort(injectResultOverviewOutput?.inject_targets ?? []);
 
-  const tabConfig = [
-    {
-      key: 0,
-      label: t('Asset groups'),
-      type: 'ASSETS_GROUPS',
-      entityPrefix: 'asset_group_target',
-    },
-    {
-      key: 1,
+  const [hasAssetsGroup, setHasAssetsGroup] = useState(false);
+  const [hasAssetsGroupChecked, setHasAssetsGroupChecked] = useState(false);
+
+  const tabConfig = useMemo(() => {
+    let index = 0;
+    const tabs = [];
+
+    if (hasAssetsGroup) {
+      tabs.push({
+        key: index++,
+        label: t('Asset groups'),
+        type: 'ASSETS_GROUPS',
+        entityPrefix: 'asset_group_target',
+      });
+    }
+
+    tabs.push({
+      key: index++,
       label: t('All targets'),
       type: 'ALL_TARGETS',
-    },
-  ];
+    });
+
+    return tabs;
+  }, [hasAssetsGroup, t]);
 
   const { queryableHelpers, searchPaginationInput } = useQueryable(buildSearchPagination({
     filterGroup: {
@@ -84,14 +95,39 @@ const AtomicTesting = () => {
     },
   }));
 
+  const injectId = injectResultOverviewOutput?.inject_id || '';
+
   useEffect(() => {
-    setSelectedTargetLegacy(selectedTargetLegacy || currentParentTarget || injectResultOverviewOutput?.inject_targets ? injectResultOverviewOutput?.inject_targets[0] : undefined);
-    searchTargets(injectResultOverviewOutput?.inject_id ? injectResultOverviewOutput?.inject_id : '', tabConfig[0].type, searchPaginationInput)
+    if (!injectResultOverviewOutput) return;
+
+    setSelectedTargetLegacy(
+      selectedTargetLegacy ||
+      currentParentTarget ||
+      injectResultOverviewOutput?.inject_targets?.[0]
+    );
+
+    const searchPaginationInput1Result = { ...searchPaginationInput, size: 1 };
+
+    searchTargets(injectId, 'ASSETS_GROUPS', searchPaginationInput1Result)
+      .then((response) => {
+        if (response.data.content.length > 0) {
+          setHasAssetsGroup(true);
+        }
+      })
+      .finally(() => {
+        setHasAssetsGroupChecked(true);
+      });
+  }, [injectResultOverviewOutput]);
+
+  useEffect(() => {
+    if (!hasAssetsGroupChecked || !injectResultOverviewOutput || tabConfig[0].type == 'ALL_TARGETS') return;
+
+    searchTargets(injectId, tabConfig[0].type, searchPaginationInput)
       .then((response) => {
         setTargets(response.data);
         setSelectedTarget(response.data);
       });
-  }, [injectResultOverviewOutput]);
+  }, [hasAssetsGroupChecked, injectResultOverviewOutput]);
 
   // Handles
 
@@ -186,66 +222,72 @@ const AtomicTesting = () => {
         </div>
         <div className="clearfix" />
         <Paper classes={{ root: classes.paper }} variant="outlined">
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
-            className={classes.tabs}
-          >
-            {tabConfig.map(tab => (
-              <Tab key={`tab-${tab.key}`} label={tab.label} />
-            ))}
-          </Tabs>
-          {tabConfig.map((tab) => {
-            const isAllTargets = tab.type === 'ALL_TARGETS';
-            return (
-              <div key={`tab-${tab.key}`} hidden={activeTab !== tab.key}>
-                {!isAllTargets && (
-                  <>
-                    <PaginationComponentV2
-                      fetch={input => searchTargets(injectResultOverviewOutput?.inject_id, tab.type, input)}
-                      searchPaginationInput={searchPaginationInput}
-                      setContent={setTargets}
-                      entityPrefix={tab.entityPrefix}
-                      queryableHelpers={queryableHelpers}
-                      topPagination={true}
-                    />
-                    {targets && targets.length > 0 ? (
-                      <List>
-                        {targets.map(target => (
-                          <NewTargetListItem
-                            onClick={() => handleNewTargetClick(target)}
-                            target={target}
-                            selected={selectedTarget?.target_id === target.target_id}
-                            key={target?.target_id}
-                          />
-                        ))}
-                      </List>
-                    ) : (
-                      <Empty message={t('No target configured.')} />
+          {hasAssetsGroupChecked && (
+            <>
+              <Tabs
+                value={activeTab}
+                onChange={handleTabChange}
+                indicatorColor="primary"
+                textColor="primary"
+                className={classes.tabs}
+              >
+                {tabConfig
+                  .map(tab => (
+                  <Tab key={`tab-${tab.key}`} label={tab.label} />
+                ))}
+              </Tabs>
+              {tabConfig
+                .map((tab) => {
+                const isAllTargets = tab.type === 'ALL_TARGETS';
+                return (
+                  <div key={`tab-${tab.key}`} hidden={activeTab !== tab.key}>
+                    {!isAllTargets && (
+                      <>
+                        <PaginationComponentV2
+                          fetch={input => searchTargets(injectResultOverviewOutput?.inject_id, tab.type, input)}
+                          searchPaginationInput={searchPaginationInput}
+                          setContent={setTargets}
+                          entityPrefix={tab.entityPrefix}
+                          queryableHelpers={queryableHelpers}
+                          topPagination={true}
+                        />
+                        {targets && targets.length > 0 ? (
+                          <List>
+                            {targets.map(target => (
+                              <NewTargetListItem
+                                onClick={() => handleNewTargetClick(target)}
+                                target={target}
+                                selected={selectedTarget?.target_id === target.target_id}
+                                key={target?.target_id}
+                              />
+                            ))}
+                          </List>
+                        ) : (
+                          <Empty message={t('No target configured.')} />
+                        )}
+                      </>
                     )}
-                  </>
-                )}
 
-                {isAllTargets && (
-                  <>
-                    {sortedTargets.length > 0 ? (
-                      <List>
-                        {sortedTargets.map(target => (
-                          <div key={target?.id}>
-                            {renderTargetItem(target, undefined, undefined)}
-                          </div>
-                        ))}
-                      </List>
-                    ) : (
-                      <Empty message={t('No target configured.')} />
+                    {isAllTargets && (
+                      <>
+                        {sortedTargets.length > 0 ? (
+                          <List>
+                            {sortedTargets.map(target => (
+                              <div key={target?.id}>
+                                {renderTargetItem(target, undefined, undefined)}
+                              </div>
+                            ))}
+                          </List>
+                        ) : (
+                          <Empty message={t('No target configured.')} />
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              </div>
-            );
-          })}
+                  </div>
+                );
+              })}
+            </>
+          )}
         </Paper>
       </GridLegacy>
       <GridLegacy item xs={6} style={{ marginTop: 29 }}>
