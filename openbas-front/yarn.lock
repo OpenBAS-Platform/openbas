@@ -4065,9 +4065,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apexcharts@npm:4.5.0":
-  version: 4.5.0
-  resolution: "apexcharts@npm:4.5.0"
+"apexcharts@npm:4.6.0":
+  version: 4.6.0
+  resolution: "apexcharts@npm:4.6.0"
   dependencies:
     "@svgdotjs/svg.draggable.js": "npm:^3.0.4"
     "@svgdotjs/svg.filter.js": "npm:^3.0.8"
@@ -4075,7 +4075,7 @@ __metadata:
     "@svgdotjs/svg.resize.js": "npm:^2.0.2"
     "@svgdotjs/svg.select.js": "npm:^4.0.1"
     "@yr/monotone-cubic-spline": "npm:^1.0.3"
-  checksum: 10c0/284e8ef367ee21055358db3705648a86e0922ae55237c6e9e6bddaf8e3012b2d7414b56be9c0267f19c7bd69b500ef7e0eefc80780661976cc4c5d7a9157f68d
+  checksum: 10c0/2cb4a0e3bf0c814ff2d8baa3ece78760566e0bd3970ad845548ae6b49a14bdebd2dc9dcaae5f569d58dd84b58a3703d68ba3cd5cab8f3d448267859da183b832
   languageName: node
   linkType: hard
 
@@ -9702,7 +9702,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:4.4.1"
     "@vitest/eslint-plugin": "npm:1.1.43"
     "@xyflow/react": "npm:12.6.0"
-    apexcharts: "npm:4.5.0"
+    apexcharts: "npm:4.6.0"
     axios: "npm:1.8.4"
     chokidar: "npm:4.0.3"
     ckeditor5: "npm:44.3.0"
