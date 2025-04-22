@@ -252,7 +252,7 @@ public class ExerciseApiTest {
                   .content(asJsonString(input))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
 
@@ -267,7 +267,7 @@ public class ExerciseApiTest {
                   .content(asJsonString(input))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
 
@@ -298,7 +298,7 @@ public class ExerciseApiTest {
                   .content(asJsonString(input))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
   }

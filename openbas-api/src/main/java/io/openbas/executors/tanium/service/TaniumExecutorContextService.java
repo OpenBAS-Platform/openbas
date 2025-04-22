@@ -10,7 +10,6 @@ import io.openbas.executors.ExecutorContextService;
 import io.openbas.executors.tanium.client.TaniumExecutorClient;
 import io.openbas.executors.tanium.config.TaniumExecutorConfig;
 import io.openbas.rest.exception.AgentException;
-import io.openbas.rest.exception.LicenseRestrictionException;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -20,31 +19,24 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service(TANIUM_EXECUTOR_NAME)
+@Service(TaniumExecutorContextService.SERVICE_NAME)
 @RequiredArgsConstructor
 public class TaniumExecutorContextService extends ExecutorContextService {
 
   private final Ee eeService;
+  private final LicenseCacheManager licenseCacheManager;
   private final TaniumExecutorConfig taniumExecutorConfig;
   private final TaniumExecutorClient taniumExecutorClient;
-  private final LicenseCacheManager licenseCacheManager;
+  public static final String SERVICE_NAME = TANIUM_EXECUTOR_NAME;
 
   public void launchExecutorSubprocess(
       @NotNull final Inject inject,
       @NotNull final Endpoint assetEndpoint,
       @NotNull final Agent agent)
       throws AgentException {
-    if (!eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
-      inject
-          .getStatus()
-          .ifPresent(
-              status ->
-                  status.addInfoTrace(
-                      "LICENSE RESTRICTION - Some asset will be executed through the Tanium executor",
-                      ExecutionTraceAction.EXECUTION));
-      throw new LicenseRestrictionException(
-          "LICENSE RESTRICTION - Asset will be executed through the Tanium executor");
-    }
+
+    InjectStatus status = inject.getStatus().orElseThrow();
+    eeService.throwEEExecutorService(licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, status);
 
     if (!this.taniumExecutorConfig.isEnable()) {
       throw new AgentException("Fatal error: Tanium executor is not enabled", agent);

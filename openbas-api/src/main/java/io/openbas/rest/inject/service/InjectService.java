@@ -1,7 +1,5 @@
 package io.openbas.rest.inject.service;
 
-import static io.openbas.executors.crowdstrike.service.CrowdStrikeExecutorService.CROWDSTRIKE_EXECUTOR_TYPE;
-import static io.openbas.executors.tanium.service.TaniumExecutorService.TANIUM_EXECUTOR_TYPE;
 import static io.openbas.helper.StreamHelper.fromIterable;
 import static io.openbas.helper.StreamHelper.iterableToSet;
 import static io.openbas.utils.AgentUtils.isPrimaryAgent;
@@ -279,41 +277,23 @@ public class InjectService {
     return injectMapper.toInjectResultOverviewOutput(savedInject);
   }
 
-  public void checkInjectLaunchable(Inject inject) {
+  public void throwIfInjectNotLaunchable(Inject inject) {
     if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
       return;
     }
     List<Agent> agents = this.getAgentsByInject(inject);
+    List<String> eeExecutors = eeService.detectEEExecutors(agents);
 
-    boolean hasCrowdstrike = false;
-    boolean hasTanium = false;
-    for (Agent agent : agents) {
-      String type = agent.getExecutor() != null ? agent.getExecutor().getType() : null;
-      if (CROWDSTRIKE_EXECUTOR_TYPE.equals(type)) {
-        hasCrowdstrike = true;
-      } else if (TANIUM_EXECUTOR_TYPE.equals(type)) {
-        hasTanium = true;
-      }
-      if (hasCrowdstrike && hasTanium) {
-        break;
-      }
-    }
-    if (hasTanium && hasCrowdstrike) {
+    if (!eeExecutors.isEmpty()) {
       throw new LicenseRestrictionException(
-          "Some asset will be executed through the Crowdstrike and Tanium executors");
-    } else if (hasTanium) {
-      throw new LicenseRestrictionException(
-          "Some asset will be executed through the Tanium executor");
-    } else if (hasCrowdstrike) {
-      throw new LicenseRestrictionException(
-          "Some asset will be executed through the Crowdstrike executor");
+          "Some asset will be executed through " + String.join(" and ", eeExecutors));
     }
   }
 
   @Transactional
   public InjectResultOverviewOutput launch(String id) {
     Inject inject = injectRepository.findById(id).orElseThrow(ElementNotFoundException::new);
-    this.checkInjectLaunchable(inject);
+    this.throwIfInjectNotLaunchable(inject);
     inject.clean();
     inject.setUpdatedAt(Instant.now());
     Inject savedInject = saveInjectAndStatusAsQueuing(inject);
@@ -323,7 +303,7 @@ public class InjectService {
   @Transactional
   public InjectResultOverviewOutput relaunch(String id) {
     Inject duplicatedInject = findAndDuplicateInject(id);
-    this.checkInjectLaunchable(duplicatedInject);
+    this.throwIfInjectNotLaunchable(duplicatedInject);
     Inject savedInject = saveInjectAndStatusAsQueuing(duplicatedInject);
     delete(id);
     return injectMapper.toInjectResultOverviewOutput(savedInject);

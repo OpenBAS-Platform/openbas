@@ -266,11 +266,11 @@ public class ScenarioService {
     return new PageImpl<>(scenarios, pageable, total);
   }
 
-  public void checkScenarioLaunchable(Scenario scenario) {
+  public void throwIfScenarioNotLaunchable(Scenario scenario) {
     if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
       return;
     }
-    scenario.getInjects().forEach(injectService::checkInjectLaunchable);
+    scenario.getInjects().forEach(injectService::throwIfInjectNotLaunchable);
   }
 
   /** Scenario is recurring AND start date is before now AND end date is after now */

@@ -189,7 +189,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
       Inject atomicTesting = getAtomicTesting(null, executorFixture.getCrowdstrikeExecutor());
 
       mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/launch"))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
 
@@ -201,7 +201,7 @@ public class AtomicTestingApiTest extends IntegrationTest {
               InjectStatusFixture.createQueuingInjectStatus(), executorFixture.getTaniumExecutor());
 
       mvc.perform(post(ATOMIC_TESTINGS_URI + "/" + atomicTesting.getId() + "/relaunch"))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
   }

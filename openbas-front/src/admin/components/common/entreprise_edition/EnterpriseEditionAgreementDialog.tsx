@@ -62,7 +62,7 @@ const EnterpriseEditionAgreementDialog = () => {
     >
       <div className={classes.eeDialogContainer}>
         {!isEmptyField(featureDetectedInfo) && (
-          <Alert icon={<EEChip />} severity="success">
+          <Alert style={{ alignItems: 'center' }} icon={<EEChip />} severity="success">
             {`${t('Enterprise Edition feature detected :')} `}
             {featureDetectedInfo}
           </Alert>

@@ -375,11 +375,11 @@ public class ExerciseService {
     return getExerciseSimples(specificationCount, pageable, result);
   }
 
-  public void checkExerciseLaunchable(Exercise exercise) {
+  public void throwIfExerciseNotLaunchable(Exercise exercise) {
     if (eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
       return;
     }
-    exercise.getInjects().forEach(injectService::checkInjectLaunchable);
+    exercise.getInjects().forEach(injectService::throwIfInjectNotLaunchable);
   }
 
   public boolean checkIfTagRulesApplies(

@@ -11,7 +11,6 @@ import io.openbas.executors.ExecutorHelper;
 import io.openbas.executors.crowdstrike.client.CrowdStrikeExecutorClient;
 import io.openbas.executors.crowdstrike.config.CrowdStrikeExecutorConfig;
 import io.openbas.executors.crowdstrike.model.CrowdStrikeAction;
-import io.openbas.rest.exception.LicenseRestrictionException;
 import jakarta.validation.constraints.NotNull;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -26,10 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Log
-@Service(CROWDSTRIKE_EXECUTOR_NAME)
+@Service(CrowdStrikeExecutorContextService.SERVICE_NAME)
 @RequiredArgsConstructor
 public class CrowdStrikeExecutorContextService extends ExecutorContextService {
-
+  public static final String SERVICE_NAME = CROWDSTRIKE_EXECUTOR_NAME;
   private static final String IMPLANT_LOCATION_WINDOWS = "\"C:\\Windows\\Temp\\.openbas\\";
   private static final String IMPLANT_LOCATION_UNIX = "/tmp/.openbas/";
 
@@ -60,13 +59,10 @@ public class CrowdStrikeExecutorContextService extends ExecutorContextService {
 
   public List<Agent> launchBatchExecutorSubprocess(
       Inject inject, List<Agent> agents, InjectStatus injectStatus) throws InterruptedException {
-    if (!eeService.isLicenseActive(licenseCacheManager.getEnterpriseEditionInfo())) {
-      injectStatus.addInfoTrace(
-          "LICENSE RESTRICTION - Some asset will be executed through the Crowdstrike executor",
-          ExecutionTraceAction.EXECUTION);
-      throw new LicenseRestrictionException(
-          "LICENSE RESTRICTION - Asset will be executed through the Crowdstrike executor");
-    }
+
+    eeService.throwEEExecutorService(
+        licenseCacheManager.getEnterpriseEditionInfo(), SERVICE_NAME, injectStatus);
+
     if (!this.crowdStrikeExecutorConfig.isEnable()) {
       throw new RuntimeException("Fatal error: CrowdStrike executor is not enabled");
     }

@@ -288,7 +288,7 @@ public class ScenarioApiTest extends IntegrationTest {
       Scenario scenario = getScenario(null, executorFixture.getCrowdstrikeExecutor());
 
       mvc.perform(post(SCENARIO_URI + "/" + scenario.getId() + "/exercise/running"))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
 
@@ -304,7 +304,7 @@ public class ScenarioApiTest extends IntegrationTest {
                   .content(asJsonString(input))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
 
@@ -348,7 +348,7 @@ public class ScenarioApiTest extends IntegrationTest {
                   .content(asJsonString(input))
                   .contentType(MediaType.APPLICATION_JSON)
                   .accept(MediaType.APPLICATION_JSON))
-          .andExpect(status().is4xxClientError())
+          .andExpect(status().isForbidden())
           .andExpect(jsonPath("$.message").value("LICENSE_RESTRICTION"));
     }
   }
