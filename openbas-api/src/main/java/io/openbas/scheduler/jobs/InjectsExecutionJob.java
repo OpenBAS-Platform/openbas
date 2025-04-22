@@ -42,6 +42,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InjectsExecutionJob implements Job {
   private final Environment env;
+  private final int INJECT_EXECUTION_THRESHOLD =
+      Integer.parseInt(env.getProperty("inject.execution.threshold.minutes", "10"));
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
   private final InjectHelper injectHelper;
@@ -94,13 +96,13 @@ public class InjectsExecutionJob implements Job {
             .toList());
   }
 
-  private int getInjectExecutionThreshold() {
-    return Integer.parseInt(env.getProperty("inject.execution.threshold.minutes", "10"));
-  }
-
   public void handlePendingInject() {
     List<Inject> pendingInjects =
-        injectHelper.getAllPendingInjectsWithThresholdMinutes(getInjectExecutionThreshold());
+        injectHelper.getAllPendingInjectsWithThresholdMinutes(INJECT_EXECUTION_THRESHOLD);
+
+    if (pendingInjects.isEmpty()) {
+      return;
+    }
 
     List<InjectStatus> updatedStatuses =
         pendingInjects.stream()
@@ -111,7 +113,7 @@ public class InjectsExecutionJob implements Job {
                   status.setName(ExecutionStatus.MAYBE_PREVENTED);
                   status.addWarningTrace(
                       "Execution delay detected: Inject exceeded the "
-                          + getInjectExecutionThreshold()
+                          + INJECT_EXECUTION_THRESHOLD
                           + " minutes threshold.",
                       ExecutionTraceAction.EXECUTION);
                   return status;
