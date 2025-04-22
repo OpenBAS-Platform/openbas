@@ -267,4 +267,8 @@ public class InjectStatusService {
     injectStatus.setPayloadOutput(injectUtils.getStatusPayloadFromInject(inject));
     return injectStatusRepository.save(injectStatus);
   }
+
+  public Iterable<InjectStatus> saveAll(@NotNull List<InjectStatus> injectStatuses){
+      return this.injectStatusRepository.saveAll(injectStatuses);
+  }
 }

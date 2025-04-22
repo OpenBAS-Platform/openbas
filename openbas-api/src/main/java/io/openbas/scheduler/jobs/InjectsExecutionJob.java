@@ -9,9 +9,9 @@ import io.openbas.database.model.*;
 import io.openbas.database.repository.ExerciseRepository;
 import io.openbas.database.repository.InjectDependenciesRepository;
 import io.openbas.database.repository.InjectExpectationRepository;
-import io.openbas.database.repository.InjectStatusRepository;
 import io.openbas.execution.ExecutableInject;
 import io.openbas.helper.InjectHelper;
+import io.openbas.rest.exception.ElementNotFoundException;
 import io.openbas.rest.inject.service.InjectStatusService;
 import io.openbas.scheduler.jobs.exception.ErrorMessagesPreExecutionException;
 import io.openbas.telemetry.metric_collectors.ActionMetricCollector;
@@ -40,11 +40,10 @@ import org.springframework.stereotype.Component;
 @DisallowConcurrentExecution
 @RequiredArgsConstructor
 public class InjectsExecutionJob implements Job {
-
+  private final int injectTimeoutThresholdMinutes = 10;
   private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
 
   private final InjectHelper injectHelper;
-  private final InjectStatusRepository injectStatusRepository;
   private final ExerciseRepository exerciseRepository;
   private final InjectDependenciesRepository injectDependenciesRepository;
   private final InjectExpectationRepository injectExpectationRepository;
@@ -92,6 +91,29 @@ public class InjectsExecutionJob implements Job {
                   exercise.setUpdatedAt(now());
                 })
             .toList());
+  }
+
+  public void handlePendingInject() {
+    List<Inject> pendingInjects =
+        injectHelper.getAllPendingInjectsWithThresholdMinutes(injectTimeoutThresholdMinutes);
+
+    List<InjectStatus> updatedStatuses =
+        pendingInjects.stream()
+            .map(
+                inject -> {
+                  InjectStatus status =
+                      inject.getStatus().orElseThrow(ElementNotFoundException::new);
+                  status.setName(ExecutionStatus.MAYBE_PREVENTED);
+                  status.addInfoTrace(
+                      "Execution delay detected: Inject exceeded the "
+                          + injectTimeoutThresholdMinutes
+                          + " minutes threshold.",
+                      ExecutionTraceAction.EXECUTION);
+                  return status;
+                })
+            .collect(Collectors.toList());
+
+    injectStatusService.saveAll(updatedStatuses);
   }
 
   private void executeInject(ExecutableInject executableInject)
@@ -270,6 +292,7 @@ public class InjectsExecutionJob implements Job {
           });
       // Change status of finished exercises.
       handleAutoClosingExercises();
+      handlePendingInject();
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, e.getMessage(), e);
       throw new JobExecutionException(e);

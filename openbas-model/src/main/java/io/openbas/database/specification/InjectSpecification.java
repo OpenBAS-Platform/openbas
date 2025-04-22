@@ -6,6 +6,8 @@ import io.openbas.database.model.Inject;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.NotBlank;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -82,6 +84,15 @@ public class InjectSpecification {
             cb.isNull(root.get("scenario")), // No scenario
             cb.equal(root.get("status").get("name"), ExecutionStatus.QUEUING),
             cb.notEqual(root.get("status").get("name"), ExecutionStatus.PENDING));
+  }
+
+  public static Specification<Inject> pendingInjectWithThresholdMinutes(int thresholdMinutes) {
+    return (root, query, cb) -> {
+      Instant thresholdInstant = Instant.now().minus(Duration.ofMinutes(thresholdMinutes));
+      return cb.and(
+          cb.equal(root.get("status").get("name"), ExecutionStatus.PENDING),
+          cb.lessThan(root.get("status").get("trackingSentDate"), thresholdInstant));
+    };
   }
 
   public static Specification<Inject> fromContract(@NotBlank final String contract) {
